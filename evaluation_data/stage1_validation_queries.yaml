@@ -1,0 +1,56 @@
+# Stage 1: Graph structure validation queries
+# These test that the KG is correctly loaded and queryable.
+
+validation_checks:
+  - id: gene_count
+    description: "Graph should have >5000 genes"
+    cypher: "MATCH (g:Gene) RETURN count(g) AS cnt"
+    expected_min: 5000
+
+  - id: organism_count
+    description: "Graph should have >=12 organisms"
+    cypher: "MATCH (o:OrganismTaxon) RETURN count(o) AS cnt"
+    expected_min: 12
+
+  - id: expression_edges
+    description: "Graph should have >10000 expression edges"
+    cypher: "MATCH ()-[r:Affects_expression_of]->() RETURN count(r) AS cnt"
+    expected_min: 10000
+
+  - id: no_orphan_genes
+    description: "All genes should belong to an organism"
+    cypher: |
+      MATCH (g:Gene)
+      WHERE NOT (g)-[:Gene_belongs_to_organism]->()
+      RETURN count(g) AS cnt
+    expected_value: 0
+
+  - id: homolog_edges_exist
+    description: "Homolog edges should exist (post-import)"
+    cypher: "MATCH ()-[r:Gene_is_homolog_of_gene]->() RETURN count(r) AS cnt"
+    expected_min: 1000
+
+  - id: expression_properties
+    description: "Expression edges should have required properties"
+    cypher: |
+      MATCH ()-[r:Affects_expression_of]->()
+      WHERE r.log2_fold_change IS NULL OR r.expression_direction IS NULL
+      RETURN count(r) AS cnt
+    expected_value: 0
+
+  - id: med4_genes
+    description: "MED4 should have ~1900 genes"
+    cypher: |
+      MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)
+      WHERE o.strain_name = 'MED4'
+      RETURN count(g) AS cnt
+    expected_min: 1800
+    expected_max: 2100
+
+  - id: katg_absent_prochlorococcus
+    description: "Prochlorococcus should not have katG (Black Queen Hypothesis)"
+    cypher: |
+      MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)
+      WHERE o.genus = 'Prochlorococcus' AND g.product CONTAINS 'catalase-peroxidase'
+      RETURN count(g) AS cnt
+    expected_value: 0

@@ -1,37 +1,203 @@
-# Agent Logic & Tool Definitions
+# AGENT.md
 
-This document outlines the specialized tools and reasoning strategies used by the Agent to interpret microbial interactions.
+This file provides guidance to Claude Code when working with this repository.
 
-## Reasoning Strategy: GraphRAG
-The agent does not just "search"; it follows a **Plan-and-Execute** pattern:
-1. **Entity Extraction:** Identify genes (e.g., *ntcA*, *amtB*), metabolites, and strains from the user query.
-2. **Pathfinding:** Query the KG for relationships (e.g., `UPREGULATED_IN`) under specific environmental stressors (e.g., $N$-starvation).
-3. **Mechanism Synthesis:** Compare retrieved data against the four primary interaction models.
+## Project Overview
 
-## 🔧 Toolset Definitions
+LangChain-based reasoning agent for querying and analyzing the Prochlorococcus/Alteromonas multi-omics knowledge graph (Neo4j). Translates natural language questions into Cypher queries, executes them, and generates biologically grounded answers.
 
-### 1. `cypher_query_tool`
-- **Purpose:** Executes read-only Cypher queries to retrieve quantitative omics data.
-- **Guardrail:** Automatically appends `WHERE r.adj_pvalue < 0.05` to ensure statistical significance.
+**This repo** (`multiomics_explorer`): Agent, CLI, evaluation framework
+**KG builder repo** (`multiomics_biocypher_kg`): Builds the Neo4j graph (separate repo, no dependency)
 
-### 2. `biological_context_tool` (Vector Search)
-- **Purpose:** Searches the `Neo4jVector` index for unstructured text from the 19 transcriptome papers.
-- **Use Case:** "Why is 2-oxoglutarate important for C/N balance?"
+## Build and Run Commands
 
-### 3. `id_mapper_tool`
-- **Purpose:** Translates common gene names to `locus_tag` or `CLOG_id` to prevent query failure.
+```bash
+# Install dependencies
+uv sync
 
-## 🔬 Interaction Mechanisms to Identify
-The agent is specifically prompted to look for these "Transcriptomic Signatures":
+# Validate Neo4j connection
+uv run python scripts/validate_connection.py
 
-| Mechanism | Prochlorococcus Markers | Alteromonas Markers |
-| :--- | :--- | :--- |
-| **ROS Detox** | $hli$ genes, $SOD$ | $katG$ (Catalase) |
-| **N-Recycling** | $ntcA$, $amtB$, $glnA$ | Proteases, Peptidases |
-| **Cross-feeding** | BCAA Synthesis | BCAA Transporters |
+# CLI commands
+uv run multiomics-explorer stats                    # KG statistics
+uv run multiomics-explorer schema                   # Print graph schema
+uv run multiomics-explorer schema --json             # Schema as JSON
+uv run multiomics-explorer cypher "MATCH (g:Gene) RETURN count(g)"  # Direct Cypher
+uv run multiomics-explorer query "What genes are upregulated in MED4?"  # NL query
+uv run multiomics-explorer interactive               # REPL mode
 
-## ⚖️ Evaluation Rubric (LLM-as-a-Judge)
-Final answers are scored (1-5) based on:
-- **Faithfulness:** Does the answer contradict the `log2FoldChange` in the graph?
-- **Specificity:** Are exact locus tags and strain IDs provided?
-- **Context:** Does it correctly identify the metabolic "Black Queen" dependency?
+# Export schema for LLM prompts
+uv run python scripts/export_schema.py --format prompt
+
+# Run unit tests (no Neo4j needed)
+pytest tests/unit/ -v
+
+# Run integration tests (requires Neo4j at localhost:7687)
+pytest tests/ -v -m kg
+
+# Run Streamlit UI (when implemented)
+uv run streamlit run multiomics_explorer/ui/app.py
+```
+
+## Architecture
+
+### Three-Stage Development
+
+**Stage 1: Graph Foundation** (implemented)
+- Neo4j connection management (`kg/connection.py`)
+- Schema introspection from live KG (`kg/schema.py`)
+- Curated query library with validation queries (`kg/queries.py`)
+- CLI for schema inspection and direct Cypher
+
+**Stage 2: NL→Cypher Translation** (skeleton implemented)
+- `agents/cypher_agent.py` — GraphCypherQAChain with domain-specific prompts
+- Few-shot examples in `config/prompts.yaml` and `kg/queries.py`
+- Evaluation dataset: `evaluation_data/stage2_nl_cypher_pairs.yaml`
+- LLM via `init_chat_model` (provider-agnostic)
+
+**Stage 3: Multi-hop Reasoning** (TODO)
+- `agents/reasoning_agent.py` — LangGraph state machine
+- `agents/tools.py` — Tool definitions (query_kg, expand_homologs, etc.)
+- `evaluation/metrics.py` — RAGAS + LLM-as-judge
+- `evaluation_data/stage3_reasoning_cases.yaml`
+
+### LLM Configuration
+
+Uses LangChain's built-in `init_chat_model` for provider-agnostic LLM access:
+
+```python
+from langchain.chat_models import init_chat_model
+
+llm = init_chat_model(
+    settings.model,                    # e.g., "claude-sonnet-4-5-20250929"
+    model_provider=settings.model_provider,  # e.g., "anthropic"
+    temperature=settings.model_temperature,
+)
+```
+
+Configured via `.env`:
+```
+MODEL=claude-sonnet-4-5-20250929
+MODEL_PROVIDER=anthropic
+MODEL_TEMPERATURE=0
+```
+
+No custom LLM factory needed — `init_chat_model` handles OpenAI, Anthropic, Ollama, etc.
+
+### Neo4j Connection
+
+Connects to existing KG at `bolt://localhost:7687` (no auth). The KG is built and deployed by the separate `multiomics_biocypher_kg` repo via Docker. This agent is **read-only** — it never writes to the graph.
+
+Schema is introspected live from Neo4j (no dependency on KG repo files).
+
+## Knowledge Graph Schema
+
+### Node Types (BioCypher PascalCase)
+
+| Label | Count | Key Properties |
+|---|---|---|
+| `Gene` | ~16,400 | `locus_tag`, `product`, `function_description`, `go_biological_processes[]` |
+| `Protein` | ~5,000 | `protein_name`, `function_description`, `amino_acid_sequence`, GO terms |
+| `OrganismTaxon` | ~18 | `strain_name`, `genus`, `species`, `clade`, `ncbi_taxon_id` |
+| `EnvironmentalCondition` | varies | `name`, `condition_type`, `nitrogen_level`, `light_condition`, etc. |
+| `Publication` | ~19 | `title`, `doi`, `study_type` |
+| `Cyanorak_cluster` | ~1,000 | `cluster_number` |
+| `BiologicalProcess` | varies | `name` (GO term) |
+| `MolecularFunction` | varies | `name` (GO term) |
+| `CellularComponent` | varies | `name` (GO term) |
+| `Pathway` | varies | `name`, `organism` |
+| `EcNumber` | varies | `name` |
+| `ProteinDomain` | varies | `name`, `type` |
+
+### Key Relationship Types
+
+| Relationship | Direction | Properties |
+|---|---|---|
+| `Gene_belongs_to_organism` | Gene → OrganismTaxon | — |
+| `Protein_belongs_to_organism` | Protein → OrganismTaxon | — |
+| `Gene_encodes_protein` | Protein → Gene | — |
+| `Affects_expression_of` | (OrganismTaxon\|EnvironmentalCondition) → Gene | `log2_fold_change`, `adjusted_p_value`, `expression_direction`, `time_point`, `publications[]` |
+| `Affects_expression_of_homolog` | same sources → Gene | same + `original_gene`, `distance`, `homology_cluster_id` |
+| `Gene_is_homolog_of_gene` | Gene ↔ Gene (bidirectional) | `distance`, `cluster_id`, `source` |
+| `Gene_in_cyanorak_cluster` | Gene → Cyanorak_cluster | — |
+| `protein_involved_in_biological_process` | Protein → BiologicalProcess | `evidence_code` |
+| `protein_enables_molecular_function` | Protein → MolecularFunction | `evidence_code` |
+| `protein_take_part_in_pathway` | Protein → Pathway | — |
+| `protein_has_domain` | Protein → ProteinDomain | — |
+| `protein_catalyzes_ec_number` | Protein → EcNumber | — |
+
+### Node ID Conventions
+
+- Gene: `ncbigene:<locus_tag>` (e.g., `ncbigene:PMM0001`)
+- Protein: `uniprot:<accession>`
+- Organism (genomic): `insdc.gcf:<accession>` (e.g., `insdc.gcf:GCF_000011465.1`)
+- Organism (treatment): `ncbitaxon:<taxid>`
+- GO terms: `go:<GO:XXXXXXX>`
+- Publications: DOI string
+
+### Organisms in the Graph
+
+**Prochlorococcus** (8 strains):
+| Strain | Clade | Locus Prefix |
+|---|---|---|
+| MED4 | HLI | PMM |
+| MIT9312 | HLII | PMT9312_ |
+| AS9601 | HLII | A9601_ |
+| MIT9301 | HLII | P9301_ |
+| NATL1A | LLI | NATL1_ |
+| NATL2A | LLII | PMN2A_ |
+| MIT9313 | LLIV | PMT9313_RS |
+| RSP50 | — | — |
+
+**Synechococcus/Parasynechococcus** (2): CC9311 (sync_), WH8102 (SYNW)
+**Alteromonas** (3): MIT1002 (AKG35_RS), EZ55 (ALTBGP6_RS), HOT1A3
+
+**Treatment organisms** (coculture sources, not genomic): Phage, Marinobacter, Thalassospira, Pseudohoeflea, Alteromonas (genus-level)
+
+## Common Pitfalls
+
+1. **Gene_encodes_protein direction**: Protein → Gene. To go Gene → Protein, use `(g)<-[:Gene_encodes_protein]-(p)`.
+
+2. **Homology is bidirectional**: Always use undirected pattern `(g)-[:Gene_is_homolog_of_gene]-(h)`, never `(g)->`.
+
+3. **Organism filtering**: Use `strain_name` for specific strains (e.g., `'MED4'`), `genus` for genus-level (e.g., `'Alteromonas'`). Do NOT use `organism_name` (inconsistent format).
+
+4. **Denormalized gene properties**: `function_description` and `go_biological_processes` are copied from Protein onto Gene during post-import. No need to traverse Gene→Protein for these.
+
+5. **Cyanorak clusters**: Only Prochlorococcus/Synechococcus genes have Cyanorak cluster membership. Alteromonas genes do not.
+
+6. **adjusted_p_value can be null**: Some studies don't report adjusted p-values. Always use `IS NOT NULL` when filtering.
+
+7. **Expression edge sources**: Coculture experiments → source is `OrganismTaxon`. Stress experiments → source is `EnvironmentalCondition`. Both use the same `Affects_expression_of` edge label.
+
+8. **Always LIMIT**: When generating Cypher, include `LIMIT` unless doing aggregation. Use `ORDER BY` before `LIMIT`.
+
+## Configuration
+
+All config via `.env` (copy from `.env.example`):
+- `NEO4J_URI` — Bolt URL (default: `bolt://localhost:7687`)
+- `MODEL` / `MODEL_PROVIDER` — LLM model and provider
+- `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` — API keys
+- `KG_REPO_PATH` — Optional path to KG builder repo for richer metadata
+
+## Testing
+
+- `pytest tests/unit/` — Unit tests (no external dependencies)
+- `pytest -m kg` — Integration tests (require running Neo4j)
+- `pytest -m eval` — Evaluation tests (require LLM API, slow)
+
+Tests auto-skip if Neo4j is unreachable.
+
+## Key Files
+
+| File | Purpose |
+|---|---|
+| `config/settings.py` | Pydantic settings from .env |
+| `config/prompts.yaml` | LLM system prompts + few-shot examples |
+| `kg/connection.py` | Neo4j driver wrapper |
+| `kg/schema.py` | Schema introspection from live KG |
+| `kg/queries.py` | Curated Cypher queries + few-shot examples |
+| `agents/cypher_agent.py` | NL→Cypher agent (Stage 2) |
+| `agents/reasoning_agent.py` | Multi-hop reasoning (Stage 3, TODO) |
+| `cli/main.py` | Typer CLI |
+| `evaluation_data/*.yaml` | Test cases for each stage |

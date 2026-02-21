@@ -1,0 +1,113 @@
+# Stage 2: Natural language to Cypher translation test cases
+# Each case has a question, expected Cypher, and validation criteria.
+
+test_cases:
+  - id: basic_gene_count
+    question: "How many genes are in MED4?"
+    expected_cypher: |
+      MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)
+      WHERE o.strain_name = 'MED4'
+      RETURN count(g) AS gene_count
+    expected_result_type: scalar
+    expected_range: [1800, 2100]
+    tags: [basic, count]
+
+  - id: organism_list
+    question: "What organisms are in the knowledge graph?"
+    expected_cypher: |
+      MATCH (o:OrganismTaxon)
+      RETURN o.strain_name AS strain, o.genus AS genus
+      ORDER BY o.genus, o.strain_name
+    expected_result_type: list
+    expected_min_count: 12
+    tags: [basic, list]
+
+  - id: homology_query
+    question: "What genes are homologous to PMM1375?"
+    expected_cypher: |
+      MATCH (g:Gene {locus_tag: 'PMM1375'})-[:Gene_is_homolog_of_gene]-(h:Gene)
+      RETURN h.locus_tag, h.product
+    expected_result_type: list
+    expected_min_count: 3
+    tags: [homology]
+
+  - id: coculture_upregulated
+    question: "Which MED4 genes are upregulated in coculture with Alteromonas?"
+    expected_cypher: |
+      MATCH (org:OrganismTaxon)-[r:Affects_expression_of]->(g:Gene)-[:Gene_belongs_to_organism]->(target:OrganismTaxon)
+      WHERE org.genus = 'Alteromonas'
+        AND target.strain_name = 'MED4'
+        AND r.expression_direction = 'up'
+      RETURN g.locus_tag, g.product, r.log2_fold_change
+      ORDER BY r.log2_fold_change DESC
+      LIMIT 50
+    expected_result_type: list
+    tags: [expression, coculture]
+
+  - id: nitrogen_stress
+    question: "What genes respond to nitrogen starvation in MED4?"
+    expected_cypher: |
+      MATCH (env:EnvironmentalCondition)-[r:Affects_expression_of]->(g:Gene)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)
+      WHERE env.nitrogen_level = 'starved'
+        AND o.strain_name = 'MED4'
+      RETURN g.locus_tag, g.product, r.expression_direction, r.log2_fold_change
+      ORDER BY abs(r.log2_fold_change) DESC
+      LIMIT 50
+    expected_result_type: list
+    tags: [expression, stress]
+
+  - id: gene_details
+    question: "What is the function of gene PMM0001?"
+    expected_cypher: |
+      MATCH (g:Gene {locus_tag: 'PMM0001'})
+      RETURN g.locus_tag, g.product, g.function_description
+    expected_result_type: single_row
+    tags: [basic, gene]
+
+  - id: go_enrichment
+    question: "What biological processes are enriched among genes upregulated by Alteromonas?"
+    expected_cypher: |
+      MATCH (org:OrganismTaxon)-[r:Affects_expression_of {expression_direction: 'up'}]->(g:Gene)
+      WHERE org.genus = 'Alteromonas'
+      MATCH (g)<-[:Gene_encodes_protein]-(p:Protein)-[:protein_involved_in_biological_process]->(bp:BiologicalProcess)
+      RETURN bp.name AS process, count(DISTINCT g) AS gene_count
+      ORDER BY gene_count DESC
+      LIMIT 10
+    expected_result_type: list
+    tags: [expression, go, multi_hop]
+
+  - id: time_series
+    question: "Show the expression of PMM0001 over time in coculture"
+    expected_cypher: |
+      MATCH (org:OrganismTaxon)-[r:Affects_expression_of]->(g:Gene {locus_tag: 'PMM0001'})
+      WHERE org.genus = 'Alteromonas'
+      RETURN r.time_point, r.log2_fold_change, r.expression_direction
+      ORDER BY r.time_point
+    expected_result_type: list
+    tags: [expression, time_series]
+
+  - id: significant_genes
+    question: "What are the most significantly differentially expressed genes in coculture?"
+    expected_cypher: |
+      MATCH (org:OrganismTaxon)-[r:Affects_expression_of]->(g:Gene)
+      WHERE org.genus = 'Alteromonas'
+        AND r.adjusted_p_value IS NOT NULL
+        AND r.adjusted_p_value < 0.05
+        AND abs(r.log2_fold_change) > 1
+      RETURN g.locus_tag, g.product, r.log2_fold_change, r.adjusted_p_value
+      ORDER BY r.adjusted_p_value ASC
+      LIMIT 20
+    expected_result_type: list
+    tags: [expression, significance]
+
+  - id: cross_strain_comparison
+    question: "Do MED4 and MIT9313 share any homologs that are upregulated in coculture?"
+    expected_cypher: |
+      MATCH (org:OrganismTaxon)-[r1:Affects_expression_of {expression_direction: 'up'}]->(g1:Gene)-[:Gene_belongs_to_organism]->(o1:OrganismTaxon {strain_name: 'MED4'})
+      WHERE org.genus = 'Alteromonas'
+      MATCH (g1)-[:Gene_is_homolog_of_gene]-(g2:Gene)-[:Gene_belongs_to_organism]->(o2:OrganismTaxon {strain_name: 'MIT9313'})
+      MATCH (org2:OrganismTaxon)-[r2:Affects_expression_of {expression_direction: 'up'}]->(g2)
+      WHERE org2.genus = 'Alteromonas'
+      RETURN g1.locus_tag AS med4_gene, g2.locus_tag AS mit9313_gene, g1.product
+    expected_result_type: list
+    tags: [homology, expression, complex]

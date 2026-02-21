@@ -1,0 +1,39 @@
+# Stage 3: End-to-end reasoning test cases
+# Complex biological questions requiring multi-hop reasoning.
+
+test_cases:
+  - id: black_queen_hypothesis
+    question: "Why can't Prochlorococcus detoxify hydrogen peroxide on its own?"
+    reasoning_steps:
+      - "Check if any Prochlorococcus strain has catalase-peroxidase (katG)"
+      - "Check if Alteromonas strains have katG"
+      - "Look for ROS-related genes in expression data"
+      - "Synthesize Black Queen Hypothesis explanation"
+    ground_truth: >
+      Prochlorococcus has lost the catalase-peroxidase gene (katG) through genome
+      streamlining. It relies on co-occurring heterotrophs like Alteromonas for
+      ROS detoxification. This is a key example of the Black Queen Hypothesis.
+    tags: [biology, black_queen]
+
+  - id: nitrogen_recycling_mechanism
+    question: "How does Alteromonas help Prochlorococcus survive nitrogen starvation?"
+    reasoning_steps:
+      - "Find nitrogen-related genes upregulated in Prochlorococcus during coculture (ntcA, amtB, glnA)"
+      - "Check expression of protease/peptidase genes in Alteromonas"
+      - "Look for genes downregulated in Alteromonas (e.g., flagellar, chemotaxis)"
+      - "Synthesize nitrogen recycling narrative"
+    ground_truth: >
+      Alteromonas recycles organic nitrogen into bioavailable ammonium (NH4+).
+      Prochlorococcus upregulates high-affinity nitrogen transporters (amtB) and
+      assimilation enzymes (glnA), regulated by the global nitrogen regulator ntcA.
+    tags: [biology, nitrogen, mechanism]
+
+  - id: cross_strain_conservation
+    question: "Is the transcriptomic response to coculture conserved across Prochlorococcus ecotypes?"
+    reasoning_steps:
+      - "Get upregulated genes in MED4 (HLI) during coculture"
+      - "Get upregulated genes in MIT9313 (LLIV) during coculture"
+      - "Use homology to find shared response"
+      - "Compare with NATL2A (LLII) if data available"
+      - "Assess conservation level"
+    tags: [biology, comparative, complex]
