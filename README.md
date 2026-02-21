@@ -1,6 +1,6 @@
 # Multiomics Explorer
 
-LangChain-based agent for reasoning over a Prochlorococcus/Alteromonas multi-omics knowledge graph. Translates natural language questions into Cypher queries, executes them against a Neo4j database, and generates biologically grounded answers.
+Tools for exploring a Prochlorococcus/Alteromonas multi-omics knowledge graph. Provides an MCP server for Claude Code integration, a CLI, and a LangChain agent for natural language queries against Neo4j.
 
 ## Prerequisites
 
@@ -19,7 +19,32 @@ cp .env.example .env
 # Edit .env with your API key and Neo4j settings
 
 uv sync
+```
 
+### MCP Server (Claude Code integration)
+
+The MCP server exposes the KG to Claude Code with 7 specialized tools:
+`get_schema`, `search_genes`, `get_gene_details`, `query_expression`,
+`compare_conditions`, `get_homologs`, `run_cypher`.
+
+To use with Claude Code, add to your `.claude/settings.json` (already configured in this repo):
+
+```json
+{
+  "mcpServers": {
+    "multiomics-kg": {
+      "command": "uv",
+      "args": ["run", "--directory", "/path/to/multiomics_explorer", "multiomics-kg-mcp"]
+    }
+  }
+}
+```
+
+Then start Claude Code in any project directory — the KG tools will be available automatically.
+
+### CLI
+
+```bash
 # Verify Neo4j connection
 uv run python scripts/validate_connection.py
 
@@ -45,11 +70,11 @@ The agent queries a Neo4j knowledge graph containing:
 - Protein annotations, GO terms, pathways, homology relationships
 - Expression data from coculture experiments and environmental stress studies
 
-## Development Stages
+## Architecture
 
-1. **Graph Foundation** (done) — Neo4j connection, schema introspection, curated queries, CLI
-2. **NL→Cypher Translation** (in progress) — LangChain GraphCypherQAChain, evaluation framework
-3. **Multi-hop Reasoning** (planned) — LangGraph agents, tool calling, LLM-as-judge evaluation
+- **MCP Server** — Primary interface. 7 tools for Claude Code to query the KG.
+- **Graph Foundation** — Neo4j connection, schema introspection, curated queries, CLI.
+- **LangChain Agent** — NL→Cypher translation (skeleton). Superseded by MCP approach for interactive use.
 
 ## Testing
 

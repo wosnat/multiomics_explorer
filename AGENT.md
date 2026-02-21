@@ -41,25 +41,45 @@ uv run streamlit run multiomics_explorer/ui/app.py
 
 ## Architecture
 
-### Three-Stage Development
+### MCP Server (primary interface)
 
-**Stage 1: Graph Foundation** (implemented)
+The MCP server (`mcp_server/`) exposes the KG to Claude Code via 7 tools. Claude Code becomes the reasoning agent — no custom agentic pipeline needed.
+
+```bash
+# Start MCP server standalone (for testing)
+uv run multiomics-kg-mcp
+
+# Or configure Claude Code to auto-start it (see .claude/settings.json)
+```
+
+**Tools:**
+| Tool | Purpose |
+|---|---|
+| `get_schema` | Graph schema with node counts, relationship types, properties |
+| `search_genes` | Search by locus_tag, gene name, or product keyword |
+| `get_gene_details` | Full gene profile: protein, organism, cluster, homologs |
+| `query_expression` | Expression data with flexible filters (gene, organism, condition, direction, FC, p-value) |
+| `compare_conditions` | Cross-condition or cross-strain expression comparison |
+| `get_homologs` | Homologs across strains, optionally with expression data |
+| `run_cypher` | Raw Cypher escape hatch (read-only) |
+
+### Graph Foundation (shared library)
+
 - Neo4j connection management (`kg/connection.py`)
 - Schema introspection from live KG (`kg/schema.py`)
 - Curated query library with validation queries (`kg/queries.py`)
 - CLI for schema inspection and direct Cypher
 
-**Stage 2: NL→Cypher Translation** (skeleton implemented)
+### LangChain Agents (legacy/alternative)
+
+**Stage 2: NL→Cypher Translation** (skeleton)
 - `agents/cypher_agent.py` — GraphCypherQAChain with domain-specific prompts
 - Few-shot examples in `config/prompts.yaml` and `kg/queries.py`
 - Evaluation dataset: `evaluation_data/stage2_nl_cypher_pairs.yaml`
-- LLM via `init_chat_model` (provider-agnostic)
 
-**Stage 3: Multi-hop Reasoning** (TODO)
+**Stage 3: Multi-hop Reasoning** (not started)
 - `agents/reasoning_agent.py` — LangGraph state machine
-- `agents/tools.py` — Tool definitions (query_kg, expand_homologs, etc.)
-- `evaluation/metrics.py` — RAGAS + LLM-as-judge
-- `evaluation_data/stage3_reasoning_cases.yaml`
+- Superseded by MCP + Claude Code approach for interactive research
 
 ### LLM Configuration
 
@@ -199,5 +219,7 @@ Tests auto-skip if Neo4j is unreachable.
 | `kg/queries.py` | Curated Cypher queries + few-shot examples |
 | `agents/cypher_agent.py` | NL→Cypher agent (Stage 2) |
 | `agents/reasoning_agent.py` | Multi-hop reasoning (Stage 3, TODO) |
+| `mcp_server/server.py` | MCP server entry point (FastMCP) |
+| `mcp_server/tools.py` | 7 MCP tool implementations |
 | `cli/main.py` | Typer CLI |
 | `evaluation_data/*.yaml` | Test cases for each stage |

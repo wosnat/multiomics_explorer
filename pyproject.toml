@@ -45,6 +45,9 @@ dependencies = [
 
     # Testing
     "pytest>=9.0.2",
+
+    # MCP server
+    "mcp[cli]>=1.0",
 ]
 
 [dependency-groups]
@@ -56,6 +59,7 @@ dev = [
 
 [project.scripts]
 multiomics-explorer = "multiomics_explorer.cli.main:app"
+multiomics-kg-mcp = "multiomics_explorer.mcp_server.server:main"
 
 [tool.pytest.ini_options]
 markers = [
