@@ -72,9 +72,11 @@ The agent queries a Neo4j knowledge graph containing:
 
 ## Architecture
 
-- **MCP Server** — Primary interface. 7 tools for Claude Code to query the KG.
-- **Graph Foundation** — Neo4j connection, schema introspection, curated queries, CLI.
-- **LangChain Agent** — NL→Cypher translation (skeleton). Superseded by MCP approach for interactive use.
+- **MCP Server** — Primary interface. Tools for Claude Code to query the KG.
+- **CLI** — Typer-based terminal interface for direct exploration.
+- **kg/** — Shared core: Neo4j connection, schema introspection, curated Cypher queries.
+
+See [docs/architecture.md](docs/architecture.md) for the full technology stack, package structure, and data flow.
 
 ## Testing
 

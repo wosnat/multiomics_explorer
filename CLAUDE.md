@@ -36,7 +36,9 @@ The MCP server (`mcp_server/`) is the primary interface for Claude Code.
 | Tool | Purpose |
 |---|---|
 | `get_schema` | Graph schema with node counts, relationships, properties |
-| `search_genes` | Search by locus_tag, gene name, or product keyword |
+| `get_gene` | Exact gene lookup by any identifier (locus_tag, gene_name, old IDs) |
+| `find_gene` | Full-text search across gene annotations (Lucene syntax) |
+| `search_genes` | Simple CONTAINS search by locus_tag, gene name, or product |
 | `get_gene_details` | Full gene profile with protein, organism, cluster, homologs |
 | `query_expression` | Expression data with filters (gene, organism, condition, direction, FC, p-value) |
 | `compare_conditions` | Cross-condition or cross-strain expression comparison |
@@ -69,7 +71,7 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 | File | Purpose |
 |---|---|
 | `mcp_server/server.py` | MCP server entry point (FastMCP with Neo4j lifespan) |
-| `mcp_server/tools.py` | 7 MCP tool implementations |
+| `mcp_server/tools.py` | 9 MCP tool implementations |
 | `kg/connection.py` | Neo4j driver wrapper (shared by MCP + CLI) |
 | `kg/schema.py` | Schema introspection from live KG |
 | `kg/queries.py` | Curated Cypher queries + few-shot examples |

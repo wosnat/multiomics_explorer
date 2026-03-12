@@ -48,6 +48,102 @@ def schema(
             console.print(graph_schema.to_prompt_string())
 
 
+@app.command("schema-snapshot")
+def schema_snapshot(
+    output: str = typer.Option(None, "--output", "-o", help="Output path (default: config/schema_baseline.yaml)"),
+):
+    """Capture the live KG schema as a versioned baseline."""
+    from pathlib import Path
+
+    from multiomics_explorer.kg.connection import GraphConnection
+    from multiomics_explorer.kg.schema import BASELINE_PATH, load_schema_from_neo4j, save_baseline
+
+    with GraphConnection() as conn:
+        if not conn.verify_connectivity():
+            console.print("[red]Cannot connect to Neo4j. Is it running?[/red]")
+            raise typer.Exit(1)
+
+        graph_schema = load_schema_from_neo4j(conn)
+        path = Path(output) if output else BASELINE_PATH
+        save_baseline(graph_schema, path)
+
+        n_nodes = len(graph_schema.nodes)
+        n_rels = len(graph_schema.relationships)
+        console.print(f"[green]Baseline saved:[/green] {path}")
+        console.print(f"  {n_nodes} node types, {n_rels} relationship types")
+
+
+@app.command("schema-validate")
+def schema_validate(
+    baseline: str = typer.Option(None, "--baseline", "-b", help="Baseline file path (default: config/schema_baseline.yaml)"),
+    strict: bool = typer.Option(False, "--strict", help="Fail on any change (including additions)"),
+):
+    """Compare the live KG schema against the saved baseline."""
+    from pathlib import Path
+
+    from multiomics_explorer.kg.connection import GraphConnection
+    from multiomics_explorer.kg.schema import (
+        BASELINE_PATH,
+        diff_schemas,
+        load_baseline,
+        load_schema_from_neo4j,
+    )
+
+    path = Path(baseline) if baseline else BASELINE_PATH
+    if not path.exists():
+        console.print(f"[red]No baseline found at {path}. Run 'schema-snapshot' first.[/red]")
+        raise typer.Exit(1)
+
+    baseline_schema, meta = load_baseline(path)
+    console.print(f"[dim]Baseline from {meta['captured_at']}[/dim]\n")
+
+    with GraphConnection() as conn:
+        if not conn.verify_connectivity():
+            console.print("[red]Cannot connect to Neo4j. Is it running?[/red]")
+            raise typer.Exit(1)
+
+        live_schema = load_schema_from_neo4j(conn)
+
+    diff = diff_schemas(baseline_schema, live_schema)
+
+    if not diff.has_changes:
+        console.print("[green]Schema matches baseline. No drift detected.[/green]")
+        return
+
+    has_breaking = bool(diff.removed_nodes or diff.removed_relationships)
+
+    if diff.added_nodes:
+        console.print("[yellow]Added node types:[/yellow]")
+        for n in diff.added_nodes:
+            console.print(f"  + {n}")
+    if diff.removed_nodes:
+        console.print("[red]Removed node types:[/red]")
+        for n in diff.removed_nodes:
+            console.print(f"  - {n}")
+    if diff.added_relationships:
+        console.print("[yellow]Added relationship types:[/yellow]")
+        for r in diff.added_relationships:
+            console.print(f"  + {r}")
+    if diff.removed_relationships:
+        console.print("[red]Removed relationship types:[/red]")
+        for r in diff.removed_relationships:
+            console.print(f"  - {r}")
+    for label, changes in diff.node_property_changes.items():
+        console.print(f"[yellow]Node '{label}' property changes:[/yellow]")
+        for c in changes:
+            console.print(f"  ~ {c}")
+    for rt, changes in diff.relationship_property_changes.items():
+        console.print(f"[yellow]Relationship '{rt}' property changes:[/yellow]")
+        for c in changes:
+            console.print(f"  ~ {c}")
+
+    if has_breaking or strict:
+        console.print(f"\n[red]Schema validation failed.[/red]")
+        raise typer.Exit(1)
+    else:
+        console.print(f"\n[yellow]Schema has non-breaking changes. Update baseline with 'schema-snapshot'.[/yellow]")
+
+
 @app.command()
 def cypher(
     query: str = typer.Argument(help="Cypher query to execute"),

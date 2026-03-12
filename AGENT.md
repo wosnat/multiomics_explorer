@@ -4,9 +4,9 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-LangChain-based reasoning agent for querying and analyzing the Prochlorococcus/Alteromonas multi-omics knowledge graph (Neo4j). Translates natural language questions into Cypher queries, executes them, and generates biologically grounded answers.
+Tools for querying and analyzing the Prochlorococcus/Alteromonas multi-omics knowledge graph (Neo4j). Provides an MCP server for Claude Code, a CLI, and a LangChain agent.
 
-**This repo** (`multiomics_explorer`): Agent, CLI, evaluation framework
+**This repo** (`multiomics_explorer`): MCP server, CLI, agent, evaluation framework
 **KG builder repo** (`multiomics_biocypher_kg`): Builds the Neo4j graph (separate repo, no dependency)
 
 ## Build and Run Commands
@@ -35,28 +35,23 @@ pytest tests/unit/ -v
 # Run integration tests (requires Neo4j at localhost:7687)
 pytest tests/ -v -m kg
 
-# Run Streamlit UI (when implemented)
-uv run streamlit run multiomics_explorer/ui/app.py
+# Start MCP server standalone (for testing)
+uv run multiomics-kg-mcp
 ```
 
 ## Architecture
 
 ### MCP Server (primary interface)
 
-The MCP server (`mcp_server/`) exposes the KG to Claude Code via 7 tools. Claude Code becomes the reasoning agent — no custom agentic pipeline needed.
-
-```bash
-# Start MCP server standalone (for testing)
-uv run multiomics-kg-mcp
-
-# Or configure Claude Code to auto-start it (see .claude/settings.json)
-```
+The MCP server (`mcp_server/`) exposes the KG to Claude Code via tools. Claude Code becomes the reasoning agent — no custom agentic pipeline needed.
 
 **Tools:**
 | Tool | Purpose |
 |---|---|
 | `get_schema` | Graph schema with node counts, relationship types, properties |
-| `search_genes` | Search by locus_tag, gene name, or product keyword |
+| `get_gene` | Exact gene lookup by any identifier (locus_tag, gene_name, old IDs) |
+| `find_gene` | Full-text search across gene annotations (Lucene syntax) |
+| `search_genes` | Simple CONTAINS search by locus_tag, gene name, or product |
 | `get_gene_details` | Full gene profile: protein, organism, cluster, homologs |
 | `query_expression` | Expression data with flexible filters (gene, organism, condition, direction, FC, p-value) |
 | `compare_conditions` | Cross-condition or cross-strain expression comparison |
@@ -83,17 +78,7 @@ uv run multiomics-kg-mcp
 
 ### LLM Configuration
 
-Uses LangChain's built-in `init_chat_model` for provider-agnostic LLM access:
-
-```python
-from langchain.chat_models import init_chat_model
-
-llm = init_chat_model(
-    settings.model,                    # e.g., "claude-sonnet-4-5-20250929"
-    model_provider=settings.model_provider,  # e.g., "anthropic"
-    temperature=settings.model_temperature,
-)
-```
+Uses LangChain's built-in `init_chat_model` for provider-agnostic LLM access.
 
 Configured via `.env`:
 ```
@@ -101,8 +86,6 @@ MODEL=claude-sonnet-4-5-20250929
 MODEL_PROVIDER=anthropic
 MODEL_TEMPERATURE=0
 ```
-
-No custom LLM factory needed — `init_chat_model` handles OpenAI, Anthropic, Ollama, etc.
 
 ### Neo4j Connection
 
@@ -116,18 +99,21 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 
 | Label | Count | Key Properties |
 |---|---|---|
-| `Gene` | ~16,400 | `locus_tag`, `product`, `function_description`, `go_biological_processes[]` |
-| `Protein` | ~5,000 | `protein_name`, `function_description`, `amino_acid_sequence`, GO terms |
-| `OrganismTaxon` | ~18 | `strain_name`, `genus`, `species`, `clade`, `ncbi_taxon_id` |
-| `EnvironmentalCondition` | varies | `name`, `condition_type`, `nitrogen_level`, `light_condition`, etc. |
-| `Publication` | ~19 | `title`, `doi`, `study_type` |
-| `Cyanorak_cluster` | ~1,000 | `cluster_number` |
-| `BiologicalProcess` | varies | `name` (GO term) |
-| `MolecularFunction` | varies | `name` (GO term) |
-| `CellularComponent` | varies | `name` (GO term) |
-| `Pathway` | varies | `name`, `organism` |
-| `EcNumber` | varies | `name` |
-| `ProteinDomain` | varies | `name`, `type` |
+| `Gene` | ~35,200 | `locus_tag`, `gene_name`, `product`, `function_description`, `gene_summary`, `organism_strain`, `annotation_quality` (0-3), `go_terms[]`, `kegg_ko[]`, `cog_category[]`, `all_identifiers[]` |
+| `Protein` | ~26,600 | `gene_names[]`, `is_reviewed` ('reviewed'/'not reviewed'), `annotation_score`, `sequence_length`, `refseq_ids[]` |
+| `OrganismTaxon` | 18 | `preferred_name` (e.g. 'Prochlorococcus MED4'), `strain_name`, `genus`, `species`, `clade`, `ncbi_taxon_id`, `organism_name` |
+| `EnvironmentalCondition` | ~57 | `name`, `condition_type`, `condition_category`, `description`, `temperature`, `light_condition` |
+| `Publication` | ~21 | `title`, `doi`, `study_type`, `publication_year` |
+| `Cyanorak_cluster` | ~5,600 | `cluster_number` |
+| `BiologicalProcess` | ~2,400 | `name` (GO term) |
+| `MolecularFunction` | ~9,400 | `name` (GO term) |
+| `CellularComponent` | ~330 | `name` (GO term) |
+| `KeggOrthologousGroup` | ~2,700 | `name` |
+| `KeggPathway` | ~285 | `name` |
+| `EcNumber` | ~7,300 | `name`, `catalytic_activity[]` |
+| `CogFunctionalCategory` | 26 | `code`, `name` |
+| `CyanorakRole` | ~170 | `code`, `description` |
+| `TigrRole` | ~114 | `code`, `description` |
 
 ### Key Relationship Types
 
@@ -135,16 +121,23 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 |---|---|---|
 | `Gene_belongs_to_organism` | Gene → OrganismTaxon | — |
 | `Protein_belongs_to_organism` | Protein → OrganismTaxon | — |
-| `Gene_encodes_protein` | Protein → Gene | — |
-| `Affects_expression_of` | (OrganismTaxon\|EnvironmentalCondition) → Gene | `log2_fold_change`, `adjusted_p_value`, `expression_direction`, `time_point`, `publications[]` |
-| `Affects_expression_of_homolog` | same sources → Gene | same + `original_gene`, `distance`, `homology_cluster_id` |
+| `Gene_encodes_protein` | Gene → Protein | — |
+| `Coculture_changes_expression_of` | OrganismTaxon → Gene | `log2_fold_change`, `adjusted_p_value`, `expression_direction`, `organism_strain` (preferred_name format), `time_point`, `publications[]`, `significant` ('significant'/'not significant'/'unknown'), `control_condition`, `treatment_condition`, `experimental_context`, `omics_type`, `statistical_test`, `analysis_name` |
+| `Condition_changes_expression_of` | EnvironmentalCondition → Gene | same as above |
+| `Coculture_changes_expression_of_ortholog` | OrganismTaxon → Gene | same + `original_gene`, `homology_source`, `homology_cluster_id`, `distance` |
+| `Condition_changes_expression_of_ortholog` | EnvironmentalCondition → Gene | same + `original_gene`, `homology_source`, `homology_cluster_id`, `distance` |
+| `Published_expression_data_about` | Publication → EnvironmentalCondition/OrganismTaxon | — |
 | `Gene_is_homolog_of_gene` | Gene ↔ Gene (bidirectional) | `distance`, `cluster_id`, `source` |
 | `Gene_in_cyanorak_cluster` | Gene → Cyanorak_cluster | — |
-| `protein_involved_in_biological_process` | Protein → BiologicalProcess | `evidence_code` |
-| `protein_enables_molecular_function` | Protein → MolecularFunction | `evidence_code` |
-| `protein_take_part_in_pathway` | Protein → Pathway | — |
-| `protein_has_domain` | Protein → ProteinDomain | — |
-| `protein_catalyzes_ec_number` | Protein → EcNumber | — |
+| `Gene_involved_in_biological_process` | Gene → BiologicalProcess | — |
+| `Gene_enables_molecular_function` | Gene → MolecularFunction | — |
+| `Gene_located_in_cellular_component` | Gene → CellularComponent | — |
+| `Gene_has_kegg_ko` | Gene → KeggOrthologousGroup | — |
+| `Ko_in_kegg_pathway` | KeggOrthologousGroup → KeggPathway | — |
+| `Gene_catalyzes_ec_number` | Gene → EcNumber | — |
+| `Gene_in_cog_category` | Gene → CogFunctionalCategory | — |
+| `Gene_has_cyanorak_role` | Gene → CyanorakRole | — |
+| `Gene_has_tigr_role` | Gene → TigrRole | — |
 
 ### Node ID Conventions
 
@@ -161,40 +154,67 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 | Strain | Clade | Locus Prefix |
 |---|---|---|
 | MED4 | HLI | PMM |
+| RSP50 | HLI | — |
 | MIT9312 | HLII | PMT9312_ |
-| AS9601 | HLII | A9601_ |
 | MIT9301 | HLII | P9301_ |
-| NATL1A | LLI | NATL1_ |
+| AS9601 | HLII | A9601_ |
+| NATL1A | LLII | NATL1_ |
 | NATL2A | LLII | PMN2A_ |
 | MIT9313 | LLIV | PMT9313_RS |
-| RSP50 | — | — |
 
 **Synechococcus/Parasynechococcus** (2): CC9311 (sync_), WH8102 (SYNW)
-**Alteromonas** (3): MIT1002 (AKG35_RS), EZ55 (ALTBGP6_RS), HOT1A3
+**Alteromonas** (3): MIT1002 (AKG35_RS), EZ55 (ALTBGP6_RS), HOT1A3 (ACZ81_)
 
-**Treatment organisms** (coculture sources, not genomic): Phage, Marinobacter, Thalassospira, Pseudohoeflea, Alteromonas (genus-level)
+**Treatment organisms** (coculture sources, not genomic): Alteromonas, Phage, Marinobacter, Thalassospira, Pseudohoeflea
+
+### Environmental Condition Types
+
+| `condition_type` | Description |
+|---|---|
+| `growth_medium` | Baseline growth conditions (control) |
+| `light_stress` | Light/dark shifts, high-light stress |
+| `gas_shock` | CO₂/O₂ perturbations |
+| `nutrient_stress` | Nitrogen, iron, phosphate limitation |
+| `growth_state` | Stationary vs exponential phase |
+| `salt_stress` | Salinity changes |
+| `iron_stress` | Iron limitation/addition |
+| `pco2` | pCO₂ level experiments |
+| `dark_tolerance` | Extended darkness survival |
+| `viral_lysis_products` | Viral lysate exposure |
+| `plastic_leachate_stress` | Plastic leachate exposure |
+| `coculture` | Coculture conditions |
 
 ## Common Pitfalls
 
-1. **Gene_encodes_protein direction**: Protein → Gene. To go Gene → Protein, use `(g)<-[:Gene_encodes_protein]-(p)`.
+1. **Gene_encodes_protein direction**: Gene → Protein. Use `(g)-[:Gene_encodes_protein]->(p)`.
 
 2. **Homology is bidirectional**: Always use undirected pattern `(g)-[:Gene_is_homolog_of_gene]-(h)`, never `(g)->`.
 
-3. **Organism filtering**: Use `strain_name` for specific strains (e.g., `'MED4'`), `genus` for genus-level (e.g., `'Alteromonas'`). Do NOT use `organism_name` (inconsistent format).
+3. **Organism filtering**: Use `strain_name` for genome strains (e.g., `'MED4'`), `genus` for genus-level. Treatment organisms use `organism_name` (e.g., `'Alteromonas'`, `'Phage'`).
 
-4. **Denormalized gene properties**: `function_description` and `go_biological_processes` are copied from Protein onto Gene during post-import. No need to traverse Gene→Protein for these.
+4. **Expression edges are split by source type**:
+   - `Coculture_changes_expression_of` — source is OrganismTaxon
+   - `Condition_changes_expression_of` — source is EnvironmentalCondition
+   - To query both: use `|` syntax: `[r:Condition_changes_expression_of|Coculture_changes_expression_of]`
+   - Target organism is on the edge as `r.organism_strain`, not via a separate MATCH
 
-5. **Cyanorak clusters**: Only Prochlorococcus/Synechococcus genes have Cyanorak cluster membership. Alteromonas genes do not.
+5. **EnvironmentalCondition filtering**: Use `condition_type` (e.g., `'nutrient_stress'`) and `description CONTAINS` for specific stressors. There are NO `nitrogen_level` or `phosphate_level` properties.
 
-6. **adjusted_p_value can be null**: Some studies don't report adjusted p-values. Always use `IS NOT NULL` when filtering.
+6. **Gene annotations are gene-centric**: GO, KEGG, COG relationships are on Gene nodes (not Protein): `Gene_involved_in_biological_process`, `Gene_has_kegg_ko`, `Gene_in_cog_category`, etc.
 
-7. **Expression edge sources**: Coculture experiments → source is `OrganismTaxon`. Stress experiments → source is `EnvironmentalCondition`. Both use the same `Affects_expression_of` edge label.
+7. **Denormalized gene properties**: `gene_name`, `product`, `organism_strain`, `gene_summary`, `go_terms[]`, `kegg_ko[]` are directly on Gene nodes. No need to traverse relationships for basic info.
 
-8. **Always LIMIT**: When generating Cypher, include `LIMIT` unless doing aggregation. Use `ORDER BY` before `LIMIT`.
+8. **Cyanorak clusters**: Only Prochlorococcus/Synechococcus genes have Cyanorak cluster membership. Alteromonas genes do not.
+
+9. **adjusted_p_value can be null**: Some studies don't report adjusted p-values. Always use `IS NOT NULL` when filtering.
+
+10. **Publication DOIs**: In `r.publications` arrays, DOIs are bare (e.g., `10.1038/...`), not prefixed with `doi:`.
+
+11. **Always LIMIT**: When generating Cypher, include `LIMIT` unless doing aggregation. Use `ORDER BY` before `LIMIT`.
 
 ## Configuration
 
-All config via `.env` (copy from `.env.example`):
+All config via `.env`:
 - `NEO4J_URI` — Bolt URL (default: `bolt://localhost:7687`)
 - `MODEL` / `MODEL_PROVIDER` — LLM model and provider
 - `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` — API keys
@@ -220,6 +240,6 @@ Tests auto-skip if Neo4j is unreachable.
 | `agents/cypher_agent.py` | NL→Cypher agent (Stage 2) |
 | `agents/reasoning_agent.py` | Multi-hop reasoning (Stage 3, TODO) |
 | `mcp_server/server.py` | MCP server entry point (FastMCP) |
-| `mcp_server/tools.py` | 7 MCP tool implementations |
+| `mcp_server/tools.py` | MCP tool implementations |
 | `cli/main.py` | Typer CLI |
 | `evaluation_data/*.yaml` | Test cases for each stage |

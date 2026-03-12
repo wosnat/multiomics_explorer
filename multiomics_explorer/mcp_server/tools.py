@@ -7,6 +7,15 @@ from mcp.server.fastmcp import Context, FastMCP
 
 from multiomics_explorer.kg.connection import GraphConnection
 
+# Expression relationship types in the current KG schema.
+# Direct edges: from the original study organism/condition to the measured gene.
+# Ortholog edges: propagated to homologous genes via cluster membership.
+_DIRECT_EXPR_RELS = "Condition_changes_expression_of|Coculture_changes_expression_of"
+_ORTHOLOG_EXPR_RELS = (
+    "Condition_changes_expression_of_ortholog|Coculture_changes_expression_of_ortholog"
+)
+_ALL_EXPR_RELS = f"{_DIRECT_EXPR_RELS}|{_ORTHOLOG_EXPR_RELS}"
+
 
 def _conn(ctx: Context) -> GraphConnection:
     """Get the Neo4j connection from lifespan context."""
@@ -41,13 +50,110 @@ def register_tools(mcp: FastMCP):
         return schema.to_prompt_string()
 
     @mcp.tool()
+    def get_gene(
+        ctx,
+        id: str,
+        organism: str | None = None,
+    ) -> str:
+        """Look up a gene by any known identifier: locus_tag, gene_name, old locus tag,
+        RefSeq protein ID, etc. Returns up to 5 matches (specify organism to narrow).
+
+        Args:
+            id: Gene identifier — locus_tag (e.g. "PMM0001"), gene name (e.g. "dnaN"),
+                old locus tag, or RefSeq protein ID.
+            organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
+        """
+        conn = _conn(ctx)
+        cypher = (
+            "MATCH (g:Gene)\n"
+            "WHERE (\n"
+            "    g.locus_tag = $id\n"
+            "    OR g.gene_name = $id\n"
+            "    OR $id IN g.all_identifiers\n"
+            "  )\n"
+            "  AND ($organism IS NULL OR g.organism_strain = $organism)\n"
+            "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+            "       g.gene_summary AS gene_summary, g.product AS product,\n"
+            "       g.function_description AS function_description,\n"
+            "       g.organism_strain AS organism_strain,\n"
+            "       g.go_terms AS go_terms, g.kegg_ko AS kegg_ko,\n"
+            "       g.annotation_quality AS annotation_quality\n"
+            "LIMIT 5"
+        )
+        results = conn.execute_query(cypher, id=id, organism=organism)
+        if not results:
+            msg = f"No gene found for id '{id}'"
+            if organism:
+                msg += f" in {organism}"
+            return json.dumps({"results": [], "message": msg})
+        if len(results) > 1:
+            return json.dumps({
+                "results": results,
+                "message": f"Ambiguous — {len(results)} matches found. Specify organism to narrow.",
+            }, indent=2, default=str)
+        return json.dumps({"results": results}, indent=2, default=str)
+
+    @mcp.tool()
+    def find_gene(
+        ctx,
+        search_text: str,
+        organism: str | None = None,
+        min_quality: int = 0,
+        limit: int = 10,
+    ) -> str:
+        """Free-text search across gene functional annotations using full-text index.
+        Supports Lucene syntax: "DNA repair", nitrogen AND transport, iron*, dnaN~.
+
+        Args:
+            search_text: Free-text query (Lucene syntax supported).
+            organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
+            min_quality: Minimum annotation_quality (0-3). Use 2 to skip hypothetical proteins.
+            limit: Max results (default 10, max 50).
+        """
+        conn = _conn(ctx)
+        limit = min(limit, 50)
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('geneFullText', $search_text)\n"
+            "YIELD node AS g, score\n"
+            "WHERE ($organism IS NULL OR g.organism_strain = $organism)\n"
+            "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
+            "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+            "       g.gene_summary AS gene_summary, g.product AS product,\n"
+            "       g.organism_strain AS organism_strain,\n"
+            "       g.annotation_quality AS annotation_quality,\n"
+            "       score\n"
+            "ORDER BY score DESC\n"
+            "LIMIT $limit"
+        )
+        try:
+            results = conn.execute_query(
+                cypher, search_text=search_text, organism=organism,
+                min_quality=min_quality, limit=limit,
+            )
+        except Exception:
+            # Retry with escaped Lucene special characters
+            escaped = re.sub(r'[+\-!(){}\[\]^"~*?:\\/]', r'\\\g<0>', search_text)
+            results = conn.execute_query(
+                cypher, search_text=escaped, organism=organism,
+                min_quality=min_quality, limit=limit,
+            )
+        if not results:
+            return json.dumps({
+                "results": [], "total": 0, "query": search_text,
+            })
+        return json.dumps({
+            "results": results, "total": len(results), "query": search_text,
+        }, indent=2, default=str)
+
+    @mcp.tool()
     def search_genes(
         ctx,
         query: str,
         organism: str | None = None,
         limit: int = 20,
     ) -> str:
-        """Search for genes by locus_tag, gene name, or product keyword.
+        """Search for genes by locus_tag, gene name, or product keyword (CONTAINS match).
+        For richer free-text search, use find_gene instead.
 
         Args:
             query: Search term — locus_tag (e.g. "PMM0001"), gene name (e.g. "psbA"),
@@ -60,21 +166,20 @@ def register_tools(mcp: FastMCP):
         where_clauses = [
             "(g.locus_tag CONTAINS $q OR "
             "toLower(g.product) CONTAINS toLower($q) OR "
-            "any(name IN g.gene_names WHERE toLower(name) CONTAINS toLower($q)))"
+            "toLower(g.gene_name) CONTAINS toLower($q))"
         ]
         params: dict = {"q": query, "limit": limit}
 
         if organism:
-            where_clauses.append("o.strain_name = $strain")
+            where_clauses.append("g.organism_strain CONTAINS $strain")
             params["strain"] = organism
 
         where = " AND ".join(where_clauses)
         cypher = (
-            "MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
+            "MATCH (g:Gene)\n"
             f"WHERE {where}\n"
-            "RETURN g.locus_tag AS locus_tag, g.gene_names AS gene_names,\n"
-            "       g.product AS product, o.strain_name AS strain,\n"
-            "       g.protein_id AS protein_id\n"
+            "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+            "       g.product AS product, g.organism_strain AS organism_strain\n"
             "ORDER BY g.locus_tag\n"
             "LIMIT $limit"
         )
@@ -98,24 +203,24 @@ def register_tools(mcp: FastMCP):
         # Main gene + protein + organism
         main = conn.execute_query(
             "MATCH (g:Gene {locus_tag: $lt})\n"
-            "OPTIONAL MATCH (g)<-[:Gene_encodes_protein]-(p:Protein)\n"
+            "OPTIONAL MATCH (g)-[:Gene_encodes_protein]->(p:Protein)\n"
             "OPTIONAL MATCH (g)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
             "OPTIONAL MATCH (g)-[:Gene_in_cyanorak_cluster]->(c:Cyanorak_cluster)\n"
-            "RETURN g {.*, _protein: p {.protein_name, .function, .go_terms, .ec_numbers,\n"
-            "           .subcellular_location, .refseq_ids},\n"
-            "       _organism: o {.strain_name, .genus, .clade, .ncbi_taxon_id},\n"
+            "RETURN g {.*, _protein: p {.gene_names, .is_reviewed, .annotation_score,\n"
+            "           .sequence_length, .refseq_ids},\n"
+            "       _organism: o {.preferred_name, .strain_name, .genus, .clade, .ncbi_taxon_id},\n"
             "       _cluster: c {.cluster_number}} AS gene",
             lt=gene_id,
         )
         if not main or main[0]["gene"] is None:
             return f"Gene '{gene_id}' not found."
 
-        # Homolog count
+        # Homolog summary
         homologs = conn.execute_query(
             "MATCH (g:Gene {locus_tag: $lt})-[h:Gene_is_homolog_of_gene]-(other:Gene)\n"
-            "OPTIONAL MATCH (other)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
-            "RETURN other.locus_tag AS locus_tag, o.strain_name AS strain,\n"
-            "       h.distance AS distance, h.cluster_id AS cluster_id\n"
+            "RETURN other.locus_tag AS locus_tag, other.organism_strain AS organism_strain,\n"
+            "       h.distance AS distance, h.cluster_id AS cluster_id,\n"
+            "       h.source AS source\n"
             "ORDER BY h.distance\n"
             "LIMIT 20",
             lt=gene_id,
@@ -134,9 +239,14 @@ def register_tools(mcp: FastMCP):
         direction: str | None = None,
         min_log2fc: float | None = None,
         max_pvalue: float | None = None,
+        include_orthologs: bool = False,
         limit: int = 50,
     ) -> str:
         """Query differential expression data from the knowledge graph.
+
+        Expression edges come in two types:
+        - Coculture_changes_expression_of: OrganismTaxon → Gene (coculture experiments)
+        - Condition_changes_expression_of: EnvironmentalCondition → Gene (stress experiments)
 
         At least one of gene_id, organism, or condition must be provided.
 
@@ -144,12 +254,13 @@ def register_tools(mcp: FastMCP):
             gene_id: Filter by gene locus_tag (e.g. "PMM0001").
             organism: Filter by target organism strain (e.g. "MED4") — the organism
                       whose genes are affected.
-            condition: Filter by expression source — coculture partner genus
+            condition: Filter by expression source — coculture partner name
                        (e.g. "Alteromonas") or environmental condition name/type
-                       (e.g. "nitrogen starvation", "iron limitation").
+                       (e.g. "nitrogen_stress", "light_stress").
             direction: Filter by "up" or "down" regulation.
             min_log2fc: Minimum absolute log2 fold change.
             max_pvalue: Maximum adjusted p-value.
+            include_orthologs: If True, also include ortholog-inferred expression edges.
             limit: Max results (default 50).
         """
         if not any([gene_id, organism, condition]):
@@ -157,8 +268,8 @@ def register_tools(mcp: FastMCP):
 
         conn = _conn(ctx)
 
-        # Build dynamic query
-        match_parts = ["MATCH (factor)-[r:Affects_expression_of]->(g:Gene)"]
+        expr_rels = _ALL_EXPR_RELS if include_orthologs else _DIRECT_EXPR_RELS
+        match_parts = [f"MATCH (factor)-[r:{expr_rels}]->(g:Gene)"]
         where_clauses = []
         params: dict = {"limit": limit}
 
@@ -167,10 +278,7 @@ def register_tools(mcp: FastMCP):
             params["gene_id"] = gene_id
 
         if organism:
-            match_parts.append(
-                "MATCH (g)-[:Gene_belongs_to_organism]->(target:OrganismTaxon)"
-            )
-            where_clauses.append("target.strain_name = $target_strain")
+            where_clauses.append("r.organism_strain CONTAINS $target_strain")
             params["target_strain"] = organism
 
         if condition:
@@ -203,12 +311,13 @@ def register_tools(mcp: FastMCP):
             f"{match_block}\n"
             f"WHERE {where_block}\n"
             "RETURN g.locus_tag AS gene, g.product AS product,\n"
-            "       labels(factor) AS source_type,\n"
+            "       type(r) AS edge_type,\n"
             "       CASE WHEN factor:OrganismTaxon THEN factor.organism_name\n"
             "            ELSE factor.name END AS source,\n"
             "       r.expression_direction AS direction,\n"
             "       r.log2_fold_change AS log2fc,\n"
             "       r.adjusted_p_value AS padj,\n"
+            "       r.organism_strain AS organism_strain,\n"
             "       r.control_condition AS control,\n"
             "       r.experimental_context AS context,\n"
             "       r.time_point AS time_point,\n"
@@ -237,7 +346,7 @@ def register_tools(mcp: FastMCP):
         Args:
             gene_ids: List of gene locus_tags to compare.
             organisms: List of target strain names (whose genes are affected).
-            conditions: List of source names (coculture genus or condition type).
+            conditions: List of source names (coculture organism_name or condition_type).
             limit: Max results (default 100).
         """
         if not any([gene_ids, organisms, conditions]):
@@ -246,8 +355,7 @@ def register_tools(mcp: FastMCP):
         conn = _conn(ctx)
 
         match_parts = [
-            "MATCH (factor)-[r:Affects_expression_of]->(g:Gene)"
-            "-[:Gene_belongs_to_organism]->(target:OrganismTaxon)"
+            f"MATCH (factor)-[r:{_DIRECT_EXPR_RELS}]->(g:Gene)"
         ]
         where_clauses = []
         params: dict = {"limit": limit}
@@ -257,7 +365,9 @@ def register_tools(mcp: FastMCP):
             params["gene_ids"] = gene_ids
 
         if organisms:
-            where_clauses.append("target.strain_name IN $organisms")
+            where_clauses.append(
+                "any(org IN $organisms WHERE r.organism_strain CONTAINS org)"
+            )
             params["organisms"] = organisms
 
         if conditions:
@@ -275,7 +385,7 @@ def register_tools(mcp: FastMCP):
             f"{match_block}\n"
             f"WHERE {where_block}\n"
             "RETURN g.locus_tag AS gene, g.product AS product,\n"
-            "       target.strain_name AS target_strain,\n"
+            "       r.organism_strain AS target_strain,\n"
             "       CASE WHEN factor:OrganismTaxon THEN factor.organism_name\n"
             "            ELSE factor.name END AS source,\n"
             "       r.expression_direction AS direction,\n"
@@ -300,16 +410,16 @@ def register_tools(mcp: FastMCP):
 
         Args:
             gene_id: Gene locus_tag (e.g. "PMM0001").
-            include_expression: If True, also return expression data for each homolog.
+            include_expression: If True, also return direct expression data for each homolog.
         """
         conn = _conn(ctx)
 
         homologs = conn.execute_query(
             "MATCH (g:Gene {locus_tag: $lt})-[h:Gene_is_homolog_of_gene]-(other:Gene)\n"
-            "OPTIONAL MATCH (other)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
             "RETURN other.locus_tag AS locus_tag, other.product AS product,\n"
-            "       o.strain_name AS strain, o.clade AS clade,\n"
-            "       h.distance AS distance, h.cluster_id AS cluster_id\n"
+            "       other.organism_strain AS organism_strain,\n"
+            "       h.distance AS distance, h.cluster_id AS cluster_id,\n"
+            "       h.source AS source\n"
             "ORDER BY h.distance, other.locus_tag",
             lt=gene_id,
         )
@@ -319,9 +429,10 @@ def register_tools(mcp: FastMCP):
         if include_expression:
             all_ids = [gene_id] + [h["locus_tag"] for h in homologs]
             expr = conn.execute_query(
-                "MATCH (factor)-[r:Affects_expression_of]->(g:Gene)\n"
+                f"MATCH (factor)-[r:{_DIRECT_EXPR_RELS}]->(g:Gene)\n"
                 "WHERE g.locus_tag IN $ids\n"
                 "RETURN g.locus_tag AS gene,\n"
+                "       type(r) AS edge_type,\n"
                 "       CASE WHEN factor:OrganismTaxon THEN factor.organism_name\n"
                 "            ELSE factor.name END AS source,\n"
                 "       r.expression_direction AS direction,\n"

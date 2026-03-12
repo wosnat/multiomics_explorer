@@ -1,9 +1,15 @@
 """Graph schema introspection from the live Neo4j instance."""
 
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
+import yaml
+
 from multiomics_explorer.kg.connection import GraphConnection
+
+BASELINE_PATH = Path(__file__).parent.parent / "config" / "schema_baseline.yaml"
 
 
 @dataclass
@@ -28,6 +34,43 @@ class GraphSchema:
     """Complete graph schema introspected from Neo4j."""
     nodes: dict[str, NodeSchema] = field(default_factory=dict)
     relationships: dict[str, RelationshipSchema] = field(default_factory=dict)
+
+    def to_dict(self) -> dict:
+        """Serialize to a plain dict (suitable for YAML/JSON)."""
+        return {
+            "nodes": {
+                label: {
+                    "properties": dict(sorted(n.properties.items())),
+                }
+                for label, n in sorted(self.nodes.items())
+            },
+            "relationships": {
+                rt: {
+                    "source_labels": r.source_labels,
+                    "target_labels": r.target_labels,
+                    "properties": dict(sorted(r.properties.items())),
+                }
+                for rt, r in sorted(self.relationships.items())
+            },
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "GraphSchema":
+        """Deserialize from a plain dict."""
+        schema = cls()
+        for label, info in data.get("nodes", {}).items():
+            schema.nodes[label] = NodeSchema(
+                label=label,
+                properties=info.get("properties", {}),
+            )
+        for rt, info in data.get("relationships", {}).items():
+            schema.relationships[rt] = RelationshipSchema(
+                type=rt,
+                source_labels=info.get("source_labels", []),
+                target_labels=info.get("target_labels", []),
+                properties=info.get("properties", {}),
+            )
+        return schema
 
     def to_prompt_string(self) -> str:
         """Format schema for injection into LLM prompts."""
@@ -119,3 +162,95 @@ def load_schema_from_neo4j(conn: GraphConnection) -> GraphSchema:
         schema.relationships[rel_type] = rel_schema
 
     return schema
+
+
+def save_baseline(schema: GraphSchema, path: Path = BASELINE_PATH) -> Path:
+    """Save a schema snapshot as the baseline YAML file."""
+    data = {
+        "version": 1,
+        "captured_at": datetime.now(timezone.utc).isoformat(),
+        "schema": schema.to_dict(),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(yaml.dump(data, default_flow_style=False, sort_keys=False))
+    return path
+
+
+def load_baseline(path: Path = BASELINE_PATH) -> tuple[GraphSchema, dict]:
+    """Load baseline schema from YAML. Returns (schema, metadata)."""
+    data = yaml.safe_load(path.read_text())
+    schema = GraphSchema.from_dict(data["schema"])
+    return schema, {"version": data.get("version"), "captured_at": data.get("captured_at")}
+
+
+@dataclass
+class SchemaDiff:
+    """Differences between a baseline and live schema."""
+    added_nodes: list[str] = field(default_factory=list)
+    removed_nodes: list[str] = field(default_factory=list)
+    added_relationships: list[str] = field(default_factory=list)
+    removed_relationships: list[str] = field(default_factory=list)
+    # label -> list of property-level changes
+    node_property_changes: dict[str, list[str]] = field(default_factory=dict)
+    relationship_property_changes: dict[str, list[str]] = field(default_factory=dict)
+
+    @property
+    def has_changes(self) -> bool:
+        return bool(
+            self.added_nodes or self.removed_nodes
+            or self.added_relationships or self.removed_relationships
+            or self.node_property_changes or self.relationship_property_changes
+        )
+
+
+def diff_schemas(baseline: GraphSchema, live: GraphSchema) -> SchemaDiff:
+    """Compare baseline against live schema and return differences."""
+    d = SchemaDiff()
+
+    base_nodes = set(baseline.nodes)
+    live_nodes = set(live.nodes)
+    d.added_nodes = sorted(live_nodes - base_nodes)
+    d.removed_nodes = sorted(base_nodes - live_nodes)
+
+    for label in base_nodes & live_nodes:
+        base_props = set(baseline.nodes[label].properties)
+        live_props = set(live.nodes[label].properties)
+        changes = []
+        for p in sorted(live_props - base_props):
+            changes.append(f"added property '{p}'")
+        for p in sorted(base_props - live_props):
+            changes.append(f"removed property '{p}'")
+        for p in sorted(base_props & live_props):
+            bt = baseline.nodes[label].properties[p]
+            lt = live.nodes[label].properties[p]
+            if bt != lt:
+                changes.append(f"property '{p}' type changed: {bt} -> {lt}")
+        if changes:
+            d.node_property_changes[label] = changes
+
+    base_rels = set(baseline.relationships)
+    live_rels = set(live.relationships)
+    d.added_relationships = sorted(live_rels - base_rels)
+    d.removed_relationships = sorted(base_rels - live_rels)
+
+    for rt in base_rels & live_rels:
+        base_r = baseline.relationships[rt]
+        live_r = live.relationships[rt]
+        changes = []
+        if base_r.source_labels != live_r.source_labels:
+            changes.append(f"source_labels changed: {base_r.source_labels} -> {live_r.source_labels}")
+        if base_r.target_labels != live_r.target_labels:
+            changes.append(f"target_labels changed: {base_r.target_labels} -> {live_r.target_labels}")
+        base_props = set(base_r.properties)
+        live_props = set(live_r.properties)
+        for p in sorted(live_props - base_props):
+            changes.append(f"added property '{p}'")
+        for p in sorted(base_props - live_props):
+            changes.append(f"removed property '{p}'")
+        for p in sorted(base_props & live_props):
+            if base_r.properties[p] != live_r.properties[p]:
+                changes.append(f"property '{p}' type changed: {base_r.properties[p]} -> {live_r.properties[p]}")
+        if changes:
+            d.relationship_property_changes[rt] = changes
+
+    return d
