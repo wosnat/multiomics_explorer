@@ -1,0 +1,83 @@
+case_id: find_gene_photosystem
+row_count: 10
+rows:
+- annotation_quality: 2
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: A9601_12041
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II protein CyanoP
+  score: 4.4527
+- annotation_quality: 2
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: NATL1_14821
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II protein CyanoP
+  score: 4.4527
+- annotation_quality: 2
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: PMM1098
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II protein CyanoP
+  score: 4.4527
+- annotation_quality: 2
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: PMN2A_0650
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II protein CyanoP
+  score: 4.4527
+- annotation_quality: 2
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: PMT1078
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II protein CyanoP
+  score: 4.4527
+- annotation_quality: 2
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: PMT9312_1109
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II protein CyanoP
+  score: 4.4527
+- annotation_quality: 2
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: SYNW0927
+  organism_strain: Synechococcus WH8102
+  product: photosystem II protein CyanoP
+  score: 4.4527
+- annotation_quality: 2
+  gene_name: cyanoQ
+  gene_summary: 'cyanoQ :: photosystem II protein CyanoQ :: TIGRFAM Photosystem II
+    protein PsbQ'
+  locus_tag: SYNW2505
+  organism_strain: Synechococcus WH8102
+  product: photosystem II protein CyanoQ
+  score: 4.5645
+- annotation_quality: 2
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: sync_1039
+  organism_strain: Synechococcus CC9311
+  product: photosystem II protein CyanoP
+  score: 4.4527
+- annotation_quality: 2
+  gene_name: cyanoQ
+  gene_summary: 'cyanoQ :: photosystem II protein CyanoQ :: TIGRFAM Photosystem II
+    protein PsbQ'
+  locus_tag: sync_2918
+  organism_strain: Synechococcus CC9311
+  product: photosystem II protein CyanoQ
+  score: 4.5645

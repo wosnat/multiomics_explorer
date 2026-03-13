@@ -1,0 +1,807 @@
+case_id: homologs_with_expression
+row_count: 134
+rows:
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: A9601_10241
+  log2fc: 0.22
+  padj: 0.7
+  source: Salt-acclimated (5% salt)
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: 2.9304
+  padj: 0.0014
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: 2.3268
+  padj: 0.0111
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: 1.8233
+  padj: 0.0547
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: 1.6542
+  padj: 0.1084
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: 1.4663
+  padj: 0.0742
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: 0.9889
+  padj: 0.3485
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: -0.7749
+  padj: 0.6202
+  source: MED4
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: 0.6913
+  padj: 0.3947
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_04210
+  log2fc: 0.6671
+  padj: 0.5701
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.7495
+  padj: 0.0014
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.6026
+  padj: 0.0035
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: -0.4718
+  padj: 0.08
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.4556
+  padj: 0.03
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.3585
+  padj: 0.1697
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.3326
+  padj: 0.6143
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: -0.2817
+  padj: 0.2683
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.2709
+  padj: 0.2271
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: -0.242
+  padj: 0.5432
+  source: MED4
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: -0.2062
+  padj: 0.9943
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: -0.1936
+  padj: 0.5304
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.19
+  padj: 0.3785
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.1766
+  padj: 0.552
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: -0.1277
+  padj: 0.7139
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.029
+  padj: 0.9047
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_10260
+  log2fc: 0.0202
+  padj: 0.9505
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 1.1342
+  padj: 0.0
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.927
+  padj: 0.0001
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: -0.8513
+  padj: 0.0136
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.7199
+  padj: 0.0003
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.543
+  padj: 0.203
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.5075
+  padj: 0.0048
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.4468
+  padj: 0.585
+  source: MED4
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.4457
+  padj: 0.4665
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.3732
+  padj: 0.5736
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.3379
+  padj: 0.5737
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.2396
+  padj: 0.7357
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: -0.2291
+  padj: 0.7112
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: -0.1948
+  padj: 0.76
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: -0.1554
+  padj: 0.4411
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: -0.1071
+  padj: 0.9943
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_13050
+  log2fc: 0.0961
+  padj: 0.8603
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: -1.3208
+  padj: 0.0253
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 1.0228
+  padj: 0.0006
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.8867
+  padj: 0.0005
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.8091
+  padj: 0.01
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.7382
+  padj: 0.0173
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.6694
+  padj: 0.032
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.5608
+  padj: 0.0246
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.4417
+  padj: 0.0375
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.4148
+  padj: 0.2451
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.361
+  padj: 0.1023
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.3542
+  padj: 0.0535
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: -0.3257
+  padj: 0.5065
+  source: MED4
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.2963
+  padj: 0.4306
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: 0.2667
+  padj: 0.1999
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: -0.1808
+  padj: 0.5143
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_19405
+  log2fc: -0.0109
+  padj: 0.998
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: EZ55_00904
+  log2fc: -1.9184
+  padj: 0.0
+  source: MIT9312
+- direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: EZ55_00904
+  log2fc: 1.1654
+  padj: 0.0002
+  source: CC9311
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_00912
+  log2fc: -0.9293
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_00912
+  log2fc: -0.6187
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_00912
+  log2fc: -0.6139
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_00912
+  log2fc: 0.5853
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_00912
+  log2fc: -0.3836
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_00912
+  log2fc: -0.2111
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_00912
+  log2fc: 0.1603
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02038
+  log2fc: -0.4762
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02038
+  log2fc: -0.2788
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02038
+  log2fc: -0.2397
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02038
+  log2fc: -0.0582
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02038
+  log2fc: -0.0429
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02038
+  log2fc: -0.0145
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02038
+  log2fc: 0.0045
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02704
+  log2fc: 0.4161
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02704
+  log2fc: -0.1615
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02704
+  log2fc: -0.1448
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02704
+  log2fc: 0.1366
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02704
+  log2fc: -0.0799
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02704
+  log2fc: 0.0289
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_02704
+  log2fc: 0.0196
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_04001
+  log2fc: 0.9838
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_04001
+  log2fc: 0.671
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_04001
+  log2fc: 0.6191
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_04001
+  log2fc: -0.5939
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_04001
+  log2fc: 0.3622
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_04001
+  log2fc: 0.2538
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: MIT1002_04001
+  log2fc: -0.0533
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0845
+  log2fc: -1.9098
+  padj: 0.3711
+  source: HOT1A3
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 1.4935
+  padj: 0.0
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 1.2484
+  padj: 0.0002
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.9
+  padj: 0.53
+  source: N-depleted Pro99 medium
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.8003
+  padj: 1.0
+  source: Nitrogen deprivation (MED4)
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.5426
+  padj: 0.1417
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.4925
+  padj: 1.0
+  source: Nitrogen deprivation (MED4)
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.4853
+  padj: 0.1074
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.4279
+  padj: 0.231
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.4271
+  padj: 0.1512
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.3929
+  padj: 1.0
+  source: Growth on cyanate as sole N source (MED4)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.3881
+  padj: 0.3468
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.3235
+  padj: 0.4862
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.274
+  padj: 0.3892
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.2565
+  padj: 0.4934
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.238
+  padj: 1.0
+  source: Nitrogen deprivation (MED4)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.1785
+  padj: 0.8067
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.1776
+  padj: 1.0
+  source: Growth on urea as sole N source (MED4)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.1568
+  padj: 1.0
+  source: Nitrogen deprivation (MED4)
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.147
+  padj: 0.7262
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.1074
+  padj: 0.8009
+  source: PRO99-lowN nutrient starvation
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.1026
+  padj: 1.0
+  source: Nitrogen deprivation (MED4)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.0869
+  padj: 0.8364
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.0656
+  padj: 0.935
+  source: HOT1A3
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.06
+  padj: 0.53
+  source: N-depleted Pro99 medium
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.04
+  padj: 1.0
+  source: N-depleted Pro99 medium
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.0304
+  padj: 1.0
+  source: Nitrogen deprivation (MED4)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.0215
+  padj: 0.9595
+  source: PRO99-lowN nutrient starvation
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMN2A_0363
+  log2fc: 1.7948
+  padj: 0.1
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMN2A_0363
+  log2fc: 1.7736
+  padj: 0.1
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMN2A_0363
+  log2fc: 1.1674
+  padj: 0.1
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMN2A_0363
+  log2fc: 0.7969
+  padj: 0.1
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMN2A_0363
+  log2fc: 0.5584
+  padj: 0.1
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMN2A_0363
+  log2fc: -0.1078
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMN2A_0363
+  log2fc: -0.0356
+  padj: 1.0
+  source: Dark-tolerant co-culture under 13:11 diel light:dark cycle
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMT0769
+  log2fc: -0.928
+  padj: 1.0
+  source: Nitrogen deprivation (MIT9313)
+- direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMT0769
+  log2fc: -0.4474
+  padj: 0.3047
+  source: HOT1A3
+- direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMT0769
+  log2fc: 0.4329
+  padj: 0.0019
+  source: HOT1A3
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMT0769
+  log2fc: -0.3929
+  padj: 1.0
+  source: Growth on urea as sole N source (MIT9313)
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMT0769
+  log2fc: 0.3108
+  padj: 1.0
+  source: Nitrogen deprivation (MIT9313)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMT0769
+  log2fc: -0.1602
+  padj: 1.0
+  source: Growth on nitrite as sole N source (MIT9313)
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMT0769
+  log2fc: 0.1307
+  padj: 1.0
+  source: Nitrogen deprivation (MIT9313)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMT0769
+  log2fc: -0.0684
+  padj: 1.0
+  source: Nitrogen deprivation (MIT9313)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMT0769
+  log2fc: -0.0398
+  padj: 1.0
+  source: Nitrogen deprivation (MIT9313)
+- direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMT0769
+  log2fc: -0.0091
+  padj: 1.0
+  source: Nitrogen deprivation (MIT9313)
+- direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMT9312_0955
+  log2fc: 1.13
+  padj: null
+  source: PVC plastic leachate (2% dilution)

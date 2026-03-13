@@ -129,6 +129,50 @@
     min_rows: 1
     columns: [locus_tag, organism_strain, distance]
 
+# ── Full-text search ────────────────────────────────────
+
+- id: find_gene_photosystem
+  tool: find_gene
+  desc: Full-text search for photosystem genes
+  params:
+    search_text: photosystem
+  expect:
+    min_rows: 1
+    columns: [locus_tag, product, score]
+
+- id: find_gene_with_organism
+  tool: find_gene
+  desc: Full-text search narrowed by organism
+  params:
+    search_text: "DNA repair"
+    organism: MED4
+  expect:
+    min_rows: 1
+    contains:
+      organism_strain: Prochlorococcus MED4
+
+# ── Compare conditions ──────────────────────────────────
+
+- id: compare_conditions_med4
+  tool: compare_conditions
+  desc: Cross-condition comparison for MED4
+  params:
+    organisms: ["MED4"]
+    limit: 10
+  expect:
+    min_rows: 1
+    columns: [gene, source, direction, log2fc]
+
+# ── Homologs with expression ────────────────────────────
+
+- id: homologs_with_expression
+  tool: get_homologs_with_expression
+  desc: Homologs of PMM0845 enriched with expression data
+  params:
+    gene_id: PMM0845
+  expect:
+    min_rows: 1
+
 # ── Validation queries ───────────────────────────────────
 
 - id: gene_count_nonzero

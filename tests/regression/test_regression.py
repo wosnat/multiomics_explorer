@@ -14,9 +14,12 @@ import pytest
 import yaml
 
 from multiomics_explorer.kg.queries_lib import (
+    build_compare_conditions,
+    build_find_gene,
     build_get_gene,
     build_get_gene_details_main,
     build_get_homologs,
+    build_homolog_expression,
     build_query_expression,
     build_search_genes,
 )
@@ -31,9 +34,11 @@ CASE_IDS = [c["id"] for c in CASES]
 
 TOOL_BUILDERS = {
     "get_gene": build_get_gene,
+    "find_gene": build_find_gene,
     "search_genes": build_search_genes,
     "get_gene_details": build_get_gene_details_main,
     "query_expression": build_query_expression,
+    "compare_conditions": build_compare_conditions,
     "get_homologs": build_get_homologs,
 }
 
@@ -92,6 +97,15 @@ def test_regression(conn, case, data_regression):
 
     if tool == "raw_cypher":
         results = conn.execute_query(params["query"])
+    elif tool == "get_homologs_with_expression":
+        cypher, query_params = build_get_homologs(gene_id=params["gene_id"])
+        homologs = conn.execute_query(cypher, **query_params)
+        if not homologs:
+            results = []
+        else:
+            all_ids = [params["gene_id"]] + [h["locus_tag"] for h in homologs]
+            cypher_expr, params_expr = build_homolog_expression(gene_ids=all_ids)
+            results = conn.execute_query(cypher_expr, **params_expr)
     else:
         builder = TOOL_BUILDERS[tool]
         cypher, query_params = builder(**params)
