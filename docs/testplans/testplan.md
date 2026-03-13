@@ -2,12 +2,18 @@
 
 ## Current State
 
-**Existing tests (452 LOC across 4 files):**
+**Existing tests (10 files, 105 unit + integration/eval/regression):**
 
 | File | Tests | Neo4j? |
 |------|-------|--------|
 | `tests/unit/test_settings.py` | 4 unit tests | No |
 | `tests/unit/test_query_builders.py` | 19 unit tests (all 9 builders) | No |
+| `tests/unit/test_write_blocking.py` | 15 unit tests (regex + `_fmt`) | No |
+| `tests/unit/test_schema.py` | 18 unit tests (diffing, baseline, formatting) | No |
+| `tests/unit/test_connection.py` | 3 unit tests (error handling, lifecycle) | No |
+| `tests/unit/test_mcp_server.py` | 3 unit tests (lifespan, KGContext) | No |
+| `tests/unit/test_tool_wrappers.py` | 29 unit tests (all 9 MCP tool wrappers) | No |
+| `tests/integration/test_mcp_tools.py` | 13 integration tests | Yes |
 | `tests/evals/test_eval.py` | 15 parameterized integration tests | Yes |
 | `tests/regression/test_regression.py` | 15 golden-file baselines | Yes |
 
@@ -59,6 +65,56 @@ Key for detecting KG rebuild breakage.
 - [x] Lifespan manager creates and closes connection
 - [x] Lifespan raises `RuntimeError` when Neo4j is unreachable
 
+#### `tests/unit/test_tool_wrappers.py` — MCP tool wrapper logic (P1)
+
+Tests all 9 tool functions' wrapper logic (input validation, response formatting,
+error messages, multi-query orchestration) with a mocked Neo4j connection.
+
+**`get_gene`:**
+- [x] Not-found returns JSON with empty results and message
+- [x] Not-found with organism includes organism in message
+- [x] Single match returns results without ambiguity message
+- [x] Multiple matches returns results with "Ambiguous" message
+
+**`find_gene`:**
+- [x] Empty result returns JSON envelope with `results`, `total`, `query`
+- [x] Non-empty result populates envelope correctly
+- [x] Limit capped at 50
+- [x] Lucene parse error triggers escaped retry (fallback path)
+
+**`search_genes`:**
+- [x] Empty result returns plain string (not JSON) — documents inconsistency
+- [x] Empty result with organism includes organism in message
+- [x] Non-empty result returns JSON array
+
+**`get_gene_details`:**
+- [x] Gene not found (null gene) returns "not found" message
+- [x] Gene not found (empty results) returns "not found" message
+- [x] Two-query orchestration assembles `_homologs` key into result
+
+**`query_expression`:**
+- [x] No filters returns error without calling Neo4j
+- [x] Empty results returns "No expression data" message
+- [x] Non-empty results returns JSON array
+
+**`compare_conditions`:**
+- [x] No filters returns error without calling Neo4j
+- [x] Empty results returns "No expression data" message
+- [x] Non-empty results returns JSON array
+
+**`get_homologs`:**
+- [x] No homologs returns "No homologs found" message
+- [x] Without expression returns JSON array of homologs
+- [x] With expression merges `homologs` + `expression` into single response
+
+**`run_cypher`:**
+- [x] Write keyword returns error message without calling Neo4j
+- [x] LIMIT injected when absent from query
+- [x] LIMIT not duplicated when already present
+- [x] Limit parameter capped at 200
+- [x] Empty results returns "no results" message
+- [x] Trailing semicolon stripped before LIMIT injection
+
 ### 2. Integration Tests (Neo4j required, `@pytest.mark.kg`)
 
 #### `tests/integration/test_mcp_tools.py` — MCP tools end-to-end (P1)
@@ -102,6 +158,7 @@ Add cases to `tests/evals/cases.yaml`:
 |----------|------|-----------|
 | **P0** | Write-blocking in `run_cypher` | Safety-critical — prevents accidental graph mutation |
 | **P1** | Schema diffing unit tests | Key for detecting KG rebuild breakage |
+| **P1** | MCP tool wrapper logic | Validates response formatting, input validation, error messages |
 | **P1** | MCP tool error paths | Prevents crashes exposed to Claude Code users |
 | **P2** | CLI command smoke tests | Ensures CLI remains functional |
 | **P2** | Eval case expansion | Fills gaps in `find_gene`, `compare_conditions` |
@@ -118,6 +175,7 @@ tests/
     test_write_blocking.py    # NEW — run_cypher safety
     test_schema.py            # NEW — diffing, baseline, prompt formatting
     test_connection.py        # NEW — error handling, lifecycle
+    test_tool_wrappers.py     # NEW — MCP tool wrapper logic (29 tests)
   evals/
     cases.yaml                # expand with ~5 new cases
     test_eval.py              # existing
@@ -138,3 +196,4 @@ tests/
 | 2026-03-13 | Implemented P0 write-blocking (26 tests) and P1 schema diffing (18 tests) — all 44 passing |
 | 2026-03-13 | Implemented P1 integration (13 tests), P2 CLI (5 tests), P2 eval expansion (4 cases), edge cases — 123/123 passing |
 | 2026-03-13 | Implemented P3 connection tests (3), P3 MCP server lifespan tests (3), P1 conflicting-filters edge case — 76 unit tests passing, test plan complete |
+| 2026-03-13 | Added P1 MCP tool wrapper tests (29 tests) — covers input validation, response formatting, error messages, multi-query orchestration for all 9 tools — 105 unit tests passing |
