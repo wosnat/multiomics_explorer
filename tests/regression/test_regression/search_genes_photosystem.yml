@@ -1,0 +1,83 @@
+case_id: search_genes_photosystem
+row_count: 20
+rows:
+- gene_name: psbX
+  locus_tag: A9601_00741
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II PsbX protein
+- gene_name: ycf3
+  locus_tag: A9601_01491
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I assembly protein Ycf3
+- gene_name: psbA
+  locus_tag: A9601_02441
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II protein D1.1
+- gene_name: psbO
+  locus_tag: A9601_02491
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II manganese-stabilizing protein PsbO
+- gene_name: psbH
+  locus_tag: A9601_02731
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbH
+- gene_name: psbN
+  locus_tag: A9601_02741
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center assembly factor
+- gene_name: psbI
+  locus_tag: A9601_02751
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbI
+- gene_name: psbK
+  locus_tag: A9601_02941
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbK
+- gene_name: ycf48
+  locus_tag: A9601_03191
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II stability/assembly factor
+- gene_name: psbL
+  locus_tag: A9601_03221
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbL
+- gene_name: psbJ
+  locus_tag: A9601_03231
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbJ
+- gene_name: psbT
+  locus_tag: A9601_03381
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center T protein
+- gene_name: psbB
+  locus_tag: A9601_03391
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_name: psbM
+  locus_tag: A9601_03411
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbM
+- gene_name: psaE
+  locus_tag: A9601_03551
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I reaction centre subunit IV
+- gene_name: psaF
+  locus_tag: A9601_05241
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I reaction centre PsaF protein
+- gene_name: psb27
+  locus_tag: A9601_05641
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II manganese cluster assembly protein Psb27
+- gene_name: psaM
+  locus_tag: A9601_05961
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I reaction centre subunit XII
+- gene_name: pcb
+  locus_tag: A9601_06831
+  organism_strain: Prochlorococcus AS9601
+  product: divinyl-chlorophyll a/b binding light harvesting protein, photosystem II-associated
+- gene_name: ctpA
+  locus_tag: A9601_07321
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II D1 protein carboxyl-terminal processing peptidase

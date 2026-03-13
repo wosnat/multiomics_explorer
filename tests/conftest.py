@@ -38,3 +38,15 @@ def run_query(neo4j_driver):
         with neo4j_driver.session() as session:
             return session.run(cypher, **params).data()
     return _run
+
+
+@pytest.fixture(scope="session")
+def conn(neo4j_driver):
+    """GraphConnection wrapping the session-scoped neo4j_driver."""
+    from multiomics_explorer.config.settings import Settings
+    from multiomics_explorer.kg.connection import GraphConnection
+
+    settings = Settings()
+    connection = GraphConnection(settings)
+    connection._driver = neo4j_driver
+    yield connection

@@ -1,0 +1,36 @@
+case_id: get_gene_with_organism
+row_count: 1
+rows:
+- annotation_quality: 2
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  go_terms:
+  - GO:0003677
+  - GO:0003887
+  - GO:0005737
+  - GO:0006260
+  - GO:0006271
+  - GO:0008408
+  - GO:0009360
+  - GO:0034061
+  kegg_ko:
+  - K02338
+  locus_tag: PMM0001
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, beta subunit

@@ -1,0 +1,136 @@
+"""Unit tests for query builder functions — no Neo4j needed.
+
+Verifies Cypher structure and parameter correctness.
+"""
+
+from multiomics_explorer.kg.queries_lib import (
+    build_compare_conditions,
+    build_find_gene,
+    build_get_gene,
+    build_get_gene_details_homologs,
+    build_get_gene_details_main,
+    build_get_homologs,
+    build_homolog_expression,
+    build_query_expression,
+    build_search_genes,
+)
+
+
+class TestBuildGetGene:
+    def test_basic(self):
+        cypher, params = build_get_gene(id="PMM0001")
+        assert "MATCH (g:Gene)" in cypher
+        assert params["id"] == "PMM0001"
+        assert params["organism"] is None
+
+    def test_with_organism(self):
+        cypher, params = build_get_gene(id="dnaN", organism="MED4")
+        assert params["organism"] == "MED4"
+        assert "CONTAINS $organism" in cypher
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_get_gene(id="x")
+        for col in ["locus_tag", "gene_name", "product", "organism_strain"]:
+            assert col in cypher
+
+
+class TestBuildSearchGenes:
+    def test_basic(self):
+        cypher, params = build_search_genes(query="photosystem")
+        assert params["q"] == "photosystem"
+        assert "LIMIT $limit" in cypher
+
+    def test_limit(self):
+        _, params = build_search_genes(query="x", limit=5)
+        assert params["limit"] == 5
+
+    def test_organism_filter(self):
+        cypher, params = build_search_genes(query="x", organism="MED4")
+        assert "strain" in params
+        assert "organism_strain CONTAINS $strain" in cypher
+
+    def test_no_organism_no_strain_param(self):
+        _, params = build_search_genes(query="x")
+        assert "strain" not in params
+
+
+class TestBuildFindGene:
+    def test_basic(self):
+        cypher, params = build_find_gene(search_text="DNA repair")
+        assert "fulltext" in cypher.lower() or "geneFullText" in cypher
+        assert params["search_text"] == "DNA repair"
+
+    def test_min_quality(self):
+        _, params = build_find_gene(search_text="x", min_quality=2)
+        assert params["min_quality"] == 2
+
+
+class TestBuildGetGeneDetails:
+    def test_main_query(self):
+        cypher, params = build_get_gene_details_main(gene_id="PMM0001")
+        assert params["lt"] == "PMM0001"
+        assert "Gene_encodes_protein" in cypher
+        assert "Gene_belongs_to_organism" in cypher
+
+    def test_homologs_query(self):
+        cypher, params = build_get_gene_details_homologs(gene_id="PMM0001")
+        assert params["lt"] == "PMM0001"
+        assert "Gene_is_homolog_of_gene" in cypher
+
+
+class TestBuildQueryExpression:
+    def test_by_gene(self):
+        cypher, params = build_query_expression(gene_id="PMM0845")
+        assert params["gene_id"] == "PMM0845"
+        assert "g.locus_tag = $gene_id" in cypher
+
+    def test_direction_lowercased(self):
+        _, params = build_query_expression(gene_id="x", direction="UP")
+        assert params["dir"] == "up"
+
+    def test_includes_orthologs(self):
+        cypher, _ = build_query_expression(gene_id="x", include_orthologs=True)
+        assert "ortholog" in cypher.lower()
+
+    def test_excludes_orthologs_by_default(self):
+        cypher, _ = build_query_expression(gene_id="x")
+        assert "ortholog" not in cypher.lower()
+
+    def test_min_log2fc(self):
+        cypher, params = build_query_expression(gene_id="x", min_log2fc=1.5)
+        assert params["min_fc"] == 1.5
+        assert "abs(r.log2_fold_change) >= $min_fc" in cypher
+
+    def test_max_pvalue(self):
+        cypher, params = build_query_expression(gene_id="x", max_pvalue=0.05)
+        assert params["max_pv"] == 0.05
+
+
+class TestBuildCompareConditions:
+    def test_by_gene_ids(self):
+        cypher, params = build_compare_conditions(gene_ids=["PMM0001", "PMM0002"])
+        assert params["gene_ids"] == ["PMM0001", "PMM0002"]
+        assert "g.locus_tag IN $gene_ids" in cypher
+
+    def test_by_organisms(self):
+        cypher, params = build_compare_conditions(organisms=["MED4"])
+        assert params["organisms"] == ["MED4"]
+
+
+class TestBuildGetHomologs:
+    def test_basic(self):
+        cypher, params = build_get_homologs(gene_id="PMM0845")
+        assert params["lt"] == "PMM0845"
+        assert "Gene_is_homolog_of_gene" in cypher
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_get_homologs(gene_id="x")
+        for col in ["locus_tag", "organism_strain", "distance"]:
+            assert col in cypher
+
+
+class TestBuildHomologExpression:
+    def test_basic(self):
+        cypher, params = build_homolog_expression(gene_ids=["PMM0001", "PMM0002"])
+        assert params["ids"] == ["PMM0001", "PMM0002"]
+        assert "g.locus_tag IN $ids" in cypher

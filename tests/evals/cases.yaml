@@ -1,0 +1,159 @@
+# Eval cases for KG query tools.
+#
+# Each case tests a specific tool/query pattern against the live KG.
+# Fields:
+#   id:       unique case identifier
+#   tool:     which tool/query pattern is being tested
+#   desc:     what the case verifies (biological meaning)
+#   params:   kwargs passed to the query function
+#   expect:   assertions on results
+#     min_rows:    minimum number of result rows (default 1)
+#     max_rows:    optional upper bound
+#     columns:     required column names in results
+#     contains:    dict of column -> value that must appear in at least one row
+#     row0:        dict of column -> value for the first result row
+
+# ── Gene lookup ──────────────────────────────────────────
+
+- id: get_gene_by_locus_tag
+  tool: get_gene
+  desc: Exact lookup by locus_tag returns the correct gene
+  params:
+    id: PMM0001
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, product, organism_strain]
+    row0:
+      locus_tag: PMM0001
+
+- id: get_gene_by_name
+  tool: get_gene
+  desc: Lookup by gene_name works
+  params:
+    id: dnaN
+  expect:
+    min_rows: 1
+    contains:
+      gene_name: dnaN
+
+- id: get_gene_not_found
+  tool: get_gene
+  desc: Non-existent gene returns empty
+  params:
+    id: FAKE_GENE_999
+  expect:
+    min_rows: 0
+    max_rows: 0
+
+- id: get_gene_with_organism
+  tool: get_gene
+  desc: Organism filter narrows results
+  params:
+    id: dnaN
+    organism: MED4
+  expect:
+    min_rows: 1
+    contains:
+      organism_strain: Prochlorococcus MED4
+
+# ── Gene search ──────────────────────────────────────────
+
+- id: search_genes_photosystem
+  tool: search_genes
+  desc: Product keyword search finds photosystem genes
+  params:
+    query: photosystem
+  expect:
+    min_rows: 1
+    columns: [locus_tag, product]
+
+- id: search_genes_by_locus
+  tool: search_genes
+  desc: Partial locus_tag search works
+  params:
+    query: PMM00
+  expect:
+    min_rows: 1
+
+# ── Gene details ─────────────────────────────────────────
+
+- id: gene_details_has_organism
+  tool: get_gene_details
+  desc: Gene details include organism info
+  params:
+    gene_id: PMM0001
+  expect:
+    min_rows: 1
+
+# ── Expression ───────────────────────────────────────────
+
+- id: expression_by_gene
+  tool: query_expression
+  desc: Known gene has expression data
+  params:
+    gene_id: PMM0845
+  expect:
+    min_rows: 1
+    columns: [gene, direction, log2fc]
+
+- id: expression_by_organism
+  tool: query_expression
+  desc: MED4 has expression edges
+  params:
+    organism: MED4
+    limit: 5
+  expect:
+    min_rows: 1
+
+- id: expression_coculture_up
+  tool: query_expression
+  desc: Alteromonas coculture produces upregulated genes in MED4
+  params:
+    condition: Alteromonas
+    organism: MED4
+    direction: up
+    limit: 10
+  expect:
+    min_rows: 1
+    contains:
+      direction: up
+
+# ── Homologs ─────────────────────────────────────────────
+
+- id: homologs_exist
+  tool: get_homologs
+  desc: Known gene has homologs across strains
+  params:
+    gene_id: PMM0845
+  expect:
+    min_rows: 1
+    columns: [locus_tag, organism_strain, distance]
+
+# ── Validation queries ───────────────────────────────────
+
+- id: gene_count_nonzero
+  tool: raw_cypher
+  desc: KG has genes loaded
+  params:
+    query: "MATCH (g:Gene) RETURN count(g) AS cnt"
+  expect:
+    min_rows: 1
+    row0_check: "cnt > 0"
+
+- id: no_orphan_genes
+  tool: raw_cypher
+  desc: All genes belong to an organism
+  params:
+    query: "MATCH (g:Gene) WHERE NOT (g)-[:Gene_belongs_to_organism]->() RETURN count(g) AS cnt"
+  expect:
+    row0:
+      cnt: 0
+
+- id: organisms_exist
+  tool: raw_cypher
+  desc: OrganismTaxon nodes are present
+  params:
+    query: "MATCH (o:OrganismTaxon) RETURN count(o) AS cnt"
+  expect:
+    min_rows: 1
+    row0_check: "cnt > 0"

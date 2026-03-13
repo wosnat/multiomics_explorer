@@ -1,0 +1,393 @@
+case_id: expression_by_gene
+row_count: 28
+rows:
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0845
+  log2fc: -1.9098
+  organism_strain: Prochlorococcus MED4
+  padj: 0.3711
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: Axenic Prochlorococcus MED4 in PRO99-lowN at 24C under continuous light.
+    Cells are dead at this point; proteome represents decomposing cells.
+  control: Log exponential growth (day 7)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 1.4935
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 89
+- context: Axenic Prochlorococcus MED4 in PRO99-lowN at 24C under continuous light.
+    Cells are dead at this point; proteome represents decomposing cells.
+  control: Log exponential growth (day 7)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 1.2484
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0002
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 31
+- context: Axenic Prochlorococcus MED4 in Pro99 medium at 25C under continuous light
+    (~55 µmol photons m-2 s-1); TEX-treated RNA sequenced on Ion Torrent platform;
+    results include genes with expression values in the top 50% of the dataset
+  control: N-replete
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.9
+  organism_strain: Prochlorococcus MED4
+  padj: 0.53
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/ismej.2017.88
+  source: N-depleted Pro99 medium
+  time_point: 12h
+- context: Axenic Prochlorococcus MED4 in Pro99 at 22C under continuous light (50
+    umol quanta m-2 s-1)
+  control: N-replete Pro99 with 800 uM ammonium
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.8003
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/msb4100087
+  source: Nitrogen deprivation (MED4)
+  time_point: 12h
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.5426
+  organism_strain: Prochlorococcus MED4
+  padj: 0.1417
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 60
+- context: Axenic Prochlorococcus MED4 in Pro99 at 22C under continuous light (50
+    umol quanta m-2 s-1)
+  control: N-replete Pro99 with 800 uM ammonium
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.4925
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/msb4100087
+  source: Nitrogen deprivation (MED4)
+  time_point: 3h
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.4853
+  organism_strain: Prochlorococcus MED4
+  padj: 0.1074
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: days 60+89
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.4279
+  organism_strain: Prochlorococcus MED4
+  padj: 0.231
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 89
+- context: Axenic Prochlorococcus MED4 in PRO99-lowN at 24C under continuous light
+  control: Log exponential growth (day 7)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.4271
+  organism_strain: Prochlorococcus MED4
+  padj: 0.1512
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 14
+- context: Axenic Prochlorococcus MED4 in steady-state log-phase growth in Pro99 at
+    22C under continuous light (50 umol quanta m-2 s-1)
+  control: N-replete Pro99 with 800 uM ammonium
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.3929
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/msb4100087
+  source: Growth on cyanate as sole N source (MED4)
+  time_point: null
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.3881
+  organism_strain: Prochlorococcus MED4
+  padj: 0.3468
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 89
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.3235
+  organism_strain: Prochlorococcus MED4
+  padj: 0.4862
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 18
+- context: Axenic Prochlorococcus MED4 in PRO99-lowN at 24C under continuous light
+  control: Log exponential growth (day 7)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.274
+  organism_strain: Prochlorococcus MED4
+  padj: 0.3892
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 14
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.2565
+  organism_strain: Prochlorococcus MED4
+  padj: 0.4934
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 31
+- context: Axenic Prochlorococcus MED4 in Pro99 at 22C under continuous light (50
+    umol quanta m-2 s-1)
+  control: N-replete Pro99 with 800 uM ammonium
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.238
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/msb4100087
+  source: Nitrogen deprivation (MED4)
+  time_point: 24h
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.1785
+  organism_strain: Prochlorococcus MED4
+  padj: 0.8067
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 18
+- context: Axenic Prochlorococcus MED4 in steady-state log-phase growth in Pro99 at
+    22C under continuous light (50 umol quanta m-2 s-1)
+  control: N-replete Pro99 with 800 uM ammonium
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.1776
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/msb4100087
+  source: Growth on urea as sole N source (MED4)
+  time_point: null
+- context: Axenic Prochlorococcus MED4 in Pro99 at 22C under continuous light (50
+    umol quanta m-2 s-1)
+  control: N-replete Pro99 with 800 uM ammonium
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.1568
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/msb4100087
+  source: Nitrogen deprivation (MED4)
+  time_point: 48h
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.147
+  organism_strain: Prochlorococcus MED4
+  padj: 0.7262
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 60
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.1074
+  organism_strain: Prochlorococcus MED4
+  padj: 0.8009
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 31
+- context: Axenic Prochlorococcus MED4 in Pro99 at 22C under continuous light (50
+    umol quanta m-2 s-1)
+  control: N-replete Pro99 with 800 uM ammonium
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.1026
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/msb4100087
+  source: Nitrogen deprivation (MED4)
+  time_point: 6h
+- context: Prochlorococcus MED4 in coculture with Alteromonas HOT1A3 in PRO99-lowN
+    at 24C under continuous light
+  control: Log exponential growth (day 11)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.0869
+  organism_strain: Prochlorococcus MED4
+  padj: 0.8364
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: days 60+89
+- context: Log exponential day 11 in PRO99-lowN at 24C under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0845
+  log2fc: 0.0656
+  organism_strain: Prochlorococcus MED4
+  padj: 0.935
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: HOT1A3
+  time_point: day 11
+- context: Axenic Prochlorococcus MED4 in Pro99 medium at 25C under continuous light
+    (~55 µmol photons m-2 s-1); TEX-treated RNA sequenced on Ion Torrent platform;
+    results include genes with expression values in the top 50% of the dataset
+  control: N-replete
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.06
+  organism_strain: Prochlorococcus MED4
+  padj: 0.53
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/ismej.2017.88
+  source: N-depleted Pro99 medium
+  time_point: 24h
+- context: Axenic Prochlorococcus MED4 in Pro99 medium at 25C under continuous light
+    (~55 µmol photons m-2 s-1); TEX-treated RNA sequenced on Ion Torrent platform;
+    results include genes with expression values in the top 50% of the dataset
+  control: N-replete
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.04
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/ismej.2017.88
+  source: N-depleted Pro99 medium
+  time_point: 3h
+- context: Axenic Prochlorococcus MED4 in Pro99 at 22C under continuous light (50
+    umol quanta m-2 s-1)
+  control: N-replete Pro99 with 800 uM ammonium
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.0304
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1038/msb4100087
+  source: Nitrogen deprivation (MED4)
+  time_point: 0h
+- context: Axenic Prochlorococcus MED4 in PRO99-lowN at 24C under continuous light
+  control: Log exponential growth (day 7)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: PMM0845
+  log2fc: -0.0215
+  organism_strain: Prochlorococcus MED4
+  padj: 0.9595
+  product: NADH dehydrogenase subunit NdhV
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: days 60+89

@@ -1,0 +1,133 @@
+case_id: expression_coculture_up
+row_count: 10
+rows:
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0108
+  log2fc: 10.8146
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: protein of unknown function DUF3571
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: Log exponential day 11 in PRO99-lowN at 24C under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0337
+  log2fc: 4.1947
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0074
+  product: conserved hypothetical protein
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: HOT1A3
+  time_point: day 11
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0735
+  log2fc: 12.4515
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: conserved hypothetical protein
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1089
+  log2fc: 10.23
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: ribosomal-protein-alanine acetyltransferase
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1136
+  log2fc: 11.168
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: uncharacterized conserved membrane protein family UPF005
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1392
+  log2fc: 4.6369
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: possible Heat-labile enterotoxin alpha chain
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: Log exponential day 11 in PRO99-lowN at 24C under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1404
+  log2fc: 4.2839
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0015
+  product: high light inducible protein
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: HOT1A3
+  time_point: day 11
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1517
+  log2fc: 9.8154
+  organism_strain: Prochlorococcus MED4
+  padj: 1.0
+  product: beta-lactamase enzyme family protein
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1538
+  log2fc: 7.4369
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: 50S ribosomal protein L36
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: Log exponential day 11 in PRO99-lowN at 24C under continuous light
+  control: Axenic
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1828
+  log2fc: 4.5271
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0086
+  product: Hypothetical protein
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: HOT1A3
+  time_point: day 11
