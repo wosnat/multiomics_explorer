@@ -44,7 +44,7 @@ rows:
     3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
     of replication as well as for processivity of DNA replication
   gene_name: dnaN
-  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+  gene_summary: 'dnaN :: DNA polymerase III subunit beta :: Confers DNA tethering
     and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
     a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
     in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
@@ -54,19 +54,99 @@ rows:
     The beta chain is required for initiation of replication as well as for processivity
     of DNA replication'
   go_terms:
+  - GO:0003674
   - GO:0003677
+  - GO:0003824
   - GO:0003887
+  - GO:0005488
+  - GO:0005515
+  - GO:0005575
+  - GO:0005622
+  - GO:0005623
   - GO:0005737
+  - GO:0005829
+  - GO:0006139
+  - GO:0006259
   - GO:0006260
+  - GO:0006261
   - GO:0006271
+  - GO:0006725
+  - GO:0006807
+  - GO:0006950
+  - GO:0006974
+  - GO:0008150
+  - GO:0008152
   - GO:0008408
+  - GO:0009058
+  - GO:0009059
   - GO:0009360
+  - GO:0009987
+  - GO:0016740
+  - GO:0016772
+  - GO:0016779
+  - GO:0018130
+  - GO:0019438
+  - GO:0022616
+  - GO:0032991
+  - GO:0033554
   - GO:0034061
+  - GO:0034641
+  - GO:0034645
+  - GO:0034654
+  - GO:0042575
+  - GO:0042802
+  - GO:0043170
+  - GO:0044237
+  - GO:0044238
+  - GO:0044249
+  - GO:0044260
+  - GO:0044271
+  - GO:0044424
+  - GO:0044444
+  - GO:0044464
+  - GO:0046483
+  - GO:0050896
+  - GO:0051716
+  - GO:0061695
+  - GO:0071704
+  - GO:0071897
+  - GO:0090304
+  - GO:0140097
+  - GO:1901360
+  - GO:1901362
+  - GO:1901576
+  - GO:1902494
+  - GO:1990234
   kegg_ko:
   - K02338
-  locus_tag: P9301_00001
-  organism_strain: Prochlorococcus MIT9301
-  product: DNA polymerase III, beta subunit
+  locus_tag: ACZ81_00010
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: DNA polymerase III subunit beta
+- annotation_quality: 2
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III subunit beta :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria'
+  go_terms:
+  - GO:0003677
+  - GO:0003887
+  - GO:0006260
+  - GO:0009360
+  kegg_ko:
+  - K02338
+  locus_tag: BSR22_03070
+  organism_strain: Prochlorococcus RSP50
+  product: DNA polymerase III subunit beta
 - annotation_quality: 2
   function_description: Confers DNA tethering and processivity to DNA polymerases
     and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
@@ -77,7 +157,7 @@ rows:
     3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
     of replication as well as for processivity of DNA replication
   gene_name: dnaN
-  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+  gene_summary: 'dnaN :: DNA polymerase III subunit beta :: Confers DNA tethering
     and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
     a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
     in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
@@ -87,82 +167,154 @@ rows:
     The beta chain is required for initiation of replication as well as for processivity
     of DNA replication'
   go_terms:
+  - GO:0003674
   - GO:0003677
+  - GO:0003824
   - GO:0003887
+  - GO:0005488
+  - GO:0005515
+  - GO:0005575
+  - GO:0005622
+  - GO:0005623
   - GO:0005737
+  - GO:0005829
+  - GO:0006139
+  - GO:0006259
   - GO:0006260
+  - GO:0006261
   - GO:0006271
+  - GO:0006725
+  - GO:0006807
+  - GO:0006950
+  - GO:0006974
+  - GO:0008150
+  - GO:0008152
   - GO:0008408
+  - GO:0009058
+  - GO:0009059
   - GO:0009360
+  - GO:0009987
+  - GO:0016740
+  - GO:0016772
+  - GO:0016779
+  - GO:0018130
+  - GO:0019438
+  - GO:0022616
+  - GO:0032991
+  - GO:0033554
   - GO:0034061
+  - GO:0034641
+  - GO:0034645
+  - GO:0034654
+  - GO:0042575
+  - GO:0042802
+  - GO:0043170
+  - GO:0044237
+  - GO:0044238
+  - GO:0044249
+  - GO:0044260
+  - GO:0044271
+  - GO:0044424
+  - GO:0044444
+  - GO:0044464
+  - GO:0046483
+  - GO:0050896
+  - GO:0051716
+  - GO:0061695
+  - GO:0071704
+  - GO:0071897
+  - GO:0090304
+  - GO:0140097
+  - GO:1901360
+  - GO:1901362
+  - GO:1901576
+  - GO:1902494
+  - GO:1990234
   kegg_ko:
   - K02338
-  locus_tag: PMM0001
-  organism_strain: Prochlorococcus MED4
-  product: DNA polymerase III, beta subunit
+  locus_tag: EZ55_00002
+  organism_strain: Alteromonas macleodii EZ55
+  product: DNA polymerase III subunit beta
 - annotation_quality: 2
   function_description: Confers DNA tethering and processivity to DNA polymerases
     and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
     by the clamp-loading complex) which diffuses in an ATP-independent manner freely
     and bidirectionally along dsDNA. Initially characterized for its ability to contact
     the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
-    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
-    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
-    of replication as well as for processivity of DNA replication
+    responsible for most of the replicative synthesis in bacteria
   gene_name: dnaN
-  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+  gene_summary: 'dnaN :: DNA polymerase III subunit beta :: Confers DNA tethering
     and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
     a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
     in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
     characterized for its ability to contact the catalytic subunit of DNA polymerase
     III (Pol III), a complex, multichain enzyme responsible for most of the replicative
-    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
-    The beta chain is required for initiation of replication as well as for processivity
-    of DNA replication'
+    synthesis in bacteria'
   go_terms:
+  - GO:0003674
   - GO:0003677
+  - GO:0003824
   - GO:0003887
+  - GO:0005488
+  - GO:0005515
+  - GO:0005575
+  - GO:0005622
+  - GO:0005623
   - GO:0005737
+  - GO:0005829
+  - GO:0006139
+  - GO:0006259
   - GO:0006260
+  - GO:0006261
   - GO:0006271
-  - GO:0008408
+  - GO:0006725
+  - GO:0006807
+  - GO:0006950
+  - GO:0006974
+  - GO:0008150
+  - GO:0008152
+  - GO:0009058
+  - GO:0009059
   - GO:0009360
+  - GO:0009987
+  - GO:0016740
+  - GO:0016772
+  - GO:0016779
+  - GO:0018130
+  - GO:0019438
+  - GO:0022616
+  - GO:0032991
+  - GO:0033554
   - GO:0034061
+  - GO:0034641
+  - GO:0034645
+  - GO:0034654
+  - GO:0042575
+  - GO:0042802
+  - GO:0043170
+  - GO:0044237
+  - GO:0044238
+  - GO:0044249
+  - GO:0044260
+  - GO:0044271
+  - GO:0044424
+  - GO:0044444
+  - GO:0044464
+  - GO:0046483
+  - GO:0050896
+  - GO:0051716
+  - GO:0061695
+  - GO:0071704
+  - GO:0071897
+  - GO:0090304
+  - GO:0140097
+  - GO:1901360
+  - GO:1901362
+  - GO:1901576
+  - GO:1902494
+  - GO:1990234
   kegg_ko:
   - K02338
-  locus_tag: PMT0001
-  organism_strain: Prochlorococcus MIT9313
-  product: DNA polymerase III, beta subunit
-- annotation_quality: 2
-  function_description: Confers DNA tethering and processivity to DNA polymerases
-    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
-    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
-    and bidirectionally along dsDNA. Initially characterized for its ability to contact
-    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
-    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
-    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
-    of replication as well as for processivity of DNA replication
-  gene_name: dnaN
-  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
-    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
-    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
-    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
-    characterized for its ability to contact the catalytic subunit of DNA polymerase
-    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
-    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
-    The beta chain is required for initiation of replication as well as for processivity
-    of DNA replication'
-  go_terms:
-  - GO:0003677
-  - GO:0003887
-  - GO:0005737
-  - GO:0006260
-  - GO:0006271
-  - GO:0008408
-  - GO:0009360
-  - GO:0034061
-  kegg_ko:
-  - K02338
-  locus_tag: PMT9312_0001
-  organism_strain: Prochlorococcus MIT9312
-  product: DNA polymerase III, beta subunit
+  locus_tag: MIT1002_00002
+  organism_strain: Alteromonas macleodii MIT1002
+  product: DNA polymerase III subunit beta

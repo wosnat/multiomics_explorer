@@ -29,6 +29,7 @@ def build_get_gene(
         "       g.organism_strain AS organism_strain,\n"
         "       g.go_terms AS go_terms, g.kegg_ko AS kegg_ko,\n"
         "       g.annotation_quality AS annotation_quality\n"
+        "ORDER BY g.locus_tag\n"
         "LIMIT 5"
     )
     return cypher, {"id": id, "organism": organism}
@@ -48,7 +49,7 @@ def build_find_gene(
         "       g.organism_strain AS organism_strain,\n"
         "       g.annotation_quality AS annotation_quality,\n"
         "       score\n"
-        "ORDER BY score DESC\n"
+        "ORDER BY score DESC, g.locus_tag\n"
         "LIMIT $limit"
     )
     return cypher, {
@@ -103,7 +104,7 @@ def build_get_gene_details_homologs(*, gene_id: str) -> tuple[str, dict]:
         "RETURN other.locus_tag AS locus_tag, other.organism_strain AS organism_strain,\n"
         "       h.distance AS distance, h.cluster_id AS cluster_id,\n"
         "       h.source AS source\n"
-        "ORDER BY h.distance\n"
+        "ORDER BY h.distance, other.locus_tag\n"
         "LIMIT 20"
     )
     return cypher, {"lt": gene_id}
@@ -173,7 +174,7 @@ def build_query_expression(
         "       r.experimental_context AS context,\n"
         "       r.time_point AS time_point,\n"
         "       r.publications AS publications\n"
-        "ORDER BY abs(r.log2_fold_change) DESC\n"
+        "ORDER BY abs(r.log2_fold_change) DESC, g.locus_tag, source\n"
         "LIMIT $limit"
     )
     return cypher, params
@@ -220,7 +221,7 @@ def build_compare_conditions(
         "       r.log2_fold_change AS log2fc,\n"
         "       r.adjusted_p_value AS padj,\n"
         "       r.experimental_context AS context\n"
-        "ORDER BY g.locus_tag, source\n"
+        "ORDER BY g.locus_tag, source, r.log2_fold_change\n"
         "LIMIT $limit"
     )
     return cypher, params
@@ -249,6 +250,6 @@ def build_homolog_expression(*, gene_ids: list[str]) -> tuple[str, dict]:
         "       r.expression_direction AS direction,\n"
         "       r.log2_fold_change AS log2fc,\n"
         "       r.adjusted_p_value AS padj\n"
-        "ORDER BY g.locus_tag, abs(r.log2_fold_change) DESC"
+        "ORDER BY g.locus_tag, abs(r.log2_fold_change) DESC, source"
     )
     return cypher, {"ids": gene_ids}

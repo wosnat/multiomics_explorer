@@ -19,19 +19,19 @@ rows:
   product: DNA polymerase III, beta subunit
   source: Growth on urea as sole N source (MED4)
   target_strain: Prochlorococcus MED4
-- context: Log exponential day 11 in PRO99-lowN at 24C under continuous light
-  direction: up
-  gene: PMM0001
-  log2fc: 0.7087
-  padj: 0.2466
-  product: DNA polymerase III, beta subunit
-  source: HOT1A3
-  target_strain: Prochlorococcus MED4
 - context: in Pro99 medium under continuous light
   direction: down
   gene: PMM0001
   log2fc: -2.8863
   padj: 0.0311
+  product: DNA polymerase III, beta subunit
+  source: HOT1A3
+  target_strain: Prochlorococcus MED4
+- context: Log exponential day 11 in PRO99-lowN at 24C under continuous light
+  direction: up
+  gene: PMM0001
+  log2fc: 0.7087
+  padj: 0.2466
   product: DNA polymerase III, beta subunit
   source: HOT1A3
   target_strain: Prochlorococcus MED4
@@ -50,8 +50,8 @@ rows:
     results include genes with expression values in the top 50% of the dataset
   direction: up
   gene: PMM0001
-  log2fc: 2.23
-  padj: 0.0
+  log2fc: 0.89
+  padj: 0.54
   product: DNA polymerase III, beta subunit
   source: N-depleted Pro99 medium
   target_strain: Prochlorococcus MED4
@@ -60,8 +60,8 @@ rows:
     results include genes with expression values in the top 50% of the dataset
   direction: up
   gene: PMM0001
-  log2fc: 0.89
-  padj: 0.54
+  log2fc: 2.23
+  padj: 0.0
   product: DNA polymerase III, beta subunit
   source: N-depleted Pro99 medium
   target_strain: Prochlorococcus MED4
@@ -78,7 +78,7 @@ rows:
     umol quanta m-2 s-1)
   direction: up
   gene: PMM0001
-  log2fc: 1.008
+  log2fc: 0.1577
   padj: 1.0
   product: DNA polymerase III, beta subunit
   source: Nitrogen deprivation (MED4)
@@ -87,7 +87,7 @@ rows:
     umol quanta m-2 s-1)
   direction: up
   gene: PMM0001
-  log2fc: 0.1577
+  log2fc: 0.5111
   padj: 1.0
   product: DNA polymerase III, beta subunit
   source: Nitrogen deprivation (MED4)

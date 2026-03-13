@@ -2,15 +2,6 @@ case_id: find_gene_with_organism
 row_count: 10
 rows:
 - annotation_quality: 2
-  gene_name: PMM0005
-  gene_summary: 'PMM0005 :: DNA gyrase/topoisomerase IV, subunit A family protein
-    :: COG188 Type IIA topoisomerase (DNA gyrase topo II, topoisomerase IV), A subunit
-    DNA replication, recombination, and repair'
-  locus_tag: PMM0005
-  organism_strain: Prochlorococcus MED4
-  product: DNA gyrase/topoisomerase IV, subunit A family protein
-  score: 4.7449
-- annotation_quality: 2
   gene_name: radA
   gene_summary: 'radA :: DNA repair protein Sms/RadA :: DNA-dependent ATPase involved
     in processing of recombination intermediates, plays a role in repairing DNA breaks.
@@ -24,7 +15,7 @@ rows:
   locus_tag: PMM0133
   organism_strain: Prochlorococcus MED4
   product: DNA repair protein Sms/RadA
-  score: 6.145
+  score: 18.8748
 - annotation_quality: 2
   gene_name: mutS2
   gene_summary: 'mutS2 :: DNA mismatch repair protein, MutS family :: Acts as a ribosome
@@ -39,7 +30,15 @@ rows:
   locus_tag: PMM0217
   organism_strain: Prochlorococcus MED4
   product: DNA mismatch repair protein, MutS family
-  score: 4.5745
+  score: 19.1619
+- annotation_quality: 2
+  gene_name: mpg
+  gene_summary: 'mpg :: DNA-3-methyladenine glycosylase :: Belongs to the DNA glycosylase
+    MPG family'
+  locus_tag: PMM0234
+  organism_strain: Prochlorococcus MED4
+  product: DNA-3-methyladenine glycosylase
+  score: 16.7598
 - annotation_quality: 2
   gene_name: recO
   gene_summary: 'recO :: gap repair protein RecO :: Involved in DNA repair and RecF
@@ -47,22 +46,7 @@ rows:
   locus_tag: PMM0398
   organism_strain: Prochlorococcus MED4
   product: gap repair protein RecO
-  score: 6.8649
-- annotation_quality: 2
-  gene_name: PMM0680
-  gene_summary: 'PMM0680 :: repair family protein :: Alternative locus ID'
-  locus_tag: PMM0680
-  organism_strain: Prochlorococcus MED4
-  product: repair family protein
-  score: 5.3083
-- annotation_quality: 2
-  gene_name: psb29
-  gene_summary: 'psb29 :: photosystem II repair protein Psb29 :: May be involved in
-    photosynthetic membrane biogenesis'
-  locus_tag: PMM0741
-  organism_strain: Prochlorococcus MED4
-  product: photosystem II repair protein Psb29
-  score: 4.3662
+  score: 18.9958
 - annotation_quality: 2
   gene_name: mfd
   gene_summary: 'mfd :: transcription-repair coupling factor :: Couples transcription
@@ -72,7 +56,18 @@ rows:
   locus_tag: PMM0839
   organism_strain: Prochlorococcus MED4
   product: transcription-repair coupling factor
-  score: 6.378
+  score: 19.1342
+- annotation_quality: 2
+  gene_name: recA
+  gene_summary: 'recA :: recombinase A :: Can catalyze the hydrolysis of ATP in the
+    presence of single-stranded DNA, the ATP-dependent uptake of single-stranded DNA
+    by duplex DNA, and the ATP-dependent hybridization of homologous single-stranded
+    DNAs. It interacts with LexA causing its activation and leading to its autocatalytic
+    cleavage'
+  locus_tag: PMM1562
+  organism_strain: Prochlorococcus MED4
+  product: recombinase A
+  score: 16.9586
 - annotation_quality: 2
   gene_name: recF
   gene_summary: 'recF :: DNA replication and repair protein recF :: it is required
@@ -81,7 +76,7 @@ rows:
   locus_tag: PMM1573
   organism_strain: Prochlorococcus MED4
   product: DNA replication and repair protein recF
-  score: 6.7461
+  score: 21.8487
 - annotation_quality: 2
   gene_name: mutS
   gene_summary: 'mutS :: DNA mismatch repair protein MutS :: that it carries out the
@@ -89,7 +84,14 @@ rows:
   locus_tag: PMM1645
   organism_strain: Prochlorococcus MED4
   product: DNA mismatch repair protein MutS
-  score: 6.7829
+  score: 22.7215
+- annotation_quality: 2
+  gene_name: ligA
+  gene_summary: 'ligA :: ATP-dependent DNA ligase'
+  locus_tag: PMM1679
+  organism_strain: Prochlorococcus MED4
+  product: ATP-dependent DNA ligase
+  score: 16.8087
 - annotation_quality: 2
   gene_name: recN
   gene_summary: 'recN :: ATP-dependent DNA repair protein RecN :: May be involved
@@ -97,4 +99,4 @@ rows:
   locus_tag: PMM1713
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA repair protein RecN
-  score: 8.1665
+  score: 23.8968
