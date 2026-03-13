@@ -26,11 +26,24 @@ def _conn(ctx: Context) -> GraphConnection:
     return ctx.request_context.lifespan_context.conn
 
 
+def _debug(ctx: Context) -> bool:
+    """Check if debug_queries is enabled."""
+    return ctx.request_context.lifespan_context.debug_queries
+
+
 def _fmt(results: list[dict], limit: int | None = None) -> str:
     """Format query results as JSON string."""
     if limit is not None:
         results = results[:limit]
     return json.dumps(results, indent=2, default=str)
+
+
+def _with_query(response: str, cypher: str, params: dict, ctx: Context) -> str:
+    """Wrap response with query info if debug mode is on."""
+    if not _debug(ctx):
+        return response
+    debug_block = json.dumps({"_debug": {"cypher": cypher, "params": params}}, indent=2, default=str)
+    return f"{debug_block}\n---\n{response}"
 
 
 # Read-only keywords check for raw Cypher
@@ -74,13 +87,15 @@ def register_tools(mcp: FastMCP):
             msg = f"No gene found for id '{id}'"
             if organism:
                 msg += f" in {organism}"
-            return json.dumps({"results": [], "message": msg})
-        if len(results) > 1:
-            return json.dumps({
+            response = json.dumps({"results": [], "message": msg})
+        elif len(results) > 1:
+            response = json.dumps({
                 "results": results,
                 "message": f"Ambiguous — {len(results)} matches found. Specify organism to narrow.",
             }, indent=2, default=str)
-        return json.dumps({"results": results}, indent=2, default=str)
+        else:
+            response = json.dumps({"results": results}, indent=2, default=str)
+        return _with_query(response, cypher, params, ctx)
 
     @mcp.tool()
     def find_gene(
@@ -116,12 +131,14 @@ def register_tools(mcp: FastMCP):
             )
             results = conn.execute_query(cypher, **params)
         if not results:
-            return json.dumps({
+            response = json.dumps({
                 "results": [], "total": 0, "query": search_text,
             })
-        return json.dumps({
-            "results": results, "total": len(results), "query": search_text,
-        }, indent=2, default=str)
+        else:
+            response = json.dumps({
+                "results": results, "total": len(results), "query": search_text,
+            }, indent=2, default=str)
+        return _with_query(response, cypher, params, ctx)
 
     @mcp.tool()
     def search_genes(
@@ -147,8 +164,10 @@ def register_tools(mcp: FastMCP):
             msg = f"No genes found matching '{query}'"
             if organism:
                 msg += f" in {organism}"
-            return json.dumps({"results": [], "message": msg})
-        return json.dumps({"results": results}, indent=2, default=str)
+            response = json.dumps({"results": [], "message": msg})
+        else:
+            response = json.dumps({"results": results}, indent=2, default=str)
+        return _with_query(response, cypher, params, ctx)
 
     @mcp.tool()
     def get_gene_details(ctx: Context, gene_id: str) -> str:
@@ -161,18 +180,26 @@ def register_tools(mcp: FastMCP):
         conn = _conn(ctx)
 
         # Main gene + protein + organism
-        cypher, params = build_get_gene_details_main(gene_id=gene_id)
-        main = conn.execute_query(cypher, **params)
+        cypher_main, params_main = build_get_gene_details_main(gene_id=gene_id)
+        main = conn.execute_query(cypher_main, **params_main)
         if not main or main[0]["gene"] is None:
             return f"Gene '{gene_id}' not found."
 
         # Homolog summary
-        cypher, params = build_get_gene_details_homologs(gene_id=gene_id)
-        homologs = conn.execute_query(cypher, **params)
+        cypher_hom, params_hom = build_get_gene_details_homologs(gene_id=gene_id)
+        homologs = conn.execute_query(cypher_hom, **params_hom)
 
         result = main[0]["gene"]
         result["_homologs"] = homologs
-        return _fmt([result])
+        response = _fmt([result])
+        if _debug(ctx):
+            queries = [
+                {"cypher": cypher_main, "params": params_main},
+                {"cypher": cypher_hom, "params": params_hom},
+            ]
+            debug_block = json.dumps({"_debug": {"queries": queries}}, indent=2, default=str)
+            return f"{debug_block}\n---\n{response}"
+        return response
 
     @mcp.tool()
     def query_expression(
@@ -218,8 +245,8 @@ def register_tools(mcp: FastMCP):
         )
         results = conn.execute_query(cypher, **params)
         if not results:
-            return "No expression data found for the given filters."
-        return _fmt(results)
+            return _with_query("No expression data found for the given filters.", cypher, params, ctx)
+        return _with_query(_fmt(results), cypher, params, ctx)
 
     @mcp.tool()
     def compare_conditions(
@@ -237,7 +264,8 @@ def register_tools(mcp: FastMCP):
         Args:
             gene_ids: List of gene locus_tags to compare.
             organisms: List of target strain names (whose genes are affected).
-            conditions: List of source names (coculture organism_name or condition_type).
+            conditions: List of source names — coculture organism genus or condition_type
+                        (exact match, unlike query_expression which uses CONTAINS).
             limit: Max results (default 100).
         """
         if not any([gene_ids, organisms, conditions]):
@@ -250,8 +278,8 @@ def register_tools(mcp: FastMCP):
         )
         results = conn.execute_query(cypher, **params)
         if not results:
-            return "No expression data found for the given filters."
-        return _fmt(results)
+            return _with_query("No expression data found for the given filters.", cypher, params, ctx)
+        return _with_query(_fmt(results), cypher, params, ctx)
 
     @mcp.tool()
     def get_homologs(
@@ -270,26 +298,34 @@ def register_tools(mcp: FastMCP):
         cypher, params = build_get_homologs(gene_id=gene_id)
         homologs = conn.execute_query(cypher, **params)
         if not homologs:
-            return f"No homologs found for '{gene_id}'."
+            return _with_query(f"No homologs found for '{gene_id}'.", cypher, params, ctx)
 
         if include_expression:
             all_ids = [gene_id] + [h["locus_tag"] for h in homologs]
-            cypher, params = build_homolog_expression(gene_ids=all_ids)
-            expr = conn.execute_query(cypher, **params)
-            return json.dumps(
+            cypher_expr, params_expr = build_homolog_expression(gene_ids=all_ids)
+            expr = conn.execute_query(cypher_expr, **params_expr)
+            response = json.dumps(
                 {"homologs": homologs, "expression": expr},
                 indent=2,
                 default=str,
             )
+            if _debug(ctx):
+                queries = [
+                    {"cypher": cypher, "params": params},
+                    {"cypher": cypher_expr, "params": params_expr},
+                ]
+                debug_block = json.dumps({"_debug": {"queries": queries}}, indent=2, default=str)
+                return f"{debug_block}\n---\n{response}"
+            return response
 
-        return _fmt(homologs)
+        return _with_query(_fmt(homologs), cypher, params, ctx)
 
     @mcp.tool()
     def run_cypher(ctx: Context, query: str, limit: int = 25) -> str:
         """Execute a raw Cypher query against the knowledge graph (read-only).
 
         Use this as an escape hatch when the other tools don't cover your query.
-        Write operations are blocked.
+        Write operations are blocked (regex keyword filter + read-only transaction).
 
         Args:
             query: Cypher query string. A LIMIT clause will be added if not present.

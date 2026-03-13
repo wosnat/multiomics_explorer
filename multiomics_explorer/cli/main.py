@@ -14,6 +14,16 @@ app = typer.Typer(
 console = Console()
 
 
+@app.callback()
+def main(
+    version: bool = typer.Option(False, "--version", "-V", help="Show version and exit", is_eager=True),
+):
+    if version:
+        from importlib.metadata import version as pkg_version
+        console.print(pkg_version("multiomics-explorer"))
+        raise typer.Exit()
+
+
 @app.command()
 def schema(
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
@@ -149,6 +159,7 @@ def schema_validate(
 def cypher(
     query: str = typer.Argument(help="Cypher query to execute"),
     limit: int = typer.Option(25, help="Max rows to display"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ):
     """Execute a Cypher query directly against the knowledge graph."""
     from multiomics_explorer.kg.connection import GraphConnection
@@ -174,16 +185,20 @@ def cypher(
             console.print("[yellow]No results.[/yellow]")
             return
 
-        # Build a rich table from the results
-        table = Table(show_lines=True)
-        keys = list(results[0].keys())
-        for k in keys:
-            table.add_column(k)
+        if json_output:
+            console.print(json.dumps(results[:limit], indent=2, default=str))
+        else:
+            # Build a rich table from the results
+            table = Table(show_lines=True)
+            keys = list(results[0].keys())
+            for k in keys:
+                table.add_column(k)
 
-        for row in results[:limit]:
-            table.add_row(*[str(row.get(k, "")) for k in keys])
+            for row in results[:limit]:
+                table.add_row(*[str(row.get(k, "")) for k in keys])
 
-        console.print(table)
+            console.print(table)
+
         if len(results) > limit:
             console.print(f"[dim]Showing {limit} of {len(results)} results[/dim]")
 
@@ -268,8 +283,14 @@ def interactive():
                 cypher_query = user_input[7:].strip()
                 try:
                     results = conn.execute_query(cypher_query)
-                    for row in results[:25]:
-                        console.print(row)
+                    if results:
+                        table = Table(show_lines=True)
+                        keys = list(results[0].keys())
+                        for k in keys:
+                            table.add_column(k)
+                        for row in results[:25]:
+                            table.add_row(*[str(row.get(k, "")) for k in keys])
+                        console.print(table)
                     if len(results) > 25:
                         console.print(f"[dim]... {len(results)} total results[/dim]")
                 except Exception as e:

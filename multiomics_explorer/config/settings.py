@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     # Optional: path to KG builder repo for richer schema metadata
     kg_repo_path: Optional[str] = None
 
+    # Debug: include Cypher queries in MCP tool responses
+    debug_queries: bool = False
+
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",

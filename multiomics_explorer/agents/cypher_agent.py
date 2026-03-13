@@ -45,10 +45,11 @@ class CypherAgent:
     @property
     def graph(self) -> Neo4jGraph:
         if self._graph is None:
+            auth = self._settings.neo4j_auth
             self._graph = Neo4jGraph(
                 url=self._settings.neo4j_uri,
-                username=self._settings.neo4j_user or "neo4j",
-                password=self._settings.neo4j_password or "neo4j",
+                username=auth[0] if auth else "",
+                password=auth[1] if auth else "",
             )
         return self._graph
 

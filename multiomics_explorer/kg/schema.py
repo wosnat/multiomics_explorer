@@ -123,13 +123,15 @@ def load_schema_from_neo4j(conn: GraphConnection) -> GraphSchema:
         count = conn.get_node_count(label)
         node_schema = NodeSchema(label=label, count=count)
 
-        # Sample one node to get property names and types
+        # Sample multiple nodes to capture optional properties
         sample = conn.execute_query(
-            f"MATCH (n:`{label}`) RETURN properties(n) AS props LIMIT 1"
+            f"MATCH (n:`{label}`) RETURN properties(n) AS props LIMIT 10"
         )
-        if sample and sample[0]["props"]:
-            for k, v in sample[0]["props"].items():
-                node_schema.properties[k] = _infer_type(v)
+        for row in sample:
+            if row["props"]:
+                for k, v in row["props"].items():
+                    if k not in node_schema.properties or node_schema.properties[k] == "any":
+                        node_schema.properties[k] = _infer_type(v)
 
         schema.nodes[label] = node_schema
 
@@ -151,13 +153,15 @@ def load_schema_from_neo4j(conn: GraphConnection) -> GraphSchema:
         rel_schema.source_labels = sorted(src_labels)
         rel_schema.target_labels = sorted(tgt_labels)
 
-        # Sample one relationship to get properties
+        # Sample multiple relationships to capture optional properties
         sample = conn.execute_query(
-            f"MATCH ()-[r:`{rel_type}`]->() RETURN properties(r) AS props LIMIT 1"
+            f"MATCH ()-[r:`{rel_type}`]->() RETURN properties(r) AS props LIMIT 10"
         )
-        if sample and sample[0]["props"]:
-            for k, v in sample[0]["props"].items():
-                rel_schema.properties[k] = _infer_type(v)
+        for row in sample:
+            if row["props"]:
+                for k, v in row["props"].items():
+                    if k not in rel_schema.properties or rel_schema.properties[k] == "any":
+                        rel_schema.properties[k] = _infer_type(v)
 
         schema.relationships[rel_type] = rel_schema
 

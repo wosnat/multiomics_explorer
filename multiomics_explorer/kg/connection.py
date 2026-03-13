@@ -1,5 +1,6 @@
 """Neo4j connection management."""
 
+import logging
 import threading
 from typing import Any
 
@@ -7,6 +8,8 @@ from neo4j import GraphDatabase
 from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from multiomics_explorer.config.settings import Settings, get_settings
+
+logger = logging.getLogger(__name__)
 
 
 class GraphConnection:
@@ -36,11 +39,12 @@ class GraphConnection:
         except (ServiceUnavailable, AuthError):
             return False
 
-    def execute_query(self, cypher: str, **params: Any) -> list[dict]:
+    def execute_query(self, cypher: str, timeout: float = 30, **params: Any) -> list[dict]:
         """Execute a read-only Cypher query and return results as list of dicts."""
+        logger.debug("Cypher: %s | params: %s", cypher, params)
         with self.driver.session() as session:
             result = session.execute_read(
-                lambda tx: tx.run(cypher, **params).data()
+                lambda tx: tx.run(cypher, timeout=timeout, **params).data()
             )
             return result
 
