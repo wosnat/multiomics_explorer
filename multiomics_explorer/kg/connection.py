@@ -1,9 +1,10 @@
 """Neo4j connection management."""
 
+import threading
 from typing import Any
 
 from neo4j import GraphDatabase
-from neo4j.exceptions import ServiceUnavailable
+from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from multiomics_explorer.config.settings import Settings, get_settings
 
@@ -14,14 +15,17 @@ class GraphConnection:
     def __init__(self, settings: Settings | None = None):
         self._settings = settings or get_settings()
         self._driver = None
+        self._lock = threading.Lock()
 
     @property
     def driver(self):
         if self._driver is None:
-            self._driver = GraphDatabase.driver(
-                self._settings.neo4j_uri,
-                auth=self._settings.neo4j_auth,
-            )
+            with self._lock:
+                if self._driver is None:
+                    self._driver = GraphDatabase.driver(
+                        self._settings.neo4j_uri,
+                        auth=self._settings.neo4j_auth,
+                    )
         return self._driver
 
     def verify_connectivity(self) -> bool:
@@ -29,13 +33,16 @@ class GraphConnection:
         try:
             self.driver.verify_connectivity()
             return True
-        except (ServiceUnavailable, Exception):
+        except (ServiceUnavailable, AuthError):
             return False
 
     def execute_query(self, cypher: str, **params: Any) -> list[dict]:
-        """Execute a Cypher query and return results as list of dicts."""
+        """Execute a read-only Cypher query and return results as list of dicts."""
         with self.driver.session() as session:
-            return session.run(cypher, **params).data()
+            result = session.execute_read(
+                lambda tx: tx.run(cypher, **params).data()
+            )
+            return result
 
     def get_labels(self) -> list[str]:
         """Get all node labels in the graph."""

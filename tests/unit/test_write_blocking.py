@@ -88,9 +88,9 @@ class TestFmt:
         parsed = json.loads(result)
         assert len(parsed) == 10
 
-    def test_limit_zero_returns_all(self):
-        """_fmt uses `if limit:` so 0 should return all."""
+    def test_limit_zero_returns_empty(self):
+        """_fmt with limit=0 now correctly slices to 0 items (is not None check)."""
         data = [{"id": i} for i in range(5)]
         result = _fmt(data, limit=0)
         parsed = json.loads(result)
-        assert len(parsed) == 5
+        assert len(parsed) == 0

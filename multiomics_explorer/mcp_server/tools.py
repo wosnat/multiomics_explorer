@@ -5,6 +5,8 @@ import re
 
 from mcp.server.fastmcp import Context, FastMCP
 
+from neo4j.exceptions import ClientError as Neo4jClientError
+
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
@@ -26,14 +28,14 @@ def _conn(ctx: Context) -> GraphConnection:
 
 def _fmt(results: list[dict], limit: int | None = None) -> str:
     """Format query results as JSON string."""
-    if limit:
+    if limit is not None:
         results = results[:limit]
     return json.dumps(results, indent=2, default=str)
 
 
 # Read-only keywords check for raw Cypher
 _WRITE_KEYWORDS = re.compile(
-    r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|CALL\s*\{)\b",
+    r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{|CALL\s+\w+\.\w+|LOAD\s+CSV)\b",
     re.IGNORECASE,
 )
 
@@ -42,7 +44,7 @@ def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
     @mcp.tool()
-    def get_schema(ctx) -> str:
+    def get_schema(ctx: Context) -> str:
         """Get the knowledge graph schema: node types with counts, relationship types with
         source/target labels, and property names. Use this first to understand what's queryable."""
         from multiomics_explorer.kg.schema import load_schema_from_neo4j
@@ -53,7 +55,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     def get_gene(
-        ctx,
+        ctx: Context,
         id: str,
         organism: str | None = None,
     ) -> str:
@@ -82,7 +84,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     def find_gene(
-        ctx,
+        ctx: Context,
         search_text: str,
         organism: str | None = None,
         min_quality: int = 0,
@@ -105,7 +107,7 @@ def register_tools(mcp: FastMCP):
         )
         try:
             results = conn.execute_query(cypher, **params)
-        except Exception:
+        except Neo4jClientError:
             # Retry with escaped Lucene special characters
             escaped = re.sub(r'[+\-!(){}\[\]^"~*?:\\/]', r'\\\g<0>', search_text)
             cypher, params = build_find_gene(
@@ -123,7 +125,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     def search_genes(
-        ctx,
+        ctx: Context,
         query: str,
         organism: str | None = None,
         limit: int = 20,
@@ -138,6 +140,7 @@ def register_tools(mcp: FastMCP):
             limit: Max results (default 20).
         """
         conn = _conn(ctx)
+        limit = min(limit, 200)
         cypher, params = build_search_genes(query=query, organism=organism, limit=limit)
         results = conn.execute_query(cypher, **params)
         if not results:
@@ -145,10 +148,10 @@ def register_tools(mcp: FastMCP):
             if organism:
                 msg += f" in {organism}"
             return json.dumps({"results": [], "message": msg})
-        return _fmt(results)
+        return json.dumps({"results": results}, indent=2, default=str)
 
     @mcp.tool()
-    def get_gene_details(ctx, gene_id: str) -> str:
+    def get_gene_details(ctx: Context, gene_id: str) -> str:
         """Get full details for a gene: properties, protein, organism, Cyanorak cluster,
         and homolog summary.
 
@@ -173,7 +176,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     def query_expression(
-        ctx,
+        ctx: Context,
         gene_id: str | None = None,
         organism: str | None = None,
         condition: str | None = None,
@@ -220,7 +223,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     def compare_conditions(
-        ctx,
+        ctx: Context,
         gene_ids: list[str] | None = None,
         organisms: list[str] | None = None,
         conditions: list[str] | None = None,
@@ -252,7 +255,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     def get_homologs(
-        ctx,
+        ctx: Context,
         gene_id: str,
         include_expression: bool = False,
     ) -> str:
@@ -282,7 +285,7 @@ def register_tools(mcp: FastMCP):
         return _fmt(homologs)
 
     @mcp.tool()
-    def run_cypher(ctx, query: str, limit: int = 25) -> str:
+    def run_cypher(ctx: Context, query: str, limit: int = 25) -> str:
         """Execute a raw Cypher query against the knowledge graph (read-only).
 
         Use this as an escape hatch when the other tools don't cover your query.

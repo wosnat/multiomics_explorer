@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from mcp.server.fastmcp import FastMCP
+from neo4j.exceptions import ClientError as Neo4jClientError
 
 from multiomics_explorer.mcp_server.tools import register_tools
 
@@ -120,16 +121,36 @@ class TestFindGeneWrapper:
     def test_limit_capped_at_50(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
         tool_fns["find_gene"](mock_ctx, search_text="x", limit=999)
-        # The build_find_gene call should have received limit=50
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args
-        # We can't easily inspect the Cypher params, but at least it didn't crash
-        assert True
+        assert call_kwargs.kwargs["limit"] == 50
+
+    def test_raises_on_double_failure(self, tool_fns, mock_ctx):
+        """When both original and escaped queries fail, exception propagates."""
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            Neo4jClientError("parse error"),
+            Neo4jClientError("still broken"),
+        ]
+        with pytest.raises(Neo4jClientError):
+            tool_fns["find_gene"](mock_ctx, search_text="bad [query")
+
+    def test_organism_filter_passed_through(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["find_gene"](mock_ctx, search_text="photosystem", organism="MED4")
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["organism"] == "MED4"
+
+    def test_min_quality_passed_through(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["find_gene"](mock_ctx, search_text="photosystem", min_quality=2)
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["min_quality"] == 2
 
     def test_lucene_fallback_on_error(self, tool_fns, mock_ctx):
         """When first query raises, should retry with escaped Lucene chars."""
         conn = _conn_from(mock_ctx)
         conn.execute_query.side_effect = [
-            Exception("Lucene parse error"),  # first call fails
+            Neo4jClientError("Lucene parse error"),  # first call fails
             [{"locus_tag": "PMM0001"}],  # retry succeeds
         ]
         result = json.loads(tool_fns["find_gene"](mock_ctx, search_text="DNA [repair"))
@@ -156,7 +177,14 @@ class TestSearchGenesWrapper:
         rows = [{"locus_tag": "PMM0001", "product": "photosystem II"}]
         _conn_from(mock_ctx).execute_query.return_value = rows
         result = json.loads(tool_fns["search_genes"](mock_ctx, query="photosystem"))
-        assert len(result) == 1
+        assert len(result["results"]) == 1
+        assert result["results"][0]["locus_tag"] == "PMM0001"
+
+    def test_limit_capped_at_200(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["search_genes"](mock_ctx, query="test", limit=999)
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["limit"] == 200
 
 
 # ---------------------------------------------------------------------------
@@ -209,6 +237,32 @@ class TestQueryExpressionWrapper:
         result = json.loads(tool_fns["query_expression"](mock_ctx, organism="MED4"))
         assert len(result) == 1
 
+    def test_direction_filter_passed_through(self, tool_fns, mock_ctx):
+        rows = [{"gene": "PMM0001", "direction": "up"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", direction="up")
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["dir"] == "up"
+
+    def test_include_orthologs_changes_query(self, tool_fns, mock_ctx):
+        rows = [{"gene": "PMM0001"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", include_orthologs=True)
+        called_cypher = _conn_from(mock_ctx).execute_query.call_args[0][0]
+        assert "ortholog" in called_cypher.lower()
+
+    def test_min_log2fc_passed_through(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", min_log2fc=1.5)
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["min_fc"] == 1.5
+
+    def test_max_pvalue_passed_through(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", max_pvalue=0.05)
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["max_pv"] == 0.05
+
 
 # ---------------------------------------------------------------------------
 # compare_conditions
@@ -232,6 +286,13 @@ class TestCompareConditionsWrapper:
             tool_fns["compare_conditions"](mock_ctx, gene_ids=["PMM0001"])
         )
         assert len(result) == 1
+
+    def test_conditions_filter_passed_through(self, tool_fns, mock_ctx):
+        rows = [{"gene": "PMM0001"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        tool_fns["compare_conditions"](mock_ctx, conditions=["nitrogen_stress"])
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["conditions"] == ["nitrogen_stress"]
 
 
 # ---------------------------------------------------------------------------
@@ -302,3 +363,29 @@ class TestRunCypherWrapper:
         called_query = _conn_from(mock_ctx).execute_query.call_args[0][0]
         assert ";" not in called_query
         assert "LIMIT" in called_query
+
+    def test_neo4j_error_propagates(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.side_effect = Neo4jClientError("syntax error")
+        with pytest.raises(Neo4jClientError):
+            tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
+
+    def test_foreach_blocked(self, tool_fns, mock_ctx):
+        result = tool_fns["run_cypher"](
+            mock_ctx, query="FOREACH (x IN [1] | CREATE (:Node))"
+        )
+        assert "Error" in result
+        _conn_from(mock_ctx).execute_query.assert_not_called()
+
+    def test_load_csv_blocked(self, tool_fns, mock_ctx):
+        result = tool_fns["run_cypher"](
+            mock_ctx, query="LOAD CSV FROM 'file:///data.csv' AS row RETURN row"
+        )
+        assert "Error" in result
+        _conn_from(mock_ctx).execute_query.assert_not_called()
+
+    def test_call_procedure_blocked(self, tool_fns, mock_ctx):
+        result = tool_fns["run_cypher"](
+            mock_ctx, query="CALL apoc.create.node(['Gene'], {name: 'x'})"
+        )
+        assert "Error" in result
+        _conn_from(mock_ctx).execute_query.assert_not_called()

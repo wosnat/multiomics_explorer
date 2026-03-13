@@ -15,7 +15,8 @@ class TestConnectionErrorHandling:
         conn = GraphConnection(settings)
         # Inject a mock driver whose verify_connectivity raises
         mock_driver = MagicMock()
-        mock_driver.verify_connectivity.side_effect = Exception("unreachable")
+        from neo4j.exceptions import ServiceUnavailable
+        mock_driver.verify_connectivity.side_effect = ServiceUnavailable("unreachable")
         conn._driver = mock_driver
         assert conn.verify_connectivity() is False
 

@@ -1,5 +1,6 @@
 """Application settings loaded from environment variables / .env file."""
 
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
@@ -49,6 +50,7 @@ class Settings(BaseSettings):
         return None
 
 
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
     """Get cached settings instance."""
     return Settings()

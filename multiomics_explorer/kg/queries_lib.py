@@ -158,10 +158,11 @@ def build_query_expression(
         params["max_pv"] = max_pvalue
 
     where_block = " AND ".join(where_clauses)
+    where_line = f"WHERE {where_block}\n" if where_block else "\n"
 
     cypher = (
         f"MATCH (factor)-[r:{expr_rels}]->(g:Gene)\n"
-        f"WHERE {where_block}\n"
+        f"{where_line}"
         "RETURN g.locus_tag AS gene, g.product AS product,\n"
         "       type(r) AS edge_type,\n"
         "       CASE WHEN factor:OrganismTaxon THEN factor.organism_name\n"
@@ -209,10 +210,11 @@ def build_compare_conditions(
         params["conditions"] = conditions
 
     where_block = " AND ".join(where_clauses)
+    where_line = f"WHERE {where_block}\n" if where_block else "\n"
 
     cypher = (
         f"MATCH (factor)-[r:{DIRECT_EXPR_RELS}]->(g:Gene)\n"
-        f"WHERE {where_block}\n"
+        f"{where_line}"
         "RETURN g.locus_tag AS gene, g.product AS product,\n"
         "       r.organism_strain AS target_strain,\n"
         "       CASE WHEN factor:OrganismTaxon THEN factor.organism_name\n"
