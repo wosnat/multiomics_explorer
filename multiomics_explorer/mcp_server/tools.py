@@ -141,9 +141,10 @@ def register_tools(mcp: FastMCP):
         cypher, params = build_search_genes(query=query, organism=organism, limit=limit)
         results = conn.execute_query(cypher, **params)
         if not results:
-            return f"No genes found matching '{query}'" + (
-                f" in {organism}" if organism else ""
-            )
+            msg = f"No genes found matching '{query}'"
+            if organism:
+                msg += f" in {organism}"
+            return json.dumps({"results": [], "message": msg})
         return _fmt(results)
 
     @mcp.tool()

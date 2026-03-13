@@ -33,6 +33,42 @@ def _conn_from(ctx):
     return ctx.request_context.lifespan_context.conn
 
 
+EXPECTED_TOOLS = [
+    "get_schema", "get_gene", "find_gene", "search_genes",
+    "get_gene_details", "query_expression", "compare_conditions",
+    "get_homologs", "run_cypher",
+]
+
+
+# ---------------------------------------------------------------------------
+# Tool registration
+# ---------------------------------------------------------------------------
+class TestToolRegistration:
+    def test_all_nine_tools_registered(self, tool_fns):
+        assert sorted(tool_fns.keys()) == sorted(EXPECTED_TOOLS)
+
+    def test_no_extra_tools(self, tool_fns):
+        assert len(tool_fns) == len(EXPECTED_TOOLS)
+
+
+# ---------------------------------------------------------------------------
+# get_schema
+# ---------------------------------------------------------------------------
+class TestGetSchemaWrapper:
+    def test_returns_prompt_string(self, tool_fns, mock_ctx):
+        """get_schema calls load_schema_from_neo4j and returns its prompt string."""
+        mock_schema = MagicMock()
+        mock_schema.to_prompt_string.return_value = "## Graph Schema\n- Gene (42)"
+        with patch(
+            "multiomics_explorer.kg.schema.load_schema_from_neo4j",
+            return_value=mock_schema,
+        ):
+            result = tool_fns["get_schema"](mock_ctx)
+        assert "Graph Schema" in result
+        assert "Gene" in result
+        mock_schema.to_prompt_string.assert_called_once()
+
+
 # ---------------------------------------------------------------------------
 # get_gene
 # ---------------------------------------------------------------------------
@@ -105,18 +141,16 @@ class TestFindGeneWrapper:
 # search_genes
 # ---------------------------------------------------------------------------
 class TestSearchGenesWrapper:
-    def test_empty_returns_plain_string(self, tool_fns, mock_ctx):
+    def test_empty_returns_json_with_message(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["search_genes"](mock_ctx, query="nonexistent")
-        assert "No genes found" in result
-        # Not JSON — this is the current behavior
-        with pytest.raises(json.JSONDecodeError):
-            json.loads(result)
+        result = json.loads(tool_fns["search_genes"](mock_ctx, query="nonexistent"))
+        assert result["results"] == []
+        assert "No genes found" in result["message"]
 
     def test_empty_with_organism_in_message(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["search_genes"](mock_ctx, query="x", organism="MED4")
-        assert "MED4" in result
+        result = json.loads(tool_fns["search_genes"](mock_ctx, query="x", organism="MED4"))
+        assert "MED4" in result["message"]
 
     def test_results_returned_as_json(self, tool_fns, mock_ctx):
         rows = [{"locus_tag": "PMM0001", "product": "photosystem II"}]

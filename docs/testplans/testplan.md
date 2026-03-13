@@ -2,7 +2,7 @@
 
 ## Current State
 
-**Existing tests (10 files, 105 unit + integration/eval/regression):**
+**Existing tests (10 files, 108 unit + integration/eval/regression):**
 
 | File | Tests | Neo4j? |
 |------|-------|--------|
@@ -12,7 +12,7 @@
 | `tests/unit/test_schema.py` | 18 unit tests (diffing, baseline, formatting) | No |
 | `tests/unit/test_connection.py` | 3 unit tests (error handling, lifecycle) | No |
 | `tests/unit/test_mcp_server.py` | 3 unit tests (lifespan, KGContext) | No |
-| `tests/unit/test_tool_wrappers.py` | 29 unit tests (all 9 MCP tool wrappers) | No |
+| `tests/unit/test_tool_wrappers.py` | 32 unit tests (all 9 MCP tool wrappers + registration) | No |
 | `tests/integration/test_mcp_tools.py` | 13 integration tests | Yes |
 | `tests/evals/test_eval.py` | 15 parameterized integration tests | Yes |
 | `tests/regression/test_regression.py` | 15 golden-file baselines | Yes |
@@ -70,6 +70,13 @@ Key for detecting KG rebuild breakage.
 Tests all 9 tool functions' wrapper logic (input validation, response formatting,
 error messages, multi-query orchestration) with a mocked Neo4j connection.
 
+**Tool registration:**
+- [x] All 9 expected tools are registered
+- [x] No unexpected extra tools
+
+**`get_schema`:**
+- [x] Calls `load_schema_from_neo4j` and returns its prompt string
+
 **`get_gene`:**
 - [x] Not-found returns JSON with empty results and message
 - [x] Not-found with organism includes organism in message
@@ -83,7 +90,7 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 - [x] Lucene parse error triggers escaped retry (fallback path)
 
 **`search_genes`:**
-- [x] Empty result returns plain string (not JSON) — documents inconsistency
+- [x] Empty result returns JSON with empty results and message
 - [x] Empty result with organism includes organism in message
 - [x] Non-empty result returns JSON array
 
@@ -197,3 +204,4 @@ tests/
 | 2026-03-13 | Implemented P1 integration (13 tests), P2 CLI (5 tests), P2 eval expansion (4 cases), edge cases — 123/123 passing |
 | 2026-03-13 | Implemented P3 connection tests (3), P3 MCP server lifespan tests (3), P1 conflicting-filters edge case — 76 unit tests passing, test plan complete |
 | 2026-03-13 | Added P1 MCP tool wrapper tests (29 tests) — covers input validation, response formatting, error messages, multi-query orchestration for all 9 tools — 105 unit tests passing |
+| 2026-03-13 | Fixed `search_genes` response inconsistency (now returns JSON like other tools), added `get_schema` wrapper test and tool registration smoke tests — 108 unit tests passing |
