@@ -21,5 +21,11 @@ if [[ -n "${DEBUG_QUERIES:-}" ]]; then
     echo "Debug mode: Cypher queries will appear in tool responses"
 fi
 
+ENV_ARGS=()
+if [[ -n "${DEBUG_QUERIES:-}" ]]; then
+    ENV_ARGS=(-e "DEBUG_QUERIES=true")
+fi
+
 exec npx @modelcontextprotocol/inspector \
+    "${ENV_ARGS[@]}" \
     uv run --directory "$PROJECT_DIR" multiomics-kg-mcp
