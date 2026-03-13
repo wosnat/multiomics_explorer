@@ -54,6 +54,7 @@ dependencies = [
 dev = [
     "ipykernel>=7.1.0",
     "jupyter>=1.1.1",
+    "pytest-regressions>=2.10.0",
     "ruff>=0.8.0",
 ]
 
