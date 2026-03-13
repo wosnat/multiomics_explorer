@@ -139,3 +139,16 @@ class TestEdgeCases:
         results = conn.execute_query(cypher, **params)
         # Either empty or gene is None
         assert not results or results[0]["gene"] is None
+
+    def test_query_expression_conflicting_filters(self, conn):
+        """Conflicting filters should return empty results, not crash."""
+        cypher, params = build_query_expression(
+            gene_id="PMM0001",
+            organism="NONEXISTENT_STRAIN_XYZ",
+            direction="up",
+            min_log2fc=999.0,
+            max_pvalue=0.0000001,
+        )
+        results = conn.execute_query(cypher, **params)
+        assert isinstance(results, list)
+        assert len(results) == 0

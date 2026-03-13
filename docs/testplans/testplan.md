@@ -49,14 +49,15 @@ Key for detecting KG rebuild breakage.
 
 #### `tests/unit/test_connection.py` — Connection error handling (P3)
 
-- [ ] `GraphConnection` raises on invalid URI
-- [ ] `verify_connectivity()` fails gracefully when Neo4j is down
-- [ ] Context manager cleans up driver on exit
+- [x] `GraphConnection` raises on invalid URI
+- [x] `verify_connectivity()` fails gracefully when Neo4j is down
+- [x] Context manager cleans up driver on exit
 
 #### `tests/unit/test_mcp_server.py` — Lifespan & context (P3)
 
-- [ ] `KGContext` dataclass holds connection correctly
-- [ ] Lifespan manager creates and closes connection
+- [x] `KGContext` dataclass holds connection correctly
+- [x] Lifespan manager creates and closes connection
+- [x] Lifespan raises `RuntimeError` when Neo4j is unreachable
 
 ### 2. Integration Tests (Neo4j required, `@pytest.mark.kg`)
 
@@ -81,7 +82,7 @@ Add to relevant unit/integration test files.
 
 - [x] `get_gene()` with empty string identifier
 - [x] `search_genes()` with special characters in search term
-- [ ] `query_expression()` with conflicting filters (returns empty, no crash)
+- [x] `query_expression()` with conflicting filters (returns empty, no crash)
 - [x] `run_cypher()` with syntax-invalid Cypher (returns Neo4j error, no crash)
 - [x] `get_gene_details()` for gene with no protein/no homologs
 
@@ -136,3 +137,4 @@ tests/
 | 2026-03-13 | Initial test plan created |
 | 2026-03-13 | Implemented P0 write-blocking (26 tests) and P1 schema diffing (18 tests) — all 44 passing |
 | 2026-03-13 | Implemented P1 integration (13 tests), P2 CLI (5 tests), P2 eval expansion (4 cases), edge cases — 123/123 passing |
+| 2026-03-13 | Implemented P3 connection tests (3), P3 MCP server lifespan tests (3), P1 conflicting-filters edge case — 76 unit tests passing, test plan complete |
