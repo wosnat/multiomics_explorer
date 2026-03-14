@@ -22,7 +22,7 @@ def build_resolve_gene(
         "    OR g.gene_name = $identifier\n"
         "    OR $identifier IN g.all_identifiers\n"
         "  )\n"
-        "  AND ($organism IS NULL OR g.organism_strain CONTAINS $organism)\n"
+        "  AND ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word))\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.organism_strain AS organism_strain\n"
         "ORDER BY g.locus_tag"
@@ -37,7 +37,7 @@ def build_find_gene(
     cypher = (
         "CALL db.index.fulltext.queryNodes('geneFullText', $search_text)\n"
         "YIELD node AS g, score\n"
-        "WHERE ($organism IS NULL OR g.organism_strain CONTAINS $organism)\n"
+        "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word))\n"
         "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.gene_summary AS gene_summary, g.product AS product,\n"
@@ -64,7 +64,10 @@ def build_search_genes(
     params: dict = {"q": query, "limit": limit}
 
     if organism:
-        where_clauses.append("g.organism_strain CONTAINS $strain")
+        where_clauses.append(
+            "ALL(word IN split(toLower($strain), ' ') "
+            "WHERE toLower(g.organism_strain) CONTAINS word)"
+        )
         params["strain"] = organism
 
     where = " AND ".join(where_clauses)

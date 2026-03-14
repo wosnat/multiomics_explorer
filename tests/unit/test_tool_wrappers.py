@@ -104,6 +104,40 @@ class TestResolveGeneWrapper:
         assert result["total"] == 3
         assert len(result["results"]) == 3  # 3 organism groups
 
+    def test_same_organism_grouped_together(self, tool_fns, mock_ctx):
+        """Multiple genes from the same organism land under one key."""
+        rows = [
+            {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "p1", "organism_strain": "Prochlorococcus MED4"},
+            {"locus_tag": "PMM0002", "gene_name": "dnaN2", "product": "p2", "organism_strain": "Prochlorococcus MED4"},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="dnaN"))
+        assert result["total"] == 2
+        assert len(result["results"]) == 1  # single organism group
+        assert len(result["results"]["Prochlorococcus MED4"]) == 2
+        # organism_strain should be stripped from individual entries
+        for entry in result["results"]["Prochlorococcus MED4"]:
+            assert "organism_strain" not in entry
+
+    def test_missing_organism_strain_grouped_as_unknown(self, tool_fns, mock_ctx):
+        """Row without organism_strain is grouped under 'Unknown'."""
+        rows = [{"locus_tag": "PMM0001", "gene_name": "x", "product": "y"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001"))
+        assert "Unknown" in result["results"]
+
+    def test_debug_mode_includes_query(self, tool_fns, mock_ctx):
+        """When debug_queries is on, response includes cypher and params."""
+        mock_ctx.request_context.lifespan_context.debug_queries = True
+        rows = [{"locus_tag": "PMM0001", "gene_name": "dnaN", "organism_strain": "MED4"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        raw = tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
+        assert "_debug" in raw
+        debug_part = raw.split("---")[0]
+        debug = json.loads(debug_part)
+        assert "cypher" in debug["_debug"]
+        assert "params" in debug["_debug"]
+
 
 # ---------------------------------------------------------------------------
 # find_gene

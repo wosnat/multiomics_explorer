@@ -26,12 +26,34 @@ class TestBuildResolveGene:
     def test_with_organism(self):
         cypher, params = build_resolve_gene(identifier="dnaN", organism="MED4")
         assert params["organism"] == "MED4"
-        assert "CONTAINS $organism" in cypher
+        assert "toLower($organism)" in cypher
+        assert "toLower(g.organism_strain)" in cypher
+
+    def test_organism_case_insensitive(self):
+        """Organism filter uses toLower for case-insensitive matching."""
+        cypher, params = build_resolve_gene(identifier="recF", organism="prochlorococcus")
+        assert params["organism"] == "prochlorococcus"
+        assert "toLower($organism)" in cypher
+
+    def test_organism_multi_word_partial(self):
+        """Multi-word organism like 'Alteromonas EZ55' uses ALL/split for word matching."""
+        cypher, params = build_resolve_gene(identifier="recF", organism="Alteromonas EZ55")
+        assert params["organism"] == "Alteromonas EZ55"
+        assert "ALL(word IN split(" in cypher
 
     def test_returns_expected_columns(self):
         cypher, _ = build_resolve_gene(identifier="x")
         for col in ["locus_tag", "gene_name", "product", "organism_strain"]:
             assert col in cypher
+
+    def test_matches_all_identifiers(self):
+        """Query checks all_identifiers list for alternate IDs (old locus tags, RefSeq IDs)."""
+        cypher, _ = build_resolve_gene(identifier="x")
+        assert "$identifier IN g.all_identifiers" in cypher
+
+    def test_order_by_locus_tag(self):
+        cypher, _ = build_resolve_gene(identifier="x")
+        assert "ORDER BY g.locus_tag" in cypher
 
 
 class TestBuildSearchGenes:
@@ -47,7 +69,19 @@ class TestBuildSearchGenes:
     def test_organism_filter(self):
         cypher, params = build_search_genes(query="x", organism="MED4")
         assert "strain" in params
-        assert "organism_strain CONTAINS $strain" in cypher
+        assert "toLower($strain)" in cypher
+        assert "toLower(g.organism_strain)" in cypher
+
+    def test_organism_filter_case_insensitive(self):
+        """Organism filter uses toLower for case-insensitive matching."""
+        cypher, params = build_search_genes(query="x", organism="alteromonas")
+        assert params["strain"] == "alteromonas"
+        assert "toLower($strain)" in cypher
+
+    def test_organism_filter_multi_word(self):
+        """Multi-word organism uses ALL/split for word matching."""
+        cypher, params = build_search_genes(query="x", organism="Alteromonas EZ55")
+        assert "ALL(word IN split(" in cypher
 
     def test_no_organism_no_strain_param(self):
         _, params = build_search_genes(query="x")
@@ -63,6 +97,17 @@ class TestBuildFindGene:
     def test_min_quality(self):
         _, params = build_find_gene(search_text="x", min_quality=2)
         assert params["min_quality"] == 2
+
+    def test_organism_case_insensitive(self):
+        """Organism filter uses toLower for case-insensitive matching."""
+        cypher, params = build_find_gene(search_text="x", organism="prochlorococcus")
+        assert params["organism"] == "prochlorococcus"
+        assert "toLower($organism)" in cypher
+
+    def test_organism_multi_word(self):
+        """Multi-word organism uses ALL/split for word matching."""
+        cypher, _ = build_find_gene(search_text="x", organism="Alteromonas EZ55")
+        assert "ALL(word IN split(" in cypher
 
 
 class TestBuildGetGeneDetails:

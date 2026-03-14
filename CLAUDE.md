@@ -29,7 +29,7 @@ pytest -m kg -v                # requires Neo4j at localhost:7687
 
 ## MCP Server
 
-The MCP server (`mcp_server/`) is the primary interface for Claude Code.
+The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for Claude Code.
 
 ### Tools
 
@@ -70,10 +70,12 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 
 | File | Purpose |
 |---|---|
-| `mcp_server/server.py` | MCP server entry point (FastMCP with Neo4j lifespan) |
-| `mcp_server/tools.py` | 9 MCP tool implementations |
-| `kg/connection.py` | Neo4j driver wrapper (shared by MCP + CLI) |
-| `kg/schema.py` | Schema introspection from live KG |
-| `kg/queries.py` | Curated Cypher queries + few-shot examples |
-| `config/settings.py` | Pydantic settings from .env |
-| `cli/main.py` | Typer CLI |
+| `multiomics_explorer/mcp_server/server.py` | MCP server entry point (FastMCP with Neo4j lifespan) |
+| `multiomics_explorer/mcp_server/tools.py` | MCP tool implementations |
+| `multiomics_explorer/kg/connection.py` | Neo4j driver wrapper (shared by MCP + CLI) |
+| `multiomics_explorer/kg/schema.py` | Schema introspection from live KG |
+| `multiomics_explorer/kg/queries.py` | Curated Cypher queries + few-shot examples |
+| `multiomics_explorer/kg/queries_lib.py` | Query builder functions (parameterized Cypher) |
+| `multiomics_explorer/config/settings.py` | Pydantic settings from .env |
+| `multiomics_explorer/cli/main.py` | Typer CLI |
+| `multiomics_explorer/agents/tools.py` | LangChain agent tools |

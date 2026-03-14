@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "multiomics-kg": {
+      "command": "uv",
+      "args": ["run", "--directory", "/home/osnat/github/multiomics_explorer", "multiomics-kg-mcp"]
+    }
+  }
+}
