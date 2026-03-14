@@ -1,0 +1,83 @@
+case_id: get_gene_by_protein_id
+row_count: 1
+rows:
+- annotation_quality: 2
+  function_description: Subunits I and II form the functional core of the enzyme complex.
+    Electrons originating in cytochrome c are transferred via heme a and Cu(A) to
+    the binuclear center formed by heme a3 and Cu(B)
+  gene_name: ctaCI
+  gene_summary: 'ctaCI :: cytochrome c oxidase subunit II :: Subunits I and II form
+    the functional core of the enzyme complex. Electrons originating in cytochrome
+    c are transferred via heme a and Cu(A) to the binuclear center formed by heme
+    a3 and Cu(B)'
+  go_terms:
+  - GO:0004129
+  - GO:0005507
+  - GO:0005575
+  - GO:0005623
+  - GO:0005886
+  - GO:0005887
+  - GO:0006091
+  - GO:0006119
+  - GO:0006139
+  - GO:0006163
+  - GO:0006725
+  - GO:0006753
+  - GO:0006793
+  - GO:0006796
+  - GO:0006807
+  - GO:0008150
+  - GO:0008152
+  - GO:0009117
+  - GO:0009123
+  - GO:0009126
+  - GO:0009141
+  - GO:0009144
+  - GO:0009150
+  - GO:0009161
+  - GO:0009167
+  - GO:0009199
+  - GO:0009205
+  - GO:0009259
+  - GO:0009319
+  - GO:0009987
+  - GO:0015980
+  - GO:0016020
+  - GO:0016021
+  - GO:0016310
+  - GO:0016491
+  - GO:0017144
+  - GO:0019637
+  - GO:0019693
+  - GO:0022900
+  - GO:0022904
+  - GO:0031224
+  - GO:0031226
+  - GO:0032991
+  - GO:0034641
+  - GO:0042773
+  - GO:0044237
+  - GO:0044238
+  - GO:0044281
+  - GO:0044425
+  - GO:0044459
+  - GO:0044464
+  - GO:0045333
+  - GO:0046034
+  - GO:0046483
+  - GO:0055086
+  - GO:0055114
+  - GO:0070069
+  - GO:0071704
+  - GO:0071944
+  - GO:0072521
+  - GO:0098796
+  - GO:1901135
+  - GO:1901360
+  - GO:1901564
+  - GO:1902494
+  kegg_ko:
+  - K02275
+  locus_tag: PMM0446
+  organism_strain: Prochlorococcus MED4
+  product: cytochrome c oxidase subunit II

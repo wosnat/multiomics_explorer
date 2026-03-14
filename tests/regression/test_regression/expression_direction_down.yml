@@ -1,0 +1,133 @@
+case_id: expression_direction_down
+row_count: 10
+rows:
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0020
+  log2fc: -13.742
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: DNA-binding protein, YbaB/EbfC family
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0373
+  log2fc: -13.4253
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: cyanate hydratase
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0471
+  log2fc: -14.4448
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: high light inducible protein
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0540
+  log2fc: -13.3582
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: photosystem I reaction centre subunit XII
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0910
+  log2fc: -14.5923
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: cell division membrane protein YlmG1 (factor involved in shape determination)
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM0974
+  log2fc: -13.1986
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: ABC-type urea transporter, ATPase component UrtE
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1110
+  log2fc: -15.3887
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: bolA-like family protein
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1151
+  log2fc: -13.742
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: translation initiation factor IF-1
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1402
+  log2fc: -13.1832
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: conserved hypothetical protein
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h
+- context: in Pro99 medium under continuous light
+  control: Axenic
+  direction: down
+  edge_type: Coculture_changes_expression_of
+  gene: PMM1633
+  log2fc: -13.2734
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: conserved hypothetical protein
+  publications:
+  - doi:10.1038/ismej.2016.70
+  source: HOT1A3
+  time_point: 20h

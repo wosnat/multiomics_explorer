@@ -1,0 +1,87 @@
+case_id: get_gene_synechococcus_locus
+row_count: 1
+rows:
+- annotation_quality: 2
+  function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
+    for both cytoplasmic and membrane proteins. Plays a role in the quality control
+    of integral membrane proteins
+  gene_name: ftsH1
+  gene_summary: 'ftsH1 :: cell division protein FtsH1 :: Acts as a processive, ATP-dependent
+    zinc metallopeptidase for both cytoplasmic and membrane proteins. Plays a role
+    in the quality control of integral membrane proteins'
+  go_terms:
+  - GO:0003674
+  - GO:0003824
+  - GO:0004176
+  - GO:0004222
+  - GO:0005524
+  - GO:0006091
+  - GO:0006508
+  - GO:0006807
+  - GO:0008150
+  - GO:0008152
+  - GO:0008233
+  - GO:0008237
+  - GO:0008270
+  - GO:0009056
+  - GO:0009057
+  - GO:0009314
+  - GO:0009416
+  - GO:0009628
+  - GO:0009642
+  - GO:0009644
+  - GO:0009765
+  - GO:0009892
+  - GO:0009987
+  - GO:0010109
+  - GO:0010205
+  - GO:0010206
+  - GO:0010304
+  - GO:0015979
+  - GO:0016021
+  - GO:0016462
+  - GO:0016787
+  - GO:0016817
+  - GO:0016818
+  - GO:0016887
+  - GO:0017111
+  - GO:0019222
+  - GO:0019538
+  - GO:0019684
+  - GO:0030091
+  - GO:0030163
+  - GO:0031323
+  - GO:0031324
+  - GO:0031676
+  - GO:0042548
+  - GO:0042623
+  - GO:0042651
+  - GO:0043155
+  - GO:0043170
+  - GO:0043467
+  - GO:0044237
+  - GO:0044238
+  - GO:0044248
+  - GO:0044257
+  - GO:0044260
+  - GO:0044265
+  - GO:0044267
+  - GO:0048519
+  - GO:0048523
+  - GO:0050789
+  - GO:0050794
+  - GO:0050896
+  - GO:0051301
+  - GO:0065007
+  - GO:0070011
+  - GO:0071704
+  - GO:0140096
+  - GO:1901564
+  - GO:1901565
+  - GO:1901575
+  - GO:1905156
+  kegg_ko:
+  - K03798
+  locus_tag: SYNW0305
+  organism_strain: Synechococcus WH8102
+  product: cell division protein FtsH1

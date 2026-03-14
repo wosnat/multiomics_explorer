@@ -1,0 +1,135 @@
+case_id: homologs_dnan_cross_strain
+row_count: 22
+rows:
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: A9601_00001
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: A9601_00001
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: COG0592
+  distance: cross phylum
+  locus_tag: ACZ81_00010
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: DNA polymerase III subunit beta
+  source: eggnog_bacteria_cog_og
+- cluster_id: COG0592
+  distance: cross phylum
+  locus_tag: ACZ81_00010
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: DNA polymerase III subunit beta
+  source: eggnog_bacteria_cog_og
+- cluster_id: COG0592
+  distance: cross phylum
+  locus_tag: EZ55_00002
+  organism_strain: Alteromonas macleodii EZ55
+  product: DNA polymerase III subunit beta
+  source: eggnog_bacteria_cog_og
+- cluster_id: COG0592
+  distance: cross phylum
+  locus_tag: EZ55_00002
+  organism_strain: Alteromonas macleodii EZ55
+  product: DNA polymerase III subunit beta
+  source: eggnog_bacteria_cog_og
+- cluster_id: COG0592
+  distance: cross phylum
+  locus_tag: MIT1002_00002
+  organism_strain: Alteromonas macleodii MIT1002
+  product: DNA polymerase III subunit beta
+  source: eggnog_bacteria_cog_og
+- cluster_id: COG0592
+  distance: cross phylum
+  locus_tag: MIT1002_00002
+  organism_strain: Alteromonas macleodii MIT1002
+  product: DNA polymerase III subunit beta
+  source: eggnog_bacteria_cog_og
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: NATL1_00001
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: NATL1_00001
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: P9301_00001
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: P9301_00001
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: PMN2A_1328
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: PMN2A_1328
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: PMT0001
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: PMT0001
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: PMT9312_0001
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same species: Prochlorococcus marinus'
+  locus_tag: PMT9312_0001
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same order: Synechococcales'
+  locus_tag: SYNW0001
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same order: Synechococcales'
+  locus_tag: SYNW0001
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same order: Synechococcales'
+  locus_tag: sync_0001
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster
+- cluster_id: CK_00000364
+  distance: 'same order: Synechococcales'
+  locus_tag: sync_0001
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase III, beta subunit
+  source: cyanorak_cluster

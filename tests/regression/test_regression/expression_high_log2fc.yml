@@ -1,0 +1,140 @@
+case_id: expression_high_log2fc
+row_count: 10
+rows:
+- context: MED4 grown at 22C in continuous light at 30 uE m-2 s-1 in Pro99 medium
+  control: P-replete Pro99 (50 uM PO4)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0708
+  log2fc: 162.295
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: probable alkaline phosphatase
+  publications:
+  - doi:10.1073/pnas.0601301103
+  source: Phosphate starvation
+  time_point: 48h
+- context: MED4 grown at 22C in continuous light at 30 uE m-2 s-1 in Pro99 medium
+  control: P-replete Pro99 (50 uM PO4)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0709
+  log2fc: 117.337
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: outer membrane porin
+  publications:
+  - doi:10.1073/pnas.0601301103
+  source: Phosphate starvation
+  time_point: 48h
+- context: Prochlorococcus MED4 in Sargasso seawater-based Pro99 medium at 21C, 45
+    min light exposure after 5h dark adaptation
+  control: Darkness (5h dark adaptation)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM0818
+  log2fc: 41.7
+  organism_strain: Prochlorococcus MED4
+  padj: 0.05
+  product: high light inducible protein
+  publications:
+  - doi:10.1128/JB.01097-06
+  source: High white light (55 umol photons m-2 s-1)
+  time_point: null
+- context: Prochlorococcus MED4 in Sargasso seawater-based Pro99 medium at 21C, 45
+    min light exposure after 5h dark adaptation
+  control: Darkness (5h dark adaptation)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM1135
+  log2fc: 40.8
+  organism_strain: Prochlorococcus MED4
+  padj: 0.05
+  product: high light inducible protein
+  publications:
+  - doi:10.1128/JB.01097-06
+  source: High white light (55 umol photons m-2 s-1)
+  time_point: null
+- context: Prochlorococcus MED4 in Sargasso seawater-based Pro99 medium at 21C, 45
+    min light exposure after 5h dark adaptation
+  control: Darkness (5h dark adaptation)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM1359
+  log2fc: 61.2
+  organism_strain: Prochlorococcus MED4
+  padj: 0.05
+  product: uncharacterized conserved membrane protein, DoxX family
+  publications:
+  - doi:10.1128/JB.01097-06
+  source: High white light (55 umol photons m-2 s-1)
+  time_point: null
+- context: Prochlorococcus MED4 in Sargasso seawater-based Pro99 medium at 21C, 45
+    min light exposure after 5h dark adaptation
+  control: Darkness (5h dark adaptation)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM1359
+  log2fc: 37.2
+  organism_strain: Prochlorococcus MED4
+  padj: 0.05
+  product: uncharacterized conserved membrane protein, DoxX family
+  publications:
+  - doi:10.1128/JB.01097-06
+  source: Blue light (13 umol photons m-2 s-1)
+  time_point: null
+- context: Prochlorococcus MED4 in Sargasso seawater-based Pro99 medium at 21C, 45
+    min light exposure after 5h dark adaptation
+  control: Darkness (5h dark adaptation)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM1396
+  log2fc: 41.3
+  organism_strain: Prochlorococcus MED4
+  padj: 0.05
+  product: high light inducible protein
+  publications:
+  - doi:10.1128/JB.01097-06
+  source: High white light (55 umol photons m-2 s-1)
+  time_point: null
+- context: Prochlorococcus MED4 in Sargasso seawater-based Pro99 medium at 21C, 45
+    min light exposure after 5h dark adaptation
+  control: Darkness (5h dark adaptation)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM1397
+  log2fc: 42.2
+  organism_strain: Prochlorococcus MED4
+  padj: 0.05
+  product: high light inducible protein
+  publications:
+  - doi:10.1128/JB.01097-06
+  source: High white light (55 umol photons m-2 s-1)
+  time_point: null
+- context: Prochlorococcus MED4 in Sargasso seawater-based Pro99 medium at 21C, 45
+    min light exposure after 5h dark adaptation
+  control: Darkness (5h dark adaptation)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM1404
+  log2fc: 39.5
+  organism_strain: Prochlorococcus MED4
+  padj: 0.05
+  product: high light inducible protein
+  publications:
+  - doi:10.1128/JB.01097-06
+  source: High white light (55 umol photons m-2 s-1)
+  time_point: null
+- context: MED4 grown at 22C in continuous light at 30 uE m-2 s-1 in Pro99 medium
+  control: P-replete Pro99 (50 uM PO4)
+  direction: up
+  edge_type: Condition_changes_expression_of
+  gene: PMM1416
+  log2fc: 44.524
+  organism_strain: Prochlorococcus MED4
+  padj: 0.0
+  product: phosphate starvation inducible protein 1
+  publications:
+  - doi:10.1073/pnas.0601301103
+  source: Phosphate starvation
+  time_point: 48h

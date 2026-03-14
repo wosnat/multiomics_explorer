@@ -1,0 +1,240 @@
+case_id: gene_details_synechococcus
+row_count: 1
+rows:
+- gene:
+    _cluster:
+      cluster_number: CK_00008085
+    _organism:
+      clade: null
+      genus: Parasynechococcus
+      ncbi_taxon_id: 84588
+      preferred_name: Synechococcus WH8102
+      strain_name: WH8102
+    _protein:
+      annotation_score: 3.0
+      gene_names:
+      - ftsH2
+      - ftsH
+      - SYNW0305
+      is_reviewed: not reviewed
+      refseq_ids:
+      - WP_011127179.1
+      sequence_length: 615
+    all_identifiers:
+    - CK_Syn_WH8102_00305
+    - TX72_RS01535
+    - WP_011127179.1
+    - ftsH
+    - ftsH2
+    - ftsH3
+    alternate_functional_descriptions:
+    - '[cyanorak] cell division protein FtsH1'
+    - '[ncbi] ATP-dependent zinc metalloprotease FtsH3'
+    - '[eggnog] Acts as a processive, ATP-dependent zinc metallopeptidase for both
+      cytoplasmic and membrane proteins. Plays a role in the quality control of integral
+      membrane proteins'
+    - '[uniprot] Acts as a processive, ATP-dependent zinc metallopeptidase for both
+      cytoplasmic and membrane proteins. Plays a role in the quality control of integral
+      membrane proteins'
+    - '[protein_family] AAA ATPase family; Peptidase M41 family; AAA ATPase family'
+    - '[cyanorak_role] Cell division'
+    - '[tigr_role] Cellular processes / Cell division'
+    - '[cog] COG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
+      protein turnover, chaperones'
+    - '[cog] bactNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
+      protein turnover, chaperones'
+    - '[cog] cyaNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
+      protein turnover, chaperones'
+    - '[pfam] AAA: ATP-dependent metallopeptidase HflB'
+    - '[pfam] FtsH_ext: Peptidase family M41'
+    - '[pfam] Peptidase_M41: FtsH Extracellular'
+    alternative_locus_tags:
+    - SYNW0305
+    annotation_quality: 2
+    bacteria_cog_og: COG0465
+    cluster_number: CK_00008085
+    cog_category:
+    - O
+    cyanorak_Role:
+    - D.2
+    cyanorak_Role_description:
+    - Cell division
+    ec_numbers:
+    - 3.4.24.-
+    eggnog_og_descriptions:
+    - 'COG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification, protein
+      turnover, chaperones'
+    - 'bactNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
+      protein turnover, chaperones'
+    - 'cyaNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
+      protein turnover, chaperones'
+    eggnog_ogs:
+    - COG0465
+    - bactNOG01729
+    - cyaNOG01610
+    - COG0465@1,root
+    - COG0465@2,Bacteria
+    - 1G1BT@1117,Cyanobacteria
+    - 1GYE1@1129,Synechococcus
+    end: 304589
+    end_cyanorak: 304589
+    function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
+      for both cytoplasmic and membrane proteins. Plays a role in the quality control
+      of integral membrane proteins
+    function_description_source: uniprot
+    gene_name: ftsH1
+    gene_name_source: cyanorak
+    gene_name_synonyms:
+    - ftsH3
+    - ftsH2
+    - ftsH
+    gene_summary: 'ftsH1 :: cell division protein FtsH1 :: Acts as a processive, ATP-dependent
+      zinc metallopeptidase for both cytoplasmic and membrane proteins. Plays a role
+      in the quality control of integral membrane proteins'
+    gene_synonyms:
+    - ftsH3
+    - SYNW0305
+    - ftsH2
+    - ftsH
+    go_term_descriptions:
+    - protein catabolic process
+    - proteolysis
+    - protein catabolic process
+    - proteolysis
+    - metalloendopeptidase activity
+    - ATP binding
+    - nucleoside-triphosphatase activity
+    - zinc ion binding
+    - protein catabolic process
+    - proteolysis
+    - metalloendopeptidase activity
+    - ATP binding
+    - nucleoside-triphosphatase activity
+    - zinc ion binding
+    - thylakoid membrane
+    - integral component of membrane
+    go_terms:
+    - GO:0031676
+    - GO:0051301
+    - GO:0030163
+    - GO:0006508
+    - GO:0005524
+    - GO:0016887
+    - GO:0004176
+    - GO:0004222
+    - GO:0008270
+    - GO:0017111
+    - GO:0042651
+    - GO:0016021
+    - GO:0003674
+    - GO:0003824
+    - GO:0006091
+    - GO:0006807
+    - GO:0008150
+    - GO:0008152
+    - GO:0008233
+    - GO:0008237
+    - GO:0009056
+    - GO:0009057
+    - GO:0009314
+    - GO:0009416
+    - GO:0009628
+    - GO:0009642
+    - GO:0009644
+    - GO:0009765
+    - GO:0009892
+    - GO:0009987
+    - GO:0010109
+    - GO:0010205
+    - GO:0010206
+    - GO:0010304
+    - GO:0015979
+    - GO:0016462
+    - GO:0016787
+    - GO:0016817
+    - GO:0016818
+    - GO:0019222
+    - GO:0019538
+    - GO:0019684
+    - GO:0030091
+    - GO:0031323
+    - GO:0031324
+    - GO:0042548
+    - GO:0042623
+    - GO:0043155
+    - GO:0043170
+    - GO:0043467
+    - GO:0044237
+    - GO:0044238
+    - GO:0044248
+    - GO:0044257
+    - GO:0044260
+    - GO:0044265
+    - GO:0044267
+    - GO:0048519
+    - GO:0048523
+    - GO:0050789
+    - GO:0050794
+    - GO:0050896
+    - GO:0065007
+    - GO:0070011
+    - GO:0071704
+    - GO:0140096
+    - GO:1901564
+    - GO:1901565
+    - GO:1901575
+    - GO:1905156
+    id: ncbigene:SYNW0305
+    kegg_brite:
+    - ko00000
+    - ko00002
+    - ko01000
+    - ko01002
+    - ko03110
+    kegg_ko:
+    - K03798
+    kegg_module:
+    - M00742
+    locus_tag: SYNW0305
+    locus_tag_cyanorak: CK_Syn_WH8102_00305
+    locus_tag_ncbi: TX72_RS01535
+    max_annot_lvl: 1117,Cyanobacteria
+    old_locus_tags:
+    - SYNW0305
+    organism_strain: Synechococcus WH8102
+    pfam_descriptions:
+    - ATP-dependent metallopeptidase HflB
+    - Peptidase family M41
+    - FtsH Extracellular
+    - ATPase family associated with various cellular activities (AAA)
+    - AAA-protein family signature.
+    - Peptidase M41
+    - Peptidase M41, FtsH extracellular
+    - ATPase, AAA-type, core
+    - ATPase, AAA-type, conserved site
+    - Peptidase, FtsH
+    pfam_ids:
+    - PF01434
+    - PF06480
+    - PF00004
+    - PF17862
+    pfam_names:
+    - AAA
+    - FtsH_ext
+    - Peptidase_M41
+    preferred_id: ncbigene
+    product: cell division protein FtsH1
+    product_cyanorak: cell division protein FtsH1
+    product_source: cyanorak
+    protein_family: AAA ATPase family; Peptidase M41 family; AAA ATPase family
+    protein_id: WP_011127179.1
+    seed_ortholog: 84588.SYNW0305
+    seed_ortholog_evalue: 0.0
+    start: 302742
+    start_cyanorak: 302742
+    strand: +
+    strand_cyanorak: +
+    tIGR_Role:
+    - '93'
+    tIGR_Role_description:
+    - Cellular processes / Cell division

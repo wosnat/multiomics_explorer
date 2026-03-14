@@ -1,0 +1,83 @@
+case_id: search_genes_partial_alteromonas_locus
+row_count: 20
+rows:
+- gene_name: ALT831_RS00180
+  locus_tag: ALT831_RS00180
+  organism_strain: Alteromonas macleodii MIT1002
+  product: IS630 family transposase
+- gene_name: ALT831_RS00590
+  locus_tag: ALT831_RS00590
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS01630
+  locus_tag: ALT831_RS01630
+  organism_strain: Alteromonas macleodii MIT1002
+  product: DUF5676 family membrane protein
+- gene_name: ALT831_RS02085
+  locus_tag: ALT831_RS02085
+  organism_strain: Alteromonas macleodii MIT1002
+  product: IS630 family transposase
+- gene_name: ALT831_RS02820
+  locus_tag: ALT831_RS02820
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS03340
+  locus_tag: ALT831_RS03340
+  organism_strain: Alteromonas macleodii MIT1002
+  product: IS630 family transposase
+- gene_name: ALT831_RS03440
+  locus_tag: ALT831_RS03440
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS03875
+  locus_tag: ALT831_RS03875
+  organism_strain: Alteromonas macleodii MIT1002
+  product: YbaN family protein
+- gene_name: ALT831_RS05025
+  locus_tag: ALT831_RS05025
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS05230
+  locus_tag: ALT831_RS05230
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS07285
+  locus_tag: ALT831_RS07285
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS07470
+  locus_tag: ALT831_RS07470
+  organism_strain: Alteromonas macleodii MIT1002
+  product: IS3 family transposase
+- gene_name: ALT831_RS07720
+  locus_tag: ALT831_RS07720
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS08090
+  locus_tag: ALT831_RS08090
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS08345
+  locus_tag: ALT831_RS08345
+  organism_strain: Alteromonas macleodii MIT1002
+  product: IS3 family transposase
+- gene_name: ALT831_RS08740
+  locus_tag: ALT831_RS08740
+  organism_strain: Alteromonas macleodii MIT1002
+  product: DUF2252 family protein
+- gene_name: ALT831_RS09030
+  locus_tag: ALT831_RS09030
+  organism_strain: Alteromonas macleodii MIT1002
+  product: SprT family zinc-dependent metalloprotease
+- gene_name: ALT831_RS09040
+  locus_tag: ALT831_RS09040
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+- gene_name: ALT831_RS09205
+  locus_tag: ALT831_RS09205
+  organism_strain: Alteromonas macleodii MIT1002
+  product: IS3 family transposase
+- gene_name: ALT831_RS09315
+  locus_tag: ALT831_RS09315
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein

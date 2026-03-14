@@ -1,0 +1,83 @@
+case_id: search_genes_hypothetical_alteromonas
+row_count: 20
+rows:
+- gene_name: ACZ81_RS00025
+  locus_tag: ACZ81_00025
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00190
+  locus_tag: ACZ81_00190
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00210
+  locus_tag: ACZ81_00210
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00245
+  locus_tag: ACZ81_00245
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00275
+  locus_tag: ACZ81_00275
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00295
+  locus_tag: ACZ81_00295
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00300
+  locus_tag: ACZ81_00300
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00390
+  locus_tag: ACZ81_00390
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00435
+  locus_tag: ACZ81_00435
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00440
+  locus_tag: ACZ81_00440
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00575
+  locus_tag: ACZ81_00575
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00605
+  locus_tag: ACZ81_00605
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00610
+  locus_tag: ACZ81_00610
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00635
+  locus_tag: ACZ81_00635
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00670
+  locus_tag: ACZ81_00670
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00675
+  locus_tag: ACZ81_00675
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00770
+  locus_tag: ACZ81_00770
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS21265
+  locus_tag: ACZ81_00935
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00950
+  locus_tag: ACZ81_00955
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein
+- gene_name: ACZ81_RS00990
+  locus_tag: ACZ81_00995
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: hypothetical protein

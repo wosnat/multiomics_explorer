@@ -201,3 +201,189 @@
   expect:
     min_rows: 1
     row0_check: "cnt > 0"
+
+# ── Gene lookup corner cases ──────────────────────────────
+
+- id: get_gene_alteromonas_locus
+  tool: get_gene
+  desc: Exact lookup by Alteromonas locus_tag
+  params:
+    id: ALT831_RS00180
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, product, organism_strain]
+    row0:
+      locus_tag: ALT831_RS00180
+
+- id: get_gene_synechococcus_locus
+  tool: get_gene
+  desc: Exact lookup by Synechococcus locus_tag
+  params:
+    id: SYNW0305
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, product, organism_strain]
+    row0:
+      locus_tag: SYNW0305
+      gene_name: ftsH1
+
+- id: get_gene_by_protein_id
+  tool: get_gene
+  desc: Lookup by protein accession in all_identifiers resolves to correct gene
+  params:
+    id: WP_011132082.1
+  expect:
+    min_rows: 1
+    contains:
+      locus_tag: PMM0446
+
+- id: get_gene_dnan_multi_strain
+  tool: get_gene
+  desc: dnaN without organism filter returns hits from multiple strains
+  params:
+    id: dnaN
+  expect:
+    min_rows: 2
+
+- id: get_gene_mit9312
+  tool: get_gene
+  desc: Lookup MIT9312 gene by locus_tag
+  params:
+    id: PMT9312_0001
+  expect:
+    min_rows: 1
+    row0:
+      locus_tag: PMT9312_0001
+      gene_name: dnaN
+
+- id: get_gene_hypothetical_minimal
+  tool: get_gene
+  desc: Hypothetical protein with minimal annotation fields still returns
+  params:
+    id: PMT9312_0342
+  expect:
+    min_rows: 1
+    row0:
+      locus_tag: PMT9312_0342
+
+# ── Search corner cases ───────────────────────────────────
+
+- id: search_genes_hypothetical_alteromonas
+  tool: search_genes
+  desc: Hypothetical protein search filtered to Alteromonas
+  params:
+    query: hypothetical
+    organism: Alteromonas
+  expect:
+    min_rows: 1
+
+- id: search_genes_partial_alteromonas_locus
+  tool: search_genes
+  desc: Partial Alteromonas locus_tag prefix matches multiple genes
+  params:
+    query: ALT831
+  expect:
+    min_rows: 1
+
+- id: search_genes_case_insensitive
+  tool: search_genes
+  desc: Product search is case-insensitive (FtsH vs ftsH)
+  params:
+    query: FtsH
+  expect:
+    min_rows: 1
+    contains:
+      gene_name: ftsH1
+
+# ── Find gene corner cases ────────────────────────────────
+
+- id: find_gene_synechococcus_filter
+  tool: find_gene
+  desc: Full-text search with Synechococcus organism filter
+  params:
+    search_text: cell division
+    organism: Synechococcus
+  expect:
+    min_rows: 1
+
+- id: find_gene_naphthoate
+  tool: find_gene
+  desc: Specific enzyme search finds naphthoate synthase
+  params:
+    search_text: naphthoate
+  expect:
+    min_rows: 1
+    columns: [locus_tag, product, score]
+
+# ── Gene details corner cases ─────────────────────────────
+
+- id: gene_details_alteromonas
+  tool: get_gene_details
+  desc: Alteromonas gene details returned (no CyanORAK cluster expected)
+  params:
+    gene_id: ALT831_RS00180
+  expect:
+    min_rows: 1
+
+- id: gene_details_synechococcus
+  tool: get_gene_details
+  desc: Synechococcus gene details returned
+  params:
+    gene_id: SYNW0305
+  expect:
+    min_rows: 1
+
+# ── Expression corner cases ───────────────────────────────
+
+- id: expression_direction_down
+  tool: query_expression
+  desc: Filtering to direction=down returns only downregulated entries
+  params:
+    organism: MED4
+    direction: down
+    limit: 10
+  expect:
+    min_rows: 1
+    contains:
+      direction: down
+
+- id: expression_high_log2fc
+  tool: query_expression
+  desc: High fold-change filter returns strongly regulated genes
+  params:
+    organism: MED4
+    min_log2fc: 2.0
+    limit: 10
+  expect:
+    min_rows: 1
+
+- id: expression_alteromonas_organism
+  tool: query_expression
+  desc: Alteromonas has expression data as the responding organism
+  params:
+    organism: Alteromonas
+    limit: 10
+  expect:
+    min_rows: 1
+
+# ── Homolog corner cases ──────────────────────────────────
+
+- id: homologs_dnan_cross_strain
+  tool: get_homologs
+  desc: dnaN (PMM0001) has homologs across many strains
+  params:
+    gene_id: PMM0001
+  expect:
+    min_rows: 2
+    columns: [locus_tag, organism_strain, distance]
+
+# ── Validation queries ─────────────────────────────────────
+
+- id: all_genes_have_organism_strain
+  tool: raw_cypher
+  desc: Every gene node has the organism_strain property set
+  params:
+    query: "MATCH (g:Gene) WHERE g.organism_strain IS NULL RETURN count(g) AS cnt"
+  expect:
+    row0:
+      cnt: 0

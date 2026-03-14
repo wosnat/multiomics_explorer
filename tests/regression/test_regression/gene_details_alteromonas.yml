@@ -1,0 +1,57 @@
+case_id: gene_details_alteromonas
+row_count: 1
+rows:
+- gene:
+    _cluster: null
+    _organism:
+      clade: null
+      genus: Alteromonas
+      ncbi_taxon_id: 28108
+      preferred_name: Alteromonas macleodii MIT1002
+      strain_name: MIT1002
+    _protein: null
+    all_identifiers:
+    - WP_197047964.1
+    alternate_functional_descriptions:
+    - '[ncbi] IS630 family transposase'
+    - '[eggnog] Winged helix-turn helix'
+    - '[pfam] DDE_3'
+    - '[pfam] HTH_32'
+    alternative_locus_tags:
+    - ALT831_RS00180
+    annotation_quality: 2
+    bacteria_cog_og: COG3335
+    cog_category:
+    - L
+    eggnog_ogs:
+    - COG3335@1,root
+    - COG3415@1,root
+    - COG3335@2,Bacteria
+    - COG3415@2,Bacteria
+    - 1RCFZ@1224,Proteobacteria
+    - 1S2QS@1236,Gammaproteobacteria
+    - 2QEEF@267890,Shewanellaceae
+    end: 40258
+    function_description: Winged helix-turn helix
+    function_description_source: eggnog
+    gene_name: ALT831_RS00180
+    gene_name_source: ncbi
+    gene_summary: 'ALT831_RS00180 :: IS630 family transposase :: Winged helix-turn
+      helix'
+    go_terms:
+    - GO:0004803
+    id: ncbigene:ALT831_RS00180
+    locus_tag: ALT831_RS00180
+    locus_tag_ncbi: ALT831_RS00180
+    max_annot_lvl: 1236,Gammaproteobacteria
+    organism_strain: Alteromonas macleodii MIT1002
+    pfam_names:
+    - DDE_3
+    - HTH_32
+    preferred_id: ncbigene
+    product: IS630 family transposase
+    product_source: ncbi
+    protein_id: WP_197047964.1
+    seed_ortholog: 211586.SO_2275
+    seed_ortholog_evalue: 9.55e-143
+    start: 39682

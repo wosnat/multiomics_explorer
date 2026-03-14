@@ -1,0 +1,134 @@
+case_id: expression_alteromonas_organism
+row_count: 10
+rows:
+- context: Axenic Alteromonas HOT1A3 in PRO99-lowN at 24C under continuous light
+  control: Exponential growth (day 11)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_16915
+  log2fc: -9.844
+  organism_strain: Alteromonas macleodii HOT1A3
+  padj: 0.0
+  product: catalase
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 31
+- context: Alteromonas HOT1A3 in coculture with Prochlorococcus MED4 in PRO99-lowN
+    at 24C under continuous light
+  control: Exponential growth (day 11)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_RS21240
+  log2fc: -11.0658
+  organism_strain: Alteromonas macleodii HOT1A3
+  padj: 0.0
+  product: hypothetical protein
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 31
+- context: Axenic Alteromonas HOT1A3 in PRO99-lowN at 24C under continuous light
+  control: Exponential growth (day 11)
+  direction: down
+  edge_type: Condition_changes_expression_of
+  gene: ACZ81_RS21240
+  log2fc: -10.514
+  organism_strain: Alteromonas macleodii HOT1A3
+  padj: 0.0
+  product: hypothetical protein
+  publications:
+  - doi:10.1101/2025.11.24.690089
+  source: PRO99-lowN nutrient starvation
+  time_point: day 31
+- context: in Pro99 medium under continuous light
+  control: 12 hours after co-culturing with Prochlorococcus NATL2A
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: MIT1002_00894
+  log2fc: 9.7
+  organism_strain: Alteromonas MIT1002
+  padj: null
+  product: DUF3718 domain-containing protein
+  publications:
+  - doi:10.1038/ismej.2016.82
+  source: NATL2A
+  time_point: 48h vs 12h
+- context: in Pro99 medium under continuous light
+  control: 12 hours after co-culturing with Prochlorococcus NATL2A
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: MIT1002_00930
+  log2fc: 9.78
+  organism_strain: Alteromonas MIT1002
+  padj: null
+  product: DUF3718 domain-containing protein
+  publications:
+  - doi:10.1038/ismej.2016.82
+  source: NATL2A
+  time_point: 48h vs 12h
+- context: in Pro99 medium under continuous light
+  control: 12 hours after co-culturing with Prochlorococcus NATL2A
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: MIT1002_03386
+  log2fc: 9.49
+  organism_strain: Alteromonas MIT1002
+  padj: null
+  product: hypothetical protein
+  publications:
+  - doi:10.1038/ismej.2016.82
+  source: NATL2A
+  time_point: 48h vs 12h
+- context: in Pro99 medium under continuous light
+  control: 12 hours after co-culturing with Prochlorococcus NATL2A
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: MIT1002_03521
+  log2fc: 8.75
+  organism_strain: Alteromonas MIT1002
+  padj: null
+  product: S8 family peptidase
+  publications:
+  - doi:10.1038/ismej.2016.82
+  source: NATL2A
+  time_point: 24h vs 12h
+- context: in Pro99 medium under continuous light
+  control: 12 hours after co-culturing with Prochlorococcus NATL2A
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: MIT1002_03521
+  log2fc: 8.59
+  organism_strain: Alteromonas MIT1002
+  padj: null
+  product: S8 family peptidase
+  publications:
+  - doi:10.1038/ismej.2016.82
+  source: NATL2A
+  time_point: 48h vs 12h
+- context: in Pro99 medium under continuous light
+  control: 12 hours after co-culturing with Prochlorococcus NATL2A
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: MIT1002_03528
+  log2fc: 9.81
+  organism_strain: Alteromonas MIT1002
+  padj: null
+  product: hypothetical protein
+  publications:
+  - doi:10.1038/ismej.2016.82
+  source: NATL2A
+  time_point: 48h vs 12h
+- context: in Pro99 medium under continuous light
+  control: 12 hours after co-culturing with Prochlorococcus NATL2A
+  direction: up
+  edge_type: Coculture_changes_expression_of
+  gene: MIT1002_03528
+  log2fc: 9.73
+  organism_strain: Alteromonas MIT1002
+  padj: null
+  product: hypothetical protein
+  publications:
+  - doi:10.1038/ismej.2016.82
+  source: NATL2A
+  time_point: 24h vs 12h

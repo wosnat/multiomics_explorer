@@ -1,0 +1,12 @@
+case_id: get_gene_hypothetical_minimal
+row_count: 1
+rows:
+- annotation_quality: 2
+  function_description: null
+  gene_name: null
+  gene_summary: hypothetical protein
+  go_terms: null
+  kegg_ko: null
+  locus_tag: PMT9312_0342
+  organism_strain: Prochlorococcus MIT9312
+  product: hypothetical protein
