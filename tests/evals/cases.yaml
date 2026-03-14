@@ -15,41 +15,41 @@
 
 # ── Gene lookup ──────────────────────────────────────────
 
-- id: get_gene_by_locus_tag
-  tool: get_gene
+- id: resolve_gene_by_locus_tag
+  tool: resolve_gene
   desc: Exact lookup by locus_tag returns the correct gene
   params:
-    id: PMM0001
+    identifier: PMM0001
   expect:
     min_rows: 1
     columns: [locus_tag, gene_name, product, organism_strain]
     row0:
       locus_tag: PMM0001
 
-- id: get_gene_by_name
-  tool: get_gene
+- id: resolve_gene_by_name
+  tool: resolve_gene
   desc: Lookup by gene_name works
   params:
-    id: dnaN
+    identifier: dnaN
   expect:
     min_rows: 1
     contains:
       gene_name: dnaN
 
-- id: get_gene_not_found
-  tool: get_gene
+- id: resolve_gene_not_found
+  tool: resolve_gene
   desc: Non-existent gene returns empty
   params:
-    id: FAKE_GENE_999
+    identifier: FAKE_GENE_999
   expect:
     min_rows: 0
     max_rows: 0
 
-- id: get_gene_with_organism
-  tool: get_gene
+- id: resolve_gene_with_organism
+  tool: resolve_gene
   desc: Organism filter narrows results
   params:
-    id: dnaN
+    identifier: dnaN
     organism: MED4
   expect:
     min_rows: 1
@@ -204,22 +204,22 @@
 
 # ── Gene lookup corner cases ──────────────────────────────
 
-- id: get_gene_alteromonas_locus
-  tool: get_gene
+- id: resolve_gene_alteromonas_locus
+  tool: resolve_gene
   desc: Exact lookup by Alteromonas locus_tag
   params:
-    id: ALT831_RS00180
+    identifier: ALT831_RS00180
   expect:
     min_rows: 1
     columns: [locus_tag, gene_name, product, organism_strain]
     row0:
       locus_tag: ALT831_RS00180
 
-- id: get_gene_synechococcus_locus
-  tool: get_gene
+- id: resolve_gene_synechococcus_locus
+  tool: resolve_gene
   desc: Exact lookup by Synechococcus locus_tag
   params:
-    id: SYNW0305
+    identifier: SYNW0305
   expect:
     min_rows: 1
     columns: [locus_tag, gene_name, product, organism_strain]
@@ -227,40 +227,40 @@
       locus_tag: SYNW0305
       gene_name: ftsH1
 
-- id: get_gene_by_protein_id
-  tool: get_gene
+- id: resolve_gene_by_protein_id
+  tool: resolve_gene
   desc: Lookup by protein accession in all_identifiers resolves to correct gene
   params:
-    id: WP_011132082.1
+    identifier: WP_011132082.1
   expect:
     min_rows: 1
     contains:
       locus_tag: PMM0446
 
-- id: get_gene_dnan_multi_strain
-  tool: get_gene
+- id: resolve_gene_dnan_multi_strain
+  tool: resolve_gene
   desc: dnaN without organism filter returns hits from multiple strains
   params:
-    id: dnaN
+    identifier: dnaN
   expect:
     min_rows: 2
 
-- id: get_gene_mit9312
-  tool: get_gene
+- id: resolve_gene_mit9312
+  tool: resolve_gene
   desc: Lookup MIT9312 gene by locus_tag
   params:
-    id: PMT9312_0001
+    identifier: PMT9312_0001
   expect:
     min_rows: 1
     row0:
       locus_tag: PMT9312_0001
       gene_name: dnaN
 
-- id: get_gene_hypothetical_minimal
-  tool: get_gene
+- id: resolve_gene_hypothetical_minimal
+  tool: resolve_gene
   desc: Hypothetical protein with minimal annotation fields still returns
   params:
-    id: PMT9312_0342
+    identifier: PMT9312_0342
   expect:
     min_rows: 1
     row0:

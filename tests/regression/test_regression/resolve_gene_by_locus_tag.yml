@@ -1,4 +1,4 @@
-case_id: get_gene_mit9312
+case_id: resolve_gene_by_locus_tag
 row_count: 1
 rows:
 - annotation_quality: 2
@@ -31,6 +31,6 @@ rows:
   - GO:0034061
   kegg_ko:
   - K02338
-  locus_tag: PMT9312_0001
-  organism_strain: Prochlorococcus MIT9312
+  locus_tag: PMM0001
+  organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, beta subunit

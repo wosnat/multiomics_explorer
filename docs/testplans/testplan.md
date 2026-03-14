@@ -77,7 +77,7 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 **`get_schema`:**
 - [x] Calls `load_schema_from_neo4j` and returns its prompt string
 
-**`get_gene`:**
+**`resolve_gene`:**
 - [x] Not-found returns JSON with empty results and message
 - [x] Not-found with organism includes organism in message
 - [x] Single match returns results without ambiguity message
@@ -143,7 +143,7 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 
 Add to relevant unit/integration test files.
 
-- [x] `get_gene()` with empty string identifier
+- [x] `resolve_gene()` with empty string identifier
 - [x] `search_genes()` with special characters in search term
 - [x] `query_expression()` with conflicting filters (returns empty, no crash)
 - [x] `run_cypher()` with syntax-invalid Cypher (returns Neo4j error, no crash)

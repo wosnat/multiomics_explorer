@@ -36,7 +36,7 @@ def _conn_from(ctx):
 
 
 EXPECTED_TOOLS = [
-    "get_schema", "get_gene", "find_gene", "search_genes",
+    "get_schema", "resolve_gene", "find_gene", "search_genes",
     "get_gene_details", "query_expression", "compare_conditions",
     "get_homologs", "run_cypher",
 ]
@@ -72,33 +72,37 @@ class TestGetSchemaWrapper:
 
 
 # ---------------------------------------------------------------------------
-# get_gene
+# resolve_gene
 # ---------------------------------------------------------------------------
-class TestGetGeneWrapper:
+class TestResolveGeneWrapper:
     def test_not_found_message(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="FAKE_GENE"))
-        assert result["results"] == []
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="FAKE_GENE"))
+        assert result["results"] == {}
         assert "No gene found" in result["message"]
 
     def test_not_found_with_organism(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="FAKE", organism="MED4"))
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="FAKE", organism="MED4"))
         assert "MED4" in result["message"]
 
     def test_single_match(self, tool_fns, mock_ctx):
-        row = {"locus_tag": "PMM0001", "gene_name": "dnaN"}
+        row = {"locus_tag": "PMM0001", "gene_name": "dnaN", "organism_strain": "Prochlorococcus MED4"}
         _conn_from(mock_ctx).execute_query.return_value = [row]
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="PMM0001"))
-        assert len(result["results"]) == 1
-        assert "message" not in result  # no ambiguity message
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001"))
+        assert result["total"] == 1
+        assert "Prochlorococcus MED4" in result["results"]
 
-    def test_ambiguous_multi_match(self, tool_fns, mock_ctx):
-        rows = [{"locus_tag": f"PMM000{i}"} for i in range(3)]
+    def test_multi_match_grouped(self, tool_fns, mock_ctx):
+        rows = [
+            {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4"},
+            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312"},
+            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102"},
+        ]
         _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="dnaN"))
-        assert len(result["results"]) == 3
-        assert "Ambiguous" in result["message"]
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="dnaN"))
+        assert result["total"] == 3
+        assert len(result["results"]) == 3  # 3 organism groups
 
 
 # ---------------------------------------------------------------------------

@@ -11,8 +11,8 @@ import pytest
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_find_gene,
-    build_get_gene,
-    build_get_gene_details_main,
+    build_resolve_gene,
+    build_resolve_gene_details_main,
     build_get_homologs,
     build_homolog_expression,
     build_query_expression,
@@ -123,8 +123,8 @@ class TestRunCypherBlocking:
 
 @pytest.mark.kg
 class TestEdgeCases:
-    def test_get_gene_empty_id(self, conn):
-        cypher, params = build_get_gene(id="")
+    def test_resolve_gene_empty_id(self, conn):
+        cypher, params = build_resolve_gene(identifier="")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 0
 
@@ -135,7 +135,7 @@ class TestEdgeCases:
         assert len(results) == 0
 
     def test_get_gene_details_nonexistent(self, conn):
-        cypher, params = build_get_gene_details_main(gene_id="FAKE_GENE_XYZ")
+        cypher, params = build_resolve_gene_details_main(gene_id="FAKE_GENE_XYZ")
         results = conn.execute_query(cypher, **params)
         # Either empty or gene is None
         assert not results or results[0]["gene"] is None

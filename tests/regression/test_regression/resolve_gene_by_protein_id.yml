@@ -1,4 +1,4 @@
-case_id: get_gene_by_protein_id
+case_id: resolve_gene_by_protein_id
 row_count: 1
 rows:
 - annotation_quality: 2

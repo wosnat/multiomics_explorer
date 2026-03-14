@@ -36,7 +36,7 @@ The MCP server (`mcp_server/`) is the primary interface for Claude Code.
 | Tool | Purpose |
 |---|---|
 | `get_schema` | Graph schema with node counts, relationships, properties |
-| `get_gene` | Exact gene lookup by any identifier (locus_tag, gene_name, old IDs) |
+| `resolve_gene` | Resolve a gene identifier to matching graph nodes. Returns locus_tags grouped by organism. |
 | `find_gene` | Full-text search across gene annotations (Lucene syntax) |
 | `search_genes` | Simple CONTAINS search by locus_tag, gene name, or product |
 | `get_gene_details` | Full gene profile with protein, organism, cluster, homologs |

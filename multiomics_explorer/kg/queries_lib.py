@@ -12,27 +12,22 @@ ORTHOLOG_EXPR_RELS = (
 ALL_EXPR_RELS = f"{DIRECT_EXPR_RELS}|{ORTHOLOG_EXPR_RELS}"
 
 
-def build_get_gene(
-    *, id: str, organism: str | None = None
+def build_resolve_gene(
+    *, identifier: str, organism: str | None = None
 ) -> tuple[str, dict]:
     cypher = (
         "MATCH (g:Gene)\n"
         "WHERE (\n"
-        "    g.locus_tag = $id\n"
-        "    OR g.gene_name = $id\n"
-        "    OR $id IN g.all_identifiers\n"
+        "    g.locus_tag = $identifier\n"
+        "    OR g.gene_name = $identifier\n"
+        "    OR $identifier IN g.all_identifiers\n"
         "  )\n"
         "  AND ($organism IS NULL OR g.organism_strain CONTAINS $organism)\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.gene_summary AS gene_summary, g.product AS product,\n"
-        "       g.function_description AS function_description,\n"
-        "       g.organism_strain AS organism_strain,\n"
-        "       g.go_terms AS go_terms, g.kegg_ko AS kegg_ko,\n"
-        "       g.annotation_quality AS annotation_quality\n"
-        "ORDER BY g.locus_tag\n"
-        "LIMIT 5"
+        "       g.product AS product, g.organism_strain AS organism_strain\n"
+        "ORDER BY g.locus_tag"
     )
-    return cypher, {"id": id, "organism": organism}
+    return cypher, {"identifier": identifier, "organism": organism}
 
 
 def build_find_gene(

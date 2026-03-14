@@ -67,8 +67,8 @@ Pattern for adding a specific test:
 ```python
 def test_new_edge_case_name(self, tool_fns, mock_ctx):
     gene = GENES_BY_LOCUS["NEW_LOCUS_TAG"]
-    _conn_from(mock_ctx).execute_query.return_value = [as_get_gene_result(gene)]
-    result = json.loads(tool_fns["get_gene"](mock_ctx, id=gene["locus_tag"]))
+    _conn_from(mock_ctx).execute_query.return_value = [as_resolve_gene_result(gene)]
+    result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier=gene["locus_tag"]))
     assert len(result["results"]) == 1
     # ... specific assertions for the edge case
 ```
@@ -85,10 +85,10 @@ Edit `tests/evals/cases.yaml` — append new entries:
 
 ```yaml
 - id: descriptive_case_id
-  tool: get_gene  # or find_gene, search_genes, etc.
+  tool: resolve_gene  # or find_gene, search_genes, etc.
   desc: What this case verifies
   params:
-    id: NEW_LOCUS_TAG
+    identifier: NEW_LOCUS_TAG
   expect:
     min_rows: 1
     columns: [locus_tag, gene_name, product, organism_strain]

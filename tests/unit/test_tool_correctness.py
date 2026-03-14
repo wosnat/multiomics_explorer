@@ -19,7 +19,7 @@ from tests.fixtures.gene_data import (
     GENES_WITH_EC,
     GENES_WITH_GENE_NAME,
     GENES_WITHOUT_GENE_NAME,
-    as_get_gene_result,
+    as_resolve_gene_result,
     as_search_genes_result,
     genes_by_organism,
 )
@@ -47,10 +47,10 @@ def _conn_from(ctx):
 
 
 # ---------------------------------------------------------------------------
-# TestGetGeneCorrectness
+# TestResolveGeneCorrectness
 # ---------------------------------------------------------------------------
-class TestGetGeneCorrectness:
-    """Verify get_gene returns correct data for realistic mock responses."""
+class TestResolveGeneCorrectness:
+    """Verify resolve_gene returns correct data for realistic mock responses."""
 
     @pytest.mark.parametrize(
         "locus_tag",
@@ -60,127 +60,112 @@ class TestGetGeneCorrectness:
     def test_single_gene_lookup_all_fixtures(self, tool_fns, mock_ctx, locus_tag):
         """Each fixture gene returns correct locus_tag, product, organism."""
         gene = GENES_BY_LOCUS[locus_tag]
-        row = as_get_gene_result(gene)
+        row = as_resolve_gene_result(gene)
         _conn_from(mock_ctx).execute_query.return_value = [row]
 
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id=locus_tag))
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier=locus_tag))
 
-        assert len(result["results"]) == 1
-        r = result["results"][0]
+        org = gene.get("organism_strain")
+        assert org in result["results"]
+        entries = result["results"][org]
+        assert len(entries) == 1
+        r = entries[0]
         assert r["locus_tag"] == locus_tag
         assert r["product"] == gene.get("product")
-        assert r["organism_strain"] == gene.get("organism_strain")
-        assert "message" not in result  # single match = no ambiguity
 
     def test_lookup_by_gene_name_dnaN(self, tool_fns, mock_ctx):
         """Looking up 'dnaN' with a single mock result returns the correct gene."""
         gene = GENES_BY_LOCUS["PMM0001"]
-        row = as_get_gene_result(gene)
+        row = as_resolve_gene_result(gene)
         _conn_from(mock_ctx).execute_query.return_value = [row]
 
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="dnaN"))
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="dnaN"))
 
-        assert result["results"][0]["locus_tag"] == "PMM0001"
-        assert result["results"][0]["gene_name"] == "dnaN"
+        org = "Prochlorococcus MED4"
+        assert result["results"][org][0]["locus_tag"] == "PMM0001"
+        assert result["results"][org][0]["gene_name"] == "dnaN"
 
-    def test_ambiguous_dnaN_multiple_organisms(self, tool_fns, mock_ctx):
-        """dnaN exists in MED4 and MIT9312; multiple results trigger ambiguity."""
-        med4 = as_get_gene_result(GENES_BY_LOCUS["PMM0001"])
-        mit9312 = as_get_gene_result(GENES_BY_LOCUS["PMT9312_0001"])
+    def test_dnaN_multiple_organisms_grouped(self, tool_fns, mock_ctx):
+        """dnaN exists in MED4 and MIT9312; results are grouped by organism."""
+        med4 = as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"])
+        mit9312 = as_resolve_gene_result(GENES_BY_LOCUS["PMT9312_0001"])
         _conn_from(mock_ctx).execute_query.return_value = [med4, mit9312]
 
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="dnaN"))
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="dnaN"))
 
-        assert len(result["results"]) == 2
-        assert "Ambiguous" in result["message"]
-        loci = {r["locus_tag"] for r in result["results"]}
+        assert result["total"] == 2
+        assert "Prochlorococcus MED4" in result["results"]
+        assert "Prochlorococcus MIT9312" in result["results"]
+        loci = set()
+        for entries in result["results"].values():
+            for e in entries:
+                loci.add(e["locus_tag"])
         assert loci == {"PMM0001", "PMT9312_0001"}
 
     def test_lookup_by_identifier_refseq(self, tool_fns, mock_ctx):
         """PMM0446 can be found via RefSeq protein ID WP_011132082.1."""
         gene = GENES_BY_LOCUS["PMM0446"]
-        row = as_get_gene_result(gene)
+        row = as_resolve_gene_result(gene)
         _conn_from(mock_ctx).execute_query.return_value = [row]
 
         result = json.loads(
-            tool_fns["get_gene"](mock_ctx, id="WP_011132082.1")
+            tool_fns["resolve_gene"](mock_ctx, identifier="WP_011132082.1")
         )
 
-        assert result["results"][0]["locus_tag"] == "PMM0446"
-        assert result["results"][0]["gene_name"] == "ctaCI"
+        org = gene["organism_strain"]
+        assert result["results"][org][0]["locus_tag"] == "PMM0446"
+        assert result["results"][org][0]["gene_name"] == "ctaCI"
 
     def test_gene_without_real_gene_name(self, tool_fns, mock_ctx):
         """S8102_04001 has no gene_name field — result shows None."""
         gene = GENES_BY_LOCUS["S8102_04001"]
-        row = as_get_gene_result(gene)
+        row = as_resolve_gene_result(gene)
         _conn_from(mock_ctx).execute_query.return_value = [row]
 
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="S8102_04001"))
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="S8102_04001"))
 
-        r = result["results"][0]
+        org = gene["organism_strain"]
+        r = result["results"][org][0]
         assert r["locus_tag"] == "S8102_04001"
-        # gene_name is None because the fixture has no gene_name key
         assert r["gene_name"] is None
 
     def test_gene_name_equals_locus_tag(self, tool_fns, mock_ctx):
         """ALT831_RS00180 has gene_name == locus_tag (fallback)."""
         gene = GENES_BY_LOCUS["ALT831_RS00180"]
-        row = as_get_gene_result(gene)
+        row = as_resolve_gene_result(gene)
         _conn_from(mock_ctx).execute_query.return_value = [row]
 
         result = json.loads(
-            tool_fns["get_gene"](mock_ctx, id="ALT831_RS00180")
+            tool_fns["resolve_gene"](mock_ctx, identifier="ALT831_RS00180")
         )
 
-        r = result["results"][0]
+        org = gene["organism_strain"]
+        r = result["results"][org][0]
         assert r["gene_name"] == r["locus_tag"]
 
-    def test_organism_filter_narrows_ambiguous(self, tool_fns, mock_ctx):
+    def test_organism_filter_narrows_results(self, tool_fns, mock_ctx):
         """With organism='MED4', only the MED4 dnaN is returned."""
-        med4 = as_get_gene_result(GENES_BY_LOCUS["PMM0001"])
+        med4 = as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"])
         _conn_from(mock_ctx).execute_query.return_value = [med4]
 
         result = json.loads(
-            tool_fns["get_gene"](mock_ctx, id="dnaN", organism="MED4")
+            tool_fns["resolve_gene"](mock_ctx, identifier="dnaN", organism="MED4")
         )
 
-        assert len(result["results"]) == 1
-        assert result["results"][0]["organism_strain"] == "Prochlorococcus MED4"
-        assert "message" not in result
-
-    def test_get_gene_preserves_go_terms(self, tool_fns, mock_ctx):
-        """Well-annotated PMM0001 has GO terms in result."""
-        gene = GENES_BY_LOCUS["PMM0001"]
-        row = as_get_gene_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
-
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="PMM0001"))
-
-        go = result["results"][0]["go_terms"]
-        assert isinstance(go, list)
-        assert len(go) > 0
-        assert "GO:0006260" in go  # DNA replication
-
-    def test_get_gene_preserves_kegg_ko(self, tool_fns, mock_ctx):
-        """PMM0001 has KEGG KO in result."""
-        gene = GENES_BY_LOCUS["PMM0001"]
-        row = as_get_gene_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
-
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="PMM0001"))
-
-        assert result["results"][0]["kegg_ko"] == ["K02338"]
+        assert result["total"] == 1
+        assert "Prochlorococcus MED4" in result["results"]
 
     def test_old_locus_tag_lookup(self, tool_fns, mock_ctx):
         """PMT0106 has old_locus_tags including PMT_0106."""
         gene = GENES_BY_LOCUS["PMT0106"]
-        row = as_get_gene_result(gene)
+        row = as_resolve_gene_result(gene)
         _conn_from(mock_ctx).execute_query.return_value = [row]
 
-        result = json.loads(tool_fns["get_gene"](mock_ctx, id="PMT_0106"))
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="PMT_0106"))
 
-        assert result["results"][0]["locus_tag"] == "PMT0106"
-        assert result["results"][0]["gene_name"] == "legI"
+        org = gene["organism_strain"]
+        assert result["results"][org][0]["locus_tag"] == "PMT0106"
+        assert result["results"][org][0]["gene_name"] == "legI"
 
 
 # ---------------------------------------------------------------------------
@@ -278,9 +263,9 @@ class TestFindGeneCorrectness:
     def test_fulltext_results_with_scores(self, tool_fns, mock_ctx):
         """Results from multiple organisms are returned with total count."""
         rows = [
-            {**as_get_gene_result(GENES_BY_LOCUS["PMM0001"]), "score": 5.2},
-            {**as_get_gene_result(GENES_BY_LOCUS["PMT9312_0001"]), "score": 4.8},
-            {**as_get_gene_result(GENES_BY_LOCUS["SYNW0305"]), "score": 2.1},
+            {**as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"]), "score": 5.2},
+            {**as_resolve_gene_result(GENES_BY_LOCUS["PMT9312_0001"]), "score": 4.8},
+            {**as_resolve_gene_result(GENES_BY_LOCUS["SYNW0305"]), "score": 2.1},
         ]
         _conn_from(mock_ctx).execute_query.return_value = rows
 
@@ -296,7 +281,7 @@ class TestFindGeneCorrectness:
 
     def test_organism_filter_wh8102(self, tool_fns, mock_ctx):
         """Organism filter passes through and only WH8102 genes returned."""
-        wh8102_row = {**as_get_gene_result(GENES_BY_LOCUS["SYNW0305"]), "score": 3.0}
+        wh8102_row = {**as_resolve_gene_result(GENES_BY_LOCUS["SYNW0305"]), "score": 3.0}
         _conn_from(mock_ctx).execute_query.return_value = [wh8102_row]
 
         tool_fns["find_gene"](mock_ctx, search_text="metallopeptidase", organism="WH8102")
@@ -307,7 +292,7 @@ class TestFindGeneCorrectness:
     def test_quality_filter_passed(self, tool_fns, mock_ctx):
         """min_quality=2 is passed through to query builder."""
         rows = [
-            {**as_get_gene_result(GENES_BY_LOCUS["PMM0001"]), "score": 5.0,
+            {**as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"]), "score": 5.0,
              "annotation_quality": 2},
         ]
         _conn_from(mock_ctx).execute_query.return_value = rows
@@ -319,7 +304,7 @@ class TestFindGeneCorrectness:
 
     def test_find_gene_result_envelope(self, tool_fns, mock_ctx):
         """Result envelope contains query, total, and results keys."""
-        rows = [{**as_get_gene_result(GENES_BY_LOCUS["PMN2A_0044"]), "score": 4.0}]
+        rows = [{**as_resolve_gene_result(GENES_BY_LOCUS["PMN2A_0044"]), "score": 4.0}]
         _conn_from(mock_ctx).execute_query.return_value = rows
 
         result = json.loads(

@@ -6,7 +6,7 @@ Verifies Cypher structure and parameter correctness.
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_find_gene,
-    build_get_gene,
+    build_resolve_gene,
     build_get_gene_details_homologs,
     build_get_gene_details_main,
     build_get_homologs,
@@ -16,20 +16,20 @@ from multiomics_explorer.kg.queries_lib import (
 )
 
 
-class TestBuildGetGene:
+class TestBuildResolveGene:
     def test_basic(self):
-        cypher, params = build_get_gene(id="PMM0001")
+        cypher, params = build_resolve_gene(identifier="PMM0001")
         assert "MATCH (g:Gene)" in cypher
-        assert params["id"] == "PMM0001"
+        assert params["identifier"] == "PMM0001"
         assert params["organism"] is None
 
     def test_with_organism(self):
-        cypher, params = build_get_gene(id="dnaN", organism="MED4")
+        cypher, params = build_resolve_gene(identifier="dnaN", organism="MED4")
         assert params["organism"] == "MED4"
         assert "CONTAINS $organism" in cypher
 
     def test_returns_expected_columns(self):
-        cypher, _ = build_get_gene(id="x")
+        cypher, _ = build_resolve_gene(identifier="x")
         for col in ["locus_tag", "gene_name", "product", "organism_strain"]:
             assert col in cypher
 

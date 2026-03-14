@@ -7,7 +7,7 @@ Requires a live Neo4j instance — all tests are marked with @pytest.mark.kg.
 
 Usage:
     pytest tests/evals/ -v                     # run all evals
-    pytest tests/evals/ -v -k get_gene         # run gene lookup evals only
+    pytest tests/evals/ -v -k resolve_gene      # run gene lookup evals only
 """
 
 from pathlib import Path
@@ -18,8 +18,8 @@ import yaml
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_find_gene,
-    build_get_gene,
-    build_get_gene_details_main,
+    build_resolve_gene,
+    build_resolve_gene_details_main,
     build_get_homologs,
     build_homolog_expression,
     build_query_expression,
@@ -39,10 +39,10 @@ CASE_IDS = [c["id"] for c in CASES]
 # ---------------------------------------------------------------------------
 
 TOOL_BUILDERS = {
-    "get_gene": build_get_gene,
+    "resolve_gene": build_resolve_gene,
     "find_gene": build_find_gene,
     "search_genes": build_search_genes,
-    "get_gene_details": build_get_gene_details_main,
+    "get_gene_details": build_resolve_gene_details_main,
     "query_expression": build_query_expression,
     "compare_conditions": build_compare_conditions,
     "get_homologs": build_get_homologs,

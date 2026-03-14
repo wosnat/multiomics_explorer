@@ -78,7 +78,7 @@ system_prompts:
       1 Parasynechococcus, 3 Alteromonas) + 5 treatment organisms
     - ~188,000 direct expression edges + ~2M ortholog-inferred expression edges
     - Protein annotations, GO terms, KEGG pathways, EC numbers, COG categories, homology
-    - Gene lookup: get_gene (exact ID match) and find_gene (full-text search with Lucene)
+    - Gene lookup: resolve_gene (ID resolution) and find_gene (full-text search with Lucene)
 
     Key biological context:
     - Prochlorococcus lacks catalase-peroxidase (katG) — relies on Alteromonas for ROS detoxification

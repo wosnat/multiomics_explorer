@@ -15,9 +15,9 @@ import pytest
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_find_gene,
-    build_get_gene,
-    build_get_gene_details_homologs,
-    build_get_gene_details_main,
+    build_resolve_gene,
+    build_resolve_gene_details_homologs,
+    build_resolve_gene_details_main,
     build_get_homologs,
     build_query_expression,
     build_search_genes,
@@ -54,15 +54,15 @@ def _kg_escape(text):
 # ---------------------------------------------------------------------------
 
 @pytest.mark.kg
-class TestGetGeneCorrectnessKG:
-    """Validate get_gene queries return correct data for every fixture gene."""
+class TestResolveGeneCorrectnessKG:
+    """Validate resolve_gene queries return correct data for every fixture gene."""
 
     @pytest.mark.parametrize(
         "gene", GENES, ids=[g["locus_tag"] for g in GENES],
     )
     def test_lookup_by_locus_tag(self, conn, gene):
         """Every fixture gene should be found by locus_tag with matching product and organism."""
-        cypher, params = build_get_gene(id=gene["locus_tag"])
+        cypher, params = build_resolve_gene(identifier=gene["locus_tag"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1, (
             f"Expected 1 result for {gene['locus_tag']}, got {len(results)}"
@@ -78,11 +78,10 @@ class TestGetGeneCorrectnessKG:
         ids=[g["locus_tag"] for g in GENES_WITH_GENE_NAME],
     )
     def test_lookup_by_gene_name(self, conn, gene):
-        """Genes with a real gene_name should return results (LIMIT 5 may
-        exclude the specific fixture gene when the name is shared widely).
-        Note: get_gene also matches on all_identifiers, so results may
+        """Genes with a real gene_name should return results.
+        Note: resolve_gene also matches on all_identifiers, so results may
         include genes with different gene_names that share an identifier."""
-        cypher, params = build_get_gene(id=gene["gene_name"])
+        cypher, params = build_resolve_gene(identifier=gene["gene_name"])
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1, (
             f"No results for gene_name={gene['gene_name']}"
@@ -90,27 +89,27 @@ class TestGetGeneCorrectnessKG:
 
     def test_dnan_ambiguous_without_organism(self, conn):
         """dnaN exists in multiple organisms, so unfiltered lookup returns >1 result."""
-        cypher, params = build_get_gene(id="dnaN")
+        cypher, params = build_resolve_gene(identifier="dnaN")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 1, "dnaN should match multiple organisms"
 
     def test_dnan_filtered_by_organism(self, conn):
         """dnaN + organism=MED4 should return exactly 1 result from MED4."""
-        cypher, params = build_get_gene(id="dnaN", organism="MED4")
+        cypher, params = build_resolve_gene(identifier="dnaN", organism="MED4")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         assert "MED4" in results[0]["organism_strain"]
 
     def test_lookup_by_all_identifiers_entry(self, conn):
         """PMM0446 should be found via its WP_ protein accession."""
-        cypher, params = build_get_gene(id="WP_011132082.1")
+        cypher, params = build_resolve_gene(identifier="WP_011132082.1")
         results = conn.execute_query(cypher, **params)
         found_loci = _locus_tags(results)
         assert "PMM0446" in found_loci
 
     def test_lookup_by_old_locus_tag(self, conn):
         """PMT0106 should be found via old locus tag PMT_0106 (in all_identifiers)."""
-        cypher, params = build_get_gene(id="PMT_0106")
+        cypher, params = build_resolve_gene(identifier="PMT_0106")
         results = conn.execute_query(cypher, **params)
         found_loci = _locus_tags(results)
         assert "PMT0106" in found_loci
@@ -118,7 +117,7 @@ class TestGetGeneCorrectnessKG:
     def test_gene_name_equals_locus_tag(self, conn):
         """ALT831_RS00180 has gene_name = locus_tag; verify it returns correctly."""
         gene = GENES_BY_LOCUS["ALT831_RS00180"]
-        cypher, params = build_get_gene(id=gene["locus_tag"])
+        cypher, params = build_resolve_gene(identifier=gene["locus_tag"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         assert results[0]["gene_name"] == gene["gene_name"]
@@ -226,7 +225,7 @@ class TestGetGeneDetailsCorrectnessKG:
 
     def test_well_annotated_prochlorococcus(self, conn):
         """PMM0001 should have protein, organism, and cluster info."""
-        cypher, params = build_get_gene_details_main(gene_id="PMM0001")
+        cypher, params = build_resolve_gene_details_main(gene_id="PMM0001")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
@@ -238,7 +237,7 @@ class TestGetGeneDetailsCorrectnessKG:
 
     def test_alteromonas_no_cluster(self, conn):
         """ALT831_RS00180 (Alteromonas) should have no CyanORAK cluster."""
-        cypher, params = build_get_gene_details_main(gene_id="ALT831_RS00180")
+        cypher, params = build_resolve_gene_details_main(gene_id="ALT831_RS00180")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
@@ -247,7 +246,7 @@ class TestGetGeneDetailsCorrectnessKG:
 
     def test_homologs_exist_for_pmm0001(self, conn):
         """PMM0001 (dnaN) should have homologs from other organisms."""
-        cypher, params = build_get_gene_details_homologs(gene_id="PMM0001")
+        cypher, params = build_resolve_gene_details_homologs(gene_id="PMM0001")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         strains = {r["organism_strain"] for r in results}

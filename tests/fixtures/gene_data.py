@@ -1763,18 +1763,13 @@ GENES_WITH_EC = [g for g in GENES if g.get("ec_numbers")]
 GENES_HYPOTHETICAL = [g for g in GENES if "hypothetical" in g.get("product", "").lower()]
 
 
-# Helper: project to get_gene return shape
-def as_get_gene_result(gene):
+# Helper: project to resolve_gene return shape
+def as_resolve_gene_result(gene):
     return {
         "locus_tag": gene["locus_tag"],
         "gene_name": gene.get("gene_name"),
-        "gene_summary": gene.get("gene_summary"),
         "product": gene.get("product"),
-        "function_description": gene.get("function_description"),
         "organism_strain": gene.get("organism_strain"),
-        "go_terms": gene.get("go_terms"),
-        "kegg_ko": gene.get("kegg_ko"),
-        "annotation_quality": gene.get("annotation_quality"),
     }
 
 

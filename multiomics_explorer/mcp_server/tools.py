@@ -11,7 +11,7 @@ from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_find_gene,
-    build_get_gene,
+    build_resolve_gene,
     build_get_gene_details_homologs,
     build_get_gene_details_main,
     build_get_homologs,
@@ -67,34 +67,38 @@ def register_tools(mcp: FastMCP):
         return schema.to_prompt_string()
 
     @mcp.tool()
-    def get_gene(
+    def resolve_gene(
         ctx: Context,
-        id: str,
+        identifier: str,
         organism: str | None = None,
     ) -> str:
-        """Look up a gene by any known identifier: locus_tag, gene_name, old locus tag,
-        RefSeq protein ID, etc. Returns up to 5 matches (specify organism to narrow).
+        """Resolve a gene identifier to matching graph nodes. Returns locus_tags grouped by
+        organism. Use the returned locus_tag with get_gene_details, query_expression, or
+        other tools.
 
         Args:
-            id: Gene identifier — locus_tag (e.g. "PMM0001"), gene name (e.g. "dnaN"),
+            identifier: Gene identifier — locus_tag (e.g. "PMM0001"), gene name (e.g. "dnaN"),
                 old locus tag, or RefSeq protein ID.
             organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
         """
         conn = _conn(ctx)
-        cypher, params = build_get_gene(id=id, organism=organism)
+        cypher, params = build_resolve_gene(identifier=identifier, organism=organism)
         results = conn.execute_query(cypher, **params)
         if not results:
-            msg = f"No gene found for id '{id}'"
+            msg = f"No gene found for identifier '{identifier}'"
             if organism:
                 msg += f" in {organism}"
-            response = json.dumps({"results": [], "message": msg})
-        elif len(results) > 1:
-            response = json.dumps({
-                "results": results,
-                "message": f"Ambiguous — {len(results)} matches found. Specify organism to narrow.",
-            }, indent=2, default=str)
+            response = json.dumps({"results": {}, "message": msg})
         else:
-            response = json.dumps({"results": results}, indent=2, default=str)
+            grouped: dict[str, list[dict]] = {}
+            for row in results:
+                org = row.get("organism_strain", "Unknown")
+                entry = {k: v for k, v in row.items() if k != "organism_strain"}
+                grouped.setdefault(org, []).append(entry)
+            response = json.dumps(
+                {"results": grouped, "total": len(results)},
+                indent=2, default=str,
+            )
         return _with_query(response, cypher, params, ctx)
 
     @mcp.tool()
