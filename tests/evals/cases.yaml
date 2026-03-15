@@ -193,6 +193,37 @@
     contains:
       condition_type: nitrogen_stress
 
+# ── List organisms ──────────────────────────────────────
+
+- id: list_organisms
+  tool: list_organisms
+  desc: Returns all organisms with metadata
+  params: {}
+  expect:
+    min_rows: 10
+    columns: [name, genus, strain, clade, gene_count]
+    contains:
+      name: Prochlorococcus MED4
+    row0:
+      genus: Alteromonas
+
+- id: list_organisms_raw
+  tool: raw_cypher
+  desc: Snapshot of all organisms with metadata
+  params:
+    query: >
+      MATCH (o:OrganismTaxon)
+      OPTIONAL MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o)
+      RETURN o.preferred_name AS name, o.genus AS genus,
+             o.strain_name AS strain, o.clade AS clade,
+             count(g) AS gene_count
+      ORDER BY o.genus, o.preferred_name
+  expect:
+    min_rows: 10
+    columns: [name, genus, strain, clade, gene_count]
+    contains:
+      name: Prochlorococcus MED4
+
 # ── Validation queries ───────────────────────────────────
 
 - id: gene_count_nonzero

@@ -16,6 +16,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_list_condition_types,
     build_list_gene_categories,
+    build_list_organisms,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
@@ -377,4 +378,72 @@ class TestListFilterValuesCorrectnessKG:
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 5, (
             f"Expected >= 5 condition types, got {len(results)}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# TestListOrganismsCorrectnessKG
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestListOrganismsCorrectnessKG:
+    """Validate list_organisms query builder against live Neo4j."""
+
+    def test_known_organisms_present(self, conn):
+        """Known organisms MED4 and EZ55 must appear in results."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        names = {r["name"] for r in results}
+        for expected in ["Prochlorococcus MED4", "Alteromonas EZ55", "MIT9313", "HOT1A3"]:
+            assert any(expected in n for n in names), (
+                f"Expected organism containing '{expected}' not found in {sorted(names)}"
+            )
+
+    def test_gene_count_positive(self, conn):
+        """All returned organisms should have gene_count > 0."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        for r in results:
+            assert r["gene_count"] > 0, (
+                f"Organism '{r['name']}' has gene_count={r['gene_count']}"
+            )
+
+    def test_clade_populated_for_prochlorococcus(self, conn):
+        """Prochlorococcus strains should have a non-null clade."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        pro_strains = [r for r in results if r["genus"] == "Prochlorococcus"]
+        assert len(pro_strains) > 0, "No Prochlorococcus strains found"
+        for r in pro_strains:
+            assert r["clade"] is not None, (
+                f"Prochlorococcus strain '{r['name']}' has null clade"
+            )
+
+    def test_clade_null_for_alteromonas(self, conn):
+        """Alteromonas strains should not have a clade."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        alt_strains = [r for r in results if r["genus"] == "Alteromonas"]
+        for r in alt_strains:
+            assert r["clade"] is None, (
+                f"Alteromonas strain '{r['name']}' has unexpected clade={r['clade']}"
+            )
+
+    def test_clade_null_for_synechococcus(self, conn):
+        """Synechococcus/Parasynechococcus strains should not have a clade."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        syn_strains = [r for r in results if "synechococcus" in (r["genus"] or "").lower()
+                       or "parasynechococcus" in (r["genus"] or "").lower()]
+        for r in syn_strains:
+            assert r["clade"] is None, (
+                f"Synechococcus strain '{r['name']}' has unexpected clade={r['clade']}"
+            )
+
+    def test_minimum_organisms(self, conn):
+        """At least 10 organisms should be returned."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 10, (
+            f"Expected >= 10 organisms, got {len(results)}"
         )

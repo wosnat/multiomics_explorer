@@ -233,6 +233,18 @@ def build_list_condition_types() -> tuple[str, dict]:
     return cypher, {}
 
 
+def build_list_organisms() -> tuple[str, dict]:
+    cypher = (
+        "MATCH (o:OrganismTaxon)\n"
+        "OPTIONAL MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o)\n"
+        "RETURN o.preferred_name AS name, o.genus AS genus,\n"
+        "       o.strain_name AS strain, o.clade AS clade,\n"
+        "       count(g) AS gene_count\n"
+        "ORDER BY o.genus, o.preferred_name"
+    )
+    return cypher, {}
+
+
 def build_homolog_expression(*, gene_ids: list[str]) -> tuple[str, dict]:
     cypher = (
         f"MATCH (factor)-[r:{DIRECT_EXPR_RELS}]->(g:Gene)\n"

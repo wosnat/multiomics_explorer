@@ -36,9 +36,9 @@ def _conn_from(ctx):
 
 
 EXPECTED_TOOLS = [
-    "get_schema", "list_filter_values", "resolve_gene", "search_genes",
-    "get_gene_details", "query_expression", "compare_conditions",
-    "get_homologs", "run_cypher",
+    "get_schema", "list_filter_values", "list_organisms", "resolve_gene",
+    "search_genes", "get_gene_details", "query_expression",
+    "compare_conditions", "get_homologs", "run_cypher",
 ]
 
 
@@ -46,7 +46,7 @@ EXPECTED_TOOLS = [
 # Tool registration
 # ---------------------------------------------------------------------------
 class TestToolRegistration:
-    def test_all_nine_tools_registered(self, tool_fns):
+    def test_all_tools_registered(self, tool_fns):
         assert sorted(tool_fns.keys()) == sorted(EXPECTED_TOOLS)
 
     def test_no_extra_tools(self, tool_fns):
@@ -127,6 +127,45 @@ class TestListFilterValuesWrapper:
         })
         mock_ctx.request_context.lifespan_context._filter_values_cache = cached_response
         result = tool_fns["list_filter_values"](mock_ctx)
+        assert result == cached_response
+        _conn_from(mock_ctx).execute_query.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# list_organisms
+# ---------------------------------------------------------------------------
+class TestListOrganismsWrapper:
+    def test_returns_json_array(self, tool_fns, mock_ctx):
+        """list_organisms returns a JSON array with expected columns."""
+        rows = [
+            {"name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
+             "strain": "MED4", "clade": "HLI", "gene_count": 1929},
+            {"name": "Alteromonas EZ55", "genus": "Alteromonas",
+             "strain": "EZ55", "clade": None, "gene_count": 3800},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        mock_ctx.request_context.lifespan_context._organisms_cache = None
+        result = json.loads(tool_fns["list_organisms"](mock_ctx))
+        assert isinstance(result, list)
+        assert len(result) == 2
+        for col in ["name", "genus", "strain", "clade", "gene_count"]:
+            assert col in result[0]
+
+    def test_empty_result_message(self, tool_fns, mock_ctx):
+        """Empty result returns descriptive message."""
+        _conn_from(mock_ctx).execute_query.return_value = []
+        mock_ctx.request_context.lifespan_context._organisms_cache = None
+        result = tool_fns["list_organisms"](mock_ctx)
+        assert result == "No organisms found in the knowledge graph."
+
+    def test_caching(self, tool_fns, mock_ctx):
+        """Second call returns cached value without hitting Neo4j again."""
+        cached_response = json.dumps([
+            {"name": "Cached", "genus": "G", "strain": "S",
+             "clade": None, "gene_count": 1},
+        ])
+        mock_ctx.request_context.lifespan_context._organisms_cache = cached_response
+        result = tool_fns["list_organisms"](mock_ctx)
         assert result == cached_response
         _conn_from(mock_ctx).execute_query.assert_not_called()
 

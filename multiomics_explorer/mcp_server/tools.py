@@ -12,6 +12,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_list_condition_types,
     build_list_gene_categories,
+    build_list_organisms,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
@@ -96,6 +97,29 @@ def register_tools(mcp: FastMCP):
         }
         response = json.dumps(result, indent=2, default=str)
         lc._filter_values_cache = response
+        return response
+
+    @mcp.tool()
+    def list_organisms(ctx: Context) -> str:
+        """List all organisms in the knowledge graph with strain, genus, clade,
+        and gene count.
+
+        Use this to discover valid organism names for filtering in other tools.
+        The organism filter uses partial matching (CONTAINS), so "MED4",
+        "Prochlorococcus MED4", and "Prochlorococcus" all work.
+        """
+        lc = ctx.request_context.lifespan_context
+        cached = getattr(lc, "_organisms_cache", None)
+        if cached is not None:
+            return cached
+
+        conn = _conn(ctx)
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        if not results:
+            return "No organisms found in the knowledge graph."
+        response = _fmt(results)
+        lc._organisms_cache = response
         return response
 
     @mcp.tool()

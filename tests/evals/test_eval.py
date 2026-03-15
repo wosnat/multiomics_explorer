@@ -19,6 +19,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_list_condition_types,
     build_list_gene_categories,
+    build_list_organisms,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_main,
@@ -46,6 +47,7 @@ TOOL_BUILDERS = {
     "query_expression": build_query_expression,
     "compare_conditions": build_compare_conditions,
     "get_homologs": build_get_homologs,
+    "list_organisms": build_list_organisms,
 }
 
 

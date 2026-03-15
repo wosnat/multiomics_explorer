@@ -7,6 +7,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_list_condition_types,
     build_list_gene_categories,
+    build_list_organisms,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
@@ -194,6 +195,27 @@ class TestBuildListConditionTypes:
     def test_no_params(self):
         _, params = build_list_condition_types()
         assert params == {}
+
+
+class TestBuildListOrganisms:
+    def test_cypher_structure(self):
+        cypher, params = build_list_organisms()
+        assert "MATCH (o:OrganismTaxon)" in cypher
+        assert "OPTIONAL MATCH" in cypher
+        assert "Gene_belongs_to_organism" in cypher
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_list_organisms()
+        for col in ["name", "genus", "strain", "clade", "gene_count"]:
+            assert col in cypher
+
+    def test_no_params(self):
+        _, params = build_list_organisms()
+        assert params == {}
+
+    def test_ordered_by_genus_and_name(self):
+        cypher, _ = build_list_organisms()
+        assert "ORDER BY o.genus, o.preferred_name" in cypher
 
 
 class TestBuildHomologExpression:

@@ -12,7 +12,7 @@
 | `tests/unit/test_schema.py` | 18 unit tests (diffing, baseline, formatting) | No |
 | `tests/unit/test_connection.py` | 3 unit tests (error handling, lifecycle) | No |
 | `tests/unit/test_mcp_server.py` | 3 unit tests (lifespan, KGContext) | No |
-| `tests/unit/test_tool_wrappers.py` | 35 unit tests (all 9 MCP tool wrappers + registration) | No |
+| `tests/unit/test_tool_wrappers.py` | 39 unit tests (all 10 MCP tool wrappers + registration) | No |
 | `tests/integration/test_mcp_tools.py` | 13 integration tests | Yes |
 | `tests/evals/test_eval.py` | 15 parameterized integration tests | Yes |
 | `tests/regression/test_regression.py` | 15 golden-file baselines | Yes |
@@ -71,7 +71,7 @@ Tests all 8 tool functions' wrapper logic (input validation, response formatting
 error messages, multi-query orchestration) with a mocked Neo4j connection.
 
 **Tool registration:**
-- [x] All 9 expected tools are registered
+- [x] All 10 expected tools are registered
 - [x] No unexpected extra tools
 
 **`get_schema`:**
@@ -216,6 +216,29 @@ tests/
 - [ ] `list_filter_values` — combined tool response
 - [ ] `list_filter_values_categories` — raw_cypher snapshot of gene categories
 - [ ] `list_filter_values_conditions` — raw_cypher snapshot of condition types
+
+---
+
+### `list_organisms` Tool Tests
+
+#### Unit tests (`tests/unit/test_query_builders.py`)
+- [ ] `build_list_organisms`: verify Cypher structure (MATCH OrganismTaxon, OPTIONAL MATCH Gene)
+
+#### Unit tests (`tests/unit/test_tool_wrappers.py`)
+- [ ] Returns JSON array with expected columns
+- [ ] All expected columns: `name`, `genus`, `strain`, `clade`, `gene_count`
+- [ ] Empty result handling
+- [ ] Tool registration count updated (9 → 10)
+
+#### Integration tests (`tests/integration/test_tool_correctness_kg.py`)
+- [ ] Known organisms present: MED4, MIT9313, EZ55, HOT1A3
+- [ ] `gene_count > 0` for strains with genes
+- [ ] `clade` populated for Prochlorococcus strains
+- [ ] `clade` is null for Alteromonas/Synechococcus
+
+#### Eval cases (`tests/evals/cases.yaml`)
+- [ ] `list_organisms` — tool-level response
+- [ ] `list_organisms_raw` — raw_cypher snapshot of all organisms
 
 ---
 
