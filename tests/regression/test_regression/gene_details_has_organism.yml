@@ -62,7 +62,7 @@ rows:
     - '[pfam] DNA_pol3_beta_3: DNA polymerase III beta subunit, C-terminal domain'
     alternative_locus_tags:
     - PMM0001
-    annotation_quality: 2
+    annotation_quality: 3
     bacteria_cog_og: COG0592
     cluster_number: CK_00000364
     cog_category:

@@ -16,11 +16,10 @@ from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_find_gene,
     build_resolve_gene,
-    build_resolve_gene_details_homologs,
-    build_resolve_gene_details_main,
+    build_get_gene_details_homologs,
+    build_get_gene_details_main,
     build_get_homologs,
     build_query_expression,
-    build_search_genes,
 )
 from tests.fixtures.gene_data import (
     GENES,
@@ -125,57 +124,6 @@ class TestResolveGeneCorrectnessKG:
 
 
 # ---------------------------------------------------------------------------
-# TestSearchGenesCorrectnessKG
-# ---------------------------------------------------------------------------
-
-@pytest.mark.kg
-class TestSearchGenesCorrectnessKG:
-    """Validate search_genes returns correct results."""
-
-    def test_hypothetical_in_different_organisms(self, conn):
-        """'hypothetical' should exist in both Prochlorococcus and Alteromonas."""
-        cypher_pro, params_pro = build_search_genes(
-            query="hypothetical", organism="MED4", limit=5,
-        )
-        cypher_alt, params_alt = build_search_genes(
-            query="hypothetical", organism="Alteromonas", limit=5,
-        )
-        results_pro = conn.execute_query(cypher_pro, **params_pro)
-        results_alt = conn.execute_query(cypher_alt, **params_alt)
-        assert len(results_pro) > 0, "MED4 should have hypothetical proteins"
-        assert len(results_alt) > 0, "Alteromonas should have hypothetical proteins"
-
-    def test_locus_tag_prefix(self, conn):
-        """Search by locus_tag prefix PMM00 should only return matching loci."""
-        cypher, params = build_search_genes(query="PMM00")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        for r in results:
-            assert "PMM00" in r["locus_tag"], (
-                f"locus_tag {r['locus_tag']} does not contain 'PMM00'"
-            )
-
-    def test_organism_filter(self, conn):
-        """Organism filter should restrict results to that strain only."""
-        cypher, params = build_search_genes(query="hypothetical", organism="MIT1002")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        for r in results:
-            assert "MIT1002" in r["organism_strain"], (
-                f"Expected MIT1002 in organism_strain, got {r['organism_strain']}"
-            )
-
-    def test_known_gene_by_product(self, conn):
-        """PMM0001 product contains 'DNA polymerase III'; it should appear with organism filter."""
-        cypher, params = build_search_genes(
-            query="DNA polymerase III", organism="MED4",
-        )
-        results = conn.execute_query(cypher, **params)
-        found_loci = _locus_tags(results)
-        assert "PMM0001" in found_loci
-
-
-# ---------------------------------------------------------------------------
 # TestFindGeneCorrectnessKG
 # ---------------------------------------------------------------------------
 
@@ -225,7 +173,7 @@ class TestGetGeneDetailsCorrectnessKG:
 
     def test_well_annotated_prochlorococcus(self, conn):
         """PMM0001 should have protein, organism, and cluster info."""
-        cypher, params = build_resolve_gene_details_main(gene_id="PMM0001")
+        cypher, params = build_get_gene_details_main(gene_id="PMM0001")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
@@ -237,7 +185,7 @@ class TestGetGeneDetailsCorrectnessKG:
 
     def test_alteromonas_no_cluster(self, conn):
         """ALT831_RS00180 (Alteromonas) should have no CyanORAK cluster."""
-        cypher, params = build_resolve_gene_details_main(gene_id="ALT831_RS00180")
+        cypher, params = build_get_gene_details_main(gene_id="ALT831_RS00180")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
@@ -246,7 +194,7 @@ class TestGetGeneDetailsCorrectnessKG:
 
     def test_homologs_exist_for_pmm0001(self, conn):
         """PMM0001 (dnaN) should have homologs from other organisms."""
-        cypher, params = build_resolve_gene_details_homologs(gene_id="PMM0001")
+        cypher, params = build_get_gene_details_homologs(gene_id="PMM0001")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         strains = {r["organism_strain"] for r in results}

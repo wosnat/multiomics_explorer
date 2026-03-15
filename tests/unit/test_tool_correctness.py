@@ -20,7 +20,6 @@ from tests.fixtures.gene_data import (
     GENES_WITH_GENE_NAME,
     GENES_WITHOUT_GENE_NAME,
     as_resolve_gene_result,
-    as_search_genes_result,
     genes_by_organism,
 )
 
@@ -166,92 +165,6 @@ class TestResolveGeneCorrectness:
         org = gene["organism_strain"]
         assert result["results"][org][0]["locus_tag"] == "PMT0106"
         assert result["results"][org][0]["gene_name"] == "legI"
-
-
-# ---------------------------------------------------------------------------
-# TestSearchGenesCorrectness
-# ---------------------------------------------------------------------------
-class TestSearchGenesCorrectness:
-    """Verify search_genes returns correct data for realistic mock responses."""
-
-    def test_hypothetical_product_match(self, tool_fns, mock_ctx):
-        """Searching 'hypothetical' returns genes with hypothetical in product."""
-        rows = [as_search_genes_result(g) for g in GENES_HYPOTHETICAL]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, query="hypothetical")
-        )
-
-        assert len(result["results"]) == len(GENES_HYPOTHETICAL)
-        for r in result["results"]:
-            assert "hypothetical" in r["product"].lower()
-
-    def test_case_insensitive_product_search(self, tool_fns, mock_ctx):
-        """Search for 'DNA POLYMERASE' (uppercase) returns PMM0001."""
-        gene = GENES_BY_LOCUS["PMM0001"]
-        row = as_search_genes_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
-
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, query="DNA POLYMERASE")
-        )
-
-        assert len(result["results"]) == 1
-        assert result["results"][0]["locus_tag"] == "PMM0001"
-
-    def test_organism_filter_med4_only(self, tool_fns, mock_ctx):
-        """With organism='MED4', only MED4 genes are returned."""
-        med4_genes = genes_by_organism("MED4")
-        rows = [as_search_genes_result(g) for g in med4_genes]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, query="polymerase", organism="MED4")
-        )
-
-        for r in result["results"]:
-            assert "MED4" in r["organism_strain"]
-
-    def test_gene_without_gene_name_found_by_product(self, tool_fns, mock_ctx):
-        """S8102_04001 has no real gene_name but can be found via product."""
-        gene = GENES_BY_LOCUS["S8102_04001"]
-        row = as_search_genes_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
-
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, query="membrane protein")
-        )
-
-        assert result["results"][0]["locus_tag"] == "S8102_04001"
-        assert result["results"][0]["product"] == "putative membrane protein"
-
-    def test_alteromonas_organism_filter(self, tool_fns, mock_ctx):
-        """Organism filter for Alteromonas returns only Alteromonas genes."""
-        alt_genes = genes_by_organism("Alteromonas")
-        rows = [as_search_genes_result(g) for g in alt_genes]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, query="transposase", organism="Alteromonas")
-        )
-
-        for r in result["results"]:
-            assert "Alteromonas" in r["organism_strain"]
-
-    def test_search_returns_correct_field_structure(self, tool_fns, mock_ctx):
-        """Each search result has exactly the expected fields."""
-        gene = GENES_BY_LOCUS["PMN2A_0044"]
-        row = as_search_genes_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
-
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, query="naphthoate")
-        )
-
-        r = result["results"][0]
-        assert set(r.keys()) == {"locus_tag", "gene_name", "product", "organism_strain"}
-        assert r["gene_name"] == "menB"
 
 
 # ---------------------------------------------------------------------------

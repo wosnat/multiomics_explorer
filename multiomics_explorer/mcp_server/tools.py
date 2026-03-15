@@ -17,7 +17,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_homologs,
     build_homolog_expression,
     build_query_expression,
-    build_search_genes,
 )
 
 
@@ -115,7 +114,12 @@ def register_tools(mcp: FastMCP):
         Args:
             search_text: Free-text query (Lucene syntax supported).
             organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
-            min_quality: Minimum annotation_quality (0-3). Use 2 to skip hypothetical proteins.
+            min_quality: Minimum annotation_quality (0-3).
+                0 = hypothetical, no function info;
+                1 = hypothetical but has function description;
+                2 = real product name;
+                3 = well-annotated (product + GO/KEGG/EC/Pfam).
+                Use 2 to skip hypothetical proteins.
             limit: Max results (default 10, max 50).
         """
         conn = _conn(ctx)
@@ -142,35 +146,6 @@ def register_tools(mcp: FastMCP):
             response = json.dumps({
                 "results": results, "total": len(results), "query": search_text,
             }, indent=2, default=str)
-        return _with_query(response, cypher, params, ctx)
-
-    @mcp.tool()
-    def search_genes(
-        ctx: Context,
-        query: str,
-        organism: str | None = None,
-        limit: int = 20,
-    ) -> str:
-        """Search for genes by locus_tag, gene name, or product keyword (CONTAINS match).
-        For richer free-text search, use find_gene instead.
-
-        Args:
-            query: Search term — locus_tag (e.g. "PMM0001"), gene name (e.g. "psbA"),
-                   or product keyword (e.g. "photosystem"). Case-insensitive.
-            organism: Optional strain name filter (e.g. "MED4", "MIT9313").
-            limit: Max results (default 20).
-        """
-        conn = _conn(ctx)
-        limit = min(limit, 200)
-        cypher, params = build_search_genes(query=query, organism=organism, limit=limit)
-        results = conn.execute_query(cypher, **params)
-        if not results:
-            msg = f"No genes found matching '{query}'"
-            if organism:
-                msg += f" in {organism}"
-            response = json.dumps({"results": [], "message": msg})
-        else:
-            response = json.dumps({"results": results}, indent=2, default=str)
         return _with_query(response, cypher, params, ctx)
 
     @mcp.tool()

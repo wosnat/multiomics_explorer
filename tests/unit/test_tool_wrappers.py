@@ -36,7 +36,7 @@ def _conn_from(ctx):
 
 
 EXPECTED_TOOLS = [
-    "get_schema", "resolve_gene", "find_gene", "search_genes",
+    "get_schema", "resolve_gene", "find_gene",
     "get_gene_details", "query_expression", "compare_conditions",
     "get_homologs", "run_cypher",
 ]
@@ -195,35 +195,6 @@ class TestFindGeneWrapper:
         result = json.loads(tool_fns["find_gene"](mock_ctx, search_text="DNA [repair"))
         assert result["total"] == 1
         assert conn.execute_query.call_count == 2
-
-
-# ---------------------------------------------------------------------------
-# search_genes
-# ---------------------------------------------------------------------------
-class TestSearchGenesWrapper:
-    def test_empty_returns_json_with_message(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["search_genes"](mock_ctx, query="nonexistent"))
-        assert result["results"] == []
-        assert "No genes found" in result["message"]
-
-    def test_empty_with_organism_in_message(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["search_genes"](mock_ctx, query="x", organism="MED4"))
-        assert "MED4" in result["message"]
-
-    def test_results_returned_as_json(self, tool_fns, mock_ctx):
-        rows = [{"locus_tag": "PMM0001", "product": "photosystem II"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_genes"](mock_ctx, query="photosystem"))
-        assert len(result["results"]) == 1
-        assert result["results"][0]["locus_tag"] == "PMM0001"
-
-    def test_limit_capped_at_200(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["search_genes"](mock_ctx, query="test", limit=999)
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["limit"] == 200
 
 
 # ---------------------------------------------------------------------------

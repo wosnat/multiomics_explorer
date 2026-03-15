@@ -38,7 +38,6 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `get_schema` | Graph schema with node counts, relationships, properties |
 | `resolve_gene` | Resolve a gene identifier to matching graph nodes. Returns locus_tags grouped by organism. |
 | `find_gene` | Full-text search across gene annotations (Lucene syntax) |
-| `search_genes` | Simple CONTAINS search by locus_tag, gene name, or product |
 | `get_gene_details` | Full gene profile with protein, organism, cluster, homologs |
 | `query_expression` | Expression data with filters (gene, organism, condition, direction, FC, p-value) |
 | `compare_conditions` | Cross-condition or cross-strain expression comparison |

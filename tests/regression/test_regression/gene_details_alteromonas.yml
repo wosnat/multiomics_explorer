@@ -36,8 +36,7 @@ rows:
     function_description_source: eggnog
     gene_name: ALT831_RS00180
     gene_name_source: ncbi
-    gene_summary: 'ALT831_RS00180 :: IS630 family transposase :: Winged helix-turn
-      helix'
+    gene_summary: 'IS630 family transposase :: Winged helix-turn helix'
     go_terms:
     - GO:0004803
     id: ncbigene:ALT831_RS00180

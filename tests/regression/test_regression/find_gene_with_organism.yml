@@ -1,102 +1,86 @@
 case_id: find_gene_with_organism
 row_count: 10
 rows:
-- annotation_quality: 2
-  gene_name: radA
-  gene_summary: 'radA :: DNA repair protein Sms/RadA :: DNA-dependent ATPase involved
-    in processing of recombination intermediates, plays a role in repairing DNA breaks.
-    Stimulates the branch migration of RecA-mediated strand transfer reactions, allowing
-    the 3^ invading strand to extend heteroduplex DNA faster. Binds ssDNA in the presence
-    of ADP but not other nucleotides, has ATPase activity that is stimulated by ssDNA
-    and various branched DNA structures, but inhibited by SSB. Does not have RecA^s
-    homology-searching function. ; FUNCTION: Plays a role in repairing double-strand
-    DNA breaks, probably involving stabilizing or processing branched DNA or blocked
-    replication forks'
-  locus_tag: PMM0133
+- annotation_quality: 3
+  function_description: COG188 Type IIA topoisomerase (DNA gyrase topo II, topoisomerase
+    IV), A subunit DNA replication, recombination, and repair
+  gene_name: PMM0005
+  locus_tag: PMM0005
   organism_strain: Prochlorococcus MED4
-  product: DNA repair protein Sms/RadA
-  score: 18.8748
-- annotation_quality: 2
-  gene_name: mutS2
-  gene_summary: 'mutS2 :: DNA mismatch repair protein, MutS family :: Acts as a ribosome
-    collision sensor, splitting the ribosome into its 2 subunits. Detects stalled/collided
-    70S ribosomes which it binds and splits by an ATP-hydrolysis driven conformational
-    change. Acts upstream of the ribosome quality control system (RQC), a ribosome-associated
-    complex that mediates the extraction of incompletely synthesized nascent chains
-    from stalled ribosomes and their subsequent degradation. Probably generates substrates
-    for RQC. ; FUNCTION: Endonuclease that is involved in the suppression of homologous
-    recombination and thus may have a key role in the control of bacterial genetic
-    diversity'
-  locus_tag: PMM0217
-  organism_strain: Prochlorococcus MED4
-  product: DNA mismatch repair protein, MutS family
-  score: 19.1619
-- annotation_quality: 2
+  product: DNA gyrase/topoisomerase IV, subunit A family protein
+  score: 8.1461
+- annotation_quality: 3
+  function_description: Belongs to the DNA glycosylase MPG family
   gene_name: mpg
-  gene_summary: 'mpg :: DNA-3-methyladenine glycosylase :: Belongs to the DNA glycosylase
-    MPG family'
   locus_tag: PMM0234
   organism_strain: Prochlorococcus MED4
   product: DNA-3-methyladenine glycosylase
-  score: 16.7598
-- annotation_quality: 2
+  score: 6.7737
+- annotation_quality: 3
+  function_description: Involved in DNA repair and RecF pathway recombination
   gene_name: recO
-  gene_summary: 'recO :: gap repair protein RecO :: Involved in DNA repair and RecF
-    pathway recombination'
   locus_tag: PMM0398
   organism_strain: Prochlorococcus MED4
   product: gap repair protein RecO
-  score: 18.9958
-- annotation_quality: 2
+  score: 9.289
+- annotation_quality: 3
+  function_description: Plays a critical role in recombination and DNA repair. Helps
+    process Holliday junction intermediates to mature products by catalyzing branch
+    migration. Has replication fork regression activity, unwinds stalled or blocked
+    replication forks to make a HJ that can be resolved. Has a DNA unwinding activity
+    characteristic of a DNA helicase with 3^-5^ polarity
+  gene_name: recG
+  locus_tag: PMM0756
+  organism_strain: Prochlorococcus MED4
+  product: ATP-dependent DNA helicase
+  score: 6.7278
+- annotation_quality: 3
+  function_description: Couples transcription and DNA repair by recognizing RNA polymerase
+    (RNAP) stalled at DNA lesions. Mediates ATP-dependent release of RNAP and its
+    truncated transcript from the DNA, and recruitment of nucleotide excision repair
+    machinery to the damaged site
   gene_name: mfd
-  gene_summary: 'mfd :: transcription-repair coupling factor :: Couples transcription
-    and DNA repair by recognizing RNA polymerase (RNAP) stalled at DNA lesions. Mediates
-    ATP-dependent release of RNAP and its truncated transcript from the DNA, and recruitment
-    of nucleotide excision repair machinery to the damaged site'
   locus_tag: PMM0839
   organism_strain: Prochlorococcus MED4
   product: transcription-repair coupling factor
-  score: 19.1342
-- annotation_quality: 2
-  gene_name: recA
-  gene_summary: 'recA :: recombinase A :: Can catalyze the hydrolysis of ATP in the
-    presence of single-stranded DNA, the ATP-dependent uptake of single-stranded DNA
-    by duplex DNA, and the ATP-dependent hybridization of homologous single-stranded
-    DNAs. It interacts with LexA causing its activation and leading to its autocatalytic
-    cleavage'
-  locus_tag: PMM1562
+  score: 8.4084
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  locus_tag: PMM0945
   organism_strain: Prochlorococcus MED4
-  product: recombinase A
-  score: 16.9586
-- annotation_quality: 2
+  product: DNA polymerase III, alpha subunit
+  score: 6.8349
+- annotation_quality: 3
+  function_description: May play a role in DNA repair. It seems to be involved in
+    an RecBC-independent recombinational process of DNA repair. It may act with RecF
+    and RecO
+  gene_name: recR
+  locus_tag: PMM1097
+  organism_strain: Prochlorococcus MED4
+  product: recombination protein RecR
+  score: 7.8919
+- annotation_quality: 3
+  function_description: it is required for DNA replication and normal SOS inducibility.
+    RecF binds preferentially to single-stranded, linear DNA. It also seems to bind
+    ATP
   gene_name: recF
-  gene_summary: 'recF :: DNA replication and repair protein recF :: it is required
-    for DNA replication and normal SOS inducibility. RecF binds preferentially to
-    single-stranded, linear DNA. It also seems to bind ATP'
   locus_tag: PMM1573
   organism_strain: Prochlorococcus MED4
   product: DNA replication and repair protein recF
-  score: 21.8487
-- annotation_quality: 2
+  score: 7.9495
+- annotation_quality: 3
+  function_description: that it carries out the mismatch recognition step. This protein
+    has a weak ATPase activity
   gene_name: mutS
-  gene_summary: 'mutS :: DNA mismatch repair protein MutS :: that it carries out the
-    mismatch recognition step. This protein has a weak ATPase activity'
   locus_tag: PMM1645
   organism_strain: Prochlorococcus MED4
   product: DNA mismatch repair protein MutS
-  score: 22.7215
-- annotation_quality: 2
-  gene_name: ligA
-  gene_summary: 'ligA :: ATP-dependent DNA ligase'
-  locus_tag: PMM1679
-  organism_strain: Prochlorococcus MED4
-  product: ATP-dependent DNA ligase
-  score: 16.8087
-- annotation_quality: 2
+  score: 7.2658
+- annotation_quality: 3
+  function_description: May be involved in recombinational repair of damaged DNA
   gene_name: recN
-  gene_summary: 'recN :: ATP-dependent DNA repair protein RecN :: May be involved
-    in recombinational repair of damaged DNA'
   locus_tag: PMM1713
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA repair protein RecN
-  score: 23.8968
+  score: 9.4057

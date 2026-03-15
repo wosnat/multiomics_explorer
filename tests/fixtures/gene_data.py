@@ -31,7 +31,7 @@ GENES = [
         "alternative_locus_tags": [
             "PMM0001"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG0592",
         "cluster_number": "CK_00000364",
         "cog_category": [
@@ -64,6 +64,7 @@ GENES = [
         "end_cyanorak": 1331,
         "function_description": "Confers DNA tethering and processivity to DNA polymerases and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses in an ATP-independent manner freely and bidirectionally along dsDNA. Initially characterized for its ability to contact the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity. The beta chain is required for initiation of replication as well as for processivity of DNA replication",
         "function_description_source": "uniprot",
+        "gene_category": "Replication and repair",
         "gene_name": "dnaN",
         "gene_name_source": "cyanorak",
         "gene_summary": "dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering and processivity to DNA polymerases and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses in an ATP-independent manner freely and bidirectionally along dsDNA. Initially characterized for its ability to contact the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity. The beta chain is required for initiation of replication as well as for processivity of DNA replication",
@@ -194,7 +195,7 @@ GENES = [
             "PMM0002",
             "TX50_RS00025"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 1,
         "bacteria_cog_og": "COG3881",
         "cluster_number": "CK_00000363",
         "cog_category": [
@@ -229,9 +230,10 @@ GENES = [
         "end_cyanorak": 2040,
         "function_description": "Alternative locus ID",
         "function_description_source": "eggnog",
+        "gene_category": "Unknown",
         "gene_name": "PMM0002",
         "gene_name_source": "cyanorak",
-        "gene_summary": "PMM0002 :: conserved hypothetical protein :: Alternative locus ID",
+        "gene_summary": "conserved hypothetical protein :: Alternative locus ID",
         "gene_synonyms": [
             "TX50_RS00025"
         ],
@@ -292,7 +294,7 @@ GENES = [
         "alternative_locus_tags": [
             "PMM0446"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG1622",
         "catalytic_activities": [
             "Reaction=4 Fe(II)-[cytochrome c] + O2 + 8 H(+)(in) = 4 Fe(III)-[cytochrome c] + 2 H2O + 4 H(+)(out); Xref=Rhea:RHEA:11436, Rhea:RHEA-COMP:10350, Rhea:RHEA-COMP:14399, ChEBI:CHEBI:15377, ChEBI:CHEBI:15378, ChEBI:CHEBI:15379, ChEBI:CHEBI:29033, ChEBI:CHEBI:29034; EC=7.1.1.9; Evidence="
@@ -332,6 +334,7 @@ GENES = [
         "end_cyanorak": 425917,
         "function_description": "Subunits I and II form the functional core of the enzyme complex. Electrons originating in cytochrome c are transferred via heme a and Cu(A) to the binuclear center formed by heme a3 and Cu(B)",
         "function_description_source": "uniprot",
+        "gene_category": "Carbohydrate metabolism",
         "gene_name": "ctaCI",
         "gene_name_source": "cyanorak",
         "gene_name_synonyms": [
@@ -518,7 +521,7 @@ GENES = [
         "alternative_locus_tags": [
             "PMT9312_0001"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG0592",
         "cluster_number": "CK_00000364",
         "cog_category": [
@@ -551,6 +554,7 @@ GENES = [
         "end_cyanorak": 1362,
         "function_description": "Confers DNA tethering and processivity to DNA polymerases and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses in an ATP-independent manner freely and bidirectionally along dsDNA. Initially characterized for its ability to contact the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity. The beta chain is required for initiation of replication as well as for processivity of DNA replication",
         "function_description_source": "uniprot",
+        "gene_category": "Replication and repair",
         "gene_name": "dnaN",
         "gene_name_source": "cyanorak",
         "gene_summary": "dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering and processivity to DNA polymerases and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses in an ATP-independent manner freely and bidirectionally along dsDNA. Initially characterized for its ability to contact the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity. The beta chain is required for initiation of replication as well as for processivity of DNA replication",
@@ -666,9 +670,10 @@ GENES = [
         "alternate_functional_descriptions": [
             "[cyanorak] hypothetical protein"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 0,
         "cluster_number": "CK_00038231",
         "end_cyanorak": 329961,
+        "gene_category": "Unknown",
         "gene_summary": "hypothetical protein",
         "locus_tag": "PMT9312_0342",
         "locus_tag_cyanorak": "CK_Pro_MIT9312_00342",
@@ -705,7 +710,7 @@ GENES = [
         "alternative_locus_tags": [
             "PMN2A_0044"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG0447",
         "bigg_reaction": [
             "iJN678.menB"
@@ -747,6 +752,7 @@ GENES = [
         "end_cyanorak": 598565,
         "function_description": "Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA (DHNA-CoA)",
         "function_description_source": "uniprot",
+        "gene_category": "Coenzyme metabolism",
         "gene_name": "menB",
         "gene_name_source": "cyanorak",
         "gene_summary": "menB :: naphthoate synthase :: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA (DHNA-CoA)",
@@ -862,9 +868,10 @@ GENES = [
         "end": 40258,
         "function_description": "Winged helix-turn helix",
         "function_description_source": "eggnog",
+        "gene_category": "Replication and repair",
         "gene_name": "ALT831_RS00180",
         "gene_name_source": "ncbi",
-        "gene_summary": "ALT831_RS00180 :: IS630 family transposase :: Winged helix-turn helix",
+        "gene_summary": "IS630 family transposase :: Winged helix-turn helix",
         "go_terms": [
             "GO:0004803"
         ],
@@ -893,11 +900,12 @@ GENES = [
         "alternative_locus_tags": [
             "ALT831_RS00590"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 0,
         "end": 130720,
+        "gene_category": "Unknown",
         "gene_name": "ALT831_RS00590",
         "gene_name_source": "ncbi",
-        "gene_summary": "ALT831_RS00590 :: hypothetical protein",
+        "gene_summary": "hypothetical protein",
         "locus_tag": "ALT831_RS00590",
         "locus_tag_ncbi": "ALT831_RS00590",
         "organism_strain": "Alteromonas macleodii MIT1002",
@@ -921,7 +929,7 @@ GENES = [
             "ALT831_RS03440"
         ],
         "alteromonadaceae_og": "46684@72275|Alteromonadaceae",
-        "annotation_quality": 2,
+        "annotation_quality": 1,
         "bacteria_cog_og": "COG0737",
         "cog_category": [
             "F"
@@ -940,9 +948,10 @@ GENES = [
         "end": 771889,
         "function_description": "5'-nucleotidase, C-terminal domain",
         "function_description_source": "eggnog",
+        "gene_category": "Nucleotide metabolism",
         "gene_name": "ALT831_RS03440",
         "gene_name_source": "ncbi",
-        "gene_summary": "ALT831_RS03440 :: hypothetical protein :: 5'-nucleotidase, C-terminal domain",
+        "gene_summary": "hypothetical protein :: 5'-nucleotidase, C-terminal domain",
         "kegg_brite": [
             "ko00000",
             "ko00001",
@@ -998,7 +1007,7 @@ GENES = [
             "[eggnog] Required for coenzyme pyrroloquinoline quinone (PQQ) biosynthesis. PQQ is probably formed by cross-linking a specific glutamate to a specific tyrosine residue and excising these residues from the peptide",
             "[pfam] PqqA"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "cog_category": [
             "S"
         ],
@@ -1012,6 +1021,7 @@ GENES = [
         "end": 3745253,
         "function_description": "Required for coenzyme pyrroloquinoline quinone (PQQ) biosynthesis. PQQ is probably formed by cross-linking a specific glutamate to a specific tyrosine residue and excising these residues from the peptide",
         "function_description_source": "eggnog",
+        "gene_category": "Unknown",
         "gene_name": "pqqA",
         "gene_name_source": "ncbi",
         "gene_summary": "pqqA :: pyrroloquinoline quinone precursor peptide PqqA :: Required for coenzyme pyrroloquinoline quinone (PQQ) biosynthesis. PQQ is probably formed by cross-linking a specific glutamate to a specific tyrosine residue and excising these residues from the peptide",
@@ -1067,7 +1077,7 @@ GENES = [
         "alternative_locus_tags": [
             "SYNW0305"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG0465",
         "cluster_number": "CK_00008085",
         "cog_category": [
@@ -1100,6 +1110,7 @@ GENES = [
         "end_cyanorak": 304589,
         "function_description": "Acts as a processive, ATP-dependent zinc metallopeptidase for both cytoplasmic and membrane proteins. Plays a role in the quality control of integral membrane proteins",
         "function_description_source": "uniprot",
+        "gene_category": "Cell cycle and division",
         "gene_name": "ftsH1",
         "gene_name_source": "cyanorak",
         "gene_name_synonyms": [
@@ -1278,6 +1289,7 @@ GENES = [
         "annotation_quality": 2,
         "cluster_number": "CK_00056274",
         "end_cyanorak": 373534,
+        "gene_category": "Cell wall and membrane",
         "gene_summary": "putative membrane protein",
         "go_term_descriptions": [
             "membrane"
@@ -1302,7 +1314,8 @@ GENES = [
     {
         "all_identifiers": [
             "CK_Syn_CC9311_01876",
-            "WP_041426620.1"
+            "WP_041426620.1",
+            "sync_1876"
         ],
         "alternate_functional_descriptions": [
             "[cyanorak] alpha/beta hydrolase fold family protein",
@@ -1321,7 +1334,7 @@ GENES = [
             "sync_1876",
             "SYNC_RS08630"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG1075",
         "cluster_number": "CK_00000174",
         "cog_category": [
@@ -1356,9 +1369,10 @@ GENES = [
         "end_cyanorak": 1674465,
         "function_description": "acetyltransferases and hydrolases with the alpha beta hydrolase fold",
         "function_description_source": "eggnog",
+        "gene_category": "Lipid metabolism",
         "gene_name": "sync_1876",
         "gene_name_source": "cyanorak",
-        "gene_summary": "sync_1876 :: alpha/beta hydrolase fold family protein :: acetyltransferases and hydrolases with the alpha beta hydrolase fold",
+        "gene_summary": "alpha/beta hydrolase fold family protein :: acetyltransferases and hydrolases with the alpha beta hydrolase fold",
         "gene_synonyms": [
             "SYNC_RS08630"
         ],
@@ -1440,7 +1454,7 @@ GENES = [
             "PMT_0106",
             "RG24_RS00540"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG2089",
         "cluster_number": "CK_00051362",
         "cog_category": [
@@ -1475,6 +1489,7 @@ GENES = [
         "end_cyanorak": 121981,
         "function_description": "COG2089 Sialic acid synthase Cell envelope biogenesis, outer membrane",
         "function_description_source": "eggnog",
+        "gene_category": "Nucleotide metabolism",
         "gene_name": "legI",
         "gene_name_source": "cyanorak",
         "gene_name_synonyms": [
@@ -1590,7 +1605,7 @@ GENES = [
         "alternative_locus_tags": [
             "A9601_50004"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bigg_reaction": [
             "iJN678.psaJ"
         ],
@@ -1627,6 +1642,7 @@ GENES = [
         "end_cyanorak": 456481,
         "function_description": "May help in the organization of the PsaE and PsaF subunits",
         "function_description_source": "eggnog",
+        "gene_category": "Photosynthesis",
         "gene_name": "psaJ",
         "gene_name_source": "cyanorak",
         "gene_summary": "psaJ :: photosystem I reaction centre subunit IX :: May help in the organization of the PsaE and PsaF subunits",
@@ -1711,7 +1727,7 @@ GENES = [
         "alternative_locus_tags": [
             "ALTBGP6_RS12485"
         ],
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG1335",
         "cog_category": [
             "Q"
@@ -1729,9 +1745,10 @@ GENES = [
         "end": 2861235,
         "function_description": "Isochorismatase family",
         "function_description_source": "eggnog",
+        "gene_category": "Secondary metabolites",
         "gene_name": "ALTBGP6_RS12485",
         "gene_name_source": "ncbi",
-        "gene_summary": "ALTBGP6_RS12485 :: cysteine hydrolase family protein :: Isochorismatase family",
+        "gene_summary": "cysteine hydrolase family protein :: Isochorismatase family",
         "go_terms": [
             "GO:0016787"
         ],
@@ -1765,16 +1782,6 @@ GENES_HYPOTHETICAL = [g for g in GENES if "hypothetical" in g.get("product", "")
 
 # Helper: project to resolve_gene return shape
 def as_resolve_gene_result(gene):
-    return {
-        "locus_tag": gene["locus_tag"],
-        "gene_name": gene.get("gene_name"),
-        "product": gene.get("product"),
-        "organism_strain": gene.get("organism_strain"),
-    }
-
-
-# Helper: project to search_genes return shape
-def as_search_genes_result(gene):
     return {
         "locus_tag": gene["locus_tag"],
         "gene_name": gene.get("gene_name"),

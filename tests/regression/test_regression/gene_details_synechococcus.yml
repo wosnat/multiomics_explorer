@@ -50,7 +50,7 @@ rows:
     - '[pfam] Peptidase_M41: FtsH Extracellular'
     alternative_locus_tags:
     - SYNW0305
-    annotation_quality: 2
+    annotation_quality: 3
     bacteria_cog_og: COG0465
     cluster_number: CK_00008085
     cog_category:

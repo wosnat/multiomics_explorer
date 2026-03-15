@@ -1,92 +1,84 @@
 case_id: find_gene_naphthoate
 row_count: 10
 rows:
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4-naphthoquinone'
-  locus_tag: A9601_01941
-  organism_strain: Prochlorococcus AS9601
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.6532
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4-naphthoquinone'
-  locus_tag: NATL1_02511
-  organism_strain: Prochlorococcus NATL1A
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.6532
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4-naphthoquinone'
-  locus_tag: P9301_01961
-  organism_strain: Prochlorococcus MIT9301
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.6532
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4-naphthoquinone'
-  locus_tag: PMM0176
-  organism_strain: Prochlorococcus MED4
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.6532
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4-naphthoquinone'
-  locus_tag: PMN2A_1544
-  organism_strain: Prochlorococcus NATL2A
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.6532
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4-naphthoquinone'
-  locus_tag: PMT2059
-  organism_strain: Prochlorococcus MIT9313
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.6532
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4-naphthoquinone'
-  locus_tag: PMT9312_0178
-  organism_strain: Prochlorococcus MIT9312
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.6532
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4-naphthoquinone'
-  locus_tag: SYNW2307
-  organism_strain: Synechococcus WH8102
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.6532
-- annotation_quality: 2
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
   gene_name: menB
-  gene_summary: 'menB :: naphthoate synthase :: Converts o-succinylbenzoyl-CoA (OSB-CoA)
-    to 1,4- dihydroxy-2-naphthoyl-CoA (DHNA-CoA)'
+  locus_tag: A9601_06641
+  organism_strain: Prochlorococcus AS9601
+  product: naphthoate synthase
+  score: 7.5371
+- annotation_quality: 3
+  function_description: Catalyzes the hydrolysis of 1,4-dihydroxy-2-naphthoyl- CoA
+    (DHNA-CoA) to 1,4-dihydroxy-2-naphthoate (DHNA), a reaction involved in phylloquinone
+    (vitamin K1) biosynthesis
+  gene_name: BSR22_RS03975
+  locus_tag: BSR22_03960
+  organism_strain: Prochlorococcus RSP50
+  product: acyl-CoA thioesterase
+  score: 5.9963
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
+  gene_name: menB
+  locus_tag: NATL1_06641
+  organism_strain: Prochlorococcus NATL1A
+  product: naphthoate synthase
+  score: 7.5371
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
+  gene_name: menB
+  locus_tag: P9301_06341
+  organism_strain: Prochlorococcus MIT9301
+  product: naphthoate synthase
+  score: 7.5371
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
+  gene_name: menB
+  locus_tag: PMM0608
+  organism_strain: Prochlorococcus MED4
+  product: naphthoate synthase
+  score: 7.5371
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
+  gene_name: menB
+  locus_tag: PMN2A_0044
+  organism_strain: Prochlorococcus NATL2A
+  product: naphthoate synthase
+  score: 7.5371
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
+  gene_name: menB
+  locus_tag: PMT0405
+  organism_strain: Prochlorococcus MIT9313
+  product: naphthoate synthase
+  score: 7.5371
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
+  gene_name: menB
+  locus_tag: PMT9312_0608
+  organism_strain: Prochlorococcus MIT9312
+  product: naphthoate synthase
+  score: 7.5371
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
+  gene_name: menB
+  locus_tag: SYNW0998
+  organism_strain: Synechococcus WH8102
+  product: naphthoate synthase
+  score: 7.5371
+- annotation_quality: 3
+  function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4- dihydroxy-2-naphthoyl-CoA
+    (DHNA-CoA)
+  gene_name: menB
   locus_tag: sync_1527
   organism_strain: Synechococcus CC9311
   product: naphthoate synthase
-  score: 14.6985
-- annotation_quality: 2
-  gene_name: menA
-  gene_summary: 'menA :: 1,4-dihydroxy-2-naphthoate phytyltransferase :: Involved
-    in the synthesis of phylloquinone (vitamin K1). Catalyzes the transfer of a prenyl
-    chain to 2-carboxy-1,4- naphthoquinone'
-  locus_tag: sync_2655
-  organism_strain: Synechococcus CC9311
-  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 14.9392
+  score: 7.8122

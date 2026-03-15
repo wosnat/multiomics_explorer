@@ -1,100 +1,87 @@
 case_id: find_gene_synechococcus_filter
 row_count: 10
 rows:
-- annotation_quality: 2
+- annotation_quality: 3
+  function_description: Peptidoglycan polymerase that is essential for cell division
   gene_name: ftsW
-  gene_summary: 'ftsW :: cell division protein FtsW :: Peptidoglycan polymerase that
-    is essential for cell division'
   locus_tag: SYNW0475
   organism_strain: Synechococcus WH8102
   product: cell division protein FtsW
-  score: 29.871
+  score: 11.1612
 - annotation_quality: 2
-  gene_name: sepF
-  gene_summary: 'sepF :: cell division protein SepF (Cdv2) :: Cell division protein
-    that is part of the divisome complex and is recruited early to the Z-ring. Probably
-    stimulates Z-ring formation, perhaps through the cross-linking of FtsZ protofilaments.
-    Its function overlaps with FtsA'
-  locus_tag: SYNW0661
-  organism_strain: Synechococcus WH8102
-  product: cell division protein SepF (Cdv2)
-  score: 26.6488
-- annotation_quality: 2
+  function_description: COG3599 Cell division initiation protein
   gene_name: cdv3
-  gene_summary: 'cdv3 :: possible cell division protein Cdv3 :: COG3599 Cell division
-    initiation protein'
   locus_tag: SYNW1249
   organism_strain: Synechococcus WH8102
   product: possible cell division protein Cdv3
-  score: 25.092
-- annotation_quality: 2
+  score: 11.4129
+- annotation_quality: 3
+  function_description: Cell division
+  gene_name: ftsQ
+  locus_tag: SYNW1643
+  organism_strain: Synechococcus WH8102
+  product: cell division protein FtsQ
+  score: 11.7435
+- annotation_quality: 3
+  function_description: Essential cell division protein that forms a contractile ring
+    structure (Z ring) at the future cell division site. The regulation of the ring
+    assembly controls the timing and the location of cell division. One of the functions
+    of the FtsZ ring is to recruit other cell division proteins to the septum to produce
+    a new cell wall between the dividing cells. Binds GTP and shows GTPase activity
   gene_name: ftsZ
-  gene_summary: 'ftsZ :: cell division protein FtsZ :: Essential cell division protein
-    that forms a contractile ring structure (Z ring) at the future cell division site.
-    The regulation of the ring assembly controls the timing and the location of cell
-    division. One of the functions of the FtsZ ring is to recruit other cell division
-    proteins to the septum to produce a new cell wall between the dividing cells.
-    Binds GTP and shows GTPase activity'
   locus_tag: SYNW1644
   organism_strain: Synechococcus WH8102
   product: cell division protein FtsZ
-  score: 26.9154
-- annotation_quality: 2
+  score: 10.2671
+- annotation_quality: 3
+  function_description: Prevents the cell division inhibition by proteins MinC and
+    MinD at internal division sites while permitting inhibition at polar sites. This
+    ensures cell division at the proper site by restricting the formation of a division
+    septum at the midpoint of the long axis of the cell
   gene_name: minE
-  gene_summary: 'minE :: cell division topological specificity factor MinE :: Prevents
-    the cell division inhibition by proteins MinC and MinD at internal division sites
-    while permitting inhibition at polar sites. This ensures cell division at the
-    proper site by restricting the formation of a division septum at the midpoint
-    of the long axis of the cell'
   locus_tag: SYNW1972
   organism_strain: Synechococcus WH8102
   product: cell division topological specificity factor MinE
-  score: 28.9769
-- annotation_quality: 2
+  score: 10.6417
+- annotation_quality: 3
+  function_description: Prevents the cell division inhibition by proteins MinC and
+    MinD at internal division sites while permitting inhibition at polar sites. This
+    ensures cell division at the proper site by restricting the formation of a division
+    septum at the midpoint of the long axis of the cell
   gene_name: minE
-  gene_summary: 'minE :: cell division topological specificity factor MinE :: Prevents
-    the cell division inhibition by proteins MinC and MinD at internal division sites
-    while permitting inhibition at polar sites. This ensures cell division at the
-    proper site by restricting the formation of a division septum at the midpoint
-    of the long axis of the cell'
   locus_tag: sync_0544
   organism_strain: Synechococcus CC9311
   product: cell division topological specificity factor MinE
-  score: 28.9769
-- annotation_quality: 2
-  gene_name: sepF
-  gene_summary: 'sepF :: cell division protein SepF (Cdv2) :: Cell division protein
-    that is part of the divisome complex and is recruited early to the Z-ring. Probably
-    stimulates Z-ring formation, perhaps through the cross-linking of FtsZ protofilaments.
-    Its function overlaps with FtsA'
-  locus_tag: sync_0600
-  organism_strain: Synechococcus CC9311
-  product: cell division protein SepF (Cdv2)
-  score: 26.6488
-- annotation_quality: 2
+  score: 10.6417
+- annotation_quality: 3
+  function_description: Essential cell division protein that forms a contractile ring
+    structure (Z ring) at the future cell division site. The regulation of the ring
+    assembly controls the timing and the location of cell division. One of the functions
+    of the FtsZ ring is to recruit other cell division proteins to the septum to produce
+    a new cell wall between the dividing cells. Binds GTP and shows GTPase activity
   gene_name: ftsZ
-  gene_summary: 'ftsZ :: cell division protein FtsZ :: Essential cell division protein
-    that forms a contractile ring structure (Z ring) at the future cell division site.
-    The regulation of the ring assembly controls the timing and the location of cell
-    division. One of the functions of the FtsZ ring is to recruit other cell division
-    proteins to the septum to produce a new cell wall between the dividing cells.
-    Binds GTP and shows GTPase activity'
   locus_tag: sync_0731
   organism_strain: Synechococcus CC9311
   product: cell division protein FtsZ
-  score: 26.9154
+  score: 10.2671
+- annotation_quality: 3
+  function_description: Cell division
+  gene_name: ftsQ
+  locus_tag: sync_0732
+  organism_strain: Synechococcus CC9311
+  product: cell division protein FtsQ
+  score: 11.7435
 - annotation_quality: 2
+  function_description: COG3599 Cell division initiation protein
   gene_name: cdv3
-  gene_summary: 'cdv3 :: possible cell division protein Cdv3 :: COG3599 Cell division
-    initiation protein'
   locus_tag: sync_1363
   organism_strain: Synechococcus CC9311
   product: possible cell division protein Cdv3
-  score: 25.092
-- annotation_quality: 2
+  score: 11.4129
+- annotation_quality: 3
+  function_description: Belongs to the SEDS family
   gene_name: ftsW
-  gene_summary: 'ftsW :: cell division protein FtsW :: Belongs to the SEDS family'
   locus_tag: sync_2326
   organism_strain: Synechococcus CC9311
   product: cell division protein FtsW
-  score: 28.851
+  score: 10.1408

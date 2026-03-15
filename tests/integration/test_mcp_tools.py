@@ -12,11 +12,10 @@ from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_find_gene,
     build_resolve_gene,
-    build_resolve_gene_details_main,
+    build_get_gene_details_main,
     build_get_homologs,
     build_homolog_expression,
     build_query_expression,
-    build_search_genes,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 from multiomics_explorer.mcp_server.tools import _WRITE_KEYWORDS
@@ -128,14 +127,8 @@ class TestEdgeCases:
         results = conn.execute_query(cypher, **params)
         assert len(results) == 0
 
-    def test_search_genes_special_chars(self, conn):
-        cypher, params = build_search_genes(query="<script>alert('x')</script>")
-        results = conn.execute_query(cypher, **params)
-        assert isinstance(results, list)
-        assert len(results) == 0
-
     def test_get_gene_details_nonexistent(self, conn):
-        cypher, params = build_resolve_gene_details_main(gene_id="FAKE_GENE_XYZ")
+        cypher, params = build_get_gene_details_main(gene_id="FAKE_GENE_XYZ")
         results = conn.execute_query(cypher, **params)
         # Either empty or gene is None
         assert not results or results[0]["gene"] is None

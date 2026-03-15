@@ -12,7 +12,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_homologs,
     build_homolog_expression,
     build_query_expression,
-    build_search_genes,
 )
 
 
@@ -54,38 +53,6 @@ class TestBuildResolveGene:
     def test_order_by_locus_tag(self):
         cypher, _ = build_resolve_gene(identifier="x")
         assert "ORDER BY g.locus_tag" in cypher
-
-
-class TestBuildSearchGenes:
-    def test_basic(self):
-        cypher, params = build_search_genes(query="photosystem")
-        assert params["q"] == "photosystem"
-        assert "LIMIT $limit" in cypher
-
-    def test_limit(self):
-        _, params = build_search_genes(query="x", limit=5)
-        assert params["limit"] == 5
-
-    def test_organism_filter(self):
-        cypher, params = build_search_genes(query="x", organism="MED4")
-        assert "strain" in params
-        assert "toLower($strain)" in cypher
-        assert "toLower(g.organism_strain)" in cypher
-
-    def test_organism_filter_case_insensitive(self):
-        """Organism filter uses toLower for case-insensitive matching."""
-        cypher, params = build_search_genes(query="x", organism="alteromonas")
-        assert params["strain"] == "alteromonas"
-        assert "toLower($strain)" in cypher
-
-    def test_organism_filter_multi_word(self):
-        """Multi-word organism uses ALL/split for word matching."""
-        cypher, params = build_search_genes(query="x", organism="Alteromonas EZ55")
-        assert "ALL(word IN split(" in cypher
-
-    def test_no_organism_no_strain_param(self):
-        _, params = build_search_genes(query="x")
-        assert "strain" not in params
 
 
 class TestBuildFindGene:

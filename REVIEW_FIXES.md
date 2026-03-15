@@ -17,9 +17,7 @@
 ## Medium Priority
 
 ### Correctness
-- [x] 9. Add limit cap to `search_genes` (cap at 200 like run_cypher)
 - [x] 10. Fix `_fmt` truthiness check: `if limit:` → `if limit is not None:`
-- [x] 11. Fix `search_genes` return format inconsistency (use envelope like other tools)
 - [x] 12. Cache `get_settings()` with `@lru_cache`
 
 ### Query Builders
@@ -37,6 +35,4 @@
 - [x] 17. Add test for `find_gene` double-failure (both calls raise)
 - [x] 18. Add wrapper tests for untested params: `find_gene(organism, min_quality)`, `query_expression(direction, include_orthologs, min_log2fc, max_pvalue)`, `compare_conditions(conditions)`
 - [x] 19. Add tests for `run_cypher`: FOREACH, LOAD CSV, CALL procedure blocking + Neo4j error propagation
-- [x] 20. Add test for `search_genes` limit cap at 200
-- [x] 21. Update `search_genes` test to expect envelope format
 - [x] 22. Fix existing tests broken by narrowed exception handling (connection test, _fmt test)

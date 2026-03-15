@@ -56,25 +56,6 @@
     contains:
       organism_strain: Prochlorococcus MED4
 
-# ── Gene search ──────────────────────────────────────────
-
-- id: search_genes_photosystem
-  tool: search_genes
-  desc: Product keyword search finds photosystem genes
-  params:
-    query: photosystem
-  expect:
-    min_rows: 1
-    columns: [locus_tag, product]
-
-- id: search_genes_by_locus
-  tool: search_genes
-  desc: Partial locus_tag search works
-  params:
-    query: PMM00
-  expect:
-    min_rows: 1
-
 # ── Gene details ─────────────────────────────────────────
 
 - id: gene_details_has_organism
@@ -265,35 +246,6 @@
     min_rows: 1
     row0:
       locus_tag: PMT9312_0342
-
-# ── Search corner cases ───────────────────────────────────
-
-- id: search_genes_hypothetical_alteromonas
-  tool: search_genes
-  desc: Hypothetical protein search filtered to Alteromonas
-  params:
-    query: hypothetical
-    organism: Alteromonas
-  expect:
-    min_rows: 1
-
-- id: search_genes_partial_alteromonas_locus
-  tool: search_genes
-  desc: Partial Alteromonas locus_tag prefix matches multiple genes
-  params:
-    query: ALT831
-  expect:
-    min_rows: 1
-
-- id: search_genes_case_insensitive
-  tool: search_genes
-  desc: Product search is case-insensitive (FtsH vs ftsH)
-  params:
-    query: FtsH
-  expect:
-    min_rows: 1
-    contains:
-      gene_name: ftsH1
 
 # ── Find gene corner cases ────────────────────────────────
 

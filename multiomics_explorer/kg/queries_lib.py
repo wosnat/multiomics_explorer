@@ -40,7 +40,7 @@ def build_find_gene(
         "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word))\n"
         "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.gene_summary AS gene_summary, g.product AS product,\n"
+        "       g.product AS product, g.function_description AS function_description,\n"
         "       g.organism_strain AS organism_strain,\n"
         "       g.annotation_quality AS annotation_quality,\n"
         "       score\n"
@@ -51,35 +51,6 @@ def build_find_gene(
         "search_text": search_text, "organism": organism,
         "min_quality": min_quality, "limit": limit,
     }
-
-
-def build_search_genes(
-    *, query: str, organism: str | None = None, limit: int = 20,
-) -> tuple[str, dict]:
-    where_clauses = [
-        "(g.locus_tag CONTAINS $q OR "
-        "toLower(g.product) CONTAINS toLower($q) OR "
-        "toLower(g.gene_name) CONTAINS toLower($q))"
-    ]
-    params: dict = {"q": query, "limit": limit}
-
-    if organism:
-        where_clauses.append(
-            "ALL(word IN split(toLower($strain), ' ') "
-            "WHERE toLower(g.organism_strain) CONTAINS word)"
-        )
-        params["strain"] = organism
-
-    where = " AND ".join(where_clauses)
-    cypher = (
-        "MATCH (g:Gene)\n"
-        f"WHERE {where}\n"
-        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.product AS product, g.organism_strain AS organism_strain\n"
-        "ORDER BY g.locus_tag\n"
-        "LIMIT $limit"
-    )
-    return cypher, params
 
 
 def build_get_gene_details_main(*, gene_id: str) -> tuple[str, dict]:
