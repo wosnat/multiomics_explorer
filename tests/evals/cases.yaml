@@ -154,6 +154,45 @@
   expect:
     min_rows: 1
 
+# ── Filter values ────────────────────────────────────────
+
+- id: list_filter_values
+  tool: list_filter_values
+  desc: Returns gene categories and condition types
+  params: {}
+  expect:
+    # This tool returns a combined JSON, so eval assertions are on the
+    # tool wrapper response. Use a raw_cypher case for each sub-query
+    # to snapshot the individual lists.
+
+- id: list_filter_values_categories
+  tool: raw_cypher
+  desc: Snapshot of all gene categories with counts
+  params:
+    query: >
+      MATCH (g:Gene) WHERE g.gene_category IS NOT NULL
+      RETURN g.gene_category AS category, count(*) AS gene_count
+      ORDER BY gene_count DESC
+  expect:
+    min_rows: 20
+    columns: [category, gene_count]
+    contains:
+      category: Photosynthesis
+
+- id: list_filter_values_conditions
+  tool: raw_cypher
+  desc: Snapshot of all condition types with counts
+  params:
+    query: >
+      MATCH (e:EnvironmentalCondition)
+      RETURN e.condition_type AS condition_type, count(*) AS cnt
+      ORDER BY cnt DESC
+  expect:
+    min_rows: 5
+    columns: [condition_type, cnt]
+    contains:
+      condition_type: nitrogen_stress
+
 # ── Validation queries ───────────────────────────────────
 
 - id: gene_count_nonzero

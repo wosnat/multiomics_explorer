@@ -17,6 +17,8 @@ import yaml
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_list_condition_types,
+    build_list_gene_categories,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_main,
@@ -51,6 +53,14 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
     """Execute a case using the shared query builders."""
     if tool == "raw_cypher":
         return conn.execute_query(params["query"])
+
+    if tool == "list_filter_values":
+        cat_cypher, cat_params = build_list_gene_categories()
+        categories = conn.execute_query(cat_cypher, **cat_params)
+        cond_cypher, cond_params = build_list_condition_types()
+        condition_types = conn.execute_query(cond_cypher, **cond_params)
+        # Return combined list so check_expectations can count rows
+        return categories + condition_types
 
     if tool == "get_homologs_with_expression":
         cypher, query_params = build_get_homologs(gene_id=params["gene_id"])

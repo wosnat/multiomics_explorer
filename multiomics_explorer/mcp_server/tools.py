@@ -10,6 +10,8 @@ from neo4j.exceptions import ClientError as Neo4jClientError
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_list_condition_types,
+    build_list_gene_categories,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
@@ -64,6 +66,37 @@ def register_tools(mcp: FastMCP):
         conn = _conn(ctx)
         schema = load_schema_from_neo4j(conn)
         return schema.to_prompt_string()
+
+    @mcp.tool()
+    def list_filter_values(ctx: Context) -> str:
+        """List valid values for categorical filters used across tools.
+
+        Returns:
+        - gene_categories: values for the category filter on search_genes
+          (e.g. "Photosynthesis", "Transport", "Stress response and adaptation")
+        - condition_types: values for the condition filter on query_expression
+          and compare_conditions (e.g. "nitrogen_stress", "light_stress", "coculture")
+        """
+        lc = ctx.request_context.lifespan_context
+        cached = getattr(lc, "_filter_values_cache", None)
+        if cached is not None:
+            return cached
+
+        conn = _conn(ctx)
+
+        cat_cypher, cat_params = build_list_gene_categories()
+        categories = conn.execute_query(cat_cypher, **cat_params)
+
+        cond_cypher, cond_params = build_list_condition_types()
+        condition_types = conn.execute_query(cond_cypher, **cond_params)
+
+        result = {
+            "gene_categories": categories,
+            "condition_types": condition_types,
+        }
+        response = json.dumps(result, indent=2, default=str)
+        lc._filter_values_cache = response
+        return response
 
     @mcp.tool()
     def resolve_gene(

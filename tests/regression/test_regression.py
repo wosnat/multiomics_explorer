@@ -15,6 +15,8 @@ import yaml
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_list_condition_types,
+    build_list_gene_categories,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_main,
@@ -58,6 +60,10 @@ def _normalize(results: list[dict]) -> list[dict]:
         sort_key = "locus_tag"
     elif results and "gene" in results[0]:
         sort_key = "gene"
+    elif results and "category" in results[0]:
+        sort_key = "category"
+    elif results and "condition_type" in results[0]:
+        sort_key = "condition_type"
     elif results and "cnt" in results[0]:
         sort_key = "cnt"
     else:
@@ -95,6 +101,12 @@ def test_regression(conn, case, data_regression):
 
     if tool == "raw_cypher":
         results = conn.execute_query(params["query"])
+    elif tool == "list_filter_values":
+        cat_cypher, cat_params = build_list_gene_categories()
+        categories = conn.execute_query(cat_cypher, **cat_params)
+        cond_cypher, cond_params = build_list_condition_types()
+        condition_types = conn.execute_query(cond_cypher, **cond_params)
+        results = categories + condition_types
     elif tool == "get_homologs_with_expression":
         cypher, query_params = build_get_homologs(gene_id=params["gene_id"])
         homologs = conn.execute_query(cypher, **query_params)

@@ -36,7 +36,7 @@ def _conn_from(ctx):
 
 
 EXPECTED_TOOLS = [
-    "get_schema", "resolve_gene", "search_genes",
+    "get_schema", "list_filter_values", "resolve_gene", "search_genes",
     "get_gene_details", "query_expression", "compare_conditions",
     "get_homologs", "run_cypher",
 ]
@@ -69,6 +69,66 @@ class TestGetSchemaWrapper:
         assert "Graph Schema" in result
         assert "Gene" in result
         mock_schema.to_prompt_string.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# list_filter_values
+# ---------------------------------------------------------------------------
+class TestListFilterValuesWrapper:
+    def test_returns_combined_json(self, tool_fns, mock_ctx):
+        """list_filter_values returns gene_categories and condition_types in one JSON response."""
+        categories = [
+            {"category": "Photosynthesis", "gene_count": 100},
+            {"category": "Transport", "gene_count": 50},
+        ]
+        condition_types = [
+            {"condition_type": "nitrogen_stress", "cnt": 10},
+            {"condition_type": "light_stress", "cnt": 8},
+        ]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [categories, condition_types]
+        # Ensure no cached value
+        mock_ctx.request_context.lifespan_context._filter_values_cache = None
+        result = json.loads(tool_fns["list_filter_values"](mock_ctx))
+        assert "gene_categories" in result
+        assert "condition_types" in result
+        assert len(result["gene_categories"]) == 2
+        assert len(result["condition_types"]) == 2
+
+    def test_gene_categories_keys(self, tool_fns, mock_ctx):
+        """Each gene_categories entry has 'category' and 'gene_count' keys."""
+        categories = [{"category": "Photosynthesis", "gene_count": 100}]
+        condition_types = [{"condition_type": "nitrogen_stress", "cnt": 10}]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [categories, condition_types]
+        mock_ctx.request_context.lifespan_context._filter_values_cache = None
+        result = json.loads(tool_fns["list_filter_values"](mock_ctx))
+        entry = result["gene_categories"][0]
+        assert "category" in entry
+        assert "gene_count" in entry
+
+    def test_condition_types_keys(self, tool_fns, mock_ctx):
+        """Each condition_types entry has 'condition_type' and 'cnt' keys."""
+        categories = [{"category": "Photosynthesis", "gene_count": 100}]
+        condition_types = [{"condition_type": "nitrogen_stress", "cnt": 10}]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [categories, condition_types]
+        mock_ctx.request_context.lifespan_context._filter_values_cache = None
+        result = json.loads(tool_fns["list_filter_values"](mock_ctx))
+        entry = result["condition_types"][0]
+        assert "condition_type" in entry
+        assert "cnt" in entry
+
+    def test_caching(self, tool_fns, mock_ctx):
+        """Second call returns cached value without hitting Neo4j again."""
+        cached_response = json.dumps({
+            "gene_categories": [{"category": "Cached", "gene_count": 1}],
+            "condition_types": [{"condition_type": "cached_type", "cnt": 1}],
+        })
+        mock_ctx.request_context.lifespan_context._filter_values_cache = cached_response
+        result = tool_fns["list_filter_values"](mock_ctx)
+        assert result == cached_response
+        _conn_from(mock_ctx).execute_query.assert_not_called()
 
 
 # ---------------------------------------------------------------------------

@@ -1,9 +1,12 @@
 # Plan: `list_filter_values` Tool
 
 New MCP tool — returns valid values for categorical filters: gene categories
-and experimental condition types. Gives the LLM the vocabulary for `find_gene`
+and experimental condition types. Gives the LLM the vocabulary for `search_genes`
 category filtering and `query_expression` / `compare_conditions` condition
 filtering.
+
+**Caching:** Results change only on KG rebuild. Cache in lifespan context on
+first call and return the cached value on subsequent calls.
 
 ## Tool signature
 
@@ -13,30 +16,44 @@ def list_filter_values(ctx: Context) -> str:
     """List valid values for categorical filters used across tools.
 
     Returns:
-    - gene_categories: values for the category filter on find_gene
+    - gene_categories: values for the category filter on search_genes
       (e.g. "Photosynthesis", "Transport", "Stress response and adaptation")
     - condition_types: values for the condition filter on query_expression
       and compare_conditions (e.g. "nitrogen_stress", "light_stress", "coculture")
     """
 ```
 
-## Query builders — `build_list_filter_values`
+## Agent assignments
+
+| Step | Agent | Task | Depends on |
+|------|-------|------|------------|
+| 1 | **query-builder** | Add `build_list_gene_categories` and `build_list_condition_types` to `queries_lib.py` | — |
+| 2 | **tool-wrapper** | Add `list_filter_values` tool to `tools.py` with caching and combined JSON response | query-builder |
+| 3a | **test-updater** | Add unit, integration, eval, and regression tests for the new tool | tool-wrapper |
+| 3b | **doc-updater** | Update `CLAUDE.md`, `README.md`, `AGENT.md`, `docs/testplans/testplan.md`, skills | tool-wrapper |
+| 4 | **code-reviewer** | Review all changes against this plan, run unit tests, grep for stale refs | test-updater, doc-updater |
+
+Steps 3a and 3b can run in parallel.
+
+## Query builders
 
 **Files:** `queries_lib.py`
 
-Two queries combined in one tool call:
+Two separate builders for independent testability and reuse:
+
+### `build_list_gene_categories`
 
 ```cypher
--- Gene categories
 MATCH (g:Gene) WHERE g.gene_category IS NOT NULL
 RETURN g.gene_category AS category, count(*) AS gene_count
 ORDER BY gene_count DESC
 ```
 
+### `build_list_condition_types`
+
 ```cypher
--- Condition types
 MATCH (e:EnvironmentalCondition)
-RETURN DISTINCT e.condition_type AS condition_type, count(*) AS cnt
+RETURN e.condition_type AS condition_type, count(*) AS cnt
 ORDER BY cnt DESC
 ```
 
@@ -53,9 +70,9 @@ Returns ~25 categories + ~12 condition types. Combined into one response:
 ### Unit tests
 
 **`tests/unit/test_query_builders.py`:**
-- Verify Cypher structure for category query (MATCH Gene, gene_category)
-- Verify Cypher structure for condition type query (MATCH EnvironmentalCondition)
-- No parameters — builders take no args
+- `build_list_gene_categories`: verify Cypher structure (MATCH Gene, gene_category)
+- `build_list_condition_types`: verify Cypher structure (MATCH EnvironmentalCondition)
+- No parameters — both builders take no args
 
 **`tests/unit/test_tool_wrappers.py`:**
 - Mock both query results, verify combined JSON structure:
@@ -69,8 +86,8 @@ Returns ~25 categories + ~12 condition types. Combined into one response:
 - Verify known condition types present: "nitrogen_stress", "light_stress",
   "coculture"
 - Verify all counts > 0
-- Verify 25 gene categories returned
-- Verify ~12 condition types returned
+- Verify at least 20 gene categories returned
+- Verify at least 5 condition types returned
 
 ### Eval cases (`tests/evals/cases.yaml`)
 
@@ -104,7 +121,7 @@ Returns ~25 categories + ~12 condition types. Combined into one response:
   params:
     query: >
       MATCH (e:EnvironmentalCondition)
-      RETURN DISTINCT e.condition_type AS condition_type, count(*) AS cnt
+      RETURN e.condition_type AS condition_type, count(*) AS cnt
       ORDER BY cnt DESC
   expect:
     min_rows: 5
@@ -112,6 +129,16 @@ Returns ~25 categories + ~12 condition types. Combined into one response:
     contains:
       condition_type: nitrogen_stress
 ```
+
+## Documentation updates
+
+| File | What to update |
+|------|----------------|
+| `CLAUDE.md` | Add `list_filter_values` row to MCP Tools table |
+| `README.md` | Add entry to MCP tools section, bump tool count |
+| `AGENT.md` | Add row to tools table (~line 52) |
+| `docs/testplans/testplan.md` | Add test plan section for new tool |
+| `.claude/skills/update-tests/SKILL.md` | Update test counts after implementation |
 
 ### Regression snapshots (`tests/regression/`)
 

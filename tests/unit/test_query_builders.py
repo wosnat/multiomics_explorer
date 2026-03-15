@@ -5,6 +5,8 @@ Verifies Cypher structure and parameter correctness.
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_list_condition_types,
+    build_list_gene_categories,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
@@ -165,6 +167,33 @@ class TestBuildGetHomologs:
         cypher, _ = build_get_homologs(gene_id="x")
         for col in ["locus_tag", "organism_strain", "distance"]:
             assert col in cypher
+
+
+class TestBuildListGeneCategories:
+    def test_cypher_structure(self):
+        cypher, params = build_list_gene_categories()
+        assert "MATCH (g:Gene)" in cypher
+        assert "gene_category" in cypher
+        assert "category" in cypher
+        assert "gene_count" in cypher
+        assert "ORDER BY gene_count DESC" in cypher
+
+    def test_no_params(self):
+        _, params = build_list_gene_categories()
+        assert params == {}
+
+
+class TestBuildListConditionTypes:
+    def test_cypher_structure(self):
+        cypher, params = build_list_condition_types()
+        assert "MATCH (e:EnvironmentalCondition)" in cypher
+        assert "condition_type" in cypher
+        assert "cnt" in cypher
+        assert "ORDER BY cnt DESC" in cypher
+
+    def test_no_params(self):
+        _, params = build_list_condition_types()
+        assert params == {}
 
 
 class TestBuildHomologExpression:

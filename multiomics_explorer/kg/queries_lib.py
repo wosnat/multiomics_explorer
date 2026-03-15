@@ -215,6 +215,24 @@ def build_get_homologs(*, gene_id: str) -> tuple[str, dict]:
     return cypher, {"lt": gene_id}
 
 
+def build_list_gene_categories() -> tuple[str, dict]:
+    cypher = (
+        "MATCH (g:Gene) WHERE g.gene_category IS NOT NULL\n"
+        "RETURN g.gene_category AS category, count(*) AS gene_count\n"
+        "ORDER BY gene_count DESC"
+    )
+    return cypher, {}
+
+
+def build_list_condition_types() -> tuple[str, dict]:
+    cypher = (
+        "MATCH (e:EnvironmentalCondition)\n"
+        "RETURN e.condition_type AS condition_type, count(*) AS cnt\n"
+        "ORDER BY cnt DESC"
+    )
+    return cypher, {}
+
+
 def build_homolog_expression(*, gene_ids: list[str]) -> tuple[str, dict]:
     cypher = (
         f"MATCH (factor)-[r:{DIRECT_EXPR_RELS}]->(g:Gene)\n"

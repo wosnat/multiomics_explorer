@@ -42,6 +42,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `query_expression` | Expression data with filters (gene, organism, condition, direction, FC, p-value) |
 | `compare_conditions` | Cross-condition or cross-strain expression comparison |
 | `get_homologs` | Homologs across strains, optionally with expression data |
+| `list_filter_values` | List valid values for categorical filters (gene categories, condition types) |
 | `run_cypher` | Raw Cypher escape hatch (read-only, write operations blocked) |
 
 ### Claude Code Configuration

@@ -2,17 +2,17 @@
 
 ## Current State
 
-**Existing tests (10 files, 108 unit + integration/eval/regression):**
+**Existing tests (10 files, 108+ unit + integration/eval/regression):**
 
 | File | Tests | Neo4j? |
 |------|-------|--------|
 | `tests/unit/test_settings.py` | 4 unit tests | No |
-| `tests/unit/test_query_builders.py` | 19 unit tests (all 8 builders) | No |
+| `tests/unit/test_query_builders.py` | 21 unit tests (all 10 builders) | No |
 | `tests/unit/test_write_blocking.py` | 15 unit tests (regex + `_fmt`) | No |
 | `tests/unit/test_schema.py` | 18 unit tests (diffing, baseline, formatting) | No |
 | `tests/unit/test_connection.py` | 3 unit tests (error handling, lifecycle) | No |
 | `tests/unit/test_mcp_server.py` | 3 unit tests (lifespan, KGContext) | No |
-| `tests/unit/test_tool_wrappers.py` | 32 unit tests (all 8 MCP tool wrappers + registration) | No |
+| `tests/unit/test_tool_wrappers.py` | 35 unit tests (all 9 MCP tool wrappers + registration) | No |
 | `tests/integration/test_mcp_tools.py` | 13 integration tests | Yes |
 | `tests/evals/test_eval.py` | 15 parameterized integration tests | Yes |
 | `tests/regression/test_regression.py` | 15 golden-file baselines | Yes |
@@ -71,7 +71,7 @@ Tests all 8 tool functions' wrapper logic (input validation, response formatting
 error messages, multi-query orchestration) with a mocked Neo4j connection.
 
 **Tool registration:**
-- [x] All 8 expected tools are registered
+- [x] All 9 expected tools are registered
 - [x] No unexpected extra tools
 
 **`get_schema`:**
@@ -108,6 +108,11 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 - [x] No homologs returns "No homologs found" message
 - [x] Without expression returns JSON array of homologs
 - [x] With expression merges `homologs` + `expression` into single response
+
+**`list_filter_values`:**
+- [ ] Returns combined JSON with `gene_categories` and `condition_types` keys
+- [ ] Each sub-list has expected keys (`category`/`gene_count` and `condition_type`/`cnt`)
+- [ ] Caching returns same result on subsequent calls
 
 **`run_cypher`:**
 - [x] Write keyword returns error message without calling Neo4j
@@ -186,6 +191,31 @@ tests/
     test_mcp_tools.py         # NEW — tool-level integration
     test_cli.py               # NEW — CLI smoke tests
 ```
+
+---
+
+### `list_filter_values` Tool Tests
+
+#### Unit tests (`tests/unit/test_query_builders.py`)
+- [ ] `build_list_gene_categories`: verify Cypher structure (MATCH Gene, gene_category)
+- [ ] `build_list_condition_types`: verify Cypher structure (MATCH EnvironmentalCondition)
+
+#### Unit tests (`tests/unit/test_tool_wrappers.py`)
+- [ ] Mock both query results, verify combined JSON structure: `{"gene_categories": [...], "condition_types": [...]}`
+- [ ] Verify each sub-list has expected keys
+- [ ] Caching returns same result on subsequent calls
+
+#### Integration tests (`tests/integration/test_tool_correctness_kg.py`)
+- [ ] Known categories present: "Photosynthesis", "Transport", "Stress response and adaptation", "Translation"
+- [ ] Known condition types present: "nitrogen_stress", "light_stress", "coculture"
+- [ ] All counts > 0
+- [ ] At least 20 gene categories returned
+- [ ] At least 5 condition types returned
+
+#### Eval cases (`tests/evals/cases.yaml`)
+- [ ] `list_filter_values` — combined tool response
+- [ ] `list_filter_values_categories` — raw_cypher snapshot of gene categories
+- [ ] `list_filter_values_conditions` — raw_cypher snapshot of condition types
 
 ---
 

@@ -14,6 +14,8 @@ import pytest
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_list_condition_types,
+    build_list_gene_categories,
     build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
@@ -314,3 +316,65 @@ class TestCompareConditionsCorrectnessKG:
             assert r["gene"] == "PMM0001", (
                 f"Expected gene='PMM0001', got {r['gene']}"
             )
+
+
+# ---------------------------------------------------------------------------
+# TestListFilterValuesCorrectnessKG
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestListFilterValuesCorrectnessKG:
+    """Validate list_filter_values query builders against live Neo4j."""
+
+    def test_known_categories_present(self, conn):
+        """Known gene categories must be present in results."""
+        cypher, params = build_list_gene_categories()
+        results = conn.execute_query(cypher, **params)
+        categories = {r["category"] for r in results}
+        for expected in ["Photosynthesis", "Transport",
+                         "Stress response and adaptation", "Translation"]:
+            assert expected in categories, (
+                f"Expected category '{expected}' not found in {sorted(categories)}"
+            )
+
+    def test_known_condition_types_present(self, conn):
+        """Known condition types must be present in results."""
+        cypher, params = build_list_condition_types()
+        results = conn.execute_query(cypher, **params)
+        condition_types = {r["condition_type"] for r in results}
+        for expected in ["nitrogen_stress", "light_stress", "coculture"]:
+            assert expected in condition_types, (
+                f"Expected condition_type '{expected}' not found in {sorted(condition_types)}"
+            )
+
+    def test_all_counts_positive(self, conn):
+        """All gene_count and cnt values must be > 0."""
+        cat_cypher, cat_params = build_list_gene_categories()
+        categories = conn.execute_query(cat_cypher, **cat_params)
+        for r in categories:
+            assert r["gene_count"] > 0, (
+                f"Category '{r['category']}' has gene_count={r['gene_count']}"
+            )
+
+        cond_cypher, cond_params = build_list_condition_types()
+        conditions = conn.execute_query(cond_cypher, **cond_params)
+        for r in conditions:
+            assert r["cnt"] > 0, (
+                f"Condition type '{r['condition_type']}' has cnt={r['cnt']}"
+            )
+
+    def test_minimum_gene_categories(self, conn):
+        """At least 20 gene categories should be returned."""
+        cypher, params = build_list_gene_categories()
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 20, (
+            f"Expected >= 20 gene categories, got {len(results)}"
+        )
+
+    def test_minimum_condition_types(self, conn):
+        """At least 5 condition types should be returned."""
+        cypher, params = build_list_condition_types()
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 5, (
+            f"Expected >= 5 condition types, got {len(results)}"
+        )
