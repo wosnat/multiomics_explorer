@@ -36,7 +36,7 @@ def _conn_from(ctx):
 
 
 EXPECTED_TOOLS = [
-    "get_schema", "resolve_gene", "find_gene",
+    "get_schema", "resolve_gene", "search_genes",
     "get_gene_details", "query_expression", "compare_conditions",
     "get_homologs", "run_cypher",
 ]
@@ -140,12 +140,12 @@ class TestResolveGeneWrapper:
 
 
 # ---------------------------------------------------------------------------
-# find_gene
+# search_genes
 # ---------------------------------------------------------------------------
-class TestFindGeneWrapper:
+class TestSearchGenesWrapper:
     def test_empty_result_envelope(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["find_gene"](mock_ctx, search_text="nonexistent"))
+        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="nonexistent"))
         assert result["results"] == []
         assert result["total"] == 0
         assert result["query"] == "nonexistent"
@@ -153,13 +153,13 @@ class TestFindGeneWrapper:
     def test_result_envelope_with_hits(self, tool_fns, mock_ctx):
         rows = [{"locus_tag": "PMM0001", "score": 1.5}]
         _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["find_gene"](mock_ctx, search_text="photosystem"))
+        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="photosystem"))
         assert result["total"] == 1
         assert result["query"] == "photosystem"
 
     def test_limit_capped_at_50(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["find_gene"](mock_ctx, search_text="x", limit=999)
+        tool_fns["search_genes"](mock_ctx, search_text="x", limit=999)
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args
         assert call_kwargs.kwargs["limit"] == 50
 
@@ -171,17 +171,17 @@ class TestFindGeneWrapper:
             Neo4jClientError("still broken"),
         ]
         with pytest.raises(Neo4jClientError):
-            tool_fns["find_gene"](mock_ctx, search_text="bad [query")
+            tool_fns["search_genes"](mock_ctx, search_text="bad [query")
 
     def test_organism_filter_passed_through(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["find_gene"](mock_ctx, search_text="photosystem", organism="MED4")
+        tool_fns["search_genes"](mock_ctx, search_text="photosystem", organism="MED4")
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
         assert call_kwargs["organism"] == "MED4"
 
     def test_min_quality_passed_through(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["find_gene"](mock_ctx, search_text="photosystem", min_quality=2)
+        tool_fns["search_genes"](mock_ctx, search_text="photosystem", min_quality=2)
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
         assert call_kwargs["min_quality"] == 2
 
@@ -192,9 +192,58 @@ class TestFindGeneWrapper:
             Neo4jClientError("Lucene parse error"),  # first call fails
             [{"locus_tag": "PMM0001"}],  # retry succeeds
         ]
-        result = json.loads(tool_fns["find_gene"](mock_ctx, search_text="DNA [repair"))
+        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="DNA [repair"))
         assert result["total"] == 1
         assert conn.execute_query.call_count == 2
+
+    def test_category_passed_through(self, tool_fns, mock_ctx):
+        """category param is forwarded to the query builder."""
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["search_genes"](mock_ctx, search_text="x", category="Photosynthesis")
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["category"] == "Photosynthesis"
+
+    def test_dedup_collapses_same_cluster(self, tool_fns, mock_ctx):
+        """Dedup groups rows with the same cluster_id, keeping the first as representative."""
+        rows = [
+            {"locus_tag": "PMM0044", "cluster_id": "CK_00001234", "organism_strain": "Prochlorococcus MED4", "score": 5.0},
+            {"locus_tag": "PMT9312_0044", "cluster_id": "CK_00001234", "organism_strain": "Prochlorococcus MIT9312", "score": 4.5},
+            {"locus_tag": "SYNW0044", "cluster_id": "CK_00001234", "organism_strain": "Synechococcus WH8102", "score": 4.0},
+            {"locus_tag": "PMM0099", "cluster_id": "CK_00005678", "organism_strain": "Prochlorococcus MED4", "score": 3.0},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(
+            tool_fns["search_genes"](mock_ctx, search_text="naphthoate", deduplicate=True)
+        )
+        assert result["total"] == 2
+        rep = result["results"][0]
+        assert rep["locus_tag"] == "PMM0044"
+        assert rep["collapsed_count"] == 3
+        assert rep["cluster_organisms"] == {
+            "Prochlorococcus MED4": 1,
+            "Prochlorococcus MIT9312": 1,
+            "Synechococcus WH8102": 1,
+        }
+        # Second cluster has only 1 member
+        assert result["results"][1]["collapsed_count"] == 1
+
+    def test_dedup_genes_without_cluster_appear_individually(self, tool_fns, mock_ctx):
+        """Genes without cluster_id always appear individually even with dedup."""
+        rows = [
+            {"locus_tag": "PMM0044", "cluster_id": "CK_00001234", "organism_strain": "Prochlorococcus MED4", "score": 5.0},
+            {"locus_tag": "PMT9312_0044", "cluster_id": "CK_00001234", "organism_strain": "Prochlorococcus MIT9312", "score": 4.5},
+            {"locus_tag": "ALT_NOCL", "cluster_id": None, "organism_strain": "Alteromonas macleodii MIT1002", "score": 3.0},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(
+            tool_fns["search_genes"](mock_ctx, search_text="test", deduplicate=True)
+        )
+        assert result["total"] == 2
+        loci = [r["locus_tag"] for r in result["results"]]
+        assert "ALT_NOCL" in loci
+        # Gene without cluster should not have collapsed_count
+        nocl = [r for r in result["results"] if r["locus_tag"] == "ALT_NOCL"][0]
+        assert "collapsed_count" not in nocl
 
 
 # ---------------------------------------------------------------------------

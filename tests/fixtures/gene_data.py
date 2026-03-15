@@ -851,6 +851,7 @@ GENES = [
         "alternative_locus_tags": [
             "ALT831_RS00180"
         ],
+        "alteromonadaceae_og": "2QEEF@267890|Shewanellaceae",
         "annotation_quality": 2,
         "bacteria_cog_og": "COG3335",
         "cog_category": [
@@ -900,6 +901,7 @@ GENES = [
         "alternative_locus_tags": [
             "ALT831_RS00590"
         ],
+        "alteromonadaceae_og": "31GCA@72275|Alteromonadaceae",
         "annotation_quality": 0,
         "end": 130720,
         "gene_category": "Unknown",
@@ -1007,6 +1009,7 @@ GENES = [
             "[eggnog] Required for coenzyme pyrroloquinoline quinone (PQQ) biosynthesis. PQQ is probably formed by cross-linking a specific glutamate to a specific tyrosine residue and excising these residues from the peptide",
             "[pfam] PqqA"
         ],
+        "alteromonadaceae_og": "1T9VB@72275|Alteromonadaceae",
         "annotation_quality": 3,
         "cog_category": [
             "S"
@@ -1727,6 +1730,7 @@ GENES = [
         "alternative_locus_tags": [
             "ALTBGP6_RS12485"
         ],
+        "alteromonadaceae_og": "1S6WV@72275|Alteromonadaceae",
         "annotation_quality": 3,
         "bacteria_cog_og": "COG1335",
         "cog_category": [
@@ -1787,6 +1791,21 @@ def as_resolve_gene_result(gene):
         "gene_name": gene.get("gene_name"),
         "product": gene.get("product"),
         "organism_strain": gene.get("organism_strain"),
+    }
+
+
+# Helper: project to search_genes return shape
+def as_search_genes_result(gene, score=1.0):
+    return {
+        "locus_tag": gene["locus_tag"],
+        "gene_name": gene.get("gene_name"),
+        "product": gene.get("product"),
+        "function_description": gene.get("function_description"),
+        "gene_summary": gene.get("gene_summary"),
+        "organism_strain": gene.get("organism_strain"),
+        "annotation_quality": gene.get("annotation_quality"),
+        "cluster_id": gene.get("cluster_number") or gene.get("alteromonadaceae_og"),
+        "score": score,
     }
 
 

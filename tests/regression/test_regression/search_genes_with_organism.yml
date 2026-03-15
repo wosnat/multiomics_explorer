@@ -1,4 +1,4 @@
-case_id: find_gene_with_organism
+case_id: search_genes_with_organism
 row_count: 10
 rows:
 - annotation_quality: 3

@@ -14,7 +14,7 @@ import pytest
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
-    build_find_gene,
+    build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
     build_get_gene_details_main,
@@ -124,16 +124,16 @@ class TestResolveGeneCorrectnessKG:
 
 
 # ---------------------------------------------------------------------------
-# TestFindGeneCorrectnessKG
+# TestSearchGenesCorrectnessKG
 # ---------------------------------------------------------------------------
 
 @pytest.mark.kg
-class TestFindGeneCorrectnessKG:
-    """Validate full-text find_gene returns scored results."""
+class TestSearchGenesCorrectnessKG:
+    """Validate full-text search_genes returns scored results."""
 
     def test_basic_search_has_scores(self, conn):
         """Full-text search for 'photosystem' should return results with scores."""
-        cypher, params = build_find_gene(search_text="photosystem")
+        cypher, params = build_search_genes(search_text="photosystem")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         for r in results:
@@ -142,7 +142,7 @@ class TestFindGeneCorrectnessKG:
 
     def test_organism_filter(self, conn):
         """Organism filter should restrict full-text results."""
-        cypher, params = build_find_gene(search_text="DNA repair", organism="MED4")
+        cypher, params = build_search_genes(search_text="DNA repair", organism="MED4")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         for r in results:
@@ -152,10 +152,10 @@ class TestFindGeneCorrectnessKG:
 
     def test_quality_filter_reduces_results(self, conn):
         """Higher min_quality should return fewer or equal results than lower."""
-        cypher_low, params_low = build_find_gene(
+        cypher_low, params_low = build_search_genes(
             search_text="polymerase", min_quality=0, limit=50,
         )
-        cypher_high, params_high = build_find_gene(
+        cypher_high, params_high = build_search_genes(
             search_text="polymerase", min_quality=2, limit=50,
         )
         results_low = conn.execute_query(cypher_low, **params_low)

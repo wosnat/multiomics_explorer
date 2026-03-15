@@ -19,14 +19,14 @@ Compare the current tool/query code against what the tests expect:
 
 1. Read `multiomics_explorer/mcp_server/tools.py` — check each tool's signature (params, defaults, return format)
 2. Read `multiomics_explorer/kg/queries_lib.py` — check each builder's Cypher, returned columns, and param names
-3. Read the projection helpers in `tests/fixtures/gene_data.py` (`as_resolve_gene_result`, `as_find_gene_result`) — do they match the current RETURN columns?
+3. Read the projection helpers in `tests/fixtures/gene_data.py` (`as_resolve_gene_result`, `as_search_genes_result`) — do they match the current RETURN columns?
 
 List every discrepancy found.
 
 ## Step 2: Update fixtures
 
 If RETURN columns changed, update:
-- `tests/fixtures/gene_data.py` — the `as_resolve_gene_result()` and `as_find_gene_result()` helpers must match the current query RETURN columns exactly
+- `tests/fixtures/gene_data.py` — the `as_resolve_gene_result()` and `as_search_genes_result()` helpers must match the current query RETURN columns exactly
 - Also update `scripts/build_test_fixtures.py` so re-running it produces the correct helpers
 
 ## Step 3: Update unit tests

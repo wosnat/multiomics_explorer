@@ -15,7 +15,7 @@ import yaml
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
-    build_find_gene,
+    build_search_genes,
     build_resolve_gene,
     build_get_gene_details_main,
     build_get_homologs,
@@ -33,7 +33,7 @@ CASE_IDS = [c["id"] for c in CASES]
 
 TOOL_BUILDERS = {
     "resolve_gene": build_resolve_gene,
-    "find_gene": build_find_gene,
+    "search_genes": build_search_genes,
     "get_gene_details": build_get_gene_details_main,
     "query_expression": build_query_expression,
     "compare_conditions": build_compare_conditions,
@@ -106,7 +106,9 @@ def test_regression(conn, case, data_regression):
             results = conn.execute_query(cypher_expr, **params_expr)
     else:
         builder = TOOL_BUILDERS[tool]
-        cypher, query_params = builder(**params)
+        # Strip tool-level params that aren't accepted by query builders
+        builder_params = {k: v for k, v in params.items() if k != "deduplicate"}
+        cypher, query_params = builder(**builder_params)
         results = conn.execute_query(cypher, **query_params)
 
     normalized = _normalize(results)

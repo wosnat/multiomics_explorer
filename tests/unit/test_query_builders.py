@@ -5,7 +5,7 @@ Verifies Cypher structure and parameter correctness.
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
-    build_find_gene,
+    build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
     build_get_gene_details_main,
@@ -55,26 +55,52 @@ class TestBuildResolveGene:
         assert "ORDER BY g.locus_tag" in cypher
 
 
-class TestBuildFindGene:
+class TestBuildSearchGenes:
     def test_basic(self):
-        cypher, params = build_find_gene(search_text="DNA repair")
+        cypher, params = build_search_genes(search_text="DNA repair")
         assert "fulltext" in cypher.lower() or "geneFullText" in cypher
         assert params["search_text"] == "DNA repair"
 
     def test_min_quality(self):
-        _, params = build_find_gene(search_text="x", min_quality=2)
+        _, params = build_search_genes(search_text="x", min_quality=2)
         assert params["min_quality"] == 2
 
     def test_organism_case_insensitive(self):
         """Organism filter uses toLower for case-insensitive matching."""
-        cypher, params = build_find_gene(search_text="x", organism="prochlorococcus")
+        cypher, params = build_search_genes(search_text="x", organism="prochlorococcus")
         assert params["organism"] == "prochlorococcus"
         assert "toLower($organism)" in cypher
 
     def test_organism_multi_word(self):
         """Multi-word organism uses ALL/split for word matching."""
-        cypher, _ = build_find_gene(search_text="x", organism="Alteromonas EZ55")
+        cypher, _ = build_search_genes(search_text="x", organism="Alteromonas EZ55")
         assert "ALL(word IN split(" in cypher
+
+    def test_gene_summary_in_return(self):
+        """RETURN clause includes gene_summary."""
+        cypher, _ = build_search_genes(search_text="x")
+        assert "gene_summary" in cypher
+
+    def test_cluster_id_via_coalesce(self):
+        """RETURN clause includes cluster_id via coalesce of cluster_number and alteromonadaceae_og."""
+        cypher, _ = build_search_genes(search_text="x")
+        assert "cluster_id" in cypher
+        assert "coalesce" in cypher.lower()
+        assert "cluster_number" in cypher
+        assert "alteromonadaceae_og" in cypher
+
+    def test_category_param_when_provided(self):
+        """When category is provided, it is passed as $category parameter."""
+        cypher, params = build_search_genes(search_text="x", category="Photosynthesis")
+        assert params["category"] == "Photosynthesis"
+        assert "gene_category" in cypher
+        assert "$category" in cypher
+
+    def test_category_is_null_when_none(self):
+        """When category is None, $category IS NULL allows all rows through."""
+        cypher, params = build_search_genes(search_text="x", category=None)
+        assert params["category"] is None
+        assert "$category IS NULL" in cypher
 
 
 class TestBuildGetGeneDetails:

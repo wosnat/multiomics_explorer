@@ -20,6 +20,7 @@ from tests.fixtures.gene_data import (
     GENES_WITH_GENE_NAME,
     GENES_WITHOUT_GENE_NAME,
     as_resolve_gene_result,
+    as_search_genes_result,
     genes_by_organism,
 )
 
@@ -168,22 +169,22 @@ class TestResolveGeneCorrectness:
 
 
 # ---------------------------------------------------------------------------
-# TestFindGeneCorrectness
+# TestSearchGenesCorrectness
 # ---------------------------------------------------------------------------
-class TestFindGeneCorrectness:
-    """Verify find_gene returns correct data for realistic mock responses."""
+class TestSearchGenesCorrectness:
+    """Verify search_genes returns correct data for realistic mock responses."""
 
     def test_fulltext_results_with_scores(self, tool_fns, mock_ctx):
         """Results from multiple organisms are returned with total count."""
         rows = [
-            {**as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"]), "score": 5.2},
-            {**as_resolve_gene_result(GENES_BY_LOCUS["PMT9312_0001"]), "score": 4.8},
-            {**as_resolve_gene_result(GENES_BY_LOCUS["SYNW0305"]), "score": 2.1},
+            as_search_genes_result(GENES_BY_LOCUS["PMM0001"], score=5.2),
+            as_search_genes_result(GENES_BY_LOCUS["PMT9312_0001"], score=4.8),
+            as_search_genes_result(GENES_BY_LOCUS["SYNW0305"], score=2.1),
         ]
         _conn_from(mock_ctx).execute_query.return_value = rows
 
         result = json.loads(
-            tool_fns["find_gene"](mock_ctx, search_text="DNA polymerase")
+            tool_fns["search_genes"](mock_ctx, search_text="DNA polymerase")
         )
 
         assert result["total"] == 3
@@ -194,10 +195,10 @@ class TestFindGeneCorrectness:
 
     def test_organism_filter_wh8102(self, tool_fns, mock_ctx):
         """Organism filter passes through and only WH8102 genes returned."""
-        wh8102_row = {**as_resolve_gene_result(GENES_BY_LOCUS["SYNW0305"]), "score": 3.0}
+        wh8102_row = as_search_genes_result(GENES_BY_LOCUS["SYNW0305"], score=3.0)
         _conn_from(mock_ctx).execute_query.return_value = [wh8102_row]
 
-        tool_fns["find_gene"](mock_ctx, search_text="metallopeptidase", organism="WH8102")
+        tool_fns["search_genes"](mock_ctx, search_text="metallopeptidase", organism="WH8102")
 
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
         assert call_kwargs["organism"] == "WH8102"
@@ -205,23 +206,22 @@ class TestFindGeneCorrectness:
     def test_quality_filter_passed(self, tool_fns, mock_ctx):
         """min_quality=2 is passed through to query builder."""
         rows = [
-            {**as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"]), "score": 5.0,
-             "annotation_quality": 2},
+            as_search_genes_result(GENES_BY_LOCUS["PMM0001"], score=5.0),
         ]
         _conn_from(mock_ctx).execute_query.return_value = rows
 
-        tool_fns["find_gene"](mock_ctx, search_text="polymerase", min_quality=2)
+        tool_fns["search_genes"](mock_ctx, search_text="polymerase", min_quality=2)
 
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
         assert call_kwargs["min_quality"] == 2
 
-    def test_find_gene_result_envelope(self, tool_fns, mock_ctx):
+    def test_search_genes_result_envelope(self, tool_fns, mock_ctx):
         """Result envelope contains query, total, and results keys."""
-        rows = [{**as_resolve_gene_result(GENES_BY_LOCUS["PMN2A_0044"]), "score": 4.0}]
+        rows = [as_search_genes_result(GENES_BY_LOCUS["PMN2A_0044"], score=4.0)]
         _conn_from(mock_ctx).execute_query.return_value = rows
 
         result = json.loads(
-            tool_fns["find_gene"](mock_ctx, search_text="naphthoate synthase")
+            tool_fns["search_genes"](mock_ctx, search_text="naphthoate synthase")
         )
 
         assert "results" in result

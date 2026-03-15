@@ -30,8 +30,9 @@ def build_resolve_gene(
     return cypher, {"identifier": identifier, "organism": organism}
 
 
-def build_find_gene(
+def build_search_genes(
     *, search_text: str, organism: str | None = None,
+    category: str | None = None,
     min_quality: int = 0, limit: int = 10,
 ) -> tuple[str, dict]:
     cypher = (
@@ -39,16 +40,20 @@ def build_find_gene(
         "YIELD node AS g, score\n"
         "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word))\n"
         "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
+        "  AND ($category IS NULL OR g.gene_category = $category)\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.function_description AS function_description,\n"
+        "       g.gene_summary AS gene_summary,\n"
         "       g.organism_strain AS organism_strain,\n"
         "       g.annotation_quality AS annotation_quality,\n"
+        "       coalesce(g.cluster_number, g.alteromonadaceae_og) AS cluster_id,\n"
         "       score\n"
         "ORDER BY score DESC, g.locus_tag\n"
         "LIMIT $limit"
     )
     return cypher, {
         "search_text": search_text, "organism": organism,
+        "category": category,
         "min_quality": min_quality, "limit": limit,
     }
 

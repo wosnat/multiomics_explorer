@@ -1,4 +1,4 @@
-case_id: find_gene_photosystem
+case_id: search_genes_photosystem
 row_count: 10
 rows:
 - annotation_quality: 3

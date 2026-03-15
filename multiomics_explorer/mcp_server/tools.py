@@ -10,7 +10,7 @@ from neo4j.exceptions import ClientError as Neo4jClientError
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
-    build_find_gene,
+    build_search_genes,
     build_resolve_gene,
     build_get_gene_details_homologs,
     build_get_gene_details_main,
@@ -101,11 +101,13 @@ def register_tools(mcp: FastMCP):
         return _with_query(response, cypher, params, ctx)
 
     @mcp.tool()
-    def find_gene(
+    def search_genes(
         ctx: Context,
         search_text: str,
         organism: str | None = None,
+        category: str | None = None,
         min_quality: int = 0,
+        deduplicate: bool = False,
         limit: int = 10,
     ) -> str:
         """Free-text search across gene functional annotations using full-text index.
@@ -114,18 +116,30 @@ def register_tools(mcp: FastMCP):
         Args:
             search_text: Free-text query (Lucene syntax supported).
             organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
+                Use list_organisms to see all valid organisms.
+            category: Optional gene_category filter (e.g. "Photosynthesis", "Transport").
+                Use list_filter_values to see all valid categories. Invalid values
+                return empty results (no validation).
             min_quality: Minimum annotation_quality (0-3).
                 0 = hypothetical, no function info;
                 1 = hypothetical but has function description;
                 2 = real product name;
                 3 = well-annotated (product + GO/KEGG/EC/Pfam).
                 Use 2 to skip hypothetical proteins.
-            limit: Max results (default 10, max 50).
+            deduplicate: If True, collapse orthologs by cluster and return one
+                representative per cluster with collapsed_count and
+                cluster_organisms summary. Counts reflect hits within the result
+                set, not total cluster membership — use get_homologs for full
+                ortholog inventory.
+            limit: Max results (default 10, max 50). When deduplicate=True, the
+                limit applies to the pre-dedup query, so fewer rows may be
+                returned after collapsing.
         """
         conn = _conn(ctx)
         limit = min(limit, 50)
-        cypher, params = build_find_gene(
+        cypher, params = build_search_genes(
             search_text=search_text, organism=organism,
+            category=category,
             min_quality=min_quality, limit=limit,
         )
         try:
@@ -133,11 +147,35 @@ def register_tools(mcp: FastMCP):
         except Neo4jClientError:
             # Retry with escaped Lucene special characters
             escaped = re.sub(r'[+\-!(){}\[\]^"~*?:\\/]', r'\\\g<0>', search_text)
-            cypher, params = build_find_gene(
+            cypher, params = build_search_genes(
                 search_text=escaped, organism=organism,
+                category=category,
                 min_quality=min_quality, limit=limit,
             )
             results = conn.execute_query(cypher, **params)
+        if deduplicate:
+            cluster_groups: dict[str, list] = {}
+            deduped = []
+            for row in results:
+                cluster = row.get("cluster_id")
+                if cluster:
+                    if cluster in cluster_groups:
+                        cluster_groups[cluster].append(row)
+                        continue
+                    cluster_groups[cluster] = [row]
+                deduped.append(row)
+            # Add cluster summary to each representative
+            for row in deduped:
+                cluster = row.get("cluster_id")
+                if cluster:
+                    group = cluster_groups[cluster]
+                    row["collapsed_count"] = len(group)
+                    org_counts: dict[str, int] = {}
+                    for r in group:
+                        org = r.get("organism_strain", "Unknown")
+                        org_counts[org] = org_counts.get(org, 0) + 1
+                    row["cluster_organisms"] = org_counts
+            results = deduped
         if not results:
             response = json.dumps({
                 "results": [], "total": 0, "query": search_text,

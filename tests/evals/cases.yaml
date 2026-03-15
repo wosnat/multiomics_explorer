@@ -112,17 +112,17 @@
 
 # ── Full-text search ────────────────────────────────────
 
-- id: find_gene_photosystem
-  tool: find_gene
+- id: search_genes_photosystem
+  tool: search_genes
   desc: Full-text search for photosystem genes
   params:
     search_text: photosystem
   expect:
     min_rows: 1
-    columns: [locus_tag, product, score]
+    columns: [locus_tag, product, gene_summary, cluster_id, score]
 
-- id: find_gene_with_organism
-  tool: find_gene
+- id: search_genes_with_organism
+  tool: search_genes
   desc: Full-text search narrowed by organism
   params:
     search_text: "DNA repair"
@@ -247,10 +247,10 @@
     row0:
       locus_tag: PMT9312_0342
 
-# ── Find gene corner cases ────────────────────────────────
+# ── Search genes corner cases ────────────────────────────────
 
-- id: find_gene_synechococcus_filter
-  tool: find_gene
+- id: search_genes_synechococcus_filter
+  tool: search_genes
   desc: Full-text search with Synechococcus organism filter
   params:
     search_text: cell division
@@ -258,14 +258,102 @@
   expect:
     min_rows: 1
 
-- id: find_gene_naphthoate
-  tool: find_gene
+- id: search_genes_naphthoate
+  tool: search_genes
   desc: Specific enzyme search finds naphthoate synthase
   params:
     search_text: naphthoate
   expect:
     min_rows: 1
-    columns: [locus_tag, product, score]
+    columns: [locus_tag, product, gene_summary, cluster_id, score]
+
+# ── Search genes: cluster_id ────────────────────────────────
+
+- id: search_genes_with_cluster_id
+  tool: search_genes
+  desc: Results include cluster_id for ortholog grouping
+  params:
+    search_text: naphthoate
+    limit: 10
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, product, function_description,
+              gene_summary, organism_strain, annotation_quality,
+              cluster_id, score]
+
+# ── Search genes: deduplication ────────────────────────────
+
+- id: search_genes_dedup_photosystem
+  tool: search_genes
+  desc: Dedup collapses photosystem orthologs into cluster representatives
+  params:
+    search_text: photosystem
+    deduplicate: true
+    limit: 20
+  expect:
+    min_rows: 1
+
+- id: search_genes_dedup_naphthoate
+  tool: search_genes
+  desc: Dedup collapses menB orthologs into clusters
+  params:
+    search_text: naphthoate
+    deduplicate: true
+    limit: 10
+  expect:
+    min_rows: 1
+    max_rows: 3
+
+# ── Search genes: category filter ──────────────────────────
+
+- id: search_genes_category_filter
+  tool: search_genes
+  desc: Category filter restricts to Photosynthesis genes
+  params:
+    search_text: reaction centre
+    category: Photosynthesis
+  expect:
+    min_rows: 1
+
+# ── Search genes: cross-organism ───────────────────────────
+
+- id: search_genes_cross_organism_chaperone
+  tool: search_genes
+  desc: "chaperone spans Pro + Syn + Alt in top results"
+  params:
+    search_text: chaperone
+    limit: 10
+  expect:
+    min_rows: 5
+    columns: [locus_tag, gene_name, product, organism_strain, score]
+
+- id: search_genes_cross_organism_superoxide
+  tool: search_genes
+  desc: "superoxide dismutase spans Pro/Syn + Alt"
+  params:
+    search_text: superoxide dismutase
+    limit: 10
+  expect:
+    min_rows: 3
+
+- id: search_genes_alteromonas_only_catalase
+  tool: search_genes
+  desc: "catalase returns Alteromonas only (not in cyanobacteria)"
+  params:
+    search_text: catalase
+    limit: 10
+  expect:
+    min_rows: 5
+
+- id: search_genes_dedup_cross_organism_chaperone
+  tool: search_genes
+  desc: Dedup chaperone collapses orthologs but keeps both Pro + Alt representatives
+  params:
+    search_text: chaperone
+    deduplicate: true
+    limit: 10
+  expect:
+    min_rows: 2
 
 # ── Gene details corner cases ─────────────────────────────
 

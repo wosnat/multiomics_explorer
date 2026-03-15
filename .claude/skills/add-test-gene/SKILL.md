@@ -85,7 +85,7 @@ Edit `tests/evals/cases.yaml` — append new entries:
 
 ```yaml
 - id: descriptive_case_id
-  tool: resolve_gene  # or find_gene, get_gene_details, etc.
+  tool: resolve_gene  # or search_genes, get_gene_details, etc.
   desc: What this case verifies
   params:
     identifier: NEW_LOCUS_TAG

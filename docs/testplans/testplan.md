@@ -83,7 +83,7 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 - [x] Single match returns results without ambiguity message
 - [x] Multiple matches returns results with "Ambiguous" message
 
-**`find_gene`:**
+**`search_genes`:**
 - [x] Empty result returns JSON envelope with `results`, `total`, `query`
 - [x] Non-empty result populates envelope correctly
 - [x] Limit capped at 50
@@ -122,7 +122,7 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 #### `tests/integration/test_mcp_tools.py` — MCP tools end-to-end (P1)
 
 - [x] `get_schema()` returns node counts and relationship types
-- [x] `find_gene()` with invalid Lucene syntax triggers fallback (not crash)
+- [x] `search_genes()` with invalid Lucene syntax triggers fallback (not crash)
 - [x] `query_expression()` with ortholog inclusion returns more rows than without
 - [x] `compare_conditions()` with two conditions returns comparison data
 - [x] `get_homologs()` with `include_expression=True` adds expression columns
@@ -147,7 +147,7 @@ Add to relevant unit/integration test files.
 
 Add cases to `tests/evals/cases.yaml`:
 
-- [x] `find_gene` full-text search (currently untested in evals)
+- [x] `search_genes` full-text search (currently untested in evals)
 - [x] `compare_conditions` cross-strain comparison
 - [x] `get_homologs` with expression data included
 
@@ -162,7 +162,7 @@ Add cases to `tests/evals/cases.yaml`:
 | **P1** | MCP tool wrapper logic | Validates response formatting, input validation, error messages |
 | **P1** | MCP tool error paths | Prevents crashes exposed to Claude Code users |
 | **P2** | CLI command smoke tests | Ensures CLI remains functional |
-| **P2** | Eval case expansion | Fills gaps in `find_gene`, `compare_conditions` |
+| **P2** | Eval case expansion | Fills gaps in `search_genes`, `compare_conditions` |
 | **P3** | Connection error handling | Nice-to-have robustness |
 | **P3** | LLM agent isolation tests | Blocked until `CypherAgent` is more mature |
 
