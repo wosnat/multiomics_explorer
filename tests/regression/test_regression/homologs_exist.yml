@@ -1,123 +1,38 @@
 case_id: homologs_exist
-row_count: 24
+row_count: 3
 rows:
-- locus_tag: A9601_10241
-  organism_strain: Prochlorococcus AS9601
-  product: NADH dehydrogenase subunit NdhV
+- consensus_gene_name: ndhV
+  consensus_product: NADH dehydrogenase subunit NdhV
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  has_cross_genus_members: cross_genus
+  member_count: 9
+  og_name: CK_00000853
+  organism_count: 9
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: ndhV
+  consensus_product: NADH dehydrogenase subunit NdhV
+  genera:
+  - Prochlorococcus
+  has_cross_genus_members: single_genus
+  member_count: 8
+  og_name: 1MMP8@1212
+  organism_count: 8
   source: eggnog
-  taxonomic_level: Bacteria
-- locus_tag: A9601_10241
-  organism_strain: Prochlorococcus AS9601
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
+  specificity_rank: 1
   taxonomic_level: Prochloraceae
-- locus_tag: A9601_10241
-  organism_strain: Prochlorococcus AS9601
-  product: NADH dehydrogenase subunit NdhV
-  source: cyanorak
-  taxonomic_level: curated
-- locus_tag: BSR22_08055
-  organism_strain: Prochlorococcus RSP50
-  product: DUF2996 domain-containing protein
+- consensus_gene_name: ndhV
+  consensus_product: NADH dehydrogenase subunit NdhV
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  has_cross_genus_members: cross_genus
+  member_count: 10
+  og_name: 31HP9@2
+  organism_count: 10
   source: eggnog
+  specificity_rank: 3
   taxonomic_level: Bacteria
-- locus_tag: BSR22_08055
-  organism_strain: Prochlorococcus RSP50
-  product: DUF2996 domain-containing protein
-  source: eggnog
-  taxonomic_level: Prochloraceae
-- locus_tag: NATL1_10451
-  organism_strain: Prochlorococcus NATL1A
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Bacteria
-- locus_tag: NATL1_10451
-  organism_strain: Prochlorococcus NATL1A
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Prochloraceae
-- locus_tag: NATL1_10451
-  organism_strain: Prochlorococcus NATL1A
-  product: NADH dehydrogenase subunit NdhV
-  source: cyanorak
-  taxonomic_level: curated
-- locus_tag: P9301_10231
-  organism_strain: Prochlorococcus MIT9301
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Bacteria
-- locus_tag: P9301_10231
-  organism_strain: Prochlorococcus MIT9301
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Prochloraceae
-- locus_tag: P9301_10231
-  organism_strain: Prochlorococcus MIT9301
-  product: NADH dehydrogenase subunit NdhV
-  source: cyanorak
-  taxonomic_level: curated
-- locus_tag: PMN2A_0363
-  organism_strain: Prochlorococcus NATL2A
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Bacteria
-- locus_tag: PMN2A_0363
-  organism_strain: Prochlorococcus NATL2A
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Prochloraceae
-- locus_tag: PMN2A_0363
-  organism_strain: Prochlorococcus NATL2A
-  product: NADH dehydrogenase subunit NdhV
-  source: cyanorak
-  taxonomic_level: curated
-- locus_tag: PMT0769
-  organism_strain: Prochlorococcus MIT9313
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Bacteria
-- locus_tag: PMT0769
-  organism_strain: Prochlorococcus MIT9313
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Prochloraceae
-- locus_tag: PMT0769
-  organism_strain: Prochlorococcus MIT9313
-  product: NADH dehydrogenase subunit NdhV
-  source: cyanorak
-  taxonomic_level: curated
-- locus_tag: PMT9312_0955
-  organism_strain: Prochlorococcus MIT9312
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Bacteria
-- locus_tag: PMT9312_0955
-  organism_strain: Prochlorococcus MIT9312
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Prochloraceae
-- locus_tag: PMT9312_0955
-  organism_strain: Prochlorococcus MIT9312
-  product: NADH dehydrogenase subunit NdhV
-  source: cyanorak
-  taxonomic_level: curated
-- locus_tag: SYNC_RS06055
-  organism_strain: Synechococcus CC9311
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Bacteria
-- locus_tag: SYNC_RS06055
-  organism_strain: Synechococcus CC9311
-  product: NADH dehydrogenase subunit NdhV
-  source: cyanorak
-  taxonomic_level: curated
-- locus_tag: SYNW1199
-  organism_strain: Synechococcus WH8102
-  product: NADH dehydrogenase subunit NdhV
-  source: eggnog
-  taxonomic_level: Bacteria
-- locus_tag: SYNW1199
-  organism_strain: Synechococcus WH8102
-  product: NADH dehydrogenase subunit NdhV
-  source: cyanorak
-  taxonomic_level: curated

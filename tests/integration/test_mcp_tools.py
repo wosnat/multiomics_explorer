@@ -10,12 +10,13 @@ import pytest
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
-    build_search_genes,
-    build_resolve_gene,
+    build_gene_stub,
     build_get_gene_details_main,
-    build_get_homologs,
-    build_homolog_expression,
+    build_get_homologs_groups,
+    build_get_homologs_members,
     build_query_expression,
+    build_resolve_gene,
+    build_search_genes,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 from multiomics_explorer.mcp_server.tools import _WRITE_KEYWORDS
@@ -85,17 +86,35 @@ class TestCompareConditions:
 
 @pytest.mark.kg
 class TestGetHomologs:
-    def test_with_expression_data(self, conn):
-        """get_homologs + expression enrichment should return expression rows."""
-        cypher, params = build_get_homologs(gene_id="PMM0845")
-        homologs = conn.execute_query(cypher, **params)
-        assert len(homologs) > 0
+    def test_gene_stub_returns_metadata(self, conn):
+        """build_gene_stub returns query gene metadata."""
+        cypher, params = build_gene_stub(gene_id="PMM0845")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) == 1
+        assert results[0]["locus_tag"] == "PMM0845"
+        assert "gene_name" in results[0]
+        assert "product" in results[0]
+        assert "organism_strain" in results[0]
 
-        all_ids = ["PMM0845"] + [h["locus_tag"] for h in homologs]
-        cypher_expr, params_expr = build_homolog_expression(gene_ids=all_ids)
-        expr = conn.execute_query(cypher_expr, **params_expr)
-        # Should have at least some expression data
-        assert isinstance(expr, list)
+    def test_groups_query_returns_ortholog_groups(self, conn):
+        """build_get_homologs_groups returns group metadata for PMM0845."""
+        cypher, params = build_get_homologs_groups(gene_id="PMM0845")
+        groups = conn.execute_query(cypher, **params)
+        assert len(groups) > 0
+        for g in groups:
+            assert "og_name" in g
+            assert "source" in g
+            assert "consensus_product" in g
+
+    def test_members_query_returns_homolog_genes(self, conn):
+        """build_get_homologs_members returns member genes."""
+        cypher, params = build_get_homologs_members(gene_id="PMM0845")
+        members = conn.execute_query(cypher, **params)
+        assert len(members) > 0
+        for m in members:
+            assert "locus_tag" in m
+            assert "og_name" in m
+            assert "organism_strain" in m
 
 
 @pytest.mark.kg

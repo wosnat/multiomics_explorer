@@ -8,22 +8,28 @@ from mcp.server.fastmcp import Context, FastMCP
 from neo4j.exceptions import ClientError as Neo4jClientError
 
 from multiomics_explorer.kg.connection import GraphConnection
+from multiomics_explorer.kg.constants import (
+    MAX_SPECIFICITY_RANK,
+    VALID_OG_SOURCES,
+    VALID_TAXONOMIC_LEVELS,
+)
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_gene_ontology_terms,
+    build_gene_stub,
     build_genes_by_ontology,
+    build_get_gene_details_homologs,
+    build_get_gene_details_main,
+    build_get_homologs_groups,
+    build_get_homologs_members,
     build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
+    build_query_expression,
+    build_resolve_gene,
     build_search_genes,
     build_search_genes_dedup_groups,
     build_search_ontology,
-    build_resolve_gene,
-    build_get_gene_details_homologs,
-    build_get_gene_details_main,
-    build_get_homologs,
-    build_homolog_expression,
-    build_query_expression,
 )
 
 
@@ -371,44 +377,144 @@ def register_tools(mcp: FastMCP):
             return _with_query("No expression data found for the given filters.", cypher, params, ctx)
         return _with_query(_fmt(results), cypher, params, ctx)
 
+    def _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank):
+        msg = f"No ortholog groups found for '{gene_id}'"
+        filters = []
+        if source:
+            filters.append(f"source={source}")
+        if taxonomic_level:
+            filters.append(f"taxonomic_level={taxonomic_level}")
+        if max_specificity_rank is not None:
+            filters.append(f"max_specificity_rank={max_specificity_rank}")
+        if filters:
+            msg += f" with constraints: {', '.join(filters)}"
+        return msg + "."
+
     @mcp.tool()
     def get_homologs(
         ctx: Context,
         gene_id: str,
-        include_expression: bool = False,
+        source: str | None = None,
+        taxonomic_level: str | None = None,
+        max_specificity_rank: int | None = None,
+        exclude_paralogs: bool = True,
+        include_members: bool = False,
+        member_limit: int = 50,
     ) -> str:
-        """Find homologs of a gene across strains, with optional expression data.
+        """Find orthologs of a gene, grouped by ortholog group.
+
+        Returns ortholog groups the gene belongs to, ordered from most specific
+        (curated) to broadest (Bacteria-level COG). Each group includes its
+        consensus function, member/organism counts, and genera.
+
+        By default returns group summaries only. Set include_members=True to
+        get the full list of member genes per group.
 
         Args:
             gene_id: Gene locus_tag (e.g. "PMM0001").
-            include_expression: If True, also return direct expression data for each homolog.
+            source: Filter by OG source: "cyanorak" or "eggnog".
+            taxonomic_level: Filter by level: "curated", "Prochloraceae",
+                "Synechococcus", "Alteromonadaceae", "Cyanobacteria",
+                "Gammaproteobacteria", "Bacteria".
+            max_specificity_rank: Cap breadth — 0=curated only, 1=+family,
+                2=+order, 3=+domain (all). Overrides source/taxonomic_level.
+            exclude_paralogs: If True (default), exclude members from the same
+                organism strain as the query gene. Set False to include paralogs.
+                Only applies when include_members=True.
+            include_members: If True, include full member gene lists per group.
+                Default False returns group summaries (counts, consensus function,
+                genera) without individual member genes.
+            member_limit: Max members returned per group (default 50, max 200).
+                Only applies when include_members=True. Groups exceeding the
+                limit include a "truncated" flag.
+
+        Raises:
+            ValueError if source is not in {"cyanorak", "eggnog"} or
+            taxonomic_level is not in {"curated", "Prochloraceae",
+            "Synechococcus", "Alteromonadaceae", "Cyanobacteria",
+            "Gammaproteobacteria", "Bacteria"} or max_specificity_rank
+            is not in 0-3 or member_limit is not in 1-200.
+
+        Notes:
+            - member_count and organism_count are total group counts from the
+              KG (include paralogs). When exclude_paralogs is True, the
+              returned members list may be smaller than member_count.
+            - For expression data of orthologs, use query_expression with
+              include_orthologs (separate tool, not part of this response).
+            - A gene typically belongs to 1-3 groups: one Cyanorak curated
+              cluster (Pro/Syn only), one eggNOG family-level OG, and one
+              eggNOG Bacteria-level COG.
         """
         conn = _conn(ctx)
 
-        cypher, params = build_get_homologs(gene_id=gene_id)
-        homologs = conn.execute_query(cypher, **params)
-        if not homologs:
-            return _with_query(f"No homologs found for '{gene_id}'.", cypher, params, ctx)
+        # Validate enum params
+        if source is not None and source not in VALID_OG_SOURCES:
+            return f"Invalid source '{source}'. Valid: {sorted(VALID_OG_SOURCES)}"
+        if taxonomic_level is not None and taxonomic_level not in VALID_TAXONOMIC_LEVELS:
+            return f"Invalid taxonomic_level '{taxonomic_level}'. Valid: {sorted(VALID_TAXONOMIC_LEVELS)}"
+        if max_specificity_rank is not None and not (0 <= max_specificity_rank <= MAX_SPECIFICITY_RANK):
+            return f"Invalid max_specificity_rank {max_specificity_rank}. Valid: 0-{MAX_SPECIFICITY_RANK}."
+        if not (1 <= member_limit <= 200):
+            return f"Invalid member_limit {member_limit}. Valid: 1-200."
 
-        if include_expression:
-            all_ids = [gene_id] + [h["locus_tag"] for h in homologs]
-            cypher_expr, params_expr = build_homolog_expression(gene_ids=all_ids)
-            expr = conn.execute_query(cypher_expr, **params_expr)
-            response = json.dumps(
-                {"homologs": homologs, "expression": expr},
-                indent=2,
-                default=str,
+        # 1. Query gene metadata
+        cypher_gene, params_gene = build_gene_stub(gene_id=gene_id)
+        gene_rows = conn.execute_query(cypher_gene, **params_gene)
+        if not gene_rows:
+            return f"Gene '{gene_id}' not found."
+        query_gene = gene_rows[0]
+
+        # 2. Query ortholog groups
+        cypher_groups, params_groups = build_get_homologs_groups(
+            gene_id=gene_id, source=source,
+            taxonomic_level=taxonomic_level,
+            max_specificity_rank=max_specificity_rank,
+        )
+        groups = conn.execute_query(cypher_groups, **params_groups)
+        if not groups:
+            return _with_query(
+                _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank),
+                cypher_groups, params_groups, ctx,
             )
-            if _debug(ctx):
-                queries = [
-                    {"cypher": cypher, "params": params},
-                    {"cypher": cypher_expr, "params": params_expr},
-                ]
-                debug_block = json.dumps({"_debug": {"queries": queries}}, indent=2, default=str)
-                return f"{debug_block}\n---\n{response}"
-            return response
 
-        return _with_query(_fmt(homologs), cypher, params, ctx)
+        # 3. Optionally fetch members
+        if include_members:
+            cypher_members, params_members = build_get_homologs_members(
+                gene_id=gene_id, source=source,
+                taxonomic_level=taxonomic_level,
+                max_specificity_rank=max_specificity_rank,
+                exclude_paralogs=exclude_paralogs,
+            )
+            members = conn.execute_query(cypher_members, **params_members)
+
+            # Group members by og_name, apply per-group limit
+            from collections import defaultdict
+            members_by_og = defaultdict(list)
+            for m in members:
+                members_by_og[m.pop("og_name")].append(m)
+
+            for g in groups:
+                og_members = members_by_og.get(g["og_name"], [])
+                if len(og_members) > member_limit:
+                    g["members"] = og_members[:member_limit]
+                    g["truncated"] = True
+                else:
+                    g["members"] = og_members
+
+        response = json.dumps(
+            {"query_gene": query_gene, "ortholog_groups": groups},
+            indent=2, default=str,
+        )
+
+        # Debug: attach all queries
+        if _debug(ctx):
+            queries = [{"cypher": cypher_groups, "params": params_groups}]
+            if include_members:
+                queries.append({"cypher": cypher_members, "params": params_members})
+            debug_block = json.dumps({"_debug": {"queries": queries}}, indent=2, default=str)
+            return f"{debug_block}\n---\n{response}"
+
+        return response
 
     @mcp.tool()
     def run_cypher(ctx: Context, query: str, limit: int = 25) -> str:

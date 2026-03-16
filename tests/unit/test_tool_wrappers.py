@@ -471,29 +471,196 @@ class TestCompareConditionsWrapper:
 # get_homologs
 # ---------------------------------------------------------------------------
 class TestGetHomologsWrapper:
-    def test_no_homologs_message(self, tool_fns, mock_ctx):
+    def _gene_stub(self):
+        return {"locus_tag": "PMM0001", "gene_name": "dnaN",
+                "product": "DNA polymerase III, beta subunit",
+                "organism_strain": "Prochlorococcus MED4"}
+
+    def _sample_groups(self):
+        return [
+            {"og_name": "CK_00000364", "source": "cyanorak",
+             "taxonomic_level": "curated", "specificity_rank": 0,
+             "consensus_product": "DNA polymerase III beta subunit",
+             "consensus_gene_name": "dnaN", "member_count": 72,
+             "organism_count": 72, "genera": "Prochlorococcus;Synechococcus",
+             "has_cross_genus_members": True},
+            {"og_name": "COG0592@2", "source": "eggnog",
+             "taxonomic_level": "Bacteria", "specificity_rank": 3,
+             "consensus_product": "DNA polymerase III beta subunit",
+             "consensus_gene_name": "dnaN", "member_count": 150,
+             "organism_count": 140, "genera": "Prochlorococcus;Synechococcus;Alteromonas",
+             "has_cross_genus_members": True},
+        ]
+
+    def test_gene_not_found_message(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        assert "No homologs found" in result
+        result = tool_fns["get_homologs"](mock_ctx, gene_id="FAKE")
+        assert "not found" in result
 
-    def test_without_expression(self, tool_fns, mock_ctx):
-        rows = [{"locus_tag": "sync_0001", "organism": "CC9311"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001"))
-        assert len(result) == 1
-
-    def test_with_expression_merges_response(self, tool_fns, mock_ctx):
-        homologs = [{"locus_tag": "sync_0001", "organism": "CC9311"}]
-        expr = [{"gene": "PMM0001", "log2fc": 1.5}]
+    def test_no_ortholog_groups_message(self, tool_fns, mock_ctx):
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [homologs, expr]
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],  # gene stub
+            [],                   # no groups
+        ]
+        result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
+        assert "No ortholog groups" in result
+
+    def test_default_mode_has_query_gene_and_groups_without_members(self, tool_fns, mock_ctx):
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+        ]
+        result = json.loads(tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001"))
+        assert "query_gene" in result
+        assert "ortholog_groups" in result
+        assert result["query_gene"]["locus_tag"] == "PMM0001"
+        for g in result["ortholog_groups"]:
+            assert "members" not in g
+
+    def test_include_members_has_members_lists(self, tool_fns, mock_ctx):
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
+             "gene_name": "dnaN", "product": "DNA pol III beta",
+             "organism_strain": "Prochlorococcus MIT9312"},
+        ]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+            members,
+        ]
         result = json.loads(
-            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", include_expression=True)
+            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", include_members=True)
         )
-        assert "homologs" in result
-        assert "expression" in result
-        assert result["homologs"] == homologs
-        assert result["expression"] == expr
+        # At least one group should have members
+        has_members = any("members" in g for g in result["ortholog_groups"])
+        assert has_members
+
+    def test_source_filter_passed_through(self, tool_fns, mock_ctx):
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups()[:1],  # only cyanorak group
+        ]
+        tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", source="cyanorak")
+        # The groups query (2nd call) should have source param
+        groups_call = conn.execute_query.call_args_list[1]
+        groups_kwargs = groups_call.kwargs
+        assert groups_kwargs.get("source") == "cyanorak"
+
+    def test_exclude_paralogs_passed_to_members_builder(self, tool_fns, mock_ctx):
+        """exclude_paralogs=True adds organism_strain filter in members query."""
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
+             "gene_name": "dnaN", "product": "p",
+             "organism_strain": "Prochlorococcus MIT9312"},
+        ]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+            members,
+        ]
+        tool_fns["get_homologs"](
+            mock_ctx, gene_id="PMM0001", include_members=True, exclude_paralogs=True,
+        )
+        # Members query is the 3rd call
+        members_cypher = conn.execute_query.call_args_list[2][0][0]
+        assert "other.organism_strain <> g.organism_strain" in members_cypher
+
+    def test_include_expression_parameter_no_longer_exists(self, tool_fns, mock_ctx):
+        """include_expression is no longer accepted by get_homologs."""
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+        ]
+        with pytest.raises(TypeError):
+            tool_fns["get_homologs"](
+                mock_ctx, gene_id="PMM0001", include_expression=True,
+            )
+
+    def test_response_is_json(self, tool_fns, mock_ctx):
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+        ]
+        raw = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
+        result = json.loads(raw)
+        assert isinstance(result, dict)
+
+    def test_invalid_source_returns_error(self, tool_fns, mock_ctx):
+        result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", source="bad")
+        assert "Invalid source" in result
+        assert "cyanorak" in result
+        assert "eggnog" in result
+
+    def test_invalid_taxonomic_level_returns_error(self, tool_fns, mock_ctx):
+        result = tool_fns["get_homologs"](
+            mock_ctx, gene_id="PMM0001", taxonomic_level="bad",
+        )
+        assert "Invalid taxonomic_level" in result
+
+    def test_invalid_max_specificity_rank_returns_error(self, tool_fns, mock_ctx):
+        result = tool_fns["get_homologs"](
+            mock_ctx, gene_id="PMM0001", max_specificity_rank=5,
+        )
+        assert "Invalid max_specificity_rank" in result
+
+    def test_invalid_member_limit_zero_returns_error(self, tool_fns, mock_ctx):
+        result = tool_fns["get_homologs"](
+            mock_ctx, gene_id="PMM0001", member_limit=0,
+        )
+        assert "Invalid member_limit" in result
+
+    def test_invalid_member_limit_300_returns_error(self, tool_fns, mock_ctx):
+        result = tool_fns["get_homologs"](
+            mock_ctx, gene_id="PMM0001", member_limit=300,
+        )
+        assert "Invalid member_limit" in result
+
+    def test_member_limit_truncates_and_sets_flag(self, tool_fns, mock_ctx):
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": f"PMT{i:04d}",
+             "gene_name": "x", "product": "p", "organism_strain": f"Strain{i}"}
+            for i in range(5)
+        ]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups()[:1],  # one group
+            members,
+        ]
+        result = json.loads(
+            tool_fns["get_homologs"](
+                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=2,
+            )
+        )
+        g = result["ortholog_groups"][0]
+        assert len(g["members"]) == 2
+        assert g["truncated"] is True
+
+    def test_groups_below_limit_no_truncated_key(self, tool_fns, mock_ctx):
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": "PMT0001",
+             "gene_name": "x", "product": "p", "organism_strain": "Strain1"},
+        ]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups()[:1],
+            members,
+        ]
+        result = json.loads(
+            tool_fns["get_homologs"](
+                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=50,
+            )
+        )
+        g = result["ortholog_groups"][0]
+        assert "truncated" not in g
 
 
 # ---------------------------------------------------------------------------

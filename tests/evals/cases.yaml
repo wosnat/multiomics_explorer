@@ -103,12 +103,13 @@
 
 - id: homologs_exist
   tool: get_homologs
-  desc: Known gene has homologs across strains
+  desc: Known gene has ortholog groups
   params:
     gene_id: PMM0845
   expect:
     min_rows: 1
-    columns: [locus_tag, organism_strain, source, taxonomic_level]
+    columns: [og_name, source, taxonomic_level, specificity_rank,
+              consensus_product, member_count, organism_count]
 
 # ── Full-text search ────────────────────────────────────
 
@@ -144,11 +145,11 @@
     min_rows: 1
     columns: [gene, source, direction, log2fc]
 
-# ── Homologs with expression ────────────────────────────
+# ── Homologs with members ───────────────────────────────
 
-- id: homologs_with_expression
-  tool: get_homologs_with_expression
-  desc: Homologs of PMM0845 enriched with expression data
+- id: homologs_with_members
+  tool: get_homologs_with_members
+  desc: Ortholog groups of PMM0845 (used to verify group metadata)
   params:
     gene_id: PMM0845
   expect:
@@ -498,12 +499,13 @@
 
 - id: homologs_dnan_cross_strain
   tool: get_homologs
-  desc: dnaN (PMM0001) has homologs across many strains
+  desc: dnaN (PMM0001) has ortholog groups from multiple sources
   params:
     gene_id: PMM0001
   expect:
     min_rows: 2
-    columns: [locus_tag, organism_strain, source, taxonomic_level]
+    columns: [og_name, source, taxonomic_level, specificity_rank,
+              consensus_product, member_count, organism_count]
 
 # ── Validation queries ─────────────────────────────────────
 

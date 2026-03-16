@@ -257,17 +257,90 @@ def build_compare_conditions(
     return cypher, params
 
 
-def build_get_homologs(*, gene_id: str) -> tuple[str, dict]:
+def build_gene_stub(*, gene_id: str) -> tuple[str, dict]:
+    cypher = (
+        "MATCH (g:Gene {locus_tag: $lt})\n"
+        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       g.product AS product, g.organism_strain AS organism_strain"
+    )
+    return cypher, {"lt": gene_id}
+
+
+def build_get_homologs_groups(
+    *,
+    gene_id: str,
+    source: str | None = None,
+    taxonomic_level: str | None = None,
+    max_specificity_rank: int | None = None,
+) -> tuple[str, dict]:
+    conditions: list[str] = []
+    params: dict = {"lt": gene_id}
+
+    if source is not None:
+        conditions.append("og.source = $source")
+        params["source"] = source
+    if taxonomic_level is not None:
+        conditions.append("og.taxonomic_level = $level")
+        params["level"] = taxonomic_level
+    if max_specificity_rank is not None:
+        conditions.append("og.specificity_rank <= $max_rank")
+        params["max_rank"] = max_specificity_rank
+
+    where_block = " AND ".join(conditions)
+    where_line = f"WHERE {where_block}\n" if where_block else ""
+
+    cypher = (
+        "MATCH (g:Gene {locus_tag: $lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+        f"{where_line}"
+        "RETURN og.name AS og_name, og.source AS source,\n"
+        "       og.taxonomic_level AS taxonomic_level,\n"
+        "       og.specificity_rank AS specificity_rank,\n"
+        "       og.consensus_product AS consensus_product,\n"
+        "       og.consensus_gene_name AS consensus_gene_name,\n"
+        "       og.member_count AS member_count,\n"
+        "       og.organism_count AS organism_count,\n"
+        "       og.genera AS genera,\n"
+        "       og.has_cross_genus_members AS has_cross_genus_members\n"
+        "ORDER BY og.specificity_rank, og.source"
+    )
+    return cypher, params
+
+
+def build_get_homologs_members(
+    *,
+    gene_id: str,
+    source: str | None = None,
+    taxonomic_level: str | None = None,
+    max_specificity_rank: int | None = None,
+    exclude_paralogs: bool = True,
+) -> tuple[str, dict]:
+    conditions: list[str] = ["other <> g"]
+    params: dict = {"lt": gene_id}
+
+    if exclude_paralogs:
+        conditions.append("other.organism_strain <> g.organism_strain")
+    if source is not None:
+        conditions.append("og.source = $source")
+        params["source"] = source
+    if taxonomic_level is not None:
+        conditions.append("og.taxonomic_level = $level")
+        params["level"] = taxonomic_level
+    if max_specificity_rank is not None:
+        conditions.append("og.specificity_rank <= $max_rank")
+        params["max_rank"] = max_specificity_rank
+
+    where_block = " AND ".join(conditions)
+
     cypher = (
         "MATCH (g:Gene {locus_tag: $lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
         "      <-[:Gene_in_ortholog_group]-(other:Gene)\n"
-        "WHERE other <> g\n"
-        "RETURN DISTINCT other.locus_tag AS locus_tag, other.product AS product,\n"
-        "       other.organism_strain AS organism_strain,\n"
-        "       og.source AS source, og.taxonomic_level AS taxonomic_level\n"
-        "ORDER BY og.taxonomic_level, other.locus_tag"
+        f"WHERE {where_block}\n"
+        "RETURN og.name AS og_name,\n"
+        "       other.locus_tag AS locus_tag, other.gene_name AS gene_name,\n"
+        "       other.product AS product, other.organism_strain AS organism_strain\n"
+        "ORDER BY og.specificity_rank, og.source, other.organism_strain, other.locus_tag"
     )
-    return cypher, {"lt": gene_id}
+    return cypher, params
 
 
 def build_list_gene_categories() -> tuple[str, dict]:
@@ -380,19 +453,3 @@ def build_gene_ontology_terms(
             "LIMIT $limit"
         )
     return cypher, {"gene_id": gene_id, "limit": limit}
-
-
-def build_homolog_expression(*, gene_ids: list[str]) -> tuple[str, dict]:
-    cypher = (
-        f"MATCH (factor)-[r:{DIRECT_EXPR_RELS}]->(g:Gene)\n"
-        "WHERE g.locus_tag IN $ids\n"
-        "RETURN g.locus_tag AS gene,\n"
-        "       type(r) AS edge_type,\n"
-        "       CASE WHEN factor:OrganismTaxon THEN factor.organism_name\n"
-        "            ELSE factor.name END AS source,\n"
-        "       r.expression_direction AS direction,\n"
-        "       r.log2_fold_change AS log2fc,\n"
-        "       r.adjusted_p_value AS padj\n"
-        "ORDER BY g.locus_tag, abs(r.log2_fold_change) DESC, source"
-    )
-    return cypher, {"ids": gene_ids}

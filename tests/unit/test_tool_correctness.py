@@ -475,98 +475,120 @@ class TestCompareConditionsCorrectness:
 # TestGetHomologsCorrectness
 # ---------------------------------------------------------------------------
 class TestGetHomologsCorrectness:
-    """Verify get_homologs returns correct homolog data and merges expression."""
+    """Verify get_homologs returns correct homolog data with new group-based API."""
 
-    def test_cross_organism_homologs(self, tool_fns, mock_ctx):
-        """Homologs from MED4, MIT9312, WH8102 are all returned."""
-        homologs = [
-            {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
-             "gene_name": "dnaN"},
-            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312",
-             "gene_name": "dnaN"},
-            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102",
-             "gene_name": "ftsH1"},
+    def _gene_stub(self):
+        return {"locus_tag": "PMM0001", "gene_name": "dnaN",
+                "product": "DNA polymerase III, beta subunit",
+                "organism_strain": "Prochlorococcus MED4"}
+
+    def _sample_groups(self):
+        return [
+            {"og_name": "CK_00000364", "source": "cyanorak",
+             "taxonomic_level": "curated", "specificity_rank": 0,
+             "consensus_product": "DNA polymerase III beta subunit",
+             "consensus_gene_name": "dnaN", "member_count": 72,
+             "organism_count": 72, "genera": "Prochlorococcus;Synechococcus",
+             "has_cross_genus_members": True},
+            {"og_name": "COG0592@2", "source": "eggnog",
+             "taxonomic_level": "Bacteria", "specificity_rank": 3,
+             "consensus_product": "DNA polymerase III beta subunit",
+             "consensus_gene_name": "dnaN", "member_count": 150,
+             "organism_count": 140, "genera": "Prochlorococcus;Synechococcus;Alteromonas",
+             "has_cross_genus_members": True},
         ]
-        _conn_from(mock_ctx).execute_query.return_value = homologs
+
+    def test_cross_organism_homologs_via_groups(self, tool_fns, mock_ctx):
+        """Groups from different sources are returned with query_gene."""
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+        ]
 
         result = json.loads(
             tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
         )
 
-        assert len(result) == 3
-        orgs = {h["organism_strain"] for h in result}
-        assert orgs == {
-            "Prochlorococcus MED4",
-            "Prochlorococcus MIT9312",
-            "Synechococcus WH8102",
-        }
+        assert result["query_gene"]["locus_tag"] == "PMM0001"
+        assert len(result["ortholog_groups"]) == 2
+        sources = {g["source"] for g in result["ortholog_groups"]}
+        assert sources == {"cyanorak", "eggnog"}
 
-    def test_include_expression_merges_data(self, tool_fns, mock_ctx):
-        """include_expression=True returns homologs + expression in merged dict."""
-        homologs = [
-            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312"},
-            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102"},
-        ]
-        expr = [
-            {"gene": "PMM0001", "log2fc": 2.5, "condition": "coculture"},
-            {"gene": "PMT9312_0001", "log2fc": 1.8, "condition": "coculture"},
+    def test_include_members_shows_cross_organism_members(self, tool_fns, mock_ctx):
+        """include_members=True returns member genes from multiple organisms."""
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
+             "gene_name": "dnaN", "product": "DNA pol III beta",
+             "organism_strain": "Prochlorococcus MIT9312"},
+            {"og_name": "CK_00000364", "locus_tag": "SYNW0305",
+             "gene_name": "ftsH1", "product": "metalloprotease",
+             "organism_strain": "Synechococcus WH8102"},
         ]
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [homologs, expr]
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups()[:1],  # one group
+            members,
+        ]
 
         result = json.loads(
             tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_expression=True
+                mock_ctx, gene_id="PMM0001", include_members=True,
             )
         )
 
-        assert "homologs" in result
-        assert "expression" in result
-        assert result["homologs"] == homologs
-        assert result["expression"] == expr
+        g = result["ortholog_groups"][0]
+        assert "members" in g
+        orgs = {m["organism_strain"] for m in g["members"]}
+        assert "Prochlorococcus MIT9312" in orgs
+        assert "Synechococcus WH8102" in orgs
 
-    def test_all_ids_passed_to_expression_query(self, tool_fns, mock_ctx):
-        """Expression query includes source gene + all homolog locus_tags."""
-        homologs = [
-            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312"},
-            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102"},
-        ]
-        expr = []
+    def test_default_mode_two_queries(self, tool_fns, mock_ctx):
+        """Without include_members, two queries are executed (gene stub + groups)."""
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [homologs, expr]
-
-        tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", include_expression=True
-        )
-
-        # Second call is expression query — check gene_ids param
-        expr_call = conn.execute_query.call_args_list[1]
-        expr_kwargs = expr_call.kwargs
-        expected_ids = ["PMM0001", "PMT9312_0001", "SYNW0305"]
-        assert expr_kwargs["ids"] == expected_ids
-
-    def test_homologs_without_expression_single_query(self, tool_fns, mock_ctx):
-        """Without include_expression, only one query is executed."""
-        homologs = [
-            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312"},
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
         ]
-        _conn_from(mock_ctx).execute_query.return_value = homologs
 
         tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
 
-        assert _conn_from(mock_ctx).execute_query.call_count == 1
+        assert conn.execute_query.call_count == 2
 
-    def test_include_expression_two_queries(self, tool_fns, mock_ctx):
-        """With include_expression, two queries are executed (homologs + expr)."""
-        homologs = [
-            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312"},
+    def test_include_members_three_queries(self, tool_fns, mock_ctx):
+        """With include_members, three queries are executed (stub + groups + members)."""
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
+             "gene_name": "dnaN", "product": "p",
+             "organism_strain": "Prochlorococcus MIT9312"},
         ]
-        expr = [{"gene": "PMM0001", "log2fc": 1.0}]
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [homologs, expr]
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+            members,
+        ]
 
         tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", include_expression=True
+            mock_ctx, gene_id="PMM0001", include_members=True,
         )
 
-        assert conn.execute_query.call_count == 2
+        assert conn.execute_query.call_count == 3
+
+    def test_group_enrichment_fields_in_response(self, tool_fns, mock_ctx):
+        """Response includes OG enrichment fields like consensus_product."""
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+        ]
+
+        result = json.loads(
+            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
+        )
+
+        g = result["ortholog_groups"][0]
+        assert g["consensus_product"] == "DNA polymerase III beta subunit"
+        assert g["consensus_gene_name"] == "dnaN"
+        assert g["member_count"] == 72

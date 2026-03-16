@@ -41,7 +41,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `get_gene_details` | Full gene profile with protein, organism, cluster, homologs |
 | `query_expression` | Expression data with filters (gene, organism, condition, direction, FC, p-value) |
 | `compare_conditions` | Cross-condition or cross-strain expression comparison |
-| `get_homologs` | Homologs across strains, optionally with expression data |
+| `get_homologs` | Orthologs grouped by ortholog group, with filtering by source/level/rank. Excludes paralogs by default. |
 | `list_filter_values` | List valid values for categorical filters (gene categories, condition types) |
 | `list_organisms` | All organisms with strain, genus, clade, gene count |
 | `search_ontology` | Browse ontology terms by text search (GO, KEGG, EC). Returns term IDs for use with `genes_by_ontology`. |

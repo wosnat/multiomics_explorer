@@ -54,7 +54,7 @@ The MCP server (`mcp_server/`) exposes the KG to Claude Code via tools. Claude C
 | `get_gene_details` | Full gene profile: protein, organism, cluster, homologs |
 | `query_expression` | Expression data with flexible filters (gene, organism, condition, direction, FC, p-value) |
 | `compare_conditions` | Cross-condition or cross-strain expression comparison |
-| `get_homologs` | Homologs across strains, optionally with expression data |
+| `get_homologs` | Orthologs grouped by ortholog group, with filtering by source/level/rank. Excludes paralogs by default. |
 | `list_filter_values` | List valid values for categorical filters (gene categories, condition types) |
 | `list_organisms` | All organisms with strain, genus, clade, gene count |
 | `run_cypher` | Raw Cypher escape hatch (read-only) |

@@ -28,6 +28,9 @@ rows:
 - id: go:0019045
   name: latent virus replication
   score: 2.1916
+- id: go:0030174
+  name: regulation of DNA-templated DNA replication initiation
+  score: 1.5003
 - id: go:0031297
   name: replication fork processing
   score: 2.1916
@@ -73,6 +76,3 @@ rows:
 - id: go:1902328
   name: bacterial-type DNA replication initiation
   score: 1.7812
-- id: go:2000105
-  name: positive regulation of DNA-templated DNA replication
-  score: 1.5003

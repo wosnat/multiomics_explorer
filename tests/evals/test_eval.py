@@ -20,18 +20,18 @@ from functools import partial
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_gene_ontology_terms,
+    build_gene_stub,
     build_genes_by_ontology,
+    build_get_gene_details_main,
+    build_get_homologs_groups,
     build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
+    build_query_expression,
+    build_resolve_gene,
     build_search_genes,
     build_search_genes_dedup_groups,
     build_search_ontology,
-    build_resolve_gene,
-    build_get_gene_details_main,
-    build_get_homologs,
-    build_homolog_expression,
-    build_query_expression,
 )
 
 # ---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ TOOL_BUILDERS = {
     "get_gene_details": build_get_gene_details_main,
     "query_expression": build_query_expression,
     "compare_conditions": build_compare_conditions,
-    "get_homologs": build_get_homologs,
+    "get_homologs": build_get_homologs_groups,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
     "genes_by_ontology": build_genes_by_ontology,
@@ -73,14 +73,9 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         # Return combined list so check_expectations can count rows
         return categories + condition_types
 
-    if tool == "get_homologs_with_expression":
-        cypher, query_params = build_get_homologs(gene_id=params["gene_id"])
-        homologs = conn.execute_query(cypher, **query_params)
-        if not homologs:
-            return []
-        all_ids = [params["gene_id"]] + [h["locus_tag"] for h in homologs]
-        cypher_expr, params_expr = build_homolog_expression(gene_ids=all_ids)
-        return conn.execute_query(cypher_expr, **params_expr)
+    if tool == "get_homologs_with_members":
+        cypher_groups, params_groups = build_get_homologs_groups(gene_id=params["gene_id"])
+        return conn.execute_query(cypher_groups, **params_groups)
 
     builder = TOOL_BUILDERS[tool]
     deduplicate = params.get("deduplicate", False)

@@ -105,9 +105,18 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 - [x] Non-empty results returns JSON array
 
 **`get_homologs`:**
-- [x] No homologs returns "No homologs found" message
-- [x] Without expression returns JSON array of homologs
-- [x] With expression merges `homologs` + `expression` into single response
+- [x] Gene not found returns "not found" message
+- [x] No ortholog groups returns "No ortholog groups found" message
+- [x] Default mode: response has `query_gene` and `ortholog_groups` without `members` key
+- [x] `include_members=True`: response has `ortholog_groups` with `members` lists
+- [x] `source` filter is passed through to builder
+- [x] `exclude_paralogs=True` is passed through to members builder
+- [x] Response is JSON (not tabular `_fmt`)
+- [x] Invalid `source` returns error message listing valid values
+- [x] Invalid `taxonomic_level` returns error message listing valid values
+- [x] Invalid `max_specificity_rank` returns error message
+- [x] Invalid `member_limit` returns error message
+- [x] `member_limit` truncates per-group members and sets `truncated: true`
 
 **`list_filter_values`:**
 - [ ] Returns combined JSON with `gene_categories` and `condition_types` keys
@@ -130,7 +139,7 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 - [x] `search_genes()` with invalid Lucene syntax triggers fallback (not crash)
 - [x] `query_expression()` with ortholog inclusion returns more rows than without
 - [x] `compare_conditions()` with two conditions returns comparison data
-- [x] `get_homologs()` with `include_expression=True` adds expression columns
+- [x] `get_homologs()` group-centric API: gene stub, groups query, members query
 
 #### `tests/integration/test_cli.py` — CLI smoke tests (P2)
 
@@ -154,7 +163,7 @@ Add cases to `tests/evals/cases.yaml`:
 
 - [x] `search_genes` full-text search (currently untested in evals)
 - [x] `compare_conditions` cross-strain comparison
-- [x] `get_homologs` with expression data included
+- [x] `get_homologs` group-centric API with ortholog group metadata
 
 ---
 
