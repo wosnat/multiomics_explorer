@@ -1,78 +1,78 @@
 case_id: search_ontology_go_mf
 row_count: 25
 rows:
-- id: go:0000166
-  name: nucleotide binding
-  score: 1.2853
 - id: go:0001530
   name: lipopolysaccharide binding
   score: 1.2853
-- id: go:0001882
-  name: nucleoside binding
-  score: 1.2853
-- id: go:0002020
-  name: protease binding
+- id: go:0001968
+  name: fibronectin binding
   score: 1.2853
 - id: go:0002058
   name: uracil binding
   score: 1.2853
-- id: go:0003677
-  name: DNA binding
-  score: 1.2853
-- id: go:0003723
-  name: RNA binding
-  score: 1.2853
-- id: go:0003729
-  name: mRNA binding
+- id: go:0003779
+  name: actin binding
   score: 1.2853
 - id: go:0005488
   name: binding
   score: 1.4522
-- id: go:0005543
-  name: phospholipid binding
+- id: go:0005527
+  name: macrolide binding
   score: 1.2853
-- id: go:0009374
-  name: biotin binding
+- id: go:0005539
+  name: glycosaminoglycan binding
   score: 1.2853
-- id: go:0019900
-  name: kinase binding
+- id: go:0008658
+  name: penicillin binding
   score: 1.2853
-- id: go:0020037
-  name: heme binding
+- id: go:0019842
+  name: vitamin binding
   score: 1.2853
-- id: go:0030552
-  name: cAMP binding
+- id: go:0031177
+  name: phosphopantetheine binding
   score: 1.2853
-- id: go:0034618
-  name: arginine binding
+- id: go:0031409
+  name: pigment binding
+  score: 1.2853
+- id: go:0031419
+  name: cobalamin binding
+  score: 1.2853
+- id: go:0032934
+  name: sterol binding
+  score: 1.2853
+- id: go:0043167
+  name: ion binding
   score: 1.2853
 - id: go:0043168
   name: anion binding
   score: 1.2853
-- id: go:0046906
-  name: tetrapyrrole binding
+- id: go:0043169
+  name: cation binding
   score: 1.2853
-- id: go:0048030
-  name: disaccharide binding
+- id: go:0043531
+  name: ADP binding
   score: 1.2853
-- id: go:0048038
-  name: quinone binding
+- id: go:0048029
+  name: monosaccharide binding
   score: 1.2853
-- id: go:0051020
-  name: GTPase binding
+- id: go:0051287
+  name: NAD binding
   score: 1.2853
-- id: go:0051117
-  name: ATPase binding
+- id: go:0070403
+  name: NAD+ binding
   score: 1.2853
-- id: go:0051870
-  name: methotrexate binding
+- id: go:0070492
+  name: oligosaccharide binding
   score: 1.2853
-- id: go:0070402
-  name: NADPH binding
+- id: go:0070905
+  name: serine binding
   score: 1.2853
-- id: go:0070404
-  name: NADH binding
+- id: go:0071949
+  name: FAD binding
   score: 1.2853
-- id: go:1900750
-  name: oligopeptide binding
+- id: go:1990275
+  name: preribosome binding
+  score: 1.2853
+- id: go:1990827
+  name: deaminase binding
   score: 1.2853

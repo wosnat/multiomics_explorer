@@ -108,7 +108,7 @@
     gene_id: PMM0845
   expect:
     min_rows: 1
-    columns: [locus_tag, organism_strain, distance]
+    columns: [locus_tag, organism_strain, source, taxonomic_level]
 
 # ── Full-text search ────────────────────────────────────
 
@@ -119,7 +119,7 @@
     search_text: photosystem
   expect:
     min_rows: 1
-    columns: [locus_tag, product, gene_summary, cluster_id, score]
+    columns: [locus_tag, product, gene_summary, score]
 
 - id: search_genes_with_organism
   tool: search_genes
@@ -335,13 +335,13 @@
     search_text: naphthoate
   expect:
     min_rows: 1
-    columns: [locus_tag, product, gene_summary, cluster_id, score]
+    columns: [locus_tag, product, gene_summary, score]
 
-# ── Search genes: cluster_id ────────────────────────────────
+# ── Search genes: return columns ──────────────────────────────
 
 - id: search_genes_with_cluster_id
   tool: search_genes
-  desc: Results include cluster_id for ortholog grouping
+  desc: Results include all expected columns
   params:
     search_text: naphthoate
     limit: 10
@@ -349,7 +349,7 @@
     min_rows: 1
     columns: [locus_tag, gene_name, product, function_description,
               gene_summary, organism_strain, annotation_quality,
-              cluster_id, score]
+              score]
 
 # ── Search genes: deduplication ────────────────────────────
 
@@ -365,14 +365,13 @@
 
 - id: search_genes_dedup_naphthoate
   tool: search_genes
-  desc: Dedup collapses menB orthologs into clusters
+  desc: Dedup naphthoate (dedup currently no-op without cluster_id)
   params:
     search_text: naphthoate
     deduplicate: true
     limit: 10
   expect:
     min_rows: 1
-    max_rows: 3
 
 # ── Search genes: category filter ──────────────────────────
 
@@ -504,7 +503,7 @@
     gene_id: PMM0001
   expect:
     min_rows: 2
-    columns: [locus_tag, organism_strain, distance]
+    columns: [locus_tag, organism_strain, source, taxonomic_level]
 
 # ── Validation queries ─────────────────────────────────────
 

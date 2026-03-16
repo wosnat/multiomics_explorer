@@ -16,6 +16,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_gene_categories,
     build_list_organisms,
     build_search_genes,
+    build_search_genes_dedup_groups,
     build_search_ontology,
     build_resolve_gene,
     build_get_gene_details_homologs,
@@ -192,10 +193,10 @@ def register_tools(mcp: FastMCP):
                 2 = real product name;
                 3 = well-annotated (product + GO/KEGG/EC/Pfam).
                 Use 2 to skip hypothetical proteins.
-            deduplicate: If True, collapse orthologs by cluster and return one
-                representative per cluster with collapsed_count and
-                cluster_organisms summary. Counts reflect hits within the result
-                set, not total cluster membership — use get_homologs for full
+            deduplicate: If True, collapse orthologs by ortholog group and return
+                one representative per group with collapsed_count and
+                group_organisms summary. Counts reflect hits within the result
+                set, not total group membership — use get_homologs for full
                 ortholog inventory.
             limit: Max results (default 10, max 50). When deduplicate=True, the
                 limit applies to the pre-dedup query, so fewer rows may be
@@ -220,27 +221,35 @@ def register_tools(mcp: FastMCP):
             )
             results = conn.execute_query(cypher, **params)
         if deduplicate:
-            cluster_groups: dict[str, list] = {}
+            # Fetch most-specific ortholog group for each result gene
+            locus_tags = [r["locus_tag"] for r in results]
+            dedup_cypher, dedup_params = build_search_genes_dedup_groups(
+                locus_tags=locus_tags,
+            )
+            dedup_rows = conn.execute_query(dedup_cypher, **dedup_params)
+            tag_to_group = {r["locus_tag"]: r["dedup_group"] for r in dedup_rows}
+
+            seen_groups: dict[str, list] = {}
             deduped = []
             for row in results:
-                cluster = row.get("cluster_id")
-                if cluster:
-                    if cluster in cluster_groups:
-                        cluster_groups[cluster].append(row)
+                group = tag_to_group.get(row["locus_tag"])
+                if group:
+                    if group in seen_groups:
+                        seen_groups[group].append(row)
                         continue
-                    cluster_groups[cluster] = [row]
+                    seen_groups[group] = [row]
                 deduped.append(row)
-            # Add cluster summary to each representative
+            # Add group summary to each representative
             for row in deduped:
-                cluster = row.get("cluster_id")
-                if cluster:
-                    group = cluster_groups[cluster]
-                    row["collapsed_count"] = len(group)
+                group = tag_to_group.get(row["locus_tag"])
+                if group:
+                    members = seen_groups[group]
+                    row["collapsed_count"] = len(members)
                     org_counts: dict[str, int] = {}
-                    for r in group:
+                    for r in members:
                         org = r.get("organism_strain", "Unknown")
                         org_counts[org] = org_counts.get(org, 0) + 1
-                    row["cluster_organisms"] = org_counts
+                    row["group_organisms"] = org_counts
             results = deduped
         if not results:
             response = json.dumps({
@@ -254,7 +263,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool()
     def get_gene_details(ctx: Context, gene_id: str) -> str:
-        """Get full details for a gene: properties, protein, organism, Cyanorak cluster,
+        """Get full details for a gene: properties, protein, organism, ortholog groups,
         and homolog summary.
 
         Args:
@@ -293,7 +302,6 @@ def register_tools(mcp: FastMCP):
         direction: str | None = None,
         min_log2fc: float | None = None,
         max_pvalue: float | None = None,
-        include_orthologs: bool = False,
         limit: int = 50,
     ) -> str:
         """Query differential expression data from the knowledge graph.
@@ -314,7 +322,6 @@ def register_tools(mcp: FastMCP):
             direction: Filter by "up" or "down" regulation.
             min_log2fc: Minimum absolute log2 fold change.
             max_pvalue: Maximum adjusted p-value.
-            include_orthologs: If True, also include ortholog-inferred expression edges.
             limit: Max results (default 50).
         """
         if not any([gene_id, organism, condition]):
@@ -324,7 +331,7 @@ def register_tools(mcp: FastMCP):
         cypher, params = build_query_expression(
             gene_id=gene_id, organism=organism, condition=condition,
             direction=direction, min_log2fc=min_log2fc, max_pvalue=max_pvalue,
-            include_orthologs=include_orthologs, limit=limit,
+            limit=limit,
         )
         results = conn.execute_query(cypher, **params)
         if not results:

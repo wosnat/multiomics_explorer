@@ -2,7 +2,6 @@ case_id: search_genes_alteromonas_only_catalase
 row_count: 10
 rows:
 - annotation_quality: 3
-  cluster_id: 464SN@72275,Alteromonadaceae
   function_description: Catalase
   gene_name: katA
   gene_summary: 'katA :: catalase :: Catalase'
@@ -11,7 +10,6 @@ rows:
   product: catalase
   score: 17.2535
 - annotation_quality: 3
-  cluster_id: 464SN@72275,Alteromonadaceae
   function_description: Catalase
   gene_name: katA
   gene_summary: 'katA :: catalase :: Catalase'
@@ -20,7 +18,6 @@ rows:
   product: catalase
   score: 17.2535
 - annotation_quality: 3
-  cluster_id: 4644E@72275,Alteromonadaceae
   function_description: Serves to protect cells from the toxic effects of hydrogen
     peroxide
   gene_name: katB
@@ -31,7 +28,6 @@ rows:
   product: catalase
   score: 14.0897
 - annotation_quality: 3
-  cluster_id: 464SN@72275,Alteromonadaceae
   function_description: Catalase
   gene_name: katA
   gene_summary: 'katA :: catalase :: Catalase'
@@ -40,7 +36,6 @@ rows:
   product: catalase
   score: 17.2535
 - annotation_quality: 3
-  cluster_id: 464SN@72275,Alteromonadaceae
   function_description: Catalase
   gene_name: katA
   gene_summary: 'katA :: catalase :: Catalase'
@@ -49,7 +44,6 @@ rows:
   product: catalase
   score: 17.2535
 - annotation_quality: 3
-  cluster_id: 4644E@72275,Alteromonadaceae
   function_description: Serves to protect cells from the toxic effects of hydrogen
     peroxide
   gene_name: katB
@@ -60,7 +54,6 @@ rows:
   product: catalase
   score: 14.0897
 - annotation_quality: 3
-  cluster_id: 464SN@72275,Alteromonadaceae
   function_description: Catalase
   gene_name: katA
   gene_summary: 'katA :: catalase :: Catalase'
@@ -69,7 +62,6 @@ rows:
   product: catalase
   score: 17.2535
 - annotation_quality: 3
-  cluster_id: 464SN@72275,Alteromonadaceae
   function_description: Catalase
   gene_name: katA
   gene_summary: 'katA :: catalase :: Catalase'
@@ -78,7 +70,6 @@ rows:
   product: catalase
   score: 17.3306
 - annotation_quality: 3
-  cluster_id: 4644E@72275,Alteromonadaceae
   function_description: Serves to protect cells from the toxic effects of hydrogen
     peroxide
   gene_name: katE
@@ -89,7 +80,6 @@ rows:
   product: catalase
   score: 13.1298
 - annotation_quality: 3
-  cluster_id: 4644E@72275,Alteromonadaceae
   function_description: Serves to protect cells from the toxic effects of hydrogen
     peroxide
   gene_name: katB

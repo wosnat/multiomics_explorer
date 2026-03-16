@@ -2,7 +2,6 @@ case_id: search_genes_naphthoate
 row_count: 10
 rows:
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB
@@ -13,7 +12,6 @@ rows:
   product: naphthoate synthase
   score: 7.5478
 - annotation_quality: 3
-  cluster_id: null
   function_description: Catalyzes the hydrolysis of 1,4-dihydroxy-2-naphthoyl- CoA
     (DHNA-CoA) to 1,4-dihydroxy-2-naphthoate (DHNA), a reaction involved in phylloquinone
     (vitamin K1) biosynthesis
@@ -26,7 +24,6 @@ rows:
   product: acyl-CoA thioesterase
   score: 6.0068
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB
@@ -37,7 +34,6 @@ rows:
   product: naphthoate synthase
   score: 7.5478
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB
@@ -48,7 +44,6 @@ rows:
   product: naphthoate synthase
   score: 7.5478
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB
@@ -59,7 +54,6 @@ rows:
   product: naphthoate synthase
   score: 7.5478
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB
@@ -70,7 +64,6 @@ rows:
   product: naphthoate synthase
   score: 7.5478
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB
@@ -81,7 +74,6 @@ rows:
   product: naphthoate synthase
   score: 7.5478
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB
@@ -92,7 +84,6 @@ rows:
   product: naphthoate synthase
   score: 7.5478
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4-dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB
@@ -103,7 +94,6 @@ rows:
   product: naphthoate synthase
   score: 7.5478
 - annotation_quality: 3
-  cluster_id: CK_00000769
   function_description: Converts o-succinylbenzoyl-CoA (OSB-CoA) to 1,4- dihydroxy-2-naphthoyl-CoA
     (DHNA-CoA)
   gene_name: menB

@@ -2,13 +2,19 @@ case_id: gene_details_alteromonas
 row_count: 1
 rows:
 - gene:
-    _cluster: null
     _organism:
       clade: null
       genus: Alteromonas
       ncbi_taxon_id: 28108
       preferred_name: Alteromonas macleodii MIT1002
       strain_name: MIT1002
+    _ortholog_groups:
+    - name: 1S2QS@1236
+      source: eggnog
+      taxonomic_level: Gammaproteobacteria
+    - name: COG3415@2
+      source: eggnog
+      taxonomic_level: Bacteria
     _protein: null
     all_identifiers:
     - WP_197047964.1
@@ -20,7 +26,6 @@ rows:
     alternative_locus_tags:
     - ALT831_RS00180
     annotation_quality: 2
-    bacteria_cog_og: COG3335
     cog_category:
     - L
     eggnog_ogs:

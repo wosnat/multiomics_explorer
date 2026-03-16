@@ -16,19 +16,16 @@ system_prompts:
     - Treatment organisms (coculture sources) use organism_name: 'Alteromonas', 'Phage', 'Marinobacter'
     - Do NOT use organism_name for filtering genome organisms
 
-    Expression edges (4 types):
+    Expression edges (2 types):
     - Coculture_changes_expression_of: OrganismTaxon → Gene (coculture experiments)
     - Condition_changes_expression_of: EnvironmentalCondition → Gene (stress/condition experiments)
-    - Coculture_changes_expression_of_ortholog: OrganismTaxon → Gene (inferred via homology)
-    - Condition_changes_expression_of_ortholog: EnvironmentalCondition → Gene (inferred via homology)
-    - To query both direct types at once: (factor)-[r:Condition_changes_expression_of|Coculture_changes_expression_of]->(g:Gene)
+    - To query both at once: (factor)-[r:Condition_changes_expression_of|Coculture_changes_expression_of]->(g:Gene)
     - Edge properties: log2_fold_change (float), adjusted_p_value (float|null),
       expression_direction ('up'|'down'), time_point, publications[] (bare DOIs),
       organism_strain (target strain, preferred_name format e.g. 'Prochlorococcus MED4'),
       control_condition, experimental_context,
       treatment_condition, significant ('significant'|'not significant'|'unknown'),
       omics_type, statistical_test, analysis_name
-    - Ortholog edges additionally have: original_gene, homology_source, homology_cluster_id, distance
 
     EnvironmentalCondition:
     - Filter by condition_type: 'nutrient_stress', 'light_stress', 'salt_stress', 'gas_shock',
@@ -53,11 +50,17 @@ system_prompts:
     - Gene_has_cyanorak_role → CyanorakRole (Pro/Syn only)
     - Gene_has_tigr_role → TigrRole (Pro/Syn only)
 
-    Homology:
-    - Gene_is_homolog_of_gene is bidirectional, use undirected pattern: (g)-[:Gene_is_homolog_of_gene]-(h)
-    - Properties: distance (phylogenetic), cluster_id (Cyanorak cluster), source
-    - source values: 'cyanorak_cluster' (Pro/Syn↔Pro/Syn), 'eggnog_alteromonadaceae_og' (Alt↔Alt),
-      'eggnog_bacteria_cog_og' (cross-phylum Alt↔Pro/Syn)
+    Homology (OrthologGroup model):
+    - Homology is modeled via shared OrthologGroup cluster nodes, not pairwise edges.
+    - Two genes are homologs if they share an OrthologGroup:
+      (g)-[:Gene_in_ortholog_group]->(og:OrthologGroup)<-[:Gene_in_ortholog_group]-(h)
+      WHERE g <> h
+    - OrthologGroup properties: name (OG ID), source ('cyanorak' or 'eggnog'),
+      taxonomic_level ('curated', 'Prochloraceae', 'Synechococcus', 'Alteromonadaceae',
+      'Bacteria', 'Cyanobacteria', 'Gammaproteobacteria'), taxon_id (integer),
+      specificity_rank (int: 0=curated, 1=family, 2=order, 3=domain/Bacteria)
+    - A gene may belong to 1-3 groups (Cyanorak cluster + lowest-level eggNOG OG + Bacteria-level COG)
+    - For ortholog expression lookup, join through OrthologGroup to homolog then to expression edges
 
     Rules:
     - Always include LIMIT unless counting/aggregating
@@ -76,7 +79,7 @@ system_prompts:
     the multi-omics knowledge graph. The graph contains:
     - 35,000+ genes across 13 genome organisms (8 Prochlorococcus, 1 Synechococcus,
       1 Parasynechococcus, 3 Alteromonas) + 5 treatment organisms
-    - ~188,000 direct expression edges + ~2M ortholog-inferred expression edges
+    - ~188,000 expression edges, ~21,000 OrthologGroup nodes with ~84,500 membership edges
     - Protein annotations, GO terms, KEGG pathways, EC numbers, COG categories, homology
     - Gene lookup: resolve_gene (ID resolution) and search_genes (full-text search with Lucene)
 

@@ -1,243 +1,123 @@
 case_id: homologs_exist
-row_count: 40
+row_count: 24
 rows:
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: A9601_10241
+- locus_tag: A9601_10241
   organism_strain: Prochlorococcus AS9601
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: A9601_10241
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: A9601_10241
   organism_strain: Prochlorococcus AS9601
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: ACZ81_04210
-  organism_strain: Alteromonas macleodii HOT1A3
-  product: ABC-F family ATPase
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: ACZ81_04210
-  organism_strain: Alteromonas macleodii HOT1A3
-  product: ABC-F family ATPase
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: ACZ81_10260
-  organism_strain: Alteromonas macleodii HOT1A3
-  product: ABC transporter ATP-binding protein
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: ACZ81_10260
-  organism_strain: Alteromonas macleodii HOT1A3
-  product: ABC transporter ATP-binding protein
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: ACZ81_13050
-  organism_strain: Alteromonas macleodii HOT1A3
-  product: energy-dependent translational throttle protein EttA
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: ACZ81_13050
-  organism_strain: Alteromonas macleodii HOT1A3
-  product: energy-dependent translational throttle protein EttA
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: ACZ81_19405
-  organism_strain: Alteromonas macleodii HOT1A3
-  product: ATP-binding cassette domain-containing protein
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: ACZ81_19405
-  organism_strain: Alteromonas macleodii HOT1A3
-  product: ATP-binding cassette domain-containing protein
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: EZ55_00904
-  organism_strain: Alteromonas macleodii EZ55
-  product: ABC-F family ATPase
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: EZ55_00904
-  organism_strain: Alteromonas macleodii EZ55
-  product: ABC-F family ATPase
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: EZ55_02100
-  organism_strain: Alteromonas macleodii EZ55
-  product: ATP-binding cassette ATPase Uup
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: EZ55_02100
-  organism_strain: Alteromonas macleodii EZ55
-  product: ATP-binding cassette ATPase Uup
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: EZ55_02678
-  organism_strain: Alteromonas macleodii EZ55
-  product: energy-dependent translational throttle protein EttA
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: EZ55_02678
-  organism_strain: Alteromonas macleodii EZ55
-  product: energy-dependent translational throttle protein EttA
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: EZ55_04000
-  organism_strain: Alteromonas macleodii EZ55
-  product: ATP-binding cassette domain-containing protein
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: EZ55_04000
-  organism_strain: Alteromonas macleodii EZ55
-  product: ATP-binding cassette domain-containing protein
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: MIT1002_00912
-  organism_strain: Alteromonas macleodii MIT1002
-  product: ABC-F family ATPase
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: MIT1002_00912
-  organism_strain: Alteromonas macleodii MIT1002
-  product: ABC-F family ATPase
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: MIT1002_02038
-  organism_strain: Alteromonas macleodii MIT1002
-  product: ATP-binding cassette ATPase Uup
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: MIT1002_02038
-  organism_strain: Alteromonas macleodii MIT1002
-  product: ATP-binding cassette ATPase Uup
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: MIT1002_02704
-  organism_strain: Alteromonas macleodii MIT1002
-  product: energy-dependent translational throttle protein EttA
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: MIT1002_02704
-  organism_strain: Alteromonas macleodii MIT1002
-  product: energy-dependent translational throttle protein EttA
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: MIT1002_04001
-  organism_strain: Alteromonas macleodii MIT1002
-  product: ATP-binding cassette domain-containing protein
-  source: eggnog_bacteria_cog_og
-- cluster_id: COG0488
-  distance: cross phylum
-  locus_tag: MIT1002_04001
-  organism_strain: Alteromonas macleodii MIT1002
-  product: ATP-binding cassette domain-containing protein
-  source: eggnog_bacteria_cog_og
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: NATL1_10451
+  source: eggnog
+  taxonomic_level: Prochloraceae
+- locus_tag: A9601_10241
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase subunit NdhV
+  source: cyanorak
+  taxonomic_level: curated
+- locus_tag: BSR22_08055
+  organism_strain: Prochlorococcus RSP50
+  product: DUF2996 domain-containing protein
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: BSR22_08055
+  organism_strain: Prochlorococcus RSP50
+  product: DUF2996 domain-containing protein
+  source: eggnog
+  taxonomic_level: Prochloraceae
+- locus_tag: NATL1_10451
   organism_strain: Prochlorococcus NATL1A
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: NATL1_10451
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: NATL1_10451
   organism_strain: Prochlorococcus NATL1A
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: P9301_10231
+  source: eggnog
+  taxonomic_level: Prochloraceae
+- locus_tag: NATL1_10451
+  organism_strain: Prochlorococcus NATL1A
+  product: NADH dehydrogenase subunit NdhV
+  source: cyanorak
+  taxonomic_level: curated
+- locus_tag: P9301_10231
   organism_strain: Prochlorococcus MIT9301
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: P9301_10231
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: P9301_10231
   organism_strain: Prochlorococcus MIT9301
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: PMN2A_0363
+  source: eggnog
+  taxonomic_level: Prochloraceae
+- locus_tag: P9301_10231
+  organism_strain: Prochlorococcus MIT9301
+  product: NADH dehydrogenase subunit NdhV
+  source: cyanorak
+  taxonomic_level: curated
+- locus_tag: PMN2A_0363
   organism_strain: Prochlorococcus NATL2A
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: PMN2A_0363
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: PMN2A_0363
   organism_strain: Prochlorococcus NATL2A
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: PMT0769
+  source: eggnog
+  taxonomic_level: Prochloraceae
+- locus_tag: PMN2A_0363
+  organism_strain: Prochlorococcus NATL2A
+  product: NADH dehydrogenase subunit NdhV
+  source: cyanorak
+  taxonomic_level: curated
+- locus_tag: PMT0769
   organism_strain: Prochlorococcus MIT9313
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: PMT0769
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: PMT0769
   organism_strain: Prochlorococcus MIT9313
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: PMT9312_0955
+  source: eggnog
+  taxonomic_level: Prochloraceae
+- locus_tag: PMT0769
+  organism_strain: Prochlorococcus MIT9313
+  product: NADH dehydrogenase subunit NdhV
+  source: cyanorak
+  taxonomic_level: curated
+- locus_tag: PMT9312_0955
   organism_strain: Prochlorococcus MIT9312
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same species: Prochlorococcus marinus'
-  locus_tag: PMT9312_0955
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: PMT9312_0955
   organism_strain: Prochlorococcus MIT9312
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same order: Synechococcales'
-  locus_tag: SYNC_RS06055
+  source: eggnog
+  taxonomic_level: Prochloraceae
+- locus_tag: PMT9312_0955
+  organism_strain: Prochlorococcus MIT9312
+  product: NADH dehydrogenase subunit NdhV
+  source: cyanorak
+  taxonomic_level: curated
+- locus_tag: SYNC_RS06055
   organism_strain: Synechococcus CC9311
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same order: Synechococcales'
-  locus_tag: SYNC_RS06055
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: SYNC_RS06055
   organism_strain: Synechococcus CC9311
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same order: Synechococcales'
-  locus_tag: SYNW1199
+  source: cyanorak
+  taxonomic_level: curated
+- locus_tag: SYNW1199
   organism_strain: Synechococcus WH8102
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
-- cluster_id: CK_00000853
-  distance: 'same order: Synechococcales'
-  locus_tag: SYNW1199
+  source: eggnog
+  taxonomic_level: Bacteria
+- locus_tag: SYNW1199
   organism_strain: Synechococcus WH8102
   product: NADH dehydrogenase subunit NdhV
-  source: cyanorak_cluster
+  source: cyanorak
+  taxonomic_level: curated

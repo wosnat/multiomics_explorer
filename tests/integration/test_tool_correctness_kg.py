@@ -195,7 +195,7 @@ class TestGetGeneDetailsCorrectnessKG:
     """Validate gene details queries return expected nested structures."""
 
     def test_well_annotated_prochlorococcus(self, conn):
-        """PMM0001 should have protein, organism, and cluster info."""
+        """PMM0001 should have protein, organism, and ortholog group info."""
         cypher, params = build_get_gene_details_main(gene_id="PMM0001")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
@@ -204,16 +204,17 @@ class TestGetGeneDetailsCorrectnessKG:
         assert gene["locus_tag"] == "PMM0001"
         assert gene["_protein"] is not None, "PMM0001 should have a linked Protein"
         assert gene["_organism"] is not None, "PMM0001 should have a linked Organism"
-        assert gene["_cluster"] is not None, "PMM0001 should have a CyanORAK cluster"
+        assert len(gene["_ortholog_groups"]) >= 1, "PMM0001 should have OrthologGroup memberships"
 
-    def test_alteromonas_no_cluster(self, conn):
-        """ALT831_RS00180 (Alteromonas) should have no CyanORAK cluster."""
+    def test_alteromonas_has_eggnog_groups(self, conn):
+        """ALT831_RS00180 (Alteromonas) should have eggnog OrthologGroup memberships."""
         cypher, params = build_get_gene_details_main(gene_id="ALT831_RS00180")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
         assert gene is not None
-        assert gene["_cluster"] is None, "Alteromonas genes should not have CyanORAK clusters"
+        og_sources = {og["source"] for og in gene["_ortholog_groups"]}
+        assert "cyanorak" not in og_sources, "Alteromonas genes should not have Cyanorak groups"
 
     def test_homologs_exist_for_pmm0001(self, conn):
         """PMM0001 (dnaN) should have homologs from other organisms."""
@@ -241,13 +242,16 @@ class TestGetHomologsCorrectnessKG:
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
 
-    def test_homolog_distances_present(self, conn):
-        """All homologs should have a non-null distance value."""
+    def test_homolog_source_and_level_present(self, conn):
+        """All homologs should have non-null source and taxonomic_level."""
         cypher, params = build_get_homologs(gene_id="PMM0001")
         results = conn.execute_query(cypher, **params)
         for r in results:
-            assert r["distance"] is not None, (
-                f"Null distance for {r['locus_tag']}"
+            assert r["source"] is not None, (
+                f"Null source for {r['locus_tag']}"
+            )
+            assert r["taxonomic_level"] is not None, (
+                f"Null taxonomic_level for {r['locus_tag']}"
             )
 
     def test_homologs_cross_organism(self, conn):

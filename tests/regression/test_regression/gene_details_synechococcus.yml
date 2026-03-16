@@ -2,14 +2,22 @@ case_id: gene_details_synechococcus
 row_count: 1
 rows:
 - gene:
-    _cluster:
-      cluster_number: CK_00008085
     _organism:
       clade: null
       genus: Parasynechococcus
       ncbi_taxon_id: 84588
       preferred_name: Synechococcus WH8102
       strain_name: WH8102
+    _ortholog_groups:
+    - name: 1GYE1@1129
+      source: eggnog
+      taxonomic_level: Synechococcus
+    - name: COG0465@2
+      source: eggnog
+      taxonomic_level: Bacteria
+    - name: CK_00008085
+      source: cyanorak
+      taxonomic_level: curated
     _protein:
       annotation_score: 3.0
       gene_names:
@@ -51,8 +59,6 @@ rows:
     alternative_locus_tags:
     - SYNW0305
     annotation_quality: 3
-    bacteria_cog_og: COG0465
-    cluster_number: CK_00008085
     cog_category:
     - O
     cyanorak_Role:

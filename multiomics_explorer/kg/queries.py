@@ -35,13 +35,13 @@ MATCH ()-[r:Condition_changes_expression_of|Coculture_changes_expression_of]->()
 RETURN count(r) AS cnt
 """
 
-ORTHOLOG_EXPRESSION_EDGE_COUNT = """
-MATCH ()-[r:Condition_changes_expression_of_ortholog|Coculture_changes_expression_of_ortholog]->()
-RETURN count(r) AS cnt
+ORTHOLOG_GROUP_COUNT = """
+MATCH (og:OrthologGroup)
+RETURN count(og) AS cnt
 """
 
-HOMOLOG_EDGE_COUNT = """
-MATCH ()-[r:Gene_is_homolog_of_gene]->()
+ORTHOLOG_MEMBERSHIP_EDGE_COUNT = """
+MATCH ()-[r:Gene_in_ortholog_group]->()
 RETURN count(r) AS cnt
 """
 
@@ -70,12 +70,14 @@ RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,
 """
 
 HOMOLOGS_OF_GENE = """
-MATCH (g:Gene {locus_tag: $locus_tag})-[h:Gene_is_homolog_of_gene]-(other:Gene)
+MATCH (g:Gene {locus_tag: $locus_tag})-[:Gene_in_ortholog_group]->(og:OrthologGroup)
+      <-[:Gene_in_ortholog_group]-(other:Gene)
+WHERE other <> g
 OPTIONAL MATCH (other)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)
-RETURN other.locus_tag AS locus_tag, other.product AS product,
-       o.strain_name AS strain, h.distance AS distance,
-       h.cluster_id AS cluster_id, h.source AS source
-ORDER BY h.distance, other.locus_tag
+RETURN DISTINCT other.locus_tag AS locus_tag, other.product AS product,
+       o.strain_name AS strain, og.source AS source,
+       og.taxonomic_level AS taxonomic_level
+ORDER BY og.taxonomic_level, other.locus_tag
 """
 
 EXPRESSION_FOR_GENE = """
@@ -145,14 +147,17 @@ FEW_SHOT_EXAMPLES = [
     {
         "question": "What are the homologs of PMM1375 (psbA)?",
         "cypher": (
-            "MATCH (g:Gene {locus_tag: 'PMM1375'})-[h:Gene_is_homolog_of_gene]-(hg:Gene)\n"
+            "MATCH (g:Gene {locus_tag: 'PMM1375'})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+            "      <-[:Gene_in_ortholog_group]-(hg:Gene)\n"
+            "WHERE hg <> g\n"
             "OPTIONAL MATCH (hg)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
-            "RETURN hg.locus_tag AS locus_tag, hg.product AS product,\n"
-            "       o.strain_name AS strain, h.source, h.distance"
+            "RETURN DISTINCT hg.locus_tag AS locus_tag, hg.product AS product,\n"
+            "       o.strain_name AS strain, og.source, og.taxonomic_level"
         ),
         "explanation": (
-            "Gene_is_homolog_of_gene is bidirectional, so use undirected pattern (no arrow). "
-            "h.source indicates origin: cyanorak_cluster, eggnog_alteromonadaceae_og, or eggnog_bacteria_cog_og."
+            "Homology is modeled via shared OrthologGroup nodes. Two genes are homologs if they "
+            "share an OrthologGroup. og.source is 'cyanorak' or 'eggnog', og.taxonomic_level "
+            "indicates the scope ('curated', 'Prochloraceae', 'Alteromonadaceae', 'Bacteria', etc.)."
         ),
     },
     {

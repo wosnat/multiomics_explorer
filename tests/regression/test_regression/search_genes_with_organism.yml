@@ -2,7 +2,6 @@ case_id: search_genes_with_organism
 row_count: 10
 rows:
 - annotation_quality: 3
-  cluster_id: CK_00008107
   function_description: COG188 Type IIA topoisomerase (DNA gyrase topo II, topoisomerase
     IV), A subunit DNA replication, recombination, and repair
   gene_name: null
@@ -14,7 +13,6 @@ rows:
   product: DNA gyrase/topoisomerase IV, subunit A family protein
   score: 8.1577
 - annotation_quality: 3
-  cluster_id: CK_00044232
   function_description: Belongs to the DNA glycosylase MPG family
   gene_name: mpg
   gene_summary: 'mpg :: DNA-3-methyladenine glycosylase :: Belongs to the DNA glycosylase
@@ -24,7 +22,6 @@ rows:
   product: DNA-3-methyladenine glycosylase
   score: 6.7778
 - annotation_quality: 3
-  cluster_id: CK_00001039
   function_description: Involved in DNA repair and RecF pathway recombination
   gene_name: recO
   gene_summary: 'recO :: gap repair protein RecO :: Involved in DNA repair and RecF
@@ -34,7 +31,6 @@ rows:
   product: gap repair protein RecO
   score: 9.2995
 - annotation_quality: 3
-  cluster_id: CK_00000889
   function_description: Plays a critical role in recombination and DNA repair. Helps
     process Holliday junction intermediates to mature products by catalyzing branch
     migration. Has replication fork regression activity, unwinds stalled or blocked
@@ -51,7 +47,6 @@ rows:
   product: ATP-dependent DNA helicase
   score: 6.7389
 - annotation_quality: 3
-  cluster_id: CK_00000857
   function_description: Couples transcription and DNA repair by recognizing RNA polymerase
     (RNAP) stalled at DNA lesions. Mediates ATP-dependent release of RNAP and its
     truncated transcript from the DNA, and recruitment of nucleotide excision repair
@@ -66,7 +61,6 @@ rows:
   product: transcription-repair coupling factor
   score: 8.4219
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -75,7 +69,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.8382
 - annotation_quality: 3
-  cluster_id: CK_00000751
   function_description: May play a role in DNA repair. It seems to be involved in
     an RecBC-independent recombinational process of DNA repair. It may act with RecF
     and RecO
@@ -88,7 +81,6 @@ rows:
   product: recombination protein RecR
   score: 7.9049
 - annotation_quality: 3
-  cluster_id: CK_00000549
   function_description: it is required for DNA replication and normal SOS inducibility.
     RecF binds preferentially to single-stranded, linear DNA. It also seems to bind
     ATP
@@ -101,7 +93,6 @@ rows:
   product: DNA replication and repair protein recF
   score: 7.9612
 - annotation_quality: 3
-  cluster_id: CK_00000315
   function_description: that it carries out the mismatch recognition step. This protein
     has a weak ATPase activity
   gene_name: mutS
@@ -112,7 +103,6 @@ rows:
   product: DNA mismatch repair protein MutS
   score: 7.2774
 - annotation_quality: 3
-  cluster_id: CK_00000366
   function_description: May be involved in recombinational repair of damaged DNA
   gene_name: recN
   gene_summary: 'recN :: ATP-dependent DNA repair protein RecN :: May be involved

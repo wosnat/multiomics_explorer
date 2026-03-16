@@ -1804,7 +1804,6 @@ def as_search_genes_result(gene, score=1.0):
         "gene_summary": gene.get("gene_summary"),
         "organism_strain": gene.get("organism_strain"),
         "annotation_quality": gene.get("annotation_quality"),
-        "cluster_id": gene.get("cluster_number") or gene.get("alteromonadaceae_og"),
         "score": score,
     }
 

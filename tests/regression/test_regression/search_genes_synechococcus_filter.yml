@@ -2,7 +2,6 @@ case_id: search_genes_synechococcus_filter
 row_count: 10
 rows:
 - annotation_quality: 3
-  cluster_id: CK_00001124
   function_description: Peptidoglycan polymerase that is essential for cell division
   gene_name: ftsW
   gene_summary: 'ftsW :: cell division protein FtsW :: Peptidoglycan polymerase that
@@ -12,7 +11,6 @@ rows:
   product: cell division protein FtsW
   score: 11.1726
 - annotation_quality: 2
-  cluster_id: CK_00001459
   function_description: COG3599 Cell division initiation protein
   gene_name: cdv3
   gene_summary: 'cdv3 :: possible cell division protein Cdv3 :: COG3599 Cell division
@@ -22,7 +20,6 @@ rows:
   product: possible cell division protein Cdv3
   score: 11.4233
 - annotation_quality: 3
-  cluster_id: CK_00001237
   function_description: Cell division
   gene_name: ftsQ
   gene_summary: 'ftsQ :: cell division protein FtsQ :: Cell division'
@@ -31,7 +28,6 @@ rows:
   product: cell division protein FtsQ
   score: 11.7515
 - annotation_quality: 3
-  cluster_id: CK_00000705
   function_description: Essential cell division protein that forms a contractile ring
     structure (Z ring) at the future cell division site. The regulation of the ring
     assembly controls the timing and the location of cell division. One of the functions
@@ -49,7 +45,6 @@ rows:
   product: cell division protein FtsZ
   score: 10.2828
 - annotation_quality: 3
-  cluster_id: CK_00000575
   function_description: Prevents the cell division inhibition by proteins MinC and
     MinD at internal division sites while permitting inhibition at polar sites. This
     ensures cell division at the proper site by restricting the formation of a division
@@ -65,7 +60,6 @@ rows:
   product: cell division topological specificity factor MinE
   score: 10.6569
 - annotation_quality: 3
-  cluster_id: CK_00000575
   function_description: Prevents the cell division inhibition by proteins MinC and
     MinD at internal division sites while permitting inhibition at polar sites. This
     ensures cell division at the proper site by restricting the formation of a division
@@ -81,7 +75,6 @@ rows:
   product: cell division topological specificity factor MinE
   score: 10.6569
 - annotation_quality: 3
-  cluster_id: CK_00000705
   function_description: Essential cell division protein that forms a contractile ring
     structure (Z ring) at the future cell division site. The regulation of the ring
     assembly controls the timing and the location of cell division. One of the functions
@@ -99,7 +92,6 @@ rows:
   product: cell division protein FtsZ
   score: 10.2828
 - annotation_quality: 3
-  cluster_id: CK_00001237
   function_description: Cell division
   gene_name: ftsQ
   gene_summary: 'ftsQ :: cell division protein FtsQ :: Cell division'
@@ -108,7 +100,6 @@ rows:
   product: cell division protein FtsQ
   score: 11.7515
 - annotation_quality: 2
-  cluster_id: CK_00001459
   function_description: COG3599 Cell division initiation protein
   gene_name: cdv3
   gene_summary: 'cdv3 :: possible cell division protein Cdv3 :: COG3599 Cell division
@@ -118,7 +109,6 @@ rows:
   product: possible cell division protein Cdv3
   score: 11.4233
 - annotation_quality: 3
-  cluster_id: CK_00001124
   function_description: Belongs to the SEDS family
   gene_name: ftsW
   gene_summary: 'ftsW :: cell division protein FtsW :: Belongs to the SEDS family'

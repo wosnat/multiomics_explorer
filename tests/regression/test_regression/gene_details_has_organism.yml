@@ -2,14 +2,22 @@ case_id: gene_details_has_organism
 row_count: 1
 rows:
 - gene:
-    _cluster:
-      cluster_number: CK_00000364
     _organism:
       clade: HLI
       genus: Prochlorococcus
       ncbi_taxon_id: 59919
       preferred_name: Prochlorococcus MED4
       strain_name: MED4
+    _ortholog_groups:
+    - name: 1MKTR@1212
+      source: eggnog
+      taxonomic_level: Prochloraceae
+    - name: COG0592@2
+      source: eggnog
+      taxonomic_level: Bacteria
+    - name: CK_00000364
+      source: cyanorak
+      taxonomic_level: curated
     _protein:
       annotation_score: 2.0
       gene_names:
@@ -63,8 +71,6 @@ rows:
     alternative_locus_tags:
     - PMM0001
     annotation_quality: 3
-    bacteria_cog_og: COG0592
-    cluster_number: CK_00000364
     cog_category:
     - L
     cyanorak_Role:

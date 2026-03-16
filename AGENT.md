@@ -105,7 +105,7 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 | `OrganismTaxon` | 18 | `preferred_name` (e.g. 'Prochlorococcus MED4'), `strain_name`, `genus`, `species`, `clade`, `ncbi_taxon_id`, `organism_name` |
 | `EnvironmentalCondition` | ~57 | `name`, `condition_type`, `condition_category`, `description`, `temperature`, `light_condition` |
 | `Publication` | ~21 | `title`, `doi`, `study_type`, `publication_year` |
-| `Cyanorak_cluster` | ~5,600 | `cluster_number` |
+| `OrthologGroup` | ~21,000 | `name` (OG ID), `source` ('cyanorak'/'eggnog'), `taxonomic_level`, `taxon_id`, `specificity_rank` (0=curated, 1=family, 2=order, 3=domain) |
 | `BiologicalProcess` | ~2,400 | `name` (GO term) |
 | `MolecularFunction` | ~2,100 | `name` (GO term) |
 | `CellularComponent` | ~330 | `name` (GO term) |
@@ -124,11 +124,8 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 | `Gene_encodes_protein` | Gene → Protein | — |
 | `Coculture_changes_expression_of` | OrganismTaxon → Gene | `log2_fold_change`, `adjusted_p_value`, `expression_direction`, `organism_strain` (preferred_name format), `time_point`, `publications[]`, `significant` ('significant'/'not significant'/'unknown'), `control_condition`, `treatment_condition`, `experimental_context`, `omics_type`, `statistical_test`, `analysis_name` |
 | `Condition_changes_expression_of` | EnvironmentalCondition → Gene | same as above |
-| `Coculture_changes_expression_of_ortholog` | OrganismTaxon → Gene | same + `original_gene`, `homology_source`, `homology_cluster_id`, `distance` |
-| `Condition_changes_expression_of_ortholog` | EnvironmentalCondition → Gene | same + `original_gene`, `homology_source`, `homology_cluster_id`, `distance` |
 | `Published_expression_data_about` | Publication → EnvironmentalCondition/OrganismTaxon | — |
-| `Gene_is_homolog_of_gene` | Gene ↔ Gene (bidirectional) | `distance`, `cluster_id`, `source` |
-| `Gene_in_cyanorak_cluster` | Gene → Cyanorak_cluster | — |
+| `Gene_in_ortholog_group` | Gene → OrthologGroup | — |
 | `Gene_involved_in_biological_process` | Gene → BiologicalProcess | — |
 | `Gene_enables_molecular_function` | Gene → MolecularFunction | — |
 | `Gene_located_in_cellular_component` | Gene → CellularComponent | — |
@@ -188,7 +185,7 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 
 1. **Gene_encodes_protein direction**: Gene → Protein. Use `(g)-[:Gene_encodes_protein]->(p)`.
 
-2. **Homology is bidirectional**: Always use undirected pattern `(g)-[:Gene_is_homolog_of_gene]-(h)`, never `(g)->`.
+2. **Homology via OrthologGroup**: Two genes are homologs if they share an OrthologGroup: `(g)-[:Gene_in_ortholog_group]->(og:OrthologGroup)<-[:Gene_in_ortholog_group]-(h) WHERE g <> h`. Filter by `og.source` ('cyanorak'/'eggnog') or `og.taxonomic_level` for scope.
 
 3. **Organism filtering**: Use `strain_name` for genome strains (e.g., `'MED4'`), `genus` for genus-level. Treatment organisms use `organism_name` (e.g., `'Alteromonas'`, `'Phage'`).
 
@@ -204,7 +201,7 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 
 7. **Denormalized gene properties**: `gene_name`, `product`, `organism_strain`, `gene_summary`, `go_terms[]`, `kegg_ko[]` are directly on Gene nodes. No need to traverse relationships for basic info.
 
-8. **Cyanorak clusters**: Only Prochlorococcus/Synechococcus genes have Cyanorak cluster membership. Alteromonas genes do not.
+8. **OrthologGroup membership**: A gene may belong to 1-3 groups: a Cyanorak curated cluster (Pro/Syn only), a lowest-level eggNOG OG (family-specific), and a Bacteria-level COG (cross-phylum).
 
 9. **adjusted_p_value can be null**: Some studies don't report adjusted p-values. Always use `IS NOT NULL` when filtering.
 

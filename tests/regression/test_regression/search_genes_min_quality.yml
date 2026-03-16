@@ -2,7 +2,6 @@ case_id: search_genes_min_quality
 row_count: 20
 rows:
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -11,7 +10,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9377
 - annotation_quality: 3
-  cluster_id: CK_00001019
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
   gene_name: polA
@@ -22,7 +20,6 @@ rows:
   product: DNA polymerase I
   score: 6.6737
 - annotation_quality: 3
-  cluster_id: 4640I@72275,Alteromonadaceae
   function_description: DNA polymerase
   gene_name: polB
   gene_summary: 'polB :: DNA polymerase II :: DNA polymerase'
@@ -31,7 +28,6 @@ rows:
   product: DNA polymerase II
   score: 6.7721
 - annotation_quality: 3
-  cluster_id: 4640I@72275,Alteromonadaceae
   function_description: DNA polymerase
   gene_name: polB
   gene_summary: 'polB :: DNA polymerase II :: DNA polymerase'
@@ -40,7 +36,6 @@ rows:
   product: DNA polymerase II
   score: 6.7721
 - annotation_quality: 3
-  cluster_id: 4640I@72275,Alteromonadaceae
   function_description: DNA polymerase
   gene_name: polB
   gene_summary: 'polB :: DNA polymerase II :: DNA polymerase'
@@ -49,7 +44,6 @@ rows:
   product: DNA polymerase II
   score: 6.7721
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -58,7 +52,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9377
 - annotation_quality: 3
-  cluster_id: CK_00001019
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
   gene_name: polA
@@ -69,7 +62,6 @@ rows:
   product: DNA polymerase I
   score: 6.6737
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -78,7 +70,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9377
 - annotation_quality: 3
-  cluster_id: CK_00001019
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
   gene_name: polA
@@ -89,7 +80,6 @@ rows:
   product: DNA polymerase I
   score: 6.6737
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -98,7 +88,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9377
 - annotation_quality: 3
-  cluster_id: CK_00001019
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
   gene_name: polA
@@ -109,7 +98,6 @@ rows:
   product: DNA polymerase I
   score: 6.6737
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -118,7 +106,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9377
 - annotation_quality: 3
-  cluster_id: CK_00001019
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
   gene_name: polA
@@ -129,7 +116,6 @@ rows:
   product: DNA polymerase I
   score: 6.6737
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -138,7 +124,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9377
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -147,7 +132,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9377
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -156,7 +140,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9377
 - annotation_quality: 3
-  cluster_id: CK_00000217
   function_description: DNA polymerase III
   gene_name: holB
   gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: DNA polymerase III'
@@ -165,7 +148,6 @@ rows:
   product: DNA polymerase III, delta^ subunit
   score: 6.8687
 - annotation_quality: 3
-  cluster_id: CK_00001019
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     5^-3^ exonuclease activity
   gene_name: polA
@@ -176,7 +158,6 @@ rows:
   product: DNA polymerase I
   score: 6.8192
 - annotation_quality: 3
-  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
   gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
@@ -185,7 +166,6 @@ rows:
   product: DNA polymerase III, alpha subunit
   score: 6.9132
 - annotation_quality: 3
-  cluster_id: CK_00000217
   function_description: DNA polymerase III
   gene_name: holB
   gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: DNA polymerase III'

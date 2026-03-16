@@ -90,13 +90,11 @@ class TestBuildSearchGenes:
         cypher, _ = build_search_genes(search_text="x")
         assert "gene_summary" in cypher
 
-    def test_cluster_id_via_coalesce(self):
-        """RETURN clause includes cluster_id via coalesce of cluster_number and alteromonadaceae_og."""
+    def test_no_removed_properties(self):
+        """RETURN clause should not reference removed gene properties."""
         cypher, _ = build_search_genes(search_text="x")
-        assert "cluster_id" in cypher
-        assert "coalesce" in cypher.lower()
-        assert "cluster_number" in cypher
-        assert "alteromonadaceae_og" in cypher
+        assert "cluster_number" not in cypher
+        assert "alteromonadaceae_og" not in cypher
 
     def test_category_param_when_provided(self):
         """When category is provided, it is passed as $category parameter."""
@@ -130,7 +128,16 @@ class TestBuildGetGeneDetails:
     def test_homologs_query(self):
         cypher, params = build_get_gene_details_homologs(gene_id="PMM0001")
         assert params["lt"] == "PMM0001"
-        assert "Gene_is_homolog_of_gene" in cypher
+        assert "Gene_in_ortholog_group" in cypher
+        assert "OrthologGroup" in cypher
+
+    def test_main_query_ortholog_groups(self):
+        """Main query fetches OrthologGroup memberships instead of Cyanorak cluster."""
+        cypher, _ = build_get_gene_details_main(gene_id="PMM0001")
+        assert "Gene_in_ortholog_group" in cypher
+        assert "OrthologGroup" in cypher
+        assert "Cyanorak_cluster" not in cypher
+        assert "Gene_in_cyanorak_cluster" not in cypher
 
 
 class TestBuildQueryExpression:
@@ -143,11 +150,8 @@ class TestBuildQueryExpression:
         _, params = build_query_expression(gene_id="x", direction="UP")
         assert params["dir"] == "up"
 
-    def test_includes_orthologs(self):
-        cypher, _ = build_query_expression(gene_id="x", include_orthologs=True)
-        assert "ortholog" in cypher.lower()
-
-    def test_excludes_orthologs_by_default(self):
+    def test_no_ortholog_edges_in_query(self):
+        """Query should only use direct expression edges (ortholog edges removed from KG)."""
         cypher, _ = build_query_expression(gene_id="x")
         assert "ortholog" not in cypher.lower()
 
@@ -176,11 +180,12 @@ class TestBuildGetHomologs:
     def test_basic(self):
         cypher, params = build_get_homologs(gene_id="PMM0845")
         assert params["lt"] == "PMM0845"
-        assert "Gene_is_homolog_of_gene" in cypher
+        assert "Gene_in_ortholog_group" in cypher
+        assert "OrthologGroup" in cypher
 
     def test_returns_expected_columns(self):
         cypher, _ = build_get_homologs(gene_id="x")
-        for col in ["locus_tag", "organism_strain", "distance"]:
+        for col in ["locus_tag", "organism_strain", "source", "taxonomic_level"]:
             assert col in cypher
 
 

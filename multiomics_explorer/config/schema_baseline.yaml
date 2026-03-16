@@ -1,5 +1,5 @@
 version: 1
-captured_at: '2026-03-15T19:47:46.339077+00:00'
+captured_at: '2026-03-16T12:51:17.835251+00:00'
 schema:
   nodes:
     AnatomicalEntity:
@@ -56,11 +56,6 @@ schema:
         description: string
         id: string
         preferred_id: string
-    Cyanorak_cluster:
-      properties:
-        cluster_number: string
-        id: string
-        preferred_id: string
     EcNumber:
       properties:
         alternate_name: list
@@ -71,10 +66,26 @@ schema:
         preferred_id: string
     Entity:
       properties:
-        code: string
+        annotation_score: float
+        cofactor_names: list
+        eggnog_ids: string
+        gene_names: list
+        go_biological_processes: list
         id: string
-        name: string
+        is_reviewed: string
+        keyword_ids: list
+        keywords: list
+        locus_tag: string
+        molecular_mass: int
+        pfam_ids: list
         preferred_id: string
+        protein_family: string
+        protein_synonyms: string
+        proteome_ids: list
+        refseq_ids: list
+        sequence_length: int
+        string_ids: string
+        transmembrane_regions: list
     EnvironmentalCondition:
       properties:
         co2_level: string
@@ -111,19 +122,31 @@ schema:
         alternate_functional_descriptions: list
         alternative_locus_tags: list
         annotation_quality: int
-        cluster_number: string
+        catalytic_activities: list
         cog_category: list
         cyanorak_Role: list
         cyanorak_Role_description: list
+        ec_numbers: list
+        eggnog_og_descriptions: list
         eggnog_ogs: list
         end: int
         end_cyanorak: int
         function_description: string
         function_description_source: string
         gene_category: string
+        gene_name: string
+        gene_name_source: string
         gene_summary: string
         gene_synonyms: list
+        go_term_descriptions: list
+        go_terms: list
         id: string
+        kegg_brite: list
+        kegg_ko: list
+        kegg_ko_descriptions: list
+        kegg_module: list
+        kegg_pathway: list
+        kegg_reaction: list
         locus_tag: string
         locus_tag_cyanorak: string
         locus_tag_ncbi: string
@@ -131,14 +154,16 @@ schema:
         old_locus_tags: list
         organism_strain: string
         pfam_descriptions: list
+        pfam_ids: list
+        pfam_names: list
         preferred_id: string
         product: string
         product_cyanorak: string
         product_source: string
+        protein_family: string
         protein_id: string
         seed_ortholog: string
         seed_ortholog_evalue: float
-        signal_peptide: string
         start: int
         start_cyanorak: int
         strand: string
@@ -146,6 +171,7 @@ schema:
         tIGR_Role: list
         tIGR_Role_description: list
         transmembrane_regions: list
+        transporter_classification: list
     GeneOntology:
       properties:
         id: string
@@ -153,9 +179,13 @@ schema:
         preferred_id: string
     GroupingClass:
       properties:
-        cluster_number: string
         id: string
+        name: string
         preferred_id: string
+        source: string
+        specificity_rank: int
+        taxon_id: int
+        taxonomic_level: string
     InformationContentEntity:
       properties:
         abstract: string
@@ -182,10 +212,26 @@ schema:
         preferred_id: string
     NamedThing:
       properties:
-        code: string
+        annotation_score: float
+        cofactor_names: list
+        eggnog_ids: string
+        gene_names: list
+        go_biological_processes: list
         id: string
-        name: string
+        is_reviewed: string
+        keyword_ids: list
+        keywords: list
+        locus_tag: string
+        molecular_mass: int
+        pfam_ids: list
         preferred_id: string
+        protein_family: string
+        protein_synonyms: string
+        proteome_ids: list
+        refseq_ids: list
+        sequence_length: int
+        string_ids: string
+        transmembrane_regions: list
     OrganismTaxon:
       properties:
         clade: string
@@ -209,6 +255,15 @@ schema:
         id: string
         name: string
         preferred_id: string
+    OrthologGroup:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+        source: string
+        specificity_rank: int
+        taxon_id: int
+        taxonomic_level: string
     Polypeptide:
       properties:
         annotation_score: float
@@ -399,33 +454,6 @@ schema:
         statistical_test: string
         time_point: string
         treatment_condition: string
-    Coculture_changes_expression_of_ortholog:
-      source_labels:
-      - Entity
-      - NamedThing
-      - OrganismTaxon
-      target_labels:
-      - BiologicalEntity
-      - Entity
-      - Gene
-      - NamedThing
-      properties:
-        analysis_name: string
-        control_condition: string
-        distance: string
-        experimental_context: string
-        expression_direction: string
-        homology_cluster_id: string
-        homology_source: string
-        log2_fold_change: float
-        omics_type: string
-        organism_strain: string
-        original_gene: string
-        publications: list
-        significant: string
-        statistical_test: string
-        time_point: string
-        treatment_condition: string
     Condition_changes_expression_of:
       source_labels:
       - EnvironmentalCondition
@@ -445,33 +473,6 @@ schema:
         log2_fold_change: float
         omics_type: string
         organism_strain: string
-        publications: list
-        significant: string
-        statistical_test: string
-        time_point: string
-        treatment_condition: string
-    Condition_changes_expression_of_ortholog:
-      source_labels:
-      - EnvironmentalCondition
-      - EnvironmentalFeature
-      target_labels:
-      - BiologicalEntity
-      - Entity
-      - Gene
-      - NamedThing
-      properties:
-        adjusted_p_value: float
-        analysis_name: string
-        control_condition: string
-        distance: string
-        experimental_context: string
-        expression_direction: string
-        homology_cluster_id: string
-        homology_source: string
-        log2_fold_change: float
-        omics_type: string
-        organism_strain: string
-        original_gene: string
         publications: list
         significant: string
         statistical_test: string
@@ -600,15 +601,15 @@ schema:
       - NamedThing
       properties:
         id: string
-    Gene_in_cyanorak_cluster:
+    Gene_in_ortholog_group:
       source_labels:
       - BiologicalEntity
       - Entity
       - Gene
       - NamedThing
       target_labels:
-      - Cyanorak_cluster
       - GroupingClass
+      - OrthologGroup
       properties:
         id: string
     Gene_involved_in_biological_process:
@@ -626,21 +627,6 @@ schema:
       - NamedThing
       properties:
         id: string
-    Gene_is_homolog_of_gene:
-      source_labels:
-      - BiologicalEntity
-      - Entity
-      - Gene
-      - NamedThing
-      target_labels:
-      - BiologicalEntity
-      - Entity
-      - Gene
-      - NamedThing
-      properties:
-        cluster_id: string
-        distance: string
-        source: string
     Gene_located_in_cellular_component:
       source_labels:
       - BiologicalEntity

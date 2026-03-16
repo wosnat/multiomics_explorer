@@ -238,7 +238,7 @@ class TestGetGeneDetailsCorrectness:
     """Verify get_gene_details assembles realistic data correctly."""
 
     def test_well_annotated_prochlorococcus(self, tool_fns, mock_ctx):
-        """PMM0001 returns full gene data with protein, organism, cluster info."""
+        """PMM0001 returns full gene data with protein, organism, ortholog group info."""
         gene_data = {
             "locus_tag": "PMM0001",
             "gene_name": "dnaN",
@@ -248,7 +248,10 @@ class TestGetGeneDetailsCorrectness:
             "go_terms": GENES_BY_LOCUS["PMM0001"]["go_terms"],
             "_protein": {"protein_id": "WP_011131639.1", "protein_family": "Beta sliding clamp family"},
             "_organism": {"strain": "MED4", "species": "Prochlorococcus marinus"},
-            "_cluster": {"cluster_number": "CK_00000364"},
+            "_ortholog_groups": [
+                {"name": "CK_00000364", "source": "cyanorak", "taxonomic_level": "curated"},
+                {"name": "COG0592@2", "source": "eggnog", "taxonomic_level": "Bacteria"},
+            ],
         }
         homologs = [
             {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312",
@@ -268,11 +271,12 @@ class TestGetGeneDetailsCorrectness:
         assert r["gene_name"] == "dnaN"
         assert r["_protein"]["protein_id"] == "WP_011131639.1"
         assert r["_organism"]["strain"] == "MED4"
-        assert r["_cluster"]["cluster_number"] == "CK_00000364"
+        assert len(r["_ortholog_groups"]) == 2
+        assert r["_ortholog_groups"][0]["source"] == "cyanorak"
         assert r["_homologs"] == homologs
 
-    def test_alteromonas_gene_no_cluster(self, tool_fns, mock_ctx):
-        """ALT831_RS00180 is Alteromonas — no CyanORAK cluster."""
+    def test_alteromonas_gene_eggnog_only(self, tool_fns, mock_ctx):
+        """ALT831_RS00180 is Alteromonas — eggnog OGs only, no Cyanorak."""
         gene_data = {
             "locus_tag": "ALT831_RS00180",
             "gene_name": "ALT831_RS00180",
@@ -280,7 +284,9 @@ class TestGetGeneDetailsCorrectness:
             "organism_strain": "Alteromonas macleodii MIT1002",
             "_protein": {"protein_id": "WP_197047964.1"},
             "_organism": {"strain": "MIT1002", "species": "Alteromonas macleodii"},
-            "_cluster": None,
+            "_ortholog_groups": [
+                {"name": "465MN@72275", "source": "eggnog", "taxonomic_level": "Alteromonadaceae"},
+            ],
         }
         conn = _conn_from(mock_ctx)
         conn.execute_query.side_effect = [
@@ -294,7 +300,8 @@ class TestGetGeneDetailsCorrectness:
 
         r = result[0]
         assert r["locus_tag"] == "ALT831_RS00180"
-        assert r["_cluster"] is None
+        assert len(r["_ortholog_groups"]) == 1
+        assert r["_ortholog_groups"][0]["source"] == "eggnog"
         assert r["_homologs"] == []
 
     def test_homologs_merged_from_different_organisms(self, tool_fns, mock_ctx):
@@ -369,18 +376,6 @@ class TestQueryExpressionCorrectness:
 
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
         assert call_kwargs["max_pv"] == 0.05
-
-    def test_include_orthologs_query_contains_ortholog(self, tool_fns, mock_ctx):
-        """include_orthologs=True changes query to include ortholog relationships."""
-        rows = [{"gene": "PMM0001", "log2fc": 1.5}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-
-        tool_fns["query_expression"](
-            mock_ctx, gene_id="PMM0001", include_orthologs=True
-        )
-
-        called_cypher = _conn_from(mock_ctx).execute_query.call_args[0][0]
-        assert "ortholog" in called_cypher.lower()
 
     def test_combined_filters_gene_organism_direction(self, tool_fns, mock_ctx):
         """All three filters are passed through together."""

@@ -303,15 +303,21 @@ class TestSearchGenesWrapper:
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
         assert call_kwargs["category"] == "Photosynthesis"
 
-    def test_dedup_collapses_same_cluster(self, tool_fns, mock_ctx):
-        """Dedup groups rows with the same cluster_id, keeping the first as representative."""
-        rows = [
-            {"locus_tag": "PMM0044", "cluster_id": "CK_00001234", "organism_strain": "Prochlorococcus MED4", "score": 5.0},
-            {"locus_tag": "PMT9312_0044", "cluster_id": "CK_00001234", "organism_strain": "Prochlorococcus MIT9312", "score": 4.5},
-            {"locus_tag": "SYNW0044", "cluster_id": "CK_00001234", "organism_strain": "Synechococcus WH8102", "score": 4.0},
-            {"locus_tag": "PMM0099", "cluster_id": "CK_00005678", "organism_strain": "Prochlorococcus MED4", "score": 3.0},
+    def test_dedup_collapses_same_group(self, tool_fns, mock_ctx):
+        """Dedup groups rows with the same ortholog group, keeping the first as representative."""
+        search_rows = [
+            {"locus_tag": "PMM0044", "organism_strain": "Prochlorococcus MED4", "score": 5.0},
+            {"locus_tag": "PMT9312_0044", "organism_strain": "Prochlorococcus MIT9312", "score": 4.5},
+            {"locus_tag": "SYNW0044", "organism_strain": "Synechococcus WH8102", "score": 4.0},
+            {"locus_tag": "PMM0099", "organism_strain": "Prochlorococcus MED4", "score": 3.0},
         ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
+        dedup_rows = [
+            {"locus_tag": "PMM0044", "dedup_group": "CK_00001234"},
+            {"locus_tag": "PMT9312_0044", "dedup_group": "CK_00001234"},
+            {"locus_tag": "SYNW0044", "dedup_group": "CK_00001234"},
+            {"locus_tag": "PMM0099", "dedup_group": "CK_00005678"},
+        ]
+        _conn_from(mock_ctx).execute_query.side_effect = [search_rows, dedup_rows]
         result = json.loads(
             tool_fns["search_genes"](mock_ctx, search_text="naphthoate", deduplicate=True)
         )
@@ -319,29 +325,34 @@ class TestSearchGenesWrapper:
         rep = result["results"][0]
         assert rep["locus_tag"] == "PMM0044"
         assert rep["collapsed_count"] == 3
-        assert rep["cluster_organisms"] == {
+        assert rep["group_organisms"] == {
             "Prochlorococcus MED4": 1,
             "Prochlorococcus MIT9312": 1,
             "Synechococcus WH8102": 1,
         }
-        # Second cluster has only 1 member
+        # Second group has only 1 member
         assert result["results"][1]["collapsed_count"] == 1
 
-    def test_dedup_genes_without_cluster_appear_individually(self, tool_fns, mock_ctx):
-        """Genes without cluster_id always appear individually even with dedup."""
-        rows = [
-            {"locus_tag": "PMM0044", "cluster_id": "CK_00001234", "organism_strain": "Prochlorococcus MED4", "score": 5.0},
-            {"locus_tag": "PMT9312_0044", "cluster_id": "CK_00001234", "organism_strain": "Prochlorococcus MIT9312", "score": 4.5},
-            {"locus_tag": "ALT_NOCL", "cluster_id": None, "organism_strain": "Alteromonas macleodii MIT1002", "score": 3.0},
+    def test_dedup_genes_without_group_appear_individually(self, tool_fns, mock_ctx):
+        """Genes without an ortholog group always appear individually even with dedup."""
+        search_rows = [
+            {"locus_tag": "PMM0044", "organism_strain": "Prochlorococcus MED4", "score": 5.0},
+            {"locus_tag": "PMT9312_0044", "organism_strain": "Prochlorococcus MIT9312", "score": 4.5},
+            {"locus_tag": "ALT_NOCL", "organism_strain": "Alteromonas macleodii MIT1002", "score": 3.0},
         ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
+        dedup_rows = [
+            {"locus_tag": "PMM0044", "dedup_group": "CK_00001234"},
+            {"locus_tag": "PMT9312_0044", "dedup_group": "CK_00001234"},
+            # ALT_NOCL has no ortholog group — not in dedup_rows
+        ]
+        _conn_from(mock_ctx).execute_query.side_effect = [search_rows, dedup_rows]
         result = json.loads(
             tool_fns["search_genes"](mock_ctx, search_text="test", deduplicate=True)
         )
         assert result["total"] == 2
         loci = [r["locus_tag"] for r in result["results"]]
         assert "ALT_NOCL" in loci
-        # Gene without cluster should not have collapsed_count
+        # Gene without group should not have collapsed_count
         nocl = [r for r in result["results"] if r["locus_tag"] == "ALT_NOCL"][0]
         assert "collapsed_count" not in nocl
 
@@ -411,13 +422,6 @@ class TestQueryExpressionWrapper:
         tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", direction="up")
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
         assert call_kwargs["dir"] == "up"
-
-    def test_include_orthologs_changes_query(self, tool_fns, mock_ctx):
-        rows = [{"gene": "PMM0001"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", include_orthologs=True)
-        called_cypher = _conn_from(mock_ctx).execute_query.call_args[0][0]
-        assert "ortholog" in called_cypher.lower()
 
     def test_min_log2fc_passed_through(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []

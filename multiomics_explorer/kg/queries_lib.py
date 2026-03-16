@@ -50,10 +50,6 @@ ONTOLOGY_CONFIG = {
 
 # Expression relationship types in the current KG schema.
 DIRECT_EXPR_RELS = "Condition_changes_expression_of|Coculture_changes_expression_of"
-ORTHOLOG_EXPR_RELS = (
-    "Condition_changes_expression_of_ortholog|Coculture_changes_expression_of_ortholog"
-)
-ALL_EXPR_RELS = f"{DIRECT_EXPR_RELS}|{ORTHOLOG_EXPR_RELS}"
 
 
 def build_resolve_gene(
@@ -90,7 +86,6 @@ def build_search_genes(
         "       g.gene_summary AS gene_summary,\n"
         "       g.organism_strain AS organism_strain,\n"
         "       g.annotation_quality AS annotation_quality,\n"
-        "       coalesce(g.cluster_number, g.alteromonadaceae_og) AS cluster_id,\n"
         "       score\n"
         "ORDER BY score DESC, g.locus_tag\n"
         "LIMIT $limit"
@@ -102,27 +97,43 @@ def build_search_genes(
     }
 
 
+def build_search_genes_dedup_groups(*, locus_tags: list[str]) -> tuple[str, dict]:
+    """Return the most specific OrthologGroup name for each gene (for dedup)."""
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+        "WHERE og.specificity_rank < 3\n"
+        "WITH g.locus_tag AS locus_tag, og ORDER BY og.specificity_rank\n"
+        "WITH locus_tag, collect(og.name)[0] AS dedup_group\n"
+        "RETURN locus_tag, dedup_group"
+    )
+    return cypher, {"locus_tags": locus_tags}
+
+
 def build_get_gene_details_main(*, gene_id: str) -> tuple[str, dict]:
     cypher = (
         "MATCH (g:Gene {locus_tag: $lt})\n"
         "OPTIONAL MATCH (g)-[:Gene_encodes_protein]->(p:Protein)\n"
         "OPTIONAL MATCH (g)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
-        "OPTIONAL MATCH (g)-[:Gene_in_cyanorak_cluster]->(c:Cyanorak_cluster)\n"
+        "OPTIONAL MATCH (g)-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+        "WITH g, p, o, collect(DISTINCT og {.name, .source, .taxonomic_level}) AS ogs\n"
         "RETURN g {.*, _protein: p {.gene_names, .is_reviewed, .annotation_score,\n"
         "           .sequence_length, .refseq_ids},\n"
         "       _organism: o {.preferred_name, .strain_name, .genus, .clade, .ncbi_taxon_id},\n"
-        "       _cluster: c {.cluster_number}} AS gene"
+        "       _ortholog_groups: ogs} AS gene"
     )
     return cypher, {"lt": gene_id}
 
 
 def build_get_gene_details_homologs(*, gene_id: str) -> tuple[str, dict]:
     cypher = (
-        "MATCH (g:Gene {locus_tag: $lt})-[h:Gene_is_homolog_of_gene]-(other:Gene)\n"
-        "RETURN other.locus_tag AS locus_tag, other.organism_strain AS organism_strain,\n"
-        "       h.distance AS distance, h.cluster_id AS cluster_id,\n"
-        "       h.source AS source\n"
-        "ORDER BY h.distance, other.locus_tag\n"
+        "MATCH (g:Gene {locus_tag: $lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+        "      <-[:Gene_in_ortholog_group]-(other:Gene)\n"
+        "WHERE other <> g\n"
+        "RETURN DISTINCT other.locus_tag AS locus_tag,\n"
+        "       other.organism_strain AS organism_strain,\n"
+        "       og.source AS source, og.taxonomic_level AS taxonomic_level\n"
+        "ORDER BY og.taxonomic_level, other.locus_tag\n"
         "LIMIT 20"
     )
     return cypher, {"lt": gene_id}
@@ -136,10 +147,9 @@ def build_query_expression(
     direction: str | None = None,
     min_log2fc: float | None = None,
     max_pvalue: float | None = None,
-    include_orthologs: bool = False,
     limit: int = 50,
 ) -> tuple[str, dict]:
-    expr_rels = ALL_EXPR_RELS if include_orthologs else DIRECT_EXPR_RELS
+    expr_rels = DIRECT_EXPR_RELS
 
     where_clauses: list[str] = []
     params: dict = {"limit": limit}
@@ -249,12 +259,13 @@ def build_compare_conditions(
 
 def build_get_homologs(*, gene_id: str) -> tuple[str, dict]:
     cypher = (
-        "MATCH (g:Gene {locus_tag: $lt})-[h:Gene_is_homolog_of_gene]-(other:Gene)\n"
-        "RETURN other.locus_tag AS locus_tag, other.product AS product,\n"
+        "MATCH (g:Gene {locus_tag: $lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+        "      <-[:Gene_in_ortholog_group]-(other:Gene)\n"
+        "WHERE other <> g\n"
+        "RETURN DISTINCT other.locus_tag AS locus_tag, other.product AS product,\n"
         "       other.organism_strain AS organism_strain,\n"
-        "       h.distance AS distance, h.cluster_id AS cluster_id,\n"
-        "       h.source AS source\n"
-        "ORDER BY h.distance, other.locus_tag"
+        "       og.source AS source, og.taxonomic_level AS taxonomic_level\n"
+        "ORDER BY og.taxonomic_level, other.locus_tag"
     )
     return cypher, {"lt": gene_id}
 

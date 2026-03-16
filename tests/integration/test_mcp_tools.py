@@ -65,19 +65,11 @@ class TestSearchGenes:
 
 @pytest.mark.kg
 class TestQueryExpression:
-    def test_orthologs_increase_results(self, conn):
-        """Including orthologs should return >= the direct-only count."""
-        cypher_direct, params_direct = build_query_expression(
-            organism="MED4", include_orthologs=False, limit=100,
-        )
-        direct = conn.execute_query(cypher_direct, **params_direct)
-
-        cypher_all, params_all = build_query_expression(
-            organism="MED4", include_orthologs=True, limit=100,
-        )
-        all_results = conn.execute_query(cypher_all, **params_all)
-
-        assert len(all_results) >= len(direct)
+    def test_direct_expression_returns_results(self, conn):
+        """Direct expression query for MED4 should return results."""
+        cypher, params = build_query_expression(organism="MED4", limit=10)
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
 
 
 @pytest.mark.kg

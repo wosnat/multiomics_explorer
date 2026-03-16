@@ -2,7 +2,6 @@ case_id: search_genes_cross_organism_superoxide
 row_count: 10
 rows:
 - annotation_quality: 3
-  cluster_id: CK_00001843
   function_description: Alternative locus ID
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
@@ -11,7 +10,6 @@ rows:
   product: superoxide dismutase [Ni]
   score: 19.4382
 - annotation_quality: 3
-  cluster_id: 46B1B@72275,Alteromonadaceae
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase, Ni :: Nickel-containing superoxide
@@ -21,7 +19,6 @@ rows:
   product: superoxide dismutase, Ni
   score: 21.2239
 - annotation_quality: 3
-  cluster_id: 46B1B@72275,Alteromonadaceae
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase, Ni :: Nickel-containing superoxide
@@ -31,7 +28,6 @@ rows:
   product: superoxide dismutase, Ni
   score: 21.2239
 - annotation_quality: 3
-  cluster_id: 46B1B@72275,Alteromonadaceae
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase, Ni :: Nickel-containing superoxide
@@ -41,7 +37,6 @@ rows:
   product: superoxide dismutase, Ni
   score: 21.2239
 - annotation_quality: 3
-  cluster_id: CK_00001843
   function_description: Alternative locus ID
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
@@ -50,7 +45,6 @@ rows:
   product: superoxide dismutase [Ni]
   score: 19.4382
 - annotation_quality: 3
-  cluster_id: CK_00001843
   function_description: Alternative locus ID
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
@@ -59,7 +53,6 @@ rows:
   product: superoxide dismutase [Ni]
   score: 19.4382
 - annotation_quality: 3
-  cluster_id: CK_00001843
   function_description: Alternative locus ID
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
@@ -68,7 +61,6 @@ rows:
   product: superoxide dismutase [Ni]
   score: 19.4382
 - annotation_quality: 3
-  cluster_id: CK_00001843
   function_description: Superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Superoxide dismutase'
@@ -77,7 +69,6 @@ rows:
   product: superoxide dismutase [Ni]
   score: 22.0826
 - annotation_quality: 3
-  cluster_id: CK_00001843
   function_description: Superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Superoxide dismutase'
@@ -86,7 +77,6 @@ rows:
   product: superoxide dismutase [Ni]
   score: 22.0826
 - annotation_quality: 3
-  cluster_id: CK_00008747
   function_description: Nickel-containing superoxide dismutase
   gene_name: null
   gene_summary: 'nickel-type superoxide dismutase :: Nickel-containing superoxide

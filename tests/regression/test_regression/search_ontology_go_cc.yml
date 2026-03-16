@@ -4,6 +4,9 @@ rows:
 - id: go:0000139
   name: Golgi membrane
   score: 0.9814
+- id: go:0005743
+  name: mitochondrial inner membrane
+  score: 0.8543
 - id: go:0005765
   name: lysosomal membrane
   score: 0.9814
@@ -13,9 +16,6 @@ rows:
 - id: go:0005886
   name: plasma membrane
   score: 0.9814
-- id: go:0009279
-  name: cell outer membrane
-  score: 0.8543
 - id: go:0009528
   name: plastid inner membrane
   score: 0.8543
@@ -61,14 +61,14 @@ rows:
 - id: go:0043227
   name: membrane-bounded organelle
   score: 0.8543
+- id: go:0044853
+  name: plasma membrane raft
+  score: 0.8543
 - id: go:0045121
   name: membrane raft
   score: 0.9814
-- id: go:0098552
-  name: side of membrane
-  score: 0.8543
-- id: go:0098590
-  name: plasma membrane region
+- id: go:0055035
+  name: plastid thylakoid membrane
   score: 0.8543
 - id: go:0098796
   name: membrane protein complex

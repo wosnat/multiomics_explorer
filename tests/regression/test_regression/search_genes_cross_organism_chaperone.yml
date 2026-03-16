@@ -2,7 +2,6 @@ case_id: search_genes_cross_organism_chaperone
 row_count: 10
 rows:
 - annotation_quality: 3
-  cluster_id: CK_00008052
   function_description: Acts as a chaperone
   gene_name: dnaK2
   gene_summary: 'dnaK2 :: chaperone protein DnaK :: Acts as a chaperone'
@@ -11,7 +10,6 @@ rows:
   product: chaperone protein DnaK
   score: 6.9109
 - annotation_quality: 3
-  cluster_id: 4647F@72275,Alteromonadaceae
   function_description: Molecular chaperone. Has ATPase activity
   gene_name: htpG
   gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
@@ -21,7 +19,6 @@ rows:
   product: molecular chaperone HtpG
   score: 6.9827
 - annotation_quality: 2
-  cluster_id: null
   function_description: Molecular chaperone
   gene_name: null
   gene_summary: 'molecular chaperone :: Molecular chaperone'
@@ -30,7 +27,6 @@ rows:
   product: molecular chaperone
   score: 7.5386
 - annotation_quality: 3
-  cluster_id: null
   function_description: Chaperone protein HtpG
   gene_name: htpG
   gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
@@ -39,7 +35,6 @@ rows:
   product: molecular chaperone HtpG
   score: 7.1157
 - annotation_quality: 3
-  cluster_id: 4647F@72275,Alteromonadaceae
   function_description: Molecular chaperone. Has ATPase activity
   gene_name: htpG
   gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
@@ -49,7 +44,6 @@ rows:
   product: molecular chaperone HtpG
   score: 6.9115
 - annotation_quality: 3
-  cluster_id: 4647F@72275,Alteromonadaceae
   function_description: Molecular chaperone. Has ATPase activity
   gene_name: htpG
   gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
@@ -59,7 +53,6 @@ rows:
   product: molecular chaperone HtpG
   score: 6.9115
 - annotation_quality: 3
-  cluster_id: CK_00008052
   function_description: Acts as a chaperone
   gene_name: dnaK2
   gene_summary: 'dnaK2 :: chaperone protein DnaK :: Acts as a chaperone'
@@ -68,7 +61,6 @@ rows:
   product: chaperone protein DnaK
   score: 6.9109
 - annotation_quality: 3
-  cluster_id: CK_00008052
   function_description: Acts as a chaperone
   gene_name: dnaK2
   gene_summary: 'dnaK2 :: chaperone protein DnaK :: Acts as a chaperone'
@@ -77,7 +69,6 @@ rows:
   product: chaperone protein DnaK
   score: 6.9109
 - annotation_quality: 3
-  cluster_id: CK_00041814
   function_description: Molecular chaperone
   gene_name: null
   gene_summary: 'DnaJ type IV chaperone protein :: Molecular chaperone'
@@ -86,7 +77,6 @@ rows:
   product: DnaJ type IV chaperone protein
   score: 7.1891
 - annotation_quality: 3
-  cluster_id: CK_00041814
   function_description: Molecular chaperone
   gene_name: null
   gene_summary: 'DnaJ type IV chaperone protein :: Molecular chaperone'

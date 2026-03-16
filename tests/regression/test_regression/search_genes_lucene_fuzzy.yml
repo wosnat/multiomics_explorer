@@ -2,7 +2,6 @@ case_id: search_genes_lucene_fuzzy
 row_count: 10
 rows:
 - annotation_quality: 3
-  cluster_id: CK_00000917
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -12,7 +11,6 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.2592
 - annotation_quality: 3
-  cluster_id: 46843@72275,Alteromonadaceae
   function_description: Negative regulator of replication initiation, which contributes
     to regulation of DNA replication and ensures that replication initiation occurs
     exactly once per chromosome per cell cycle. Binds to pairs of hemimethylated GATC
@@ -31,7 +29,6 @@ rows:
   product: replication initiation negative regulator SeqA
   score: 3.99
 - annotation_quality: 3
-  cluster_id: 46843@72275,Alteromonadaceae
   function_description: Negative regulator of replication initiation, which contributes
     to regulation of DNA replication and ensures that replication initiation occurs
     exactly once per chromosome per cell cycle. Binds to pairs of hemimethylated GATC
@@ -50,7 +47,6 @@ rows:
   product: replication initiation negative regulator SeqA
   score: 3.99
 - annotation_quality: 1
-  cluster_id: 46843@72275,Alteromonadaceae
   function_description: Negative regulator of replication initiation, which contributes
     to regulation of DNA replication and ensures that replication initiation occurs
     exactly once per chromosome per cell cycle. Binds to pairs of hemimethylated GATC
@@ -69,7 +65,6 @@ rows:
   product: hypothetical protein
   score: 4.1349
 - annotation_quality: 3
-  cluster_id: CK_00000917
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -79,7 +74,6 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.2592
 - annotation_quality: 3
-  cluster_id: CK_00000917
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -89,7 +83,6 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.2592
 - annotation_quality: 3
-  cluster_id: CK_00000917
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -99,7 +92,6 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.2592
 - annotation_quality: 3
-  cluster_id: CK_00000917
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -109,7 +101,6 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.2592
 - annotation_quality: 3
-  cluster_id: CK_00000917
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -119,7 +110,6 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.2592
 - annotation_quality: 3
-  cluster_id: CK_00000917
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24

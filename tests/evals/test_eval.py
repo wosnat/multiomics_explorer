@@ -25,6 +25,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_gene_categories,
     build_list_organisms,
     build_search_genes,
+    build_search_genes_dedup_groups,
     build_search_ontology,
     build_resolve_gene,
     build_get_gene_details_main,
@@ -89,15 +90,20 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
     results = conn.execute_query(cypher, **query_params)
 
     if deduplicate and tool == "search_genes":
-        cluster_groups: dict[str, list] = {}
+        locus_tags = [r["locus_tag"] for r in results]
+        dedup_cypher, dedup_params = build_search_genes_dedup_groups(
+            locus_tags=locus_tags,
+        )
+        dedup_rows = conn.execute_query(dedup_cypher, **dedup_params)
+        tag_to_group = {r["locus_tag"]: r["dedup_group"] for r in dedup_rows}
+        seen_groups: set[str] = set()
         deduped = []
         for row in results:
-            cluster = row.get("cluster_id")
-            if cluster:
-                if cluster in cluster_groups:
-                    cluster_groups[cluster].append(row)
+            group = tag_to_group.get(row["locus_tag"])
+            if group:
+                if group in seen_groups:
                     continue
-                cluster_groups[cluster] = [row]
+                seen_groups.add(group)
             deduped.append(row)
         results = deduped
 

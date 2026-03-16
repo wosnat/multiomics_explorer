@@ -49,9 +49,6 @@ rows:
 - id: go:0045004
   name: DNA replication proofreading
   score: 2.1916
-- id: go:0045005
-  name: DNA-templated DNA replication maintenance of fidelity
-  score: 1.5003
 - id: go:0045740
   name: positive regulation of DNA replication
   score: 1.7812
@@ -76,3 +73,6 @@ rows:
 - id: go:1902328
   name: bacterial-type DNA replication initiation
   score: 1.7812
+- id: go:2000105
+  name: positive regulation of DNA-templated DNA replication
+  score: 1.5003
