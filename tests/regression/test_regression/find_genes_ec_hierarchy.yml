@@ -1,0 +1,103 @@
+case_id: find_genes_ec_hierarchy
+row_count: 25
+rows:
+- gene_name: queG
+  locus_tag: A9601_00061
+  organism_strain: Prochlorococcus AS9601
+  product: epoxyqueuosine reductase
+- gene_name: dusA
+  locus_tag: A9601_00131
+  organism_strain: Prochlorococcus AS9601
+  product: tRNA dihydrouridine synthase
+- gene_name: msrB
+  locus_tag: A9601_00141
+  organism_strain: Prochlorococcus AS9601
+  product: peptide methionine-R-sulfoxide reductase
+- gene_name: murB
+  locus_tag: A9601_00201
+  organism_strain: Prochlorococcus AS9601
+  product: UDP-N-acetylenolpyruvoylglucosamine reductase
+- gene_name: gap2
+  locus_tag: A9601_00221
+  organism_strain: Prochlorococcus AS9601
+  product: glyceraldehyde-3-phosphate dehydrogenase
+- gene_name: pdxA
+  locus_tag: A9601_00271
+  organism_strain: Prochlorococcus AS9601
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_name: PSTA
+  locus_tag: A9601_00341
+  organism_strain: Prochlorococcus AS9601
+  product: 3-phosphoserine transaminase
+- gene_name: null
+  locus_tag: A9601_00421
+  organism_strain: Prochlorococcus AS9601
+  product: NADPH-dependent FMN reductase family protein
+- gene_name: flv3
+  locus_tag: A9601_00441
+  organism_strain: Prochlorococcus AS9601
+  product: flavoprotein involved in Mehler reaction
+- gene_name: thiO
+  locus_tag: A9601_00481
+  organism_strain: Prochlorococcus AS9601
+  product: glycine oxidase
+- gene_name: tas
+  locus_tag: A9601_00621
+  organism_strain: Prochlorococcus AS9601
+  product: pyridoxine 4-dehydrogenase
+- gene_name: prxQ
+  locus_tag: A9601_00921
+  organism_strain: Prochlorococcus AS9601
+  product: 2-Cys peroxiredoxin
+- gene_name: cysH
+  locus_tag: A9601_00941
+  organism_strain: Prochlorococcus AS9601
+  product: phosphoadenylyl-sulfate reductase
+- gene_name: ndbB
+  locus_tag: A9601_00951
+  organism_strain: Prochlorococcus AS9601
+  product: type 2 NADH dehydrogenase
+- gene_name: nadB
+  locus_tag: A9601_01161
+  organism_strain: Prochlorococcus AS9601
+  product: L-aspartate oxidase
+- gene_name: ribD2
+  locus_tag: A9601_01221
+  organism_strain: Prochlorococcus AS9601
+  product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
+- gene_name: crtQ
+  locus_tag: A9601_01331
+  organism_strain: Prochlorococcus AS9601
+  product: 9,9^-di-cis-zeta-carotene desaturase
+- gene_name: ndhO
+  locus_tag: A9601_01391
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhO
+- gene_name: crtP
+  locus_tag: A9601_01611
+  organism_strain: Prochlorococcus AS9601
+  product: phytoene dehydrogenase
+- gene_name: ndhM
+  locus_tag: A9601_01621
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhM
+- gene_name: ndhF1
+  locus_tag: A9601_01661
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase subunit NdhF (chain 5 or L)
+- gene_name: ndhD1
+  locus_tag: A9601_01671
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhD (chain 4 or M)
+- gene_name: metF
+  locus_tag: A9601_01701
+  organism_strain: Prochlorococcus AS9601
+  product: 5,10-methylenetetrahydrofolate reductase
+- gene_name: ndhE
+  locus_tag: A9601_01751
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase subunit NdhE (chain kappa or 4L)
+- gene_name: ndhG
+  locus_tag: A9601_01761
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhG (chain 6 or J)

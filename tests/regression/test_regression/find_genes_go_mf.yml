@@ -1,0 +1,104 @@
+case_id: find_genes_go_mf
+row_count: 25
+rows:
+- gene_name: dnaN
+  locus_tag: A9601_00001
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, beta subunit
+- gene_name: null
+  locus_tag: A9601_00041
+  organism_strain: Prochlorococcus AS9601
+  product: DNA gyrase/topoisomerase IV, subunit A family protein
+- gene_name: null
+  locus_tag: A9601_00191
+  organism_strain: Prochlorococcus AS9601
+  product: DNA-binding protein, YbaB/EbfC family
+- gene_name: null
+  locus_tag: A9601_00521
+  organism_strain: Prochlorococcus AS9601
+  product: Putative Type IIC bifunctional restriction-modification protein with endonuclease
+    and N6-adenine DNA methyltransferase activity
+- gene_name: smc
+  locus_tag: A9601_00691
+  organism_strain: Prochlorococcus AS9601
+  product: chromosome segregation protein
+- gene_name: rarA
+  locus_tag: A9601_00901
+  organism_strain: Prochlorococcus AS9601
+  product: recombination factor
+- gene_name: rpaA
+  locus_tag: A9601_01451
+  organism_strain: Prochlorococcus AS9601
+  product: two-component system response regulator RR class II (RRII)-CheY-OmpR
+- gene_name: holB
+  locus_tag: A9601_01461
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, delta^ subunit
+- gene_name: radA
+  locus_tag: A9601_01501
+  organism_strain: Prochlorococcus AS9601
+  product: DNA repair protein Sms/RadA
+- gene_name: rpaB
+  locus_tag: A9601_01511
+  organism_strain: Prochlorococcus AS9601
+  product: two-component system response regulator RR class II (RRII)-CheY-OmpR
+- gene_name: rbcR
+  locus_tag: A9601_01641
+  organism_strain: Prochlorococcus AS9601
+  product: possible RuBisCO operon transcriptional regulator
+- gene_name: pedR
+  locus_tag: A9601_01711
+  organism_strain: Prochlorococcus AS9601
+  product: redox-responsive LuxR-type transcriptional regulator PedR
+- gene_name: ycf29
+  locus_tag: A9601_01871
+  organism_strain: Prochlorococcus AS9601
+  product: two-component response regulator, NarL subfamily
+- gene_name: mutS2
+  locus_tag: A9601_02371
+  organism_strain: Prochlorococcus AS9601
+  product: DNA mismatch repair protein, MutS family
+- gene_name: mpg
+  locus_tag: A9601_02551
+  organism_strain: Prochlorococcus AS9601
+  product: DNA-3-methyladenine glycosylase
+- gene_name: ntcA
+  locus_tag: A9601_02681
+  organism_strain: Prochlorococcus AS9601
+  product: global nitrogen regulatory protein
+- gene_name: sfsA
+  locus_tag: A9601_02841
+  organism_strain: Prochlorococcus AS9601
+  product: sugar fermentation stimulation protein
+- gene_name: phrA
+  locus_tag: A9601_03081
+  organism_strain: Prochlorococcus AS9601
+  product: deoxyribodipyrimidine photolyase (DNA photolyase) (photoreactivating enzyme)
+- gene_name: uvrD
+  locus_tag: A9601_03271
+  organism_strain: Prochlorococcus AS9601
+  product: DNA-dependent ATPase I and helicase II
+- gene_name: cry2
+  locus_tag: A9601_03931
+  organism_strain: Prochlorococcus AS9601
+  product: possible cryptochrome
+- gene_name: null
+  locus_tag: A9601_04281
+  organism_strain: Prochlorococcus AS9601
+  product: Putative Type II restriction endonuclease
+- gene_name: dcm
+  locus_tag: A9601_04331
+  organism_strain: Prochlorococcus AS9601
+  product: Putative Type II cytosine-methyltransferase
+- gene_name: null
+  locus_tag: A9601_04371
+  organism_strain: Prochlorococcus AS9601
+  product: phage integrase family protein
+- gene_name: recO
+  locus_tag: A9601_04491
+  organism_strain: Prochlorococcus AS9601
+  product: gap repair protein RecO
+- gene_name: topA
+  locus_tag: A9601_04911
+  organism_strain: Prochlorococcus AS9601
+  product: DNA topoisomerase I, omega subunit

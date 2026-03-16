@@ -107,10 +107,9 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 | `Publication` | ~21 | `title`, `doi`, `study_type`, `publication_year` |
 | `Cyanorak_cluster` | ~5,600 | `cluster_number` |
 | `BiologicalProcess` | ~2,400 | `name` (GO term) |
-| `MolecularFunction` | ~9,400 | `name` (GO term) |
+| `MolecularFunction` | ~2,100 | `name` (GO term) |
 | `CellularComponent` | ~330 | `name` (GO term) |
-| `KeggOrthologousGroup` | ~2,700 | `name` |
-| `KeggPathway` | ~285 | `name` |
+| `KeggTerm` | ~3,000 | `name`, `level` (category/subcategory/pathway/ko) |
 | `EcNumber` | ~7,300 | `name`, `catalytic_activity[]` |
 | `CogFunctionalCategory` | 26 | `code`, `name` |
 | `CyanorakRole` | ~170 | `code`, `description` |
@@ -133,8 +132,8 @@ Schema is introspected live from Neo4j (no dependency on KG repo files).
 | `Gene_involved_in_biological_process` | Gene → BiologicalProcess | — |
 | `Gene_enables_molecular_function` | Gene → MolecularFunction | — |
 | `Gene_located_in_cellular_component` | Gene → CellularComponent | — |
-| `Gene_has_kegg_ko` | Gene → KeggOrthologousGroup | — |
-| `Ko_in_kegg_pathway` | KeggOrthologousGroup → KeggPathway | — |
+| `Gene_has_kegg_ko` | Gene → KeggTerm (ko-level) | — |
+| `Kegg_term_is_a_kegg_term` | KeggTerm → KeggTerm (hierarchy) | — |
 | `Gene_catalyzes_ec_number` | Gene → EcNumber | — |
 | `Gene_in_cog_category` | Gene → CogFunctionalCategory | — |
 | `Gene_has_cyanorak_role` | Gene → CyanorakRole | — |

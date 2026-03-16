@@ -1,0 +1,103 @@
+case_id: find_genes_ec_intermediate
+row_count: 25
+rows:
+- gene_name: pdxA
+  locus_tag: A9601_00271
+  organism_strain: Prochlorococcus AS9601
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_name: tas
+  locus_tag: A9601_00621
+  organism_strain: Prochlorococcus AS9601
+  product: pyridoxine 4-dehydrogenase
+- gene_name: ribD2
+  locus_tag: A9601_01221
+  organism_strain: Prochlorococcus AS9601
+  product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
+- gene_name: null
+  locus_tag: A9601_04161
+  organism_strain: Prochlorococcus AS9601
+  product: short chain dehydrogenase family protein
+- gene_name: engA
+  locus_tag: A9601_04421
+  organism_strain: Prochlorococcus AS9601
+  product: ribosome-associated GTPase
+- gene_name: mqoA
+  locus_tag: A9601_04701
+  organism_strain: Prochlorococcus AS9601
+  product: malate:quinone oxidoreductase
+- gene_name: fabG
+  locus_tag: A9601_05091
+  organism_strain: Prochlorococcus AS9601
+  product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
+- gene_name: null
+  locus_tag: A9601_05911
+  organism_strain: Prochlorococcus AS9601
+  product: beta-ketoacyl-(acyl-carrier-protein) reductase protein family
+- gene_name: null
+  locus_tag: A9601_06381
+  organism_strain: Prochlorococcus AS9601
+  product: short chain dehydrogenase family protein
+- gene_name: null
+  locus_tag: A9601_07571
+  organism_strain: Prochlorococcus AS9601
+  product: short-chain dehydrogenase/reductase (SDR) superfamily
+- gene_name: gnd
+  locus_tag: A9601_08321
+  organism_strain: Prochlorococcus AS9601
+  product: 6-phosphogluconate dehydrogenase
+- gene_name: leuB
+  locus_tag: A9601_08501
+  organism_strain: Prochlorococcus AS9601
+  product: 3-isopropylmalate dehydrogenase
+- gene_name: thrA
+  locus_tag: A9601_11561
+  organism_strain: Prochlorococcus AS9601
+  product: homoserine dehydrogenase
+- gene_name: guaB
+  locus_tag: A9601_11671
+  organism_strain: Prochlorococcus AS9601
+  product: inositol-5-monophosphate dehydrogenase
+- gene_name: zwf
+  locus_tag: A9601_11801
+  organism_strain: Prochlorococcus AS9601
+  product: glucose-6-phosphate 1-dehydrogenase
+- gene_name: gldA
+  locus_tag: A9601_11931
+  organism_strain: Prochlorococcus AS9601
+  product: glycerol dehydrogenase
+- gene_name: dxr
+  locus_tag: A9601_13171
+  organism_strain: Prochlorococcus AS9601
+  product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
+- gene_name: ugd
+  locus_tag: A9601_13901
+  organism_strain: Prochlorococcus AS9601
+  product: UDP-glucose 6-dehydrogenase
+- gene_name: wcaG
+  locus_tag: A9601_14001
+  organism_strain: Prochlorococcus AS9601
+  product: GDP-L-fucose synthase
+- gene_name: bplA
+  locus_tag: A9601_14101
+  organism_strain: Prochlorococcus AS9601
+  product: Predicted oxidoreductase
+- gene_name: lhgO
+  locus_tag: A9601_14181
+  organism_strain: Prochlorococcus AS9601
+  product: FAD/NAD-binding oxidoreductase
+- gene_name: null
+  locus_tag: A9601_14191
+  organism_strain: Prochlorococcus AS9601
+  product: polysaccharide biosynthesis family protein
+- gene_name: null
+  locus_tag: A9601_14221
+  organism_strain: Prochlorococcus AS9601
+  product: NAD dependent epimerase/dehydratase family protein
+- gene_name: null
+  locus_tag: A9601_14431
+  organism_strain: Prochlorococcus AS9601
+  product: polysaccharide biosynthesis family protein
+- gene_name: adhC
+  locus_tag: A9601_14521
+  organism_strain: Prochlorococcus AS9601
+  product: alcohol dehydrogenase protein superfamily, zinc-type

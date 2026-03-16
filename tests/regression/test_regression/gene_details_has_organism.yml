@@ -99,6 +99,7 @@ rows:
       exhibits 3^-5^ exonuclease proofreading activity. The beta chain is required
       for initiation of replication as well as for processivity of DNA replication
     function_description_source: uniprot
+    gene_category: Replication and repair
     gene_name: dnaN
     gene_name_source: cyanorak
     gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering

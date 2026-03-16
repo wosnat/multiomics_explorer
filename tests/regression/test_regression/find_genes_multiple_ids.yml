@@ -1,0 +1,103 @@
+case_id: find_genes_multiple_ids
+row_count: 25
+rows:
+- gene_name: dnaN
+  locus_tag: A9601_00001
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, beta subunit
+- gene_name: purL
+  locus_tag: A9601_00021
+  organism_strain: Prochlorococcus AS9601
+  product: phosphoribosylformylglycinamidine synthase, synthetase domain
+- gene_name: purF
+  locus_tag: A9601_00031
+  organism_strain: Prochlorococcus AS9601
+  product: amidophosphoribosyltransferase
+- gene_name: null
+  locus_tag: A9601_00041
+  organism_strain: Prochlorococcus AS9601
+  product: DNA gyrase/topoisomerase IV, subunit A family protein
+- gene_name: queG
+  locus_tag: A9601_00061
+  organism_strain: Prochlorococcus AS9601
+  product: epoxyqueuosine reductase
+- gene_name: nusB
+  locus_tag: A9601_00081
+  organism_strain: Prochlorococcus AS9601
+  product: transcription antitermination protein NusB
+- gene_name: null
+  locus_tag: A9601_00121
+  organism_strain: Prochlorococcus AS9601
+  product: RNA-binding domain RNP-1 (RNA recognition motif) containing protein
+- gene_name: dusA
+  locus_tag: A9601_00131
+  organism_strain: Prochlorococcus AS9601
+  product: tRNA dihydrouridine synthase
+- gene_name: dnaJ1
+  locus_tag: A9601_00161
+  organism_strain: Prochlorococcus AS9601
+  product: DnaJ type I chaperone protein
+- gene_name: guaA
+  locus_tag: A9601_00361
+  organism_strain: Prochlorococcus AS9601
+  product: GMP synthase (glutamine-hydrolyzing), N-terminal domain
+- gene_name: null
+  locus_tag: A9601_00381
+  organism_strain: Prochlorococcus AS9601
+  product: putative restriction endonuclease
+- gene_name: alaS
+  locus_tag: A9601_00451
+  organism_strain: Prochlorococcus AS9601
+  product: alanyl-tRNA synthetase
+- gene_name: ndk
+  locus_tag: A9601_00471
+  organism_strain: Prochlorococcus AS9601
+  product: nucleoside diphosphate kinase
+- gene_name: gatB
+  locus_tag: A9601_00491
+  organism_strain: Prochlorococcus AS9601
+  product: aspartyl-tRNA(Asn)/glutamyl-tRNA(Gln) amidotransferase subunit B
+- gene_name: coaE
+  locus_tag: A9601_00501
+  organism_strain: Prochlorococcus AS9601
+  product: dephospho-CoA kinase
+- gene_name: ypsC
+  locus_tag: A9601_00641
+  organism_strain: Prochlorococcus AS9601
+  product: putative N6-adenine-specific DNA methylase
+- gene_name: smc
+  locus_tag: A9601_00691
+  organism_strain: Prochlorococcus AS9601
+  product: chromosome segregation protein
+- gene_name: accC
+  locus_tag: A9601_00721
+  organism_strain: Prochlorococcus AS9601
+  product: acetyl-CoA carboxylase, biotin carboxylase subunit
+- gene_name: null
+  locus_tag: A9601_00871
+  organism_strain: Prochlorococcus AS9601
+  product: conserved hypothetical protein
+- gene_name: rarA
+  locus_tag: A9601_00901
+  organism_strain: Prochlorococcus AS9601
+  product: recombination factor
+- gene_name: coaX
+  locus_tag: A9601_00931
+  organism_strain: Prochlorococcus AS9601
+  product: type III pantothenate kinase
+- gene_name: nadB
+  locus_tag: A9601_01161
+  organism_strain: Prochlorococcus AS9601
+  product: L-aspartate oxidase
+- gene_name: rimO
+  locus_tag: A9601_01181
+  organism_strain: Prochlorococcus AS9601
+  product: ribosomal protein S12 methylthiotransferase
+- gene_name: queD
+  locus_tag: A9601_01231
+  organism_strain: Prochlorococcus AS9601
+  product: queuosine biosynthesis protein QueD
+- gene_name: rbfA
+  locus_tag: A9601_01301
+  organism_strain: Prochlorococcus AS9601
+  product: ribosome-binding factor A

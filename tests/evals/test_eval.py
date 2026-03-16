@@ -15,12 +15,17 @@ from pathlib import Path
 import pytest
 import yaml
 
+from functools import partial
+
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_gene_ontology_terms,
+    build_genes_by_ontology,
     build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
     build_search_genes,
+    build_search_ontology,
     build_resolve_gene,
     build_get_gene_details_main,
     build_get_homologs,
@@ -48,6 +53,9 @@ TOOL_BUILDERS = {
     "compare_conditions": build_compare_conditions,
     "get_homologs": build_get_homologs,
     "list_organisms": build_list_organisms,
+    "search_ontology": build_search_ontology,
+    "genes_by_ontology": build_genes_by_ontology,
+    "gene_ontology_terms": build_gene_ontology_terms,
 }
 
 
@@ -74,10 +82,26 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         return conn.execute_query(cypher_expr, **params_expr)
 
     builder = TOOL_BUILDERS[tool]
+    deduplicate = params.get("deduplicate", False)
     # Strip tool-level params that aren't accepted by query builders
     builder_params = {k: v for k, v in params.items() if k != "deduplicate"}
     cypher, query_params = builder(**builder_params)
-    return conn.execute_query(cypher, **query_params)
+    results = conn.execute_query(cypher, **query_params)
+
+    if deduplicate and tool == "search_genes":
+        cluster_groups: dict[str, list] = {}
+        deduped = []
+        for row in results:
+            cluster = row.get("cluster_id")
+            if cluster:
+                if cluster in cluster_groups:
+                    cluster_groups[cluster].append(row)
+                    continue
+                cluster_groups[cluster] = [row]
+            deduped.append(row)
+        results = deduped
+
+    return results
 
 
 # ---------------------------------------------------------------------------
@@ -145,4 +169,4 @@ def test_eval(conn, case):
     expect = case.get("expect", {})
 
     results = run_case(conn, tool, params)
-    check_expectations(results, expect, case["id"])
+    check_expectations(results, expect or {}, case["id"])

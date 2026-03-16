@@ -10,10 +10,13 @@ from neo4j.exceptions import ClientError as Neo4jClientError
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_gene_ontology_terms,
+    build_genes_by_ontology,
     build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
     build_search_genes,
+    build_search_ontology,
     build_resolve_gene,
     build_get_gene_details_homologs,
     build_get_gene_details_main,
@@ -53,6 +56,16 @@ _WRITE_KEYWORDS = re.compile(
     r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{|CALL\s+\w+\.\w+|LOAD\s+CSV)\b",
     re.IGNORECASE,
 )
+
+
+def _group_by_organism(results: list[dict]) -> dict:
+    """Group gene results by organism_strain. Returns {organism: [genes], ...}."""
+    grouped: dict[str, list[dict]] = {}
+    for row in results:
+        org = row.get("organism_strain", "Unknown")
+        entry = {k: v for k, v in row.items() if k != "organism_strain"}
+        grouped.setdefault(org, []).append(entry)
+    return grouped
 
 
 def register_tools(mcp: FastMCP):
@@ -146,11 +159,7 @@ def register_tools(mcp: FastMCP):
                 msg += f" in {organism}"
             response = json.dumps({"results": {}, "message": msg})
         else:
-            grouped: dict[str, list[dict]] = {}
-            for row in results:
-                org = row.get("organism_strain", "Unknown")
-                entry = {k: v for k, v in row.items() if k != "organism_strain"}
-                grouped.setdefault(org, []).append(entry)
+            grouped = _group_by_organism(results)
             response = json.dumps(
                 {"results": grouped, "total": len(results)},
                 indent=2, default=str,
@@ -421,3 +430,134 @@ def register_tools(mcp: FastMCP):
         if not results:
             return "Query returned no results."
         return _fmt(results, limit=limit)
+
+    @mcp.tool()
+    def search_ontology(
+        ctx: Context,
+        search_text: str,
+        ontology: str,
+        limit: int = 25,
+    ) -> str:
+        """Browse ontology terms by text search (fuzzy, Lucene syntax).
+
+        Use this to discover ontology term IDs, then pass them to
+        genes_by_ontology to find genes.
+
+        Supports Lucene query syntax: fuzzy matching (~), wildcards (*),
+        exact phrases ("..."), boolean operators (AND, OR).
+
+        Args:
+            search_text: Search query against term names. Examples:
+                "DNA replication" — phrase match
+                "replicat~" — fuzzy match
+                "oxido*" — wildcard
+                "transport AND membrane" — boolean
+            ontology: Which ontology to search. One of:
+                "go_bp" (biological process), "go_mf" (molecular function),
+                "go_cc" (cellular component), "kegg", "ec".
+                For KEGG, searches across all levels — level is encoded in
+                the returned ID prefix:
+                  kegg.category:    (e.g. "Metabolism")
+                  kegg.subcategory: (e.g. "Carbohydrate metabolism")
+                  kegg.pathway:     (e.g. "Glycolysis")
+                  kegg.orthology:   (e.g. "K00001 alcohol dehydrogenase")
+            limit: Max results (default 25).
+        """
+        conn = _conn(ctx)
+        cypher, params = build_search_ontology(
+            ontology=ontology, search_text=search_text, limit=limit,
+        )
+        try:
+            results = conn.execute_query(cypher, **params)
+        except Neo4jClientError:
+            # Retry with escaped Lucene special characters
+            escaped = re.sub(r'[+\-!(){}\[\]^"~*?:\\/]', r'\\\g<0>', search_text)
+            cypher, params = build_search_ontology(
+                ontology=ontology, search_text=escaped, limit=limit,
+            )
+            results = conn.execute_query(cypher, **params)
+        if not results:
+            response = json.dumps({
+                "results": [], "total": 0, "query": search_text,
+            })
+        else:
+            response = json.dumps({
+                "results": results, "total": len(results), "query": search_text,
+            }, indent=2, default=str)
+        return _with_query(response, cypher, params, ctx)
+
+    @mcp.tool()
+    def genes_by_ontology(
+        ctx: Context,
+        term_ids: list[str],
+        ontology: str,
+        organism: str | None = None,
+        limit: int = 25,
+    ) -> str:
+        """Find genes annotated to ontology terms, with hierarchy expansion.
+
+        Takes ontology term IDs (from search_ontology) and finds all genes
+        annotated to those terms or any of their descendant terms in the
+        ontology hierarchy.
+
+        Args:
+            term_ids: One or more ontology term IDs (from search_ontology).
+            ontology: Which ontology the IDs belong to. One of:
+                "go_bp" (biological process), "go_mf" (molecular function),
+                "go_cc" (cellular component), "kegg", "ec".
+            organism: Optional organism filter (fuzzy match on strain name).
+            limit: Max gene results (default 25).
+        """
+        conn = _conn(ctx)
+        cypher, params = build_genes_by_ontology(
+            ontology=ontology, term_ids=term_ids,
+            organism=organism, limit=limit,
+        )
+        results = conn.execute_query(cypher, **params)
+        if not results:
+            response = json.dumps({"results": {}, "total": 0})
+        else:
+            grouped = _group_by_organism(results)
+            response = json.dumps(
+                {"results": grouped, "total": len(results)},
+                indent=2, default=str,
+            )
+        return _with_query(response, cypher, params, ctx)
+
+    @mcp.tool()
+    def gene_ontology_terms(
+        ctx: Context,
+        gene_id: str,
+        ontology: str,
+        leaf_only: bool = True,
+        limit: int = 50,
+    ) -> str:
+        """Get ontology annotations for a gene.
+
+        Returns the ontology terms a gene is annotated to. By default returns
+        only the most specific (leaf) terms — those that are not ancestors of
+        other terms the gene is annotated to.
+
+        Args:
+            gene_id: Gene locus_tag (e.g. "PMM0001").
+            ontology: Which ontology to return. One of:
+                "go_bp" (biological process), "go_mf" (molecular function),
+                "go_cc" (cellular component), "kegg", "ec".
+            leaf_only: If True (default), return only the most specific terms.
+                If False, return all annotations.
+            limit: Max results (default 50). Relevant mainly with
+                leaf_only=False, which can return many ancestor terms.
+        """
+        conn = _conn(ctx)
+        cypher, params = build_gene_ontology_terms(
+            ontology=ontology, gene_id=gene_id,
+            leaf_only=leaf_only, limit=limit,
+        )
+        results = conn.execute_query(cypher, **params)
+        if not results:
+            response = json.dumps({"results": [], "total": 0})
+        else:
+            response = json.dumps({
+                "results": results, "total": len(results),
+            }, indent=2, default=str)
+        return _with_query(response, cypher, params, ctx)

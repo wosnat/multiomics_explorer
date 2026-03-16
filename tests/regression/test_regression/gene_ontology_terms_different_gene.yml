@@ -1,0 +1,7 @@
+case_id: gene_ontology_terms_different_gene
+row_count: 2
+rows:
+- id: go:0006260
+  name: DNA replication
+- id: go:0006271
+  name: DNA strand elongation involved in DNA replication

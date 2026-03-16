@@ -1,0 +1,130 @@
+case_id: search_genes_lucene_fuzzy
+row_count: 10
+rows:
+- annotation_quality: 3
+  cluster_id: CK_00000917
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: A9601_09241
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase V, subunit D
+  score: 1.2592
+- annotation_quality: 3
+  cluster_id: 46843@72275,Alteromonadaceae
+  function_description: Negative regulator of replication initiation, which contributes
+    to regulation of DNA replication and ensures that replication initiation occurs
+    exactly once per chromosome per cell cycle. Binds to pairs of hemimethylated GATC
+    sequences in the oriC region, thus preventing assembly of replication proteins
+    and re- initiation at newly replicated origins. Repression is relieved when the
+    region becomes fully methylated
+  gene_name: seqA
+  gene_summary: 'seqA :: replication initiation negative regulator SeqA :: Negative
+    regulator of replication initiation, which contributes to regulation of DNA replication
+    and ensures that replication initiation occurs exactly once per chromosome per
+    cell cycle. Binds to pairs of hemimethylated GATC sequences in the oriC region,
+    thus preventing assembly of replication proteins and re- initiation at newly replicated
+    origins. Repression is relieved when the region becomes fully methylated'
+  locus_tag: ACZ81_07415
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: replication initiation negative regulator SeqA
+  score: 3.99
+- annotation_quality: 3
+  cluster_id: 46843@72275,Alteromonadaceae
+  function_description: Negative regulator of replication initiation, which contributes
+    to regulation of DNA replication and ensures that replication initiation occurs
+    exactly once per chromosome per cell cycle. Binds to pairs of hemimethylated GATC
+    sequences in the oriC region, thus preventing assembly of replication proteins
+    and re- initiation at newly replicated origins. Repression is relieved when the
+    region becomes fully methylated
+  gene_name: seqA
+  gene_summary: 'seqA :: replication initiation negative regulator SeqA :: Negative
+    regulator of replication initiation, which contributes to regulation of DNA replication
+    and ensures that replication initiation occurs exactly once per chromosome per
+    cell cycle. Binds to pairs of hemimethylated GATC sequences in the oriC region,
+    thus preventing assembly of replication proteins and re- initiation at newly replicated
+    origins. Repression is relieved when the region becomes fully methylated'
+  locus_tag: EZ55_01557
+  organism_strain: Alteromonas macleodii EZ55
+  product: replication initiation negative regulator SeqA
+  score: 3.99
+- annotation_quality: 1
+  cluster_id: 46843@72275,Alteromonadaceae
+  function_description: Negative regulator of replication initiation, which contributes
+    to regulation of DNA replication and ensures that replication initiation occurs
+    exactly once per chromosome per cell cycle. Binds to pairs of hemimethylated GATC
+    sequences in the oriC region, thus preventing assembly of replication proteins
+    and re- initiation at newly replicated origins. Repression is relieved when the
+    region becomes fully methylated
+  gene_name: seqA
+  gene_summary: 'seqA :: hypothetical protein :: Negative regulator of replication
+    initiation, which contributes to regulation of DNA replication and ensures that
+    replication initiation occurs exactly once per chromosome per cell cycle. Binds
+    to pairs of hemimethylated GATC sequences in the oriC region, thus preventing
+    assembly of replication proteins and re- initiation at newly replicated origins.
+    Repression is relieved when the region becomes fully methylated'
+  locus_tag: MIT1002_01533
+  organism_strain: Alteromonas macleodii MIT1002
+  product: hypothetical protein
+  score: 4.1349
+- annotation_quality: 3
+  cluster_id: CK_00000917
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: NATL1_09441
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase V, subunit D
+  score: 1.2592
+- annotation_quality: 3
+  cluster_id: CK_00000917
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: P9301_09221
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase V, subunit D
+  score: 1.2592
+- annotation_quality: 3
+  cluster_id: CK_00000917
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: PMM0936
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase V, subunit D
+  score: 1.2592
+- annotation_quality: 3
+  cluster_id: CK_00000917
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: PMN2A_0275
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase V, subunit D
+  score: 1.2592
+- annotation_quality: 3
+  cluster_id: CK_00000917
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: PMT0635
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase V, subunit D
+  score: 1.2592
+- annotation_quality: 3
+  cluster_id: CK_00000917
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: PMT9312_0863
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase V, subunit D
+  score: 1.2592

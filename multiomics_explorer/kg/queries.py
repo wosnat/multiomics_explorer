@@ -226,15 +226,15 @@ FEW_SHOT_EXAMPLES = [
             "MATCH (env:EnvironmentalCondition {condition_type: 'nutrient_stress'})"
             "-[r:Condition_changes_expression_of {expression_direction: 'down'}]->(g:Gene)\n"
             "WHERE env.description CONTAINS 'nitrogen'\n"
-            "MATCH (g)-[:Gene_has_kegg_ko]->(ko:KeggOrthologousGroup)"
-            "-[:Ko_in_kegg_pathway]->(pw:KeggPathway)\n"
+            "MATCH (g)-[:Gene_has_kegg_ko]->(ko:KeggTerm {level: 'ko'})"
+            "-[:Kegg_term_is_a_kegg_term]->(pw:KeggTerm {level: 'pathway'})\n"
             "RETURN pw.name AS pathway, count(DISTINCT g) AS gene_count\n"
             "ORDER BY gene_count DESC\n"
             "LIMIT 10"
         ),
         "explanation": (
-            "Multi-hop: expression edge → gene → KEGG KO → pathway. "
-            "Use the Gene_has_kegg_ko → Ko_in_kegg_pathway chain for pathway enrichment."
+            "Multi-hop: expression edge → gene → KEGG KO → pathway via KeggTerm hierarchy. "
+            "Use Gene_has_kegg_ko → Kegg_term_is_a_kegg_term chain for pathway enrichment."
         ),
     },
 ]

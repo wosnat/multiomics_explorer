@@ -44,6 +44,9 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `get_homologs` | Homologs across strains, optionally with expression data |
 | `list_filter_values` | List valid values for categorical filters (gene categories, condition types) |
 | `list_organisms` | All organisms with strain, genus, clade, gene count |
+| `search_ontology` | Browse ontology terms by text search (GO, KEGG, EC). Returns term IDs for use with `genes_by_ontology`. |
+| `genes_by_ontology` | Find genes annotated to ontology term IDs, with hierarchy expansion. Results grouped by organism. |
+| `gene_ontology_terms` | Reverse lookup: get ontology annotations for a gene. Returns leaf (most specific) terms by default. |
 | `run_cypher` | Raw Cypher escape hatch (read-only, write operations blocked) |
 
 ### Claude Code Configuration

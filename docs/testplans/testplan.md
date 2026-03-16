@@ -242,6 +242,97 @@ tests/
 
 ---
 
+### `search_ontology` Tool Tests
+
+#### Unit tests (`tests/unit/test_query_builders.py`)
+- [ ] `build_search_ontology`: each ontology type produces Cypher with correct fulltext index name
+- [ ] All ontology types return same columns: `id`, `name`, `score`
+- [ ] Invalid ontology value raises `ValueError` with valid options listed
+- [ ] `search_text` passed as parameter (not interpolated)
+
+#### Unit tests (`tests/unit/test_tool_wrappers.py`)
+- [ ] Mock query results, verify JSON response with `id`, `name`, `score`
+- [ ] KEGG results have same columns as other ontologies
+- [ ] Error on invalid ontology value
+- [ ] Lucene special chars trigger retry with escaped query (Neo4jClientError)
+
+#### Integration tests (`tests/integration/test_tool_correctness_kg.py`)
+- [ ] `search_text="replication", ontology="go_bp"` returns BP terms
+- [ ] `search_text="oxidoreductase", ontology="ec"` returns EC terms
+- [ ] `search_text="metabolism", ontology="kegg"` returns results from multiple KEGG levels
+
+#### Eval cases (`tests/evals/cases.yaml`)
+- [ ] `search_ontology_go_bp` — search biological processes for replication
+- [ ] `search_ontology_kegg` — search KEGG for metabolism
+- [ ] `search_ontology_ec` — search EC for oxidoreductase
+
+---
+
+### `genes_by_ontology` Tool Tests
+
+#### Unit tests (`tests/unit/test_query_builders.py`)
+- [ ] `build_genes_by_ontology`: GO:BP hierarchy expansion with `is_a|part_of*0..15`
+- [ ] EC hierarchy expansion with `Ec_number_is_a_ec_number*0..15`
+- [ ] KEGG hierarchy expansion with `Kegg_term_is_a_kegg_term*0..15` + `WHERE descendant.level = 'ko'`
+- [ ] Non-KEGG ontologies do NOT have level filter in Cypher
+- [ ] Organism filter present in WHERE clause
+- [ ] `term_ids` passed as parameter
+
+#### Unit tests (`tests/unit/test_tool_wrappers.py`)
+- [ ] Mock query results, verify grouped-by-organism response format
+- [ ] KEGG uses `Kegg_term_is_a_kegg_term` with `level = 'ko'` filter
+- [ ] Invalid ontology value returns error
+- [ ] Tool registration count updated (10 -> 13)
+
+#### Integration tests (`tests/integration/test_tool_correctness_kg.py`)
+- [ ] GO:BP hierarchy: `go:0006139` returns genes from descendant terms
+- [ ] EC hierarchy: `ec:1.-.-.-` returns all oxidoreductases via tree walk
+- [ ] KEGG Category: `kegg.category:09100` returns genes via hierarchy traversal
+- [ ] KEGG KO direct: `kegg.orthology:K00001` returns genes
+- [ ] Organism filter restricts results to matching strain
+- [ ] Multiple `term_ids` return union of results
+
+#### Eval cases (`tests/evals/cases.yaml`)
+- [ ] `find_genes_go_bp_hierarchy` — GO BP hierarchy expansion
+- [ ] `find_genes_ec_hierarchy` — EC hierarchy from top-level class
+- [ ] `find_genes_kegg_category` — KEGG category traversal to genes
+- [ ] `find_genes_kegg_ko_direct` — KEGG KO direct lookup
+- [ ] `find_genes_with_organism` — organism filter restricts results
+- [ ] `find_genes_multiple_ids` — multiple GO term IDs combined
+
+---
+
+### `gene_ontology_terms` Tool Tests
+
+#### Unit tests (`tests/unit/test_query_builders.py`)
+- [ ] `build_gene_ontology_terms`: each ontology type uses correct node label and gene relationship
+- [ ] `leaf_only=True` adds NOT EXISTS subquery with correct hierarchy edges
+- [ ] `leaf_only=False` returns simple match without NOT EXISTS
+- [ ] All ontology types return same columns: `id`, `name`
+- [ ] `limit` parameter present in Cypher
+- [ ] Invalid ontology value raises `ValueError`
+
+#### Unit tests (`tests/unit/test_tool_wrappers.py`)
+- [ ] Mock query results, verify JSON response with `id` and `name`
+- [ ] Invalid ontology value raises error
+- [ ] `limit` parameter passed through
+
+#### Integration tests (`tests/integration/test_tool_correctness_kg.py`)
+- [ ] BP leaf only: `gene_id="MIT1002_03493", ontology="go_bp"` returns ~12 leaf terms
+- [ ] BP all: same gene with `leaf_only=False` returns ~79 terms
+- [ ] EC: gene with EC annotations returns EC numbers with `id`, `name`
+- [ ] KEGG: gene with KOs returns KOs with `id`, `name`
+- [ ] Gene with no annotations for given ontology returns empty result
+- [ ] `limit` caps results
+
+#### Eval cases (`tests/evals/cases.yaml`)
+- [ ] `gene_ontology_terms_bp_leaf` — argR leaf BP annotations
+- [ ] `gene_ontology_terms_bp_all` — argR all BP annotations
+- [ ] `gene_ontology_terms_kegg` — gene KEGG KO annotations
+- [ ] `gene_ontology_terms_ec` — gene EC number annotations
+
+---
+
 ## Change Log
 
 | Date | Change |

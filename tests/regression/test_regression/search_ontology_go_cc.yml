@@ -1,0 +1,78 @@
+case_id: search_ontology_go_cc
+row_count: 25
+rows:
+- id: go:0000139
+  name: Golgi membrane
+  score: 0.9814
+- id: go:0005765
+  name: lysosomal membrane
+  score: 0.9814
+- id: go:0005774
+  name: vacuolar membrane
+  score: 0.9814
+- id: go:0005886
+  name: plasma membrane
+  score: 0.9814
+- id: go:0009279
+  name: cell outer membrane
+  score: 0.8543
+- id: go:0009528
+  name: plastid inner membrane
+  score: 0.8543
+- id: go:0016020
+  name: membrane
+  score: 1.153
+- id: go:0019866
+  name: organelle inner membrane
+  score: 0.8543
+- id: go:0019867
+  name: outer membrane
+  score: 0.9814
+- id: go:0031090
+  name: organelle membrane
+  score: 0.9814
+- id: go:0031676
+  name: plasma membrane-derived thylakoid membrane
+  score: 0.988
+- id: go:0031966
+  name: mitochondrial membrane
+  score: 0.9814
+- id: go:0031968
+  name: organelle outer membrane
+  score: 0.8543
+- id: go:0031969
+  name: chloroplast membrane
+  score: 0.9814
+- id: go:0034357
+  name: photosynthetic membrane
+  score: 0.9814
+- id: go:0042170
+  name: plastid membrane
+  score: 0.9814
+- id: go:0042175
+  name: nuclear outer membrane-endoplasmic reticulum membrane network
+  score: 0.8593
+- id: go:0042651
+  name: thylakoid membrane
+  score: 0.9814
+- id: go:0042717
+  name: plasma membrane-derived chromatophore membrane
+  score: 0.988
+- id: go:0043227
+  name: membrane-bounded organelle
+  score: 0.8543
+- id: go:0045121
+  name: membrane raft
+  score: 0.9814
+- id: go:0098552
+  name: side of membrane
+  score: 0.8543
+- id: go:0098590
+  name: plasma membrane region
+  score: 0.8543
+- id: go:0098796
+  name: membrane protein complex
+  score: 0.8543
+- id: go:0098857
+  name: membrane microdomain
+  score: 0.9814

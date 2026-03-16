@@ -1,0 +1,103 @@
+case_id: find_genes_with_organism
+row_count: 25
+rows:
+- gene_name: dnaN
+  locus_tag: PMM0001
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, beta subunit
+- gene_name: purL
+  locus_tag: PMM0003
+  organism_strain: Prochlorococcus MED4
+  product: phosphoribosylformylglycinamidine synthase, synthetase domain
+- gene_name: purF
+  locus_tag: PMM0004
+  organism_strain: Prochlorococcus MED4
+  product: amidophosphoribosyltransferase
+- gene_name: null
+  locus_tag: PMM0005
+  organism_strain: Prochlorococcus MED4
+  product: DNA gyrase/topoisomerase IV, subunit A family protein
+- gene_name: queG
+  locus_tag: PMM0007
+  organism_strain: Prochlorococcus MED4
+  product: epoxyqueuosine reductase
+- gene_name: nusB
+  locus_tag: PMM0009
+  organism_strain: Prochlorococcus MED4
+  product: transcription antitermination protein NusB
+- gene_name: null
+  locus_tag: PMM0013
+  organism_strain: Prochlorococcus MED4
+  product: RNA-binding domain RNP-1 (RNA recognition motif) containing protein
+- gene_name: dusA
+  locus_tag: PMM0014
+  organism_strain: Prochlorococcus MED4
+  product: tRNA dihydrouridine synthase
+- gene_name: guaA
+  locus_tag: PMM0037
+  organism_strain: Prochlorococcus MED4
+  product: GMP synthase (glutamine-hydrolyzing), N-terminal domain
+- gene_name: null
+  locus_tag: PMM0038
+  organism_strain: Prochlorococcus MED4
+  product: putative restriction endonuclease
+- gene_name: alaS
+  locus_tag: PMM0044
+  organism_strain: Prochlorococcus MED4
+  product: alanyl-tRNA synthetase
+- gene_name: ndk
+  locus_tag: PMM0046
+  organism_strain: Prochlorococcus MED4
+  product: nucleoside diphosphate kinase
+- gene_name: gatB
+  locus_tag: PMM0048
+  organism_strain: Prochlorococcus MED4
+  product: aspartyl-tRNA(Asn)/glutamyl-tRNA(Gln) amidotransferase subunit B
+- gene_name: coaE
+  locus_tag: PMM0049
+  organism_strain: Prochlorococcus MED4
+  product: dephospho-CoA kinase
+- gene_name: ypsC
+  locus_tag: PMM0053
+  organism_strain: Prochlorococcus MED4
+  product: putative N6-adenine-specific DNA methylase
+- gene_name: accC
+  locus_tag: PMM0060
+  organism_strain: Prochlorococcus MED4
+  product: acetyl-CoA carboxylase, biotin carboxylase subunit
+- gene_name: null
+  locus_tag: PMM0075
+  organism_strain: Prochlorococcus MED4
+  product: conserved hypothetical protein
+- gene_name: rarA
+  locus_tag: PMM0077
+  organism_strain: Prochlorococcus MED4
+  product: recombination factor
+- gene_name: coaX
+  locus_tag: PMM0080
+  organism_strain: Prochlorococcus MED4
+  product: type III pantothenate kinase
+- gene_name: nadB
+  locus_tag: PMM0100
+  organism_strain: Prochlorococcus MED4
+  product: L-aspartate oxidase
+- gene_name: rimO
+  locus_tag: PMM0102
+  organism_strain: Prochlorococcus MED4
+  product: ribosomal protein S12 methylthiotransferase
+- gene_name: queD
+  locus_tag: PMM0106
+  organism_strain: Prochlorococcus MED4
+  product: queuosine biosynthesis protein QueD
+- gene_name: rbfA
+  locus_tag: PMM0112
+  organism_strain: Prochlorococcus MED4
+  product: ribosome-binding factor A
+- gene_name: holB
+  locus_tag: PMM0129
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, delta^ subunit
+- gene_name: tmk
+  locus_tag: PMM0130
+  organism_strain: Prochlorococcus MED4
+  product: dTMP kinase

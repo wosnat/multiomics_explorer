@@ -47,7 +47,7 @@ system_prompts:
     - Gene_involved_in_biological_process → BiologicalProcess (GO)
     - Gene_enables_molecular_function → MolecularFunction (GO)
     - Gene_located_in_cellular_component → CellularComponent (GO)
-    - Gene_has_kegg_ko → KeggOrthologousGroup → Ko_in_kegg_pathway → KeggPathway
+    - Gene_has_kegg_ko → KeggTerm (level: ko) → Kegg_term_is_a_kegg_term → KeggTerm (pathway/subcategory/category)
     - Gene_catalyzes_ec_number → EcNumber
     - Gene_in_cog_category → CogFunctionalCategory
     - Gene_has_cyanorak_role → CyanorakRole (Pro/Syn only)

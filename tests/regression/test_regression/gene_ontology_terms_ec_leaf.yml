@@ -1,0 +1,5 @@
+case_id: gene_ontology_terms_ec_leaf
+row_count: 1
+rows:
+- id: ec:2.7.7.7
+  name: DNA-directed DNA polymerase

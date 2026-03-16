@@ -39,6 +39,7 @@ EXPECTED_TOOLS = [
     "get_schema", "list_filter_values", "list_organisms", "resolve_gene",
     "search_genes", "get_gene_details", "query_expression",
     "compare_conditions", "get_homologs", "run_cypher",
+    "search_ontology", "genes_by_ontology", "gene_ontology_terms",
 ]
 
 
@@ -344,6 +345,15 @@ class TestSearchGenesWrapper:
         nocl = [r for r in result["results"] if r["locus_tag"] == "ALT_NOCL"][0]
         assert "collapsed_count" not in nocl
 
+    def test_limit_boundary_one(self, tool_fns, mock_ctx):
+        """limit=1 returns at most 1 result."""
+        rows = [{"locus_tag": "PMM0001", "score": 5.0}, {"locus_tag": "PMM0002", "score": 3.0}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="x", limit=1))
+        # limit is applied at the query level, not post-filter
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["limit"] == 1
+
 
 # ---------------------------------------------------------------------------
 # get_gene_details
@@ -547,3 +557,215 @@ class TestRunCypherWrapper:
         )
         assert "Error" in result
         _conn_from(mock_ctx).execute_query.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# search_ontology
+# ---------------------------------------------------------------------------
+class TestSearchOntologyWrapper:
+    def test_returns_json_with_id_name_score(self, tool_fns, mock_ctx):
+        rows = [
+            {"id": "go:0006260", "name": "DNA replication", "score": 5.0},
+            {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 3.2},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="replication", ontology="go_bp"))
+        assert result["total"] == 2
+        assert result["query"] == "replication"
+        for r in result["results"]:
+            assert "id" in r
+            assert "name" in r
+            assert "score" in r
+
+    def test_kegg_same_columns(self, tool_fns, mock_ctx):
+        rows = [{"id": "kegg.pathway:ko00010", "name": "Glycolysis", "score": 4.0}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="glycolysis", ontology="kegg"))
+        assert set(result["results"][0].keys()) == {"id", "name", "score"}
+
+    def test_empty_results(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="nonexistent", ontology="go_bp"))
+        assert result["results"] == []
+        assert result["total"] == 0
+
+    def test_lucene_fallback_on_error(self, tool_fns, mock_ctx):
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            Neo4jClientError("Lucene parse error"),
+            [{"id": "go:0006260", "name": "DNA replication", "score": 1.0}],
+        ]
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="bad [query", ontology="go_bp"))
+        assert result["total"] == 1
+        assert conn.execute_query.call_count == 2
+
+    def test_raises_on_double_failure(self, tool_fns, mock_ctx):
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            Neo4jClientError("parse error"),
+            Neo4jClientError("still broken"),
+        ]
+        with pytest.raises(Neo4jClientError):
+            tool_fns["search_ontology"](mock_ctx, search_text="bad [query", ontology="go_bp")
+
+    def test_limit_passed_through(self, tool_fns, mock_ctx):
+        """Limit parameter is forwarded to the query builder."""
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["search_ontology"](mock_ctx, search_text="test", ontology="go_bp", limit=5)
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["limit"] == 5
+
+    def test_go_mf_ontology_accepted(self, tool_fns, mock_ctx):
+        """go_mf ontology is accepted without error."""
+        rows = [{"id": "go:0003677", "name": "DNA binding", "score": 4.0}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="binding", ontology="go_mf"))
+        assert result["total"] == 1
+
+    def test_go_cc_ontology_accepted(self, tool_fns, mock_ctx):
+        """go_cc ontology is accepted without error."""
+        rows = [{"id": "go:0016020", "name": "membrane", "score": 3.5}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="membrane", ontology="go_cc"))
+        assert result["total"] == 1
+
+
+# ---------------------------------------------------------------------------
+# genes_by_ontology
+# ---------------------------------------------------------------------------
+class TestGenesByOntologyWrapper:
+    def test_grouped_by_organism_response(self, tool_fns, mock_ctx):
+        rows = [
+            {"locus_tag": "PMM0120", "gene_name": "dnaN", "product": "p1", "organism_strain": "Prochlorococcus MED4"},
+            {"locus_tag": "MIT1002_00001", "gene_name": "geneA", "product": "p2", "organism_strain": "Alteromonas macleodii MIT1002"},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["go:0006260"], ontology="go_bp",
+        ))
+        assert result["total"] == 2
+        assert "Prochlorococcus MED4" in result["results"]
+        assert "Alteromonas macleodii MIT1002" in result["results"]
+        # organism_strain should be stripped from individual entries
+        for org_genes in result["results"].values():
+            for gene in org_genes:
+                assert "organism_strain" not in gene
+
+    def test_empty_results(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        result = json.loads(tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["go:9999999"], ontology="go_bp",
+        ))
+        assert result["results"] == {}
+        assert result["total"] == 0
+
+    def test_invalid_ontology_raises_error(self, tool_fns, mock_ctx):
+        """Invalid ontology value raises ValueError from the builder."""
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            tool_fns["genes_by_ontology"](
+                mock_ctx, term_ids=["x"], ontology="bad_value",
+            )
+
+    def test_go_mf_ontology_accepted(self, tool_fns, mock_ctx):
+        """go_mf ontology is accepted without error."""
+        rows = [{"locus_tag": "PMM0120", "gene_name": "x", "product": "p", "organism_strain": "Prochlorococcus MED4"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["go:0003677"], ontology="go_mf",
+        ))
+        assert result["total"] == 1
+
+    def test_go_cc_ontology_accepted(self, tool_fns, mock_ctx):
+        """go_cc ontology is accepted without error."""
+        rows = [{"locus_tag": "PMM0120", "gene_name": "x", "product": "p", "organism_strain": "Prochlorococcus MED4"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["go:0016020"], ontology="go_cc",
+        ))
+        assert result["total"] == 1
+
+    def test_organism_filter_passed_through(self, tool_fns, mock_ctx):
+        """Organism parameter is forwarded to the query builder."""
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["go:0006260"], ontology="go_bp", organism="MED4",
+        )
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["organism"] == "MED4"
+
+    def test_limit_passed_through(self, tool_fns, mock_ctx):
+        """Limit parameter is forwarded to the query builder."""
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["go:0006260"], ontology="go_bp", limit=5,
+        )
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["limit"] == 5
+
+
+# ---------------------------------------------------------------------------
+# gene_ontology_terms
+# ---------------------------------------------------------------------------
+class TestGeneOntologyTermsWrapper:
+    def test_returns_json_with_id_name(self, tool_fns, mock_ctx):
+        rows = [
+            {"id": "go:0006260", "name": "DNA replication"},
+            {"id": "go:0006261", "name": "DNA-templated DNA replication"},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="go_bp",
+        ))
+        assert result["total"] == 2
+        for r in result["results"]:
+            assert "id" in r
+            assert "name" in r
+
+    def test_empty_results(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        result = json.loads(tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="FAKE", ontology="go_bp",
+        ))
+        assert result["results"] == []
+        assert result["total"] == 0
+
+    def test_invalid_ontology_raises_error(self, tool_fns, mock_ctx):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            tool_fns["gene_ontology_terms"](
+                mock_ctx, gene_id="PMM0001", ontology="invalid",
+            )
+
+    def test_limit_passed_through(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="go_bp", limit=10,
+        )
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["limit"] == 10
+
+    def test_go_mf_ontology_accepted(self, tool_fns, mock_ctx):
+        """go_mf ontology is accepted without error."""
+        rows = [{"id": "go:0003677", "name": "DNA binding"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="go_mf",
+        ))
+        assert result["total"] == 1
+
+    def test_go_cc_ontology_accepted(self, tool_fns, mock_ctx):
+        """go_cc ontology is accepted without error."""
+        rows = [{"id": "go:0016020", "name": "membrane"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="go_cc",
+        ))
+        assert result["total"] == 1
+
+    def test_leaf_only_default_true(self, tool_fns, mock_ctx):
+        """leaf_only defaults to True (leaf_only filter in query)."""
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="go_bp",
+        )
+        called_cypher = _conn_from(mock_ctx).execute_query.call_args[0][0]
+        assert "NOT EXISTS" in called_cypher

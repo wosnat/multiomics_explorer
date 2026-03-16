@@ -1,0 +1,104 @@
+case_id: find_genes_kegg_category
+row_count: 25
+rows:
+- gene_name: purL
+  locus_tag: A9601_00021
+  organism_strain: Prochlorococcus AS9601
+  product: phosphoribosylformylglycinamidine synthase, synthetase domain
+- gene_name: purF
+  locus_tag: A9601_00031
+  organism_strain: Prochlorococcus AS9601
+  product: amidophosphoribosyltransferase
+- gene_name: argH
+  locus_tag: A9601_00111
+  organism_strain: Prochlorococcus AS9601
+  product: argininosuccinate lyase
+- gene_name: rsgA
+  locus_tag: A9601_00181
+  organism_strain: Prochlorococcus AS9601
+  product: ribosome biogenesis GTPase / thiamine phosphate phosphatase
+- gene_name: murB
+  locus_tag: A9601_00201
+  organism_strain: Prochlorococcus AS9601
+  product: UDP-N-acetylenolpyruvoylglucosamine reductase
+- gene_name: murC
+  locus_tag: A9601_00211
+  organism_strain: Prochlorococcus AS9601
+  product: UDP-N-acetylmuramate-alanine ligase
+- gene_name: gap2
+  locus_tag: A9601_00221
+  organism_strain: Prochlorococcus AS9601
+  product: glyceraldehyde-3-phosphate dehydrogenase
+- gene_name: thiL
+  locus_tag: A9601_00231
+  organism_strain: Prochlorococcus AS9601
+  product: thiamine-monophosphate kinase
+- gene_name: accB
+  locus_tag: A9601_00261
+  organism_strain: Prochlorococcus AS9601
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+- gene_name: pdxA
+  locus_tag: A9601_00271
+  organism_strain: Prochlorococcus AS9601
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_name: cbiD
+  locus_tag: A9601_00351
+  organism_strain: Prochlorococcus AS9601
+  product: pseudocobalamin biosynthesis protein CbiD
+- gene_name: guaA
+  locus_tag: A9601_00361
+  organism_strain: Prochlorococcus AS9601
+  product: GMP synthase (glutamine-hydrolyzing), N-terminal domain
+- gene_name: mrdA
+  locus_tag: A9601_00411
+  organism_strain: Prochlorococcus AS9601
+  product: transpeptidase involved in septal peptidoglycan synthesis (peptidoglycan
+    synthetase precursor)
+- gene_name: speA
+  locus_tag: A9601_00461
+  organism_strain: Prochlorococcus AS9601
+  product: arginine decarboxylase
+- gene_name: ndk
+  locus_tag: A9601_00471
+  organism_strain: Prochlorococcus AS9601
+  product: nucleoside diphosphate kinase
+- gene_name: thiO
+  locus_tag: A9601_00481
+  organism_strain: Prochlorococcus AS9601
+  product: glycine oxidase
+- gene_name: coaE
+  locus_tag: A9601_00501
+  organism_strain: Prochlorococcus AS9601
+  product: dephospho-CoA kinase
+- gene_name: argJ
+  locus_tag: A9601_00511
+  organism_strain: Prochlorococcus AS9601
+  product: glutamate N-acetyltransferase/amino-acid acetyltransferase
+- gene_name: tas
+  locus_tag: A9601_00621
+  organism_strain: Prochlorococcus AS9601
+  product: pyridoxine 4-dehydrogenase
+- gene_name: null
+  locus_tag: A9601_00711
+  organism_strain: Prochlorococcus AS9601
+  product: lipid A disaccharide synthase family protein
+- gene_name: accC
+  locus_tag: A9601_00721
+  organism_strain: Prochlorococcus AS9601
+  product: acetyl-CoA carboxylase, biotin carboxylase subunit
+- gene_name: psbX
+  locus_tag: A9601_00741
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II PsbX protein
+- gene_name: sufS1
+  locus_tag: A9601_00821
+  organism_strain: Prochlorococcus AS9601
+  product: cysteine desulfurase / selenocysteine lyase
+- gene_name: pgmA2
+  locus_tag: A9601_00891
+  organism_strain: Prochlorococcus AS9601
+  product: phosphoglucomutase
+- gene_name: coaX
+  locus_tag: A9601_00931
+  organism_strain: Prochlorococcus AS9601
+  product: type III pantothenate kinase

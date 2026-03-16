@@ -158,12 +158,11 @@
 
 - id: list_filter_values
   tool: list_filter_values
-  desc: Returns gene categories and condition types
+  desc: Returns gene categories and condition types (snapshot-stable, few changes expected)
   params: {}
   expect:
-    # This tool returns a combined JSON, so eval assertions are on the
-    # tool wrapper response. Use a raw_cypher case for each sub-query
-    # to snapshot the individual lists.
+    # Combined JSON response: gene_categories + condition_types
+    # These lists change only on KG rebuild, so treat as near-snapshot.
 
 - id: list_filter_values_categories
   tool: raw_cypher
@@ -197,15 +196,16 @@
 
 - id: list_organisms
   tool: list_organisms
-  desc: Returns all organisms with metadata
+  desc: Returns all organisms with metadata (snapshot-stable, few changes expected)
   params: {}
   expect:
     min_rows: 10
+    max_rows: 25
     columns: [name, genus, strain, clade, gene_count]
     contains:
       name: Prochlorococcus MED4
     row0:
-      genus: Alteromonas
+      genus: Alphainfluenzavirus
 
 - id: list_organisms_raw
   tool: raw_cypher
@@ -425,6 +425,25 @@
   expect:
     min_rows: 2
 
+- id: search_genes_min_quality
+  tool: search_genes
+  desc: min_quality=2 filters out hypothetical proteins
+  params:
+    search_text: polymerase
+    min_quality: 2
+    limit: 20
+  expect:
+    min_rows: 1
+
+- id: search_genes_lucene_fuzzy
+  tool: search_genes
+  desc: Lucene fuzzy syntax (~) works in gene search
+  params:
+    search_text: "replicat~"
+    limit: 10
+  expect:
+    min_rows: 1
+
 # ── Gene details corner cases ─────────────────────────────
 
 - id: gene_details_alteromonas
@@ -497,3 +516,255 @@
   expect:
     row0:
       cnt: 0
+
+# ── Ontology search ────────────────────────────────────────
+
+- id: search_ontology_go_bp
+  tool: search_ontology
+  desc: Search biological processes for replication
+  params:
+    search_text: replication
+    ontology: go_bp
+  expect:
+    min_rows: 1
+    columns: [id, name, score]
+
+- id: search_ontology_kegg
+  tool: search_ontology
+  desc: Search KEGG for metabolism
+  params:
+    search_text: metabolism
+    ontology: kegg
+  expect:
+    min_rows: 1
+    columns: [id, name, score]
+
+- id: search_ontology_ec
+  tool: search_ontology
+  desc: Search EC for oxidoreductase
+  params:
+    search_text: oxidoreductase
+    ontology: ec
+  expect:
+    min_rows: 1
+    columns: [id, name, score]
+
+- id: search_ontology_go_mf
+  tool: search_ontology
+  desc: Search molecular functions for binding
+  params:
+    search_text: binding
+    ontology: go_mf
+  expect:
+    min_rows: 1
+    columns: [id, name, score]
+
+- id: search_ontology_go_cc
+  tool: search_ontology
+  desc: Search cellular components for membrane
+  params:
+    search_text: membrane
+    ontology: go_cc
+  expect:
+    min_rows: 1
+    columns: [id, name, score]
+
+- id: search_ontology_lucene_wildcard
+  tool: search_ontology
+  desc: Lucene wildcard syntax works in ontology search
+  params:
+    search_text: "oxido*"
+    ontology: ec
+  expect:
+    min_rows: 1
+    columns: [id, name, score]
+
+# ── Genes by ontology ──────────────────────────────────────
+
+- id: find_genes_go_bp_hierarchy
+  tool: genes_by_ontology
+  desc: GO BP hierarchy expansion finds genes in descendant terms
+  params:
+    term_ids: ["go:0006139"]
+    ontology: go_bp
+  expect:
+    min_rows: 10
+
+- id: find_genes_ec_hierarchy
+  tool: genes_by_ontology
+  desc: EC hierarchy from top-level class
+  params:
+    term_ids: ["ec:1.-.-.-"]
+    ontology: ec
+  expect:
+    min_rows: 10
+
+- id: find_genes_kegg_category
+  tool: genes_by_ontology
+  desc: KEGG Category traversal to genes
+  params:
+    term_ids: ["kegg.category:09100"]
+    ontology: kegg
+  expect:
+    min_rows: 10
+
+- id: find_genes_kegg_ko_direct
+  tool: genes_by_ontology
+  desc: KEGG KO direct lookup
+  params:
+    term_ids: ["kegg.orthology:K00001"]
+    ontology: kegg
+  expect:
+    min_rows: 1
+
+- id: find_genes_with_organism
+  tool: genes_by_ontology
+  desc: Organism filter restricts results
+  params:
+    term_ids: ["go:0006139"]
+    ontology: go_bp
+    organism: MED4
+  expect:
+    min_rows: 1
+
+- id: find_genes_multiple_ids
+  tool: genes_by_ontology
+  desc: Multiple GO term IDs return combined results
+  params:
+    term_ids: ["go:0006260", "go:0006139"]
+    ontology: go_bp
+  expect:
+    min_rows: 1
+
+- id: find_genes_go_mf
+  tool: genes_by_ontology
+  desc: GO MF finds genes by molecular function
+  params:
+    term_ids: ["go:0003677"]
+    ontology: go_mf
+  expect:
+    min_rows: 1
+
+- id: find_genes_go_cc
+  tool: genes_by_ontology
+  desc: GO CC finds genes by cellular component
+  params:
+    term_ids: ["go:0016020"]
+    ontology: go_cc
+  expect:
+    min_rows: 1
+
+- id: find_genes_kegg_subcategory
+  tool: genes_by_ontology
+  desc: KEGG subcategory level traversal
+  params:
+    term_ids: ["kegg.subcategory:09101"]
+    ontology: kegg
+  expect:
+    min_rows: 1
+
+- id: find_genes_ec_intermediate
+  tool: genes_by_ontology
+  desc: EC intermediate level (ec:1.1.-.-) returns oxidoreductases acting on CH-OH
+  params:
+    term_ids: ["ec:1.1.-.-"]
+    ontology: ec
+  expect:
+    min_rows: 1
+
+# ── Gene ontology terms ────────────────────────────────────
+
+- id: gene_ontology_terms_bp_leaf
+  tool: gene_ontology_terms
+  desc: argR leaf BP annotations (most specific)
+  params:
+    gene_id: MIT1002_03493
+    ontology: go_bp
+  expect:
+    min_rows: 5
+    max_rows: 20
+    columns: [id, name]
+
+- id: gene_ontology_terms_bp_all
+  tool: gene_ontology_terms
+  desc: argR all BP annotations (full hierarchy)
+  params:
+    gene_id: MIT1002_03493
+    ontology: go_bp
+    leaf_only: false
+  expect:
+    min_rows: 50
+    columns: [id, name]
+
+- id: gene_ontology_terms_kegg
+  tool: gene_ontology_terms
+  desc: Gene KEGG KO annotations
+  params:
+    gene_id: MIT1002_03493
+    ontology: kegg
+  expect:
+    min_rows: 1
+    columns: [id, name]
+
+- id: gene_ontology_terms_ec
+  tool: gene_ontology_terms
+  desc: Gene EC number annotations
+  params:
+    gene_id: MIT1002_03493
+    ontology: ec
+  expect:
+    min_rows: 0
+
+- id: gene_ontology_terms_mf
+  tool: gene_ontology_terms
+  desc: Gene molecular function annotations
+  params:
+    gene_id: MIT1002_03493
+    ontology: go_mf
+  expect:
+    min_rows: 0
+    columns: [id, name]
+
+- id: gene_ontology_terms_cc
+  tool: gene_ontology_terms
+  desc: Gene cellular component annotations
+  params:
+    gene_id: MIT1002_03493
+    ontology: go_cc
+  expect:
+    min_rows: 0
+    columns: [id, name]
+
+- id: gene_ontology_terms_ec_leaf
+  tool: gene_ontology_terms
+  desc: EC leaf-only annotations verify NOT EXISTS clause for non-GO ontology
+  params:
+    gene_id: PMM0001
+    ontology: ec
+    leaf_only: true
+  expect:
+    min_rows: 0
+    columns: [id, name]
+
+- id: gene_ontology_terms_bp_limited
+  tool: gene_ontology_terms
+  desc: Limit parameter caps ontology term results
+  params:
+    gene_id: MIT1002_03493
+    ontology: go_bp
+    leaf_only: false
+    limit: 5
+  expect:
+    min_rows: 1
+    max_rows: 5
+    columns: [id, name]
+
+- id: gene_ontology_terms_different_gene
+  tool: gene_ontology_terms
+  desc: BP annotations for a Prochlorococcus gene (gene diversity)
+  params:
+    gene_id: PMM0001
+    ontology: go_bp
+  expect:
+    min_rows: 1
+    columns: [id, name]

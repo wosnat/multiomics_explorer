@@ -4,6 +4,50 @@ Each builder returns a (cypher, params) tuple. The caller is responsible
 for executing the query via GraphConnection.execute_query(cypher, **params).
 """
 
+# Ontology type configuration — drives all three ontology query builders.
+ONTOLOGY_CONFIG = {
+    "go_bp": {
+        "label": "BiologicalProcess",
+        "gene_rel": "Gene_involved_in_biological_process",
+        "hierarchy_rels": [
+            "Biological_process_is_a_biological_process",
+            "Biological_process_part_of_biological_process",
+        ],
+        "fulltext_index": "biologicalProcessFullText",
+    },
+    "go_mf": {
+        "label": "MolecularFunction",
+        "gene_rel": "Gene_enables_molecular_function",
+        "hierarchy_rels": [
+            "Molecular_function_is_a_molecular_function",
+            "Molecular_function_part_of_molecular_function",
+        ],
+        "fulltext_index": "molecularFunctionFullText",
+    },
+    "go_cc": {
+        "label": "CellularComponent",
+        "gene_rel": "Gene_located_in_cellular_component",
+        "hierarchy_rels": [
+            "Cellular_component_is_a_cellular_component",
+            "Cellular_component_part_of_cellular_component",
+        ],
+        "fulltext_index": "cellularComponentFullText",
+    },
+    "ec": {
+        "label": "EcNumber",
+        "gene_rel": "Gene_catalyzes_ec_number",
+        "hierarchy_rels": ["Ec_number_is_a_ec_number"],
+        "fulltext_index": "ecNumberFullText",
+    },
+    "kegg": {
+        "label": "KeggTerm",
+        "gene_rel": "Gene_has_kegg_ko",
+        "hierarchy_rels": ["Kegg_term_is_a_kegg_term"],
+        "fulltext_index": "keggFullText",
+        "gene_connects_to_level": "ko",  # genes only link to ko-level nodes
+    },
+}
+
 # Expression relationship types in the current KG schema.
 DIRECT_EXPR_RELS = "Condition_changes_expression_of|Coculture_changes_expression_of"
 ORTHOLOG_EXPR_RELS = (
@@ -243,6 +287,88 @@ def build_list_organisms() -> tuple[str, dict]:
         "ORDER BY o.genus, o.preferred_name"
     )
     return cypher, {}
+
+
+def build_search_ontology(
+    *, ontology: str, search_text: str, limit: int = 25,
+) -> tuple[str, dict]:
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    cfg = ONTOLOGY_CONFIG[ontology]
+    index_name = cfg["fulltext_index"]
+    cypher = (
+        f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
+        "YIELD node AS t, score\n"
+        "RETURN t.id AS id, t.name AS name, score\n"
+        "ORDER BY score DESC\n"
+        "LIMIT $limit"
+    )
+    return cypher, {"search_text": search_text, "limit": limit}
+
+
+def build_genes_by_ontology(
+    *, ontology: str, term_ids: list[str],
+    organism: str | None = None, limit: int = 25,
+) -> tuple[str, dict]:
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    cfg = ONTOLOGY_CONFIG[ontology]
+    label = cfg["label"]
+    gene_rel = cfg["gene_rel"]
+    hierarchy = "|".join(cfg["hierarchy_rels"])
+    level_filter = cfg.get("gene_connects_to_level")
+
+    level_clause = (
+        f"\nWITH DISTINCT descendant\nWHERE descendant.level = '{level_filter}'"
+        if level_filter else "\nWITH DISTINCT descendant"
+    )
+
+    cypher = (
+        f"MATCH (root:{label}) WHERE root.id IN $term_ids\n"
+        f"MATCH (root)<-[:{hierarchy}*0..15]-(descendant)"
+        f"{level_clause}\n"
+        f"MATCH (g:Gene)-[:{gene_rel}]->(descendant)\n"
+        "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
+        "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+        "RETURN DISTINCT g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       g.product AS product, g.organism_strain AS organism_strain\n"
+        "ORDER BY g.locus_tag\n"
+        "LIMIT $limit"
+    )
+    return cypher, {
+        "term_ids": term_ids, "organism": organism, "limit": limit,
+    }
+
+
+def build_gene_ontology_terms(
+    *, ontology: str, gene_id: str, leaf_only: bool = True, limit: int = 50,
+) -> tuple[str, dict]:
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    cfg = ONTOLOGY_CONFIG[ontology]
+    label = cfg["label"]
+    gene_rel = cfg["gene_rel"]
+    hierarchy = "|".join(cfg["hierarchy_rels"])
+
+    if leaf_only:
+        cypher = (
+            f"MATCH (g:Gene {{locus_tag: $gene_id}})-[:{gene_rel}]->(t:{label})\n"
+            "WHERE NOT EXISTS {\n"
+            f"  MATCH (g)-[:{gene_rel}]->(child:{label})\n"
+            f"        -[:{hierarchy}]->(t)\n"
+            "}\n"
+            "RETURN t.id AS id, t.name AS name\n"
+            "ORDER BY t.name\n"
+            "LIMIT $limit"
+        )
+    else:
+        cypher = (
+            f"MATCH (g:Gene {{locus_tag: $gene_id}})-[:{gene_rel}]->(t:{label})\n"
+            "RETURN t.id AS id, t.name AS name\n"
+            "ORDER BY t.name\n"
+            "LIMIT $limit"
+        )
+    return cypher, {"gene_id": gene_id, "limit": limit}
 
 
 def build_homolog_expression(*, gene_ids: list[str]) -> tuple[str, dict]:

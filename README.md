@@ -23,9 +23,10 @@ uv sync
 
 ### MCP Server (Claude Code integration)
 
-The MCP server exposes the KG to Claude Code with 10 specialized tools:
+The MCP server exposes the KG to Claude Code with 13 specialized tools:
 `get_schema`, `resolve_gene`, `search_genes`, `get_gene_details`, `query_expression`,
-`compare_conditions`, `get_homologs`, `list_filter_values`, `list_organisms`, `run_cypher`.
+`compare_conditions`, `get_homologs`, `list_filter_values`, `list_organisms`,
+`search_ontology`, `genes_by_ontology`, `gene_ontology_terms`, `run_cypher`.
 
 To use with Claude Code, add to your `.claude/settings.json` (already configured in this repo):
 

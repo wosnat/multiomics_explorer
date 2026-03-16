@@ -8,6 +8,7 @@ Usage:
     pytest tests/regression/ --force-regen     # update baselines after intentional changes
 """
 
+from functools import partial
 from pathlib import Path
 
 import pytest
@@ -15,10 +16,13 @@ import yaml
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_gene_ontology_terms,
+    build_genes_by_ontology,
     build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
     build_search_genes,
+    build_search_ontology,
     build_resolve_gene,
     build_get_gene_details_main,
     build_get_homologs,
@@ -42,6 +46,19 @@ TOOL_BUILDERS = {
     "compare_conditions": build_compare_conditions,
     "get_homologs": build_get_homologs,
     "list_organisms": build_list_organisms,
+    "search_ontology": build_search_ontology,
+    "genes_by_ontology": build_genes_by_ontology,
+    "gene_ontology_terms": build_gene_ontology_terms,
+    # Per-ontology partial entries for regression snapshots
+    "search_ontology_go_bp": partial(build_search_ontology, ontology="go_bp"),
+    "search_ontology_kegg": partial(build_search_ontology, ontology="kegg"),
+    "search_ontology_ec": partial(build_search_ontology, ontology="ec"),
+    "genes_by_ontology_go_bp": partial(build_genes_by_ontology, ontology="go_bp"),
+    "genes_by_ontology_kegg": partial(build_genes_by_ontology, ontology="kegg"),
+    "genes_by_ontology_ec": partial(build_genes_by_ontology, ontology="ec"),
+    "gene_ontology_terms_go_bp": partial(build_gene_ontology_terms, ontology="go_bp"),
+    "gene_ontology_terms_kegg": partial(build_gene_ontology_terms, ontology="kegg"),
+    "gene_ontology_terms_ec": partial(build_gene_ontology_terms, ontology="ec"),
 }
 
 
@@ -64,6 +81,8 @@ def _normalize(results: list[dict]) -> list[dict]:
         sort_key = "gene"
     elif results and "category" in results[0]:
         sort_key = "category"
+    elif results and "id" in results[0]:
+        sort_key = "id"
     elif results and "name" in results[0]:
         sort_key = "name"
     elif results and "condition_type" in results[0]:

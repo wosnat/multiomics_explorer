@@ -1,0 +1,101 @@
+case_id: search_genes_alteromonas_only_catalase
+row_count: 10
+rows:
+- annotation_quality: 3
+  cluster_id: 464SN@72275,Alteromonadaceae
+  function_description: Catalase
+  gene_name: katA
+  gene_summary: 'katA :: catalase :: Catalase'
+  locus_tag: ACZ81_02025
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: catalase
+  score: 17.2535
+- annotation_quality: 3
+  cluster_id: 464SN@72275,Alteromonadaceae
+  function_description: Catalase
+  gene_name: katA
+  gene_summary: 'katA :: catalase :: Catalase'
+  locus_tag: ACZ81_11985
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: catalase
+  score: 17.2535
+- annotation_quality: 3
+  cluster_id: 4644E@72275,Alteromonadaceae
+  function_description: Serves to protect cells from the toxic effects of hydrogen
+    peroxide
+  gene_name: katB
+  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
+    of hydrogen peroxide'
+  locus_tag: ACZ81_16915
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: catalase
+  score: 14.0897
+- annotation_quality: 3
+  cluster_id: 464SN@72275,Alteromonadaceae
+  function_description: Catalase
+  gene_name: katA
+  gene_summary: 'katA :: catalase :: Catalase'
+  locus_tag: EZ55_00433
+  organism_strain: Alteromonas macleodii EZ55
+  product: catalase
+  score: 17.2535
+- annotation_quality: 3
+  cluster_id: 464SN@72275,Alteromonadaceae
+  function_description: Catalase
+  gene_name: katA
+  gene_summary: 'katA :: catalase :: Catalase'
+  locus_tag: EZ55_02459
+  organism_strain: Alteromonas macleodii EZ55
+  product: catalase
+  score: 17.2535
+- annotation_quality: 3
+  cluster_id: 4644E@72275,Alteromonadaceae
+  function_description: Serves to protect cells from the toxic effects of hydrogen
+    peroxide
+  gene_name: katB
+  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
+    of hydrogen peroxide'
+  locus_tag: EZ55_03522
+  organism_strain: Alteromonas macleodii EZ55
+  product: catalase
+  score: 14.0897
+- annotation_quality: 3
+  cluster_id: 464SN@72275,Alteromonadaceae
+  function_description: Catalase
+  gene_name: katA
+  gene_summary: 'katA :: catalase :: Catalase'
+  locus_tag: MIT1002_00461
+  organism_strain: Alteromonas macleodii MIT1002
+  product: catalase
+  score: 17.2535
+- annotation_quality: 3
+  cluster_id: 464SN@72275,Alteromonadaceae
+  function_description: Catalase
+  gene_name: katA
+  gene_summary: 'katA :: catalase :: Catalase'
+  locus_tag: MIT1002_02464
+  organism_strain: Alteromonas macleodii MIT1002
+  product: catalase
+  score: 17.3306
+- annotation_quality: 3
+  cluster_id: 4644E@72275,Alteromonadaceae
+  function_description: Serves to protect cells from the toxic effects of hydrogen
+    peroxide
+  gene_name: katE
+  gene_summary: 'katE :: catalase :: Serves to protect cells from the toxic effects
+    of hydrogen peroxide'
+  locus_tag: MIT1002_02513
+  organism_strain: Alteromonas macleodii MIT1002
+  product: catalase
+  score: 13.1298
+- annotation_quality: 3
+  cluster_id: 4644E@72275,Alteromonadaceae
+  function_description: Serves to protect cells from the toxic effects of hydrogen
+    peroxide
+  gene_name: katB
+  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
+    of hydrogen peroxide'
+  locus_tag: MIT1002_03530
+  organism_strain: Alteromonas macleodii MIT1002
+  product: catalase
+  score: 14.0897

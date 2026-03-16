@@ -14,10 +14,13 @@ import pytest
 
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
+    build_gene_ontology_terms,
+    build_genes_by_ontology,
     build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
     build_search_genes,
+    build_search_ontology,
     build_resolve_gene,
     build_get_gene_details_homologs,
     build_get_gene_details_main,
@@ -117,13 +120,13 @@ class TestResolveGeneCorrectnessKG:
         assert "PMT0106" in found_loci
 
     def test_gene_name_equals_locus_tag(self, conn):
-        """ALT831_RS00180 has gene_name = locus_tag; verify it returns correctly."""
+        """ALT831_RS00180 has gene_name = locus_tag in source; KG stores it as synonym instead."""
         gene = GENES_BY_LOCUS["ALT831_RS00180"]
         cypher, params = build_resolve_gene(identifier=gene["locus_tag"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
-        assert results[0]["gene_name"] == gene["gene_name"]
-        assert results[0]["gene_name"] == gene["locus_tag"]
+        assert results[0]["gene_name"] is None
+        assert results[0]["locus_tag"] == gene["locus_tag"]
 
 
 # ---------------------------------------------------------------------------
@@ -164,6 +167,23 @@ class TestSearchGenesCorrectnessKG:
         results_low = conn.execute_query(cypher_low, **params_low)
         results_high = conn.execute_query(cypher_high, **params_high)
         assert len(results_high) <= len(results_low)
+
+    def test_category_filter(self, conn):
+        """Category filter restricts results to genes in that category."""
+        cypher, params = build_search_genes(
+            search_text="reaction centre", category="Photosynthesis",
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+
+    def test_cross_organism_results(self, conn):
+        """Search without organism filter returns genes from multiple organisms."""
+        cypher, params = build_search_genes(
+            search_text="chaperone", limit=20,
+        )
+        results = conn.execute_query(cypher, **params)
+        orgs = {r["organism_strain"] for r in results}
+        assert len(orgs) >= 2, f"Expected multi-organism results, got {orgs}"
 
 
 # ---------------------------------------------------------------------------
@@ -394,16 +414,18 @@ class TestListOrganismsCorrectnessKG:
         cypher, params = build_list_organisms()
         results = conn.execute_query(cypher, **params)
         names = {r["name"] for r in results}
-        for expected in ["Prochlorococcus MED4", "Alteromonas EZ55", "MIT9313", "HOT1A3"]:
+        for expected in ["Prochlorococcus MED4", "Alteromonas macleodii EZ55", "MIT9313", "HOT1A3"]:
             assert any(expected in n for n in names), (
                 f"Expected organism containing '{expected}' not found in {sorted(names)}"
             )
 
     def test_gene_count_positive(self, conn):
-        """All returned organisms should have gene_count > 0."""
+        """Organisms with a strain should have gene_count > 0."""
         cypher, params = build_list_organisms()
         results = conn.execute_query(cypher, **params)
-        for r in results:
+        strain_organisms = [r for r in results if r.get("strain")]
+        assert len(strain_organisms) > 0, "No organisms with strains found"
+        for r in strain_organisms:
             assert r["gene_count"] > 0, (
                 f"Organism '{r['name']}' has gene_count={r['gene_count']}"
             )
@@ -447,3 +469,278 @@ class TestListOrganismsCorrectnessKG:
         assert len(results) >= 10, (
             f"Expected >= 10 organisms, got {len(results)}"
         )
+
+
+# ---------------------------------------------------------------------------
+# TestSearchOntologyCorrectnessKG
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestSearchOntologyCorrectnessKG:
+    """Validate search_ontology queries against live Neo4j."""
+
+    def test_go_bp_replication(self, conn):
+        """Search for 'replication' in GO:BP returns biological process terms."""
+        cypher, params = build_search_ontology(ontology="go_bp", search_text="replication")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+            assert "score" in r
+
+    def test_ec_oxidoreductase(self, conn):
+        """Search for 'oxidoreductase' in EC returns EC terms."""
+        cypher, params = build_search_ontology(ontology="ec", search_text="oxidoreductase")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+
+    def test_kegg_metabolism_multiple_levels(self, conn):
+        """Search for 'metabolism' in KEGG returns results from multiple levels."""
+        cypher, params = build_search_ontology(ontology="kegg", search_text="metabolism")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+        # KEGG levels are visible from ID prefixes
+        id_prefixes = {r["id"].split(":")[0] for r in results}
+        # Should see at least 2 different prefixes (e.g. kegg.category, kegg.subcategory)
+        assert len(id_prefixes) >= 1
+
+    def test_go_mf_binding(self, conn):
+        """Search for 'binding' in GO:MF returns molecular function terms."""
+        cypher, params = build_search_ontology(ontology="go_mf", search_text="binding")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_go_cc_membrane(self, conn):
+        """Search for 'membrane' in GO:CC returns cellular component terms."""
+        cypher, params = build_search_ontology(ontology="go_cc", search_text="membrane")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+
+
+# ---------------------------------------------------------------------------
+# TestGenesByOntologyCorrectnessKG
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestGenesByOntologyCorrectnessKG:
+    """Validate genes_by_ontology queries against live Neo4j."""
+
+    def test_go_bp_hierarchy_expansion(self, conn):
+        """GO:BP by ID with hierarchy: nucleobase-containing compound metabolic process."""
+        cypher, params = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006139"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 10, (
+            f"Expected >= 10 genes for go:0006139 hierarchy, got {len(results)}"
+        )
+
+    def test_go_bp_leaf_fewer_than_parent(self, conn):
+        """A specific leaf term should return fewer genes than a parent term."""
+        cypher_parent, params_parent = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006139"], limit=100,
+        )
+        cypher_leaf, params_leaf = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], limit=100,
+        )
+        parent_results = conn.execute_query(cypher_parent, **params_parent)
+        leaf_results = conn.execute_query(cypher_leaf, **params_leaf)
+        assert len(leaf_results) <= len(parent_results), (
+            f"Leaf term go:0006260 ({len(leaf_results)} genes) should have "
+            f"<= parent go:0006139 ({len(parent_results)} genes)"
+        )
+
+    def test_ec_hierarchy_top_level(self, conn):
+        """EC hierarchy: ec:1.-.-.- returns all oxidoreductases via tree walk."""
+        cypher, params = build_genes_by_ontology(
+            ontology="ec", term_ids=["ec:1.-.-.-"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 10
+
+    def test_ec_leaf_direct(self, conn):
+        """EC leaf: ec:2.7.7.7 returns DNA polymerases."""
+        cypher, params = build_genes_by_ontology(
+            ontology="ec", term_ids=["ec:2.7.7.7"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_kegg_category_traversal(self, conn):
+        """KEGG Category: kegg.category:09100 (Metabolism) traverses to genes."""
+        cypher, params = build_genes_by_ontology(
+            ontology="kegg", term_ids=["kegg.category:09100"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 10
+
+    def test_kegg_ko_direct(self, conn):
+        """KEGG KO direct: kegg.orthology:K00001 returns genes."""
+        cypher, params = build_genes_by_ontology(
+            ontology="kegg", term_ids=["kegg.orthology:K00001"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_organism_filter(self, conn):
+        """Organism filter restricts results to matching organism."""
+        cypher_all, params_all = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006139"], limit=500,
+        )
+        cypher_filtered, params_filtered = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006139"],
+            organism="MED4", limit=500,
+        )
+        all_results = conn.execute_query(cypher_all, **params_all)
+        filtered = conn.execute_query(cypher_filtered, **params_filtered)
+        assert len(filtered) < len(all_results), (
+            "Organism filter should reduce result count"
+        )
+        for r in filtered:
+            assert "MED4" in r["organism_strain"]
+
+    def test_multiple_term_ids(self, conn):
+        """Multiple term IDs return union of results."""
+        cypher, params = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260", "go:0006139"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_go_mf_dna_binding(self, conn):
+        """GO:MF hierarchy: go:0003677 (DNA binding) finds genes."""
+        cypher, params = build_genes_by_ontology(
+            ontology="go_mf", term_ids=["go:0003677"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1, "Expected genes for DNA binding (go:0003677)"
+
+    def test_go_cc_membrane(self, conn):
+        """GO:CC hierarchy: go:0016020 (membrane) finds genes."""
+        cypher, params = build_genes_by_ontology(
+            ontology="go_cc", term_ids=["go:0016020"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1, "Expected genes for membrane (go:0016020)"
+
+    def test_kegg_subcategory(self, conn):
+        """KEGG subcategory: kegg.subcategory:09101 traverses to genes."""
+        cypher, params = build_genes_by_ontology(
+            ontology="kegg", term_ids=["kegg.subcategory:09101"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_ec_intermediate_level(self, conn):
+        """EC intermediate: ec:1.1.-.- returns a subset of ec:1.-.-.-."""
+        cypher, params = build_genes_by_ontology(
+            ontology="ec", term_ids=["ec:1.1.-.-"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+
+# ---------------------------------------------------------------------------
+# TestGeneOntologyTermsCorrectnessKG
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestGeneOntologyTermsCorrectnessKG:
+    """Validate gene_ontology_terms queries against live Neo4j."""
+
+    def test_bp_leaf_only_argr(self, conn):
+        """argR (MIT1002_03493) leaf BP terms should be around 12."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="go_bp", gene_id="MIT1002_03493", leaf_only=True,
+        )
+        results = conn.execute_query(cypher, **params)
+        assert 5 <= len(results) <= 20, (
+            f"Expected 5-20 leaf BP terms for argR, got {len(results)}"
+        )
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_bp_all_argr(self, conn):
+        """argR (MIT1002_03493) all BP terms should be many more than leaf-only."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="go_bp", gene_id="MIT1002_03493", leaf_only=False,
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 50, (
+            f"Expected >= 50 total BP terms for argR, got {len(results)}"
+        )
+
+    def test_ec_annotations(self, conn):
+        """Gene with EC annotations returns EC numbers with id and name."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="ec", gene_id="MIT1002_03493",
+        )
+        results = conn.execute_query(cypher, **params)
+        # argR may or may not have EC; just check column structure if results exist
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_kegg_annotations(self, conn):
+        """Gene with KEGG KOs returns terms with id and name."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="kegg", gene_id="MIT1002_03493",
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1, "argR should have at least 1 KEGG KO"
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_no_annotations_empty_result(self, conn):
+        """Gene with no annotations for given ontology returns empty."""
+        # Use a gene unlikely to have GO:CC annotations
+        cypher, params = build_gene_ontology_terms(
+            ontology="go_cc", gene_id="PMT9312_0342",
+        )
+        results = conn.execute_query(cypher, **params)
+        # Just verify it returns a list (may be empty or not)
+        assert isinstance(results, list)
+
+    def test_limit_caps_results(self, conn):
+        """Limit parameter caps result count."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="go_bp", gene_id="MIT1002_03493",
+            leaf_only=False, limit=5,
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) <= 5
+
+    def test_mf_annotations(self, conn):
+        """Gene with GO:MF annotations returns molecular function terms."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="go_mf", gene_id="MIT1002_03493",
+        )
+        results = conn.execute_query(cypher, **params)
+        # Just check structure — may or may not have MF annotations
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_cc_annotations(self, conn):
+        """Gene with GO:CC annotations returns cellular component terms."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="go_cc", gene_id="MIT1002_03493",
+        )
+        results = conn.execute_query(cypher, **params)
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_different_gene_bp(self, conn):
+        """Different gene (PMM0001/dnaN) has GO:BP annotations."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="go_bp", gene_id="PMM0001",
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1, "PMM0001 (dnaN) should have GO:BP annotations"

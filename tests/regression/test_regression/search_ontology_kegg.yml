@@ -1,0 +1,78 @@
+case_id: search_ontology_kegg
+row_count: 25
+rows:
+- id: kegg.category:09100
+  name: Metabolism
+  score: 2.6019
+- id: kegg.pathway:ko00052
+  name: Galactose metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00230
+  name: Purine metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00240
+  name: Pyrimidine metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00340
+  name: Histidine metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00350
+  name: Tyrosine metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00360
+  name: Phenylalanine metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00450
+  name: Selenocompound metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00480
+  name: Glutathione metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00561
+  name: Glycerolipid metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00600
+  name: Sphingolipid metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00620
+  name: Pyruvate metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00640
+  name: Propanoate metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00650
+  name: Butanoate metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00680
+  name: Methane metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00730
+  name: Thiamine metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00740
+  name: Riboflavin metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00780
+  name: Biotin metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00830
+  name: Retinol metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00860
+  name: Porphyrin metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00910
+  name: Nitrogen metabolism
+  score: 2.3771
+- id: kegg.pathway:ko00920
+  name: Sulfur metabolism
+  score: 2.3771
+- id: kegg.pathway:ko01200
+  name: Carbon metabolism
+  score: 2.3771
+- id: kegg.subcategory:09103
+  name: Lipid metabolism
+  score: 2.3771
+- id: kegg.subcategory:09104
+  name: Nucleotide metabolism
+  score: 2.3771

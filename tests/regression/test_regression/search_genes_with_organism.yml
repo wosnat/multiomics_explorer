@@ -2,85 +2,122 @@ case_id: search_genes_with_organism
 row_count: 10
 rows:
 - annotation_quality: 3
+  cluster_id: CK_00008107
   function_description: COG188 Type IIA topoisomerase (DNA gyrase topo II, topoisomerase
     IV), A subunit DNA replication, recombination, and repair
-  gene_name: PMM0005
+  gene_name: null
+  gene_summary: 'DNA gyrase/topoisomerase IV, subunit A family protein :: COG188 Type
+    IIA topoisomerase (DNA gyrase topo II, topoisomerase IV), A subunit DNA replication,
+    recombination, and repair'
   locus_tag: PMM0005
   organism_strain: Prochlorococcus MED4
   product: DNA gyrase/topoisomerase IV, subunit A family protein
-  score: 8.1461
+  score: 8.1577
 - annotation_quality: 3
+  cluster_id: CK_00044232
   function_description: Belongs to the DNA glycosylase MPG family
   gene_name: mpg
+  gene_summary: 'mpg :: DNA-3-methyladenine glycosylase :: Belongs to the DNA glycosylase
+    MPG family'
   locus_tag: PMM0234
   organism_strain: Prochlorococcus MED4
   product: DNA-3-methyladenine glycosylase
-  score: 6.7737
+  score: 6.7778
 - annotation_quality: 3
+  cluster_id: CK_00001039
   function_description: Involved in DNA repair and RecF pathway recombination
   gene_name: recO
+  gene_summary: 'recO :: gap repair protein RecO :: Involved in DNA repair and RecF
+    pathway recombination'
   locus_tag: PMM0398
   organism_strain: Prochlorococcus MED4
   product: gap repair protein RecO
-  score: 9.289
+  score: 9.2995
 - annotation_quality: 3
+  cluster_id: CK_00000889
   function_description: Plays a critical role in recombination and DNA repair. Helps
     process Holliday junction intermediates to mature products by catalyzing branch
     migration. Has replication fork regression activity, unwinds stalled or blocked
     replication forks to make a HJ that can be resolved. Has a DNA unwinding activity
     characteristic of a DNA helicase with 3^-5^ polarity
   gene_name: recG
+  gene_summary: 'recG :: ATP-dependent DNA helicase :: Plays a critical role in recombination
+    and DNA repair. Helps process Holliday junction intermediates to mature products
+    by catalyzing branch migration. Has replication fork regression activity, unwinds
+    stalled or blocked replication forks to make a HJ that can be resolved. Has a
+    DNA unwinding activity characteristic of a DNA helicase with 3^-5^ polarity'
   locus_tag: PMM0756
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA helicase
-  score: 6.7278
+  score: 6.7389
 - annotation_quality: 3
+  cluster_id: CK_00000857
   function_description: Couples transcription and DNA repair by recognizing RNA polymerase
     (RNAP) stalled at DNA lesions. Mediates ATP-dependent release of RNAP and its
     truncated transcript from the DNA, and recruitment of nucleotide excision repair
     machinery to the damaged site
   gene_name: mfd
+  gene_summary: 'mfd :: transcription-repair coupling factor :: Couples transcription
+    and DNA repair by recognizing RNA polymerase (RNAP) stalled at DNA lesions. Mediates
+    ATP-dependent release of RNAP and its truncated transcript from the DNA, and recruitment
+    of nucleotide excision repair machinery to the damaged site'
   locus_tag: PMM0839
   organism_strain: Prochlorococcus MED4
   product: transcription-repair coupling factor
-  score: 8.4084
+  score: 8.4219
 - annotation_quality: 3
+  cluster_id: CK_00000787
   function_description: DNA polymerase
   gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
   locus_tag: PMM0945
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, alpha subunit
-  score: 6.8349
+  score: 6.8382
 - annotation_quality: 3
+  cluster_id: CK_00000751
   function_description: May play a role in DNA repair. It seems to be involved in
     an RecBC-independent recombinational process of DNA repair. It may act with RecF
     and RecO
   gene_name: recR
+  gene_summary: 'recR :: recombination protein RecR :: May play a role in DNA repair.
+    It seems to be involved in an RecBC-independent recombinational process of DNA
+    repair. It may act with RecF and RecO'
   locus_tag: PMM1097
   organism_strain: Prochlorococcus MED4
   product: recombination protein RecR
-  score: 7.8919
+  score: 7.9049
 - annotation_quality: 3
+  cluster_id: CK_00000549
   function_description: it is required for DNA replication and normal SOS inducibility.
     RecF binds preferentially to single-stranded, linear DNA. It also seems to bind
     ATP
   gene_name: recF
+  gene_summary: 'recF :: DNA replication and repair protein recF :: it is required
+    for DNA replication and normal SOS inducibility. RecF binds preferentially to
+    single-stranded, linear DNA. It also seems to bind ATP'
   locus_tag: PMM1573
   organism_strain: Prochlorococcus MED4
   product: DNA replication and repair protein recF
-  score: 7.9495
+  score: 7.9612
 - annotation_quality: 3
+  cluster_id: CK_00000315
   function_description: that it carries out the mismatch recognition step. This protein
     has a weak ATPase activity
   gene_name: mutS
+  gene_summary: 'mutS :: DNA mismatch repair protein MutS :: that it carries out the
+    mismatch recognition step. This protein has a weak ATPase activity'
   locus_tag: PMM1645
   organism_strain: Prochlorococcus MED4
   product: DNA mismatch repair protein MutS
-  score: 7.2658
+  score: 7.2774
 - annotation_quality: 3
+  cluster_id: CK_00000366
   function_description: May be involved in recombinational repair of damaged DNA
   gene_name: recN
+  gene_summary: 'recN :: ATP-dependent DNA repair protein RecN :: May be involved
+    in recombinational repair of damaged DNA'
   locus_tag: PMM1713
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA repair protein RecN
-  score: 9.4057
+  score: 9.4168

@@ -1,0 +1,5 @@
+case_id: gene_ontology_terms_kegg
+row_count: 1
+rows:
+- id: kegg.orthology:K03402
+  name: argR, ahrC; transcriptional regulator of arginine metabolism

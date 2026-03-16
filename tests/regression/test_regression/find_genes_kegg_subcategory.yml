@@ -1,0 +1,103 @@
+case_id: find_genes_kegg_subcategory
+row_count: 25
+rows:
+- gene_name: gap2
+  locus_tag: A9601_00221
+  organism_strain: Prochlorococcus AS9601
+  product: glyceraldehyde-3-phosphate dehydrogenase
+- gene_name: accB
+  locus_tag: A9601_00261
+  organism_strain: Prochlorococcus AS9601
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+- gene_name: accC
+  locus_tag: A9601_00721
+  organism_strain: Prochlorococcus AS9601
+  product: acetyl-CoA carboxylase, biotin carboxylase subunit
+- gene_name: pgmA2
+  locus_tag: A9601_00891
+  organism_strain: Prochlorococcus AS9601
+  product: phosphoglucomutase
+- gene_name: null
+  locus_tag: A9601_01121
+  organism_strain: Prochlorococcus AS9601
+  product: Inositol monophosphatase family protein
+- gene_name: cugP
+  locus_tag: A9601_01691
+  organism_strain: Prochlorococcus AS9601
+  product: mannose-1-phosphate guanylyltransferase
+- gene_name: gltA
+  locus_tag: A9601_01791
+  organism_strain: Prochlorococcus AS9601
+  product: citrate synthase
+- gene_name: pgk
+  locus_tag: A9601_02131
+  organism_strain: Prochlorococcus AS9601
+  product: phosphoglycerate kinase
+- gene_name: eno
+  locus_tag: A9601_02261
+  organism_strain: Prochlorococcus AS9601
+  product: enolase
+- gene_name: eda
+  locus_tag: A9601_02461
+  organism_strain: Prochlorococcus AS9601
+  product: 2-keto-3-deoxy-6-phosphogluconate aldolase
+- gene_name: leuD
+  locus_tag: A9601_02771
+  organism_strain: Prochlorococcus AS9601
+  product: 3-isopropylmalate dehydratase small subunit
+- gene_name: leuC
+  locus_tag: A9601_02781
+  organism_strain: Prochlorococcus AS9601
+  product: 3-isopropylmalate dehydratase, large subunit
+- gene_name: glyA
+  locus_tag: A9601_02801
+  organism_strain: Prochlorococcus AS9601
+  product: serine hydroxymethyltransferase
+- gene_name: xylB
+  locus_tag: A9601_03341
+  organism_strain: Prochlorococcus AS9601
+  product: carbohydrate kinase, FGGY family
+- gene_name: invA
+  locus_tag: A9601_03511
+  organism_strain: Prochlorococcus AS9601
+  product: alkaline and neutral invertase
+- gene_name: ALDH
+  locus_tag: A9601_03571
+  organism_strain: Prochlorococcus AS9601
+  product: aldehyde dehydrogenase (NAD+)
+- gene_name: deoC
+  locus_tag: A9601_04501
+  organism_strain: Prochlorococcus AS9601
+  product: deoC/LacD aldolase family protein
+- gene_name: pdhC
+  locus_tag: A9601_04551
+  organism_strain: Prochlorococcus AS9601
+  product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
+- gene_name: mqoA
+  locus_tag: A9601_04701
+  organism_strain: Prochlorococcus AS9601
+  product: malate:quinone oxidoreductase
+- gene_name: pfkB
+  locus_tag: A9601_05621
+  organism_strain: Prochlorococcus AS9601
+  product: possible 6-phosphofructokinase
+- gene_name: talA
+  locus_tag: A9601_05751
+  organism_strain: Prochlorococcus AS9601
+  product: transaldolase
+- gene_name: ilvB
+  locus_tag: A9601_05821
+  organism_strain: Prochlorococcus AS9601
+  product: acetolactate synthase, large subunit, biosynthetic type
+- gene_name: accA
+  locus_tag: A9601_05901
+  organism_strain: Prochlorococcus AS9601
+  product: acetyl-CoA carboxylase, carboxyl transferase alpha subunit
+- gene_name: rbcL
+  locus_tag: A9601_06061
+  organism_strain: Prochlorococcus AS9601
+  product: ribulose bisphosphate carboxylase, large subunit
+- gene_name: rbcS
+  locus_tag: A9601_06071
+  organism_strain: Prochlorococcus AS9601
+  product: ribulose bisphosphate carboxylase, small subunit

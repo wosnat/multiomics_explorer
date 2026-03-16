@@ -1,0 +1,78 @@
+case_id: search_ontology_go_mf
+row_count: 25
+rows:
+- id: go:0000166
+  name: nucleotide binding
+  score: 1.2853
+- id: go:0001530
+  name: lipopolysaccharide binding
+  score: 1.2853
+- id: go:0001882
+  name: nucleoside binding
+  score: 1.2853
+- id: go:0002020
+  name: protease binding
+  score: 1.2853
+- id: go:0002058
+  name: uracil binding
+  score: 1.2853
+- id: go:0003677
+  name: DNA binding
+  score: 1.2853
+- id: go:0003723
+  name: RNA binding
+  score: 1.2853
+- id: go:0003729
+  name: mRNA binding
+  score: 1.2853
+- id: go:0005488
+  name: binding
+  score: 1.4522
+- id: go:0005543
+  name: phospholipid binding
+  score: 1.2853
+- id: go:0009374
+  name: biotin binding
+  score: 1.2853
+- id: go:0019900
+  name: kinase binding
+  score: 1.2853
+- id: go:0020037
+  name: heme binding
+  score: 1.2853
+- id: go:0030552
+  name: cAMP binding
+  score: 1.2853
+- id: go:0034618
+  name: arginine binding
+  score: 1.2853
+- id: go:0043168
+  name: anion binding
+  score: 1.2853
+- id: go:0046906
+  name: tetrapyrrole binding
+  score: 1.2853
+- id: go:0048030
+  name: disaccharide binding
+  score: 1.2853
+- id: go:0048038
+  name: quinone binding
+  score: 1.2853
+- id: go:0051020
+  name: GTPase binding
+  score: 1.2853
+- id: go:0051117
+  name: ATPase binding
+  score: 1.2853
+- id: go:0051870
+  name: methotrexate binding
+  score: 1.2853
+- id: go:0070402
+  name: NADPH binding
+  score: 1.2853
+- id: go:0070404
+  name: NADH binding
+  score: 1.2853
+- id: go:1900750
+  name: oligopeptide binding
+  score: 1.2853

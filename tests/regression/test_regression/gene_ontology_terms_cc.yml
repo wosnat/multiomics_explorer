@@ -1,0 +1,7 @@
+case_id: gene_ontology_terms_cc
+row_count: 2
+rows:
+- id: go:0005575
+  name: cellular_component
+- id: go:0005737
+  name: cytoplasm

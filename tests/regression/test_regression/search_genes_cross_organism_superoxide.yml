@@ -1,0 +1,97 @@
+case_id: search_genes_cross_organism_superoxide
+row_count: 10
+rows:
+- annotation_quality: 3
+  cluster_id: CK_00001843
+  function_description: Alternative locus ID
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
+  locus_tag: A9601_14931
+  organism_strain: Prochlorococcus AS9601
+  product: superoxide dismutase [Ni]
+  score: 19.4382
+- annotation_quality: 3
+  cluster_id: 46B1B@72275,Alteromonadaceae
+  function_description: Nickel-containing superoxide dismutase
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase, Ni :: Nickel-containing superoxide
+    dismutase'
+  locus_tag: ACZ81_02705
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: superoxide dismutase, Ni
+  score: 21.2239
+- annotation_quality: 3
+  cluster_id: 46B1B@72275,Alteromonadaceae
+  function_description: Nickel-containing superoxide dismutase
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase, Ni :: Nickel-containing superoxide
+    dismutase'
+  locus_tag: EZ55_00595
+  organism_strain: Alteromonas macleodii EZ55
+  product: superoxide dismutase, Ni
+  score: 21.2239
+- annotation_quality: 3
+  cluster_id: 46B1B@72275,Alteromonadaceae
+  function_description: Nickel-containing superoxide dismutase
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase, Ni :: Nickel-containing superoxide
+    dismutase'
+  locus_tag: MIT1002_00621
+  organism_strain: Alteromonas macleodii MIT1002
+  product: superoxide dismutase, Ni
+  score: 21.2239
+- annotation_quality: 3
+  cluster_id: CK_00001843
+  function_description: Alternative locus ID
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
+  locus_tag: NATL1_17141
+  organism_strain: Prochlorococcus NATL1A
+  product: superoxide dismutase [Ni]
+  score: 19.4382
+- annotation_quality: 3
+  cluster_id: CK_00001843
+  function_description: Alternative locus ID
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
+  locus_tag: P9301_14791
+  organism_strain: Prochlorococcus MIT9301
+  product: superoxide dismutase [Ni]
+  score: 19.4382
+- annotation_quality: 3
+  cluster_id: CK_00001843
+  function_description: Alternative locus ID
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
+  locus_tag: PMM1294
+  organism_strain: Prochlorococcus MED4
+  product: superoxide dismutase [Ni]
+  score: 19.4382
+- annotation_quality: 3
+  cluster_id: CK_00001843
+  function_description: Superoxide dismutase
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Superoxide dismutase'
+  locus_tag: SYNW1626
+  organism_strain: Synechococcus WH8102
+  product: superoxide dismutase [Ni]
+  score: 22.0826
+- annotation_quality: 3
+  cluster_id: CK_00001843
+  function_description: Superoxide dismutase
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Superoxide dismutase'
+  locus_tag: sync_0755
+  organism_strain: Synechococcus CC9311
+  product: superoxide dismutase [Ni]
+  score: 22.0826
+- annotation_quality: 3
+  cluster_id: CK_00008747
+  function_description: Nickel-containing superoxide dismutase
+  gene_name: null
+  gene_summary: 'nickel-type superoxide dismutase :: Nickel-containing superoxide
+    dismutase'
+  locus_tag: sync_2434
+  organism_strain: Synechococcus CC9311
+  product: nickel-type superoxide dismutase
+  score: 21.5721

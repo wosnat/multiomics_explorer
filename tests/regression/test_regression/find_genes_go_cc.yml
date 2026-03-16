@@ -1,0 +1,105 @@
+case_id: find_genes_go_cc
+row_count: 25
+rows:
+- gene_name: null
+  locus_tag: A9601_00071
+  organism_strain: Prochlorococcus AS9601
+  product: uncharacterized conserved membrane protein (DUF502)
+- gene_name: ftsY
+  locus_tag: A9601_00091
+  organism_strain: Prochlorococcus AS9601
+  product: signal recognition particle-docking protein FtsY
+- gene_name: null
+  locus_tag: A9601_00321
+  organism_strain: Prochlorococcus AS9601
+  product: conserved membrane protein, ArbrB family
+- gene_name: mrdA
+  locus_tag: A9601_00411
+  organism_strain: Prochlorococcus AS9601
+  product: transpeptidase involved in septal peptidoglycan synthesis (peptidoglycan
+    synthetase precursor)
+- gene_name: ndk
+  locus_tag: A9601_00471
+  organism_strain: Prochlorococcus AS9601
+  product: nucleoside diphosphate kinase
+- gene_name: null
+  locus_tag: A9601_00531
+  organism_strain: Prochlorococcus AS9601
+  product: tetratricopeptide repeat family protein
+- gene_name: null
+  locus_tag: A9601_00551
+  organism_strain: Prochlorococcus AS9601
+  product: tetratricopeptide repeat family protein
+- gene_name: null
+  locus_tag: A9601_00651
+  organism_strain: Prochlorococcus AS9601
+  product: uncharacterized conserved membrane protein, phage holin family
+- gene_name: null
+  locus_tag: A9601_00661
+  organism_strain: Prochlorococcus AS9601
+  product: uncharacterized conserved inner membrane protein, YqjD/ElaB family
+- gene_name: cbb3
+  locus_tag: A9601_00731
+  organism_strain: Prochlorococcus AS9601
+  product: cofactor assembly of complex C subunit CBB3
+- gene_name: psbX
+  locus_tag: A9601_00741
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II PsbX protein
+- gene_name: hli
+  locus_tag: A9601_00761
+  organism_strain: Prochlorococcus AS9601
+  product: high light inducible protein
+- gene_name: mcyH
+  locus_tag: A9601_00771
+  organism_strain: Prochlorococcus AS9601
+  product: ABC transporter, ATPase component
+- gene_name: null
+  locus_tag: A9601_00881
+  organism_strain: Prochlorococcus AS9601
+  product: uncharacterized conserved membrane protein
+- gene_name: citT
+  locus_tag: A9601_00961
+  organism_strain: Prochlorococcus AS9601
+  product: putative sodium/potassium/sulfate transporter, DASS family
+- gene_name: ktrB
+  locus_tag: A9601_00971
+  organism_strain: Prochlorococcus AS9601
+  product: Ktr-type potassium uptake transporter, potassium-translocating subunit
+    B
+- gene_name: ktrA
+  locus_tag: A9601_00981
+  organism_strain: Prochlorococcus AS9601
+  product: Ktr-type potassium uptake system, NAD-binding component
+- gene_name: null
+  locus_tag: A9601_01041
+  organism_strain: Prochlorococcus AS9601
+  product: ABC transport system ATP-binding/permease protein, Uup family
+- gene_name: hli
+  locus_tag: A9601_01091
+  organism_strain: Prochlorococcus AS9601
+  product: high light inducible protein
+- gene_name: rbn
+  locus_tag: A9601_01111
+  organism_strain: Prochlorococcus AS9601
+  product: virulence factor BrkB family protein
+- gene_name: tolC
+  locus_tag: A9601_01131
+  organism_strain: Prochlorococcus AS9601
+  product: TolC-like outer membrane efflux protein, RND family
+- gene_name: SynDsbAB
+  locus_tag: A9601_01171
+  organism_strain: Prochlorococcus AS9601
+  product: disulfide bond forming protein
+- gene_name: ndhO
+  locus_tag: A9601_01391
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhO
+- gene_name: ecfA1
+  locus_tag: A9601_01431
+  organism_strain: Prochlorococcus AS9601
+  product: energy-coupling factor transport system ATP-binding protein
+- gene_name: zntA
+  locus_tag: A9601_01481
+  organism_strain: Prochlorococcus AS9601
+  product: copper-translocating P-type ATPase

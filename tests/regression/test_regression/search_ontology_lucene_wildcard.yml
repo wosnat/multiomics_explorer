@@ -1,0 +1,78 @@
+case_id: search_ontology_lucene_wildcard
+row_count: 25
+rows:
+- id: ec:1.-.-.-
+  name: Oxidoreductases
+  score: 1.0
+- id: ec:1.12.5.1
+  name: hydrogen:quinone oxidoreductase
+  score: 1.0
+- id: ec:1.3.99.16
+  name: isoquinoline 1-oxidoreductase
+  score: 1.0
+- id: ec:1.3.99.17
+  name: quinoline 2-oxidoreductase
+  score: 1.0
+- id: ec:1.3.99.18
+  name: quinaldate 4-oxidoreductase
+  score: 1.0
+- id: ec:1.3.99.19
+  name: quinoline-4-carboxylate 2-oxidoreductase
+  score: 1.0
+- id: ec:1.5.1.40
+  name: 8-hydroxy-5-deazaflavin:NADPH oxidoreductase
+  score: 1.0
+- id: ec:1.5.3.23
+  name: glyphosate oxidoreductase
+  score: 1.0
+- id: ec:1.5.7.2
+  name: coenzyme F420 oxidoreductase (ferredoxin)
+  score: 1.0
+- id: ec:1.8.1.18
+  name: NAD(P)H sulfur oxidoreductase (CoA-dependent)
+  score: 1.0
+- id: ec:1.8.2.6
+  name: S-disulfanyl-L-cysteine oxidoreductase
+  score: 1.0
+- id: ec:1.8.4.15
+  name: protein dithiol oxidoreductase (disulfide-forming)
+  score: 1.0
+- id: ec:1.8.5.8
+  name: eukaryotic sulfide quinone oxidoreductase
+  score: 1.0
+- id: ec:1.8.5.9
+  name: protein dithiol:quinone oxidoreductase DsbB
+  score: 1.0
+- id: ec:1.97.-.-
+  name: Other oxidoreductases
+  score: 1.0
+- id: ec:1.97.1.-
+  name: Other oxidoreductases
+  score: 1.0
+- id: ec:1.97.1.13
+  name: aliphatic sulfonate oxidoreductase
+  score: 1.0
+- id: ec:1.98.1.-
+  name: Other oxidoreductases
+  score: 1.0
+- id: ec:5.3.-.-
+  name: Intramolecular oxidoreductases
+  score: 1.0
+- id: ec:5.3.99.-
+  name: Other intramolecular oxidoreductases
+  score: 1.0
+- id: ec:7.1.1.-
+  name: Hydron translocation or charge separation linked to oxidoreductase reactions
+  score: 1.0
+- id: ec:7.1.1.10
+  name: ferredoxin--quinone oxidoreductase (H(+)-translocating)
+  score: 1.0
+- id: ec:7.1.1.11
+  name: ferredoxin--NAD(+) oxidoreductase (H(+)-transporting)
+  score: 1.0
+- id: ec:7.2.1.-
+  name: Linked to oxidoreductase reactions
+  score: 1.0
+- id: ec:7.2.1.2
+  name: ferredoxin--NAD(+) oxidoreductase (Na(+)-transporting)
+  score: 1.0

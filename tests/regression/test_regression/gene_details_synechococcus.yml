@@ -82,6 +82,7 @@ rows:
       for both cytoplasmic and membrane proteins. Plays a role in the quality control
       of integral membrane proteins
     function_description_source: uniprot
+    gene_category: Cell cycle and division
     gene_name: ftsH1
     gene_name_source: cyanorak
     gene_name_synonyms:

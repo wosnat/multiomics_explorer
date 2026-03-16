@@ -1,0 +1,13 @@
+case_id: gene_ontology_terms_bp_limited
+row_count: 5
+rows:
+- id: go:0006259
+  name: DNA metabolic process
+- id: go:0006310
+  name: DNA recombination
+- id: go:0006520
+  name: amino acid metabolic process
+- id: go:0006525
+  name: arginine metabolic process
+- id: go:1901605
+  name: alpha-amino acid metabolic process

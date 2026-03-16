@@ -1,0 +1,27 @@
+case_id: gene_ontology_terms_bp_leaf
+row_count: 12
+rows:
+- id: go:0006525
+  name: arginine metabolic process
+- id: go:0010565
+  name: regulation of ketone metabolic process
+- id: go:0010628
+  name: positive regulation of gene expression
+- id: go:0010629
+  name: negative regulation of gene expression
+- id: go:0031333
+  name: negative regulation of protein-containing complex assembly
+- id: go:0031334
+  name: positive regulation of protein-containing complex assembly
+- id: go:0034214
+  name: protein hexamerization
+- id: go:0042150
+  name: plasmid recombination
+- id: go:1900079
+  name: regulation of arginine biosynthetic process
+- id: go:1900081
+  name: regulation of arginine catabolic process
+- id: go:2000143
+  name: negative regulation of DNA-templated transcription initiation
+- id: go:2000144
+  name: positive regulation of DNA-templated transcription initiation

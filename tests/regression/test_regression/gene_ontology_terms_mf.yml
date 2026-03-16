@@ -1,0 +1,11 @@
+case_id: gene_ontology_terms_mf
+row_count: 4
+rows:
+- id: go:0000987
+  name: cis-regulatory region sequence-specific DNA binding
+- id: go:0034618
+  name: arginine binding
+- id: go:0042802
+  name: identical protein binding
+- id: go:1901363
+  name: heterocyclic compound binding

@@ -3,12 +3,18 @@
 Verifies Cypher structure and parameter correctness.
 """
 
+import pytest
+
 from multiomics_explorer.kg.queries_lib import (
+    ONTOLOGY_CONFIG,
     build_compare_conditions,
+    build_gene_ontology_terms,
+    build_genes_by_ontology,
     build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
     build_search_genes,
+    build_search_ontology,
     build_resolve_gene,
     build_get_gene_details_homologs,
     build_get_gene_details_main,
@@ -104,6 +110,14 @@ class TestBuildSearchGenes:
         cypher, params = build_search_genes(search_text="x", category=None)
         assert params["category"] is None
         assert "$category IS NULL" in cypher
+
+    def test_limit_parameter(self):
+        _, params = build_search_genes(search_text="x", limit=5)
+        assert params["limit"] == 5
+
+    def test_default_limit(self):
+        _, params = build_search_genes(search_text="x")
+        assert "limit" in params
 
 
 class TestBuildGetGeneDetails:
@@ -216,6 +230,217 @@ class TestBuildListOrganisms:
     def test_ordered_by_genus_and_name(self):
         cypher, _ = build_list_organisms()
         assert "ORDER BY o.genus, o.preferred_name" in cypher
+
+
+class TestOntologyConfig:
+    def test_all_five_keys_present(self):
+        assert set(ONTOLOGY_CONFIG.keys()) == {"go_bp", "go_mf", "go_cc", "ec", "kegg"}
+
+    def test_required_fields_present(self):
+        for key, cfg in ONTOLOGY_CONFIG.items():
+            assert "label" in cfg, f"{key} missing 'label'"
+            assert "gene_rel" in cfg, f"{key} missing 'gene_rel'"
+            assert "hierarchy_rels" in cfg, f"{key} missing 'hierarchy_rels'"
+            assert "fulltext_index" in cfg, f"{key} missing 'fulltext_index'"
+
+    def test_only_kegg_has_gene_connects_to_level(self):
+        for key, cfg in ONTOLOGY_CONFIG.items():
+            if key == "kegg":
+                assert cfg.get("gene_connects_to_level") == "ko"
+            else:
+                assert "gene_connects_to_level" not in cfg, (
+                    f"{key} should not have 'gene_connects_to_level'"
+                )
+
+
+class TestBuildSearchOntology:
+    @pytest.mark.parametrize("ontology,expected_index", [
+        ("go_bp", "biologicalProcessFullText"),
+        ("go_mf", "molecularFunctionFullText"),
+        ("go_cc", "cellularComponentFullText"),
+        ("ec", "ecNumberFullText"),
+        ("kegg", "keggFullText"),
+    ])
+    def test_correct_fulltext_index(self, ontology, expected_index):
+        cypher, _ = build_search_ontology(ontology=ontology, search_text="test")
+        assert f"'{expected_index}'" in cypher
+
+    def test_returns_id_name_score_columns(self):
+        cypher, _ = build_search_ontology(ontology="go_bp", search_text="test")
+        for col in ["id", "name", "score"]:
+            assert col in cypher
+
+    def test_invalid_ontology_raises_valueerror(self):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_search_ontology(ontology="invalid", search_text="test")
+
+    def test_search_text_passed_as_parameter(self):
+        cypher, params = build_search_ontology(ontology="go_bp", search_text="replication")
+        assert params["search_text"] == "replication"
+        assert "$search_text" in cypher
+        # search_text should NOT be interpolated into cypher
+        assert "replication" not in cypher
+
+    def test_limit_parameter(self):
+        _, params = build_search_ontology(ontology="ec", search_text="x", limit=10)
+        assert params["limit"] == 10
+
+    def test_go_mf_uses_correct_index(self):
+        cypher, _ = build_search_ontology(ontology="go_mf", search_text="binding")
+        assert "'molecularFunctionFullText'" in cypher
+
+    def test_go_cc_uses_correct_index(self):
+        cypher, _ = build_search_ontology(ontology="go_cc", search_text="membrane")
+        assert "'cellularComponentFullText'" in cypher
+
+
+class TestBuildGenesByOntology:
+    def test_go_bp_hierarchy_expansion(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"],
+        )
+        assert "Biological_process_is_a_biological_process|Biological_process_part_of_biological_process" in cypher
+        assert "*0..15" in cypher
+        assert "BiologicalProcess" in cypher
+
+    def test_ec_hierarchy_expansion(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="ec", term_ids=["ec:1.-.-.-"],
+        )
+        assert "Ec_number_is_a_ec_number" in cypher
+        assert "*0..15" in cypher
+
+    def test_kegg_has_level_filter(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="kegg", term_ids=["kegg.category:09100"],
+        )
+        assert "Kegg_term_is_a_kegg_term" in cypher
+        assert "*0..15" in cypher
+        assert "descendant.level = 'ko'" in cypher
+
+    def test_non_kegg_no_level_filter(self):
+        for ontology in ["go_bp", "go_mf", "go_cc", "ec"]:
+            cypher, _ = build_genes_by_ontology(
+                ontology=ontology, term_ids=["test:001"],
+            )
+            assert "level" not in cypher, f"{ontology} should not have level filter"
+
+    def test_organism_filter_in_where(self):
+        cypher, params = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], organism="MED4",
+        )
+        assert params["organism"] == "MED4"
+        assert "toLower($organism)" in cypher
+
+    def test_term_ids_passed_as_parameter(self):
+        cypher, params = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260", "go:0006139"],
+        )
+        assert params["term_ids"] == ["go:0006260", "go:0006139"]
+        assert "$term_ids" in cypher
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"],
+        )
+        for col in ["locus_tag", "gene_name", "product", "organism_strain"]:
+            assert col in cypher
+
+    def test_invalid_ontology_raises_valueerror(self):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_genes_by_ontology(ontology="bad", term_ids=["x"])
+
+    def test_go_mf_hierarchy_expansion(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_mf", term_ids=["go:0003677"],
+        )
+        assert "MolecularFunction" in cypher
+        assert "Molecular_function_is_a_molecular_function" in cypher
+
+    def test_go_cc_hierarchy_expansion(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_cc", term_ids=["go:0016020"],
+        )
+        assert "CellularComponent" in cypher
+        assert "Cellular_component_is_a_cellular_component" in cypher
+
+    def test_limit_parameter(self):
+        _, params = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], limit=5,
+        )
+        assert params["limit"] == 5
+
+
+class TestBuildGeneOntologyTerms:
+    @pytest.mark.parametrize("ontology,expected_label,expected_rel", [
+        ("go_bp", "BiologicalProcess", "Gene_involved_in_biological_process"),
+        ("go_mf", "MolecularFunction", "Gene_enables_molecular_function"),
+        ("go_cc", "CellularComponent", "Gene_located_in_cellular_component"),
+        ("ec", "EcNumber", "Gene_catalyzes_ec_number"),
+        ("kegg", "KeggTerm", "Gene_has_kegg_ko"),
+    ])
+    def test_correct_label_and_rel(self, ontology, expected_label, expected_rel):
+        cypher, _ = build_gene_ontology_terms(ontology=ontology, gene_id="PMM0001")
+        assert expected_label in cypher
+        assert expected_rel in cypher
+
+    def test_leaf_only_adds_not_exists(self):
+        cypher, _ = build_gene_ontology_terms(
+            ontology="go_bp", gene_id="PMM0001", leaf_only=True,
+        )
+        assert "NOT EXISTS" in cypher
+        # Hierarchy edges should be in the NOT EXISTS subquery
+        assert "Biological_process_is_a_biological_process" in cypher
+        assert "Biological_process_part_of_biological_process" in cypher
+
+    def test_leaf_only_false_no_not_exists(self):
+        cypher, _ = build_gene_ontology_terms(
+            ontology="go_bp", gene_id="PMM0001", leaf_only=False,
+        )
+        assert "NOT EXISTS" not in cypher
+
+    def test_returns_id_name_columns(self):
+        for ontology in ["go_bp", "go_mf", "go_cc", "ec", "kegg"]:
+            cypher, _ = build_gene_ontology_terms(ontology=ontology, gene_id="x")
+            assert "t.id AS id" in cypher
+            assert "t.name AS name" in cypher
+
+    def test_limit_parameter(self):
+        cypher, params = build_gene_ontology_terms(
+            ontology="go_bp", gene_id="PMM0001", limit=20,
+        )
+        assert params["limit"] == 20
+        assert "$limit" in cypher
+
+    def test_invalid_ontology_raises_valueerror(self):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_gene_ontology_terms(ontology="bad", gene_id="x")
+
+    def test_go_mf_correct_label_and_rel(self):
+        cypher, _ = build_gene_ontology_terms(ontology="go_mf", gene_id="PMM0001")
+        assert "MolecularFunction" in cypher
+        assert "Gene_enables_molecular_function" in cypher
+
+    def test_go_cc_correct_label_and_rel(self):
+        cypher, _ = build_gene_ontology_terms(ontology="go_cc", gene_id="PMM0001")
+        assert "CellularComponent" in cypher
+        assert "Gene_located_in_cellular_component" in cypher
+
+    def test_leaf_only_ec(self):
+        """leaf_only=True works for EC (only is_a hierarchy)."""
+        cypher, _ = build_gene_ontology_terms(
+            ontology="ec", gene_id="PMM0001", leaf_only=True,
+        )
+        assert "NOT EXISTS" in cypher
+        assert "Ec_number_is_a_ec_number" in cypher
+
+    def test_leaf_only_kegg(self):
+        """leaf_only=True works for KEGG."""
+        cypher, _ = build_gene_ontology_terms(
+            ontology="kegg", gene_id="PMM0001", leaf_only=True,
+        )
+        assert "NOT EXISTS" in cypher
+        assert "Kegg_term_is_a_kegg_term" in cypher
 
 
 class TestBuildHomologExpression:
