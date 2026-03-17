@@ -9,6 +9,7 @@ GENES = [
     {
         "all_identifiers": [
             "CK_Pro_MED4_00001",
+            "Q7V3R7",
             "TX50_RS00020",
             "WP_011131639.1"
         ],
@@ -24,9 +25,9 @@ GENES = [
             "[cog] bactNOG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination and repair",
             "[cog] cyaNOG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination and repair",
             "[kegg] DNA-directed DNA polymerase; DNA polymerase I; DNA polymerase II; DNA polymerase III; DNA polymerase alpha; DNA polymerase beta; DNA polymerase gamma; DNA nucleotidyltransferase (DNA-directed); deoxyribonucleate nucleotidyltransferase; deoxynucleate polymerase; deoxyribonucleic acid duplicase; deoxyribonucleic acid polymerase; deoxyribonucleic duplicase; deoxyribonucleic polymerase; deoxyribonucleic polymerase I; DNA duplicase; DNA nucleotidyltransferase; DNA polymerase; DNA replicase; DNA-dependent DNA polymerase; duplicase; Klenow fragment; sequenase; Taq DNA polymerase; Taq Pol I; Tca DNA polymerase",
-            "[pfam] DNA_pol3_beta: DNA polymerase III, beta subunit",
-            "[pfam] DNA_pol3_beta_2: DNA polymerase III beta subunit, N-terminal domain",
-            "[pfam] DNA_pol3_beta_3: DNA polymerase III beta subunit, C-terminal domain"
+            "[pfam] DNA_pol3_beta: DNA polymerase III beta subunit, N-terminal domain",
+            "[pfam] DNA_pol3_beta_3: DNA polymerase III beta subunit, C-terminal domain",
+            "[pfam] DNA_pol3_beta_2: DNA polymerase III beta subunit, central domain"
         ],
         "alternative_locus_tags": [
             "PMM0001"
@@ -134,25 +135,33 @@ GENES = [
             "PMM0001"
         ],
         "organism_strain": "Prochlorococcus MED4",
-        "pfam_descriptions": [
-            "DNA polymerase III, beta subunit",
-            "DNA polymerase III beta subunit, N-terminal domain",
-            "DNA polymerase III beta subunit, C-terminal domain",
-            "DNA polymerase III beta subunit, central domain",
-            "DNA polymerase III, beta sliding clamp, N-terminal",
-            "DNA polymerase III, beta sliding clamp, C-terminal",
-            "DNA polymerase III, beta sliding clamp, central",
-            "DNA polymerase III, beta sliding clamp"
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00000364",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            },
+            {
+                "og_id": "eggnog:COG0592@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1MKTR@1212",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 1212,
+                "taxonomic_level": "Prochloraceae"
+            }
         ],
         "pfam_ids": [
             "PF00712",
             "PF02768",
             "PF02767"
-        ],
-        "pfam_names": [
-            "DNA_pol3_beta",
-            "DNA_pol3_beta_2",
-            "DNA_pol3_beta_3"
         ],
         "product": "DNA polymerase III, beta subunit",
         "product_cyanorak": "DNA polymerase III, beta subunit",
@@ -176,6 +185,7 @@ GENES = [
     {
         "all_identifiers": [
             "CK_Pro_MED4_00002",
+            "Q7V3R6",
             "TX50_RS00025",
             "WP_011131640.1"
         ],
@@ -189,7 +199,7 @@ GENES = [
             "[cog] COG: POORLY CHARACTERIZED [S] Function unknown",
             "[cog] bactNOG: POORLY CHARACTERIZED [S] Function unknown",
             "[cog] cyaNOG: POORLY CHARACTERIZED [S] Function unknown",
-            "[pfam] PRC"
+            "[pfam] PRC: PRC-barrel domain"
         ],
         "alternative_locus_tags": [
             "PMM0002",
@@ -231,10 +241,9 @@ GENES = [
         "function_description": "Alternative locus ID",
         "function_description_source": "eggnog",
         "gene_category": "Unknown",
-        "gene_name": "PMM0002",
-        "gene_name_source": "cyanorak",
         "gene_summary": "conserved hypothetical protein :: Alternative locus ID",
         "gene_synonyms": [
+            "PMM0002",
             "TX50_RS00025"
         ],
         "locus_tag": "PMM0002",
@@ -245,8 +254,31 @@ GENES = [
             "PMM0002"
         ],
         "organism_strain": "Prochlorococcus MED4",
-        "pfam_names": [
-            "PRC"
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00000363",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            },
+            {
+                "og_id": "eggnog:COG3881@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1MMB0@1212",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 1212,
+                "taxonomic_level": "Prochloraceae"
+            }
+        ],
+        "pfam_ids": [
+            "PF05239"
         ],
         "product": "conserved hypothetical protein",
         "product_cyanorak": "conserved hypothetical protein",
@@ -270,6 +302,7 @@ GENES = [
         "all_identifiers": [
             "(coxB)",
             "CK_Pro_MED4_00446",
+            "Q7V2M9",
             "TX50_RS02400",
             "WP_011132082.1",
             "coxB",
@@ -288,8 +321,8 @@ GENES = [
             "[cog] bactNOG: METABOLISM [C] Energy production and conversion",
             "[cog] cyaNOG: METABOLISM [C] Energy production and conversion",
             "[kegg] cytochrome-c oxidase; cytochrome oxidase; cytochrome a3; cytochrome aa3; Warburg's respiratory enzyme; indophenol oxidase; indophenolase; complex IV (mitochondrial electron transport); ferrocytochrome c oxidase; NADH cytochrome c oxidase",
-            "[pfam] COX2: cytochrome c oxidase, subunit II",
-            "[pfam] COX2_TM: Cytochrome C oxidase subunit II, periplasmic domain"
+            "[pfam] COX2: Cytochrome C oxidase subunit II, periplasmic domain",
+            "[pfam] COX2_TM: Cytochrome C oxidase subunit II, transmembrane domain"
         ],
         "alternative_locus_tags": [
             "PMM0446"
@@ -451,23 +484,32 @@ GENES = [
             "PMM0446"
         ],
         "organism_strain": "Prochlorococcus MED4",
-        "pfam_descriptions": [
-            "cytochrome c oxidase, subunit II",
-            "Cytochrome C oxidase subunit II, periplasmic domain",
-            "Cytochrome C oxidase subunit II, transmembrane domain",
-            "CO II and nitrous oxide reductase dinuclear copper centers signature.",
-            "Cytochrome oxidase subunit II transmembrane region profile.",
-            "Cytochrome oxidase subunit II copper A binding domain profile.",
-            "Cytochrome c oxidase subunit II-like C-terminal",
-            "Copper centre Cu(A)"
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00000614",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            },
+            {
+                "og_id": "eggnog:COG1622@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1MKMP@1212",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 1212,
+                "taxonomic_level": "Prochloraceae"
+            }
         ],
         "pfam_ids": [
             "PF00116",
             "PF02790"
-        ],
-        "pfam_names": [
-            "COX2",
-            "COX2_TM"
         ],
         "product": "cytochrome c oxidase subunit II",
         "product_cyanorak": "cytochrome c oxidase subunit II",
@@ -500,6 +542,7 @@ GENES = [
         "all_identifiers": [
             "CK_Pro_MIT9312_00001",
             "PMT9312_RS00005",
+            "Q31DI3",
             "WP_011375566.1"
         ],
         "alternate_functional_descriptions": [
@@ -514,9 +557,9 @@ GENES = [
             "[cog] bactNOG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination and repair",
             "[cog] cyaNOG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination and repair",
             "[kegg] DNA-directed DNA polymerase; DNA polymerase I; DNA polymerase II; DNA polymerase III; DNA polymerase alpha; DNA polymerase beta; DNA polymerase gamma; DNA nucleotidyltransferase (DNA-directed); deoxyribonucleate nucleotidyltransferase; deoxynucleate polymerase; deoxyribonucleic acid duplicase; deoxyribonucleic acid polymerase; deoxyribonucleic duplicase; deoxyribonucleic polymerase; deoxyribonucleic polymerase I; DNA duplicase; DNA nucleotidyltransferase; DNA polymerase; DNA replicase; DNA-dependent DNA polymerase; duplicase; Klenow fragment; sequenase; Taq DNA polymerase; Taq Pol I; Tca DNA polymerase",
-            "[pfam] DNA_pol3_beta: DNA polymerase III, beta subunit",
-            "[pfam] DNA_pol3_beta_2: DNA polymerase III beta subunit, N-terminal domain",
-            "[pfam] DNA_pol3_beta_3: DNA polymerase III beta subunit, C-terminal domain"
+            "[pfam] DNA_pol3_beta: DNA polymerase III beta subunit, N-terminal domain",
+            "[pfam] DNA_pol3_beta_3: DNA polymerase III beta subunit, C-terminal domain",
+            "[pfam] DNA_pol3_beta_2: DNA polymerase III beta subunit, central domain"
         ],
         "alternative_locus_tags": [
             "PMT9312_0001"
@@ -624,25 +667,33 @@ GENES = [
             "PMT9312_0001"
         ],
         "organism_strain": "Prochlorococcus MIT9312",
-        "pfam_descriptions": [
-            "DNA polymerase III, beta subunit",
-            "DNA polymerase III beta subunit, N-terminal domain",
-            "DNA polymerase III beta subunit, C-terminal domain",
-            "DNA polymerase III beta subunit, central domain",
-            "DNA polymerase III, beta sliding clamp, N-terminal",
-            "DNA polymerase III, beta sliding clamp, C-terminal",
-            "DNA polymerase III, beta sliding clamp, central",
-            "DNA polymerase III, beta sliding clamp"
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00000364",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            },
+            {
+                "og_id": "eggnog:COG0592@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1MKTR@1212",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 1212,
+                "taxonomic_level": "Prochloraceae"
+            }
         ],
         "pfam_ids": [
             "PF00712",
             "PF02768",
             "PF02767"
-        ],
-        "pfam_names": [
-            "DNA_pol3_beta",
-            "DNA_pol3_beta_2",
-            "DNA_pol3_beta_3"
         ],
         "product": "DNA polymerase III, beta subunit",
         "product_cyanorak": "DNA polymerase III, beta subunit",
@@ -678,6 +729,15 @@ GENES = [
         "locus_tag": "PMT9312_0342",
         "locus_tag_cyanorak": "CK_Pro_MIT9312_00342",
         "organism_strain": "Prochlorococcus MIT9312",
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00038231",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            }
+        ],
         "product": "hypothetical protein",
         "product_cyanorak": "hypothetical protein",
         "product_source": "cyanorak",
@@ -687,6 +747,7 @@ GENES = [
         "all_identifiers": [
             "CK_Pro_NATL2A_00044",
             "PMN2A_RS03160",
+            "Q46LU2",
             "WP_011293578.1"
         ],
         "alternate_functional_descriptions": [
@@ -705,7 +766,7 @@ GENES = [
             "[kegg] 4-dihydroxy-2-naphthoyl-CoA synthase; naphthoate synthase; 1",
             "[kegg] 4-dihydroxy-2-naphthoate synthase; dihydroxynaphthoate synthase; o-succinylbenzoyl-CoA 1",
             "[kegg] 4-dihydroxy-2-naphthoate-lyase (cyclizing); MenB; o-succinylbenzoyl-CoA dehydratase (cyclizing)",
-            "[pfam] ECH_1: naphthoate synthase"
+            "[pfam] ECH_1: Enoyl-CoA hydratase/isomerase"
         ],
         "alternative_locus_tags": [
             "PMN2A_0044"
@@ -805,19 +866,31 @@ GENES = [
             "PMN2A_0044"
         ],
         "organism_strain": "Prochlorococcus NATL2A",
-        "pfam_descriptions": [
-            "naphthoate synthase",
-            "Enoyl-CoA hydratase/isomerase",
-            "Enoyl-CoA hydratase/isomerase signature.",
-            "1",
-            "4-Dihydroxy-2-naphthoyl-CoA synthase, MenB",
-            "Enoyl-CoA hydratase/isomerase, conserved site"
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00000769",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            },
+            {
+                "og_id": "eggnog:COG0447@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1MKQ6@1212",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 1212,
+                "taxonomic_level": "Prochloraceae"
+            }
         ],
         "pfam_ids": [
             "PF00378"
-        ],
-        "pfam_names": [
-            "ECH_1"
         ],
         "product": "naphthoate synthase",
         "product_cyanorak": "naphthoate synthase",
@@ -845,14 +918,13 @@ GENES = [
         "alternate_functional_descriptions": [
             "[ncbi] IS630 family transposase",
             "[eggnog] Winged helix-turn helix",
-            "[pfam] DDE_3",
-            "[pfam] HTH_32"
+            "[pfam] DDE_3: DDE superfamily endonuclease",
+            "[pfam] HTH_32: Homeodomain-like domain"
         ],
         "alternative_locus_tags": [
             "ALT831_RS00180"
         ],
-        "alteromonadaceae_og": "2QEEF@267890|Shewanellaceae",
-        "annotation_quality": 2,
+        "annotation_quality": 3,
         "bacteria_cog_og": "COG3335",
         "cog_category": [
             "L"
@@ -870,9 +942,10 @@ GENES = [
         "function_description": "Winged helix-turn helix",
         "function_description_source": "eggnog",
         "gene_category": "Replication and repair",
-        "gene_name": "ALT831_RS00180",
-        "gene_name_source": "ncbi",
         "gene_summary": "IS630 family transposase :: Winged helix-turn helix",
+        "gene_synonyms": [
+            "ALT831_RS00180"
+        ],
         "go_terms": [
             "GO:0004803"
         ],
@@ -880,9 +953,25 @@ GENES = [
         "locus_tag_ncbi": "ALT831_RS00180",
         "max_annot_lvl": "1236|Gammaproteobacteria",
         "organism_strain": "Alteromonas macleodii MIT1002",
-        "pfam_names": [
-            "DDE_3",
-            "HTH_32"
+        "ortholog_groups": [
+            {
+                "og_id": "eggnog:COG3415@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1S2QS@1236",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1236,
+                "taxonomic_level": "Gammaproteobacteria"
+            }
+        ],
+        "pfam_ids": [
+            "PF13358",
+            "PF13565"
         ],
         "product": "IS630 family transposase",
         "product_source": "ncbi",
@@ -901,13 +990,13 @@ GENES = [
         "alternative_locus_tags": [
             "ALT831_RS00590"
         ],
-        "alteromonadaceae_og": "31GCA@72275|Alteromonadaceae",
         "annotation_quality": 0,
         "end": 130720,
         "gene_category": "Unknown",
-        "gene_name": "ALT831_RS00590",
-        "gene_name_source": "ncbi",
         "gene_summary": "hypothetical protein",
+        "gene_synonyms": [
+            "ALT831_RS00590"
+        ],
         "locus_tag": "ALT831_RS00590",
         "locus_tag_ncbi": "ALT831_RS00590",
         "organism_strain": "Alteromonas macleodii MIT1002",
@@ -924,8 +1013,8 @@ GENES = [
         "alternate_functional_descriptions": [
             "[ncbi] hypothetical protein",
             "[eggnog] 5'-nucleotidase, C-terminal domain",
-            "[pfam] 5_nucleotid_C",
-            "[pfam] Metallophos"
+            "[pfam] 5_nucleotid_C: 5'-nucleotidase, C-terminal domain",
+            "[pfam] Metallophos: Calcineurin-like phosphoesterase"
         ],
         "alternative_locus_tags": [
             "ALT831_RS03440"
@@ -951,9 +1040,10 @@ GENES = [
         "function_description": "5'-nucleotidase, C-terminal domain",
         "function_description_source": "eggnog",
         "gene_category": "Nucleotide metabolism",
-        "gene_name": "ALT831_RS03440",
-        "gene_name_source": "ncbi",
         "gene_summary": "hypothetical protein :: 5'-nucleotidase, C-terminal domain",
+        "gene_synonyms": [
+            "ALT831_RS03440"
+        ],
         "kegg_brite": [
             "ko00000",
             "ko00001",
@@ -988,9 +1078,25 @@ GENES = [
         "locus_tag_ncbi": "ALT831_RS03440",
         "max_annot_lvl": "1236|Gammaproteobacteria",
         "organism_strain": "Alteromonas macleodii MIT1002",
-        "pfam_names": [
-            "5_nucleotid_C",
-            "Metallophos"
+        "ortholog_groups": [
+            {
+                "og_id": "eggnog:COG0737@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:46684@72275",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 72275,
+                "taxonomic_level": "Alteromonadaceae"
+            }
+        ],
+        "pfam_ids": [
+            "PF02872",
+            "PF00149"
         ],
         "product": "hypothetical protein",
         "product_source": "ncbi",
@@ -1002,60 +1108,88 @@ GENES = [
     },
     {
         "all_identifiers": [
-            "WP_071953288.1"
+            "WP_156085955.1"
         ],
         "alternate_functional_descriptions": [
-            "[ncbi] pyrroloquinoline quinone precursor peptide PqqA",
-            "[eggnog] Required for coenzyme pyrroloquinoline quinone (PQQ) biosynthesis. PQQ is probably formed by cross-linking a specific glutamate to a specific tyrosine residue and excising these residues from the peptide",
-            "[pfam] PqqA"
+            "[ncbi] YbaN family protein",
+            "[eggnog] protein conserved in bacteria",
+            "[pfam] DUF454: Protein of unknown function (DUF454)"
         ],
-        "alteromonadaceae_og": "1T9VB@72275|Alteromonadaceae",
+        "alternative_locus_tags": [
+            "ALTBGP6_RS03775"
+        ],
+        "alteromonadaceae_og": "468S0@72275|Alteromonadaceae",
         "annotation_quality": 3,
+        "bacteria_cog_og": "COG2832",
         "cog_category": [
             "S"
         ],
         "eggnog_ogs": [
-            "2AQRV@1|root",
-            "31FZN@2|Bacteria",
-            "1QDS5@1224|Proteobacteria",
-            "1T9VB@1236|Gammaproteobacteria",
-            "1Z3N7@136846|Pseudomonas stutzeri group"
+            "COG2832@1|root",
+            "COG2832@2|Bacteria",
+            "1N7BI@1224|Proteobacteria",
+            "1SCJZ@1236|Gammaproteobacteria",
+            "468S0@72275|Alteromonadaceae"
         ],
-        "end": 3745253,
-        "function_description": "Required for coenzyme pyrroloquinoline quinone (PQQ) biosynthesis. PQQ is probably formed by cross-linking a specific glutamate to a specific tyrosine residue and excising these residues from the peptide",
+        "end": 866085,
+        "function_description": "protein conserved in bacteria",
         "function_description_source": "eggnog",
         "gene_category": "Unknown",
-        "gene_name": "pqqA",
-        "gene_name_source": "ncbi",
-        "gene_summary": "pqqA :: pyrroloquinoline quinone precursor peptide PqqA :: Required for coenzyme pyrroloquinoline quinone (PQQ) biosynthesis. PQQ is probably formed by cross-linking a specific glutamate to a specific tyrosine residue and excising these residues from the peptide",
+        "gene_name": "ybaN",
+        "gene_name_source": "eggnog",
+        "gene_summary": "ybaN :: YbaN family protein :: protein conserved in bacteria",
+        "gene_synonyms": [
+            "ALTBGP6_RS03775"
+        ],
         "go_terms": [
-            "GO:0003824",
-            "GO:0018189"
+            "GO:0005886",
+            "GO:0016020",
+            "GO:0005575",
+            "GO:0005623",
+            "GO:0044464",
+            "GO:0071944"
         ],
         "kegg_brite": [
             "ko00000"
         ],
         "kegg_ko": [
-            "K06135"
+            "K09790"
         ],
-        "locus_tag": "ALTBGP6_RS16330",
-        "locus_tag_ncbi": "ALTBGP6_RS16330",
+        "locus_tag": "ALTBGP6_RS03775",
+        "locus_tag_ncbi": "ALTBGP6_RS03775",
         "max_annot_lvl": "1236|Gammaproteobacteria",
         "organism_strain": "Alteromonas macleodii EZ55",
-        "pfam_names": [
-            "PqqA"
+        "ortholog_groups": [
+            {
+                "og_id": "eggnog:COG2832@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:468S0@72275",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 72275,
+                "taxonomic_level": "Alteromonadaceae"
+            }
         ],
-        "product": "pyrroloquinoline quinone precursor peptide PqqA",
+        "pfam_ids": [
+            "PF04304"
+        ],
+        "product": "YbaN family protein",
         "product_source": "ncbi",
-        "protein_id": "WP_071953288.1",
-        "seed_ortholog": "1196835.A458_10385",
-        "seed_ortholog_evalue": 8.56e-06,
-        "start": 3745182,
+        "protein_id": "WP_156085955.1",
+        "seed_ortholog": "1004785.AMBLS11_03430",
+        "seed_ortholog_evalue": 1.22e-77,
+        "start": 865717,
         "strand": "+"
     },
     {
         "all_identifiers": [
             "CK_Syn_WH8102_00305",
+            "Q7U9F3",
             "TX72_RS01535",
             "WP_011127179.1",
             "ftsH",
@@ -1073,9 +1207,10 @@ GENES = [
             "[cog] COG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification, protein turnover, chaperones",
             "[cog] bactNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification, protein turnover, chaperones",
             "[cog] cyaNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification, protein turnover, chaperones",
-            "[pfam] AAA: ATP-dependent metallopeptidase HflB",
-            "[pfam] FtsH_ext: Peptidase family M41",
-            "[pfam] Peptidase_M41: FtsH Extracellular"
+            "[pfam] Peptidase_M41: Peptidase family M41",
+            "[pfam] FtsH_ext: FtsH Extracellular",
+            "[pfam] AAA: ATPase family associated with various cellular activities (AAA)",
+            "[pfam] AAA_lid_3: AAA+ lid domain"
         ],
         "alternative_locus_tags": [
             "SYNW0305"
@@ -1239,28 +1374,34 @@ GENES = [
             "SYNW0305"
         ],
         "organism_strain": "Synechococcus WH8102",
-        "pfam_descriptions": [
-            "ATP-dependent metallopeptidase HflB",
-            "Peptidase family M41",
-            "FtsH Extracellular",
-            "ATPase family associated with various cellular activities (AAA)",
-            "AAA-protein family signature.",
-            "Peptidase M41",
-            "Peptidase M41, FtsH extracellular",
-            "ATPase, AAA-type, core",
-            "ATPase, AAA-type, conserved site",
-            "Peptidase, FtsH"
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00008085",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            },
+            {
+                "og_id": "eggnog:COG0465@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1GYE1@1129",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 1129,
+                "taxonomic_level": "Synechococcus"
+            }
         ],
         "pfam_ids": [
             "PF01434",
             "PF06480",
             "PF00004",
             "PF17862"
-        ],
-        "pfam_names": [
-            "AAA",
-            "FtsH_ext",
-            "Peptidase_M41"
         ],
         "product": "cell division protein FtsH1",
         "product_cyanorak": "cell division protein FtsH1",
@@ -1303,6 +1444,15 @@ GENES = [
         "locus_tag": "S8102_04001",
         "locus_tag_cyanorak": "CK_Syn_WH8102_04001",
         "organism_strain": "Synechococcus WH8102",
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00056274",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            }
+        ],
         "product": "putative membrane protein",
         "product_cyanorak": "putative membrane protein",
         "product_source": "cyanorak",
@@ -1316,204 +1466,37 @@ GENES = [
     },
     {
         "all_identifiers": [
-            "CK_Syn_CC9311_01876",
-            "WP_041426620.1",
-            "sync_1876"
+            "WP_041426808.1"
         ],
         "alternate_functional_descriptions": [
-            "[cyanorak] alpha/beta hydrolase fold family protein",
-            "[ncbi] triacylglycerol lipase",
-            "[eggnog] acetyltransferases and hydrolases with the alpha beta hydrolase fold",
-            "[cyanorak_role] Fatty acid metabolism",
-            "[tigr_role] Fatty acid and phospholipid metabolism / Degradation",
-            "[cog] COG: POORLY CHARACTERIZED [R] General function prediction only",
-            "[cog] bactNOG: POORLY CHARACTERIZED [R] General function prediction only",
-            "[cog] cyaNOG: POORLY CHARACTERIZED [R] General function prediction only",
-            "[pfam] Abhydrolase_1",
-            "[pfam] Abhydrolase_6",
-            "[pfam] Lipase_2"
-        ],
-        "alternative_locus_tags": [
-            "sync_1876",
-            "SYNC_RS08630"
+            "[ncbi] molybdenum cofactor biosynthesis protein B",
+            "[eggnog] May be involved in the biosynthesis of molybdopterin",
+            "[pfam] MoCF_biosynth: Probable molybdopterin binding domain"
         ],
         "annotation_quality": 3,
-        "bacteria_cog_og": "COG1075",
-        "cluster_number": "CK_00000174",
+        "bacteria_cog_og": "COG0521",
         "cog_category": [
-            "S"
-        ],
-        "cyanorak_Role": [
-            "H.2"
-        ],
-        "cyanorak_Role_description": [
-            "Fatty acid metabolism"
+            "H"
         ],
         "ec_numbers": [
-            "3.1.1.3"
-        ],
-        "eggnog_og_descriptions": [
-            "COG: POORLY CHARACTERIZED [R] General function prediction only",
-            "bactNOG: POORLY CHARACTERIZED [R] General function prediction only",
-            "cyaNOG: POORLY CHARACTERIZED [R] General function prediction only"
+            "2.7.7.75"
         ],
         "eggnog_ogs": [
-            "COG1075",
-            "bactNOG57853",
-            "bactNOG39874",
-            "cyaNOG05722",
-            "cyaNOG02630",
-            "COG1075@1|root",
-            "COG1075@2|Bacteria",
-            "1G5F7@1117|Cyanobacteria",
-            "1GZGN@1129|Synechococcus"
+            "COG0521@1|root",
+            "COG0521@2|Bacteria",
+            "1G514@1117|Cyanobacteria",
+            "1H08Z@1129|Synechococcus"
         ],
-        "end": 1674465,
-        "end_cyanorak": 1674465,
-        "function_description": "acetyltransferases and hydrolases with the alpha beta hydrolase fold",
+        "end": 2548880,
+        "function_description": "May be involved in the biosynthesis of molybdopterin",
         "function_description_source": "eggnog",
-        "gene_category": "Lipid metabolism",
-        "gene_name": "sync_1876",
-        "gene_name_source": "cyanorak",
-        "gene_summary": "alpha/beta hydrolase fold family protein :: acetyltransferases and hydrolases with the alpha beta hydrolase fold",
-        "gene_synonyms": [
-            "SYNC_RS08630"
-        ],
-        "kegg_brite": [
-            "ko00000",
-            "ko00001",
-            "ko00002",
-            "ko01000"
-        ],
-        "kegg_ko": [
-            "K01046"
-        ],
-        "kegg_module": [
-            "M00098"
-        ],
-        "kegg_pathway": [
-            "ko00561",
-            "ko01100"
-        ],
-        "kegg_reaction": [
-            "R02250",
-            "R02687"
-        ],
-        "locus_tag": "SYNC_RS08630",
-        "locus_tag_cyanorak": "CK_Syn_CC9311_01876",
-        "locus_tag_ncbi": "SYNC_RS08630",
-        "max_annot_lvl": "1117|Cyanobacteria",
-        "old_locus_tags": [
-            "sync_1876"
-        ],
-        "organism_strain": "Synechococcus CC9311",
-        "pfam_names": [
-            "Abhydrolase_1",
-            "Abhydrolase_6",
-            "Lipase_2"
-        ],
-        "product": "alpha/beta hydrolase fold family protein",
-        "product_cyanorak": "alpha/beta hydrolase fold family protein",
-        "product_source": "cyanorak",
-        "protein_id": "WP_041426620.1",
-        "seed_ortholog": "166318.Syn8016DRAFT_1084",
-        "seed_ortholog_evalue": 3.84e-128,
-        "start": 1673860,
-        "start_cyanorak": 1673860,
-        "tIGR_Role": [
-            "177"
-        ],
-        "tIGR_Role_description": [
-            "Fatty acid and phospholipid metabolism / Degradation"
-        ]
-    },
-    {
-        "all_identifiers": [
-            "AKG35_RS00540",
-            "CK_Pro_MIT9313_00106",
-            "PMT_0106",
-            "RG24_RS00540",
-            "WP_011129485.1",
-            "neuB",
-            "pseI"
-        ],
-        "alternate_functional_descriptions": [
-            "[cyanorak] N,N'-diacetyllegionaminate synthase",
-            "[ncbi] pseudaminic acid synthase",
-            "[eggnog] COG2089 Sialic acid synthase Cell envelope biogenesis, outer membrane",
-            "[cyanorak_role] Sugar-nucleotide biosynthesis and conversions",
-            "[tigr_role] Energy metabolism / Sugars",
-            "[tigr_role] Purines, pyrimidines, nucleosides, and nucleotides / Sugar-nucleotide biosynthesis and conversions",
-            "[cog] COG: CELLULAR PROCESSES AND SIGNALING [M] Cell wall/membrane/envelope biogenesis",
-            "[cog] bactNOG: CELLULAR PROCESSES AND SIGNALING [M] Cell wall/membrane/envelope biogenesis",
-            "[cog] cyaNOG: CELLULAR PROCESSES AND SIGNALING [M] Cell wall/membrane/envelope biogenesis",
-            "[kegg] N",
-            "[kegg] N'-diacetyllegionaminate synthase; neuB (gene name); legI (gene name)",
-            "[pfam] NeuB: N-acetylneuraminate synthase",
-            "[pfam] SAF: SAF domain"
-        ],
-        "alternative_locus_tags": [
-            "PMT0106",
-            "PMT_0106",
-            "RG24_RS00540"
-        ],
-        "annotation_quality": 3,
-        "bacteria_cog_og": "COG2089",
-        "cluster_number": "CK_00051362",
-        "cog_category": [
-            "M"
-        ],
-        "cyanorak_Role": [
-            "M.6"
-        ],
-        "cyanorak_Role_description": [
-            "Sugar-nucleotide biosynthesis and conversions"
-        ],
-        "ec_numbers": [
-            "2.5.1.97",
-            "2.5.1.101",
-            "2.5.1.56"
-        ],
-        "eggnog_og_descriptions": [
-            "COG: CELLULAR PROCESSES AND SIGNALING [M] Cell wall/membrane/envelope biogenesis",
-            "bactNOG: CELLULAR PROCESSES AND SIGNALING [M] Cell wall/membrane/envelope biogenesis",
-            "cyaNOG: CELLULAR PROCESSES AND SIGNALING [M] Cell wall/membrane/envelope biogenesis"
-        ],
-        "eggnog_ogs": [
-            "COG2089",
-            "bactNOG00795",
-            "cyaNOG05597",
-            "COG2089@1|root",
-            "COG2089@2|Bacteria",
-            "1G78N@1117|Cyanobacteria",
-            "1MM7X@1212|Prochloraceae"
-        ],
-        "end": 121981,
-        "end_cyanorak": 121981,
-        "function_description": "COG2089 Sialic acid synthase Cell envelope biogenesis, outer membrane",
-        "function_description_source": "eggnog",
-        "gene_category": "Nucleotide metabolism",
-        "gene_name": "legI",
-        "gene_name_source": "cyanorak",
-        "gene_name_synonyms": [
-            "pseI",
-            "neuB"
-        ],
-        "gene_summary": "legI :: N,N'-diacetyllegionaminate synthase :: COG2089 Sialic acid synthase Cell envelope biogenesis, outer membrane",
-        "gene_synonyms": [
-            "pseI",
-            "PMT0106",
-            "PMT_0106",
-            "RG24_RS00540",
-            "neuB"
-        ],
-        "go_term_descriptions": [
-            "carbohydrate biosynthetic process"
-        ],
+        "gene_category": "Coenzyme metabolism",
+        "gene_name": "moaB",
+        "gene_name_source": "ncbi",
+        "gene_summary": "moaB :: molybdenum cofactor biosynthesis protein B :: May be involved in the biosynthesis of molybdopterin",
         "go_terms": [
-            "GO:0016051",
-            "GO:0047444",
-            "GO:0016765"
+            "GO:0003824",
+            "GO:0006777"
         ],
         "kegg_brite": [
             "ko00000",
@@ -1521,202 +1504,243 @@ GENES = [
             "ko01000"
         ],
         "kegg_ko": [
-            "K01654"
-        ],
-        "kegg_ko_descriptions": [
-            "N",
-            "N'-diacetyllegionaminate synthase; neuB (gene name); legI (gene name)"
+            "K03638",
+            "K03831"
         ],
         "kegg_pathway": [
-            "ko00520",
-            "ko01100"
+            "ko00790",
+            "ko01100",
+            "ko04122"
         ],
         "kegg_reaction": [
-            "R01804",
-            "R04435"
+            "R09726"
         ],
-        "locus_tag": "PMT0106",
-        "locus_tag_cyanorak": "CK_Pro_MIT9313_00106",
-        "locus_tag_ncbi": "AKG35_RS00540",
+        "locus_tag": "SYNC_RS13265",
+        "locus_tag_ncbi": "SYNC_RS13265",
         "max_annot_lvl": "1117|Cyanobacteria",
-        "old_locus_tags": [
-            "PMT0106",
-            "PMT_0106",
-            "RG24_RS00540"
-        ],
-        "organism_strain": "Prochlorococcus MIT9313",
-        "pfam_descriptions": [
-            "N-acetylneuraminate synthase",
-            "SAF domain",
-            "NeuB family",
-            "Xylose isomerase-like TIM barrel",
-            "CBS domain",
-            "CBS domain profile.",
-            "Antifreeze protein-like domain profile.",
-            "N-acetylneuraminic acid synthase, N-terminal",
-            "Xylose isomerase-like, TIM barrel domain",
-            "Antifreeze-like/N-acetylneuraminic acid synthase C-terminal"
+        "organism_strain": "Synechococcus CC9311",
+        "ortholog_groups": [
+            {
+                "og_id": "eggnog:COG0521@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1H08Z@1129",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 1129,
+                "taxonomic_level": "Synechococcus"
+            }
         ],
         "pfam_ids": [
-            "PF08666",
-            "PF03102",
-            "PF01261",
-            "PF00571"
+            "PF00994"
         ],
-        "pfam_names": [
-            "NeuB",
-            "SAF"
-        ],
-        "product": "N,N'-diacetyllegionaminate synthase",
-        "product_cyanorak": "N,N'-diacetyllegionaminate synthase",
-        "product_source": "cyanorak",
-        "protein_id": "WP_011129485.1",
-        "seed_ortholog": "74547.PMT_0106",
-        "seed_ortholog_evalue": 2.51e-262,
-        "start": 120917,
-        "start_cyanorak": 120917,
-        "strand": "+",
-        "strand_cyanorak": "+",
-        "tIGR_Role": [
-            "119",
-            "128"
-        ],
-        "tIGR_Role_description": [
-            "Energy metabolism / Sugars",
-            "Purines, pyrimidines, nucleosides, and nucleotides / Sugar-nucleotide biosynthesis and conversions"
-        ],
-        "uniprot_accession": "Q7V953"
+        "product": "molybdenum cofactor biosynthesis protein B",
+        "product_source": "ncbi",
+        "protein_id": "WP_041426808.1",
+        "seed_ortholog": "166318.Syn8016DRAFT_2110",
+        "seed_ortholog_evalue": 6.81e-115,
+        "start": 2548350,
+        "strand": "+"
     },
     {
         "all_identifiers": [
-            "A9601_50004",
-            "CK_Pro_AS9601_50004",
-            "WP_011862490.1"
+            "CK_Pro_MED4_00630",
+            "GSTO1",
+            "GSTTLp28",
+            "P28",
+            "Q7V256",
+            "TX50_RS03345",
+            "WP_011132264.1"
         ],
         "alternate_functional_descriptions": [
-            "[cyanorak] photosystem I reaction centre subunit IX",
-            "[ncbi] photosystem I reaction center subunit IX",
-            "[eggnog] May help in the organization of the PsaE and PsaF subunits",
-            "[cyanorak_role] Photosystem I",
-            "[tigr_role] Energy metabolism / Photosynthesis",
-            "[cog] COG: POORLY CHARACTERIZED [R] General function prediction only",
+            "[cyanorak] glutathione S-transferase",
+            "[ncbi] glutathione S-transferase",
+            "[eggnog] Glutathione S-transferase",
+            "[cyanorak_role] Thioredoxin, glutaredoxin and glutathione",
+            "[tigr_role] Biosynthesis of cofactors, prosthetic groups, and carriers / Glutathione and analogs",
+            "[cog] COG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification, protein turnover, chaperones",
             "[cog] COG: POORLY CHARACTERIZED [S] Function unknown",
             "[cog] bactNOG: POORLY CHARACTERIZED [S] Function unknown",
+            "[cog] bactNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification, protein turnover, chaperones",
             "[cog] cyaNOG: POORLY CHARACTERIZED [S] Function unknown",
-            "[pfam] PSI_PsaJ: Photosystem I reaction centre subunit IX / PsaJ"
+            "[kegg] glutathione transferase; glutathione S-transferase; glutathione S-alkyltransferase; glutathione S-aryltransferase; S-(hydroxyalkyl)glutathione lyase; glutathione S-aralkyltransferase; glutathione S-alkyl transferase; GST",
+            "[pfam] DUF952: Protein of unknown function (DUF952)",
+            "[pfam] GST_N_3: Glutathione S-transferase, N-terminal domain",
+            "[pfam] GST_C_2: Glutathione S-transferase, C-terminal domain"
         ],
         "alternative_locus_tags": [
-            "A9601_50004"
+            "TX50_RS03345",
+            "PMM0630"
         ],
         "annotation_quality": 3,
-        "bigg_reaction": [
-            "iJN678.psaJ"
-        ],
-        "cluster_number": "CK_00001692",
+        "bacteria_cog_og": "COG0625",
+        "cluster_number": "CK_00000753",
         "cog_category": [
-            "S"
+            "O"
         ],
         "cyanorak_Role": [
-            "J.7"
+            "B.9"
         ],
         "cyanorak_Role_description": [
-            "Photosystem I"
+            "Thioredoxin, glutaredoxin and glutathione"
+        ],
+        "ec_numbers": [
+            "2.5.1.18"
         ],
         "eggnog_og_descriptions": [
-            "COG: POORLY CHARACTERIZED [R] General function prediction only",
+            "COG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification, protein turnover, chaperones",
             "COG: POORLY CHARACTERIZED [S] Function unknown",
             "bactNOG: POORLY CHARACTERIZED [S] Function unknown",
+            "bactNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification, protein turnover, chaperones",
             "cyaNOG: POORLY CHARACTERIZED [S] Function unknown"
         ],
         "eggnog_ogs": [
-            "NOG235728",
-            "NOG274349",
-            "NOG14690",
-            "bactNOG52548",
-            "bactNOG81908",
-            "cyaNOG04125",
-            "cyaNOG04530",
-            "2EGDF@1|root",
-            "33A5A@2|Bacteria",
-            "1GARS@1117|Cyanobacteria",
-            "1MN5Q@1212|Prochloraceae"
+            "COG0625",
+            "COG3502",
+            "NOG245192",
+            "NOG295331",
+            "bactNOG28984",
+            "bactNOG20861",
+            "cyaNOG03537",
+            "cyaNOG04378",
+            "COG0625@1|root",
+            "COG0625@2|Bacteria",
+            "1G4IV@1117|Cyanobacteria",
+            "1MMEX@1212|Prochloraceae"
         ],
-        "end": 456481,
-        "end_cyanorak": 456481,
-        "function_description": "May help in the organization of the PsaE and PsaF subunits",
+        "end": 600181,
+        "end_cyanorak": 600181,
+        "function_description": "Glutathione S-transferase",
         "function_description_source": "eggnog",
-        "gene_category": "Photosynthesis",
-        "gene_name": "psaJ",
+        "gene_category": "Coenzyme metabolism",
+        "gene_name": "gst",
         "gene_name_source": "cyanorak",
-        "gene_summary": "psaJ :: photosystem I reaction centre subunit IX :: May help in the organization of the PsaE and PsaF subunits",
+        "gene_name_synonyms": [
+            "GSTTLp28",
+            "P28",
+            "GSTO1"
+        ],
+        "gene_summary": "gst :: glutathione S-transferase :: Glutathione S-transferase",
         "gene_synonyms": [
-            "A9601_50004"
+            "TX50_RS03345",
+            "PMM0630",
+            "GSTTLp28",
+            "P28",
+            "GSTO1"
         ],
         "go_term_descriptions": [
-            "photosynthesis",
-            "photosynthesis, light reaction",
-            "photosynthesis",
-            "photosynthesis, light reaction",
-            "chlorophyll binding",
-            "photosynthesis",
-            "photosynthesis, light reaction",
-            "chlorophyll binding",
-            "photosystem I reaction center",
-            "plasma membrane-derived photosystem I",
-            "photosystem I"
+            "glutathione transferase activity"
         ],
         "go_terms": [
-            "GO:0015979",
-            "GO:0019684",
-            "GO:0016168",
-            "GO:0009538",
-            "GO:0030094",
-            "GO:0009522"
+            "GO:0005737",
+            "GO:0004364"
         ],
         "kegg_brite": [
             "ko00000",
             "ko00001",
-            "ko00194"
+            "ko01000",
+            "ko02000"
         ],
         "kegg_ko": [
-            "K02697"
+            "K00799"
+        ],
+        "kegg_ko_descriptions": [
+            "glutathione transferase; glutathione S-transferase; glutathione S-alkyltransferase; glutathione S-aryltransferase; S-(hydroxyalkyl)glutathione lyase; glutathione S-aralkyltransferase; glutathione S-alkyl transferase; GST"
         ],
         "kegg_pathway": [
-            "ko00195",
-            "ko01100"
+            "ko00480",
+            "ko00980",
+            "ko00982",
+            "ko00983",
+            "ko01524",
+            "ko05200",
+            "ko05204",
+            "ko05225",
+            "ko05418"
         ],
-        "locus_tag": "A9601_RS11640",
-        "locus_tag_cyanorak": "CK_Pro_AS9601_50004",
-        "locus_tag_ncbi": "A9601_RS11640",
+        "kegg_reaction": [
+            "R03522",
+            "R07002",
+            "R07003",
+            "R07004",
+            "R07023",
+            "R07024",
+            "R07025",
+            "R07026",
+            "R07069",
+            "R07070",
+            "R07083",
+            "R07084",
+            "R07091",
+            "R07092",
+            "R07093",
+            "R07094",
+            "R07100",
+            "R07113",
+            "R07116",
+            "R08280",
+            "R09409",
+            "R11905"
+        ],
+        "locus_tag": "PMM0630",
+        "locus_tag_cyanorak": "CK_Pro_MED4_00630",
+        "locus_tag_ncbi": "TX50_RS03345",
         "max_annot_lvl": "1117|Cyanobacteria",
         "old_locus_tags": [
-            "A9601_50004"
+            "PMM0630"
         ],
-        "organism_strain": "Prochlorococcus AS9601",
-        "pfam_descriptions": [
-            "Photosystem I reaction centre subunit IX / PsaJ",
-            "Photosystem I PsaJ, reaction centre subunit IX"
+        "organism_strain": "Prochlorococcus MED4",
+        "ortholog_groups": [
+            {
+                "og_id": "cyanorak:CK_00000753",
+                "source": "cyanorak",
+                "specificity_rank": 0,
+                "taxon_id": 0,
+                "taxonomic_level": "curated"
+            },
+            {
+                "og_id": "eggnog:COG0625@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1MMEX@1212",
+                "source": "eggnog",
+                "specificity_rank": 1,
+                "taxon_id": 1212,
+                "taxonomic_level": "Prochloraceae"
+            }
         ],
         "pfam_ids": [
-            "PF01701"
+            "PF06108",
+            "PF13417",
+            "PF13410"
         ],
-        "pfam_names": [
-            "PSI_PsaJ"
-        ],
-        "product": "photosystem I reaction centre subunit IX",
-        "product_cyanorak": "photosystem I reaction centre subunit IX",
+        "product": "glutathione S-transferase",
+        "product_cyanorak": "glutathione S-transferase",
         "product_source": "cyanorak",
-        "protein_id": "WP_011862490.1",
-        "seed_ortholog": "1471522.JFNU01000005_gene1436",
-        "seed_ortholog_evalue": 9.98e-24,
-        "start": 456347,
-        "start_cyanorak": 456347,
+        "protein_id": "WP_011132264.1",
+        "seed_ortholog": "59919.PMM0630",
+        "seed_ortholog_evalue": 8.13e-164,
+        "start": 599522,
+        "start_cyanorak": 599522,
         "tIGR_Role": [
-            "164"
+            "86"
         ],
         "tIGR_Role_description": [
-            "Energy metabolism / Photosynthesis"
-        ]
+            "Biosynthesis of cofactors, prosthetic groups, and carriers / Glutathione and analogs"
+        ],
+        "transporter_classification": [
+            "1.A.12.2.2",
+            "1.A.12.3.2"
+        ],
+        "uniprot_accession": "Q7V256"
     },
     {
         "all_identifiers": [
@@ -1725,12 +1749,11 @@ GENES = [
         "alternate_functional_descriptions": [
             "[ncbi] cysteine hydrolase family protein",
             "[eggnog] Isochorismatase family",
-            "[pfam] Isochorismatase"
+            "[pfam] Isochorismatase: Isochorismatase domain"
         ],
         "alternative_locus_tags": [
             "ALTBGP6_RS12485"
         ],
-        "alteromonadaceae_og": "1S6WV@72275|Alteromonadaceae",
         "annotation_quality": 3,
         "bacteria_cog_og": "COG1335",
         "cog_category": [
@@ -1750,9 +1773,10 @@ GENES = [
         "function_description": "Isochorismatase family",
         "function_description_source": "eggnog",
         "gene_category": "Secondary metabolites",
-        "gene_name": "ALTBGP6_RS12485",
-        "gene_name_source": "ncbi",
         "gene_summary": "cysteine hydrolase family protein :: Isochorismatase family",
+        "gene_synonyms": [
+            "ALTBGP6_RS12485"
+        ],
         "go_terms": [
             "GO:0016787"
         ],
@@ -1760,8 +1784,24 @@ GENES = [
         "locus_tag_ncbi": "ALTBGP6_RS12485",
         "max_annot_lvl": "135623|Vibrionales",
         "organism_strain": "Alteromonas macleodii EZ55",
-        "pfam_names": [
-            "Isochorismatase"
+        "ortholog_groups": [
+            {
+                "og_id": "eggnog:COG1335@2",
+                "source": "eggnog",
+                "specificity_rank": 3,
+                "taxon_id": 2,
+                "taxonomic_level": "Bacteria"
+            },
+            {
+                "og_id": "eggnog:1S6WV@1236",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1236,
+                "taxonomic_level": "Gammaproteobacteria"
+            }
+        ],
+        "pfam_ids": [
+            "PF00857"
         ],
         "product": "cysteine hydrolase family protein",
         "product_source": "ncbi",

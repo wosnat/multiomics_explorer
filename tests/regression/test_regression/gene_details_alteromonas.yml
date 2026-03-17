@@ -23,19 +23,24 @@ rows:
     - '[eggnog] Winged helix-turn helix'
     - '[pfam] DDE_3: DDE superfamily endonuclease'
     - '[pfam] HTH_32: Homeodomain-like domain'
-    alternative_locus_tags:
-    - ALT831_RS00180
     annotation_quality: 3
+    annotation_types:
+    - go_mf
+    - pfam
+    - cog_category
+    closest_ortholog_genera:
+    - Alteromonas
+    closest_ortholog_group_size: 9
     end: 40258
+    expression_edge_count: 0
     function_description: Winged helix-turn helix
     gene_category: Replication and repair
     gene_summary: 'IS630 family transposase :: Winged helix-turn helix'
-    gene_synonyms:
-    - ALT831_RS00180
     id: ncbigene:ALT831_RS00180
     locus_tag: ALT831_RS00180
     organism_strain: Alteromonas macleodii MIT1002
     preferred_id: ncbigene
     product: IS630 family transposase
     protein_id: WP_197047964.1
+    significant_expression_count: 0
     start: 39682

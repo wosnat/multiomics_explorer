@@ -42,7 +42,7 @@ Edit `scripts/build_test_fixtures.py` in the gene selection section (~line 136-2
 - For a specific locus_tag: `SELECTED_GENES.append(get_gene("Organism/Genome", "LOCUS_TAG"))`
 - For a criteria-based search: use `find_gene("Organism/Genome", has_gene_name=True, ...)` with appropriate filters
 
-Available `find_gene` filters: `has_gene_name`, `is_hypothetical`, `has_ec`, `min_ec_count`, `has_old_locus_tags`, `has_partial_ec`, `min_identifiers`, `prefer_minimal`, `prefer_rich`.
+Available `find_gene` filters: `has_gene_name`, `is_hypothetical`, `has_ec`, `min_ec_count`, `has_partial_ec`, `min_identifiers`, `prefer_minimal`, `prefer_rich`.
 
 ## Step 3: Regenerate fixtures
 
@@ -119,6 +119,6 @@ The current fixture set covers 16 genes. Run this to see them:
 grep '"locus_tag":' tests/fixtures/gene_data.py
 ```
 
-Axes already covered: well-annotated, hypothetical, multiple ECs, partial EC, many identifiers, old_locus_tags, gene_name=locus_tag, no gene_name, all 3 organisms, 8 strains.
+Axes already covered: well-annotated, hypothetical, multiple ECs, partial EC, many identifiers, gene_name=locus_tag, no gene_name, all 3 organisms, 8 strains.
 
 When adding genes, prefer ones that cover a **new** axis not already represented (e.g., a new organism/strain, a gene with expression data, a gene with unique functional annotations).

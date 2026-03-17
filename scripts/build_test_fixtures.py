@@ -75,7 +75,6 @@ def find_gene(
     is_hypothetical: bool | None = None,
     has_ec: bool | None = None,
     min_ec_count: int = 0,
-    has_old_locus_tags: bool | None = None,
     has_partial_ec: bool | None = None,
     min_identifiers: int = 0,
     prefer_minimal: bool = False,
@@ -105,10 +104,6 @@ def find_gene(
             continue
         if min_ec_count > 0 and len(ec) < min_ec_count:
             continue
-        if has_old_locus_tags is True:
-            olt = g.get("old_locus_tags", [])
-            if not olt or olt == [lt]:
-                continue
         if has_partial_ec is True:
             if not any("-" in e for e in ec):
                 continue
@@ -198,17 +193,6 @@ for org_key, data in ALL_DATA.items():
         continue
     break
 
-# Gene with old_locus_tags different from locus_tag
-for org_key, data in ALL_DATA.items():
-    for lt, g in data.items():
-        olt = g.get("old_locus_tags", [])
-        if olt and olt != [lt] and g["locus_tag"] not in {sg["locus_tag"] for sg in SELECTED_GENES}:
-            SELECTED_GENES.append(g)
-            break
-    else:
-        continue
-    break
-
 # Gene with partial EC number (like 3.4.24.-)
 # SYNW0305 already has 3.4.24.-, but let's find another if possible
 for org_key, data in ALL_DATA.items():
@@ -292,6 +276,20 @@ def generate_output() -> str:
     parts.append('        "gene_name": gene.get("gene_name"),')
     parts.append('        "product": gene.get("product"),')
     parts.append('        "organism_strain": gene.get("organism_strain"),')
+    parts.append("    }")
+    parts.append("")
+    parts.append("")
+    parts.append("# Helper: project to search_genes return shape")
+    parts.append("def as_search_genes_result(gene, score=1.0):")
+    parts.append("    return {")
+    parts.append('        "locus_tag": gene["locus_tag"],')
+    parts.append('        "gene_name": gene.get("gene_name"),')
+    parts.append('        "product": gene.get("product"),')
+    parts.append('        "function_description": gene.get("function_description"),')
+    parts.append('        "gene_summary": gene.get("gene_summary"),')
+    parts.append('        "organism_strain": gene.get("organism_strain"),')
+    parts.append('        "annotation_quality": gene.get("annotation_quality"),')
+    parts.append('        "score": score,')
     parts.append("    }")
     parts.append("")
     parts.append("")

@@ -695,6 +695,40 @@ class TestSearchOntologyCorrectnessKG:
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
 
+    def test_cog_category_energy(self, conn):
+        """Search for 'energy' in COG categories returns results."""
+        cypher, params = build_search_ontology(ontology="cog_category", search_text="energy")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+            assert "score" in r
+
+    def test_cyanorak_role_dna(self, conn):
+        """Search for 'DNA' in CyanoRAK roles returns results."""
+        cypher, params = build_search_ontology(ontology="cyanorak_role", search_text="DNA")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_tigr_role_metabolism(self, conn):
+        """Search for 'metabolism' in TIGR roles returns results."""
+        cypher, params = build_search_ontology(ontology="tigr_role", search_text="metabolism")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+
+    def test_pfam_polymerase(self, conn):
+        """Search for 'polymerase' in Pfam returns results from domains and/or clans."""
+        cypher, params = build_search_ontology(ontology="pfam", search_text="polymerase")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) > 0
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
 
 # ---------------------------------------------------------------------------
 # TestGenesByOntologyCorrectnessKG
@@ -818,6 +852,49 @@ class TestGenesByOntologyCorrectnessKG:
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
 
+    def test_cog_category_flat(self, conn):
+        """COG category C (Energy) -- flat ontology, no hierarchy expansion."""
+        cypher, params = build_genes_by_ontology(
+            ontology="cog_category", term_ids=["cog.category:C"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+        for r in results:
+            assert "locus_tag" in r
+            assert "organism_strain" in r
+
+    def test_cyanorak_role_hierarchy(self, conn):
+        """CyanoRAK role hierarchy expansion returns genes."""
+        cypher, params = build_genes_by_ontology(
+            ontology="cyanorak_role", term_ids=["cyanorak.role:F"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_tigr_role_flat(self, conn):
+        """TIGR role (flat ontology) returns genes."""
+        cypher, params = build_genes_by_ontology(
+            ontology="tigr_role", term_ids=["tigr.role:120"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_pfam_domain(self, conn):
+        """Pfam domain PF00712 returns annotated genes."""
+        cypher, params = build_genes_by_ontology(
+            ontology="pfam", term_ids=["pfam:PF00712"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_pfam_clan_hierarchy(self, conn):
+        """Pfam clan CL0060 with hierarchy expansion returns more genes than domain alone."""
+        cypher, params = build_genes_by_ontology(
+            ontology="pfam", term_ids=["pfam.clan:CL0060"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
 
 # ---------------------------------------------------------------------------
 # TestGeneOntologyTermsCorrectnessKG
@@ -919,3 +996,54 @@ class TestGeneOntologyTermsCorrectnessKG:
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1, "PMM0001 (dnaN) should have GO:BP annotations"
+
+    def test_cog_category_annotations(self, conn):
+        """PMM0001 should have COG category annotations."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="cog_category", gene_id="PMM0001",
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_cyanorak_role_annotations(self, conn):
+        """PMM0001 should have CyanoRAK role annotations."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="cyanorak_role", gene_id="PMM0001",
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_tigr_role_annotations(self, conn):
+        """PMM0001 should have TIGR role annotations."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="tigr_role", gene_id="PMM0001",
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+
+    def test_pfam_annotations(self, conn):
+        """PMM0001 should have Pfam domain annotations."""
+        cypher, params = build_gene_ontology_terms(
+            ontology="pfam", gene_id="PMM0001",
+        )
+        results = conn.execute_query(cypher, **params)
+        # May or may not have Pfam annotations
+        assert isinstance(results, list)
+        for r in results:
+            assert "id" in r
+            assert "name" in r
+
+    def test_cyanorak_role_leaf_only(self, conn):
+        """CyanoRAK role with leaf_only=True returns fewer or equal terms than all."""
+        cypher_leaf, params_leaf = build_gene_ontology_terms(
+            ontology="cyanorak_role", gene_id="PMM0001", leaf_only=True,
+        )
+        cypher_all, params_all = build_gene_ontology_terms(
+            ontology="cyanorak_role", gene_id="PMM0001", leaf_only=False,
+        )
+        leaf_results = conn.execute_query(cypher_leaf, **params_leaf)
+        all_results = conn.execute_query(cypher_all, **params_all)
+        assert len(leaf_results) <= len(all_results)

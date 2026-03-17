@@ -129,8 +129,8 @@ class TestResolveGeneCorrectness:
         assert r["locus_tag"] == "S8102_04001"
         assert r["gene_name"] is None
 
-    def test_gene_name_equals_locus_tag(self, tool_fns, mock_ctx):
-        """ALT831_RS00180 has gene_name == locus_tag (fallback)."""
+    def test_gene_without_gene_name(self, tool_fns, mock_ctx):
+        """ALT831_RS00180 has no gene_name (None)."""
         gene = GENES_BY_LOCUS["ALT831_RS00180"]
         row = as_resolve_gene_result(gene)
         _conn_from(mock_ctx).execute_query.return_value = [row]
@@ -141,7 +141,7 @@ class TestResolveGeneCorrectness:
 
         org = gene["organism_strain"]
         r = result["results"][org][0]
-        assert r["gene_name"] == r["locus_tag"]
+        assert r["gene_name"] is None
 
     def test_organism_filter_narrows_results(self, tool_fns, mock_ctx):
         """With organism='MED4', only the MED4 dnaN is returned."""
@@ -155,17 +155,17 @@ class TestResolveGeneCorrectness:
         assert result["total"] == 1
         assert "Prochlorococcus MED4" in result["results"]
 
-    def test_old_locus_tag_lookup(self, tool_fns, mock_ctx):
-        """PMT0106 has old_locus_tags including PMT_0106."""
-        gene = GENES_BY_LOCUS["PMT0106"]
+    def test_alternate_identifier_lookup(self, tool_fns, mock_ctx):
+        """PMM0001 all_identifiers includes TX50_RS00020 (alternate locus tag)."""
+        gene = GENES_BY_LOCUS["PMM0001"]
         row = as_resolve_gene_result(gene)
         _conn_from(mock_ctx).execute_query.return_value = [row]
 
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="PMT_0106"))
+        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="TX50_RS00020"))
 
         org = gene["organism_strain"]
-        assert result["results"][org][0]["locus_tag"] == "PMT0106"
-        assert result["results"][org][0]["gene_name"] == "legI"
+        assert result["results"][org][0]["locus_tag"] == "PMM0001"
+        assert result["results"][org][0]["gene_name"] == "dnaN"
 
 
 # ---------------------------------------------------------------------------

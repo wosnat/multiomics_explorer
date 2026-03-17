@@ -899,6 +899,34 @@ class TestSearchOntologyWrapper:
         result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="membrane", ontology="go_cc"))
         assert result["total"] == 1
 
+    def test_cog_category_ontology_accepted(self, tool_fns, mock_ctx):
+        """cog_category ontology is accepted without error."""
+        rows = [{"id": "cog:C", "name": "Energy production and conversion", "score": 4.0}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="energy", ontology="cog_category"))
+        assert result["total"] == 1
+
+    def test_cyanorak_role_ontology_accepted(self, tool_fns, mock_ctx):
+        """cyanorak_role ontology is accepted without error."""
+        rows = [{"id": "cyanorak_role:F", "name": "DNA metabolism", "score": 3.5}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="DNA", ontology="cyanorak_role"))
+        assert result["total"] == 1
+
+    def test_tigr_role_ontology_accepted(self, tool_fns, mock_ctx):
+        """tigr_role ontology is accepted without error."""
+        rows = [{"id": "tigr_role:120", "name": "Energy metabolism", "score": 3.0}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="metabolism", ontology="tigr_role"))
+        assert result["total"] == 1
+
+    def test_pfam_ontology_accepted(self, tool_fns, mock_ctx):
+        """pfam ontology is accepted without error."""
+        rows = [{"id": "pfam:PF00712", "name": "DNA polymerase", "score": 5.0}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="polymerase", ontology="pfam"))
+        assert result["total"] == 1
+
 
 # ---------------------------------------------------------------------------
 # genes_by_ontology
@@ -951,6 +979,42 @@ class TestGenesByOntologyWrapper:
         _conn_from(mock_ctx).execute_query.return_value = rows
         result = json.loads(tool_fns["genes_by_ontology"](
             mock_ctx, term_ids=["go:0016020"], ontology="go_cc",
+        ))
+        assert result["total"] == 1
+
+    def test_cog_category_ontology_accepted(self, tool_fns, mock_ctx):
+        """cog_category ontology is accepted without error."""
+        rows = [{"locus_tag": "PMM0120", "gene_name": "x", "product": "p", "organism_strain": "Prochlorococcus MED4"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["cog:C"], ontology="cog_category",
+        ))
+        assert result["total"] == 1
+
+    def test_cyanorak_role_ontology_accepted(self, tool_fns, mock_ctx):
+        """cyanorak_role ontology is accepted without error."""
+        rows = [{"locus_tag": "PMM0120", "gene_name": "x", "product": "p", "organism_strain": "Prochlorococcus MED4"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["cyanorak_role:F"], ontology="cyanorak_role",
+        ))
+        assert result["total"] == 1
+
+    def test_tigr_role_ontology_accepted(self, tool_fns, mock_ctx):
+        """tigr_role ontology is accepted without error."""
+        rows = [{"locus_tag": "PMM0120", "gene_name": "x", "product": "p", "organism_strain": "Prochlorococcus MED4"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["tigr_role:120"], ontology="tigr_role",
+        ))
+        assert result["total"] == 1
+
+    def test_pfam_ontology_accepted(self, tool_fns, mock_ctx):
+        """pfam ontology is accepted without error."""
+        rows = [{"locus_tag": "PMM0120", "gene_name": "x", "product": "p", "organism_strain": "Prochlorococcus MED4"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["pfam:PF00712"], ontology="pfam",
         ))
         assert result["total"] == 1
 
@@ -1028,6 +1092,42 @@ class TestGeneOntologyTermsWrapper:
         _conn_from(mock_ctx).execute_query.return_value = rows
         result = json.loads(tool_fns["gene_ontology_terms"](
             mock_ctx, gene_id="PMM0001", ontology="go_cc",
+        ))
+        assert result["total"] == 1
+
+    def test_cog_category_ontology_accepted(self, tool_fns, mock_ctx):
+        """cog_category ontology is accepted without error."""
+        rows = [{"id": "cog:C", "name": "Energy production and conversion"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="cog_category",
+        ))
+        assert result["total"] == 1
+
+    def test_cyanorak_role_ontology_accepted(self, tool_fns, mock_ctx):
+        """cyanorak_role ontology is accepted without error."""
+        rows = [{"id": "cyanorak_role:F", "name": "DNA metabolism"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="cyanorak_role",
+        ))
+        assert result["total"] == 1
+
+    def test_tigr_role_ontology_accepted(self, tool_fns, mock_ctx):
+        """tigr_role ontology is accepted without error."""
+        rows = [{"id": "tigr_role:120", "name": "Energy metabolism"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="tigr_role",
+        ))
+        assert result["total"] == 1
+
+    def test_pfam_ontology_accepted(self, tool_fns, mock_ctx):
+        """pfam ontology is accepted without error."""
+        rows = [{"id": "pfam:PF00712", "name": "DNA polymerase"}]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="pfam",
         ))
         assert result["total"] == 1
 

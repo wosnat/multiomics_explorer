@@ -30,6 +30,7 @@ rows:
       sequence_length: 615
     all_identifiers:
     - CK_Syn_WH8102_00305
+    - Q7U9F3
     - TX72_RS01535
     - WP_011127179.1
     - ftsH
@@ -57,10 +58,23 @@ rows:
     - '[pfam] FtsH_ext: FtsH Extracellular'
     - '[pfam] AAA: ATPase family associated with various cellular activities (AAA)'
     - '[pfam] AAA_lid_3: AAA+ lid domain'
-    alternative_locus_tags:
-    - SYNW0305
     annotation_quality: 3
+    annotation_types:
+    - go_bp
+    - go_mf
+    - go_cc
+    - pfam
+    - cog_category
+    - kegg
+    - ec
+    - cyanorak_role
+    - tigr_role
+    closest_ortholog_genera:
+    - Prochlorococcus
+    - Synechococcus
+    closest_ortholog_group_size: 9
     end: 304589
+    expression_edge_count: 0
     function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
       for both cytoplasmic and membrane proteins. Plays a role in the quality control
       of integral membrane proteins
@@ -73,19 +87,13 @@ rows:
     gene_summary: 'ftsH1 :: cell division protein FtsH1 :: Acts as a processive, ATP-dependent
       zinc metallopeptidase for both cytoplasmic and membrane proteins. Plays a role
       in the quality control of integral membrane proteins'
-    gene_synonyms:
-    - ftsH3
-    - SYNW0305
-    - ftsH2
-    - ftsH
     id: ncbigene:SYNW0305
     locus_tag: SYNW0305
-    old_locus_tags:
-    - SYNW0305
     organism_strain: Synechococcus WH8102
     preferred_id: ncbigene
     product: cell division protein FtsH1
     protein_family: AAA ATPase family; Peptidase M41 family; AAA ATPase family
     protein_id: WP_011127179.1
+    significant_expression_count: 0
     start: 302742
     strand: +
