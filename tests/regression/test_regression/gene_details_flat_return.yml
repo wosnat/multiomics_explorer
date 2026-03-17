@@ -1,0 +1,91 @@
+case_id: gene_details_flat_return
+row_count: 1
+rows:
+- all_identifiers:
+  - CK_Pro_MED4_00001
+  - Q7V3R7
+  - TX50_RS00020
+  - WP_011131639.1
+  alternate_functional_descriptions:
+  - '[cog] COG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination
+    and repair'
+  - '[cog] bactNOG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination
+    and repair'
+  - '[cog] cyaNOG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination
+    and repair'
+  - '[cyanorak] DNA polymerase III, beta subunit'
+  - '[cyanorak_role] DNA replication, recombination, and repair'
+  - '[eggnog] Confers DNA tethering and processivity to DNA polymerases and other
+    proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed by
+    the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria'
+  - '[kegg] DNA-directed DNA polymerase; DNA polymerase I; DNA polymerase II; DNA
+    polymerase III; DNA polymerase alpha; DNA polymerase beta; DNA polymerase gamma;
+    DNA nucleotidyltransferase (DNA-directed); deoxyribonucleate nucleotidyltransferase;
+    deoxynucleate polymerase; deoxyribonucleic acid duplicase; deoxyribonucleic acid
+    polymerase; deoxyribonucleic duplicase; deoxyribonucleic polymerase; deoxyribonucleic
+    polymerase I; DNA duplicase; DNA nucleotidyltransferase; DNA polymerase; DNA replicase;
+    DNA-dependent DNA polymerase; duplicase; Klenow fragment; sequenase; Taq DNA polymerase;
+    Taq Pol I; Tca DNA polymerase'
+  - '[ncbi] DNA polymerase III subunit beta'
+  - '[pfam] DNA_pol3_beta: DNA polymerase III beta subunit, N-terminal domain'
+  - '[pfam] DNA_pol3_beta_2: DNA polymerase III beta subunit, central domain'
+  - '[pfam] DNA_pol3_beta_3: DNA polymerase III beta subunit, C-terminal domain'
+  - '[protein_family] Beta sliding clamp family'
+  - '[tigr_role] DNA metabolism / DNA replication, recombination, and repair'
+  - '[uniprot] Confers DNA tethering and processivity to DNA polymerases and other
+    proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed by
+    the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication'
+  annotation_quality: 3
+  annotation_types:
+  - cog_category
+  - cyanorak_role
+  - ec
+  - go_bp
+  - go_cc
+  - go_mf
+  - kegg
+  - pfam
+  - tigr_role
+  closest_ortholog_genera:
+  - Prochlorococcus
+  - Synechococcus
+  closest_ortholog_group_size: 9
+  end: 1331
+  expression_edge_count: 28
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  id: ncbigene:PMM0001
+  locus_tag: PMM0001
+  organism_strain: Prochlorococcus MED4
+  preferred_id: ncbigene
+  product: DNA polymerase III, beta subunit
+  protein_family: Beta sliding clamp family
+  protein_id: WP_011131639.1
+  significant_expression_count: 3
+  start: 174
+  strand: +

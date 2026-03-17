@@ -15,10 +15,10 @@ import pytest
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_gene_ontology_terms,
+    build_gene_overview,
     build_gene_stub,
     build_genes_by_ontology,
-    build_get_gene_details_homologs,
-    build_get_gene_details_main,
+    build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
     build_list_condition_types,
@@ -194,40 +194,77 @@ class TestSearchGenesCorrectnessKG:
 
 @pytest.mark.kg
 class TestGetGeneDetailsCorrectnessKG:
-    """Validate gene details queries return expected nested structures."""
+    """Validate gene details queries return flat g{.*} properties."""
 
     def test_well_annotated_prochlorococcus(self, conn):
-        """PMM0001 should have protein, organism, and ortholog group info."""
-        cypher, params = build_get_gene_details_main(gene_id="PMM0001")
+        """PMM0001 returns flat g{.*} with locus_tag, gene_name, product, organism_strain."""
+        cypher, params = build_get_gene_details(gene_id="PMM0001")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
         assert gene is not None
         assert gene["locus_tag"] == "PMM0001"
-        assert gene["_protein"] is not None, "PMM0001 should have a linked Protein"
-        assert gene["_organism"] is not None, "PMM0001 should have a linked Organism"
-        assert len(gene["_ortholog_groups"]) >= 1, "PMM0001 should have OrthologGroup memberships"
+        assert gene["gene_name"] == "dnaN"
+        assert "product" in gene
+        assert "organism_strain" in gene
 
-    def test_alteromonas_has_eggnog_groups(self, conn):
-        """ALT831_RS00180 (Alteromonas) should have eggnog OrthologGroup memberships."""
-        cypher, params = build_get_gene_details_main(gene_id="ALT831_RS00180")
+    def test_alteromonas_gene(self, conn):
+        """ALT831_RS00180 returns flat properties with organism_strain containing 'Alteromonas'."""
+        cypher, params = build_get_gene_details(gene_id="ALT831_RS00180")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
         assert gene is not None
-        og_sources = {og["source"] for og in gene["_ortholog_groups"]}
-        assert "cyanorak" not in og_sources, "Alteromonas genes should not have Cyanorak groups"
+        assert gene["locus_tag"] == "ALT831_RS00180"
+        assert "Alteromonas" in gene["organism_strain"]
 
-    def test_homologs_exist_for_pmm0001(self, conn):
-        """PMM0001 (dnaN) should have homologs from other organisms."""
-        cypher, params = build_get_gene_details_homologs(gene_id="PMM0001")
+
+# ---------------------------------------------------------------------------
+# TestGeneOverviewCorrectnessKG
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestGeneOverviewCorrectnessKG:
+    """Validate gene_overview queries return routing signals from pre-computed properties."""
+
+    def test_single_gene_pro(self, conn):
+        """PMM1428: verify annotation_types, expression counts, ortholog signals."""
+        cypher, params = build_gene_overview(locus_tags=["PMM1428"])
         results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        strains = {r["organism_strain"] for r in results}
-        # dnaN homologs should span multiple strains
-        assert len(strains) >= 2, (
-            f"Expected homologs from >=2 strains, got {strains}"
-        )
+        assert len(results) == 1
+        r = results[0]
+        assert r["locus_tag"] == "PMM1428"
+        assert set(r["annotation_types"]) >= {"go_mf", "pfam", "cog_category", "tigr_role"}
+        assert r["expression_edge_count"] == 36
+        assert r["significant_expression_count"] == 5
+        assert r["closest_ortholog_group_size"] == 9
+        assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
+
+    def test_single_gene_alt(self, conn):
+        """EZ55_00275: empty annotation_types, no expression, small ortholog group."""
+        cypher, params = build_gene_overview(locus_tags=["EZ55_00275"])
+        results = conn.execute_query(cypher, **params)
+        assert len(results) == 1
+        r = results[0]
+        assert r["locus_tag"] == "EZ55_00275"
+        assert r["annotation_types"] == []
+        assert r["expression_edge_count"] == 0
+        assert r["closest_ortholog_group_size"] == 1
+
+    def test_batch_mixed_organisms(self, conn):
+        """[PMM1428, EZ55_00275]: returns 2 rows with correct organism_strain."""
+        cypher, params = build_gene_overview(locus_tags=["PMM1428", "EZ55_00275"])
+        results = conn.execute_query(cypher, **params)
+        assert len(results) == 2
+        orgs = {r["organism_strain"] for r in results}
+        assert len(orgs) == 2  # different organisms
+
+    def test_nonexistent_gene_excluded(self, conn):
+        """[PMM1428, FAKE_GENE]: returns 1 row (only PMM1428)."""
+        cypher, params = build_gene_overview(locus_tags=["PMM1428", "FAKE_GENE"])
+        results = conn.execute_query(cypher, **params)
+        assert len(results) == 1
+        assert results[0]["locus_tag"] == "PMM1428"
 
 
 # ---------------------------------------------------------------------------

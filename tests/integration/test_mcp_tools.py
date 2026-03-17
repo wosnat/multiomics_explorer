@@ -11,7 +11,7 @@ import pytest
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_gene_stub,
-    build_get_gene_details_main,
+    build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
     build_query_expression,
@@ -139,7 +139,7 @@ class TestEdgeCases:
         assert len(results) == 0
 
     def test_get_gene_details_nonexistent(self, conn):
-        cypher, params = build_get_gene_details_main(gene_id="FAKE_GENE_XYZ")
+        cypher, params = build_get_gene_details(gene_id="FAKE_GENE_XYZ")
         results = conn.execute_query(cypher, **params)
         # Either empty or gene is None
         assert not results or results[0]["gene"] is None

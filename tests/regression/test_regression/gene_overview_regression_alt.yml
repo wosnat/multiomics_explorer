@@ -1,0 +1,16 @@
+case_id: gene_overview_regression_alt
+row_count: 1
+rows:
+- annotation_quality: 0
+  annotation_types: []
+  closest_ortholog_genera:
+  - Alteromonas
+  closest_ortholog_group_size: 1
+  expression_edge_count: 0
+  gene_category: Unknown
+  gene_name: null
+  gene_summary: 'hypothetical protein :: -'
+  locus_tag: EZ55_00275
+  organism_strain: Alteromonas macleodii EZ55
+  product: hypothetical protein
+  significant_expression_count: 0

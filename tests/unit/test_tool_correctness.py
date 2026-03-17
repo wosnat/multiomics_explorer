@@ -235,33 +235,21 @@ class TestSearchGenesCorrectness:
 # TestGetGeneDetailsCorrectness
 # ---------------------------------------------------------------------------
 class TestGetGeneDetailsCorrectness:
-    """Verify get_gene_details assembles realistic data correctly."""
+    """Verify get_gene_details returns flat g{.*} properties correctly."""
 
     def test_well_annotated_prochlorococcus(self, tool_fns, mock_ctx):
-        """PMM0001 returns full gene data with protein, organism, ortholog group info."""
+        """PMM0001 returns flat gene properties via g{.*}. Single execute_query call."""
         gene_data = {
             "locus_tag": "PMM0001",
             "gene_name": "dnaN",
             "product": "DNA polymerase III, beta subunit",
             "organism_strain": "Prochlorococcus MED4",
+            "gene_category": "DNA replication",
+            "annotation_quality": 3,
             "ec_numbers": ["2.7.7.7"],
-            "go_terms": GENES_BY_LOCUS["PMM0001"]["go_terms"],
-            "_protein": {"protein_id": "WP_011131639.1", "protein_family": "Beta sliding clamp family"},
-            "_organism": {"strain": "MED4", "species": "Prochlorococcus marinus"},
-            "_ortholog_groups": [
-                {"name": "CK_00000364", "source": "cyanorak", "taxonomic_level": "curated"},
-                {"name": "COG0592@2", "source": "eggnog", "taxonomic_level": "Bacteria"},
-            ],
         }
-        homologs = [
-            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312",
-             "gene_name": "dnaN"},
-        ]
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [{"gene": gene_data}],
-            homologs,
-        ]
+        conn.execute_query.return_value = [{"gene": gene_data}]
 
         result = json.loads(tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001"))
 
@@ -269,30 +257,24 @@ class TestGetGeneDetailsCorrectness:
         r = result[0]
         assert r["locus_tag"] == "PMM0001"
         assert r["gene_name"] == "dnaN"
-        assert r["_protein"]["protein_id"] == "WP_011131639.1"
-        assert r["_organism"]["strain"] == "MED4"
-        assert len(r["_ortholog_groups"]) == 2
-        assert r["_ortholog_groups"][0]["source"] == "cyanorak"
-        assert r["_homologs"] == homologs
+        assert r["organism_strain"] == "Prochlorococcus MED4"
+        assert "_protein" not in r
+        assert "_organism" not in r
+        assert "_ortholog_groups" not in r
+        assert "_homologs" not in r
+        assert conn.execute_query.call_count == 1
 
     def test_alteromonas_gene_eggnog_only(self, tool_fns, mock_ctx):
-        """ALT831_RS00180 is Alteromonas — eggnog OGs only, no Cyanorak."""
+        """ALT831_RS00180 returns flat properties. Single query call."""
         gene_data = {
             "locus_tag": "ALT831_RS00180",
-            "gene_name": "ALT831_RS00180",
+            "gene_name": None,
             "product": "IS630 family transposase",
             "organism_strain": "Alteromonas macleodii MIT1002",
-            "_protein": {"protein_id": "WP_197047964.1"},
-            "_organism": {"strain": "MIT1002", "species": "Alteromonas macleodii"},
-            "_ortholog_groups": [
-                {"name": "465MN@72275", "source": "eggnog", "taxonomic_level": "Alteromonadaceae"},
-            ],
+            "annotation_quality": 2,
         }
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [{"gene": gene_data}],
-            [],  # no homologs
-        ]
+        conn.execute_query.return_value = [{"gene": gene_data}]
 
         result = json.loads(
             tool_fns["get_gene_details"](mock_ctx, gene_id="ALT831_RS00180")
@@ -300,33 +282,90 @@ class TestGetGeneDetailsCorrectness:
 
         r = result[0]
         assert r["locus_tag"] == "ALT831_RS00180"
-        assert len(r["_ortholog_groups"]) == 1
-        assert r["_ortholog_groups"][0]["source"] == "eggnog"
-        assert r["_homologs"] == []
+        assert r["organism_strain"] == "Alteromonas macleodii MIT1002"
+        assert "_protein" not in r
+        assert "_organism" not in r
+        assert "_ortholog_groups" not in r
+        assert "_homologs" not in r
+        assert conn.execute_query.call_count == 1
 
-    def test_homologs_merged_from_different_organisms(self, tool_fns, mock_ctx):
-        """Homologs from MED4, MIT9312, WH8102 are all merged into result."""
-        gene_data = {
-            "locus_tag": "PMM0001",
-            "gene_name": "dnaN",
-            "product": "DNA polymerase III, beta subunit",
+
+# ---------------------------------------------------------------------------
+# TestGeneOverviewCorrectness
+# ---------------------------------------------------------------------------
+class TestGeneOverviewCorrectness:
+    """Verify gene_overview returns correct data for realistic mock responses."""
+
+    def test_single_gene_overview(self, tool_fns, mock_ctx):
+        """Mock single gene row with all 12 columns, verify JSON output structure."""
+        row = {
+            "locus_tag": "PMM1428",
+            "gene_name": "test",
+            "product": "test product",
+            "gene_summary": "A test summary",
+            "gene_category": "Photosynthesis",
+            "annotation_quality": 3,
+            "organism_strain": "Prochlorococcus MED4",
+            "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"],
+            "expression_edge_count": 36,
+            "significant_expression_count": 5,
+            "closest_ortholog_group_size": 9,
+            "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
         }
-        homologs = [
-            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312"},
-            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [{"gene": gene_data}],
-            homologs,
-        ]
+        _conn_from(mock_ctx).execute_query.return_value = [row]
 
-        result = json.loads(tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001"))
+        result = json.loads(tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428"]))
 
-        assert len(result[0]["_homologs"]) == 2
-        orgs = {h["organism_strain"] for h in result[0]["_homologs"]}
-        assert "Prochlorococcus MIT9312" in orgs
-        assert "Synechococcus WH8102" in orgs
+        assert len(result) == 1
+        r = result[0]
+        assert r["locus_tag"] == "PMM1428"
+        assert r["expression_edge_count"] == 36
+        assert r["annotation_types"] == ["go_mf", "pfam", "cog_category", "tigr_role"]
+
+    def test_batch_overview(self, tool_fns, mock_ctx):
+        """Mock multiple gene rows, verify all returned."""
+        rows = [
+            {"locus_tag": "PMM1428", "gene_name": "a", "product": "p1",
+             "gene_summary": None, "gene_category": None,
+             "annotation_quality": 3, "organism_strain": "Prochlorococcus MED4",
+             "annotation_types": ["go_mf"], "expression_edge_count": 36,
+             "significant_expression_count": 5, "closest_ortholog_group_size": 9,
+             "closest_ortholog_genera": ["Prochlorococcus"]},
+            {"locus_tag": "EZ55_00275", "gene_name": None, "product": "p2",
+             "gene_summary": None, "gene_category": None,
+             "annotation_quality": 0, "organism_strain": "Alteromonas EZ55",
+             "annotation_types": [], "expression_edge_count": 0,
+             "significant_expression_count": 0, "closest_ortholog_group_size": 1,
+             "closest_ortholog_genera": []},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+
+        result = json.loads(
+            tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428", "EZ55_00275"])
+        )
+
+        assert len(result) == 2
+        loci = {r["locus_tag"] for r in result}
+        assert loci == {"PMM1428", "EZ55_00275"}
+
+    def test_annotation_types_preserved(self, tool_fns, mock_ctx):
+        """List field preserved in JSON output."""
+        row = {
+            "locus_tag": "PMM1428",
+            "gene_name": "a", "product": "p",
+            "gene_summary": None, "gene_category": None,
+            "annotation_quality": 3, "organism_strain": "Prochlorococcus MED4",
+            "annotation_types": ["go_mf", "pfam", "cog_category"],
+            "expression_edge_count": 36, "significant_expression_count": 5,
+            "closest_ortholog_group_size": 9,
+            "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+        }
+        _conn_from(mock_ctx).execute_query.return_value = [row]
+
+        result = json.loads(tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428"]))
+
+        assert isinstance(result[0]["annotation_types"], list)
+        assert "go_mf" in result[0]["annotation_types"]
 
 
 # ---------------------------------------------------------------------------

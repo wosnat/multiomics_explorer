@@ -56,15 +56,59 @@
     contains:
       organism_strain: Prochlorococcus MED4
 
+# ── Gene overview ──────────────────────────────────────────
+
+- id: gene_overview_single_pro
+  tool: gene_overview
+  desc: Single Prochlorococcus gene overview with routing signals
+  params:
+    gene_ids: ["PMM1428"]
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_summary, annotation_types,
+              expression_edge_count, significant_expression_count,
+              closest_ortholog_group_size, closest_ortholog_genera]
+
+- id: gene_overview_single_alt
+  tool: gene_overview
+  desc: Single Alteromonas gene overview
+  params:
+    gene_ids: ["EZ55_00275"]
+  expect:
+    min_rows: 1
+    columns: [locus_tag, organism_strain]
+
+- id: gene_overview_batch
+  tool: gene_overview
+  desc: Batch overview for Pro + Alt genes
+  params:
+    gene_ids: ["PMM1428", "EZ55_00275"]
+  expect:
+    min_rows: 2
+    columns: [locus_tag, gene_summary, annotation_types]
+
+- id: gene_overview_regression_pro
+  tool: gene_overview
+  desc: Gene overview regression baseline for Pro gene
+  params:
+    gene_ids: ["PMM1428"]
+
+- id: gene_overview_regression_alt
+  tool: gene_overview
+  desc: Gene overview regression baseline for Alt gene
+  params:
+    gene_ids: ["EZ55_00275"]
+
 # ── Gene details ─────────────────────────────────────────
 
-- id: gene_details_has_organism
+- id: gene_details_flat_return
   tool: get_gene_details
-  desc: Gene details include organism info
+  desc: Gene details returns flat g{.*} properties
   params:
     gene_id: PMM0001
   expect:
     min_rows: 1
+    columns: [locus_tag, gene_name, product, organism_strain, gene_category]
 
 # ── Expression ───────────────────────────────────────────
 
@@ -448,19 +492,21 @@
 
 - id: gene_details_alteromonas
   tool: get_gene_details
-  desc: Alteromonas gene details returned (no CyanORAK cluster expected)
+  desc: Alteromonas gene details flat return
   params:
     gene_id: ALT831_RS00180
   expect:
     min_rows: 1
+    columns: [locus_tag, organism_strain]
 
 - id: gene_details_synechococcus
   tool: get_gene_details
-  desc: Synechococcus gene details returned
+  desc: Synechococcus gene details flat return
   params:
     gene_id: SYNW0305
   expect:
     min_rows: 1
+    columns: [locus_tag, organism_strain]
 
 # ── Expression corner cases ───────────────────────────────
 

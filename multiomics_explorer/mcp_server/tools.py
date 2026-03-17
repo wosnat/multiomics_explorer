@@ -16,10 +16,10 @@ from multiomics_explorer.kg.constants import (
 from multiomics_explorer.kg.queries_lib import (
     build_compare_conditions,
     build_gene_ontology_terms,
+    build_gene_overview,
     build_gene_stub,
     build_genes_by_ontology,
-    build_get_gene_details_homologs,
-    build_get_gene_details_main,
+    build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
     build_list_condition_types,
@@ -268,36 +268,58 @@ def register_tools(mcp: FastMCP):
         return _with_query(response, cypher, params, ctx)
 
     @mcp.tool()
+    def gene_overview(ctx: Context, gene_ids: list[str], limit: int = 50) -> str:
+        """Get an overview of one or more genes: identity and data availability.
+
+        Use this after resolve_gene, search_genes, genes_by_ontology, or
+        get_homologs to understand what each gene is and what follow-up data
+        exists.
+
+        Returns one row per gene with routing signals:
+        - annotation_types: which ontology types have annotations
+          → use gene_ontology_terms with the relevant type
+        - expression_edge_count + significant_expression_count: whether
+          expression data exists and how much is significant
+          → use query_expression
+        - closest_ortholog_group_size + closest_ortholog_genera: whether
+          orthologs exist and in which genera
+          → use get_homologs for full membership
+
+        Args:
+            gene_ids: List of gene locus_tags.
+                      Use resolve_gene to find locus_tags from other identifiers.
+            limit: Max genes to return (default 50).
+        """
+        conn = _conn(ctx)
+        cypher, params = build_gene_overview(locus_tags=gene_ids, limit=limit)
+        rows = conn.execute_query(cypher, **params)
+        if not rows:
+            return "No genes found for the given locus_tags."
+        response = _fmt(rows)
+        return _with_query(response, cypher, params, ctx)
+
+    @mcp.tool()
     def get_gene_details(ctx: Context, gene_id: str) -> str:
-        """Get full details for a gene: properties, protein, organism, ortholog groups,
-        and homolog summary.
+        """Get all properties for a gene.
+
+        This is a deep-dive tool — use gene_overview for the common case.
+        Returns all Gene node properties including sparse fields
+        (catalytic_activities, transporter_classification, cazy_ids, etc.).
+
+        For organism taxonomy, use list_organisms. For homologs, use
+        get_homologs. For ontology annotations, use gene_ontology_terms.
+        For expression data, use query_expression.
 
         Args:
             gene_id: Gene locus_tag (e.g. "PMM0001", "sync_0001").
         """
         conn = _conn(ctx)
-
-        # Main gene + protein + organism
-        cypher_main, params_main = build_get_gene_details_main(gene_id=gene_id)
-        main = conn.execute_query(cypher_main, **params_main)
-        if not main or main[0]["gene"] is None:
+        cypher, params = build_get_gene_details(gene_id=gene_id)
+        results = conn.execute_query(cypher, **params)
+        if not results or results[0]["gene"] is None:
             return f"Gene '{gene_id}' not found."
-
-        # Homolog summary
-        cypher_hom, params_hom = build_get_gene_details_homologs(gene_id=gene_id)
-        homologs = conn.execute_query(cypher_hom, **params_hom)
-
-        result = main[0]["gene"]
-        result["_homologs"] = homologs
-        response = _fmt([result])
-        if _debug(ctx):
-            queries = [
-                {"cypher": cypher_main, "params": params_main},
-                {"cypher": cypher_hom, "params": params_hom},
-            ]
-            debug_block = json.dumps({"_debug": {"queries": queries}}, indent=2, default=str)
-            return f"{debug_block}\n---\n{response}"
-        return response
+        response = _fmt([results[0]["gene"]])
+        return _with_query(response, cypher, params, ctx)
 
     @mcp.tool()
     def query_expression(

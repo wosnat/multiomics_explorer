@@ -1,99 +1,72 @@
 case_id: gene_details_synechococcus
 row_count: 1
 rows:
-- gene:
-    _organism:
-      clade: null
-      genus: Parasynechococcus
-      ncbi_taxon_id: 84588
-      preferred_name: Synechococcus WH8102
-      strain_name: WH8102
-    _ortholog_groups:
-    - name: 1GYE1@1129
-      source: eggnog
-      taxonomic_level: Synechococcus
-    - name: COG0465@2
-      source: eggnog
-      taxonomic_level: Bacteria
-    - name: CK_00008085
-      source: cyanorak
-      taxonomic_level: curated
-    _protein:
-      annotation_score: 3.0
-      gene_names:
-      - ftsH2
-      - ftsH
-      - SYNW0305
-      is_reviewed: not reviewed
-      refseq_ids:
-      - WP_011127179.1
-      sequence_length: 615
-    all_identifiers:
-    - CK_Syn_WH8102_00305
-    - Q7U9F3
-    - TX72_RS01535
-    - WP_011127179.1
-    - ftsH
-    - ftsH2
-    - ftsH3
-    alternate_functional_descriptions:
-    - '[cyanorak] cell division protein FtsH1'
-    - '[ncbi] ATP-dependent zinc metalloprotease FtsH3'
-    - '[eggnog] Acts as a processive, ATP-dependent zinc metallopeptidase for both
-      cytoplasmic and membrane proteins. Plays a role in the quality control of integral
-      membrane proteins'
-    - '[uniprot] Acts as a processive, ATP-dependent zinc metallopeptidase for both
-      cytoplasmic and membrane proteins. Plays a role in the quality control of integral
-      membrane proteins'
-    - '[protein_family] AAA ATPase family; Peptidase M41 family; AAA ATPase family'
-    - '[cyanorak_role] Cell division'
-    - '[tigr_role] Cellular processes / Cell division'
-    - '[cog] COG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
-      protein turnover, chaperones'
-    - '[cog] bactNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
-      protein turnover, chaperones'
-    - '[cog] cyaNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
-      protein turnover, chaperones'
-    - '[pfam] Peptidase_M41: Peptidase family M41'
-    - '[pfam] FtsH_ext: FtsH Extracellular'
-    - '[pfam] AAA: ATPase family associated with various cellular activities (AAA)'
-    - '[pfam] AAA_lid_3: AAA+ lid domain'
-    annotation_quality: 3
-    annotation_types:
-    - go_bp
-    - go_mf
-    - go_cc
-    - pfam
-    - cog_category
-    - kegg
-    - ec
-    - cyanorak_role
-    - tigr_role
-    closest_ortholog_genera:
-    - Prochlorococcus
-    - Synechococcus
-    closest_ortholog_group_size: 9
-    end: 304589
-    expression_edge_count: 0
-    function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
-      for both cytoplasmic and membrane proteins. Plays a role in the quality control
-      of integral membrane proteins
-    gene_category: Cell cycle and division
-    gene_name: ftsH1
-    gene_name_synonyms:
-    - ftsH3
-    - ftsH2
-    - ftsH
-    gene_summary: 'ftsH1 :: cell division protein FtsH1 :: Acts as a processive, ATP-dependent
-      zinc metallopeptidase for both cytoplasmic and membrane proteins. Plays a role
-      in the quality control of integral membrane proteins'
-    id: ncbigene:SYNW0305
-    locus_tag: SYNW0305
-    organism_strain: Synechococcus WH8102
-    preferred_id: ncbigene
-    product: cell division protein FtsH1
-    protein_family: AAA ATPase family; Peptidase M41 family; AAA ATPase family
-    protein_id: WP_011127179.1
-    significant_expression_count: 0
-    start: 302742
-    strand: +
+- all_identifiers:
+  - CK_Syn_WH8102_00305
+  - Q7U9F3
+  - TX72_RS01535
+  - WP_011127179.1
+  - ftsH
+  - ftsH2
+  - ftsH3
+  alternate_functional_descriptions:
+  - '[cog] COG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
+    protein turnover, chaperones'
+  - '[cog] bactNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
+    protein turnover, chaperones'
+  - '[cog] cyaNOG: CELLULAR PROCESSES AND SIGNALING [O] Posttranslational modification,
+    protein turnover, chaperones'
+  - '[cyanorak] cell division protein FtsH1'
+  - '[cyanorak_role] Cell division'
+  - '[eggnog] Acts as a processive, ATP-dependent zinc metallopeptidase for both cytoplasmic
+    and membrane proteins. Plays a role in the quality control of integral membrane
+    proteins'
+  - '[ncbi] ATP-dependent zinc metalloprotease FtsH3'
+  - '[pfam] AAA: ATPase family associated with various cellular activities (AAA)'
+  - '[pfam] AAA_lid_3: AAA+ lid domain'
+  - '[pfam] FtsH_ext: FtsH Extracellular'
+  - '[pfam] Peptidase_M41: Peptidase family M41'
+  - '[protein_family] AAA ATPase family; Peptidase M41 family; AAA ATPase family'
+  - '[tigr_role] Cellular processes / Cell division'
+  - '[uniprot] Acts as a processive, ATP-dependent zinc metallopeptidase for both
+    cytoplasmic and membrane proteins. Plays a role in the quality control of integral
+    membrane proteins'
+  annotation_quality: 3
+  annotation_types:
+  - cog_category
+  - cyanorak_role
+  - ec
+  - go_bp
+  - go_cc
+  - go_mf
+  - kegg
+  - pfam
+  - tigr_role
+  closest_ortholog_genera:
+  - Prochlorococcus
+  - Synechococcus
+  closest_ortholog_group_size: 9
+  end: 304589
+  expression_edge_count: 0
+  function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
+    for both cytoplasmic and membrane proteins. Plays a role in the quality control
+    of integral membrane proteins
+  gene_category: Cell cycle and division
+  gene_name: ftsH1
+  gene_name_synonyms:
+  - ftsH
+  - ftsH2
+  - ftsH3
+  gene_summary: 'ftsH1 :: cell division protein FtsH1 :: Acts as a processive, ATP-dependent
+    zinc metallopeptidase for both cytoplasmic and membrane proteins. Plays a role
+    in the quality control of integral membrane proteins'
+  id: ncbigene:SYNW0305
+  locus_tag: SYNW0305
+  organism_strain: Synechococcus WH8102
+  preferred_id: ncbigene
+  product: cell division protein FtsH1
+  protein_family: AAA ATPase family; Peptidase M41 family; AAA ATPase family
+  protein_id: WP_011127179.1
+  significant_expression_count: 0
+  start: 302742
+  strand: +

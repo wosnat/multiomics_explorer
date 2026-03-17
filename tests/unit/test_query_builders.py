@@ -9,10 +9,10 @@ from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
     build_compare_conditions,
     build_gene_ontology_terms,
+    build_gene_overview,
     build_gene_stub,
     build_genes_by_ontology,
-    build_get_gene_details_homologs,
-    build_get_gene_details_main,
+    build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
     build_list_condition_types,
@@ -119,26 +119,41 @@ class TestBuildSearchGenes:
         assert "limit" in params
 
 
+class TestBuildGeneOverview:
+    def test_gene_overview_query(self):
+        """UNWIND present, returns all 12 expected columns, $locus_tags and $limit in params."""
+        cypher, params = build_gene_overview(locus_tags=["PMM1428"])
+        assert "UNWIND" in cypher
+        assert params["locus_tags"] == ["PMM1428"]
+        assert params["limit"] == 50
+
+    def test_gene_overview_columns(self):
+        """Verify all column names in RETURN clause."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"])
+        expected_columns = [
+            "locus_tag", "gene_name", "product", "gene_summary", "gene_category",
+            "annotation_quality", "organism_strain", "annotation_types",
+            "expression_edge_count", "significant_expression_count",
+            "closest_ortholog_group_size", "closest_ortholog_genera",
+        ]
+        for col in expected_columns:
+            assert col in cypher, f"Missing column '{col}' in RETURN clause"
+
+
 class TestBuildGetGeneDetails:
-    def test_main_query(self):
-        cypher, params = build_get_gene_details_main(gene_id="PMM0001")
+    def test_get_gene_details_simplified(self):
+        """g {.*} in RETURN, no nested sub-object traversals."""
+        cypher, params = build_get_gene_details(gene_id="PMM0001")
         assert params["lt"] == "PMM0001"
-        assert "Gene_encodes_protein" in cypher
-        assert "Gene_belongs_to_organism" in cypher
+        assert "g {.*}" in cypher
+        assert "Gene_encodes_protein" not in cypher
+        assert "Gene_belongs_to_organism" not in cypher
+        assert "Gene_in_ortholog_group" not in cypher
 
-    def test_homologs_query(self):
-        cypher, params = build_get_gene_details_homologs(gene_id="PMM0001")
-        assert params["lt"] == "PMM0001"
-        assert "Gene_in_ortholog_group" in cypher
-        assert "OrthologGroup" in cypher
-
-    def test_main_query_ortholog_groups(self):
-        """Main query fetches OrthologGroup memberships instead of Cyanorak cluster."""
-        cypher, _ = build_get_gene_details_main(gene_id="PMM0001")
-        assert "Gene_in_ortholog_group" in cypher
-        assert "OrthologGroup" in cypher
-        assert "Cyanorak_cluster" not in cypher
-        assert "Gene_in_cyanorak_cluster" not in cypher
+    def test_build_get_gene_details_homologs_deleted(self):
+        """build_get_gene_details_homologs no longer importable from queries_lib."""
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "build_get_gene_details_homologs")
 
 
 class TestBuildQueryExpression:

@@ -37,7 +37,7 @@ def _conn_from(ctx):
 
 EXPECTED_TOOLS = [
     "get_schema", "list_filter_values", "list_organisms", "resolve_gene",
-    "search_genes", "get_gene_details", "query_expression",
+    "search_genes", "gene_overview", "get_gene_details", "query_expression",
     "compare_conditions", "get_homologs", "run_cypher",
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
 ]
@@ -369,6 +369,33 @@ class TestSearchGenesWrapper:
 # ---------------------------------------------------------------------------
 # get_gene_details
 # ---------------------------------------------------------------------------
+class TestGeneOverviewWrapper:
+    def test_not_found_empty_results(self, tool_fns, mock_ctx):
+        """Empty query result returns 'No genes found' message."""
+        _conn_from(mock_ctx).execute_query.return_value = []
+        result = tool_fns["gene_overview"](mock_ctx, gene_ids=["FAKE"])
+        assert "No genes found" in result
+
+    def test_returns_json_list(self, tool_fns, mock_ctx):
+        """Mock rows returned as JSON list."""
+        rows = [
+            {"locus_tag": "PMM1428", "gene_name": "test", "product": "test product",
+             "organism_strain": "Prochlorococcus MED4"},
+        ]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428"]))
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert result[0]["locus_tag"] == "PMM1428"
+
+    def test_limit_passed_to_query(self, tool_fns, mock_ctx):
+        """Verify limit param forwarded to query builder."""
+        _conn_from(mock_ctx).execute_query.return_value = []
+        tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428"], limit=10)
+        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
+        assert call_kwargs["limit"] == 10
+
+
 class TestGetGeneDetailsWrapper:
     def test_not_found_message(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = [{"gene": None}]
@@ -380,18 +407,16 @@ class TestGetGeneDetailsWrapper:
         result = tool_fns["get_gene_details"](mock_ctx, gene_id="FAKE")
         assert "not found" in result
 
-    def test_assembles_homologs_into_result(self, tool_fns, mock_ctx):
-        """Two queries: main gene + homologs, merged into one result."""
-        gene_data = {"locus_tag": "PMM0001", "product": "test"}
-        homolog_data = [{"locus_tag": "sync_0001", "organism": "CC9311"}]
+    def test_single_query_no_homologs(self, tool_fns, mock_ctx):
+        """Single execute_query call, no _homologs key in result."""
+        gene_data = {"locus_tag": "PMM0001", "product": "test", "organism_strain": "Prochlorococcus MED4"}
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [{"gene": gene_data}],  # main query
-            homolog_data,  # homologs query
-        ]
+        conn.execute_query.return_value = [{"gene": gene_data}]
         result = json.loads(tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001"))
         assert len(result) == 1
-        assert result[0]["_homologs"] == homolog_data
+        assert result[0]["locus_tag"] == "PMM0001"
+        assert "_homologs" not in result[0]
+        assert conn.execute_query.call_count == 1
 
 
 # ---------------------------------------------------------------------------

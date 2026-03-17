@@ -1,0 +1,21 @@
+case_id: gene_overview_single_pro
+row_count: 1
+rows:
+- annotation_quality: 3
+  annotation_types:
+  - cog_category
+  - go_mf
+  - pfam
+  - tigr_role
+  closest_ortholog_genera:
+  - Prochlorococcus
+  - Synechococcus
+  closest_ortholog_group_size: 9
+  expression_edge_count: 36
+  gene_category: Unknown
+  gene_name: null
+  gene_summary: 'EVE domain protein :: Alternative locus ID'
+  locus_tag: PMM1428
+  organism_strain: Prochlorococcus MED4
+  product: EVE domain protein
+  significant_expression_count: 5

@@ -1,17 +1,11 @@
 case_id: search_ontology_go_mf
 row_count: 25
 rows:
-- id: go:0000035
-  name: acyl binding
+- id: go:0000166
+  name: nucleotide binding
   score: 1.2853
-- id: go:0001968
-  name: fibronectin binding
-  score: 1.2853
-- id: go:0002054
-  name: nucleobase binding
-  score: 1.2853
-- id: go:0003677
-  name: DNA binding
+- id: go:0001530
+  name: lipopolysaccharide binding
   score: 1.2853
 - id: go:0003729
   name: mRNA binding
@@ -22,57 +16,63 @@ rows:
 - id: go:0005515
   name: protein binding
   score: 1.2853
-- id: go:0005524
-  name: ATP binding
+- id: go:0008061
+  name: chitin binding
   score: 1.2853
-- id: go:0005525
-  name: GTP binding
+- id: go:0008658
+  name: penicillin binding
   score: 1.2853
-- id: go:0005528
-  name: FK506 binding
+- id: go:0016168
+  name: chlorophyll binding
   score: 1.2853
-- id: go:0009374
-  name: biotin binding
+- id: go:0016594
+  name: glycine binding
   score: 1.2853
-- id: go:0010181
-  name: FMN binding
+- id: go:0019808
+  name: polyamine binding
   score: 1.2853
-- id: go:0019842
-  name: vitamin binding
+- id: go:0019899
+  name: enzyme binding
   score: 1.2853
 - id: go:0019900
   name: kinase binding
   score: 1.2853
-- id: go:0032553
-  name: ribonucleotide binding
+- id: go:0030552
+  name: cAMP binding
   score: 1.2853
-- id: go:0042834
-  name: peptidoglycan binding
+- id: go:0031419
+  name: cobalamin binding
   score: 1.2853
-- id: go:0043169
-  name: cation binding
+- id: go:0032549
+  name: ribonucleoside binding
   score: 1.2853
-- id: go:0043176
-  name: amine binding
+- id: go:0043022
+  name: ribosome binding
   score: 1.2853
-- id: go:0046790
-  name: virion binding
+- id: go:0043167
+  name: ion binding
+  score: 1.2853
+- id: go:0043168
+  name: anion binding
   score: 1.2853
 - id: go:0046906
   name: tetrapyrrole binding
   score: 1.2853
-- id: go:0048038
-  name: quinone binding
+- id: go:0048029
+  name: monosaccharide binding
   score: 1.2853
-- id: go:0051117
-  name: ATPase binding
+- id: go:0070401
+  name: NADP+ binding
+  score: 1.2853
+- id: go:0070404
+  name: NADH binding
+  score: 1.2853
+- id: go:0070492
+  name: oligosaccharide binding
   score: 1.2853
 - id: go:0070905
   name: serine binding
   score: 1.2853
-- id: go:0071723
-  name: lipopeptide binding
-  score: 1.2853
-- id: go:1901982
-  name: maltose binding
+- id: go:1990827
+  name: deaminase binding
   score: 1.2853

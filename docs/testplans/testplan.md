@@ -92,7 +92,12 @@ error messages, multi-query orchestration) with a mocked Neo4j connection.
 **`get_gene_details`:**
 - [x] Gene not found (null gene) returns "not found" message
 - [x] Gene not found (empty results) returns "not found" message
-- [x] Two-query orchestration assembles `_homologs` key into result
+- [ ] Single-query flat return (no `_homologs`, `_protein`, `_organism` sub-objects)
+
+**`gene_overview`:**
+- [ ] Empty result returns "No genes found" message
+- [ ] Non-empty result returns JSON list with routing signal columns
+- [ ] `limit` parameter forwarded to query builder
 
 **`query_expression`:**
 - [x] No filters returns error without calling Neo4j
@@ -155,7 +160,7 @@ Add to relevant unit/integration test files.
 - [x] `resolve_gene()` with empty string identifier
 - [x] `query_expression()` with conflicting filters (returns empty, no crash)
 - [x] `run_cypher()` with syntax-invalid Cypher (returns Neo4j error, no crash)
-- [x] `get_gene_details()` for gene with no protein/no homologs
+- [x] `get_gene_details()` for gene with sparse properties (flat g{.*} return)
 
 ### 4. Regression Expansion (P2)
 
@@ -342,6 +347,54 @@ tests/
 
 ---
 
+### `gene_overview` Tool Tests
+
+#### Unit tests (`tests/unit/test_query_builders.py`)
+- [ ] `build_gene_overview`: UNWIND present, returns all 12 expected columns
+- [ ] `$locus_tags` and `$limit` in params
+- [ ] Verify all column names in RETURN clause: `locus_tag`, `gene_name`, `product`, `gene_summary`, `gene_category`, `annotation_quality`, `organism_strain`, `annotation_types`, `expression_edge_count`, `significant_expression_count`, `closest_ortholog_group_size`, `closest_ortholog_genera`
+
+#### Unit tests (`tests/unit/test_tool_wrappers.py`)
+- [ ] Empty result returns "No genes found" message
+- [ ] Non-empty result returns JSON list with all routing signal columns
+- [ ] `limit` parameter forwarded to query builder
+- [ ] Tool registration count updated (13 -> 14)
+
+#### Integration tests (`tests/integration/test_tool_correctness_kg.py`)
+- [ ] Single Pro gene (PMM1428): `annotation_types` includes `["go_mf", "pfam", "cog_category", "tigr_role"]`, `expression_edge_count` = 36, `significant_expression_count` = 5
+- [ ] Single Alt gene (EZ55_00275): `annotation_types` = [], `expression_edge_count` = 0, `closest_ortholog_group_size` = 1
+- [ ] Batch mixed organisms: [PMM1428, EZ55_00275] returns 2 rows
+- [ ] Nonexistent gene excluded from results
+
+#### Eval cases (`tests/evals/cases.yaml`)
+- [ ] `gene_overview_single_pro` — single Prochlorococcus gene with routing signals
+- [ ] `gene_overview_single_alt` — single Alteromonas gene
+- [ ] `gene_overview_batch` — batch overview for Pro + Alt genes
+
+---
+
+### `get_gene_details` Tool Tests (updated)
+
+#### Unit tests (`tests/unit/test_query_builders.py`)
+- [ ] `build_get_gene_details`: `g {.*}` in RETURN, no `Gene_encodes_protein`, no `Gene_belongs_to_organism`, no `Gene_in_ortholog_group`
+- [ ] `build_get_gene_details_homologs` no longer importable from `queries_lib`
+
+#### Unit tests (`tests/unit/test_tool_wrappers.py`)
+- [x] Gene not found (null gene) returns "not found" message
+- [x] Gene not found (empty results) returns "not found" message
+- [ ] Single-query flat return (no `_homologs` key, no second `execute_query` call)
+
+#### Integration tests (`tests/integration/test_tool_correctness_kg.py`)
+- [ ] Well-annotated Pro gene: flat `g {.*}` return with `locus_tag`, `gene_name`, `product`, `organism_strain`
+- [ ] Alteromonas gene: flat return with `organism_strain` containing "Alteromonas"
+
+#### Eval cases (`tests/evals/cases.yaml`)
+- [ ] `gene_details_flat_return` — flat g{.*} properties for PMM0001
+- [ ] `gene_details_alteromonas` — flat return for Alteromonas gene
+- [ ] `gene_details_synechococcus` — flat return for Synechococcus gene
+
+---
+
 ## Change Log
 
 | Date | Change |
@@ -352,3 +405,4 @@ tests/
 | 2026-03-13 | Implemented P3 connection tests (3), P3 MCP server lifespan tests (3), P1 conflicting-filters edge case — 76 unit tests passing, test plan complete |
 | 2026-03-13 | Added P1 MCP tool wrapper tests (29 tests) — covers input validation, response formatting, error messages, multi-query orchestration for all 8 tools — 105 unit tests passing |
 | 2026-03-13 | Added `get_schema` wrapper test and tool registration smoke tests — 108 unit tests passing |
+| 2026-03-17 | Added `gene_overview` test plan sections. Updated `get_gene_details` tests for simplified flat g{.*} return (no sub-objects). Tool count 13 -> 14. |

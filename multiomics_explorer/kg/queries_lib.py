@@ -136,31 +136,33 @@ def build_search_genes_dedup_groups(*, locus_tags: list[str]) -> tuple[str, dict
     return cypher, {"locus_tags": locus_tags}
 
 
-def build_get_gene_details_main(*, gene_id: str) -> tuple[str, dict]:
+def build_gene_overview(
+    *, locus_tags: list[str], limit: int = 50,
+) -> tuple[str, dict]:
+    """Build query for gene overview: identity + data availability signals."""
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (g:Gene {locus_tag: lt})\n"
+        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       g.product AS product, g.gene_summary AS gene_summary,\n"
+        "       g.gene_category AS gene_category, g.annotation_quality AS annotation_quality,\n"
+        "       g.organism_strain AS organism_strain,\n"
+        "       g.annotation_types AS annotation_types,\n"
+        "       g.expression_edge_count AS expression_edge_count,\n"
+        "       g.significant_expression_count AS significant_expression_count,\n"
+        "       g.closest_ortholog_group_size AS closest_ortholog_group_size,\n"
+        "       g.closest_ortholog_genera AS closest_ortholog_genera\n"
+        "ORDER BY g.locus_tag\n"
+        "LIMIT $limit"
+    )
+    return cypher, {"locus_tags": locus_tags, "limit": limit}
+
+
+def build_get_gene_details(*, gene_id: str) -> tuple[str, dict]:
+    """Build query for full gene node properties."""
     cypher = (
         "MATCH (g:Gene {locus_tag: $lt})\n"
-        "OPTIONAL MATCH (g)-[:Gene_encodes_protein]->(p:Protein)\n"
-        "OPTIONAL MATCH (g)-[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
-        "OPTIONAL MATCH (g)-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
-        "WITH g, p, o, collect(DISTINCT og {.name, .source, .taxonomic_level}) AS ogs\n"
-        "RETURN g {.*, _protein: p {.gene_names, .is_reviewed, .annotation_score,\n"
-        "           .sequence_length, .refseq_ids},\n"
-        "       _organism: o {.preferred_name, .strain_name, .genus, .clade, .ncbi_taxon_id},\n"
-        "       _ortholog_groups: ogs} AS gene"
-    )
-    return cypher, {"lt": gene_id}
-
-
-def build_get_gene_details_homologs(*, gene_id: str) -> tuple[str, dict]:
-    cypher = (
-        "MATCH (g:Gene {locus_tag: $lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
-        "      <-[:Gene_in_ortholog_group]-(other:Gene)\n"
-        "WHERE other <> g\n"
-        "RETURN DISTINCT other.locus_tag AS locus_tag,\n"
-        "       other.organism_strain AS organism_strain,\n"
-        "       og.source AS source, og.taxonomic_level AS taxonomic_level\n"
-        "ORDER BY og.taxonomic_level, other.locus_tag\n"
-        "LIMIT 20"
+        "RETURN g {.*} AS gene"
     )
     return cypher, {"lt": gene_id}
 
