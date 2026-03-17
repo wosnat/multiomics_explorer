@@ -9,7 +9,7 @@ rows:
   locus_tag: A9601_02941
   organism_strain: Prochlorococcus AS9601
   product: photosystem II reaction center protein PsbK
-  score: 11.2005
+  score: 11.0463
 - annotation_quality: 3
   function_description: Photosystem II reaction center Psb28 protein
   gene_name: psb28
@@ -18,7 +18,7 @@ rows:
   locus_tag: A9601_09341
   organism_strain: Prochlorococcus AS9601
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0433
+  score: 9.8616
 - annotation_quality: 3
   function_description: Photosystem II reaction center Psb28 protein
   gene_name: psb28
@@ -27,7 +27,7 @@ rows:
   locus_tag: NATL1_07671
   organism_strain: Prochlorococcus NATL1A
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0433
+  score: 9.8616
 - annotation_quality: 3
   function_description: May help in the organization of the PsaE and PsaF subunits
   gene_name: psaJ2
@@ -36,7 +36,7 @@ rows:
   locus_tag: NATL1_13041
   organism_strain: Prochlorococcus NATL1A
   product: photosystem I reaction centre subunit IX
-  score: 10.8399
+  score: 10.6159
 - annotation_quality: 3
   function_description: Photosystem II 4 kDa reaction centre component
   gene_name: psbK
@@ -45,7 +45,7 @@ rows:
   locus_tag: P9301_02951
   organism_strain: Prochlorococcus MIT9301
   product: photosystem II reaction center protein PsbK
-  score: 11.2005
+  score: 11.0463
 - annotation_quality: 3
   function_description: Photosystem II reaction center Psb28 protein
   gene_name: psb28
@@ -54,7 +54,7 @@ rows:
   locus_tag: P9301_09331
   organism_strain: Prochlorococcus MIT9301
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0433
+  score: 9.8616
 - annotation_quality: 3
   function_description: Photosystem II reaction center Psb28 protein
   gene_name: psb28
@@ -63,7 +63,7 @@ rows:
   locus_tag: PMM0926
   organism_strain: Prochlorococcus MED4
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0433
+  score: 9.8616
 - annotation_quality: 3
   function_description: May help in the organization of the PsaE and PsaF subunits
   gene_name: psaJ2
@@ -72,7 +72,7 @@ rows:
   locus_tag: PMN2A_0546
   organism_strain: Prochlorococcus NATL2A
   product: photosystem I reaction centre subunit IX
-  score: 10.8399
+  score: 10.6159
 - annotation_quality: 3
   function_description: Photosystem II 4 kDa reaction centre component
   gene_name: psbK
@@ -81,7 +81,7 @@ rows:
   locus_tag: PMT9312_0274
   organism_strain: Prochlorococcus MIT9312
   product: photosystem II reaction center protein PsbK
-  score: 11.2005
+  score: 11.0463
 - annotation_quality: 3
   function_description: Photosystem I reaction center subunit III
   gene_name: psaF
@@ -90,4 +90,4 @@ rows:
   locus_tag: sync_2155
   organism_strain: Synechococcus CC9311
   product: photosystem I reaction centre PsaF protein
-  score: 10.9134
+  score: 10.7885

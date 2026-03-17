@@ -11,7 +11,7 @@ rows:
   locus_tag: PMM0005
   organism_strain: Prochlorococcus MED4
   product: DNA gyrase/topoisomerase IV, subunit A family protein
-  score: 8.1577
+  score: 8.086
 - annotation_quality: 3
   function_description: Belongs to the DNA glycosylase MPG family
   gene_name: mpg
@@ -20,7 +20,7 @@ rows:
   locus_tag: PMM0234
   organism_strain: Prochlorococcus MED4
   product: DNA-3-methyladenine glycosylase
-  score: 6.7778
+  score: 6.7003
 - annotation_quality: 3
   function_description: Involved in DNA repair and RecF pathway recombination
   gene_name: recO
@@ -29,7 +29,7 @@ rows:
   locus_tag: PMM0398
   organism_strain: Prochlorococcus MED4
   product: gap repair protein RecO
-  score: 9.2995
+  score: 9.1016
 - annotation_quality: 3
   function_description: Plays a critical role in recombination and DNA repair. Helps
     process Holliday junction intermediates to mature products by catalyzing branch
@@ -45,7 +45,7 @@ rows:
   locus_tag: PMM0756
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA helicase
-  score: 6.7389
+  score: 6.6806
 - annotation_quality: 3
   function_description: Couples transcription and DNA repair by recognizing RNA polymerase
     (RNAP) stalled at DNA lesions. Mediates ATP-dependent release of RNAP and its
@@ -59,7 +59,7 @@ rows:
   locus_tag: PMM0839
   organism_strain: Prochlorococcus MED4
   product: transcription-repair coupling factor
-  score: 8.4219
+  score: 8.3142
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -67,7 +67,7 @@ rows:
   locus_tag: PMM0945
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, alpha subunit
-  score: 6.8382
+  score: 6.6607
 - annotation_quality: 3
   function_description: May play a role in DNA repair. It seems to be involved in
     an RecBC-independent recombinational process of DNA repair. It may act with RecF
@@ -79,7 +79,7 @@ rows:
   locus_tag: PMM1097
   organism_strain: Prochlorococcus MED4
   product: recombination protein RecR
-  score: 7.9049
+  score: 7.7701
 - annotation_quality: 3
   function_description: it is required for DNA replication and normal SOS inducibility.
     RecF binds preferentially to single-stranded, linear DNA. It also seems to bind
@@ -91,7 +91,7 @@ rows:
   locus_tag: PMM1573
   organism_strain: Prochlorococcus MED4
   product: DNA replication and repair protein recF
-  score: 7.9612
+  score: 7.7297
 - annotation_quality: 3
   function_description: that it carries out the mismatch recognition step. This protein
     has a weak ATPase activity
@@ -101,7 +101,7 @@ rows:
   locus_tag: PMM1645
   organism_strain: Prochlorococcus MED4
   product: DNA mismatch repair protein MutS
-  score: 7.2774
+  score: 7.2325
 - annotation_quality: 3
   function_description: May be involved in recombinational repair of damaged DNA
   gene_name: recN
@@ -110,4 +110,4 @@ rows:
   locus_tag: PMM1713
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA repair protein RecN
-  score: 9.4168
+  score: 9.1451

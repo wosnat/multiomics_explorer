@@ -65,37 +65,13 @@ rows:
       polymerase I; DNA duplicase; DNA nucleotidyltransferase; DNA polymerase; DNA
       replicase; DNA-dependent DNA polymerase; duplicase; Klenow fragment; sequenase;
       Taq DNA polymerase; Taq Pol I; Tca DNA polymerase'
-    - '[pfam] DNA_pol3_beta: DNA polymerase III, beta subunit'
-    - '[pfam] DNA_pol3_beta_2: DNA polymerase III beta subunit, N-terminal domain'
+    - '[pfam] DNA_pol3_beta: DNA polymerase III beta subunit, N-terminal domain'
     - '[pfam] DNA_pol3_beta_3: DNA polymerase III beta subunit, C-terminal domain'
+    - '[pfam] DNA_pol3_beta_2: DNA polymerase III beta subunit, central domain'
     alternative_locus_tags:
     - PMM0001
     annotation_quality: 3
-    cog_category:
-    - L
-    cyanorak_Role:
-    - F.1
-    cyanorak_Role_description:
-    - DNA replication, recombination, and repair
-    ec_numbers:
-    - 2.7.7.7
-    eggnog_og_descriptions:
-    - 'COG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination and
-      repair'
-    - 'bactNOG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination
-      and repair'
-    - 'cyaNOG: INFORMATION STORAGE AND PROCESSING [L] Replication, recombination and
-      repair'
-    eggnog_ogs:
-    - COG0592
-    - bactNOG00989
-    - cyaNOG01040
-    - COG0592@1,root
-    - COG0592@2,Bacteria
-    - 1FZV5@1117,Cyanobacteria
-    - 1MKTR@1212,Prochloraceae
     end: 1331
-    end_cyanorak: 1331
     function_description: Confers DNA tethering and processivity to DNA polymerases
       and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
       by the clamp-loading complex) which diffuses in an ATP-independent manner freely
@@ -104,10 +80,8 @@ rows:
       enzyme responsible for most of the replicative synthesis in bacteria; Pol III
       exhibits 3^-5^ exonuclease proofreading activity. The beta chain is required
       for initiation of replication as well as for processivity of DNA replication
-    function_description_source: uniprot
     gene_category: Replication and repair
     gene_name: dnaN
-    gene_name_source: cyanorak
     gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
       and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
       a ring around DNA (a reaction catalyzed by the clamp-loading complex) which
@@ -119,98 +93,14 @@ rows:
       as well as for processivity of DNA replication'
     gene_synonyms:
     - PMM0001
-    go_term_descriptions:
-    - DNA replication
-    - DNA replication
-    - DNA polymerase activity
-    - DNA binding
-    - DNA-directed DNA polymerase activity
-    - 3^-5^ exonuclease activity
-    - DNA replication
-    - DNA polymerase activity
-    - DNA binding
-    - DNA-directed DNA polymerase activity
-    - 3^-5^ exonuclease activity
-    - DNA polymerase III complex
-    go_terms:
-    - GO:0005737
-    - GO:0009360
-    - GO:0006271
-    - GO:0008408
-    - GO:0003677
-    - GO:0003887
-    - GO:0006260
-    - GO:0034061
     id: ncbigene:PMM0001
-    kegg_brite:
-    - ko00000
-    - ko00001
-    - ko00002
-    - ko01000
-    - ko03032
-    - ko03400
-    kegg_ko:
-    - K02338
-    kegg_ko_descriptions:
-    - DNA-directed DNA polymerase; DNA polymerase I; DNA polymerase II; DNA polymerase
-      III; DNA polymerase alpha; DNA polymerase beta; DNA polymerase gamma; DNA nucleotidyltransferase
-      (DNA-directed); deoxyribonucleate nucleotidyltransferase; deoxynucleate polymerase;
-      deoxyribonucleic acid duplicase; deoxyribonucleic acid polymerase; deoxyribonucleic
-      duplicase; deoxyribonucleic polymerase; deoxyribonucleic polymerase I; DNA duplicase;
-      DNA nucleotidyltransferase; DNA polymerase; DNA replicase; DNA-dependent DNA
-      polymerase; duplicase; Klenow fragment; sequenase; Taq DNA polymerase; Taq Pol
-      I; Tca DNA polymerase
-    kegg_module:
-    - M00260
-    kegg_pathway:
-    - ko00230
-    - ko00240
-    - ko01100
-    - ko03030
-    - ko03430
-    - ko03440
-    kegg_reaction:
-    - R00375
-    - R00376
-    - R00377
-    - R00378
     locus_tag: PMM0001
-    locus_tag_cyanorak: CK_Pro_MED4_00001
-    locus_tag_ncbi: TX50_RS00020
-    max_annot_lvl: 1117,Cyanobacteria
     old_locus_tags:
     - PMM0001
     organism_strain: Prochlorococcus MED4
-    pfam_descriptions:
-    - DNA polymerase III, beta subunit
-    - DNA polymerase III beta subunit, N-terminal domain
-    - DNA polymerase III beta subunit, C-terminal domain
-    - DNA polymerase III beta subunit, central domain
-    - DNA polymerase III, beta sliding clamp, N-terminal
-    - DNA polymerase III, beta sliding clamp, C-terminal
-    - DNA polymerase III, beta sliding clamp, central
-    - DNA polymerase III, beta sliding clamp
-    pfam_ids:
-    - PF00712
-    - PF02768
-    - PF02767
-    pfam_names:
-    - DNA_pol3_beta
-    - DNA_pol3_beta_2
-    - DNA_pol3_beta_3
     preferred_id: ncbigene
     product: DNA polymerase III, beta subunit
-    product_cyanorak: DNA polymerase III, beta subunit
-    product_source: cyanorak
     protein_family: Beta sliding clamp family
     protein_id: WP_011131639.1
-    seed_ortholog: 59919.PMM0001
-    seed_ortholog_evalue: 1.12e-267
     start: 174
-    start_cyanorak: 174
     strand: +
-    strand_cyanorak: +
-    tIGR_Role:
-    - '132'
-    tIGR_Role_description:
-    - DNA metabolism / DNA replication, recombination, and repair

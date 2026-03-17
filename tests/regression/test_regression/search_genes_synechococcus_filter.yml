@@ -9,7 +9,7 @@ rows:
   locus_tag: SYNW0475
   organism_strain: Synechococcus WH8102
   product: cell division protein FtsW
-  score: 11.1726
+  score: 11.1992
 - annotation_quality: 2
   function_description: COG3599 Cell division initiation protein
   gene_name: cdv3
@@ -18,7 +18,7 @@ rows:
   locus_tag: SYNW1249
   organism_strain: Synechococcus WH8102
   product: possible cell division protein Cdv3
-  score: 11.4233
+  score: 11.4485
 - annotation_quality: 3
   function_description: Cell division
   gene_name: ftsQ
@@ -26,7 +26,7 @@ rows:
   locus_tag: SYNW1643
   organism_strain: Synechococcus WH8102
   product: cell division protein FtsQ
-  score: 11.7515
+  score: 11.8509
 - annotation_quality: 3
   function_description: Essential cell division protein that forms a contractile ring
     structure (Z ring) at the future cell division site. The regulation of the ring
@@ -43,7 +43,7 @@ rows:
   locus_tag: SYNW1644
   organism_strain: Synechococcus WH8102
   product: cell division protein FtsZ
-  score: 10.2828
+  score: 10.2315
 - annotation_quality: 3
   function_description: Prevents the cell division inhibition by proteins MinC and
     MinD at internal division sites while permitting inhibition at polar sites. This
@@ -58,7 +58,7 @@ rows:
   locus_tag: SYNW1972
   organism_strain: Synechococcus WH8102
   product: cell division topological specificity factor MinE
-  score: 10.6569
+  score: 10.6028
 - annotation_quality: 3
   function_description: Prevents the cell division inhibition by proteins MinC and
     MinD at internal division sites while permitting inhibition at polar sites. This
@@ -73,7 +73,7 @@ rows:
   locus_tag: sync_0544
   organism_strain: Synechococcus CC9311
   product: cell division topological specificity factor MinE
-  score: 10.6569
+  score: 10.6028
 - annotation_quality: 3
   function_description: Essential cell division protein that forms a contractile ring
     structure (Z ring) at the future cell division site. The regulation of the ring
@@ -90,7 +90,7 @@ rows:
   locus_tag: sync_0731
   organism_strain: Synechococcus CC9311
   product: cell division protein FtsZ
-  score: 10.2828
+  score: 10.2315
 - annotation_quality: 3
   function_description: Cell division
   gene_name: ftsQ
@@ -98,7 +98,7 @@ rows:
   locus_tag: sync_0732
   organism_strain: Synechococcus CC9311
   product: cell division protein FtsQ
-  score: 11.7515
+  score: 11.8509
 - annotation_quality: 2
   function_description: COG3599 Cell division initiation protein
   gene_name: cdv3
@@ -107,7 +107,7 @@ rows:
   locus_tag: sync_1363
   organism_strain: Synechococcus CC9311
   product: possible cell division protein Cdv3
-  score: 11.4233
+  score: 11.4485
 - annotation_quality: 3
   function_description: Belongs to the SEDS family
   gene_name: ftsW
@@ -115,4 +115,4 @@ rows:
   locus_tag: sync_2326
   organism_strain: Synechococcus CC9311
   product: cell division protein FtsW
-  score: 10.1522
+  score: 10.176

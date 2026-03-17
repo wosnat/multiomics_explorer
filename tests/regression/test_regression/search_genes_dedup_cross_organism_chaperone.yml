@@ -8,16 +8,15 @@ rows:
   locus_tag: A9601_09641
   organism_strain: Prochlorococcus AS9601
   product: chaperone protein DnaK
-  score: 6.9109
+  score: 6.7144
 - annotation_quality: 3
-  function_description: Molecular chaperone. Has ATPase activity
-  gene_name: htpG
-  gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
-    activity'
-  locus_tag: ACZ81_12775
+  function_description: Acts as a chaperone
+  gene_name: dnaK
+  gene_summary: 'dnaK :: molecular chaperone DnaK :: Acts as a chaperone'
+  locus_tag: ACZ81_07045
   organism_strain: Alteromonas macleodii HOT1A3
-  product: molecular chaperone HtpG
-  score: 6.9827
+  product: molecular chaperone DnaK
+  score: 6.7996
 - annotation_quality: 2
   function_description: Molecular chaperone
   gene_name: null
@@ -25,33 +24,23 @@ rows:
   locus_tag: BSR22_03785
   organism_strain: Prochlorococcus RSP50
   product: molecular chaperone
-  score: 7.5386
+  score: 7.6079
 - annotation_quality: 3
-  function_description: Chaperone protein HtpG
-  gene_name: htpG
-  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
-  locus_tag: BSR22_07755
-  organism_strain: Prochlorococcus RSP50
-  product: molecular chaperone HtpG
-  score: 7.1157
-- annotation_quality: 3
-  function_description: Molecular chaperone. Has ATPase activity
-  gene_name: htpG
-  gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
-    activity'
-  locus_tag: EZ55_02623
+  function_description: Acts as a chaperone
+  gene_name: dnaK
+  gene_summary: 'dnaK :: molecular chaperone DnaK :: Acts as a chaperone'
+  locus_tag: EZ55_01479
   organism_strain: Alteromonas macleodii EZ55
-  product: molecular chaperone HtpG
-  score: 6.9115
+  product: molecular chaperone DnaK
+  score: 6.7996
 - annotation_quality: 3
-  function_description: Molecular chaperone. Has ATPase activity
-  gene_name: htpG
-  gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
-    activity'
-  locus_tag: MIT1002_02648
+  function_description: Acts as a chaperone
+  gene_name: dnaK
+  gene_summary: 'dnaK :: molecular chaperone DnaK :: Acts as a chaperone'
+  locus_tag: MIT1002_01457
   organism_strain: Alteromonas macleodii MIT1002
-  product: molecular chaperone HtpG
-  score: 6.9115
+  product: molecular chaperone DnaK
+  score: 6.7996
 - annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK2
@@ -59,7 +48,7 @@ rows:
   locus_tag: NATL1_09851
   organism_strain: Prochlorococcus NATL1A
   product: chaperone protein DnaK
-  score: 6.9109
+  score: 6.7144
 - annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK2
@@ -67,7 +56,15 @@ rows:
   locus_tag: P9301_09621
   organism_strain: Prochlorococcus MIT9301
   product: chaperone protein DnaK
-  score: 6.9109
+  score: 6.7144
+- annotation_quality: 3
+  function_description: Acts as a chaperone
+  gene_name: dnaK2
+  gene_summary: 'dnaK2 :: chaperone protein DnaK :: Acts as a chaperone'
+  locus_tag: PMN2A_0312
+  organism_strain: Prochlorococcus NATL2A
+  product: chaperone protein DnaK
+  score: 6.7144
 - annotation_quality: 3
   function_description: Molecular chaperone
   gene_name: null
@@ -75,7 +72,7 @@ rows:
   locus_tag: SYNW1328
   organism_strain: Synechococcus WH8102
   product: DnaJ type IV chaperone protein
-  score: 7.1891
+  score: 7.1461
 - annotation_quality: 3
   function_description: Molecular chaperone
   gene_name: null
@@ -83,4 +80,4 @@ rows:
   locus_tag: sync_1819
   organism_strain: Synechococcus CC9311
   product: DnaJ type IV chaperone protein
-  score: 7.1891
+  score: 7.1461

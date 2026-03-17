@@ -1,0 +1,5 @@
+case_id: gene_ontology_terms_tigr_role
+row_count: 1
+rows:
+- id: tigr.role:132
+  name: DNA metabolism / DNA replication, recombination, and repair

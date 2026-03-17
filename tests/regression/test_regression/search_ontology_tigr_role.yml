@@ -1,0 +1,78 @@
+case_id: search_ontology_tigr_role
+row_count: 25
+rows:
+- id: tigr.role:100
+  name: Central intermediary metabolism / Amino sugars
+  score: 0.6195
+- id: tigr.role:102
+  name: Central intermediary metabolism / Other
+  score: 0.6701
+- id: tigr.role:103
+  name: Central intermediary metabolism / Phosphorus compounds
+  score: 0.6195
+- id: tigr.role:104
+  name: Central intermediary metabolism / Polyamine biosynthesis
+  score: 0.6195
+- id: tigr.role:106
+  name: Central intermediary metabolism / Sulfur metabolism
+  score: 0.838
+- id: tigr.role:108
+  name: Energy metabolism / Aerobic
+  score: 0.7298
+- id: tigr.role:109
+  name: Energy metabolism / Amino acids and amines
+  score: 0.5759
+- id: tigr.role:112
+  name: Energy metabolism / Electron transport
+  score: 0.6701
+- id: tigr.role:113
+  name: Energy metabolism / Entner-Doudoroff
+  score: 0.6701
+- id: tigr.role:114
+  name: Energy metabolism / Fermentation
+  score: 0.7298
+- id: tigr.role:116
+  name: Energy metabolism / Glycolysis/gluconeogenesis
+  score: 0.6701
+- id: tigr.role:117
+  name: Energy metabolism / Pentose phosphate pathway
+  score: 0.6195
+- id: tigr.role:118
+  name: Energy metabolism / Pyruvate dehydrogenase
+  score: 0.6701
+- id: tigr.role:119
+  name: Energy metabolism / Sugars
+  score: 0.7298
+- id: tigr.role:120
+  name: Energy metabolism / TCA cycle
+  score: 0.6701
+- id: tigr.role:121
+  name: Fatty acid and phospholipid metabolism / Other
+  score: 0.5759
+- id: tigr.role:130
+  name: DNA metabolism / Other
+  score: 0.7298
+- id: tigr.role:131
+  name: DNA metabolism / Degradation of DNA
+  score: 0.6195
+- id: tigr.role:159
+  name: Energy metabolism / Methanogenesis
+  score: 0.7298
+- id: tigr.role:160
+  name: Central intermediary metabolism / Nitrogen metabolism
+  score: 0.838
+- id: tigr.role:164
+  name: Energy metabolism / Photosynthesis
+  score: 0.7298
+- id: tigr.role:170
+  name: DNA metabolism / Chromosome-associated proteins
+  score: 0.6195
+- id: tigr.role:183
+  name: DNA metabolism / Restriction/modification
+  score: 0.6701
+- id: tigr.role:184
+  name: Energy metabolism / Other
+  score: 0.7298
+- id: tigr.role:698
+  name: Central intermediary metabolism / One-carbon metabolism
+  score: 0.7972

@@ -8,7 +8,7 @@ rows:
   locus_tag: A9601_14931
   organism_strain: Prochlorococcus AS9601
   product: superoxide dismutase [Ni]
-  score: 19.4382
+  score: 19.5438
 - annotation_quality: 3
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
@@ -17,7 +17,7 @@ rows:
   locus_tag: ACZ81_02705
   organism_strain: Alteromonas macleodii HOT1A3
   product: superoxide dismutase, Ni
-  score: 21.2239
+  score: 21.8334
 - annotation_quality: 3
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
@@ -26,7 +26,7 @@ rows:
   locus_tag: EZ55_00595
   organism_strain: Alteromonas macleodii EZ55
   product: superoxide dismutase, Ni
-  score: 21.2239
+  score: 21.8334
 - annotation_quality: 3
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
@@ -35,7 +35,7 @@ rows:
   locus_tag: MIT1002_00621
   organism_strain: Alteromonas macleodii MIT1002
   product: superoxide dismutase, Ni
-  score: 21.2239
+  score: 21.8334
 - annotation_quality: 3
   function_description: Alternative locus ID
   gene_name: sodN
@@ -43,7 +43,7 @@ rows:
   locus_tag: NATL1_17141
   organism_strain: Prochlorococcus NATL1A
   product: superoxide dismutase [Ni]
-  score: 19.4382
+  score: 19.5438
 - annotation_quality: 3
   function_description: Alternative locus ID
   gene_name: sodN
@@ -51,7 +51,7 @@ rows:
   locus_tag: P9301_14791
   organism_strain: Prochlorococcus MIT9301
   product: superoxide dismutase [Ni]
-  score: 19.4382
+  score: 19.5438
 - annotation_quality: 3
   function_description: Alternative locus ID
   gene_name: sodN
@@ -59,7 +59,7 @@ rows:
   locus_tag: PMM1294
   organism_strain: Prochlorococcus MED4
   product: superoxide dismutase [Ni]
-  score: 19.4382
+  score: 19.5438
 - annotation_quality: 3
   function_description: Superoxide dismutase
   gene_name: sodN
@@ -67,7 +67,7 @@ rows:
   locus_tag: SYNW1626
   organism_strain: Synechococcus WH8102
   product: superoxide dismutase [Ni]
-  score: 22.0826
+  score: 22.1812
 - annotation_quality: 3
   function_description: Superoxide dismutase
   gene_name: sodN
@@ -75,7 +75,7 @@ rows:
   locus_tag: sync_0755
   organism_strain: Synechococcus CC9311
   product: superoxide dismutase [Ni]
-  score: 22.0826
+  score: 22.1812
 - annotation_quality: 3
   function_description: Nickel-containing superoxide dismutase
   gene_name: null
@@ -84,4 +84,4 @@ rows:
   locus_tag: sync_2434
   organism_strain: Synechococcus CC9311
   product: nickel-type superoxide dismutase
-  score: 21.5721
+  score: 21.648

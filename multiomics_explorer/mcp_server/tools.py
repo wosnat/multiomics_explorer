@@ -567,7 +567,11 @@ def register_tools(mcp: FastMCP):
                 "transport AND membrane" — boolean
             ontology: Which ontology to search. One of:
                 "go_bp" (biological process), "go_mf" (molecular function),
-                "go_cc" (cellular component), "kegg", "ec".
+                "go_cc" (cellular component), "kegg", "ec",
+                "cog_category" (COG functional categories),
+                "cyanorak_role" (Cyanorak functional roles),
+                "tigr_role" (TIGR functional roles),
+                "pfam" (Pfam protein domains and clans).
                 For KEGG, searches across all levels — level is encoded in
                 the returned ID prefix:
                   kegg.category:    (e.g. "Metabolism")
@@ -617,7 +621,8 @@ def register_tools(mcp: FastMCP):
             term_ids: One or more ontology term IDs (from search_ontology).
             ontology: Which ontology the IDs belong to. One of:
                 "go_bp" (biological process), "go_mf" (molecular function),
-                "go_cc" (cellular component), "kegg", "ec".
+                "go_cc" (cellular component), "kegg", "ec",
+                "cog_category", "cyanorak_role", "tigr_role", "pfam".
             organism: Optional organism filter (fuzzy match on strain name).
             limit: Max gene results (default 25).
         """
@@ -655,7 +660,8 @@ def register_tools(mcp: FastMCP):
             gene_id: Gene locus_tag (e.g. "PMM0001").
             ontology: Which ontology to return. One of:
                 "go_bp" (biological process), "go_mf" (molecular function),
-                "go_cc" (cellular component), "kegg", "ec".
+                "go_cc" (cellular component), "kegg", "ec",
+                "cog_category", "cyanorak_role", "tigr_role", "pfam".
             leaf_only: If True (default), return only the most specific terms.
                 If False, return all annotations.
             limit: Max results (default 50). Relevant mainly with

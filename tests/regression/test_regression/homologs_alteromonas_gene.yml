@@ -1,0 +1,25 @@
+case_id: homologs_alteromonas_gene
+row_count: 2
+rows:
+- consensus_gene_name: null
+  consensus_product: IS630 family transposase
+  genera:
+  - Alteromonas
+  has_cross_genus_members: single_genus
+  member_count: 9
+  og_name: 1S2QS@1236
+  organism_count: 1
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Gammaproteobacteria
+- consensus_gene_name: null
+  consensus_product: IS630 family transposase
+  genera:
+  - Alteromonas
+  has_cross_genus_members: single_genus
+  member_count: 12
+  og_name: COG3415@2
+  organism_count: 2
+  source: eggnog
+  specificity_rank: 3
+  taxonomic_level: Bacteria

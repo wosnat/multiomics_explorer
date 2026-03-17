@@ -9,7 +9,25 @@ rows:
   locus_tag: A9601_09551
   organism_strain: Prochlorococcus AS9601
   product: photosystem I reaction center subunit X
-  score: 5.7546
+  score: 5.8181
+- annotation_quality: 3
+  function_description: Photosystem I reaction centre subunit VIII
+  gene_name: null
+  gene_summary: 'photosystem I reaction center subunit VIII :: Photosystem I reaction
+    centre subunit VIII'
+  locus_tag: BSR22_02060
+  organism_strain: Prochlorococcus RSP50
+  product: photosystem I reaction center subunit VIII
+  score: 5.89
+- annotation_quality: 3
+  function_description: Photosystem II 4 kDa reaction centre component
+  gene_name: null
+  gene_summary: 'photosystem II reaction center protein K :: Photosystem II 4 kDa
+    reaction centre component'
+  locus_tag: BSR22_04470
+  organism_strain: Prochlorococcus RSP50
+  product: photosystem II reaction center protein K
+  score: 5.8058
 - annotation_quality: 3
   function_description: Photosystem I subunit X PsaK
   gene_name: psaK
@@ -18,7 +36,7 @@ rows:
   locus_tag: BSR22_07730
   organism_strain: Prochlorococcus RSP50
   product: photosystem I reaction center subunit PsaK
-  score: 5.7398
+  score: 5.9369
 - annotation_quality: 3
   function_description: Photosystem I subunit X PsaK
   gene_name: psaK
@@ -27,7 +45,7 @@ rows:
   locus_tag: NATL1_09731
   organism_strain: Prochlorococcus NATL1A
   product: photosystem I reaction center subunit X
-  score: 5.7546
+  score: 5.8181
 - annotation_quality: 3
   function_description: Photosystem I subunit X PsaK
   gene_name: psaK
@@ -36,7 +54,7 @@ rows:
   locus_tag: P9301_09531
   organism_strain: Prochlorococcus MIT9301
   product: photosystem I reaction center subunit X
-  score: 5.7546
+  score: 5.8181
 - annotation_quality: 3
   function_description: Photosystem I subunit X PsaK
   gene_name: psaK
@@ -45,7 +63,7 @@ rows:
   locus_tag: PMM0906
   organism_strain: Prochlorococcus MED4
   product: photosystem I reaction center subunit X
-  score: 5.7546
+  score: 5.8181
 - annotation_quality: 3
   function_description: Photosystem I subunit X PsaK
   gene_name: psaK
@@ -54,7 +72,7 @@ rows:
   locus_tag: PMN2A_0301
   organism_strain: Prochlorococcus NATL2A
   product: photosystem I reaction center subunit X
-  score: 5.7546
+  score: 5.8181
 - annotation_quality: 3
   function_description: Photosystem I subunit X PsaK
   gene_name: psaK
@@ -63,7 +81,7 @@ rows:
   locus_tag: PMT0687
   organism_strain: Prochlorococcus MIT9313
   product: photosystem I reaction center subunit X
-  score: 5.7546
+  score: 5.8181
 - annotation_quality: 3
   function_description: Photosystem I protein M (PsaM)
   gene_name: psaM
@@ -72,7 +90,7 @@ rows:
   locus_tag: PMT1220
   organism_strain: Prochlorococcus MIT9313
   product: photosystem I reaction centre subunit XII
-  score: 5.9557
+  score: 5.9856
 - annotation_quality: 3
   function_description: Photosystem I subunit X PsaK
   gene_name: psaK
@@ -81,7 +99,7 @@ rows:
   locus_tag: PMT9312_0894
   organism_strain: Prochlorococcus MIT9312
   product: photosystem I reaction center subunit X
-  score: 5.7546
+  score: 5.8181
 - annotation_quality: 3
   function_description: A core subunit of photosystem II (PSII)
   gene_name: psb30
@@ -90,16 +108,7 @@ rows:
   locus_tag: SYNC_RS06090
   organism_strain: Synechococcus CC9311
   product: photosystem II biogenesis protein Psb30
-  score: 5.9329
-- annotation_quality: 3
-  function_description: Photosystem I reaction center subunit PsaK
-  gene_name: psaK
-  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
-    reaction center subunit PsaK'
-  locus_tag: SYNW1290
-  organism_strain: Synechococcus WH8102
-  product: photosystem I reaction center subunit X
-  score: 5.7373
+  score: 5.9517
 - annotation_quality: 3
   function_description: Photosystem I protein M (PsaM)
   gene_name: psaM
@@ -108,7 +117,7 @@ rows:
   locus_tag: SYNW1728
   organism_strain: Synechococcus WH8102
   product: photosystem I reaction centre subunit XII
-  score: 5.9557
+  score: 5.9856
 - annotation_quality: 3
   function_description: Photosystem I reaction
   gene_name: psaL
@@ -117,7 +126,7 @@ rows:
   locus_tag: SYNW2118
   organism_strain: Synechococcus WH8102
   product: photosystem I reaction centre subunit XI
-  score: 5.7645
+  score: 5.7968
 - annotation_quality: 3
   function_description: TIGRFAM Photosystem II protein PsbQ
   gene_name: cyanoQ
@@ -126,7 +135,7 @@ rows:
   locus_tag: SYNW2505
   organism_strain: Synechococcus WH8102
   product: photosystem II protein CyanoQ
-  score: 6.1751
+  score: 6.0633
 - annotation_quality: 3
   function_description: A core subunit of photosystem II (PSII)
   gene_name: psb30
@@ -135,7 +144,7 @@ rows:
   locus_tag: TX72_RS06035
   organism_strain: Synechococcus WH8102
   product: photosystem II biogenesis protein Psb30
-  score: 5.9329
+  score: 5.9517
 - annotation_quality: 3
   function_description: photosystem II
   gene_name: psbO
@@ -144,7 +153,7 @@ rows:
   locus_tag: sync_0353
   organism_strain: Synechococcus CC9311
   product: photosystem II manganese-stabilizing protein PsbO
-  score: 5.8593
+  score: 5.8905
 - annotation_quality: 3
   function_description: Photosystem I reaction
   gene_name: psaL
@@ -153,16 +162,7 @@ rows:
   locus_tag: sync_0398
   organism_strain: Synechococcus CC9311
   product: photosystem I reaction centre subunit XI
-  score: 5.7984
-- annotation_quality: 3
-  function_description: Photosystem I reaction center subunit PsaK
-  gene_name: psaK
-  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
-    reaction center subunit PsaK'
-  locus_tag: sync_0874
-  organism_strain: Synechococcus CC9311
-  product: photosystem I reaction center subunit X
-  score: 5.7373
+  score: 5.8296
 - annotation_quality: 3
   function_description: photosystem I reaction center subunit XII
   gene_name: psaM
@@ -171,8 +171,8 @@ rows:
   locus_tag: sync_1978
   organism_strain: Synechococcus CC9311
   product: photosystem I reaction centre subunit XII
-  score: 5.8919
-- annotation_quality: 2
+  score: 5.9222
+- annotation_quality: 3
   function_description: TIGRFAM Photosystem II protein PsbQ
   gene_name: cyanoQ
   gene_summary: 'cyanoQ :: photosystem II protein CyanoQ :: TIGRFAM Photosystem II
@@ -180,4 +180,4 @@ rows:
   locus_tag: sync_2918
   organism_strain: Synechococcus CC9311
   product: photosystem II protein CyanoQ
-  score: 6.1751
+  score: 6.0633

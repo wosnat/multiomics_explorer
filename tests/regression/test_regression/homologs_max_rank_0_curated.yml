@@ -1,0 +1,14 @@
+case_id: homologs_max_rank_0_curated
+row_count: 1
+rows:
+- consensus_gene_name: null
+  consensus_product: possible M protein repeat
+  genera:
+  - Prochlorococcus
+  has_cross_genus_members: single_genus
+  member_count: 7
+  og_name: CK_00003570
+  organism_count: 5
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated

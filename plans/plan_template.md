@@ -209,10 +209,30 @@ Include cases for:
 - Cross-organism results
 - Edge cases
 
-### Regression snapshots (`tests/regression/`)
+### Regression tests (`tests/regression/`)
+
+New regression test cases to add (each needs a `cases.yaml` entry +
+a `TOOL_BUILDERS` mapping in `test_regression.py` if the tool or variant
+is not already registered):
+
+```yaml
+- id: <tool_name>_<scenario>
+  tool: <tool_name>
+  desc: <what this snapshot captures>
+  params:
+    param1: value1
+```
+
+If the tool requires per-variant partial builders (like `search_ontology`
+per ontology type), list the new `TOOL_BUILDERS` entries:
+
+```python
+"<tool_name>_<variant>": partial(build_<tool_name>, <param>=<value>),
+```
+
+After implementation, generate baselines:
 
 ```bash
-# After implementation:
 pytest tests/regression/ --force-regen -m kg
 pytest tests/regression/ -m kg
 ```

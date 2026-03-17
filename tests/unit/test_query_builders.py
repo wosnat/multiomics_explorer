@@ -229,6 +229,44 @@ class TestBuildGetHomologsGroups:
         assert "Gene_in_ortholog_group" in cypher
         assert "OrthologGroup" in cypher
 
+    def test_source_and_taxonomic_level_combined(self):
+        """Both source and taxonomic_level filters appear in WHERE."""
+        cypher, params = build_get_homologs_groups(
+            gene_id="x", source="cyanorak", taxonomic_level="curated",
+        )
+        assert "og.source = $source" in cypher
+        assert "og.taxonomic_level = $level" in cypher
+        assert params["source"] == "cyanorak"
+        assert params["level"] == "curated"
+
+    def test_source_and_max_specificity_rank_combined(self):
+        """Both source and max_specificity_rank filters appear in WHERE."""
+        cypher, params = build_get_homologs_groups(
+            gene_id="x", source="eggnog", max_specificity_rank=2,
+        )
+        assert "og.source = $source" in cypher
+        assert "og.specificity_rank <= $max_rank" in cypher
+        assert params["source"] == "eggnog"
+        assert params["max_rank"] == 2
+
+    def test_all_three_filters_combined(self):
+        """All three filters (source, taxonomic_level, max_specificity_rank) in WHERE."""
+        cypher, params = build_get_homologs_groups(
+            gene_id="x", source="eggnog", taxonomic_level="Bacteria",
+            max_specificity_rank=3,
+        )
+        assert "og.source = $source" in cypher
+        assert "og.taxonomic_level = $level" in cypher
+        assert "og.specificity_rank <= $max_rank" in cypher
+        assert params == {"lt": "x", "source": "eggnog", "level": "Bacteria", "max_rank": 3}
+
+    @pytest.mark.parametrize("rank", [0, 1, 2, 3])
+    def test_max_specificity_rank_boundary_values(self, rank):
+        """Each valid rank value (0-3) produces correct WHERE clause."""
+        cypher, params = build_get_homologs_groups(gene_id="x", max_specificity_rank=rank)
+        assert "og.specificity_rank <= $max_rank" in cypher
+        assert params["max_rank"] == rank
+
 
 class TestBuildGetHomologsMembers:
     def test_includes_other_neq_g(self):
@@ -266,6 +304,33 @@ class TestBuildGetHomologsMembers:
         cypher, params = build_get_homologs_members(gene_id="x", max_specificity_rank=2)
         assert "og.specificity_rank <= $max_rank" in cypher
         assert params["max_rank"] == 2
+
+    def test_source_and_taxonomic_level_combined(self):
+        """Both source and taxonomic_level filters appear in WHERE."""
+        cypher, params = build_get_homologs_members(
+            gene_id="x", source="cyanorak", taxonomic_level="curated",
+        )
+        assert "og.source = $source" in cypher
+        assert "og.taxonomic_level = $level" in cypher
+
+    def test_all_filters_combined_with_exclude_paralogs(self):
+        """All filters plus exclude_paralogs=True all appear in WHERE."""
+        cypher, params = build_get_homologs_members(
+            gene_id="x", source="eggnog", taxonomic_level="Bacteria",
+            max_specificity_rank=3, exclude_paralogs=True,
+        )
+        assert "og.source = $source" in cypher
+        assert "og.taxonomic_level = $level" in cypher
+        assert "og.specificity_rank <= $max_rank" in cypher
+        assert "other.organism_strain <> g.organism_strain" in cypher
+        assert "other <> g" in cypher
+
+    @pytest.mark.parametrize("rank", [0, 1, 2, 3])
+    def test_max_specificity_rank_boundary_values(self, rank):
+        """Each valid rank value (0-3) produces correct WHERE clause."""
+        cypher, params = build_get_homologs_members(gene_id="x", max_specificity_rank=rank)
+        assert "og.specificity_rank <= $max_rank" in cypher
+        assert params["max_rank"] == rank
 
 
 class TestBuildGetHomologsOldRemoved:
@@ -329,8 +394,11 @@ class TestBuildListOrganisms:
 
 
 class TestOntologyConfig:
-    def test_all_five_keys_present(self):
-        assert set(ONTOLOGY_CONFIG.keys()) == {"go_bp", "go_mf", "go_cc", "ec", "kegg"}
+    def test_all_keys_present(self):
+        assert set(ONTOLOGY_CONFIG.keys()) == {
+            "go_bp", "go_mf", "go_cc", "ec", "kegg",
+            "cog_category", "cyanorak_role", "tigr_role", "pfam",
+        }
 
     def test_required_fields_present(self):
         for key, cfg in ONTOLOGY_CONFIG.items():
@@ -348,6 +416,30 @@ class TestOntologyConfig:
                     f"{key} should not have 'gene_connects_to_level'"
                 )
 
+    def test_pfam_has_parent_fields(self):
+        """Pfam config has parent_label and parent_fulltext_index."""
+        cfg = ONTOLOGY_CONFIG["pfam"]
+        assert cfg["label"] == "Pfam"
+        assert cfg["gene_rel"] == "Gene_has_pfam"
+        assert cfg["hierarchy_rels"] == ["Pfam_in_pfam_clan"]
+        assert cfg["fulltext_index"] == "pfamFullText"
+        assert cfg["parent_label"] == "PfamClan"
+        assert cfg["parent_fulltext_index"] == "pfamClanFullText"
+
+    def test_only_pfam_has_parent_fields(self):
+        """Only pfam has parent_label and parent_fulltext_index."""
+        for key, cfg in ONTOLOGY_CONFIG.items():
+            if key == "pfam":
+                assert "parent_label" in cfg
+                assert "parent_fulltext_index" in cfg
+            else:
+                assert "parent_label" not in cfg, (
+                    f"{key} should not have 'parent_label'"
+                )
+                assert "parent_fulltext_index" not in cfg, (
+                    f"{key} should not have 'parent_fulltext_index'"
+                )
+
 
 class TestBuildSearchOntology:
     @pytest.mark.parametrize("ontology,expected_index", [
@@ -356,6 +448,10 @@ class TestBuildSearchOntology:
         ("go_cc", "cellularComponentFullText"),
         ("ec", "ecNumberFullText"),
         ("kegg", "keggFullText"),
+        ("cog_category", "cogCategoryFullText"),
+        ("cyanorak_role", "cyanorakRoleFullText"),
+        ("tigr_role", "tigrRoleFullText"),
+        ("pfam", "pfamFullText"),
     ])
     def test_correct_fulltext_index(self, ontology, expected_index):
         cypher, _ = build_search_ontology(ontology=ontology, search_text="test")
@@ -388,6 +484,21 @@ class TestBuildSearchOntology:
     def test_go_cc_uses_correct_index(self):
         cypher, _ = build_search_ontology(ontology="go_cc", search_text="membrane")
         assert "'cellularComponentFullText'" in cypher
+
+    def test_pfam_union_query(self):
+        """Pfam search generates UNION query across both pfam and pfamClan indexes."""
+        cypher, _ = build_search_ontology(ontology="pfam", search_text="polymerase")
+        assert "CALL {" in cypher
+        assert "UNION ALL" in cypher
+        assert "'pfamFullText'" in cypher
+        assert "'pfamClanFullText'" in cypher
+
+    def test_non_pfam_no_union(self):
+        """Non-pfam ontologies do not generate UNION queries."""
+        for ontology in ["go_bp", "go_mf", "go_cc", "ec", "kegg",
+                         "cog_category", "cyanorak_role", "tigr_role"]:
+            cypher, _ = build_search_ontology(ontology=ontology, search_text="test")
+            assert "UNION ALL" not in cypher, f"{ontology} should not have UNION"
 
 
 class TestBuildGenesByOntology:
@@ -466,6 +577,43 @@ class TestBuildGenesByOntology:
         )
         assert params["limit"] == 5
 
+    def test_flat_ontology_no_hierarchy_expansion(self):
+        """Flat ontologies (empty hierarchy_rels) skip *0..15 traversal."""
+        cypher, _ = build_genes_by_ontology(
+            ontology="cog_category", term_ids=["cog.category:C"],
+        )
+        assert "*0..15" not in cypher
+        assert "root AS descendant" in cypher
+        assert "CogFunctionalCategory" in cypher
+        assert "Gene_in_cog_category" in cypher
+
+    def test_hierarchical_new_ontology(self):
+        """CyanorakRole has hierarchy and should use *0..15 traversal."""
+        cypher, _ = build_genes_by_ontology(
+            ontology="cyanorak_role", term_ids=["cyanorak.role:F"],
+        )
+        assert "Cyanorak_role_is_a_cyanorak_role" in cypher
+        assert "*0..15" in cypher
+
+    def test_pfam_multi_label_root(self):
+        """Pfam generates multi-label root match accepting both Pfam and PfamClan."""
+        cypher, _ = build_genes_by_ontology(
+            ontology="pfam", term_ids=["pfam:PF00712"],
+        )
+        assert "root:Pfam OR root:PfamClan" in cypher
+        assert "Pfam_in_pfam_clan" in cypher
+        assert "*0..15" in cypher
+        assert "Gene_has_pfam" in cypher
+
+    def test_non_pfam_single_label_root(self):
+        """Non-pfam ontologies use single-label root match."""
+        for ontology in ["go_bp", "go_mf", "go_cc", "ec", "kegg",
+                         "cog_category", "cyanorak_role", "tigr_role"]:
+            cypher, _ = build_genes_by_ontology(
+                ontology=ontology, term_ids=["test:001"],
+            )
+            assert "OR root:" not in cypher, f"{ontology} should not have multi-label root"
+
 
 class TestBuildGeneOntologyTerms:
     @pytest.mark.parametrize("ontology,expected_label,expected_rel", [
@@ -474,6 +622,10 @@ class TestBuildGeneOntologyTerms:
         ("go_cc", "CellularComponent", "Gene_located_in_cellular_component"),
         ("ec", "EcNumber", "Gene_catalyzes_ec_number"),
         ("kegg", "KeggTerm", "Gene_has_kegg_ko"),
+        ("cog_category", "CogFunctionalCategory", "Gene_in_cog_category"),
+        ("cyanorak_role", "CyanorakRole", "Gene_has_cyanorak_role"),
+        ("tigr_role", "TigrRole", "Gene_has_tigr_role"),
+        ("pfam", "Pfam", "Gene_has_pfam"),
     ])
     def test_correct_label_and_rel(self, ontology, expected_label, expected_rel):
         cypher, _ = build_gene_ontology_terms(ontology=ontology, gene_id="PMM0001")
@@ -537,5 +689,22 @@ class TestBuildGeneOntologyTerms:
         )
         assert "NOT EXISTS" in cypher
         assert "Kegg_term_is_a_kegg_term" in cypher
+
+    def test_leaf_only_flat_ontology_returns_all(self):
+        """Flat ontologies (empty hierarchy_rels) ignore leaf_only — all terms are leaves."""
+        cypher, _ = build_gene_ontology_terms(
+            ontology="cog_category", gene_id="PMM0001", leaf_only=True,
+        )
+        assert "NOT EXISTS" not in cypher
+        assert "CogFunctionalCategory" in cypher
+        assert "Gene_in_cog_category" in cypher
+
+    def test_cyanorak_role_leaf_only(self):
+        """CyanorakRole has hierarchy, so leaf_only=True uses NOT EXISTS."""
+        cypher, _ = build_gene_ontology_terms(
+            ontology="cyanorak_role", gene_id="PMM0001", leaf_only=True,
+        )
+        assert "NOT EXISTS" in cypher
+        assert "Cyanorak_role_is_a_cyanorak_role" in cypher
 
 

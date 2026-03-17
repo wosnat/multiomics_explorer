@@ -1,0 +1,6 @@
+case_id: search_ontology_cog_category
+row_count: 1
+rows:
+- id: cog.category:C
+  name: Energy production and conversion
+  score: 1.2872

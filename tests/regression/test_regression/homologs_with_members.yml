@@ -1,0 +1,38 @@
+case_id: homologs_with_members
+row_count: 3
+rows:
+- consensus_gene_name: ndhV
+  consensus_product: NADH dehydrogenase subunit NdhV
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  has_cross_genus_members: cross_genus
+  member_count: 9
+  og_name: CK_00000853
+  organism_count: 9
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: ndhV
+  consensus_product: NADH dehydrogenase subunit NdhV
+  genera:
+  - Prochlorococcus
+  has_cross_genus_members: single_genus
+  member_count: 8
+  og_name: 1MMP8@1212
+  organism_count: 8
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: ndhV
+  consensus_product: NADH dehydrogenase subunit NdhV
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  has_cross_genus_members: cross_genus
+  member_count: 10
+  og_name: 31HP9@2
+  organism_count: 10
+  source: eggnog
+  specificity_rank: 3
+  taxonomic_level: Bacteria

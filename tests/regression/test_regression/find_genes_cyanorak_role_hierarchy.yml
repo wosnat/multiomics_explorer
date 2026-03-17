@@ -1,0 +1,104 @@
+case_id: find_genes_cyanorak_role_hierarchy
+row_count: 25
+rows:
+- gene_name: dnaN
+  locus_tag: A9601_00001
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, beta subunit
+- gene_name: null
+  locus_tag: A9601_00041
+  organism_strain: Prochlorococcus AS9601
+  product: DNA gyrase/topoisomerase IV, subunit A family protein
+- gene_name: null
+  locus_tag: A9601_00301
+  organism_strain: Prochlorococcus AS9601
+  product: HNH endonuclease family protein
+- gene_name: null
+  locus_tag: A9601_00381
+  organism_strain: Prochlorococcus AS9601
+  product: putative restriction endonuclease
+- gene_name: null
+  locus_tag: A9601_00521
+  organism_strain: Prochlorococcus AS9601
+  product: Putative Type IIC bifunctional restriction-modification protein with endonuclease
+    and N6-adenine DNA methyltransferase activity
+- gene_name: rarA
+  locus_tag: A9601_00901
+  organism_strain: Prochlorococcus AS9601
+  product: recombination factor
+- gene_name: holB
+  locus_tag: A9601_01461
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, delta^ subunit
+- gene_name: radA
+  locus_tag: A9601_01501
+  organism_strain: Prochlorococcus AS9601
+  product: DNA repair protein Sms/RadA
+- gene_name: mutS2
+  locus_tag: A9601_02371
+  organism_strain: Prochlorococcus AS9601
+  product: DNA mismatch repair protein, MutS family
+- gene_name: mpg
+  locus_tag: A9601_02551
+  organism_strain: Prochlorococcus AS9601
+  product: DNA-3-methyladenine glycosylase
+- gene_name: null
+  locus_tag: A9601_02701
+  organism_strain: Prochlorococcus AS9601
+  product: polynucleotidyl transferase, ribonuclease H fold superfamily
+- gene_name: null
+  locus_tag: A9601_03001
+  organism_strain: Prochlorococcus AS9601
+  product: recB nuclease, TM0106 family domain protein
+- gene_name: phrA
+  locus_tag: A9601_03081
+  organism_strain: Prochlorococcus AS9601
+  product: deoxyribodipyrimidine photolyase (DNA photolyase) (photoreactivating enzyme)
+- gene_name: uvrD
+  locus_tag: A9601_03271
+  organism_strain: Prochlorococcus AS9601
+  product: DNA-dependent ATPase I and helicase II
+- gene_name: mutM
+  locus_tag: A9601_03541
+  organism_strain: Prochlorococcus AS9601
+  product: formamidopyrimidine-DNA glycolase
+- gene_name: cry2
+  locus_tag: A9601_03931
+  organism_strain: Prochlorococcus AS9601
+  product: possible cryptochrome
+- gene_name: null
+  locus_tag: A9601_04171
+  organism_strain: Prochlorococcus AS9601
+  product: putative restriction endonuclease
+- gene_name: vsr
+  locus_tag: A9601_04271
+  organism_strain: Prochlorococcus AS9601
+  product: DNA G:T mismatch repair endonuclease
+- gene_name: null
+  locus_tag: A9601_04281
+  organism_strain: Prochlorococcus AS9601
+  product: Putative Type II restriction endonuclease
+- gene_name: dcm
+  locus_tag: A9601_04331
+  organism_strain: Prochlorococcus AS9601
+  product: Putative Type II cytosine-methyltransferase
+- gene_name: recO
+  locus_tag: A9601_04491
+  organism_strain: Prochlorococcus AS9601
+  product: gap repair protein RecO
+- gene_name: null
+  locus_tag: A9601_04781
+  organism_strain: Prochlorococcus AS9601
+  product: deoxyribodipyrimidine photolyase-like, FAD-domain containing protein
+- gene_name: topA
+  locus_tag: A9601_04911
+  organism_strain: Prochlorococcus AS9601
+  product: DNA topoisomerase I, omega subunit
+- gene_name: xthA
+  locus_tag: A9601_05401
+  organism_strain: Prochlorococcus AS9601
+  product: exodeoxyribonuclease III
+- gene_name: priA
+  locus_tag: A9601_05541
+  organism_strain: Prochlorococcus AS9601
+  product: primosomal protein N^

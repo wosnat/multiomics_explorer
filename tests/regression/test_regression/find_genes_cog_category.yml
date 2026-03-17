@@ -1,0 +1,103 @@
+case_id: find_genes_cog_category
+row_count: 25
+rows:
+- gene_name: queG
+  locus_tag: A9601_00061
+  organism_strain: Prochlorococcus AS9601
+  product: epoxyqueuosine reductase
+- gene_name: pdxA
+  locus_tag: A9601_00271
+  organism_strain: Prochlorococcus AS9601
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_name: flv1
+  locus_tag: A9601_00431
+  organism_strain: Prochlorococcus AS9601
+  product: flavoprotein involved in Mehler reaction
+- gene_name: flv3
+  locus_tag: A9601_00441
+  organism_strain: Prochlorococcus AS9601
+  product: flavoprotein involved in Mehler reaction
+- gene_name: thiO
+  locus_tag: A9601_00481
+  organism_strain: Prochlorococcus AS9601
+  product: glycine oxidase
+- gene_name: tas
+  locus_tag: A9601_00621
+  organism_strain: Prochlorococcus AS9601
+  product: pyridoxine 4-dehydrogenase
+- gene_name: ndbB
+  locus_tag: A9601_00951
+  organism_strain: Prochlorococcus AS9601
+  product: type 2 NADH dehydrogenase
+- gene_name: null
+  locus_tag: A9601_01141
+  organism_strain: Prochlorococcus AS9601
+  product: conserved hypothetical protein
+- gene_name: SynDsbAB
+  locus_tag: A9601_01171
+  organism_strain: Prochlorococcus AS9601
+  product: disulfide bond forming protein
+- gene_name: ndhO
+  locus_tag: A9601_01391
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhO
+- gene_name: ndhM
+  locus_tag: A9601_01621
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhM
+- gene_name: ndhF1
+  locus_tag: A9601_01661
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase subunit NdhF (chain 5 or L)
+- gene_name: ndhD1
+  locus_tag: A9601_01671
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhD (chain 4 or M)
+- gene_name: metF
+  locus_tag: A9601_01701
+  organism_strain: Prochlorococcus AS9601
+  product: 5,10-methylenetetrahydrofolate reductase
+- gene_name: ndhE
+  locus_tag: A9601_01751
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase subunit NdhE (chain kappa or 4L)
+- gene_name: ndhG
+  locus_tag: A9601_01761
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhG (chain 6 or J)
+- gene_name: ndhI
+  locus_tag: A9601_01771
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhI
+- gene_name: ndhA
+  locus_tag: A9601_01781
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhA (chain 1 or H)
+- gene_name: gltA
+  locus_tag: A9601_01791
+  organism_strain: Prochlorococcus AS9601
+  product: citrate synthase
+- gene_name: ndhH
+  locus_tag: A9601_01901
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhH (chain 7 or delta)
+- gene_name: trxB
+  locus_tag: A9601_02291
+  organism_strain: Prochlorococcus AS9601
+  product: thioredoxin-disulfide reductase (NTR system)
+- gene_name: psbA
+  locus_tag: A9601_02441
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II protein D1.1
+- gene_name: txlA
+  locus_tag: A9601_02641
+  organism_strain: Prochlorococcus AS9601
+  product: thioredoxin-like protein TxlA
+- gene_name: ndhJ
+  locus_tag: A9601_03151
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhJ
+- gene_name: ndhK
+  locus_tag: A9601_03161
+  organism_strain: Prochlorococcus AS9601
+  product: NADH dehydrogenase I subunit NdhK (chain beta or K)

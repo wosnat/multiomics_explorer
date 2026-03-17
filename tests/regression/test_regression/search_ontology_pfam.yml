@@ -1,0 +1,78 @@
+case_id: search_ontology_pfam
+row_count: 25
+rows:
+- id: pfam:PF00078
+  name: Reverse transcriptase (RNA-dependent DNA polymerase)
+  score: 1.7515
+- id: pfam:PF00136
+  name: DNA polymerase family B
+  score: 2.0856
+- id: pfam:PF00476
+  name: DNA polymerase family A
+  score: 2.0856
+- id: pfam:PF00562
+  name: RNA polymerase Rpb2, domain 6
+  score: 1.904
+- id: pfam:PF00623
+  name: RNA polymerase Rpb1, domain 2
+  score: 1.904
+- id: pfam:PF00940
+  name: DNA-dependent RNA polymerase
+  score: 2.0856
+- id: pfam:PF01000
+  name: RNA polymerase Rpb3/RpoA insert domain
+  score: 1.7515
+- id: pfam:PF01192
+  name: RNA polymerase Rpb6
+  score: 2.3056
+- id: pfam:PF01743
+  name: Poly A polymerase head domain
+  score: 1.904
+- id: pfam:PF04364
+  name: DNA polymerase III chi subunit, HolC
+  score: 1.7515
+- id: pfam:PF04560
+  name: RNA polymerase Rpb2, domain 7
+  score: 1.904
+- id: pfam:PF04561
+  name: RNA polymerase Rpb2, domain 2
+  score: 1.904
+- id: pfam:PF04563
+  name: RNA polymerase beta subunit
+  score: 2.0856
+- id: pfam:PF04565
+  name: RNA polymerase Rpb2, domain 3
+  score: 1.904
+- id: pfam:PF04983
+  name: RNA polymerase Rpb1, domain 3
+  score: 1.904
+- id: pfam:PF04997
+  name: RNA polymerase Rpb1, domain 1
+  score: 1.904
+- id: pfam:PF04998
+  name: RNA polymerase Rpb1, domain 5
+  score: 1.904
+- id: pfam:PF05000
+  name: RNA polymerase Rpb1, domain 4
+  score: 1.904
+- id: pfam:PF06144
+  name: DNA polymerase III, delta subunit
+  score: 1.904
+- id: pfam:PF10789
+  name: Phage RNA polymerase binding, RpbA
+  score: 1.904
+- id: pfam:PF12137
+  name: RNA polymerase recycling family C-terminal
+  score: 1.7515
+- id: pfam:PF12626
+  name: Polymerase A arginine-rich C-terminus
+  score: 1.7515
+- id: pfam:PF13177
+  name: DNA polymerase III, delta subunit
+  score: 1.904
+- id: pfam:PF18765
+  name: Polymerase beta, Nucleotidyltransferase
+  score: 2.3056
+- id: pfam:PF21999
+  name: DNA polymerase-iota, thumb domain
+  score: 1.904

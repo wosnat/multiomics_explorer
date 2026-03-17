@@ -1,0 +1,5 @@
+case_id: gene_ontology_terms_cog_category
+row_count: 1
+rows:
+- id: cog.category:L
+  name: Replication, recombination and repair

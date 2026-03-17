@@ -8,7 +8,7 @@ rows:
   locus_tag: A9601_09151
   organism_strain: Prochlorococcus AS9601
   product: DNA polymerase III, alpha subunit
-  score: 6.9377
+  score: 6.8591
 - annotation_quality: 3
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
@@ -18,7 +18,7 @@ rows:
   locus_tag: A9601_13151
   organism_strain: Prochlorococcus AS9601
   product: DNA polymerase I
-  score: 6.6737
+  score: 6.6195
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: polB
@@ -26,7 +26,15 @@ rows:
   locus_tag: ACZ81_16185
   organism_strain: Alteromonas macleodii HOT1A3
   product: DNA polymerase II
-  score: 6.7721
+  score: 6.9673
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: null
+  gene_summary: DNA polymerase
+  locus_tag: EZ55_02972
+  organism_strain: Alteromonas macleodii EZ55
+  product: DNA polymerase
+  score: 6.7571
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: polB
@@ -34,7 +42,7 @@ rows:
   locus_tag: EZ55_03375
   organism_strain: Alteromonas macleodii EZ55
   product: DNA polymerase II
-  score: 6.7721
+  score: 6.9673
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: polB
@@ -42,7 +50,7 @@ rows:
   locus_tag: MIT1002_03358
   organism_strain: Alteromonas macleodii MIT1002
   product: DNA polymerase II
-  score: 6.7721
+  score: 6.9673
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -50,7 +58,7 @@ rows:
   locus_tag: NATL1_09341
   organism_strain: Prochlorococcus NATL1A
   product: DNA polymerase III, alpha subunit
-  score: 6.9377
+  score: 6.8591
 - annotation_quality: 3
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
@@ -60,7 +68,7 @@ rows:
   locus_tag: NATL1_15881
   organism_strain: Prochlorococcus NATL1A
   product: DNA polymerase I
-  score: 6.6737
+  score: 6.6195
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -68,7 +76,7 @@ rows:
   locus_tag: P9301_09131
   organism_strain: Prochlorococcus MIT9301
   product: DNA polymerase III, alpha subunit
-  score: 6.9377
+  score: 6.8591
 - annotation_quality: 3
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
@@ -78,7 +86,7 @@ rows:
   locus_tag: P9301_13291
   organism_strain: Prochlorococcus MIT9301
   product: DNA polymerase I
-  score: 6.6737
+  score: 6.6195
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -86,7 +94,7 @@ rows:
   locus_tag: PMM0945
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, alpha subunit
-  score: 6.9377
+  score: 6.8591
 - annotation_quality: 3
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     3^-5^ and 5^-3^ exonuclease activity
@@ -96,7 +104,7 @@ rows:
   locus_tag: PMM1140
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase I
-  score: 6.6737
+  score: 6.6195
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -104,17 +112,7 @@ rows:
   locus_tag: PMN2A_0265
   organism_strain: Prochlorococcus NATL2A
   product: DNA polymerase III, alpha subunit
-  score: 6.9377
-- annotation_quality: 3
-  function_description: In addition to polymerase activity, this DNA polymerase exhibits
-    3^-5^ and 5^-3^ exonuclease activity
-  gene_name: polA
-  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
-    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
-  locus_tag: PMN2A_0748
-  organism_strain: Prochlorococcus NATL2A
-  product: DNA polymerase I
-  score: 6.6737
+  score: 6.8591
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -122,7 +120,7 @@ rows:
   locus_tag: PMT0647
   organism_strain: Prochlorococcus MIT9313
   product: DNA polymerase III, alpha subunit
-  score: 6.9377
+  score: 6.8591
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -130,7 +128,7 @@ rows:
   locus_tag: PMT9312_0854
   organism_strain: Prochlorococcus MIT9312
   product: DNA polymerase III, alpha subunit
-  score: 6.9377
+  score: 6.8591
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -138,7 +136,7 @@ rows:
   locus_tag: SYNW1032
   organism_strain: Synechococcus WH8102
   product: DNA polymerase III, alpha subunit
-  score: 6.9377
+  score: 6.8591
 - annotation_quality: 3
   function_description: DNA polymerase III
   gene_name: holB
@@ -146,7 +144,7 @@ rows:
   locus_tag: SYNW2237
   organism_strain: Synechococcus WH8102
   product: DNA polymerase III, delta^ subunit
-  score: 6.8687
+  score: 6.8334
 - annotation_quality: 3
   function_description: In addition to polymerase activity, this DNA polymerase exhibits
     5^-3^ exonuclease activity
@@ -156,7 +154,7 @@ rows:
   locus_tag: sync_0928
   organism_strain: Synechococcus CC9311
   product: DNA polymerase I
-  score: 6.8192
+  score: 6.7159
 - annotation_quality: 3
   function_description: DNA polymerase
   gene_name: dnaE
@@ -164,7 +162,7 @@ rows:
   locus_tag: sync_1630
   organism_strain: Synechococcus CC9311
   product: DNA polymerase III, alpha subunit
-  score: 6.9132
+  score: 6.8543
 - annotation_quality: 3
   function_description: DNA polymerase III
   gene_name: holB
@@ -172,4 +170,4 @@ rows:
   locus_tag: sync_2592
   organism_strain: Synechococcus CC9311
   product: DNA polymerase III, delta^ subunit
-  score: 6.8687
+  score: 6.8334

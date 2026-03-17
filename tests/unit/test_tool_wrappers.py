@@ -662,6 +662,105 @@ class TestGetHomologsWrapper:
         g = result["ortholog_groups"][0]
         assert "truncated" not in g
 
+    # -- member_limit edge cases ------------------------------------------
+
+    def test_member_limit_1_accepts(self, tool_fns, mock_ctx):
+        """member_limit=1 is the minimum valid value."""
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": "PMT0001",
+             "gene_name": "x", "product": "p", "organism_strain": "Strain1"},
+            {"og_name": "CK_00000364", "locus_tag": "PMT0002",
+             "gene_name": "x", "product": "p", "organism_strain": "Strain2"},
+        ]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups()[:1],
+            members,
+        ]
+        result = json.loads(
+            tool_fns["get_homologs"](
+                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=1,
+            )
+        )
+        g = result["ortholog_groups"][0]
+        assert len(g["members"]) == 1
+        assert g["truncated"] is True
+
+    def test_member_limit_200_accepts(self, tool_fns, mock_ctx):
+        """member_limit=200 is the maximum valid value (accepted, not error)."""
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+        ]
+        result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", member_limit=200)
+        # Should not error — returns valid JSON
+        assert "Invalid member_limit" not in result
+
+    def test_member_limit_exact_no_truncation(self, tool_fns, mock_ctx):
+        """When members == member_limit, no truncation occurs."""
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": f"PMT{i:04d}",
+             "gene_name": "x", "product": "p", "organism_strain": f"Strain{i}"}
+            for i in range(3)
+        ]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups()[:1],
+            members,
+        ]
+        result = json.loads(
+            tool_fns["get_homologs"](
+                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=3,
+            )
+        )
+        g = result["ortholog_groups"][0]
+        assert len(g["members"]) == 3
+        assert "truncated" not in g
+
+    # -- debug mode -------------------------------------------------------
+
+    def test_debug_true_includes_queries(self, tool_fns, mock_ctx):
+        """debug=True attaches Cypher queries to the response."""
+        mock_ctx.request_context.lifespan_context.debug_queries = True
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups(),
+        ]
+        raw = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
+        assert "_debug" in raw
+        assert "queries" in raw
+        # Response has both debug block and data block separated by ---
+        assert "---" in raw
+        # Reset for other tests
+        mock_ctx.request_context.lifespan_context.debug_queries = False
+
+    def test_debug_true_with_members_has_two_queries(self, tool_fns, mock_ctx):
+        """debug=True with include_members attaches both groups and members queries."""
+        mock_ctx.request_context.lifespan_context.debug_queries = True
+        members = [
+            {"og_name": "CK_00000364", "locus_tag": "PMT0001",
+             "gene_name": "x", "product": "p", "organism_strain": "Strain1"},
+        ]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.side_effect = [
+            [self._gene_stub()],
+            self._sample_groups()[:1],
+            members,
+        ]
+        raw = tool_fns["get_homologs"](
+            mock_ctx, gene_id="PMM0001", include_members=True,
+        )
+        # Parse the debug block (before ---)
+        debug_part = raw.split("---")[0]
+        debug_data = json.loads(debug_part)
+        assert len(debug_data["_debug"]["queries"]) == 2
+        # Reset
+        mock_ctx.request_context.lifespan_context.debug_queries = False
+
 
 # ---------------------------------------------------------------------------
 # run_cypher

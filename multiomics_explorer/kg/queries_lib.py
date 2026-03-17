@@ -46,6 +46,32 @@ ONTOLOGY_CONFIG = {
         "fulltext_index": "keggFullText",
         "gene_connects_to_level": "ko",  # genes only link to ko-level nodes
     },
+    "cog_category": {
+        "label": "CogFunctionalCategory",
+        "gene_rel": "Gene_in_cog_category",
+        "hierarchy_rels": [],
+        "fulltext_index": "cogCategoryFullText",
+    },
+    "cyanorak_role": {
+        "label": "CyanorakRole",
+        "gene_rel": "Gene_has_cyanorak_role",
+        "hierarchy_rels": ["Cyanorak_role_is_a_cyanorak_role"],
+        "fulltext_index": "cyanorakRoleFullText",
+    },
+    "tigr_role": {
+        "label": "TigrRole",
+        "gene_rel": "Gene_has_tigr_role",
+        "hierarchy_rels": [],
+        "fulltext_index": "tigrRoleFullText",
+    },
+    "pfam": {
+        "label": "Pfam",
+        "gene_rel": "Gene_has_pfam",
+        "hierarchy_rels": ["Pfam_in_pfam_clan"],
+        "fulltext_index": "pfamFullText",
+        "parent_label": "PfamClan",
+        "parent_fulltext_index": "pfamClanFullText",
+    },
 }
 
 # Expression relationship types in the current KG schema.
@@ -380,13 +406,32 @@ def build_search_ontology(
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
-    cypher = (
-        f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
-        "YIELD node AS t, score\n"
-        "RETURN t.id AS id, t.name AS name, score\n"
-        "ORDER BY score DESC\n"
-        "LIMIT $limit"
-    )
+    parent_index = cfg.get("parent_fulltext_index")
+
+    if parent_index:
+        # UNION search across both indexes (e.g. Pfam domain + clan)
+        cypher = (
+            "CALL {\n"
+            f"  CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
+            "  YIELD node AS t, score\n"
+            "  RETURN t.id AS id, t.name AS name, score\n"
+            "  UNION ALL\n"
+            f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
+            "  YIELD node AS t, score\n"
+            "  RETURN t.id AS id, t.name AS name, score\n"
+            "}\n"
+            "RETURN id, name, score\n"
+            "ORDER BY score DESC\n"
+            "LIMIT $limit"
+        )
+    else:
+        cypher = (
+            f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
+            "YIELD node AS t, score\n"
+            "RETURN t.id AS id, t.name AS name, score\n"
+            "ORDER BY score DESC\n"
+            "LIMIT $limit"
+        )
     return cypher, {"search_text": search_text, "limit": limit}
 
 
@@ -399,7 +444,7 @@ def build_genes_by_ontology(
     cfg = ONTOLOGY_CONFIG[ontology]
     label = cfg["label"]
     gene_rel = cfg["gene_rel"]
-    hierarchy = "|".join(cfg["hierarchy_rels"])
+    hierarchy_rels = cfg["hierarchy_rels"]
     level_filter = cfg.get("gene_connects_to_level")
 
     level_clause = (
@@ -407,9 +452,24 @@ def build_genes_by_ontology(
         if level_filter else "\nWITH DISTINCT descendant"
     )
 
+    if hierarchy_rels:
+        hierarchy = "|".join(hierarchy_rels)
+        expansion = f"MATCH (root)<-[:{hierarchy}*0..15]-(descendant)"
+    else:
+        expansion = "WITH root AS descendant"
+
+    parent_label = cfg.get("parent_label")
+    if parent_label:
+        root_match = (
+            f"MATCH (root) WHERE (root:{label} OR root:{parent_label})\n"
+            f"  AND root.id IN $term_ids"
+        )
+    else:
+        root_match = f"MATCH (root:{label}) WHERE root.id IN $term_ids"
+
     cypher = (
-        f"MATCH (root:{label}) WHERE root.id IN $term_ids\n"
-        f"MATCH (root)<-[:{hierarchy}*0..15]-(descendant)"
+        f"{root_match}\n"
+        f"{expansion}"
         f"{level_clause}\n"
         f"MATCH (g:Gene)-[:{gene_rel}]->(descendant)\n"
         "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
@@ -432,9 +492,10 @@ def build_gene_ontology_terms(
     cfg = ONTOLOGY_CONFIG[ontology]
     label = cfg["label"]
     gene_rel = cfg["gene_rel"]
-    hierarchy = "|".join(cfg["hierarchy_rels"])
+    hierarchy_rels = cfg["hierarchy_rels"]
 
-    if leaf_only:
+    if leaf_only and hierarchy_rels:
+        hierarchy = "|".join(hierarchy_rels)
         cypher = (
             f"MATCH (g:Gene {{locus_tag: $gene_id}})-[:{gene_rel}]->(t:{label})\n"
             "WHERE NOT EXISTS {\n"

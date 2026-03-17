@@ -1,0 +1,103 @@
+case_id: find_genes_tigr_role
+row_count: 25
+rows:
+- gene_name: gltA
+  locus_tag: A9601_01791
+  organism_strain: Prochlorococcus AS9601
+  product: citrate synthase
+- gene_name: pdhC
+  locus_tag: A9601_04551
+  organism_strain: Prochlorococcus AS9601
+  product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
+- gene_name: mqoA
+  locus_tag: A9601_04701
+  organism_strain: Prochlorococcus AS9601
+  product: malate:quinone oxidoreductase
+- gene_name: phdB
+  locus_tag: A9601_09301
+  organism_strain: Prochlorococcus AS9601
+  product: pyruvate dehydrogenase E1 component beta subunit
+- gene_name: lpdA
+  locus_tag: A9601_14971
+  organism_strain: Prochlorococcus AS9601
+  product: dihydrolipoamide dehydrogenase
+- gene_name: fumC
+  locus_tag: A9601_16681
+  organism_strain: Prochlorococcus AS9601
+  product: fumarate hydratase, class II
+- gene_name: icd
+  locus_tag: A9601_18051
+  organism_strain: Prochlorococcus AS9601
+  product: isocitrate dehydrogenase
+- gene_name: acnB
+  locus_tag: A9601_19101
+  organism_strain: Prochlorococcus AS9601
+  product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
+- gene_name: gltA
+  locus_tag: NATL1_02341
+  organism_strain: Prochlorococcus NATL1A
+  product: citrate synthase
+- gene_name: pdhC
+  locus_tag: NATL1_04561
+  organism_strain: Prochlorococcus NATL1A
+  product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
+- gene_name: mqoA
+  locus_tag: NATL1_04721
+  organism_strain: Prochlorococcus NATL1A
+  product: malate:quinone oxidoreductase
+- gene_name: phdB
+  locus_tag: NATL1_09511
+  organism_strain: Prochlorococcus NATL1A
+  product: pyruvate dehydrogenase E1 component beta subunit
+- gene_name: lpdA
+  locus_tag: NATL1_17171
+  organism_strain: Prochlorococcus NATL1A
+  product: dihydrolipoamide dehydrogenase
+- gene_name: fumC
+  locus_tag: NATL1_18661
+  organism_strain: Prochlorococcus NATL1A
+  product: fumarate hydratase, class II
+- gene_name: icd
+  locus_tag: NATL1_20451
+  organism_strain: Prochlorococcus NATL1A
+  product: isocitrate dehydrogenase
+- gene_name: acnB
+  locus_tag: NATL1_21811
+  organism_strain: Prochlorococcus NATL1A
+  product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
+- gene_name: gltA
+  locus_tag: P9301_01811
+  organism_strain: Prochlorococcus MIT9301
+  product: citrate synthase
+- gene_name: pdhC
+  locus_tag: P9301_04241
+  organism_strain: Prochlorococcus MIT9301
+  product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
+- gene_name: mqoA
+  locus_tag: P9301_04391
+  organism_strain: Prochlorococcus MIT9301
+  product: malate:quinone oxidoreductase
+- gene_name: phdB
+  locus_tag: P9301_09281
+  organism_strain: Prochlorococcus MIT9301
+  product: pyruvate dehydrogenase E1 component beta subunit
+- gene_name: lpdA
+  locus_tag: P9301_14831
+  organism_strain: Prochlorococcus MIT9301
+  product: dihydrolipoamide dehydrogenase
+- gene_name: fumC
+  locus_tag: P9301_16561
+  organism_strain: Prochlorococcus MIT9301
+  product: fumarate hydratase, class II
+- gene_name: icd
+  locus_tag: P9301_17881
+  organism_strain: Prochlorococcus MIT9301
+  product: isocitrate dehydrogenase
+- gene_name: acnB
+  locus_tag: P9301_18911
+  organism_strain: Prochlorococcus MIT9301
+  product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
+- gene_name: gltA
+  locus_tag: PMM0161
+  organism_strain: Prochlorococcus MED4
+  product: citrate synthase

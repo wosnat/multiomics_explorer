@@ -8,7 +8,7 @@ rows:
   locus_tag: ACZ81_02025
   organism_strain: Alteromonas macleodii HOT1A3
   product: catalase
-  score: 17.2535
+  score: 13.4093
 - annotation_quality: 3
   function_description: Catalase
   gene_name: katA
@@ -16,17 +16,17 @@ rows:
   locus_tag: ACZ81_11985
   organism_strain: Alteromonas macleodii HOT1A3
   product: catalase
-  score: 17.2535
+  score: 13.4093
 - annotation_quality: 3
-  function_description: Serves to protect cells from the toxic effects of hydrogen
-    peroxide
-  gene_name: katB
-  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
-    of hydrogen peroxide'
-  locus_tag: ACZ81_16915
+  function_description: Bifunctional enzyme with both catalase and broad- spectrum
+    peroxidase activity
+  gene_name: katG
+  gene_summary: 'katG :: catalase/peroxidase HPI :: Bifunctional enzyme with both
+    catalase and broad- spectrum peroxidase activity'
+  locus_tag: ACZ81_16125
   organism_strain: Alteromonas macleodii HOT1A3
-  product: catalase
-  score: 14.0897
+  product: catalase/peroxidase HPI
+  score: 10.8595
 - annotation_quality: 3
   function_description: Catalase
   gene_name: katA
@@ -34,7 +34,7 @@ rows:
   locus_tag: EZ55_00433
   organism_strain: Alteromonas macleodii EZ55
   product: catalase
-  score: 17.2535
+  score: 13.4093
 - annotation_quality: 3
   function_description: Catalase
   gene_name: katA
@@ -42,17 +42,25 @@ rows:
   locus_tag: EZ55_02459
   organism_strain: Alteromonas macleodii EZ55
   product: catalase
-  score: 17.2535
-- annotation_quality: 3
-  function_description: Serves to protect cells from the toxic effects of hydrogen
-    peroxide
-  gene_name: katB
-  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
-    of hydrogen peroxide'
-  locus_tag: EZ55_03522
+  score: 13.4093
+- annotation_quality: 2
+  function_description: null
+  gene_name: null
+  gene_summary: 'catalase family protein :: -'
+  locus_tag: EZ55_02907
   organism_strain: Alteromonas macleodii EZ55
-  product: catalase
-  score: 14.0897
+  product: catalase family protein
+  score: 10.8525
+- annotation_quality: 3
+  function_description: Bifunctional enzyme with both catalase and broad- spectrum
+    peroxidase activity
+  gene_name: katG
+  gene_summary: 'katG :: catalase/peroxidase HPI :: Bifunctional enzyme with both
+    catalase and broad- spectrum peroxidase activity'
+  locus_tag: EZ55_03362
+  organism_strain: Alteromonas macleodii EZ55
+  product: catalase/peroxidase HPI
+  score: 10.8595
 - annotation_quality: 3
   function_description: Catalase
   gene_name: katA
@@ -60,7 +68,7 @@ rows:
   locus_tag: MIT1002_00461
   organism_strain: Alteromonas macleodii MIT1002
   product: catalase
-  score: 17.2535
+  score: 13.4093
 - annotation_quality: 3
   function_description: Catalase
   gene_name: katA
@@ -68,24 +76,14 @@ rows:
   locus_tag: MIT1002_02464
   organism_strain: Alteromonas macleodii MIT1002
   product: catalase
-  score: 17.3306
+  score: 13.4453
 - annotation_quality: 3
-  function_description: Serves to protect cells from the toxic effects of hydrogen
-    peroxide
-  gene_name: katE
-  gene_summary: 'katE :: catalase :: Serves to protect cells from the toxic effects
-    of hydrogen peroxide'
-  locus_tag: MIT1002_02513
+  function_description: Bifunctional enzyme with both catalase and broad-spectrum
+    peroxidase activity
+  gene_name: katG
+  gene_summary: 'katG :: catalase/peroxidase HPI :: Bifunctional enzyme with both
+    catalase and broad-spectrum peroxidase activity'
+  locus_tag: MIT1002_03345
   organism_strain: Alteromonas macleodii MIT1002
-  product: catalase
-  score: 13.1298
-- annotation_quality: 3
-  function_description: Serves to protect cells from the toxic effects of hydrogen
-    peroxide
-  gene_name: katB
-  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
-    of hydrogen peroxide'
-  locus_tag: MIT1002_03530
-  organism_strain: Alteromonas macleodii MIT1002
-  product: catalase
-  score: 14.0897
+  product: catalase/peroxidase HPI
+  score: 11.2445
