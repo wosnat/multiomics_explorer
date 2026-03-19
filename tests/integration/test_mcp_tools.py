@@ -19,7 +19,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_genes,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
-from multiomics_explorer.mcp_server.tools import _WRITE_KEYWORDS
+from multiomics_explorer.api.functions import _WRITE_KEYWORDS
 
 
 @pytest.mark.kg

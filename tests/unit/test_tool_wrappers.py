@@ -226,17 +226,6 @@ class TestResolveGeneWrapper:
         result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001"))
         assert "Unknown" in result["results"]
 
-    def test_debug_mode_includes_query(self, tool_fns, mock_ctx):
-        """When debug_queries is on, response includes cypher and params."""
-        mock_ctx.request_context.lifespan_context.debug_queries = True
-        rows = [{"locus_tag": "PMM0001", "gene_name": "dnaN", "organism_strain": "MED4"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        raw = tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
-        assert "_debug" in raw
-        debug_part = raw.split("---")[0]
-        debug = json.loads(debug_part)
-        assert "cypher" in debug["_debug"]
-        assert "params" in debug["_debug"]
 
 
 # ---------------------------------------------------------------------------
@@ -425,7 +414,7 @@ class TestQueryExpressionWrapper:
     def test_no_filters_returns_error(self, tool_fns, mock_ctx):
         result = tool_fns["query_expression"](mock_ctx)
         assert "Error" in result
-        assert "at least one" in result
+        assert "At least one" in result
         # Should NOT have called Neo4j
         _conn_from(mock_ctx).execute_query.assert_not_called()
 
@@ -744,46 +733,6 @@ class TestGetHomologsWrapper:
         assert len(g["members"]) == 3
         assert "truncated" not in g
 
-    # -- debug mode -------------------------------------------------------
-
-    def test_debug_true_includes_queries(self, tool_fns, mock_ctx):
-        """debug=True attaches Cypher queries to the response."""
-        mock_ctx.request_context.lifespan_context.debug_queries = True
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-        raw = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        assert "_debug" in raw
-        assert "queries" in raw
-        # Response has both debug block and data block separated by ---
-        assert "---" in raw
-        # Reset for other tests
-        mock_ctx.request_context.lifespan_context.debug_queries = False
-
-    def test_debug_true_with_members_has_two_queries(self, tool_fns, mock_ctx):
-        """debug=True with include_members attaches both groups and members queries."""
-        mock_ctx.request_context.lifespan_context.debug_queries = True
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "PMT0001",
-             "gene_name": "x", "product": "p", "organism_strain": "Strain1"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups()[:1],
-            members,
-        ]
-        raw = tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", include_members=True,
-        )
-        # Parse the debug block (before ---)
-        debug_part = raw.split("---")[0]
-        debug_data = json.loads(debug_part)
-        assert len(debug_data["_debug"]["queries"]) == 2
-        # Reset
-        mock_ctx.request_context.lifespan_context.debug_queries = False
 
 
 # ---------------------------------------------------------------------------
@@ -793,7 +742,7 @@ class TestRunCypherWrapper:
     def test_write_blocked_returns_error_message(self, tool_fns, mock_ctx):
         result = tool_fns["run_cypher"](mock_ctx, query="CREATE (n:Gene {name: 'x'})")
         assert "Error" in result
-        assert "write operations" in result
+        assert "Write operations" in result
         _conn_from(mock_ctx).execute_query.assert_not_called()
 
     def test_limit_injected_when_absent(self, tool_fns, mock_ctx):

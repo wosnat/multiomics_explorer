@@ -5,32 +5,9 @@ import re
 
 from mcp.server.fastmcp import Context, FastMCP
 
-from neo4j.exceptions import ClientError as Neo4jClientError
-
+import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.connection import GraphConnection
-from multiomics_explorer.kg.constants import (
-    MAX_SPECIFICITY_RANK,
-    VALID_OG_SOURCES,
-    VALID_TAXONOMIC_LEVELS,
-)
-from multiomics_explorer.kg.queries_lib import (
-    build_compare_conditions,
-    build_gene_ontology_terms,
-    build_gene_overview,
-    build_gene_stub,
-    build_genes_by_ontology,
-    build_get_gene_details,
-    build_get_homologs_groups,
-    build_get_homologs_members,
-    build_list_condition_types,
-    build_list_gene_categories,
-    build_list_organisms,
-    build_query_expression,
-    build_resolve_gene,
-    build_search_genes,
-    build_search_genes_dedup_groups,
-    build_search_ontology,
-)
+from multiomics_explorer.kg.queries_lib import build_compare_conditions
 
 
 def _conn(ctx: Context) -> GraphConnection:
@@ -38,31 +15,11 @@ def _conn(ctx: Context) -> GraphConnection:
     return ctx.request_context.lifespan_context.conn
 
 
-def _debug(ctx: Context) -> bool:
-    """Check if debug_queries is enabled."""
-    return ctx.request_context.lifespan_context.debug_queries
-
-
 def _fmt(results: list[dict], limit: int | None = None) -> str:
     """Format query results as JSON string."""
     if limit is not None:
         results = results[:limit]
     return json.dumps(results, indent=2, default=str)
-
-
-def _with_query(response: str, cypher: str, params: dict, ctx: Context) -> str:
-    """Wrap response with query info if debug mode is on."""
-    if not _debug(ctx):
-        return response
-    debug_block = json.dumps({"_debug": {"cypher": cypher, "params": params}}, indent=2, default=str)
-    return f"{debug_block}\n---\n{response}"
-
-
-# Read-only keywords check for raw Cypher
-_WRITE_KEYWORDS = re.compile(
-    r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{|CALL\s+\w+\.\w+|LOAD\s+CSV)\b",
-    re.IGNORECASE,
-)
 
 
 def _group_by_organism(results: list[dict]) -> dict:
@@ -104,17 +61,7 @@ def register_tools(mcp: FastMCP):
             return cached
 
         conn = _conn(ctx)
-
-        cat_cypher, cat_params = build_list_gene_categories()
-        categories = conn.execute_query(cat_cypher, **cat_params)
-
-        cond_cypher, cond_params = build_list_condition_types()
-        condition_types = conn.execute_query(cond_cypher, **cond_params)
-
-        result = {
-            "gene_categories": categories,
-            "condition_types": condition_types,
-        }
+        result = api.list_filter_values(conn=conn)
         response = json.dumps(result, indent=2, default=str)
         lc._filter_values_cache = response
         return response
@@ -134,8 +81,7 @@ def register_tools(mcp: FastMCP):
             return cached
 
         conn = _conn(ctx)
-        cypher, params = build_list_organisms()
-        results = conn.execute_query(cypher, **params)
+        results = api.list_organisms(conn=conn)
         if not results:
             return "No organisms found in the knowledge graph."
         response = _fmt(results)
@@ -158,20 +104,17 @@ def register_tools(mcp: FastMCP):
             organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
         """
         conn = _conn(ctx)
-        cypher, params = build_resolve_gene(identifier=identifier, organism=organism)
-        results = conn.execute_query(cypher, **params)
+        results = api.resolve_gene(identifier, organism=organism, conn=conn)
         if not results:
             msg = f"No gene found for identifier '{identifier}'"
             if organism:
                 msg += f" in {organism}"
-            response = json.dumps({"results": {}, "message": msg})
-        else:
-            grouped = _group_by_organism(results)
-            response = json.dumps(
-                {"results": grouped, "total": len(results)},
-                indent=2, default=str,
-            )
-        return _with_query(response, cypher, params, ctx)
+            return json.dumps({"results": {}, "message": msg})
+        grouped = _group_by_organism(results)
+        return json.dumps(
+            {"results": grouped, "total": len(results)},
+            indent=2, default=str,
+        )
 
     @mcp.tool()
     def search_genes(
@@ -210,63 +153,19 @@ def register_tools(mcp: FastMCP):
         """
         conn = _conn(ctx)
         limit = min(limit, 50)
-        cypher, params = build_search_genes(
-            search_text=search_text, organism=organism,
-            category=category,
-            min_quality=min_quality,
+        results = api.search_genes(
+            search_text, organism=organism,
+            category=category, min_quality=min_quality,
+            deduplicate=deduplicate, conn=conn,
         )
-        try:
-            results = conn.execute_query(cypher, **params)
-        except Neo4jClientError:
-            # Retry with escaped Lucene special characters
-            escaped = re.sub(r'[+\-!(){}\[\]^"~*?:\\/]', r'\\\g<0>', search_text)
-            cypher, params = build_search_genes(
-                search_text=escaped, organism=organism,
-                category=category,
-                min_quality=min_quality,
-            )
-            results = conn.execute_query(cypher, **params)
         results = results[:limit]
-        if deduplicate:
-            # Fetch most-specific ortholog group for each result gene
-            locus_tags = [r["locus_tag"] for r in results]
-            dedup_cypher, dedup_params = build_search_genes_dedup_groups(
-                locus_tags=locus_tags,
-            )
-            dedup_rows = conn.execute_query(dedup_cypher, **dedup_params)
-            tag_to_group = {r["locus_tag"]: r["dedup_group"] for r in dedup_rows}
-
-            seen_groups: dict[str, list] = {}
-            deduped = []
-            for row in results:
-                group = tag_to_group.get(row["locus_tag"])
-                if group:
-                    if group in seen_groups:
-                        seen_groups[group].append(row)
-                        continue
-                    seen_groups[group] = [row]
-                deduped.append(row)
-            # Add group summary to each representative
-            for row in deduped:
-                group = tag_to_group.get(row["locus_tag"])
-                if group:
-                    members = seen_groups[group]
-                    row["collapsed_count"] = len(members)
-                    org_counts: dict[str, int] = {}
-                    for r in members:
-                        org = r.get("organism_strain", "Unknown")
-                        org_counts[org] = org_counts.get(org, 0) + 1
-                    row["group_organisms"] = org_counts
-            results = deduped
         if not results:
-            response = json.dumps({
+            return json.dumps({
                 "results": [], "total": 0, "query": search_text,
             })
-        else:
-            response = json.dumps({
-                "results": results, "total": len(results), "query": search_text,
-            }, indent=2, default=str)
-        return _with_query(response, cypher, params, ctx)
+        return json.dumps({
+            "results": results, "total": len(results), "query": search_text,
+        }, indent=2, default=str)
 
     @mcp.tool()
     def gene_overview(ctx: Context, gene_ids: list[str], limit: int = 50) -> str:
@@ -292,12 +191,10 @@ def register_tools(mcp: FastMCP):
             limit: Max genes to return (default 50).
         """
         conn = _conn(ctx)
-        cypher, params = build_gene_overview(gene_ids=gene_ids)
-        rows = conn.execute_query(cypher, **params)
+        rows = api.gene_overview(gene_ids, conn=conn)
         if not rows:
             return "No genes found for the given locus_tags."
-        response = _fmt(rows, limit=limit)
-        return _with_query(response, cypher, params, ctx)
+        return _fmt(rows, limit=limit)
 
     @mcp.tool()
     def get_gene_details(ctx: Context, gene_id: str) -> str:
@@ -315,12 +212,10 @@ def register_tools(mcp: FastMCP):
             gene_id: Gene locus_tag (e.g. "PMM0001", "sync_0001").
         """
         conn = _conn(ctx)
-        cypher, params = build_get_gene_details(gene_id=gene_id)
-        results = conn.execute_query(cypher, **params)
-        if not results or results[0]["gene"] is None:
+        result = api.get_gene_details(gene_id, conn=conn)
+        if result is None:
             return f"Gene '{gene_id}' not found."
-        response = _fmt([results[0]["gene"]])
-        return _with_query(response, cypher, params, ctx)
+        return _fmt([result])
 
     @mcp.tool()
     def query_expression(
@@ -353,18 +248,18 @@ def register_tools(mcp: FastMCP):
             max_pvalue: Maximum adjusted p-value.
             limit: Max results (default 50).
         """
-        if not any([gene_id, organism, condition]):
-            return "Error: provide at least one of gene_id, organism, or condition."
-
         conn = _conn(ctx)
-        cypher, params = build_query_expression(
-            gene_id=gene_id, organism=organism, condition=condition,
-            direction=direction, min_log2fc=min_log2fc, max_pvalue=max_pvalue,
-        )
-        results = conn.execute_query(cypher, **params)
+        try:
+            results = api.query_expression(
+                gene_id=gene_id, organism=organism, condition=condition,
+                direction=direction, min_log2fc=min_log2fc,
+                max_pvalue=max_pvalue, conn=conn,
+            )
+        except ValueError as e:
+            return f"Error: {e}"
         if not results:
-            return _with_query("No expression data found for the given filters.", cypher, params, ctx)
-        return _with_query(_fmt(results, limit=limit), cypher, params, ctx)
+            return "No expression data found for the given filters."
+        return _fmt(results, limit=limit)
 
     @mcp.tool()
     def compare_conditions(
@@ -396,8 +291,8 @@ def register_tools(mcp: FastMCP):
         )
         results = conn.execute_query(cypher, **params)
         if not results:
-            return _with_query("No expression data found for the given filters.", cypher, params, ctx)
-        return _with_query(_fmt(results, limit=limit), cypher, params, ctx)
+            return "No expression data found for the given filters."
+        return _fmt(results, limit=limit)
 
     def _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank):
         msg = f"No ortholog groups found for '{gene_id}'"
@@ -468,75 +363,20 @@ def register_tools(mcp: FastMCP):
               eggNOG Bacteria-level COG.
         """
         conn = _conn(ctx)
-
-        # Validate enum params
-        if source is not None and source not in VALID_OG_SOURCES:
-            return f"Invalid source '{source}'. Valid: {sorted(VALID_OG_SOURCES)}"
-        if taxonomic_level is not None and taxonomic_level not in VALID_TAXONOMIC_LEVELS:
-            return f"Invalid taxonomic_level '{taxonomic_level}'. Valid: {sorted(VALID_TAXONOMIC_LEVELS)}"
-        if max_specificity_rank is not None and not (0 <= max_specificity_rank <= MAX_SPECIFICITY_RANK):
-            return f"Invalid max_specificity_rank {max_specificity_rank}. Valid: 0-{MAX_SPECIFICITY_RANK}."
-        if not (1 <= member_limit <= 200):
-            return f"Invalid member_limit {member_limit}. Valid: 1-200."
-
-        # 1. Query gene metadata
-        cypher_gene, params_gene = build_gene_stub(gene_id=gene_id)
-        gene_rows = conn.execute_query(cypher_gene, **params_gene)
-        if not gene_rows:
-            return f"Gene '{gene_id}' not found."
-        query_gene = gene_rows[0]
-
-        # 2. Query ortholog groups
-        cypher_groups, params_groups = build_get_homologs_groups(
-            gene_id=gene_id, source=source,
-            taxonomic_level=taxonomic_level,
-            max_specificity_rank=max_specificity_rank,
-        )
-        groups = conn.execute_query(cypher_groups, **params_groups)
-        if not groups:
-            return _with_query(
-                _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank),
-                cypher_groups, params_groups, ctx,
-            )
-
-        # 3. Optionally fetch members
-        if include_members:
-            cypher_members, params_members = build_get_homologs_members(
-                gene_id=gene_id, source=source,
+        try:
+            result = api.get_homologs(
+                gene_id, source=source,
                 taxonomic_level=taxonomic_level,
                 max_specificity_rank=max_specificity_rank,
                 exclude_paralogs=exclude_paralogs,
+                include_members=include_members,
+                member_limit=member_limit, conn=conn,
             )
-            members = conn.execute_query(cypher_members, **params_members)
-
-            # Group members by og_name, apply per-group limit
-            from collections import defaultdict
-            members_by_og = defaultdict(list)
-            for m in members:
-                members_by_og[m.pop("og_name")].append(m)
-
-            for g in groups:
-                og_members = members_by_og.get(g["og_name"], [])
-                if len(og_members) > member_limit:
-                    g["members"] = og_members[:member_limit]
-                    g["truncated"] = True
-                else:
-                    g["members"] = og_members
-
-        response = json.dumps(
-            {"query_gene": query_gene, "ortholog_groups": groups},
-            indent=2, default=str,
-        )
-
-        # Debug: attach all queries
-        if _debug(ctx):
-            queries = [{"cypher": cypher_groups, "params": params_groups}]
-            if include_members:
-                queries.append({"cypher": cypher_members, "params": params_members})
-            debug_block = json.dumps({"_debug": {"queries": queries}}, indent=2, default=str)
-            return f"{debug_block}\n---\n{response}"
-
-        return response
+        except ValueError as e:
+            return f"{e}"
+        if not result["ortholog_groups"]:
+            return _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank)
+        return json.dumps(result, indent=2, default=str)
 
     @mcp.tool()
     def run_cypher(ctx: Context, query: str, limit: int = 25) -> str:
@@ -549,10 +389,6 @@ def register_tools(mcp: FastMCP):
             query: Cypher query string. A LIMIT clause will be added if not present.
             limit: Max results (default 25, max 200).
         """
-        # Block write operations
-        if _WRITE_KEYWORDS.search(query):
-            return "Error: write operations are not allowed. This tool is read-only."
-
         limit = min(limit, 200)
 
         # Add LIMIT if not present
@@ -561,7 +397,10 @@ def register_tools(mcp: FastMCP):
             query += f"\nLIMIT {limit}"
 
         conn = _conn(ctx)
-        results = conn.execute_query(query)
+        try:
+            results = api.run_cypher(query, conn=conn)
+        except ValueError as e:
+            return f"Error: {e}"
         if not results:
             return "Query returned no results."
         return _fmt(results, limit=limit)
@@ -603,28 +442,15 @@ def register_tools(mcp: FastMCP):
             limit: Max results (default 25).
         """
         conn = _conn(ctx)
-        cypher, params = build_search_ontology(
-            ontology=ontology, search_text=search_text,
-        )
-        try:
-            results = conn.execute_query(cypher, **params)
-        except Neo4jClientError:
-            # Retry with escaped Lucene special characters
-            escaped = re.sub(r'[+\-!(){}\[\]^"~*?:\\/]', r'\\\g<0>', search_text)
-            cypher, params = build_search_ontology(
-                ontology=ontology, search_text=escaped,
-            )
-            results = conn.execute_query(cypher, **params)
+        results = api.search_ontology(search_text, ontology, conn=conn)
         results = results[:limit]
         if not results:
-            response = json.dumps({
+            return json.dumps({
                 "results": [], "total": 0, "query": search_text,
             })
-        else:
-            response = json.dumps({
-                "results": results, "total": len(results), "query": search_text,
-            }, indent=2, default=str)
-        return _with_query(response, cypher, params, ctx)
+        return json.dumps({
+            "results": results, "total": len(results), "query": search_text,
+        }, indent=2, default=str)
 
     @mcp.tool()
     def genes_by_ontology(
@@ -650,21 +476,15 @@ def register_tools(mcp: FastMCP):
             limit: Max gene results (default 25).
         """
         conn = _conn(ctx)
-        cypher, params = build_genes_by_ontology(
-            ontology=ontology, term_ids=term_ids,
-            organism=organism,
-        )
-        results = conn.execute_query(cypher, **params)
+        results = api.genes_by_ontology(term_ids, ontology, organism=organism, conn=conn)
         results = results[:limit]
         if not results:
-            response = json.dumps({"results": {}, "total": 0})
-        else:
-            grouped = _group_by_organism(results)
-            response = json.dumps(
-                {"results": grouped, "total": len(results)},
-                indent=2, default=str,
-            )
-        return _with_query(response, cypher, params, ctx)
+            return json.dumps({"results": {}, "total": 0})
+        grouped = _group_by_organism(results)
+        return json.dumps(
+            {"results": grouped, "total": len(results)},
+            indent=2, default=str,
+        )
 
     @mcp.tool()
     def gene_ontology_terms(
@@ -692,16 +512,10 @@ def register_tools(mcp: FastMCP):
                 leaf_only=False, which can return many ancestor terms.
         """
         conn = _conn(ctx)
-        cypher, params = build_gene_ontology_terms(
-            ontology=ontology, gene_id=gene_id,
-            leaf_only=leaf_only,
-        )
-        results = conn.execute_query(cypher, **params)
+        results = api.gene_ontology_terms(gene_id, ontology, leaf_only=leaf_only, conn=conn)
         results = results[:limit]
         if not results:
-            response = json.dumps({"results": [], "total": 0})
-        else:
-            response = json.dumps({
-                "results": results, "total": len(results),
-            }, indent=2, default=str)
-        return _with_query(response, cypher, params, ctx)
+            return json.dumps({"results": [], "total": 0})
+        return json.dumps({
+            "results": results, "total": len(results),
+        }, indent=2, default=str)

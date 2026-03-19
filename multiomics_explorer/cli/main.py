@@ -169,7 +169,7 @@ def cypher(
             raise typer.Exit(1)
 
         # Block write operations (read-only tool)
-        from multiomics_explorer.mcp_server.tools import _WRITE_KEYWORDS
+        from multiomics_explorer.api.functions import _WRITE_KEYWORDS
         if _WRITE_KEYWORDS.search(query):
             console.print("[red]Error: write operations are not allowed. This tool is read-only.[/red]")
             raise typer.Exit(1)

@@ -5,8 +5,9 @@ import re
 
 import pytest
 
-# Import the regex and formatter directly — no Neo4j needed
-from multiomics_explorer.mcp_server.tools import _WRITE_KEYWORDS, _fmt
+# Import the regex from api (where write-blocking lives) and formatter from tools
+from multiomics_explorer.api.functions import _WRITE_KEYWORDS
+from multiomics_explorer.mcp_server.tools import _fmt
 
 
 class TestWriteBlocking:
