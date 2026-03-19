@@ -1,7 +1,6 @@
 """Command-line interface for the multiomics explorer."""
 
 import json
-import re
 
 import typer
 from rich.console import Console
@@ -225,87 +224,6 @@ def stats():
         for label, count in sorted(s["label_counts"].items(), key=lambda x: -x[1]):
             table.add_row(label, f"{count:,}")
         console.print(table)
-
-
-@app.command()
-def query(
-    question: str = typer.Argument(help="Natural language question about the knowledge graph"),
-):
-    """Ask a natural language question (NL->Cypher->Answer)."""
-    from multiomics_explorer.agents.cypher_agent import CypherAgent
-
-    try:
-        agent = CypherAgent()
-        result = agent.query(question)
-    except Exception as e:
-        console.print(f"[red]Error: {e}[/red]")
-        raise typer.Exit(1)
-
-    console.print(f"\n[bold]Generated Cypher:[/bold]")
-    console.print(f"[cyan]{result['cypher']}[/cyan]\n")
-    console.print(f"[bold]Answer:[/bold]")
-    console.print(result["answer"])
-
-    if result["results"]:
-        console.print(f"\n[dim]({len(result['results'])} raw results returned)[/dim]")
-
-
-@app.command()
-def interactive():
-    """Start an interactive query session (REPL)."""
-    console.print("[bold]Multiomics Explorer - Interactive Mode[/bold]")
-    console.print("Type 'quit' to exit, 'cypher:' prefix for direct Cypher.\n")
-
-    from multiomics_explorer.kg.connection import GraphConnection
-
-    with GraphConnection() as conn:
-        if not conn.verify_connectivity():
-            console.print("[red]Cannot connect to Neo4j. Is it running?[/red]")
-            raise typer.Exit(1)
-
-        agent = None  # lazy init
-
-        while True:
-            try:
-                user_input = console.input("[bold green]> [/bold green]")
-            except (EOFError, KeyboardInterrupt):
-                console.print("\nBye!")
-                break
-
-            user_input = user_input.strip()
-            if not user_input:
-                continue
-            if user_input.lower() in ("quit", "exit", "q"):
-                console.print("Bye!")
-                break
-
-            if user_input.lower().startswith("cypher:"):
-                cypher_query = user_input[7:].strip()
-                try:
-                    results = conn.execute_query(cypher_query)
-                    if results:
-                        table = Table(show_lines=True)
-                        keys = list(results[0].keys())
-                        for k in keys:
-                            table.add_column(k)
-                        for row in results[:25]:
-                            table.add_row(*[str(row.get(k, "")) for k in keys])
-                        console.print(table)
-                    if len(results) > 25:
-                        console.print(f"[dim]... {len(results)} total results[/dim]")
-                except Exception as e:
-                    console.print(f"[red]Error: {e}[/red]")
-            else:
-                if agent is None:
-                    from multiomics_explorer.agents.cypher_agent import CypherAgent
-                    agent = CypherAgent()
-                try:
-                    result = agent.query(user_input)
-                    console.print(f"\n[cyan]{result['cypher']}[/cyan]\n")
-                    console.print(result["answer"])
-                    console.print()
-                except Exception as e:
-                    console.print(f"[red]Error: {e}[/red]")
 
 
 if __name__ == "__main__":
