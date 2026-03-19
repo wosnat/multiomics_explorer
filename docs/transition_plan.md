@@ -156,7 +156,7 @@ MCP wrapper applies limits.
 - Regression `_normalize()`: update sort key detection
   (`name` → `organism_name`, `cnt` removed)
 
-#### Step 3: Create api/ layer
+#### Step 3: Create api/ layer ✅
 
 Create `multiomics_explorer/api/` with functions that wrap
 query builders + `connection.execute_query`.
@@ -230,7 +230,7 @@ def get_homologs(
 - `tests/integration/test_api_contract.py` — return key assertions
   against live KG (see architecture doc "Docstring acceptance tests")
 
-#### Step 4: Wire __init__.py
+#### Step 4: Wire __init__.py ✅
 
 ```python
 # multiomics_explorer/__init__.py
