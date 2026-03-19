@@ -27,7 +27,6 @@ def mock_ctx():
     """MCP Context mock whose .conn returns a MagicMock GraphConnection."""
     ctx = MagicMock()
     ctx.request_context.lifespan_context.conn = MagicMock()
-    ctx.request_context.lifespan_context.debug_queries = False
     return ctx
 
 

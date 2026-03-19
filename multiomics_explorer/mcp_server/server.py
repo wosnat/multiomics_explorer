@@ -17,7 +17,6 @@ from multiomics_explorer.mcp_server.tools import register_tools
 @dataclass
 class KGContext:
     conn: GraphConnection
-    debug_queries: bool = False
 
 
 @asynccontextmanager
@@ -28,7 +27,7 @@ async def lifespan(server: FastMCP):
     if not conn.verify_connectivity():
         raise RuntimeError(f"Cannot connect to Neo4j at {settings.neo4j_uri}")
     try:
-        yield KGContext(conn=conn, debug_queries=settings.debug_queries)
+        yield KGContext(conn=conn)
     finally:
         conn.close()
 

@@ -1318,14 +1318,6 @@ logging.getLogger("multiomics_explorer.mcp_server").setLevel(logging.INFO)
 - Full MCP responses — logged by MCP protocol layer already
 - Credentials — never log connection strings with passwords
 
-### Debug mode
-
-The MCP server has a `debug_queries` flag (set via environment
-variable or lifespan context). When enabled, MCP tool responses
-include the Cypher query and params as a `_debug` block. This is
-separate from Python logging — it's embedded in the tool response
-for the LLM to see.
-
 ---
 
 ## KG schema coupling
