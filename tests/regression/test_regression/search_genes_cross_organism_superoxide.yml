@@ -1,5 +1,5 @@
 case_id: search_genes_cross_organism_superoxide
-row_count: 10
+row_count: 31
 rows:
 - annotation_quality: 3
   function_description: Alternative locus ID
@@ -10,6 +10,15 @@ rows:
   product: superoxide dismutase [Ni]
   score: 19.5438
 - annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Alternative
+    locus ID'
+  locus_tag: A9601_14941
+  organism_strain: Prochlorococcus AS9601
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
+- annotation_quality: 3
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase, Ni :: Nickel-containing superoxide
@@ -18,6 +27,44 @@ rows:
   organism_strain: Alteromonas macleodii HOT1A3
   product: superoxide dismutase, Ni
   score: 21.8334
+- annotation_quality: 3
+  function_description: Destroys radicals which are normally produced within the cells
+    and which are toxic to biological systems
+  gene_name: sodB
+  gene_summary: 'sodB :: superoxide dismutase [Fe] :: Destroys radicals which are
+    normally produced within the cells and which are toxic to biological systems'
+  locus_tag: ACZ81_05890
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: superoxide dismutase [Fe]
+  score: 14.9147
+- annotation_quality: 3
+  function_description: Destroys radicals which are normally produced within the cells
+    and which are toxic to biological systems
+  gene_name: sodC
+  gene_summary: 'sodC :: superoxide dismutase family protein :: Destroys radicals
+    which are normally produced within the cells and which are toxic to biological
+    systems'
+  locus_tag: ACZ81_14980
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: superoxide dismutase family protein
+  score: 15.3473
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase, Ni :: Alternative locus ID'
+  locus_tag: BSR22_00950
+  organism_strain: Prochlorococcus RSP50
+  product: superoxide dismutase, Ni
+  score: 19.0932
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Alternative
+    locus ID'
+  locus_tag: BSR22_00955
+  organism_strain: Prochlorococcus RSP50
+  product: nickel-type superoxide dismutase maturation protease
+  score: 16.1543
 - annotation_quality: 3
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
@@ -28,6 +75,27 @@ rows:
   product: superoxide dismutase, Ni
   score: 21.8334
 - annotation_quality: 3
+  function_description: Destroys radicals which are normally produced within the cells
+    and which are toxic to biological systems
+  gene_name: sodB
+  gene_summary: 'sodB :: superoxide dismutase [Fe] :: Destroys radicals which are
+    normally produced within the cells and which are toxic to biological systems'
+  locus_tag: EZ55_01223
+  organism_strain: Alteromonas macleodii EZ55
+  product: superoxide dismutase [Fe]
+  score: 14.9147
+- annotation_quality: 3
+  function_description: Destroys radicals which are normally produced within the cells
+    and which are toxic to biological systems
+  gene_name: sodC
+  gene_summary: 'sodC :: superoxide dismutase family protein :: Destroys radicals
+    which are normally produced within the cells and which are toxic to biological
+    systems'
+  locus_tag: EZ55_03092
+  organism_strain: Alteromonas macleodii EZ55
+  product: superoxide dismutase family protein
+  score: 15.3488
+- annotation_quality: 3
   function_description: Nickel-containing superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase, Ni :: Nickel-containing superoxide
@@ -36,6 +104,27 @@ rows:
   organism_strain: Alteromonas macleodii MIT1002
   product: superoxide dismutase, Ni
   score: 21.8334
+- annotation_quality: 3
+  function_description: Destroys radicals which are normally produced within the cells
+    and which are toxic to biological systems
+  gene_name: sodB
+  gene_summary: 'sodB :: superoxide dismutase [Fe] :: Destroys radicals which are
+    normally produced within the cells and which are toxic to biological systems'
+  locus_tag: MIT1002_01234
+  organism_strain: Alteromonas macleodii MIT1002
+  product: superoxide dismutase [Fe]
+  score: 14.9147
+- annotation_quality: 3
+  function_description: Destroys radicals which are normally produced within the cells
+    and which are toxic to biological systems
+  gene_name: sodC
+  gene_summary: 'sodC :: superoxide dismutase family protein :: Destroys radicals
+    which are normally produced within the cells and which are toxic to biological
+    systems'
+  locus_tag: MIT1002_03069
+  organism_strain: Alteromonas macleodii MIT1002
+  product: superoxide dismutase family protein
+  score: 15.3473
 - annotation_quality: 3
   function_description: Alternative locus ID
   gene_name: sodN
@@ -46,12 +135,30 @@ rows:
   score: 19.5438
 - annotation_quality: 3
   function_description: Alternative locus ID
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Alternative
+    locus ID'
+  locus_tag: NATL1_17151
+  organism_strain: Prochlorococcus NATL1A
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
+- annotation_quality: 3
+  function_description: Alternative locus ID
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
   locus_tag: P9301_14791
   organism_strain: Prochlorococcus MIT9301
   product: superoxide dismutase [Ni]
   score: 19.5438
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Alternative
+    locus ID'
+  locus_tag: P9301_14801
+  organism_strain: Prochlorococcus MIT9301
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
 - annotation_quality: 3
   function_description: Alternative locus ID
   gene_name: sodN
@@ -61,6 +168,66 @@ rows:
   product: superoxide dismutase [Ni]
   score: 19.5438
 - annotation_quality: 3
+  function_description: signal peptide processing
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: signal
+    peptide processing'
+  locus_tag: PMM1295
+  organism_strain: Prochlorococcus MED4
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
+  locus_tag: PMN2A_0861
+  organism_strain: Prochlorococcus NATL2A
+  product: superoxide dismutase [Ni]
+  score: 19.5438
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Alternative
+    locus ID'
+  locus_tag: PMN2A_0862
+  organism_strain: Prochlorococcus NATL2A
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Alternative
+    locus ID'
+  locus_tag: PMT0339
+  organism_strain: Prochlorococcus MIT9313
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
+  locus_tag: PMT0340
+  organism_strain: Prochlorococcus MIT9313
+  product: superoxide dismutase [Ni]
+  score: 19.5438
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodN
+  gene_summary: 'sodN :: superoxide dismutase [Ni] :: Alternative locus ID'
+  locus_tag: PMT9312_1390
+  organism_strain: Prochlorococcus MIT9312
+  product: superoxide dismutase [Ni]
+  score: 19.5438
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Alternative
+    locus ID'
+  locus_tag: PMT9312_1391
+  organism_strain: Prochlorococcus MIT9312
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
+- annotation_quality: 3
   function_description: Superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Superoxide dismutase'
@@ -69,6 +236,24 @@ rows:
   product: superoxide dismutase [Ni]
   score: 22.1812
 - annotation_quality: 3
+  function_description: Peptidase S24-like
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Peptidase
+    S24-like'
+  locus_tag: SYNW1627
+  organism_strain: Synechococcus WH8102
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
+- annotation_quality: 3
+  function_description: Peptidase S24-like
+  gene_name: sodX
+  gene_summary: 'sodX :: nickel-type superoxide dismutase maturation protease :: Peptidase
+    S24-like'
+  locus_tag: sync_0754
+  organism_strain: Synechococcus CC9311
+  product: nickel-type superoxide dismutase maturation protease
+  score: 12.9236
+- annotation_quality: 3
   function_description: Superoxide dismutase
   gene_name: sodN
   gene_summary: 'sodN :: superoxide dismutase [Ni] :: Superoxide dismutase'
@@ -76,6 +261,16 @@ rows:
   organism_strain: Synechococcus CC9311
   product: superoxide dismutase [Ni]
   score: 22.1812
+- annotation_quality: 3
+  function_description: Destroys radicals which are normally produced within the cells
+    and which are toxic to biological systems
+  gene_name: sodC
+  gene_summary: 'sodC :: superoxide dismutase [Cu-Zn] :: Destroys radicals which are
+    normally produced within the cells and which are toxic to biological systems'
+  locus_tag: sync_1771
+  organism_strain: Synechococcus CC9311
+  product: superoxide dismutase [Cu-Zn]
+  score: 16.5445
 - annotation_quality: 3
   function_description: Nickel-containing superoxide dismutase
   gene_name: null

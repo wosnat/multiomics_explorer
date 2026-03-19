@@ -1,30 +1,30 @@
 case_id: list_filter_values
 row_count: 38
 rows:
-- cnt: 21
-  condition_type: growth_medium
-- cnt: 8
-  condition_type: carbon_stress
-- cnt: 8
-  condition_type: light_stress
-- cnt: 4
-  condition_type: growth_state
-- cnt: 3
-  condition_type: nitrogen_stress
-- cnt: 2
-  condition_type: salt_stress
-- cnt: 2
-  condition_type: coculture
-- cnt: 2
-  condition_type: darkness
-- cnt: 2
-  condition_type: phosphorus_stress
-- cnt: 2
-  condition_type: plastic_stress
-- cnt: 2
-  condition_type: iron_stress
-- cnt: 1
-  condition_type: viral
+- condition_type: growth_medium
+  count: 21
+- condition_type: carbon_stress
+  count: 8
+- condition_type: light_stress
+  count: 8
+- condition_type: growth_state
+  count: 4
+- condition_type: nitrogen_stress
+  count: 3
+- condition_type: salt_stress
+  count: 2
+- condition_type: coculture
+  count: 2
+- condition_type: darkness
+  count: 2
+- condition_type: phosphorus_stress
+  count: 2
+- condition_type: plastic_stress
+  count: 2
+- condition_type: iron_stress
+  count: 2
+- condition_type: viral
+  count: 1
 - category: Amino acid metabolism
   gene_count: 1915
 - category: Carbohydrate metabolism

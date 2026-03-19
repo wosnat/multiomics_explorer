@@ -81,13 +81,14 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
 
     builder = TOOL_BUILDERS[tool]
     deduplicate = params.get("deduplicate", False)
+    limit = params.get("limit")
     # Strip tool-level params that aren't accepted by query builders
-    builder_params = {k: v for k, v in params.items() if k != "deduplicate"}
-    # gene_overview: map gene_ids -> locus_tags for the query builder
-    if tool == "gene_overview" and "gene_ids" in builder_params:
-        builder_params["locus_tags"] = builder_params.pop("gene_ids")
+    builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit")}
     cypher, query_params = builder(**builder_params)
     results = conn.execute_query(cypher, **query_params)
+    # Apply limit at the test level (mirrors MCP layer behavior)
+    if limit is not None:
+        results = results[:limit]
 
     # get_gene_details returns g{.*} AS gene — unwrap for flat column checks
     if tool == "get_gene_details" and results and "gene" in results[0]:

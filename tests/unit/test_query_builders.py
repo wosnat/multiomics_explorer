@@ -110,26 +110,18 @@ class TestBuildSearchGenes:
         assert params["category"] is None
         assert "$category IS NULL" in cypher
 
-    def test_limit_parameter(self):
-        _, params = build_search_genes(search_text="x", limit=5)
-        assert params["limit"] == 5
-
-    def test_default_limit(self):
-        _, params = build_search_genes(search_text="x")
-        assert "limit" in params
 
 
 class TestBuildGeneOverview:
     def test_gene_overview_query(self):
-        """UNWIND present, returns all 12 expected columns, $locus_tags and $limit in params."""
-        cypher, params = build_gene_overview(locus_tags=["PMM1428"])
+        """UNWIND present, returns all 12 expected columns, $gene_ids in params."""
+        cypher, params = build_gene_overview(gene_ids=["PMM1428"])
         assert "UNWIND" in cypher
         assert params["locus_tags"] == ["PMM1428"]
-        assert params["limit"] == 50
 
     def test_gene_overview_columns(self):
         """Verify all column names in RETURN clause."""
-        cypher, _ = build_gene_overview(locus_tags=["PMM1428"])
+        cypher, _ = build_gene_overview(gene_ids=["PMM1428"])
         expected_columns = [
             "locus_tag", "gene_name", "product", "gene_summary", "gene_category",
             "annotation_quality", "organism_strain", "annotation_types",
@@ -144,7 +136,7 @@ class TestBuildGetGeneDetails:
     def test_get_gene_details_simplified(self):
         """g {.*} in RETURN, no nested sub-object traversals."""
         cypher, params = build_get_gene_details(gene_id="PMM0001")
-        assert params["lt"] == "PMM0001"
+        assert params["gene_id"] == "PMM0001"
         assert "g {.*}" in cypher
         assert "Gene_encodes_protein" not in cypher
         assert "Gene_belongs_to_organism" not in cypher
@@ -379,8 +371,8 @@ class TestBuildListConditionTypes:
         cypher, params = build_list_condition_types()
         assert "MATCH (e:EnvironmentalCondition)" in cypher
         assert "condition_type" in cypher
-        assert "cnt" in cypher
-        assert "ORDER BY cnt DESC" in cypher
+        assert "count" in cypher
+        assert "ORDER BY count DESC" in cypher
 
     def test_no_params(self):
         _, params = build_list_condition_types()
@@ -396,7 +388,7 @@ class TestBuildListOrganisms:
 
     def test_returns_expected_columns(self):
         cypher, _ = build_list_organisms()
-        for col in ["name", "genus", "strain", "clade", "gene_count"]:
+        for col in ["organism_name", "genus", "strain", "clade", "gene_count"]:
             assert col in cypher
 
     def test_no_params(self):
@@ -487,10 +479,6 @@ class TestBuildSearchOntology:
         assert "$search_text" in cypher
         # search_text should NOT be interpolated into cypher
         assert "replication" not in cypher
-
-    def test_limit_parameter(self):
-        _, params = build_search_ontology(ontology="ec", search_text="x", limit=10)
-        assert params["limit"] == 10
 
     def test_go_mf_uses_correct_index(self):
         cypher, _ = build_search_ontology(ontology="go_mf", search_text="binding")
@@ -586,12 +574,6 @@ class TestBuildGenesByOntology:
         assert "CellularComponent" in cypher
         assert "Cellular_component_is_a_cellular_component" in cypher
 
-    def test_limit_parameter(self):
-        _, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], limit=5,
-        )
-        assert params["limit"] == 5
-
     def test_flat_ontology_no_hierarchy_expansion(self):
         """Flat ontologies (empty hierarchy_rels) skip *0..15 traversal."""
         cypher, _ = build_genes_by_ontology(
@@ -667,13 +649,6 @@ class TestBuildGeneOntologyTerms:
             cypher, _ = build_gene_ontology_terms(ontology=ontology, gene_id="x")
             assert "t.id AS id" in cypher
             assert "t.name AS name" in cypher
-
-    def test_limit_parameter(self):
-        cypher, params = build_gene_ontology_terms(
-            ontology="go_bp", gene_id="PMM0001", limit=20,
-        )
-        assert params["limit"] == 20
-        assert "$limit" in cypher
 
     def test_invalid_ontology_raises_valueerror(self):
         with pytest.raises(ValueError, match="Invalid ontology"):

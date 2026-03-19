@@ -99,7 +99,7 @@ def build_resolve_gene(
 def build_search_genes(
     *, search_text: str, organism: str | None = None,
     category: str | None = None,
-    min_quality: int = 0, limit: int = 10,
+    min_quality: int = 0,
 ) -> tuple[str, dict]:
     cypher = (
         "CALL db.index.fulltext.queryNodes('geneFullText', $search_text)\n"
@@ -113,13 +113,12 @@ def build_search_genes(
         "       g.organism_strain AS organism_strain,\n"
         "       g.annotation_quality AS annotation_quality,\n"
         "       score\n"
-        "ORDER BY score DESC, g.locus_tag\n"
-        "LIMIT $limit"
+        "ORDER BY score DESC, g.locus_tag"
     )
     return cypher, {
         "search_text": search_text, "organism": organism,
         "category": category,
-        "min_quality": min_quality, "limit": limit,
+        "min_quality": min_quality,
     }
 
 
@@ -137,7 +136,7 @@ def build_search_genes_dedup_groups(*, locus_tags: list[str]) -> tuple[str, dict
 
 
 def build_gene_overview(
-    *, locus_tags: list[str], limit: int = 50,
+    *, gene_ids: list[str],
 ) -> tuple[str, dict]:
     """Build query for gene overview: identity + data availability signals."""
     cypher = (
@@ -152,19 +151,18 @@ def build_gene_overview(
         "       g.significant_expression_count AS significant_expression_count,\n"
         "       g.closest_ortholog_group_size AS closest_ortholog_group_size,\n"
         "       g.closest_ortholog_genera AS closest_ortholog_genera\n"
-        "ORDER BY g.locus_tag\n"
-        "LIMIT $limit"
+        "ORDER BY g.locus_tag"
     )
-    return cypher, {"locus_tags": locus_tags, "limit": limit}
+    return cypher, {"locus_tags": gene_ids}
 
 
 def build_get_gene_details(*, gene_id: str) -> tuple[str, dict]:
     """Build query for full gene node properties."""
     cypher = (
-        "MATCH (g:Gene {locus_tag: $lt})\n"
+        "MATCH (g:Gene {locus_tag: $gene_id})\n"
         "RETURN g {.*} AS gene"
     )
-    return cypher, {"lt": gene_id}
+    return cypher, {"gene_id": gene_id}
 
 
 def build_query_expression(
@@ -175,12 +173,11 @@ def build_query_expression(
     direction: str | None = None,
     min_log2fc: float | None = None,
     max_pvalue: float | None = None,
-    limit: int = 50,
 ) -> tuple[str, dict]:
     expr_rels = DIRECT_EXPR_RELS
 
     where_clauses: list[str] = []
-    params: dict = {"limit": limit}
+    params: dict = {}
 
     if gene_id:
         where_clauses.append("g.locus_tag = $gene_id")
@@ -231,8 +228,7 @@ def build_query_expression(
         "       r.experimental_context AS context,\n"
         "       r.time_point AS time_point,\n"
         "       r.publications AS publications\n"
-        "ORDER BY abs(r.log2_fold_change) DESC, g.locus_tag, source\n"
-        "LIMIT $limit"
+        "ORDER BY abs(r.log2_fold_change) DESC, g.locus_tag, source"
     )
     return cypher, params
 
@@ -242,10 +238,9 @@ def build_compare_conditions(
     gene_ids: list[str] | None = None,
     organisms: list[str] | None = None,
     conditions: list[str] | None = None,
-    limit: int = 100,
 ) -> tuple[str, dict]:
     where_clauses: list[str] = []
-    params: dict = {"limit": limit}
+    params: dict = {}
 
     if gene_ids:
         where_clauses.append("g.locus_tag IN $gene_ids")
@@ -279,8 +274,7 @@ def build_compare_conditions(
         "       r.log2_fold_change AS log2fc,\n"
         "       r.adjusted_p_value AS padj,\n"
         "       r.experimental_context AS context\n"
-        "ORDER BY g.locus_tag, source, r.log2_fold_change\n"
-        "LIMIT $limit"
+        "ORDER BY g.locus_tag, source, r.log2_fold_change"
     )
     return cypher, params
 
@@ -383,8 +377,8 @@ def build_list_gene_categories() -> tuple[str, dict]:
 def build_list_condition_types() -> tuple[str, dict]:
     cypher = (
         "MATCH (e:EnvironmentalCondition)\n"
-        "RETURN e.condition_type AS condition_type, count(*) AS cnt\n"
-        "ORDER BY cnt DESC"
+        "RETURN e.condition_type AS condition_type, count(*) AS count\n"
+        "ORDER BY count DESC"
     )
     return cypher, {}
 
@@ -393,7 +387,7 @@ def build_list_organisms() -> tuple[str, dict]:
     cypher = (
         "MATCH (o:OrganismTaxon)\n"
         "OPTIONAL MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o)\n"
-        "RETURN o.preferred_name AS name, o.genus AS genus,\n"
+        "RETURN o.preferred_name AS organism_name, o.genus AS genus,\n"
         "       o.strain_name AS strain, o.clade AS clade,\n"
         "       count(g) AS gene_count\n"
         "ORDER BY o.genus, o.preferred_name"
@@ -402,7 +396,7 @@ def build_list_organisms() -> tuple[str, dict]:
 
 
 def build_search_ontology(
-    *, ontology: str, search_text: str, limit: int = 25,
+    *, ontology: str, search_text: str,
 ) -> tuple[str, dict]:
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
@@ -423,23 +417,21 @@ def build_search_ontology(
             "  RETURN t.id AS id, t.name AS name, score\n"
             "}\n"
             "RETURN id, name, score\n"
-            "ORDER BY score DESC\n"
-            "LIMIT $limit"
+            "ORDER BY score DESC"
         )
     else:
         cypher = (
             f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "YIELD node AS t, score\n"
             "RETURN t.id AS id, t.name AS name, score\n"
-            "ORDER BY score DESC\n"
-            "LIMIT $limit"
+            "ORDER BY score DESC"
         )
-    return cypher, {"search_text": search_text, "limit": limit}
+    return cypher, {"search_text": search_text}
 
 
 def build_genes_by_ontology(
     *, ontology: str, term_ids: list[str],
-    organism: str | None = None, limit: int = 25,
+    organism: str | None = None,
 ) -> tuple[str, dict]:
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
@@ -478,16 +470,15 @@ def build_genes_by_ontology(
         "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
         "RETURN DISTINCT g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.organism_strain AS organism_strain\n"
-        "ORDER BY g.locus_tag\n"
-        "LIMIT $limit"
+        "ORDER BY g.locus_tag"
     )
     return cypher, {
-        "term_ids": term_ids, "organism": organism, "limit": limit,
+        "term_ids": term_ids, "organism": organism,
     }
 
 
 def build_gene_ontology_terms(
-    *, ontology: str, gene_id: str, leaf_only: bool = True, limit: int = 50,
+    *, ontology: str, gene_id: str, leaf_only: bool = True,
 ) -> tuple[str, dict]:
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
@@ -505,14 +496,12 @@ def build_gene_ontology_terms(
             f"        -[:{hierarchy}]->(t)\n"
             "}\n"
             "RETURN t.id AS id, t.name AS name\n"
-            "ORDER BY t.name\n"
-            "LIMIT $limit"
+            "ORDER BY t.name"
         )
     else:
         cypher = (
             f"MATCH (g:Gene {{locus_tag: $gene_id}})-[:{gene_rel}]->(t:{label})\n"
             "RETURN t.id AS id, t.name AS name\n"
-            "ORDER BY t.name\n"
-            "LIMIT $limit"
+            "ORDER BY t.name"
         )
-    return cypher, {"gene_id": gene_id, "limit": limit}
+    return cypher, {"gene_id": gene_id}

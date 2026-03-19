@@ -1,6 +1,83 @@
 case_id: search_genes_category_filter
-row_count: 10
+row_count: 213
 rows:
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: A9601_00741
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: A9601_02441
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: A9601_02731
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: May play a role in photosystem I and II biogenesis
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor :: May play
+    a role in photosystem I and II biogenesis'
+  locus_tag: A9601_02741
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center assembly factor
+  score: 5.92
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: A9601_02751
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
 - annotation_quality: 3
   function_description: Photosystem II 4 kDa reaction centre component
   gene_name: psbK
@@ -11,6 +88,136 @@ rows:
   product: photosystem II reaction center protein PsbK
   score: 11.0463
 - annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: A9601_03201
+  organism_strain: Prochlorococcus AS9601
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbF1
+  gene_summary: 'psbF1 :: cytochrome b559, beta subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: A9601_03211
+  organism_strain: Prochlorococcus AS9601
+  product: cytochrome b559, beta subunit
+  score: 1.6657
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: A9601_03221
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: A9601_03231
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: A9601_03381
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: A9601_03411
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: A9601_03551
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I reaction centre subunit IV
+  score: 8.2982
+- annotation_quality: 3
+  function_description: Participates in efficiency of electron transfer from plastocyanin
+    to P700 (or cytochrome c553 in algae and cyanobacteria). This plastocyanin-docking
+    protein contributes to the specific association of plastocyanin to PSI
+  gene_name: psaF
+  gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Participates
+    in efficiency of electron transfer from plastocyanin to P700 (or cytochrome c553
+    in algae and cyanobacteria). This plastocyanin-docking protein contributes to
+    the specific association of plastocyanin to PSI'
+  locus_tag: A9601_05241
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I reaction centre PsaF protein
+  score: 6.9976
+- annotation_quality: 3
   function_description: Photosystem II reaction center Psb28 protein
   gene_name: psb28
   gene_summary: 'psb28 :: photosystem II reaction centre Psb28 protein :: Photosystem
@@ -19,6 +226,341 @@ rows:
   organism_strain: Prochlorococcus AS9601
   product: photosystem II reaction centre Psb28 protein
   score: 9.8616
+- annotation_quality: 3
+  function_description: Photosystem I subunit X PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    subunit X PsaK'
+  locus_tag: A9601_09551
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I reaction center subunit X
+  score: 3.931
+- annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: A9601_12041
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor PsbN-like
+    protein :: Alternative locus ID'
+  locus_tag: A9601_12431
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II reaction center assembly factor PsbN-like protein
+  score: 7.1132
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: A9601_12521
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water:plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water:plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD)
+    reaction center heterodimer binds P680, the primary electron donor of PSII as
+    well as several subsequent electron acceptors. D2 is needed for assembly of a
+    stable PSII complex'
+  locus_tag: A9601_13341
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II D2 protein
+  score: 3.1052
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light-driven water:plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light-driven
+    water:plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: A9601_13351
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II CP43 protein
+  score: 0.8377
+- annotation_quality: 3
+  function_description: PsaD can form complexes with ferredoxin and ferredoxin-oxidoreductase
+    in photosystem I (PS I) reaction center
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: PsaD can form
+    complexes with ferredoxin and ferredoxin-oxidoreductase in photosystem I (PS I)
+    reaction center'
+  locus_tag: A9601_17851
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I reaction center subunit II
+  score: 4.2031
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna, regulates electron flow through the 2 photosystem
+    reaction centers. PSII is a light-driven water plastoquinone oxidoreductase, using
+    light energy to abstract electrons from H(2)O, generating a proton gradient subsequently
+    used for ATP formation
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna, regulates electron
+    flow through the 2 photosystem reaction centers. PSII is a light-driven water
+    plastoquinone oxidoreductase, using light energy to abstract electrons from H(2)O,
+    generating a proton gradient subsequently used for ATP formation'
+  locus_tag: A9601_18531
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 2.6226
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: A9601_RS11640
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: NATL1_01261
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: NATL1_03031
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: NATL1_03301
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: NATL1_03311
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbK
+  gene_summary: 'psbK :: photosystem II reaction center protein PsbK :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: NATL1_03511
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II reaction center protein PsbK
+  score: 4.2596
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: NATL1_03771
+  organism_strain: Prochlorococcus NATL1A
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: NATL1_03781
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: NATL1_03791
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: NATL1_04041
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: NATL1_04071
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: NATL1_04211
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem I reaction centre subunit IV
+  score: 7.7319
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor PsbN-like
+    protein :: Alternative locus ID'
+  locus_tag: NATL1_04671
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II reaction center assembly factor PsbN-like protein
+  score: 7.1132
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: NATL1_05231
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
+  function_description: Participates in efficiency of electron transfer from plastocyanin
+    to P700 (or cytochrome c553 in algae and cyanobacteria). This plastocyanin-docking
+    protein contributes to the specific association of plastocyanin to PSI
+  gene_name: psaF
+  gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Participates
+    in efficiency of electron transfer from plastocyanin to P700 (or cytochrome c553
+    in algae and cyanobacteria). This plastocyanin-docking protein contributes to
+    the specific association of plastocyanin to PSI'
+  locus_tag: NATL1_05241
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem I reaction centre PsaF protein
+  score: 6.9976
 - annotation_quality: 3
   function_description: Photosystem II reaction center Psb28 protein
   gene_name: psb28
@@ -29,6 +571,23 @@ rows:
   product: photosystem II reaction centre Psb28 protein
   score: 9.8616
 - annotation_quality: 3
+  function_description: Photosystem I subunit X PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    subunit X PsaK'
+  locus_tag: NATL1_09731
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem I reaction center subunit X
+  score: 3.931
+- annotation_quality: 3
+  function_description: null
+  gene_name: psb30
+  gene_summary: 'psb30 :: photosystem II biogenesis protein Psb30'
+  locus_tag: NATL1_10391
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II biogenesis protein Psb30
+  score: 1.9878
+- annotation_quality: 3
   function_description: May help in the organization of the PsaE and PsaF subunits
   gene_name: psaJ2
   gene_summary: 'psaJ2 :: photosystem I reaction centre subunit IX :: May help in
@@ -37,6 +596,196 @@ rows:
   organism_strain: Prochlorococcus NATL1A
   product: photosystem I reaction centre subunit IX
   score: 10.6159
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: NATL1_13251
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: NATL1_14821
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: NATL1_15721
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water:plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water:plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD)
+    reaction center heterodimer binds P680, the primary electron donor of PSII as
+    well as several subsequent electron acceptors. D2 is needed for assembly of a
+    stable PSII complex'
+  locus_tag: NATL1_16071
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II D2 protein
+  score: 3.1052
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light-driven water:plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light-driven
+    water:plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: NATL1_16081
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II CP43 protein
+  score: 0.8377
+- annotation_quality: 3
+  function_description: PsaD can form complexes with ferredoxin and ferredoxin-oxidoreductase
+    in photosystem I (PS I) reaction center
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: PsaD can form
+    complexes with ferredoxin and ferredoxin-oxidoreductase in photosystem I (PS I)
+    reaction center'
+  locus_tag: NATL1_20241
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem I reaction center subunit II
+  score: 4.2031
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna, regulates electron flow through the 2 photosystem
+    reaction centers. PSII is a light-driven water plastoquinone oxidoreductase, using
+    light energy to abstract electrons from H(2)O, generating a proton gradient subsequently
+    used for ATP formation
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna, regulates electron
+    flow through the 2 photosystem reaction centers. PSII is a light-driven water
+    plastoquinone oxidoreductase, using light energy to abstract electrons from H(2)O,
+    generating a proton gradient subsequently used for ATP formation'
+  locus_tag: NATL1_21121
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 2.6226
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: P9301_00731
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: P9301_02451
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: P9301_02741
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: May play a role in photosystem I and II biogenesis
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor :: May play
+    a role in photosystem I and II biogenesis'
+  locus_tag: P9301_02761
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II reaction center assembly factor
+  score: 5.92
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: P9301_02771
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
 - annotation_quality: 3
   function_description: Photosystem II 4 kDa reaction centre component
   gene_name: psbK
@@ -47,6 +796,145 @@ rows:
   product: photosystem II reaction center protein PsbK
   score: 11.0463
 - annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: P9301_03211
+  organism_strain: Prochlorococcus MIT9301
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbF1
+  gene_summary: 'psbF1 :: cytochrome b559, beta subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: P9301_03221
+  organism_strain: Prochlorococcus MIT9301
+  product: cytochrome b559, beta subunit
+  score: 1.6657
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: P9301_03231
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: P9301_03241
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: P9301_03391
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: P9301_03421
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: P9301_03561
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem I reaction centre subunit IV
+  score: 8.2982
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: P9301_04931
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
+  function_description: Participates in efficiency of electron transfer from plastocyanin
+    to P700 (or cytochrome c553 in algae and cyanobacteria). This plastocyanin-docking
+    protein contributes to the specific association of plastocyanin to PSI
+  gene_name: psaF
+  gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Participates
+    in efficiency of electron transfer from plastocyanin to P700 (or cytochrome c553
+    in algae and cyanobacteria). This plastocyanin-docking protein contributes to
+    the specific association of plastocyanin to PSI'
+  locus_tag: P9301_04941
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem I reaction centre PsaF protein
+  score: 6.9976
+- annotation_quality: 3
   function_description: Photosystem II reaction center Psb28 protein
   gene_name: psb28
   gene_summary: 'psb28 :: photosystem II reaction centre Psb28 protein :: Photosystem
@@ -55,6 +943,339 @@ rows:
   organism_strain: Prochlorococcus MIT9301
   product: photosystem II reaction centre Psb28 protein
   score: 9.8616
+- annotation_quality: 3
+  function_description: Photosystem I subunit X PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    subunit X PsaK'
+  locus_tag: P9301_09531
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem I reaction center subunit X
+  score: 3.931
+- annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: P9301_12051
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water:plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water:plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD)
+    reaction center heterodimer binds P680, the primary electron donor of PSII as
+    well as several subsequent electron acceptors. D2 is needed for assembly of a
+    stable PSII complex'
+  locus_tag: P9301_13491
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II D2 protein
+  score: 3.1052
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light-driven water:plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light-driven
+    water:plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: P9301_13501
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II CP43 protein
+  score: 0.8377
+- annotation_quality: 3
+  function_description: PsaD can form complexes with ferredoxin and ferredoxin-oxidoreductase
+    in photosystem I (PS I) reaction center
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: PsaD can form
+    complexes with ferredoxin and ferredoxin-oxidoreductase in photosystem I (PS I)
+    reaction center'
+  locus_tag: P9301_17691
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem I reaction center subunit II
+  score: 4.2031
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna, regulates electron flow through the 2 photosystem
+    reaction centers. PSII is a light-driven water plastoquinone oxidoreductase, using
+    light energy to abstract electrons from H(2)O, generating a proton gradient subsequently
+    used for ATP formation
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna, regulates electron
+    flow through the 2 photosystem reaction centers. PSII is a light-driven water
+    plastoquinone oxidoreductase, using light energy to abstract electrons from H(2)O,
+    generating a proton gradient subsequently used for ATP formation'
+  locus_tag: P9301_18341
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 2.6226
+- annotation_quality: 3
+  function_description: null
+  gene_name: psb30
+  gene_summary: 'psb30 :: photosystem II biogenesis protein Psb30'
+  locus_tag: P9301_RS18980
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II biogenesis protein Psb30
+  score: 1.9878
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: PMM0062
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: PMM0223
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: PMM0251
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: May play a role in photosystem I and II biogenesis
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor :: May play
+    a role in photosystem I and II biogenesis'
+  locus_tag: PMM0252
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II reaction center assembly factor
+  score: 5.92
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: PMM0253
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbK
+  gene_summary: 'psbK :: photosystem II reaction center protein PsbK :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: PMM0272
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II reaction center protein PsbK
+  score: 4.2596
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: PMM0297
+  organism_strain: Prochlorococcus MED4
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbF1
+  gene_summary: 'psbF1 :: cytochrome b559, beta subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: PMM0298
+  organism_strain: Prochlorococcus MED4
+  product: cytochrome b559, beta subunit
+  score: 1.6657
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: PMM0299
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: PMM0300
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: PMM0314
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: PMM0317
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: PMM0329
+  organism_strain: Prochlorococcus MED4
+  product: photosystem I reaction centre subunit IV
+  score: 8.2982
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: PMM0468
+  organism_strain: Prochlorococcus MED4
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
+  function_description: Participates in efficiency of electron transfer from plastocyanin
+    to P700 (or cytochrome c553 in algae and cyanobacteria). This plastocyanin-docking
+    protein contributes to the specific association of plastocyanin to PSI
+  gene_name: psaF
+  gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Participates
+    in efficiency of electron transfer from plastocyanin to P700 (or cytochrome c553
+    in algae and cyanobacteria). This plastocyanin-docking protein contributes to
+    the specific association of plastocyanin to PSI'
+  locus_tag: PMM0469
+  organism_strain: Prochlorococcus MED4
+  product: photosystem I reaction centre PsaF protein
+  score: 6.9976
+- annotation_quality: 3
+  function_description: Photosystem I subunit X PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    subunit X PsaK'
+  locus_tag: PMM0906
+  organism_strain: Prochlorococcus MED4
+  product: photosystem I reaction center subunit X
+  score: 3.931
 - annotation_quality: 3
   function_description: Photosystem II reaction center Psb28 protein
   gene_name: psb28
@@ -65,6 +1286,97 @@ rows:
   product: photosystem II reaction centre Psb28 protein
   score: 9.8616
 - annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: PMM1098
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water:plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water:plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD)
+    reaction center heterodimer binds P680, the primary electron donor of PSII as
+    well as several subsequent electron acceptors. D2 is needed for assembly of a
+    stable PSII complex'
+  locus_tag: PMM1157
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II D2 protein
+  score: 3.1052
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light-driven water:plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light-driven
+    water:plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: PMM1158
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II CP43 protein
+  score: 0.8377
+- annotation_quality: 3
+  function_description: PsaD can form complexes with ferredoxin and ferredoxin-oxidoreductase
+    in photosystem I (PS I) reaction center
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: PsaD can form
+    complexes with ferredoxin and ferredoxin-oxidoreductase in photosystem I (PS I)
+    reaction center'
+  locus_tag: PMM1578
+  organism_strain: Prochlorococcus MED4
+  product: photosystem I reaction center subunit II
+  score: 4.2031
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna, regulates electron flow through the 2 photosystem
+    reaction centers. PSII is a light-driven water plastoquinone oxidoreductase, using
+    light energy to abstract electrons from H(2)O, generating a proton gradient subsequently
+    used for ATP formation
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna, regulates electron
+    flow through the 2 photosystem reaction centers. PSII is a light-driven water
+    plastoquinone oxidoreductase, using light energy to abstract electrons from H(2)O,
+    generating a proton gradient subsequently used for ATP formation'
+  locus_tag: PMM1644
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 2.6226
+- annotation_quality: 3
+  function_description: Photosystem II reaction center Psb28 protein
+  gene_name: psb28
+  gene_summary: 'psb28 :: photosystem II reaction centre Psb28 protein :: Photosystem
+    II reaction center Psb28 protein'
+  locus_tag: PMN2A_0135
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction centre Psb28 protein
+  score: 9.8616
+- annotation_quality: 3
+  function_description: Photosystem I subunit X PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    subunit X PsaK'
+  locus_tag: PMN2A_0301
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem I reaction center subunit X
+  score: 3.931
+- annotation_quality: 3
   function_description: May help in the organization of the PsaE and PsaF subunits
   gene_name: psaJ2
   gene_summary: 'psaJ2 :: photosystem I reaction centre subunit IX :: May help in
@@ -73,6 +1385,651 @@ rows:
   organism_strain: Prochlorococcus NATL2A
   product: photosystem I reaction centre subunit IX
   score: 10.6159
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: PMN2A_0558
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: PMN2A_0650
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: PMN2A_0735
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water:plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water:plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD)
+    reaction center heterodimer binds P680, the primary electron donor of PSII as
+    well as several subsequent electron acceptors. D2 is needed for assembly of a
+    stable PSII complex'
+  locus_tag: PMN2A_0767
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II D2 protein
+  score: 3.1052
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light-driven water:plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light-driven
+    water:plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: PMN2A_0768
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II CP43 protein
+  score: 0.8377
+- annotation_quality: 3
+  function_description: PsaD can form complexes with ferredoxin and ferredoxin-oxidoreductase
+    in photosystem I (PS I) reaction center
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: PsaD can form
+    complexes with ferredoxin and ferredoxin-oxidoreductase in photosystem I (PS I)
+    reaction center'
+  locus_tag: PMN2A_1150
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem I reaction center subunit II
+  score: 4.2031
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna, regulates electron flow through the 2 photosystem
+    reaction centers. PSII is a light-driven water plastoquinone oxidoreductase, using
+    light energy to abstract electrons from H(2)O, generating a proton gradient subsequently
+    used for ATP formation
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna, regulates electron
+    flow through the 2 photosystem reaction centers. PSII is a light-driven water
+    plastoquinone oxidoreductase, using light energy to abstract electrons from H(2)O,
+    generating a proton gradient subsequently used for ATP formation'
+  locus_tag: PMN2A_1242
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 2.6226
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: PMN2A_1425
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: PMN2A_1592
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: PMN2A_1618
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: PMN2A_1619
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbK
+  gene_summary: 'psbK :: photosystem II reaction center protein PsbK :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: PMN2A_1638
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction center protein PsbK
+  score: 4.2596
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: PMN2A_1663
+  organism_strain: Prochlorococcus NATL2A
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: PMN2A_1664
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: PMN2A_1665
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: PMN2A_1691
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: PMN2A_1693
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: PMN2A_1706
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem I reaction centre subunit IV
+  score: 7.7319
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor PsbN-like
+    protein :: Alternative locus ID'
+  locus_tag: PMN2A_1749
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II reaction center assembly factor PsbN-like protein
+  score: 7.1132
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: PMN2A_1800
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
+  function_description: Participates in efficiency of electron transfer from plastocyanin
+    to P700 (or cytochrome c553 in algae and cyanobacteria). This plastocyanin-docking
+    protein contributes to the specific association of plastocyanin to PSI
+  gene_name: psaF
+  gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Participates
+    in efficiency of electron transfer from plastocyanin to P700 (or cytochrome c553
+    in algae and cyanobacteria). This plastocyanin-docking protein contributes to
+    the specific association of plastocyanin to PSI'
+  locus_tag: PMN2A_1801
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem I reaction centre PsaF protein
+  score: 6.9976
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna, regulates electron flow through the 2 photosystem
+    reaction centers. PSII is a light-driven water plastoquinone oxidoreductase, using
+    light energy to abstract electrons from H(2)O, generating a proton gradient subsequently
+    used for ATP formation
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna, regulates electron
+    flow through the 2 photosystem reaction centers. PSII is a light-driven water
+    plastoquinone oxidoreductase, using light energy to abstract electrons from H(2)O,
+    generating a proton gradient subsequently used for ATP formation'
+  locus_tag: PMT0080
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 2.6226
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: PMT0187
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem I reaction centre subunit IV
+  score: 8.2982
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: PMT0419
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Photosystem II reaction center Psb28 protein
+  gene_name: psb28
+  gene_summary: 'psb28 :: photosystem II reaction centre Psb28 protein :: Photosystem
+    II reaction center Psb28 protein'
+  locus_tag: PMT0604
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction centre Psb28 protein
+  score: 9.8616
+- annotation_quality: 3
+  function_description: Photosystem I subunit X PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    subunit X PsaK'
+  locus_tag: PMT0687
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem I reaction center subunit X
+  score: 3.931
+- annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: PMT1078
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1 D2 (PsbA
+    PsbA) reaction center heterodimer binds P680, the primary electron donor of PSII
+    as well as several subsequent electron acceptors. D2 is needed for assembly of
+    a stable PSII complex'
+  locus_tag: PMT1179
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II D2 protein
+  score: 3.2877
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light-driven water:plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light-driven
+    water:plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: PMT1180
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II CP43 protein
+  score: 0.8377
+- annotation_quality: 3
+  function_description: Participates in efficiency of electron transfer from plastocyanin
+    to P700 (or cytochrome c553 in algae and cyanobacteria). This plastocyanin-docking
+    protein contributes to the specific association of plastocyanin to PSI
+  gene_name: psaF
+  gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Participates
+    in efficiency of electron transfer from plastocyanin to P700 (or cytochrome c553
+    in algae and cyanobacteria). This plastocyanin-docking protein contributes to
+    the specific association of plastocyanin to PSI'
+  locus_tag: PMT1316
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem I reaction centre PsaF protein
+  score: 6.9976
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: PMT1532
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: PMT1590
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: PMT1666
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: PsaD can form complexes with ferredoxin and ferredoxin-oxidoreductase
+    in photosystem I (PS I) reaction center
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: PsaD can form
+    complexes with ferredoxin and ferredoxin-oxidoreductase in photosystem I (PS I)
+    reaction center'
+  locus_tag: PMT1710
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem I reaction center subunit II
+  score: 4.2031
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: PMT1837
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: May play a role in photosystem I and II biogenesis
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor :: May play
+    a role in photosystem I and II biogenesis'
+  locus_tag: PMT1838
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction center assembly factor
+  score: 5.92
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbK
+  gene_summary: 'psbK :: photosystem II reaction center protein PsbK :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: PMT1863
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction center protein PsbK
+  score: 4.2596
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: PMT1896
+  organism_strain: Prochlorococcus MIT9313
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: PMT9312_0064
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: PMT9312_0225
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: PMT9312_0253
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: May play a role in photosystem I and II biogenesis
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor :: May play
+    a role in photosystem I and II biogenesis'
+  locus_tag: PMT9312_0254
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II reaction center assembly factor
+  score: 5.92
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: PMT9312_0255
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
 - annotation_quality: 3
   function_description: Photosystem II 4 kDa reaction centre component
   gene_name: psbK
@@ -83,6 +2040,1022 @@ rows:
   product: photosystem II reaction center protein PsbK
   score: 11.0463
 - annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: PMT9312_0299
+  organism_strain: Prochlorococcus MIT9312
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbF1
+  gene_summary: 'psbF1 :: cytochrome b559, beta subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: PMT9312_0300
+  organism_strain: Prochlorococcus MIT9312
+  product: cytochrome b559, beta subunit
+  score: 1.6657
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: PMT9312_0301
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: PMT9312_0302
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: PMT9312_0320
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: PMT9312_0323
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: PMT9312_0335
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem I reaction centre subunit IV
+  score: 8.2982
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: PMT9312_0468
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
+  function_description: Participates in efficiency of electron transfer from plastocyanin
+    to P700 (or cytochrome c553 in algae and cyanobacteria). This plastocyanin-docking
+    protein contributes to the specific association of plastocyanin to PSI
+  gene_name: psaF
+  gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Participates
+    in efficiency of electron transfer from plastocyanin to P700 (or cytochrome c553
+    in algae and cyanobacteria). This plastocyanin-docking protein contributes to
+    the specific association of plastocyanin to PSI'
+  locus_tag: PMT9312_0469
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem I reaction centre PsaF protein
+  score: 6.9976
+- annotation_quality: 3
+  function_description: Photosystem II reaction center Psb28 protein
+  gene_name: psb28
+  gene_summary: 'psb28 :: photosystem II reaction centre Psb28 protein :: Photosystem
+    II reaction center Psb28 protein'
+  locus_tag: PMT9312_0874
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II reaction centre Psb28 protein
+  score: 9.8616
+- annotation_quality: 3
+  function_description: Photosystem I subunit X PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    subunit X PsaK'
+  locus_tag: PMT9312_0894
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem I reaction center subunit X
+  score: 3.931
+- annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: PMT9312_1109
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: PMT9312_1144
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water:plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water:plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1/D2 (PsbA/PsbD)
+    reaction center heterodimer binds P680, the primary electron donor of PSII as
+    well as several subsequent electron acceptors. D2 is needed for assembly of a
+    stable PSII complex'
+  locus_tag: PMT9312_1256
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II D2 protein
+  score: 3.1052
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light-driven water:plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light-driven
+    water:plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: PMT9312_1257
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II CP43 protein
+  score: 0.8377
+- annotation_quality: 3
+  function_description: PsaD can form complexes with ferredoxin and ferredoxin-oxidoreductase
+    in photosystem I (PS I) reaction center
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: PsaD can form
+    complexes with ferredoxin and ferredoxin-oxidoreductase in photosystem I (PS I)
+    reaction center'
+  locus_tag: PMT9312_1670
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem I reaction center subunit II
+  score: 4.2031
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna, regulates electron flow through the 2 photosystem
+    reaction centers. PSII is a light-driven water plastoquinone oxidoreductase, using
+    light energy to abstract electrons from H(2)O, generating a proton gradient subsequently
+    used for ATP formation
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna, regulates electron
+    flow through the 2 photosystem reaction centers. PSII is a light-driven water
+    plastoquinone oxidoreductase, using light energy to abstract electrons from H(2)O,
+    generating a proton gradient subsequently used for ATP formation'
+  locus_tag: PMT9312_1736
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 2.6226
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: PMT_1317
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: PMT_1663
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: PMT_1840
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbF1
+  gene_summary: 'psbF1 :: cytochrome b559, beta subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: PMT_1897
+  organism_strain: Prochlorococcus MIT9313
+  product: cytochrome b559, beta subunit
+  score: 1.6657
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: PMT_1898
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: PMT_1899
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: A core subunit of photosystem II (PSII)
+  gene_name: psb30
+  gene_summary: 'psb30 :: photosystem II biogenesis protein Psb30 :: A core subunit
+    of photosystem II (PSII)'
+  locus_tag: SYNC_RS06090
+  organism_strain: Synechococcus CC9311
+  product: photosystem II biogenesis protein Psb30
+  score: 1.8432
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna'
+  locus_tag: SYNW0081
+  organism_strain: Synechococcus WH8102
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 1.7785
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: SYNW0201
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: SYNW0202
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbF1
+  gene_summary: 'psbF1 :: cytochrome b559, beta subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: SYNW0203
+  organism_strain: Synechococcus WH8102
+  product: cytochrome b559, beta subunit
+  score: 1.6657
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: SYNW0204
+  organism_strain: Synechococcus WH8102
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbK
+  gene_summary: 'psbK :: photosystem II reaction center protein PsbK :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: SYNW0243
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction center protein PsbK
+  score: 4.2596
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: SYNW0266
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
+- annotation_quality: 3
+  function_description: May play a role in photosystem I and II biogenesis
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor :: May play
+    a role in photosystem I and II biogenesis'
+  locus_tag: SYNW0268
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction center assembly factor
+  score: 5.92
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: SYNW0269
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: SYNW0334
+  organism_strain: Synechococcus WH8102
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light-driven water:plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light-driven
+    water:plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: SYNW0676
+  organism_strain: Synechococcus WH8102
+  product: photosystem II CP43 protein
+  score: 0.8377
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1 D2 (PsbA
+    PsbA) reaction center heterodimer binds P680, the primary electron donor of PSII
+    as well as several subsequent electron acceptors. D2 is needed for assembly of
+    a stable PSII complex'
+  locus_tag: SYNW0677
+  organism_strain: Synechococcus WH8102
+  product: photosystem II D2 protein
+  score: 3.2877
+- annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: SYNW0927
+  organism_strain: Synechococcus WH8102
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Belongs to the Psb28 family
+  gene_name: psb28
+  gene_summary: 'psb28 :: photosystem II reaction centre Psb28 protein :: Belongs
+    to the Psb28 family'
+  locus_tag: SYNW1065
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction centre Psb28 protein
+  score: 9.0565
+- annotation_quality: 3
+  function_description: Photosystem I reaction center subunit PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    reaction center subunit PsaK'
+  locus_tag: SYNW1290
+  organism_strain: Synechococcus WH8102
+  product: photosystem I reaction center subunit X
+  score: 4.8374
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: SYNW1470
+  organism_strain: Synechococcus WH8102
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: Participates in efficiency of electron transfer from plastocyanin
+    to P700 (or cytochrome c553 in algae and cyanobacteria). This plastocyanin-docking
+    protein contributes to the specific association of plastocyanin to PSI
+  gene_name: psaF
+  gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Participates
+    in efficiency of electron transfer from plastocyanin to P700 (or cytochrome c553
+    in algae and cyanobacteria). This plastocyanin-docking protein contributes to
+    the specific association of plastocyanin to PSI'
+  locus_tag: SYNW1835
+  organism_strain: Synechococcus WH8102
+  product: photosystem I reaction centre PsaF protein
+  score: 7.5969
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: SYNW1836
+  organism_strain: Synechococcus WH8102
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: SYNW1960
+  organism_strain: Synechococcus WH8102
+  product: photosystem I reaction centre subunit IV
+  score: 8.2982
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: SYNW1980
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: SYNW1983
+  organism_strain: Synechococcus WH8102
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: PsaD can form complexes with ferredoxin and ferredoxin-oxidoreductase
+    in photosystem I (PS I) reaction center
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: PsaD can form
+    complexes with ferredoxin and ferredoxin-oxidoreductase in photosystem I (PS I)
+    reaction center'
+  locus_tag: SYNW2044
+  organism_strain: Synechococcus WH8102
+  product: photosystem I reaction center subunit II
+  score: 4.399
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1 D2 (PsbA
+    PsbA) reaction center heterodimer binds P680, the primary electron donor of PSII
+    as well as several subsequent electron acceptors. D2 is needed for assembly of
+    a stable PSII complex'
+  locus_tag: SYNW2232
+  organism_strain: Synechococcus WH8102
+  product: photosystem II D2 protein
+  score: 3.2877
+- annotation_quality: 3
+  function_description: A core subunit of photosystem II (PSII)
+  gene_name: psb30
+  gene_summary: 'psb30 :: photosystem II biogenesis protein Psb30 :: A core subunit
+    of photosystem II (PSII)'
+  locus_tag: TX72_RS06035
+  organism_strain: Synechococcus WH8102
+  product: photosystem II biogenesis protein Psb30
+  score: 1.8432
+- annotation_quality: 3
+  function_description: Controls the interaction of photosystem II (PSII) cores with
+    the light-harvesting antenna
+  gene_name: psbZ
+  gene_summary: 'psbZ :: photosystem II protein PsbZ (Ycf9) :: Controls the interaction
+    of photosystem II (PSII) cores with the light-harvesting antenna'
+  locus_tag: sync_0080
+  organism_strain: Synechococcus CC9311
+  product: photosystem II protein PsbZ (Ycf9)
+  score: 1.7785
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbJ
+  gene_summary: 'psbJ :: photosystem II reaction center protein PsbJ :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: sync_0236
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction center protein PsbJ
+  score: 2.2899
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+    and is required for correct PSII assembly and or dimerization
+  gene_name: psbL
+  gene_summary: 'psbL :: photosystem II reaction center protein PsbL :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface and is required for correct PSII assembly
+    and or dimerization'
+  locus_tag: sync_0237
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction center protein PsbL
+  score: 2.0954
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbF1
+  gene_summary: 'psbF1 :: cytochrome b559, beta subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: sync_0238
+  organism_strain: Synechococcus CC9311
+  product: cytochrome b559, beta subunit
+  score: 1.6657
+- annotation_quality: 3
+  function_description: This b-type cytochrome is tightly associated with the reaction
+    center of photosystem II (PSII). PSII is a light-driven water plastoquinone oxidoreductase
+    that uses light energy to abstract electrons from H(2)O, generating O(2) and a
+    proton gradient subsequently used for ATP formation. It consists of a core antenna
+    complex that captures photons, and an electron transfer chain that converts photonic
+    excitation into a charge separation
+  gene_name: psbE
+  gene_summary: 'psbE :: cytochrome b559, alpha subunit :: This b-type cytochrome
+    is tightly associated with the reaction center of photosystem II (PSII). PSII
+    is a light-driven water plastoquinone oxidoreductase that uses light energy to
+    abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation'
+  locus_tag: sync_0239
+  organism_strain: Synechococcus CC9311
+  product: cytochrome b559, alpha subunit
+  score: 1.5861
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation
+  gene_name: psbK
+  gene_summary: 'psbK :: photosystem II reaction center protein PsbK :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation'
+  locus_tag: sync_0283
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction center protein PsbK
+  score: 4.2596
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbI
+  gene_summary: 'psbI :: photosystem II reaction center protein PsbI :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: sync_0307
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction center protein PsbI
+  score: 4.0911
+- annotation_quality: 3
+  function_description: May play a role in photosystem I and II biogenesis
+  gene_name: psbN
+  gene_summary: 'psbN :: photosystem II reaction center assembly factor :: May play
+    a role in photosystem I and II biogenesis'
+  locus_tag: sync_0309
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction center assembly factor
+  score: 5.92
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII), required for its stability and or assembly. PSII is a light-driven water
+    plastoquinone oxidoreductase that uses light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation
+  gene_name: psbH
+  gene_summary: 'psbH :: photosystem II reaction center protein PsbH :: One of the
+    components of the core complex of photosystem II (PSII), required for its stability
+    and or assembly. PSII is a light-driven water plastoquinone oxidoreductase that
+    uses light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation. It consists of a core antenna complex
+    that captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation'
+  locus_tag: sync_0310
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction center protein PsbH
+  score: 2.1374
+- annotation_quality: 3
+  function_description: Photosystem I reaction center subunit II
+  gene_name: psaD
+  gene_summary: 'psaD :: photosystem I reaction center subunit II :: Photosystem I
+    reaction center subunit II'
+  locus_tag: sync_0463
+  organism_strain: Synechococcus CC9311
+  product: photosystem I reaction center subunit II
+  score: 4.7375
+- annotation_quality: 3
+  function_description: Seems to play a role in the dimerization of PSII
+  gene_name: psbT
+  gene_summary: 'psbT :: photosystem II reaction center T protein :: Seems to play
+    a role in the dimerization of PSII'
+  locus_tag: sync_0533
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction center T protein
+  score: 6.8249
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). PSII is a light-driven water plastoquinone oxidoreductase that uses light
+    energy to abstract electrons from H(2)O, generating O(2) and a proton gradient
+    subsequently used for ATP formation. It consists of a core antenna complex that
+    captures photons, and an electron transfer chain that converts photonic excitation
+    into a charge separation. This subunit is found at the monomer-monomer interface
+  gene_name: psbM
+  gene_summary: 'psbM :: photosystem II reaction center protein PsbM :: One of the
+    components of the core complex of photosystem II (PSII). PSII is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. This subunit
+    is found at the monomer-monomer interface'
+  locus_tag: sync_0536
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction center protein PsbM
+  score: 4.0911
+- annotation_quality: 3
+  function_description: Stabilizes the interaction between PsaC and the PSI core,
+    assists the docking of the ferredoxin to PSI and interacts with ferredoxin-NADP
+    oxidoreductase
+  gene_name: psaE
+  gene_summary: 'psaE :: photosystem I reaction centre subunit IV :: Stabilizes the
+    interaction between PsaC and the PSI core, assists the docking of the ferredoxin
+    to PSI and interacts with ferredoxin-NADP oxidoreductase'
+  locus_tag: sync_0562
+  organism_strain: Synechococcus CC9311
+  product: photosystem I reaction centre subunit IV
+  score: 8.2982
+- annotation_quality: 3
+  function_description: Photosystem I reaction center subunit PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    reaction center subunit PsaK'
+  locus_tag: sync_0874
+  organism_strain: Synechococcus CC9311
+  product: photosystem I reaction center subunit X
+  score: 4.8374
+- annotation_quality: 3
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light- driven water plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
+  gene_name: psbC
+  gene_summary: 'psbC :: photosystem II CP43 protein :: One of the components of the
+    core complex of photosystem II (PSII). It binds chlorophyll and helps catalyze
+    the primary light-induced photochemical processes of PSII. PSII is a light- driven
+    water plastoquinone oxidoreductase, using light energy to abstract electrons from
+    H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation'
+  locus_tag: sync_0896
+  organism_strain: Synechococcus CC9311
+  product: photosystem II CP43 protein
+  score: 1.09
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1 D2 (PsbA
+    PsbA) reaction center heterodimer binds P680, the primary electron donor of PSII
+    as well as several subsequent electron acceptors. D2 is needed for assembly of
+    a stable PSII complex'
+  locus_tag: sync_0897
+  organism_strain: Synechococcus CC9311
+  product: photosystem II D2 protein
+  score: 3.2877
+- annotation_quality: 3
+  function_description: Photosystem II oxygen evolving complex protein PsbP
+  gene_name: cyanoP
+  gene_summary: 'cyanoP :: photosystem II protein CyanoP :: Photosystem II oxygen
+    evolving complex protein PsbP'
+  locus_tag: sync_1039
+  organism_strain: Synechococcus CC9311
+  product: photosystem II protein CyanoP
+  score: 1.513
+- annotation_quality: 3
+  function_description: Photosystem I reaction center subunit PsaK
+  gene_name: psaK
+  gene_summary: 'psaK :: photosystem I reaction center subunit X :: Photosystem I
+    reaction center subunit PsaK'
+  locus_tag: sync_1409
+  organism_strain: Synechococcus CC9311
+  product: photosystem I reaction center subunit X
+  score: 4.8374
+- annotation_quality: 3
+  function_description: Belongs to the Psb28 family
+  gene_name: psb28
+  gene_summary: 'psb28 :: photosystem II reaction centre Psb28 protein :: Belongs
+    to the Psb28 family'
+  locus_tag: sync_1583
+  organism_strain: Synechococcus CC9311
+  product: photosystem II reaction centre Psb28 protein
+  score: 9.0565
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors
+  gene_name: psbA
+  gene_summary: 'psbA :: photosystem II protein D1.1 :: Photosystem II (PSII) is a
+    light-driven water plastoquinone oxidoreductase that uses light energy to abstract
+    electrons from H(2)O, generating O(2) and a proton gradient subsequently used
+    for ATP formation. It consists of a core antenna complex that captures photons,
+    and an electron transfer chain that converts photonic excitation into a charge
+    separation. The D1 D2 (PsbA PsbA) reaction center heterodimer binds P680, the
+    primary electron donor of PSII as well as several subsequent electron acceptors'
+  locus_tag: sync_1858
+  organism_strain: Synechococcus CC9311
+  product: photosystem II protein D1.1
+  score: 3.5983
+- annotation_quality: 3
+  function_description: May help in the organization of the PsaE and PsaF subunits
+  gene_name: psaJ
+  gene_summary: 'psaJ :: photosystem I reaction centre subunit IX :: May help in the
+    organization of the PsaE and PsaF subunits'
+  locus_tag: sync_2154
+  organism_strain: Synechococcus CC9311
+  product: photosystem I reaction centre subunit IX
+  score: 9.3527
+- annotation_quality: 3
   function_description: Photosystem I reaction center subunit III
   gene_name: psaF
   gene_summary: 'psaF :: photosystem I reaction centre PsaF protein :: Photosystem
@@ -91,3 +3064,34 @@ rows:
   organism_strain: Synechococcus CC9311
   product: photosystem I reaction centre PsaF protein
   score: 10.7885
+- annotation_quality: 3
+  function_description: Involved in the binding and or turnover of quinones at the
+    Q(B) site of Photosystem II
+  gene_name: psbX
+  gene_summary: 'psbX :: photosystem II PsbX protein :: Involved in the binding and
+    or turnover of quinones at the Q(B) site of Photosystem II'
+  locus_tag: sync_2461
+  organism_strain: Synechococcus CC9311
+  product: photosystem II PsbX protein
+  score: 4.7882
+- annotation_quality: 3
+  function_description: Photosystem II (PSII) is a light-driven water plastoquinone
+    oxidoreductase that uses light energy to abstract electrons from H(2)O, generating
+    O(2) and a proton gradient subsequently used for ATP formation. It consists of
+    a core antenna complex that captures photons, and an electron transfer chain that
+    converts photonic excitation into a charge separation. The D1 D2 (PsbA PsbA) reaction
+    center heterodimer binds P680, the primary electron donor of PSII as well as several
+    subsequent electron acceptors. D2 is needed for assembly of a stable PSII complex
+  gene_name: psbD
+  gene_summary: 'psbD :: photosystem II D2 protein :: Photosystem II (PSII) is a light-driven
+    water plastoquinone oxidoreductase that uses light energy to abstract electrons
+    from H(2)O, generating O(2) and a proton gradient subsequently used for ATP formation.
+    It consists of a core antenna complex that captures photons, and an electron transfer
+    chain that converts photonic excitation into a charge separation. The D1 D2 (PsbA
+    PsbA) reaction center heterodimer binds P680, the primary electron donor of PSII
+    as well as several subsequent electron acceptors. D2 is needed for assembly of
+    a stable PSII complex'
+  locus_tag: sync_2586
+  organism_strain: Synechococcus CC9311
+  product: photosystem II D2 protein
+  score: 3.2877

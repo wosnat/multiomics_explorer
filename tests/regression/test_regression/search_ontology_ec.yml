@@ -1,5 +1,5 @@
 case_id: search_ontology_ec
-row_count: 25
+row_count: 30
 rows:
 - id: ec:1.1.1.328
   name: nicotine blue oxidoreductase
@@ -58,6 +58,12 @@ rows:
 - id: ec:1.5.7.2
   name: coenzyme F420 oxidoreductase (ferredoxin)
   score: 2.4343
+- id: ec:1.8.1.18
+  name: NAD(P)H sulfur oxidoreductase (CoA-dependent)
+  score: 1.8482
+- id: ec:1.8.2.6
+  name: S-disulfanyl-L-cysteine oxidoreductase
+  score: 2.2016
 - id: ec:1.8.4.15
   name: protein dithiol oxidoreductase (disulfide-forming)
   score: 2.2016
@@ -70,9 +76,18 @@ rows:
 - id: ec:1.97.1.13
   name: aliphatic sulfonate oxidoreductase
   score: 2.722
+- id: ec:7.1.1.-
+  name: Hydron translocation or charge separation linked to oxidoreductase reactions
+  score: 1.5925
 - id: ec:7.1.1.10
   name: ferredoxin--quinone oxidoreductase (H(+)-translocating)
+  score: 2.2016
+- id: ec:7.1.1.11
+  name: ferredoxin--NAD(+) oxidoreductase (H(+)-transporting)
   score: 2.2016
 - id: ec:7.2.1.-
   name: Linked to oxidoreductase reactions
   score: 2.4343
+- id: ec:7.2.1.2
+  name: ferredoxin--NAD(+) oxidoreductase (Na(+)-transporting)
+  score: 2.2016

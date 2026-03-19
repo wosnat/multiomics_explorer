@@ -1,5 +1,5 @@
 case_id: search_ontology_go_bp
-row_count: 25
+row_count: 31
 rows:
 - id: go:0000076
   name: DNA replication checkpoint signaling
@@ -16,6 +16,9 @@ rows:
 - id: go:0006270
   name: DNA replication initiation
   score: 2.1916
+- id: go:0006271
+  name: DNA strand elongation involved in DNA replication
+  score: 1.5003
 - id: go:0006274
   name: DNA replication termination
   score: 2.1916
@@ -28,9 +31,18 @@ rows:
 - id: go:0019045
   name: latent virus replication
   score: 2.1916
+- id: go:0030174
+  name: regulation of DNA-templated DNA replication initiation
+  score: 1.5003
 - id: go:0031297
   name: replication fork processing
   score: 2.1916
+- id: go:0032297
+  name: negative regulation of DNA-templated DNA replication initiation
+  score: 1.3907
+- id: go:0032298
+  name: positive regulation of DNA-templated DNA replication initiation
+  score: 1.3907
 - id: go:0033567
   name: DNA replication, Okazaki fragment processing
   score: 1.7812
@@ -76,3 +88,9 @@ rows:
 - id: go:1902328
   name: bacterial-type DNA replication initiation
   score: 1.7812
+- id: go:2000104
+  name: negative regulation of DNA-templated DNA replication
+  score: 1.5003
+- id: go:2000105
+  name: positive regulation of DNA-templated DNA replication
+  score: 1.5003

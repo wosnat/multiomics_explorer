@@ -68,7 +68,7 @@ class TestSearchGenes:
 class TestQueryExpression:
     def test_direct_expression_returns_results(self, conn):
         """Direct expression query for MED4 should return results."""
-        cypher, params = build_query_expression(organism="MED4", limit=10)
+        cypher, params = build_query_expression(organism="MED4")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
 
@@ -77,7 +77,7 @@ class TestQueryExpression:
 class TestCompareConditions:
     def test_compare_two_organisms(self, conn):
         cypher, params = build_compare_conditions(
-            organisms=["MED4"], limit=10,
+            organisms=["MED4"],
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0

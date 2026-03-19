@@ -63,7 +63,7 @@ logical milestones.
 
 These steps work against the current KG schema. No KG rebuild needed.
 
-#### Step 1: Remove inactive modules
+#### Step 1: Remove inactive modules ✅
 
 Low-risk cleanup. Do first to reduce noise for subsequent steps.
 
@@ -99,7 +99,7 @@ Check each dependency — remove only if no active code uses it:
 
 **Test:** All existing tests still pass. No functional changes.
 
-#### Step 2: Fix parameter and return naming inconsistencies
+#### Step 2: Fix parameter and return naming inconsistencies ✅
 
 Fix naming inconsistencies before creating api/, so the api layer
 starts clean. These are the conventions defined in

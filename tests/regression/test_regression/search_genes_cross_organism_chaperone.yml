@@ -1,6 +1,148 @@
 case_id: search_genes_cross_organism_chaperone
-row_count: 10
+row_count: 324
 rows:
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: A9601_00151
+  organism_strain: Prochlorococcus AS9601
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins and by disaggregating
+    proteins, also in an autonomous, DnaK-independent fashion. Unfolded proteins bind
+    initially to DnaJ; upon interaction with the DnaJ-bound protein, DnaK hydrolyzes
+    its bound ATP, resulting in the formation of a stable complex. GrpE releases ADP
+    from DnaK; ATP binding to DnaK triggers the release of the substrate protein,
+    thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: Participates actively in
+    the response to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins and by disaggregating proteins, also in an autonomous, DnaK-independent
+    fashion. Unfolded proteins bind initially to DnaJ; upon interaction with the DnaJ-bound
+    protein, DnaK hydrolyzes its bound ATP, resulting in the formation of a stable
+    complex. GrpE releases ADP from DnaK; ATP binding to DnaK triggers the release
+    of the substrate protein, thus completing the reaction cycle. Several rounds of
+    ATP-dependent interactions between DnaJ, DnaK and GrpE are required for fully
+    efficient folding. Also involved, together with DnaK and GrpE, in the DNA replication
+    of plasmids through activation of initiation proteins'
+  locus_tag: A9601_00161
+  organism_strain: Prochlorococcus AS9601
+  product: DnaJ type I chaperone protein
+  score: 2.0369
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: A9601_01401
+  organism_strain: Prochlorococcus AS9601
+  product: DnaJ type III chaperone protein
+  score: 4.3635
+- annotation_quality: 3
+  function_description: Essential for the assembly of the photosystem I (PSI) complex.
+    May act as a chaperone-like factor to guide the assembly of the PSI subunits
+  gene_name: ycf3
+  gene_summary: 'ycf3 :: photosystem I assembly protein Ycf3 :: Essential for the
+    assembly of the photosystem I (PSI) complex. May act as a chaperone-like factor
+    to guide the assembly of the PSI subunits'
+  locus_tag: A9601_01491
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem I assembly protein Ycf3
+  score: 2.9546
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: tsaB
+  gene_summary: 'tsaB :: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+    :: Molecular chaperone'
+  locus_tag: A9601_01561
+  organism_strain: Prochlorococcus AS9601
+  product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+  score: 5.4196
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB2
+  gene_summary: 'clpB2 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: A9601_02251
+  organism_strain: Prochlorococcus AS9601
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 1.8208
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: A9601_06361
+  organism_strain: Prochlorococcus AS9601
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 2.2564
+- annotation_quality: 1
+  function_description: Cyanobacteria-specific chaperone containing DNAJ domain fused
+    to a membrane domain
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: Cyanobacteria-specific chaperone
+    containing DNAJ domain fused to a membrane domain'
+  locus_tag: A9601_07191
+  organism_strain: Prochlorococcus AS9601
+  product: conserved hypothetical protein
+  score: 5.3862
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: hsp33 family protein :: Redox regulated molecular chaperone.
+    Protects both thermally unfolding and oxidatively damaged proteins from irreversible
+    aggregation. Plays an important role in the bacterial defense system toward oxidative
+    stress'
+  locus_tag: A9601_07201
+  organism_strain: Prochlorococcus AS9601
+  product: hsp33 family protein
+  score: 3.9385
+- annotation_quality: 3
+  function_description: Chaperone protein HtpG
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
+  locus_tag: A9601_09601
+  organism_strain: Prochlorococcus AS9601
+  product: molecular chaperone HtpG
+  score: 6.2746
 - annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK2
@@ -10,6 +152,256 @@ rows:
   product: chaperone protein DnaK
   score: 6.7144
 - annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: A9601_09651
+  organism_strain: Prochlorococcus AS9601
+  product: DnaJ type II chaperone protein
+  score: 5.8107
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: Alternative locus ID'
+  locus_tag: A9601_09891
+  organism_strain: Prochlorococcus AS9601
+  product: DnaJ type IV chaperone protein
+  score: 5.1545
+- annotation_quality: 2
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'possible Gram-negative pili assembly chaperone :: Alternative locus
+    ID'
+  locus_tag: A9601_11191
+  organism_strain: Prochlorococcus AS9601
+  product: possible Gram-negative pili assembly chaperone
+  score: 5.4051
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpC
+  gene_summary: 'clpC :: ATP-dependent Clp protease ATP-binding subunit ClpC :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: A9601_11941
+  organism_strain: Prochlorococcus AS9601
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.6921
+- annotation_quality: 3
+  function_description: Probably acts as a heme chaperone, transferring heme to an
+    unknown acceptor. Binds one molecule of heme per monomer, possibly covalently.
+    Binds 1 [4Fe-4S] cluster. The cluster is coordinated with 3 cysteines and an exchangeable
+    S-adenosyl-L-methionine
+  gene_name: hemN
+  gene_summary: 'hemN :: oxygen-independent coproporphyrinogen III oxidase :: Probably
+    acts as a heme chaperone, transferring heme to an unknown acceptor. Binds one
+    molecule of heme per monomer, possibly covalently. Binds 1 [4Fe-4S] cluster. The
+    cluster is coordinated with 3 cysteines and an exchangeable S-adenosyl-L-methionine'
+  locus_tag: A9601_15101
+  organism_strain: Prochlorococcus AS9601
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 3.2545
+- annotation_quality: 3
+  function_description: Belongs to the heat shock protein 70 family
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: Belongs to the heat shock protein
+    70 family'
+  locus_tag: A9601_16341
+  organism_strain: Prochlorococcus AS9601
+  product: chaperone protein DnaK
+  score: 4.1305
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: A9601_16391
+  organism_strain: Prochlorococcus AS9601
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: A9601_16761
+  organism_strain: Prochlorococcus AS9601
+  product: DnaJ type III chaperone protein
+  score: 4.4695
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: A9601_18641
+  organism_strain: Prochlorococcus AS9601
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: A9601_18661
+  organism_strain: Prochlorococcus AS9601
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Acts as a chaperone
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Acts as a chaperone'
+  locus_tag: A9601_19141
+  organism_strain: Prochlorococcus AS9601
+  product: chaperone protein DnaK
+  score: 6.3655
+- annotation_quality: 2
+  function_description: Molecular chaperone
+  gene_name: null
+  gene_summary: 'DNA-J related domain-containing protein :: Molecular chaperone'
+  locus_tag: ACZ81_00705
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: DNA-J related domain-containing protein
+  score: 5.4631
+- annotation_quality: 2
+  function_description: small periplasmic lipoprotein
+  gene_name: lptM
+  gene_summary: 'lptM :: LPS translocon maturation chaperone LptM :: small periplasmic
+    lipoprotein'
+  locus_tag: ACZ81_00850
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: LPS translocon maturation chaperone LptM
+  score: 5.4363
+- annotation_quality: 3
+  function_description: LTXXQ motif family protein
+  gene_name: spy
+  gene_summary: 'spy :: Spy/CpxP family protein refolding chaperone :: LTXXQ motif
+    family protein'
+  locus_tag: ACZ81_02095
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: Spy/CpxP family protein refolding chaperone
+  score: 5.276
+- annotation_quality: 3
+  function_description: One of the proteins required for the normal export of preproteins
+    out of the cell cytoplasm. It is a molecular chaperone that binds to a subset
+    of precursor proteins, maintaining them in a translocation-competent state. It
+    also specifically binds to its receptor SecA
+  gene_name: secB
+  gene_summary: 'secB :: protein-export chaperone SecB :: One of the proteins required
+    for the normal export of preproteins out of the cell cytoplasm. It is a molecular
+    chaperone that binds to a subset of precursor proteins, maintaining them in a
+    translocation-competent state. It also specifically binds to its receptor SecA'
+  locus_tag: ACZ81_02150
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: protein-export chaperone SecB
+  score: 4.5215
+- annotation_quality: 3
+  function_description: protein conserved in bacteria
+  gene_name: null
+  gene_summary: 'copper chaperone PCu(A)C :: protein conserved in bacteria'
+  locus_tag: ACZ81_02335
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: copper chaperone PCu(A)C
+  score: 5.4363
+- annotation_quality: 3
+  function_description: Chaperone involved in the correct folding and assembly of
+    outer membrane proteins. Recognizes specific patterns of aromatic residues and
+    the orientation of their side chains, which are found more frequently in integral
+    outer membrane proteins. May act in both early periplasmic and late outer membrane-associated
+    steps of protein maturation
+  gene_name: surA
+  gene_summary: 'surA :: peptidylprolyl isomerase SurA :: Chaperone involved in the
+    correct folding and assembly of outer membrane proteins. Recognizes specific patterns
+    of aromatic residues and the orientation of their side chains, which are found
+    more frequently in integral outer membrane proteins. May act in both early periplasmic
+    and late outer membrane-associated steps of protein maturation'
+  locus_tag: ACZ81_03510
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: peptidylprolyl isomerase SurA
+  score: 2.8345
+- annotation_quality: 3
+  function_description: Regulatory DnaK co-chaperone. Direct interaction between DnaK
+    and DjlA is needed for the induction of the wcaABCDE operon, involved in the synthesis
+    of a colanic acid polysaccharide capsule, possibly through activation of the RcsB
+    RcsC phosphotransfer signaling pathway. The colanic acid capsule may help the
+    bacterium survive conditions outside the host
+  gene_name: djlA
+  gene_summary: 'djlA :: co-chaperone DjlA :: Regulatory DnaK co-chaperone. Direct
+    interaction between DnaK and DjlA is needed for the induction of the wcaABCDE
+    operon, involved in the synthesis of a colanic acid polysaccharide capsule, possibly
+    through activation of the RcsB RcsC phosphotransfer signaling pathway. The colanic
+    acid capsule may help the bacterium survive conditions outside the host'
+  locus_tag: ACZ81_03525
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: co-chaperone DjlA
+  score: 4.3626
+- annotation_quality: 3
+  function_description: Involved in the biosynthesis of porphyrin-containing compound
+  gene_name: hemW
+  gene_summary: 'hemW :: radical SAM family heme chaperone HemW :: Involved in the
+    biosynthesis of porphyrin-containing compound'
+  locus_tag: ACZ81_04510
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: radical SAM family heme chaperone HemW
+  score: 4.7509
+- annotation_quality: 3
+  function_description: Heme chaperone required for the biogenesis of c-type cytochromes.
+    Transiently binds heme delivered by CcmC and transfers the heme to apo-cytochromes
+    in a process facilitated by CcmF and CcmH
+  gene_name: ccmE
+  gene_summary: 'ccmE :: cytochrome c maturation protein CcmE :: Heme chaperone required
+    for the biogenesis of c-type cytochromes. Transiently binds heme delivered by
+    CcmC and transfers the heme to apo-cytochromes in a process facilitated by CcmF
+    and CcmH'
+  locus_tag: ACZ81_04645
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: cytochrome c maturation protein CcmE
+  score: 3.6042
+- annotation_quality: 3
+  function_description: FlgN protein
+  gene_name: flgN
+  gene_summary: 'flgN :: flagellar export chaperone FlgN :: FlgN protein'
+  locus_tag: ACZ81_04975
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: flagellar export chaperone FlgN
+  score: 5.8222
+- annotation_quality: 3
+  function_description: Involved in the assembly process of the P-ring formation.
+    It may associate with FlgF on the rod constituting a structure essential for the
+    P-ring assembly or may act as a modulator protein for the P-ring assembly
+  gene_name: flgA
+  gene_summary: 'flgA :: flagellar basal body P-ring formation chaperone FlgA :: Involved
+    in the assembly process of the P-ring formation. It may associate with FlgF on
+    the rod constituting a structure essential for the P-ring assembly or may act
+    as a modulator protein for the P-ring assembly'
+  locus_tag: ACZ81_04985
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: flagellar basal body P-ring formation chaperone FlgA
+  score: 3.4466
+- annotation_quality: 3
+  function_description: flagellar protein FliS
+  gene_name: fliS
+  gene_summary: 'fliS :: flagellar export chaperone FliS :: flagellar protein FliS'
+  locus_tag: ACZ81_05085
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: flagellar export chaperone FliS
+  score: 5.6567
+- annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK
   gene_summary: 'dnaK :: molecular chaperone DnaK :: Acts as a chaperone'
@@ -17,6 +409,364 @@ rows:
   organism_strain: Alteromonas macleodii HOT1A3
   product: molecular chaperone DnaK
   score: 6.7996
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins and by disaggregating
+    proteins, also in an autonomous, DnaK-independent fashion. Unfolded proteins bind
+    initially to DnaJ; upon interaction with the DnaJ-bound protein, DnaK hydrolyzes
+    its bound ATP, resulting in the formation of a stable complex. GrpE releases ADP
+    from DnaK; ATP binding to DnaK triggers the release of the substrate protein,
+    thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ
+  gene_summary: 'dnaJ :: molecular chaperone DnaJ :: Participates actively in the
+    response to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins and by disaggregating proteins, also in an autonomous, DnaK-independent
+    fashion. Unfolded proteins bind initially to DnaJ; upon interaction with the DnaJ-bound
+    protein, DnaK hydrolyzes its bound ATP, resulting in the formation of a stable
+    complex. GrpE releases ADP from DnaK; ATP binding to DnaK triggers the release
+    of the substrate protein, thus completing the reaction cycle. Several rounds of
+    ATP-dependent interactions between DnaJ, DnaK and GrpE are required for fully
+    efficient folding. Also involved, together with DnaK and GrpE, in the DNA replication
+    of plasmids through activation of initiation proteins'
+  locus_tag: ACZ81_07050
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: molecular chaperone DnaJ
+  score: 1.6008
+- annotation_quality: 3
+  function_description: Part of the ABC transporter complex LolCDE involved in the
+    translocation of mature outer membrane-directed lipoproteins, from the inner membrane
+    to the periplasmic chaperone, LolA. Responsible for the formation of the LolA-lipoprotein
+    complex in an ATP-dependent manner
+  gene_name: lolD
+  gene_summary: 'lolD :: lipoprotein-releasing ABC transporter ATP-binding protein
+    LolD :: Part of the ABC transporter complex LolCDE involved in the translocation
+    of mature outer membrane-directed lipoproteins, from the inner membrane to the
+    periplasmic chaperone, LolA. Responsible for the formation of the LolA-lipoprotein
+    complex in an ATP-dependent manner'
+  locus_tag: ACZ81_08415
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: lipoprotein-releasing ABC transporter ATP-binding protein LolD
+  score: 2.7838
+- annotation_quality: 3
+  function_description: RNA chaperone with significant RNA binding, RNA strand exchange
+    and RNA duplexing activities
+  gene_name: proQ
+  gene_summary: 'proQ :: RNA chaperone ProQ :: RNA chaperone with significant RNA
+    binding, RNA strand exchange and RNA duplexing activities'
+  locus_tag: ACZ81_10190
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: RNA chaperone ProQ
+  score: 6.2322
+- annotation_quality: 3
+  function_description: Participates in the translocation of lipoproteins from the
+    inner membrane to the outer membrane. Only forms a complex with a lipoprotein
+    if the residue after the N-terminal Cys is not an aspartate (The Asp acts as a
+    targeting signal to indicate that the lipoprotein should stay in the inner membrane)
+  gene_name: lolA
+  gene_summary: 'lolA :: outer membrane lipoprotein chaperone LolA :: Participates
+    in the translocation of lipoproteins from the inner membrane to the outer membrane.
+    Only forms a complex with a lipoprotein if the residue after the N-terminal Cys
+    is not an aspartate (The Asp acts as a targeting signal to indicate that the lipoprotein
+    should stay in the inner membrane)'
+  locus_tag: ACZ81_10605
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: outer membrane lipoprotein chaperone LolA
+  score: 2.9142
+- annotation_quality: 3
+  function_description: Functions as both a chaperone and a metalloprotease. Maintains
+    the integrity of the outer membrane by promoting either the assembly or the elimination
+    of outer membrane proteins, depending on their folding state
+  gene_name: bepA
+  gene_summary: 'bepA :: M48 family metalloprotease :: Functions as both a chaperone
+    and a metalloprotease. Maintains the integrity of the outer membrane by promoting
+    either the assembly or the elimination of outer membrane proteins, depending on
+    their folding state'
+  locus_tag: ACZ81_10770
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: M48 family metalloprotease
+  score: 3.5506
+- annotation_quality: 3
+  function_description: Zinc chaperone that directly transfers zinc cofactor to target
+    proteins, thereby activating them. Zinc is transferred from the CXCC motif in
+    the GTPase domain to the zinc binding site in target proteins in a process requiring
+    GTP hydrolysis
+  gene_name: zigA
+  gene_summary: 'zigA :: zinc metallochaperone GTPase ZigA :: Zinc chaperone that
+    directly transfers zinc cofactor to target proteins, thereby activating them.
+    Zinc is transferred from the CXCC motif in the GTPase domain to the zinc binding
+    site in target proteins in a process requiring GTP hydrolysis'
+  locus_tag: ACZ81_12405
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: zinc metallochaperone GTPase ZigA
+  score: 3.0275
+- annotation_quality: 3
+  function_description: Molecular chaperone. Has ATPase activity
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
+    activity'
+  locus_tag: ACZ81_12775
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: molecular chaperone HtpG
+  score: 6.6969
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE
+  gene_name: clpB
+  gene_summary: 'clpB :: ATP-dependent chaperone ClpB :: Part of a stress-induced
+    multi-chaperone system, it is involved in the recovery of the cell from heat-induced
+    damage, in cooperation with DnaK, DnaJ and GrpE'
+  locus_tag: ACZ81_12910
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: ATP-dependent chaperone ClpB
+  score: 4.8452
+- annotation_quality: 3
+  function_description: Also involved in hydrogenase metallocenter assembly, probably
+    by participating in the nickel insertion step. This function in hydrogenase biosynthesis
+    requires chaperone activity and the presence of the metal-binding domain, but
+    not PPIase activity
+  gene_name: slyD
+  gene_summary: 'slyD :: FKBP-type peptidyl-prolyl cis-trans isomerase :: Also involved
+    in hydrogenase metallocenter assembly, probably by participating in the nickel
+    insertion step. This function in hydrogenase biosynthesis requires chaperone activity
+    and the presence of the metal-binding domain, but not PPIase activity'
+  locus_tag: ACZ81_13155
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: FKBP-type peptidyl-prolyl cis-trans isomerase
+  score: 3.1334
+- annotation_quality: 3
+  function_description: peptidylprolyl isomerase
+  gene_name: ppiD
+  gene_summary: 'ppiD :: SurA N-terminal domain-containing protein :: peptidylprolyl
+    isomerase'
+  locus_tag: ACZ81_13305
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: SurA N-terminal domain-containing protein
+  score: 2.3609
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent protease ATP-binding subunit ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: ACZ81_13320
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: ATP-dependent protease ATP-binding subunit ClpX
+  score: 4.3724
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: ACZ81_13330
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: trigger factor
+  score: 3.9518
+- annotation_quality: 3
+  function_description: COG0501 Zn-dependent protease with chaperone function
+  gene_name: null
+  gene_summary: 'M48 family metallopeptidase :: COG0501 Zn-dependent protease with
+    chaperone function'
+  locus_tag: ACZ81_14895
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: M48 family metallopeptidase
+  score: 5.3854
+- annotation_quality: 3
+  function_description: Coenzyme PQQ synthesis protein D (PqqD)
+  gene_name: pqqD
+  gene_summary: 'pqqD :: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
+    :: Coenzyme PQQ synthesis protein D (PqqD)'
+  locus_tag: ACZ81_15935
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
+  score: 5.0139
+- annotation_quality: 3
+  function_description: this subunit has chaperone activity. The binding of ATP and
+    its subsequent hydrolysis by HslU are essential for unfolding of protein substrates
+    subsequently hydrolyzed by HslV. HslU recognizes the N-terminal part of its protein
+    substrates and unfolds these before they are guided to HslV for hydrolysis
+  gene_name: hslU
+  gene_summary: 'hslU :: HslU--HslV peptidase ATPase subunit :: this subunit has chaperone
+    activity. The binding of ATP and its subsequent hydrolysis by HslU are essential
+    for unfolding of protein substrates subsequently hydrolyzed by HslV. HslU recognizes
+    the N-terminal part of its protein substrates and unfolds these before they are
+    guided to HslV for hydrolysis'
+  locus_tag: ACZ81_17655
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: HslU--HslV peptidase ATPase subunit
+  score: 2.9137
+- annotation_quality: 2
+  function_description: May be involved in the folding of the extracellular lipase
+    during its passage through the periplasm
+  gene_name: lifO
+  gene_summary: 'lifO :: lipase secretion chaperone :: May be involved in the folding
+    of the extracellular lipase during its passage through the periplasm'
+  locus_tag: ACZ81_18240
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: lipase secretion chaperone
+  score: 5.2288
+- annotation_quality: 3
+  function_description: RNA chaperone that binds small regulatory RNA (sRNAs) and
+    mRNAs to facilitate mRNA translational regulation in response to envelope stress,
+    environmental stress and changes in metabolite concentrations. Also binds with
+    high specificity to tRNAs
+  gene_name: hfq
+  gene_summary: 'hfq :: RNA chaperone Hfq :: RNA chaperone that binds small regulatory
+    RNA (sRNAs) and mRNAs to facilitate mRNA translational regulation in response
+    to envelope stress, environmental stress and changes in metabolite concentrations.
+    Also binds with high specificity to tRNAs'
+  locus_tag: ACZ81_18300
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: RNA chaperone Hfq
+  score: 5.006
+- annotation_quality: 3
+  function_description: Together with the chaperonin GroEL, plays an essential role
+    in assisting protein folding. The GroEL-GroES system forms a nano-cage that allows
+    encapsulation of the non-native substrate proteins and provides a physical environment
+    optimized to promote and accelerate protein folding. GroES binds to the apical
+    surface of the GroEL ring, thereby capping the opening of the GroEL channel
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperone GroES :: Together with the chaperonin GroEL,
+    plays an essential role in assisting protein folding. The GroEL-GroES system forms
+    a nano-cage that allows encapsulation of the non-native substrate proteins and
+    provides a physical environment optimized to promote and accelerate protein folding.
+    GroES binds to the apical surface of the GroEL ring, thereby capping the opening
+    of the GroEL channel'
+  locus_tag: ACZ81_19080
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: co-chaperone GroES
+  score: 2.535
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: Hsp33 family molecular chaperone HslO :: Redox regulated
+    molecular chaperone. Protects both thermally unfolding and oxidatively damaged
+    proteins from irreversible aggregation. Plays an important role in the bacterial
+    defense system toward oxidative stress'
+  locus_tag: ACZ81_19265
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: Hsp33 family molecular chaperone HslO
+  score: 5.3217
+- annotation_quality: 3
+  function_description: Involved in iron-sulfur cluster biogenesis. Binds a 4Fe-4S
+    cluster, can transfer this cluster to apoproteins, and thereby intervenes in the
+    maturation of Fe/S proteins. Could also act as a scaffold/chaperone for damaged
+    Fe/S proteins
+  gene_name: nfuA
+  gene_summary: 'nfuA :: Fe-S biogenesis protein NfuA :: Involved in iron-sulfur cluster
+    biogenesis. Binds a 4Fe-4S cluster, can transfer this cluster to apoproteins,
+    and thereby intervenes in the maturation of Fe/S proteins. Could also act as a
+    scaffold/chaperone for damaged Fe/S proteins'
+  locus_tag: ACZ81_19480
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: Fe-S biogenesis protein NfuA
+  score: 3.5144
+- annotation_quality: 3
+  function_description: ATPase with chaperone activity
+  gene_name: comM
+  gene_summary: 'comM :: YifB family Mg chelatase-like AAA ATPase :: ATPase with chaperone
+    activity'
+  locus_tag: ACZ81_19605
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: YifB family Mg chelatase-like AAA ATPase
+  score: 4.7735
+- annotation_quality: 3
+  function_description: HupF/HypC family
+  gene_name: hypC
+  gene_summary: 'hypC :: HypC/HybG/HupF family hydrogenase formation chaperone ::
+    HupF/HypC family'
+  locus_tag: ACZ81_20250
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: HypC/HybG/HupF family hydrogenase formation chaperone
+  score: 5.3079
+- annotation_quality: 3
+  function_description: Involved in the biosynthesis of porphyrin-containing compound
+  gene_name: hemW
+  gene_summary: 'hemW :: radical SAM family heme chaperone HemW :: Involved in the
+    biosynthesis of porphyrin-containing compound'
+  locus_tag: BSR22_01050
+  organism_strain: Prochlorococcus RSP50
+  product: radical SAM family heme chaperone HemW
+  score: 4.7509
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperone GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: BSR22_01645
+  organism_strain: Prochlorococcus RSP50
+  product: co-chaperone GroES
+  score: 4.4211
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: BSR22_02750
+  organism_strain: Prochlorococcus RSP50
+  product: trigger factor
+  score: 3.5988
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent protease ATP-binding subunit ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: BSR22_02760
+  organism_strain: Prochlorococcus RSP50
+  product: ATP-dependent protease ATP-binding subunit ClpX
+  score: 3.4804
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK
+  gene_summary: 'dnaK :: molecular chaperone DnaK :: Heat shock 70 kDa protein'
+  locus_tag: BSR22_03000
+  organism_strain: Prochlorococcus RSP50
+  product: molecular chaperone DnaK
+  score: 5.5682
+- annotation_quality: 3
+  function_description: ATP binding to DnaK triggers the release of the substrate
+    protein, thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ
+  gene_summary: 'dnaJ :: molecular chaperone DnaJ :: ATP binding to DnaK triggers
+    the release of the substrate protein, thus completing the reaction cycle. Several
+    rounds of ATP-dependent interactions between DnaJ, DnaK and GrpE are required
+    for fully efficient folding. Also involved, together with DnaK and GrpE, in the
+    DNA replication of plasmids through activation of initiation proteins'
+  locus_tag: BSR22_03150
+  organism_strain: Prochlorococcus RSP50
+  product: molecular chaperone DnaJ
+  score: 2.886
+- annotation_quality: 2
+  function_description: Essential for the assembly of the photosystem I (PSI) complex.
+    May act as a chaperone-like factor to guide the assembly of the PSI subunits
+  gene_name: ycf3
+  gene_summary: 'ycf3 :: photosystem I assembly protein Ycf3 :: Essential for the
+    assembly of the photosystem I (PSI) complex. May act as a chaperone-like factor
+    to guide the assembly of the PSI subunits'
+  locus_tag: BSR22_03750
+  organism_strain: Prochlorococcus RSP50
+  product: photosystem I assembly protein Ycf3
+  score: 3.5732
 - annotation_quality: 2
   function_description: Molecular chaperone
   gene_name: null
@@ -26,6 +776,205 @@ rows:
   product: molecular chaperone
   score: 7.6079
 - annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE
+  gene_name: clpB
+  gene_summary: 'clpB :: ATP-dependent Clp protease ATP-binding subunit :: Part of
+    a stress-induced multi-chaperone system, it is involved in the recovery of the
+    cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE'
+  locus_tag: BSR22_06015
+  organism_strain: Prochlorococcus RSP50
+  product: ATP-dependent Clp protease ATP-binding subunit
+  score: 3.1546
+- annotation_quality: 2
+  function_description: Cyanobacteria-specific chaperone containing DNAJ domain fused
+    to a membrane domain
+  gene_name: null
+  gene_summary: 'CPP1-like family protein :: Cyanobacteria-specific chaperone containing
+    DNAJ domain fused to a membrane domain'
+  locus_tag: BSR22_06435
+  organism_strain: Prochlorococcus RSP50
+  product: CPP1-like family protein
+  score: 5.4883
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: Hsp33 family molecular chaperone HslO :: Redox regulated
+    molecular chaperone. Protects both thermally unfolding and oxidatively damaged
+    proteins from irreversible aggregation. Plays an important role in the bacterial
+    defense system toward oxidative stress'
+  locus_tag: BSR22_06440
+  organism_strain: Prochlorococcus RSP50
+  product: Hsp33 family molecular chaperone HslO
+  score: 5.3217
+- annotation_quality: 3
+  function_description: Chaperone protein HtpG
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
+  locus_tag: BSR22_07755
+  organism_strain: Prochlorococcus RSP50
+  product: molecular chaperone HtpG
+  score: 6.6903
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK
+  gene_summary: 'dnaK :: molecular chaperone DnaK :: Heat shock 70 kDa protein'
+  locus_tag: BSR22_07780
+  organism_strain: Prochlorococcus RSP50
+  product: molecular chaperone DnaK
+  score: 5.5682
+- annotation_quality: 2
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ2
+  gene_summary: 'dnaJ2 :: DnaJ C-terminal domain-containing protein :: DnaJ-class
+    molecular chaperone'
+  locus_tag: BSR22_07785
+  organism_strain: Prochlorococcus RSP50
+  product: DnaJ C-terminal domain-containing protein
+  score: 5.1552
+- annotation_quality: 2
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'molecular chaperone DnaJ :: Alternative locus ID'
+  locus_tag: BSR22_07905
+  organism_strain: Prochlorococcus RSP50
+  product: molecular chaperone DnaJ
+  score: 5.6602
+- annotation_quality: 2
+  function_description: Molecular chaperone
+  gene_name: null
+  gene_summary: 'DNA-J related domain-containing protein :: Molecular chaperone'
+  locus_tag: EZ55_00151
+  organism_strain: Alteromonas macleodii EZ55
+  product: DNA-J related domain-containing protein
+  score: 5.4631
+- annotation_quality: 2
+  function_description: small periplasmic lipoprotein
+  gene_name: lptM
+  gene_summary: 'lptM :: LPS translocon maturation chaperone LptM :: small periplasmic
+    lipoprotein'
+  locus_tag: EZ55_00179
+  organism_strain: Alteromonas macleodii EZ55
+  product: LPS translocon maturation chaperone LptM
+  score: 5.4363
+- annotation_quality: 3
+  function_description: LTXXQ motif family protein
+  gene_name: spy
+  gene_summary: 'spy :: Spy/CpxP family protein refolding chaperone :: LTXXQ motif
+    family protein'
+  locus_tag: EZ55_00449
+  organism_strain: Alteromonas macleodii EZ55
+  product: Spy/CpxP family protein refolding chaperone
+  score: 5.276
+- annotation_quality: 3
+  function_description: One of the proteins required for the normal export of preproteins
+    out of the cell cytoplasm. It is a molecular chaperone that binds to a subset
+    of precursor proteins, maintaining them in a translocation-competent state. It
+    also specifically binds to its receptor SecA
+  gene_name: secB
+  gene_summary: 'secB :: protein-export chaperone SecB :: One of the proteins required
+    for the normal export of preproteins out of the cell cytoplasm. It is a molecular
+    chaperone that binds to a subset of precursor proteins, maintaining them in a
+    translocation-competent state. It also specifically binds to its receptor SecA'
+  locus_tag: EZ55_00464
+  organism_strain: Alteromonas macleodii EZ55
+  product: protein-export chaperone SecB
+  score: 4.5215
+- annotation_quality: 3
+  function_description: protein conserved in bacteria
+  gene_name: null
+  gene_summary: 'copper chaperone PCu(A)C :: protein conserved in bacteria'
+  locus_tag: EZ55_00505
+  organism_strain: Alteromonas macleodii EZ55
+  product: copper chaperone PCu(A)C
+  score: 5.4363
+- annotation_quality: 3
+  function_description: Chaperone involved in the correct folding and assembly of
+    outer membrane proteins. Recognizes specific patterns of aromatic residues and
+    the orientation of their side chains, which are found more frequently in integral
+    outer membrane proteins. May act in both early periplasmic and late outer membrane-associated
+    steps of protein maturation
+  gene_name: surA
+  gene_summary: 'surA :: peptidylprolyl isomerase SurA :: Chaperone involved in the
+    correct folding and assembly of outer membrane proteins. Recognizes specific patterns
+    of aromatic residues and the orientation of their side chains, which are found
+    more frequently in integral outer membrane proteins. May act in both early periplasmic
+    and late outer membrane-associated steps of protein maturation'
+  locus_tag: EZ55_00761
+  organism_strain: Alteromonas macleodii EZ55
+  product: peptidylprolyl isomerase SurA
+  score: 2.8345
+- annotation_quality: 3
+  function_description: Regulatory DnaK co-chaperone. Direct interaction between DnaK
+    and DjlA is needed for the induction of the wcaABCDE operon, involved in the synthesis
+    of a colanic acid polysaccharide capsule, possibly through activation of the RcsB/RcsC
+    phosphotransfer signaling pathway. The colanic acid capsule may help the bacterium
+    survive conditions outside the host
+  gene_name: djlA
+  gene_summary: 'djlA :: co-chaperone DjlA :: Regulatory DnaK co-chaperone. Direct
+    interaction between DnaK and DjlA is needed for the induction of the wcaABCDE
+    operon, involved in the synthesis of a colanic acid polysaccharide capsule, possibly
+    through activation of the RcsB/RcsC phosphotransfer signaling pathway. The colanic
+    acid capsule may help the bacterium survive conditions outside the host'
+  locus_tag: EZ55_00763
+  organism_strain: Alteromonas macleodii EZ55
+  product: co-chaperone DjlA
+  score: 4.2251
+- annotation_quality: 3
+  function_description: Involved in the biosynthesis of porphyrin-containing compound
+  gene_name: hemW
+  gene_summary: 'hemW :: radical SAM family heme chaperone HemW :: Involved in the
+    biosynthesis of porphyrin-containing compound'
+  locus_tag: EZ55_00944
+  organism_strain: Alteromonas macleodii EZ55
+  product: radical SAM family heme chaperone HemW
+  score: 4.7509
+- annotation_quality: 3
+  function_description: Heme chaperone required for the biogenesis of c-type cytochromes.
+    Transiently binds heme delivered by CcmC and transfers the heme to apo-cytochromes
+    in a process facilitated by CcmF and CcmH
+  gene_name: ccmE
+  gene_summary: 'ccmE :: cytochrome c maturation protein CcmE :: Heme chaperone required
+    for the biogenesis of c-type cytochromes. Transiently binds heme delivered by
+    CcmC and transfers the heme to apo-cytochromes in a process facilitated by CcmF
+    and CcmH'
+  locus_tag: EZ55_00971
+  organism_strain: Alteromonas macleodii EZ55
+  product: cytochrome c maturation protein CcmE
+  score: 3.6042
+- annotation_quality: 3
+  function_description: FlgN protein
+  gene_name: flgN
+  gene_summary: 'flgN :: flagellar export chaperone FlgN :: FlgN protein'
+  locus_tag: EZ55_01042
+  organism_strain: Alteromonas macleodii EZ55
+  product: flagellar export chaperone FlgN
+  score: 5.8222
+- annotation_quality: 3
+  function_description: Involved in the assembly process of the P-ring formation.
+    It may associate with FlgF on the rod constituting a structure essential for the
+    P-ring assembly or may act as a modulator protein for the P-ring assembly
+  gene_name: flgA
+  gene_summary: 'flgA :: flagellar basal body P-ring formation chaperone FlgA :: Involved
+    in the assembly process of the P-ring formation. It may associate with FlgF on
+    the rod constituting a structure essential for the P-ring assembly or may act
+    as a modulator protein for the P-ring assembly'
+  locus_tag: EZ55_01044
+  organism_strain: Alteromonas macleodii EZ55
+  product: flagellar basal body P-ring formation chaperone FlgA
+  score: 3.4466
+- annotation_quality: 3
+  function_description: flagellar protein FliS
+  gene_name: fliS
+  gene_summary: 'fliS :: flagellar export chaperone FliS :: flagellar protein FliS'
+  locus_tag: EZ55_01064
+  organism_strain: Alteromonas macleodii EZ55
+  product: flagellar export chaperone FliS
+  score: 5.6567
+- annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK
   gene_summary: 'dnaK :: molecular chaperone DnaK :: Acts as a chaperone'
@@ -33,6 +982,409 @@ rows:
   organism_strain: Alteromonas macleodii EZ55
   product: molecular chaperone DnaK
   score: 6.7996
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins and by disaggregating
+    proteins, also in an autonomous, DnaK-independent fashion. Unfolded proteins bind
+    initially to DnaJ; upon interaction with the DnaJ-bound protein, DnaK hydrolyzes
+    its bound ATP, resulting in the formation of a stable complex. GrpE releases ADP
+    from DnaK; ATP binding to DnaK triggers the release of the substrate protein,
+    thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ
+  gene_summary: 'dnaJ :: molecular chaperone DnaJ :: Participates actively in the
+    response to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins and by disaggregating proteins, also in an autonomous, DnaK-independent
+    fashion. Unfolded proteins bind initially to DnaJ; upon interaction with the DnaJ-bound
+    protein, DnaK hydrolyzes its bound ATP, resulting in the formation of a stable
+    complex. GrpE releases ADP from DnaK; ATP binding to DnaK triggers the release
+    of the substrate protein, thus completing the reaction cycle. Several rounds of
+    ATP-dependent interactions between DnaJ, DnaK and GrpE are required for fully
+    efficient folding. Also involved, together with DnaK and GrpE, in the DNA replication
+    of plasmids through activation of initiation proteins'
+  locus_tag: EZ55_01480
+  organism_strain: Alteromonas macleodii EZ55
+  product: molecular chaperone DnaJ
+  score: 1.6008
+- annotation_quality: 3
+  function_description: RNA chaperone with significant RNA binding, RNA strand exchange
+    and RNA duplexing activities
+  gene_name: proQ
+  gene_summary: 'proQ :: RNA chaperone ProQ :: RNA chaperone with significant RNA
+    binding, RNA strand exchange and RNA duplexing activities'
+  locus_tag: EZ55_02086
+  organism_strain: Alteromonas macleodii EZ55
+  product: RNA chaperone ProQ
+  score: 6.2322
+- annotation_quality: 3
+  function_description: Participates in the translocation of lipoproteins from the
+    inner membrane to the outer membrane. Only forms a complex with a lipoprotein
+    if the residue after the N-terminal Cys is not an aspartate (The Asp acts as a
+    targeting signal to indicate that the lipoprotein should stay in the inner membrane)
+  gene_name: lolA
+  gene_summary: 'lolA :: outer membrane lipoprotein chaperone LolA :: Participates
+    in the translocation of lipoproteins from the inner membrane to the outer membrane.
+    Only forms a complex with a lipoprotein if the residue after the N-terminal Cys
+    is not an aspartate (The Asp acts as a targeting signal to indicate that the lipoprotein
+    should stay in the inner membrane)'
+  locus_tag: EZ55_02180
+  organism_strain: Alteromonas macleodii EZ55
+  product: outer membrane lipoprotein chaperone LolA
+  score: 2.9142
+- annotation_quality: 3
+  function_description: Functions as both a chaperone and a metalloprotease. Maintains
+    the integrity of the outer membrane by promoting either the assembly or the elimination
+    of outer membrane proteins, depending on their folding state
+  gene_name: bepA
+  gene_summary: 'bepA :: beta-barrel assembly-enhancing protease :: Functions as both
+    a chaperone and a metalloprotease. Maintains the integrity of the outer membrane
+    by promoting either the assembly or the elimination of outer membrane proteins,
+    depending on their folding state'
+  locus_tag: EZ55_02213
+  organism_strain: Alteromonas macleodii EZ55
+  product: beta-barrel assembly-enhancing protease
+  score: 3.7193
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ClpX C4-type zinc finger protein :: ATP-dependent specificity
+    component of the Clp protease. It directs the protease to specific substrates.
+    Can perform chaperone functions in the absence of ClpP'
+  locus_tag: EZ55_02255
+  organism_strain: Alteromonas macleodii EZ55
+  product: ClpX C4-type zinc finger protein
+  score: 4.2506
+- annotation_quality: 3
+  function_description: Molecular chaperone. Has ATPase activity
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
+    activity'
+  locus_tag: EZ55_02623
+  organism_strain: Alteromonas macleodii EZ55
+  product: molecular chaperone HtpG
+  score: 6.4998
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE
+  gene_name: clpB
+  gene_summary: 'clpB :: ATP-dependent chaperone ClpB :: Part of a stress-induced
+    multi-chaperone system, it is involved in the recovery of the cell from heat-induced
+    damage, in cooperation with DnaK, DnaJ and GrpE'
+  locus_tag: EZ55_02651
+  organism_strain: Alteromonas macleodii EZ55
+  product: ATP-dependent chaperone ClpB
+  score: 4.8452
+- annotation_quality: 3
+  function_description: Also involved in hydrogenase metallocenter assembly, probably
+    by participating in the nickel insertion step. This function in hydrogenase biosynthesis
+    requires chaperone activity and the presence of the metal-binding domain, but
+    not PPIase activity
+  gene_name: slyD
+  gene_summary: 'slyD :: FKBP-type peptidyl-prolyl cis-trans isomerase :: Also involved
+    in hydrogenase metallocenter assembly, probably by participating in the nickel
+    insertion step. This function in hydrogenase biosynthesis requires chaperone activity
+    and the presence of the metal-binding domain, but not PPIase activity'
+  locus_tag: EZ55_02699
+  organism_strain: Alteromonas macleodii EZ55
+  product: FKBP-type peptidyl-prolyl cis-trans isomerase
+  score: 3.1334
+- annotation_quality: 3
+  function_description: peptidylprolyl isomerase
+  gene_name: ppiD
+  gene_summary: 'ppiD :: SurA N-terminal domain-containing protein :: peptidylprolyl
+    isomerase'
+  locus_tag: EZ55_02729
+  organism_strain: Alteromonas macleodii EZ55
+  product: SurA N-terminal domain-containing protein
+  score: 2.3609
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent protease ATP-binding subunit ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: EZ55_02732
+  organism_strain: Alteromonas macleodii EZ55
+  product: ATP-dependent protease ATP-binding subunit ClpX
+  score: 4.3724
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: EZ55_02734
+  organism_strain: Alteromonas macleodii EZ55
+  product: trigger factor
+  score: 3.9518
+- annotation_quality: 3
+  function_description: COG0501 Zn-dependent protease with chaperone function
+  gene_name: null
+  gene_summary: 'M48 family metallopeptidase :: COG0501 Zn-dependent protease with
+    chaperone function'
+  locus_tag: EZ55_03075
+  organism_strain: Alteromonas macleodii EZ55
+  product: M48 family metallopeptidase
+  score: 5.3854
+- annotation_quality: 3
+  function_description: Coenzyme PQQ synthesis protein D (PqqD)
+  gene_name: pqqD
+  gene_summary: 'pqqD :: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
+    :: Coenzyme PQQ synthesis protein D (PqqD)'
+  locus_tag: EZ55_03324
+  organism_strain: Alteromonas macleodii EZ55
+  product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
+  score: 5.0139
+- annotation_quality: 3
+  function_description: this subunit has chaperone activity. The binding of ATP and
+    its subsequent hydrolysis by HslU are essential for unfolding of protein substrates
+    subsequently hydrolyzed by HslV. HslU recognizes the N-terminal part of its protein
+    substrates and unfolds these before they are guided to HslV for hydrolysis
+  gene_name: hslU
+  gene_summary: 'hslU :: HslU--HslV peptidase ATPase subunit :: this subunit has chaperone
+    activity. The binding of ATP and its subsequent hydrolysis by HslU are essential
+    for unfolding of protein substrates subsequently hydrolyzed by HslV. HslU recognizes
+    the N-terminal part of its protein substrates and unfolds these before they are
+    guided to HslV for hydrolysis'
+  locus_tag: EZ55_03652
+  organism_strain: Alteromonas macleodii EZ55
+  product: HslU--HslV peptidase ATPase subunit
+  score: 2.9137
+- annotation_quality: 2
+  function_description: May be involved in the folding of the extracellular lipase
+    during its passage through the periplasm
+  gene_name: lifO
+  gene_summary: 'lifO :: lipase secretion chaperone :: May be involved in the folding
+    of the extracellular lipase during its passage through the periplasm'
+  locus_tag: EZ55_03769
+  organism_strain: Alteromonas macleodii EZ55
+  product: lipase secretion chaperone
+  score: 5.2288
+- annotation_quality: 3
+  function_description: RNA chaperone that binds small regulatory RNA (sRNAs) and
+    mRNAs to facilitate mRNA translational regulation in response to envelope stress,
+    environmental stress and changes in metabolite concentrations. Also binds with
+    high specificity to tRNAs
+  gene_name: hfq
+  gene_summary: 'hfq :: RNA chaperone Hfq :: RNA chaperone that binds small regulatory
+    RNA (sRNAs) and mRNAs to facilitate mRNA translational regulation in response
+    to envelope stress, environmental stress and changes in metabolite concentrations.
+    Also binds with high specificity to tRNAs'
+  locus_tag: EZ55_03781
+  organism_strain: Alteromonas macleodii EZ55
+  product: RNA chaperone Hfq
+  score: 5.006
+- annotation_quality: 3
+  function_description: Together with the chaperonin GroEL, plays an essential role
+    in assisting protein folding. The GroEL-GroES system forms a nano-cage that allows
+    encapsulation of the non-native substrate proteins and provides a physical environment
+    optimized to promote and accelerate protein folding. GroES binds to the apical
+    surface of the GroEL ring, thereby capping the opening of the GroEL channel
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperone GroES :: Together with the chaperonin GroEL,
+    plays an essential role in assisting protein folding. The GroEL-GroES system forms
+    a nano-cage that allows encapsulation of the non-native substrate proteins and
+    provides a physical environment optimized to promote and accelerate protein folding.
+    GroES binds to the apical surface of the GroEL ring, thereby capping the opening
+    of the GroEL channel'
+  locus_tag: EZ55_03939
+  organism_strain: Alteromonas macleodii EZ55
+  product: co-chaperone GroES
+  score: 2.535
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: Hsp33 family molecular chaperone HslO :: Redox regulated
+    molecular chaperone. Protects both thermally unfolding and oxidatively damaged
+    proteins from irreversible aggregation. Plays an important role in the bacterial
+    defense system toward oxidative stress'
+  locus_tag: EZ55_03972
+  organism_strain: Alteromonas macleodii EZ55
+  product: Hsp33 family molecular chaperone HslO
+  score: 5.3217
+- annotation_quality: 3
+  function_description: Involved in iron-sulfur cluster biogenesis. Binds a 4Fe-4S
+    cluster, can transfer this cluster to apoproteins, and thereby intervenes in the
+    maturation of Fe/S proteins. Could also act as a scaffold/chaperone for damaged
+    Fe/S proteins
+  gene_name: nfuA
+  gene_summary: 'nfuA :: Fe-S biogenesis protein NfuA :: Involved in iron-sulfur cluster
+    biogenesis. Binds a 4Fe-4S cluster, can transfer this cluster to apoproteins,
+    and thereby intervenes in the maturation of Fe/S proteins. Could also act as a
+    scaffold/chaperone for damaged Fe/S proteins'
+  locus_tag: EZ55_04039
+  organism_strain: Alteromonas macleodii EZ55
+  product: Fe-S biogenesis protein NfuA
+  score: 3.5144
+- annotation_quality: 3
+  function_description: ATPase with chaperone activity
+  gene_name: comM
+  gene_summary: 'comM :: YifB family Mg chelatase-like AAA ATPase :: ATPase with chaperone
+    activity'
+  locus_tag: EZ55_04063
+  organism_strain: Alteromonas macleodii EZ55
+  product: YifB family Mg chelatase-like AAA ATPase
+  score: 4.7735
+- annotation_quality: 3
+  function_description: HupF/HypC family
+  gene_name: hypC
+  gene_summary: 'hypC :: HypC/HybG/HupF family hydrogenase formation chaperone ::
+    HupF/HypC family'
+  locus_tag: EZ55_04180
+  organism_strain: Alteromonas macleodii EZ55
+  product: HypC/HybG/HupF family hydrogenase formation chaperone
+  score: 5.3079
+- annotation_quality: 2
+  function_description: Molecular chaperone
+  gene_name: null
+  gene_summary: 'DNA-J related domain-containing protein :: Molecular chaperone'
+  locus_tag: MIT1002_00133
+  organism_strain: Alteromonas macleodii MIT1002
+  product: DNA-J related domain-containing protein
+  score: 5.4631
+- annotation_quality: 2
+  function_description: small periplasmic lipoprotein
+  gene_name: lptM
+  gene_summary: 'lptM :: LPS translocon maturation chaperone LptM :: small periplasmic
+    lipoprotein'
+  locus_tag: MIT1002_00161
+  organism_strain: Alteromonas macleodii MIT1002
+  product: LPS translocon maturation chaperone LptM
+  score: 5.4363
+- annotation_quality: 3
+  function_description: HupF/HypC family
+  gene_name: hypC
+  gene_summary: 'hypC :: HypC/HybG/HupF family hydrogenase formation chaperone ::
+    HupF/HypC family'
+  locus_tag: MIT1002_00277
+  organism_strain: Alteromonas macleodii MIT1002
+  product: HypC/HybG/HupF family hydrogenase formation chaperone
+  score: 5.1844
+- annotation_quality: 3
+  function_description: LTXXQ motif family protein
+  gene_name: spy
+  gene_summary: 'spy :: Spy/CpxP family protein refolding chaperone :: LTXXQ motif
+    family protein'
+  locus_tag: MIT1002_00476
+  organism_strain: Alteromonas macleodii MIT1002
+  product: Spy/CpxP family protein refolding chaperone
+  score: 5.276
+- annotation_quality: 3
+  function_description: One of the proteins required for the normal export of preproteins
+    out of the cell cytoplasm. It is a molecular chaperone that binds to a subset
+    of precursor proteins, maintaining them in a translocation-competent state. It
+    also specifically binds to its receptor SecA
+  gene_name: secB
+  gene_summary: 'secB :: protein-export chaperone SecB :: One of the proteins required
+    for the normal export of preproteins out of the cell cytoplasm. It is a molecular
+    chaperone that binds to a subset of precursor proteins, maintaining them in a
+    translocation-competent state. It also specifically binds to its receptor SecA'
+  locus_tag: MIT1002_00486
+  organism_strain: Alteromonas macleodii MIT1002
+  product: protein-export chaperone SecB
+  score: 4.5215
+- annotation_quality: 3
+  function_description: protein conserved in bacteria
+  gene_name: null
+  gene_summary: 'copper chaperone PCu(A)C :: protein conserved in bacteria'
+  locus_tag: MIT1002_00524
+  organism_strain: Alteromonas macleodii MIT1002
+  product: copper chaperone PCu(A)C
+  score: 5.4363
+- annotation_quality: 3
+  function_description: Chaperone involved in the correct folding and assembly of
+    outer membrane proteins. Recognizes specific patterns of aromatic residues and
+    the orientation of their side chains, which are found more frequently in integral
+    outer membrane proteins. May act in both early periplasmic and late outer membrane-associated
+    steps of protein maturation
+  gene_name: surA
+  gene_summary: 'surA :: peptidylprolyl isomerase SurA :: Chaperone involved in the
+    correct folding and assembly of outer membrane proteins. Recognizes specific patterns
+    of aromatic residues and the orientation of their side chains, which are found
+    more frequently in integral outer membrane proteins. May act in both early periplasmic
+    and late outer membrane-associated steps of protein maturation'
+  locus_tag: MIT1002_00783
+  organism_strain: Alteromonas macleodii MIT1002
+  product: peptidylprolyl isomerase SurA
+  score: 3.1336
+- annotation_quality: 3
+  function_description: Regulatory DnaK co-chaperone. Direct interaction between DnaK
+    and DjlA is needed for the induction of the wcaABCDE operon, involved in the synthesis
+    of a colanic acid polysaccharide capsule, possibly through activation of the RcsB/RcsC
+    phosphotransfer signaling pathway. The colanic acid capsule may help the bacterium
+    survive conditions outside the host
+  gene_name: djlA
+  gene_summary: 'djlA :: co-chaperone DjlA :: Regulatory DnaK co-chaperone. Direct
+    interaction between DnaK and DjlA is needed for the induction of the wcaABCDE
+    operon, involved in the synthesis of a colanic acid polysaccharide capsule, possibly
+    through activation of the RcsB/RcsC phosphotransfer signaling pathway. The colanic
+    acid capsule may help the bacterium survive conditions outside the host'
+  locus_tag: MIT1002_00785
+  organism_strain: Alteromonas macleodii MIT1002
+  product: co-chaperone DjlA
+  score: 4.2251
+- annotation_quality: 3
+  function_description: Involved in the biosynthesis of porphyrin-containing compound
+  gene_name: hemW
+  gene_summary: 'hemW :: radical SAM family heme chaperone HemW :: Involved in the
+    biosynthesis of porphyrin-containing compound'
+  locus_tag: MIT1002_00939
+  organism_strain: Alteromonas macleodii MIT1002
+  product: radical SAM family heme chaperone HemW
+  score: 4.7509
+- annotation_quality: 3
+  function_description: Heme chaperone required for the biogenesis of c-type cytochromes.
+    Transiently binds heme delivered by CcmC and transfers the heme to apo-cytochromes
+    in a process facilitated by CcmF and CcmH
+  gene_name: ccmE
+  gene_summary: 'ccmE :: cytochrome c maturation protein CcmE :: Heme chaperone required
+    for the biogenesis of c-type cytochromes. Transiently binds heme delivered by
+    CcmC and transfers the heme to apo-cytochromes in a process facilitated by CcmF
+    and CcmH'
+  locus_tag: MIT1002_00964
+  organism_strain: Alteromonas macleodii MIT1002
+  product: cytochrome c maturation protein CcmE
+  score: 3.6042
+- annotation_quality: 3
+  function_description: FlgN protein
+  gene_name: flgN
+  gene_summary: 'flgN :: flagellar export chaperone FlgN :: FlgN protein'
+  locus_tag: MIT1002_01034
+  organism_strain: Alteromonas macleodii MIT1002
+  product: flagellar export chaperone FlgN
+  score: 5.8222
+- annotation_quality: 3
+  function_description: Involved in the assembly process of the P-ring formation.
+    It may associate with FlgF on the rod constituting a structure essential for the
+    P-ring assembly or may act as a modulator protein for the P-ring assembly
+  gene_name: flgA
+  gene_summary: 'flgA :: flagellar basal body P-ring formation chaperone FlgA :: Involved
+    in the assembly process of the P-ring formation. It may associate with FlgF on
+    the rod constituting a structure essential for the P-ring assembly or may act
+    as a modulator protein for the P-ring assembly'
+  locus_tag: MIT1002_01036
+  organism_strain: Alteromonas macleodii MIT1002
+  product: flagellar basal body P-ring formation chaperone FlgA
+  score: 3.4466
+- annotation_quality: 3
+  function_description: flagellar protein FliS
+  gene_name: fliS
+  gene_summary: 'fliS :: flagellar export chaperone FliS :: flagellar protein FliS'
+  locus_tag: MIT1002_01057
+  organism_strain: Alteromonas macleodii MIT1002
+  product: flagellar export chaperone FliS
+  score: 5.6567
 - annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK
@@ -42,6 +1394,406 @@ rows:
   product: molecular chaperone DnaK
   score: 6.7996
 - annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins and by disaggregating
+    proteins, also in an autonomous, DnaK-independent fashion. Unfolded proteins bind
+    initially to DnaJ; upon interaction with the DnaJ-bound protein, DnaK hydrolyzes
+    its bound ATP, resulting in the formation of a stable complex. GrpE releases ADP
+    from DnaK; ATP binding to DnaK triggers the release of the substrate protein,
+    thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ
+  gene_summary: 'dnaJ :: molecular chaperone DnaJ :: Participates actively in the
+    response to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins and by disaggregating proteins, also in an autonomous, DnaK-independent
+    fashion. Unfolded proteins bind initially to DnaJ; upon interaction with the DnaJ-bound
+    protein, DnaK hydrolyzes its bound ATP, resulting in the formation of a stable
+    complex. GrpE releases ADP from DnaK; ATP binding to DnaK triggers the release
+    of the substrate protein, thus completing the reaction cycle. Several rounds of
+    ATP-dependent interactions between DnaJ, DnaK and GrpE are required for fully
+    efficient folding. Also involved, together with DnaK and GrpE, in the DNA replication
+    of plasmids through activation of initiation proteins'
+  locus_tag: MIT1002_01458
+  organism_strain: Alteromonas macleodii MIT1002
+  product: molecular chaperone DnaJ
+  score: 1.6008
+- annotation_quality: 3
+  function_description: RNA chaperone with significant RNA binding, RNA strand exchange
+    and RNA duplexing activities
+  gene_name: proQ
+  gene_summary: 'proQ :: RNA chaperone ProQ :: RNA chaperone with significant RNA
+    binding, RNA strand exchange and RNA duplexing activities'
+  locus_tag: MIT1002_02024
+  organism_strain: Alteromonas macleodii MIT1002
+  product: RNA chaperone ProQ
+  score: 6.2322
+- annotation_quality: 3
+  function_description: Participates in the translocation of lipoproteins from the
+    inner membrane to the outer membrane. Only forms a complex with a lipoprotein
+    if the residue after the N-terminal Cys is not an aspartate (The Asp acts as a
+    targeting signal to indicate that the lipoprotein should stay in the inner membrane)
+  gene_name: lolA
+  gene_summary: 'lolA :: outer membrane lipoprotein chaperone LolA :: Participates
+    in the translocation of lipoproteins from the inner membrane to the outer membrane.
+    Only forms a complex with a lipoprotein if the residue after the N-terminal Cys
+    is not an aspartate (The Asp acts as a targeting signal to indicate that the lipoprotein
+    should stay in the inner membrane)'
+  locus_tag: MIT1002_02179
+  organism_strain: Alteromonas macleodii MIT1002
+  product: outer membrane lipoprotein chaperone LolA
+  score: 2.9142
+- annotation_quality: 3
+  function_description: Functions as both a chaperone and a metalloprotease. Maintains
+    the integrity of the outer membrane by promoting either the assembly or the elimination
+    of outer membrane proteins, depending on their folding state
+  gene_name: bepA
+  gene_summary: 'bepA :: beta-barrel assembly-enhancing protease :: Functions as both
+    a chaperone and a metalloprotease. Maintains the integrity of the outer membrane
+    by promoting either the assembly or the elimination of outer membrane proteins,
+    depending on their folding state'
+  locus_tag: MIT1002_02211
+  organism_strain: Alteromonas macleodii MIT1002
+  product: beta-barrel assembly-enhancing protease
+  score: 3.7193
+- annotation_quality: 3
+  function_description: Molecular chaperone. Has ATPase activity
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Molecular chaperone. Has ATPase
+    activity'
+  locus_tag: MIT1002_02648
+  organism_strain: Alteromonas macleodii MIT1002
+  product: molecular chaperone HtpG
+  score: 6.4998
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE
+  gene_name: clpB
+  gene_summary: 'clpB :: ATP-dependent chaperone ClpB :: Part of a stress-induced
+    multi-chaperone system, it is involved in the recovery of the cell from heat-induced
+    damage, in cooperation with DnaK, DnaJ and GrpE'
+  locus_tag: MIT1002_02677
+  organism_strain: Alteromonas macleodii MIT1002
+  product: ATP-dependent chaperone ClpB
+  score: 4.9053
+- annotation_quality: 3
+  function_description: Also involved in hydrogenase metallocenter assembly, probably
+    by participating in the nickel insertion step. This function in hydrogenase biosynthesis
+    requires chaperone activity and the presence of the metal-binding domain, but
+    not PPIase activity
+  gene_name: slyD
+  gene_summary: 'slyD :: FKBP-type peptidyl-prolyl cis-trans isomerase :: Also involved
+    in hydrogenase metallocenter assembly, probably by participating in the nickel
+    insertion step. This function in hydrogenase biosynthesis requires chaperone activity
+    and the presence of the metal-binding domain, but not PPIase activity'
+  locus_tag: MIT1002_02725
+  organism_strain: Alteromonas macleodii MIT1002
+  product: FKBP-type peptidyl-prolyl cis-trans isomerase
+  score: 3.1334
+- annotation_quality: 3
+  function_description: peptidylprolyl isomerase
+  gene_name: ppiD
+  gene_summary: 'ppiD :: SurA N-terminal domain-containing protein :: peptidylprolyl
+    isomerase'
+  locus_tag: MIT1002_02755
+  organism_strain: Alteromonas macleodii MIT1002
+  product: SurA N-terminal domain-containing protein
+  score: 2.3609
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent protease ATP-binding subunit ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: MIT1002_02759
+  organism_strain: Alteromonas macleodii MIT1002
+  product: ATP-dependent protease ATP-binding subunit ClpX
+  score: 4.3724
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: MIT1002_02761
+  organism_strain: Alteromonas macleodii MIT1002
+  product: trigger factor
+  score: 3.9518
+- annotation_quality: 3
+  function_description: COG0501 Zn-dependent protease with chaperone function
+  gene_name: null
+  gene_summary: 'M48 family metallopeptidase :: COG0501 Zn-dependent protease with
+    chaperone function'
+  locus_tag: MIT1002_03052
+  organism_strain: Alteromonas macleodii MIT1002
+  product: M48 family metallopeptidase
+  score: 5.2619
+- annotation_quality: 3
+  function_description: Coenzyme PQQ synthesis protein D (PqqD)
+  gene_name: pqqD
+  gene_summary: 'pqqD :: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
+    :: Coenzyme PQQ synthesis protein D (PqqD)'
+  locus_tag: MIT1002_03288
+  organism_strain: Alteromonas macleodii MIT1002
+  product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
+  score: 5.0139
+- annotation_quality: 3
+  function_description: this subunit has chaperone activity. The binding of ATP and
+    its subsequent hydrolysis by HslU are essential for unfolding of protein substrates
+    subsequently hydrolyzed by HslV. HslU recognizes the N-terminal part of its protein
+    substrates and unfolds these before they are guided to HslV for hydrolysis
+  gene_name: hslU
+  gene_summary: 'hslU :: HslU--HslV peptidase ATPase subunit :: this subunit has chaperone
+    activity. The binding of ATP and its subsequent hydrolysis by HslU are essential
+    for unfolding of protein substrates subsequently hydrolyzed by HslV. HslU recognizes
+    the N-terminal part of its protein substrates and unfolds these before they are
+    guided to HslV for hydrolysis'
+  locus_tag: MIT1002_03659
+  organism_strain: Alteromonas macleodii MIT1002
+  product: HslU--HslV peptidase ATPase subunit
+  score: 2.9137
+- annotation_quality: 2
+  function_description: May be involved in the folding of the extracellular lipase
+    during its passage through the periplasm
+  gene_name: lifO
+  gene_summary: 'lifO :: lipase secretion chaperone :: May be involved in the folding
+    of the extracellular lipase during its passage through the periplasm'
+  locus_tag: MIT1002_03775
+  organism_strain: Alteromonas macleodii MIT1002
+  product: lipase secretion chaperone
+  score: 5.2288
+- annotation_quality: 3
+  function_description: RNA chaperone that binds small regulatory RNA (sRNAs) and
+    mRNAs to facilitate mRNA translational regulation in response to envelope stress,
+    environmental stress and changes in metabolite concentrations. Also binds with
+    high specificity to tRNAs
+  gene_name: hfq
+  gene_summary: 'hfq :: RNA chaperone Hfq :: RNA chaperone that binds small regulatory
+    RNA (sRNAs) and mRNAs to facilitate mRNA translational regulation in response
+    to envelope stress, environmental stress and changes in metabolite concentrations.
+    Also binds with high specificity to tRNAs'
+  locus_tag: MIT1002_03788
+  organism_strain: Alteromonas macleodii MIT1002
+  product: RNA chaperone Hfq
+  score: 5.006
+- annotation_quality: 3
+  function_description: Together with the chaperonin GroEL, plays an essential role
+    in assisting protein folding. The GroEL-GroES system forms a nano-cage that allows
+    encapsulation of the non-native substrate proteins and provides a physical environment
+    optimized to promote and accelerate protein folding. GroES binds to the apical
+    surface of the GroEL ring, thereby capping the opening of the GroEL channel
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperone GroES :: Together with the chaperonin GroEL,
+    plays an essential role in assisting protein folding. The GroEL-GroES system forms
+    a nano-cage that allows encapsulation of the non-native substrate proteins and
+    provides a physical environment optimized to promote and accelerate protein folding.
+    GroES binds to the apical surface of the GroEL ring, thereby capping the opening
+    of the GroEL channel'
+  locus_tag: MIT1002_03936
+  organism_strain: Alteromonas macleodii MIT1002
+  product: co-chaperone GroES
+  score: 2.535
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: Hsp33 family molecular chaperone HslO :: Redox regulated
+    molecular chaperone. Protects both thermally unfolding and oxidatively damaged
+    proteins from irreversible aggregation. Plays an important role in the bacterial
+    defense system toward oxidative stress'
+  locus_tag: MIT1002_03973
+  organism_strain: Alteromonas macleodii MIT1002
+  product: Hsp33 family molecular chaperone HslO
+  score: 5.3217
+- annotation_quality: 3
+  function_description: Involved in iron-sulfur cluster biogenesis. Binds a 4Fe-4S
+    cluster, can transfer this cluster to apoproteins, and thereby intervenes in the
+    maturation of Fe/S proteins. Could also act as a scaffold/chaperone for damaged
+    Fe/S proteins
+  gene_name: nfuA
+  gene_summary: 'nfuA :: Fe-S biogenesis protein NfuA :: Involved in iron-sulfur cluster
+    biogenesis. Binds a 4Fe-4S cluster, can transfer this cluster to apoproteins,
+    and thereby intervenes in the maturation of Fe/S proteins. Could also act as a
+    scaffold/chaperone for damaged Fe/S proteins'
+  locus_tag: MIT1002_04019
+  organism_strain: Alteromonas macleodii MIT1002
+  product: Fe-S biogenesis protein NfuA
+  score: 3.5144
+- annotation_quality: 3
+  function_description: ATPase with chaperone activity
+  gene_name: comM
+  gene_summary: 'comM :: YifB family Mg chelatase-like AAA ATPase :: ATPase with chaperone
+    activity'
+  locus_tag: MIT1002_04043
+  organism_strain: Alteromonas macleodii MIT1002
+  product: YifB family Mg chelatase-like AAA ATPase
+  score: 4.7735
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: NATL1_00151
+  organism_strain: Prochlorococcus NATL1A
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins and by disaggregating
+    proteins, also in an autonomous, DnaK-independent fashion. Unfolded proteins bind
+    initially to DnaJ; upon interaction with the DnaJ-bound protein, DnaK hydrolyzes
+    its bound ATP, resulting in the formation of a stable complex. GrpE releases ADP
+    from DnaK; ATP binding to DnaK triggers the release of the substrate protein,
+    thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: Participates actively in
+    the response to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins and by disaggregating proteins, also in an autonomous, DnaK-independent
+    fashion. Unfolded proteins bind initially to DnaJ; upon interaction with the DnaJ-bound
+    protein, DnaK hydrolyzes its bound ATP, resulting in the formation of a stable
+    complex. GrpE releases ADP from DnaK; ATP binding to DnaK triggers the release
+    of the substrate protein, thus completing the reaction cycle. Several rounds of
+    ATP-dependent interactions between DnaJ, DnaK and GrpE are required for fully
+    efficient folding. Also involved, together with DnaK and GrpE, in the DNA replication
+    of plasmids through activation of initiation proteins'
+  locus_tag: NATL1_00161
+  organism_strain: Prochlorococcus NATL1A
+  product: DnaJ type I chaperone protein
+  score: 2.0369
+- annotation_quality: 3
+  function_description: heat shock protein DnaJ
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: heat shock protein DnaJ'
+  locus_tag: NATL1_01941
+  organism_strain: Prochlorococcus NATL1A
+  product: DnaJ type III chaperone protein
+  score: 4.2808
+- annotation_quality: 3
+  function_description: Essential for the assembly of the photosystem I (PSI) complex.
+    May act as a chaperone-like factor to guide the assembly of the PSI subunits
+  gene_name: ycf3
+  gene_summary: 'ycf3 :: photosystem I assembly protein Ycf3 :: Essential for the
+    assembly of the photosystem I (PSI) complex. May act as a chaperone-like factor
+    to guide the assembly of the PSI subunits'
+  locus_tag: NATL1_02041
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem I assembly protein Ycf3
+  score: 2.9546
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: tsaB
+  gene_summary: 'tsaB :: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+    :: Molecular chaperone'
+  locus_tag: NATL1_02111
+  organism_strain: Prochlorococcus NATL1A
+  product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+  score: 4.5036
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB2
+  gene_summary: 'clpB2 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: NATL1_02831
+  organism_strain: Prochlorococcus NATL1A
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 1.8208
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ2
+  gene_summary: 'dnaJ2 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: NATL1_02921
+  organism_strain: Prochlorococcus NATL1A
+  product: DnaJ type II chaperone protein
+  score: 5.8107
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: NATL1_06361
+  organism_strain: Prochlorococcus NATL1A
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 2.7002
+- annotation_quality: 1
+  function_description: Cyanobacteria-specific chaperone containing DNAJ domain fused
+    to a membrane domain
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: Cyanobacteria-specific chaperone
+    containing DNAJ domain fused to a membrane domain'
+  locus_tag: NATL1_07211
+  organism_strain: Prochlorococcus NATL1A
+  product: conserved hypothetical protein
+  score: 5.3862
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: hsp33 family protein :: Redox regulated molecular chaperone.
+    Protects both thermally unfolding and oxidatively damaged proteins from irreversible
+    aggregation. Plays an important role in the bacterial defense system toward oxidative
+    stress'
+  locus_tag: NATL1_07221
+  organism_strain: Prochlorococcus NATL1A
+  product: hsp33 family protein
+  score: 3.9385
+- annotation_quality: 2
+  function_description: null
+  gene_name: null
+  gene_summary: putative gram-negative pili assembly chaperone
+  locus_tag: NATL1_08451
+  organism_strain: Prochlorococcus NATL1A
+  product: putative gram-negative pili assembly chaperone
+  score: 5.1621
+- annotation_quality: 3
+  function_description: Chaperone protein HtpG
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
+  locus_tag: NATL1_09791
+  organism_strain: Prochlorococcus NATL1A
+  product: molecular chaperone HtpG
+  score: 6.2746
+- annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK2
   gene_summary: 'dnaK2 :: chaperone protein DnaK :: Acts as a chaperone'
@@ -49,6 +1801,267 @@ rows:
   organism_strain: Prochlorococcus NATL1A
   product: chaperone protein DnaK
   score: 6.7144
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: NATL1_09861
+  organism_strain: Prochlorococcus NATL1A
+  product: DnaJ type II chaperone protein
+  score: 5.8616
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: Alternative locus ID'
+  locus_tag: NATL1_10101
+  organism_strain: Prochlorococcus NATL1A
+  product: DnaJ type IV chaperone protein
+  score: 4.4033
+- annotation_quality: 2
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'possible Gram-negative pili assembly chaperone :: Alternative locus
+    ID'
+  locus_tag: NATL1_12101
+  organism_strain: Prochlorococcus NATL1A
+  product: possible Gram-negative pili assembly chaperone
+  score: 5.4051
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpC
+  gene_summary: 'clpC :: ATP-dependent Clp protease ATP-binding subunit ClpC :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: NATL1_14921
+  organism_strain: Prochlorococcus NATL1A
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.6921
+- annotation_quality: 3
+  function_description: Probably acts as a heme chaperone, transferring heme to an
+    unknown acceptor. Binds one molecule of heme per monomer, possibly covalently.
+    Binds 1 [4Fe-4S] cluster. The cluster is coordinated with 3 cysteines and an exchangeable
+    S-adenosyl-L-methionine
+  gene_name: hemN
+  gene_summary: 'hemN :: oxygen-independent coproporphyrinogen III oxidase :: Probably
+    acts as a heme chaperone, transferring heme to an unknown acceptor. Binds one
+    molecule of heme per monomer, possibly covalently. Binds 1 [4Fe-4S] cluster. The
+    cluster is coordinated with 3 cysteines and an exchangeable S-adenosyl-L-methionine'
+  locus_tag: NATL1_17311
+  organism_strain: Prochlorococcus NATL1A
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 3.2545
+- annotation_quality: 3
+  function_description: Belongs to the heat shock protein 70 family
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: Belongs to the heat shock protein
+    70 family'
+  locus_tag: NATL1_18321
+  organism_strain: Prochlorococcus NATL1A
+  product: chaperone protein DnaK
+  score: 4.0355
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: NATL1_18371
+  organism_strain: Prochlorococcus NATL1A
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: NATL1_18731
+  organism_strain: Prochlorococcus NATL1A
+  product: DnaJ type III chaperone protein
+  score: 4.4695
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: NATL1_21241
+  organism_strain: Prochlorococcus NATL1A
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: NATL1_21261
+  organism_strain: Prochlorococcus NATL1A
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Acts as a chaperone
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Acts as a chaperone'
+  locus_tag: NATL1_21861
+  organism_strain: Prochlorococcus NATL1A
+  product: chaperone protein DnaK
+  score: 6.3655
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: P9301_00151
+  organism_strain: Prochlorococcus MIT9301
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins and by disaggregating
+    proteins, also in an autonomous, DnaK-independent fashion. Unfolded proteins bind
+    initially to DnaJ; upon interaction with the DnaJ-bound protein, DnaK hydrolyzes
+    its bound ATP, resulting in the formation of a stable complex. GrpE releases ADP
+    from DnaK; ATP binding to DnaK triggers the release of the substrate protein,
+    thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: Participates actively in
+    the response to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins and by disaggregating proteins, also in an autonomous, DnaK-independent
+    fashion. Unfolded proteins bind initially to DnaJ; upon interaction with the DnaJ-bound
+    protein, DnaK hydrolyzes its bound ATP, resulting in the formation of a stable
+    complex. GrpE releases ADP from DnaK; ATP binding to DnaK triggers the release
+    of the substrate protein, thus completing the reaction cycle. Several rounds of
+    ATP-dependent interactions between DnaJ, DnaK and GrpE are required for fully
+    efficient folding. Also involved, together with DnaK and GrpE, in the DNA replication
+    of plasmids through activation of initiation proteins'
+  locus_tag: P9301_00161
+  organism_strain: Prochlorococcus MIT9301
+  product: DnaJ type I chaperone protein
+  score: 2.0369
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: P9301_01391
+  organism_strain: Prochlorococcus MIT9301
+  product: DnaJ type III chaperone protein
+  score: 4.3635
+- annotation_quality: 3
+  function_description: Essential for the assembly of the photosystem I (PSI) complex.
+    May act as a chaperone-like factor to guide the assembly of the PSI subunits
+  gene_name: ycf3
+  gene_summary: 'ycf3 :: photosystem I assembly protein Ycf3 :: Essential for the
+    assembly of the photosystem I (PSI) complex. May act as a chaperone-like factor
+    to guide the assembly of the PSI subunits'
+  locus_tag: P9301_01511
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem I assembly protein Ycf3
+  score: 2.9546
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: tsaB
+  gene_summary: 'tsaB :: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+    :: Molecular chaperone'
+  locus_tag: P9301_01581
+  organism_strain: Prochlorococcus MIT9301
+  product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+  score: 4.6157
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB2
+  gene_summary: 'clpB2 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: P9301_02271
+  organism_strain: Prochlorococcus MIT9301
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 1.8208
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: P9301_06061
+  organism_strain: Prochlorococcus MIT9301
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 2.2564
+- annotation_quality: 1
+  function_description: Cyanobacteria-specific chaperone containing DNAJ domain fused
+    to a membrane domain
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: Cyanobacteria-specific chaperone
+    containing DNAJ domain fused to a membrane domain'
+  locus_tag: P9301_07171
+  organism_strain: Prochlorococcus MIT9301
+  product: conserved hypothetical protein
+  score: 5.3862
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: hsp33 family protein :: Redox regulated molecular chaperone.
+    Protects both thermally unfolding and oxidatively damaged proteins from irreversible
+    aggregation. Plays an important role in the bacterial defense system toward oxidative
+    stress'
+  locus_tag: P9301_07181
+  organism_strain: Prochlorococcus MIT9301
+  product: hsp33 family protein
+  score: 3.9385
+- annotation_quality: 3
+  function_description: Chaperone protein HtpG
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
+  locus_tag: P9301_09581
+  organism_strain: Prochlorococcus MIT9301
+  product: molecular chaperone HtpG
+  score: 6.2746
 - annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK2
@@ -58,6 +2071,430 @@ rows:
   product: chaperone protein DnaK
   score: 6.7144
 - annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: P9301_09631
+  organism_strain: Prochlorococcus MIT9301
+  product: DnaJ type II chaperone protein
+  score: 5.8107
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: Alternative locus ID'
+  locus_tag: P9301_09871
+  organism_strain: Prochlorococcus MIT9301
+  product: DnaJ type IV chaperone protein
+  score: 5.1545
+- annotation_quality: 2
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'possible Gram-negative pili assembly chaperone :: Alternative locus
+    ID'
+  locus_tag: P9301_11181
+  organism_strain: Prochlorococcus MIT9301
+  product: possible Gram-negative pili assembly chaperone
+  score: 5.4051
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpC
+  gene_summary: 'clpC :: ATP-dependent Clp protease ATP-binding subunit ClpC :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: P9301_11951
+  organism_strain: Prochlorococcus MIT9301
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.6921
+- annotation_quality: 3
+  function_description: Probably acts as a heme chaperone, transferring heme to an
+    unknown acceptor. Binds one molecule of heme per monomer, possibly covalently.
+    Binds 1 [4Fe-4S] cluster. The cluster is coordinated with 3 cysteines and an exchangeable
+    S-adenosyl-L-methionine
+  gene_name: hemN
+  gene_summary: 'hemN :: oxygen-independent coproporphyrinogen III oxidase :: Probably
+    acts as a heme chaperone, transferring heme to an unknown acceptor. Binds one
+    molecule of heme per monomer, possibly covalently. Binds 1 [4Fe-4S] cluster. The
+    cluster is coordinated with 3 cysteines and an exchangeable S-adenosyl-L-methionine'
+  locus_tag: P9301_14971
+  organism_strain: Prochlorococcus MIT9301
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 3.2545
+- annotation_quality: 3
+  function_description: Belongs to the heat shock protein 70 family
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: Belongs to the heat shock protein
+    70 family'
+  locus_tag: P9301_16221
+  organism_strain: Prochlorococcus MIT9301
+  product: chaperone protein DnaK
+  score: 4.1305
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: P9301_16271
+  organism_strain: Prochlorococcus MIT9301
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: P9301_16641
+  organism_strain: Prochlorococcus MIT9301
+  product: DnaJ type III chaperone protein
+  score: 4.4695
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: P9301_18451
+  organism_strain: Prochlorococcus MIT9301
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: P9301_18471
+  organism_strain: Prochlorococcus MIT9301
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Acts as a chaperone
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Acts as a chaperone'
+  locus_tag: P9301_18951
+  organism_strain: Prochlorococcus MIT9301
+  product: chaperone protein DnaK
+  score: 6.3655
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: PMM0016
+  organism_strain: Prochlorococcus MED4
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: ATP binding to DnaK triggers the release of the substrate
+    protein, thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: ATP binding to DnaK triggers
+    the release of the substrate protein, thus completing the reaction cycle. Several
+    rounds of ATP-dependent interactions between DnaJ, DnaK and GrpE are required
+    for fully efficient folding. Also involved, together with DnaK and GrpE, in the
+    DNA replication of plasmids through activation of initiation proteins'
+  locus_tag: PMM0017
+  organism_strain: Prochlorococcus MED4
+  product: DnaJ type I chaperone protein
+  score: 3.0416
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: PMM0122
+  organism_strain: Prochlorococcus MED4
+  product: DnaJ type III chaperone protein
+  score: 4.3635
+- annotation_quality: 3
+  function_description: Essential for the assembly of the photosystem I (PSI) complex.
+    May act as a chaperone-like factor to guide the assembly of the PSI subunits
+  gene_name: ycf3
+  gene_summary: 'ycf3 :: photosystem I assembly protein Ycf3 :: Essential for the
+    assembly of the photosystem I (PSI) complex. May act as a chaperone-like factor
+    to guide the assembly of the PSI subunits'
+  locus_tag: PMM0132
+  organism_strain: Prochlorococcus MED4
+  product: photosystem I assembly protein Ycf3
+  score: 2.9546
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: tsaB
+  gene_summary: 'tsaB :: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+    :: Molecular chaperone'
+  locus_tag: PMM0139
+  organism_strain: Prochlorococcus MED4
+  product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+  score: 4.6157
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB2
+  gene_summary: 'clpB2 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMM0207
+  organism_strain: Prochlorococcus MED4
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 1.8208
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE'
+  locus_tag: PMM0580
+  organism_strain: Prochlorococcus MED4
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 2.5746
+- annotation_quality: 1
+  function_description: Cyanobacteria-specific chaperone containing DNAJ domain fused
+    to a membrane domain
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: Cyanobacteria-specific chaperone
+    containing DNAJ domain fused to a membrane domain'
+  locus_tag: PMM0664
+  organism_strain: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  score: 5.3862
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hsp33
+  gene_summary: 'hsp33 :: hsp33 family protein :: Redox regulated molecular chaperone.
+    Protects both thermally unfolding and oxidatively damaged proteins from irreversible
+    aggregation. Plays an important role in the bacterial defense system toward oxidative
+    stress'
+  locus_tag: PMM0665
+  organism_strain: Prochlorococcus MED4
+  product: hsp33 family protein
+  score: 3.9385
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: Alternative locus ID'
+  locus_tag: PMM0873
+  organism_strain: Prochlorococcus MED4
+  product: DnaJ type IV chaperone protein
+  score: 5.1545
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: PMM0896
+  organism_strain: Prochlorococcus MED4
+  product: DnaJ type II chaperone protein
+  score: 5.8107
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK2
+  gene_summary: 'dnaK2 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: PMM0897
+  organism_strain: Prochlorococcus MED4
+  product: chaperone protein DnaK
+  score: 5.622
+- annotation_quality: 3
+  function_description: Chaperone protein HtpG
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
+  locus_tag: PMM0901
+  organism_strain: Prochlorococcus MED4
+  product: molecular chaperone HtpG
+  score: 6.2746
+- annotation_quality: 2
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'possible Gram-negative pili assembly chaperone :: Alternative locus
+    ID'
+  locus_tag: PMM1021
+  organism_strain: Prochlorococcus MED4
+  product: possible Gram-negative pili assembly chaperone
+  score: 5.4051
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpC
+  gene_summary: 'clpC :: ATP-dependent Clp protease ATP-binding subunit ClpC :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMM1088
+  organism_strain: Prochlorococcus MED4
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.6921
+- annotation_quality: 3
+  function_description: Involved in the biosynthesis of porphyrin-containing compound
+  gene_name: hemN
+  gene_summary: 'hemN :: oxygen-independent coproporphyrinogen III oxidase :: Involved
+    in the biosynthesis of porphyrin-containing compound'
+  locus_tag: PMM1311
+  organism_strain: Prochlorococcus MED4
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 1.7785
+- annotation_quality: 3
+  function_description: Belongs to the heat shock protein 70 family
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: Belongs to the heat shock protein
+    70 family'
+  locus_tag: PMM1432
+  organism_strain: Prochlorococcus MED4
+  product: chaperone protein DnaK
+  score: 4.0355
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: PMM1437
+  organism_strain: Prochlorococcus MED4
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: PMM1474
+  organism_strain: Prochlorococcus MED4
+  product: DnaJ type III chaperone protein
+  score: 4.4695
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: PMM1655
+  organism_strain: Prochlorococcus MED4
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: PMM1657
+  organism_strain: Prochlorococcus MED4
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: PMM1704
+  organism_strain: Prochlorococcus MED4
+  product: chaperone protein DnaK
+  score: 5.2186
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMN2A_0016
+  organism_strain: Prochlorococcus NATL2A
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 2.7002
+- annotation_quality: 1
+  function_description: Cyanobacteria-specific chaperone containing DNAJ domain fused
+    to a membrane domain
+  gene_name: PMN2A_RS03430
+  gene_summary: 'PMN2A_RS03430 :: conserved hypothetical protein :: Cyanobacteria-specific
+    chaperone containing DNAJ domain fused to a membrane domain'
+  locus_tag: PMN2A_0096
+  organism_strain: Prochlorococcus NATL2A
+  product: conserved hypothetical protein
+  score: 5.3253
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: hsp33 family protein :: Redox regulated molecular chaperone.
+    Protects both thermally unfolding and oxidatively damaged proteins from irreversible
+    aggregation. Plays an important role in the bacterial defense system toward oxidative
+    stress'
+  locus_tag: PMN2A_0097
+  organism_strain: Prochlorococcus NATL2A
+  product: hsp33 family protein
+  score: 3.9385
+- annotation_quality: 2
+  function_description: null
+  gene_name: null
+  gene_summary: putative gram-negative pili assembly chaperone
+  locus_tag: PMN2A_0213
+  organism_strain: Prochlorococcus NATL2A
+  product: putative gram-negative pili assembly chaperone
+  score: 5.1621
+- annotation_quality: 3
+  function_description: Chaperone protein HtpG
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
+  locus_tag: PMN2A_0306
+  organism_strain: Prochlorococcus NATL2A
+  product: molecular chaperone HtpG
+  score: 6.2746
+- annotation_quality: 3
   function_description: Acts as a chaperone
   gene_name: dnaK2
   gene_summary: 'dnaK2 :: chaperone protein DnaK :: Acts as a chaperone'
@@ -65,6 +2502,929 @@ rows:
   organism_strain: Prochlorococcus NATL2A
   product: chaperone protein DnaK
   score: 6.7144
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: PMN2A_0313
+  organism_strain: Prochlorococcus NATL2A
+  product: DnaJ type II chaperone protein
+  score: 5.8616
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: PMN2A_RS04625
+  gene_summary: 'PMN2A_RS04625 :: DnaJ type IV chaperone protein :: Alternative locus
+    ID'
+  locus_tag: PMN2A_0337
+  organism_strain: Prochlorococcus NATL2A
+  product: DnaJ type IV chaperone protein
+  score: 5.066
+- annotation_quality: 2
+  function_description: Alternative locus ID
+  gene_name: PMN2A_RS05470
+  gene_summary: 'PMN2A_RS05470 :: possible Gram-negative pili assembly chaperone ::
+    Alternative locus ID'
+  locus_tag: PMN2A_0488
+  organism_strain: Prochlorococcus NATL2A
+  product: possible Gram-negative pili assembly chaperone
+  score: 5.3224
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpC
+  gene_summary: 'clpC :: ATP-dependent Clp protease ATP-binding subunit ClpC :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMN2A_0660
+  organism_strain: Prochlorococcus NATL2A
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.6921
+- annotation_quality: 3
+  function_description: Probably acts as a heme chaperone, transferring heme to an
+    unknown acceptor. Binds one molecule of heme per monomer, possibly covalently.
+    Binds 1 [4Fe-4S] cluster. The cluster is coordinated with 3 cysteines and an exchangeable
+    S-adenosyl-L-methionine
+  gene_name: hemN
+  gene_summary: 'hemN :: oxygen-independent coproporphyrinogen III oxidase :: Probably
+    acts as a heme chaperone, transferring heme to an unknown acceptor. Binds one
+    molecule of heme per monomer, possibly covalently. Binds 1 [4Fe-4S] cluster. The
+    cluster is coordinated with 3 cysteines and an exchangeable S-adenosyl-L-methionine'
+  locus_tag: PMN2A_0877
+  organism_strain: Prochlorococcus NATL2A
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 3.2545
+- annotation_quality: 3
+  function_description: Belongs to the heat shock protein 70 family
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: Belongs to the heat shock protein
+    70 family'
+  locus_tag: PMN2A_0964
+  organism_strain: Prochlorococcus NATL2A
+  product: chaperone protein DnaK
+  score: 4.0355
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: PMN2A_0969
+  organism_strain: Prochlorococcus NATL2A
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: PMN2A_1004
+  organism_strain: Prochlorococcus NATL2A
+  product: DnaJ type III chaperone protein
+  score: 4.4695
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: PMN2A_1253
+  organism_strain: Prochlorococcus NATL2A
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: PMN2A_1255
+  organism_strain: Prochlorococcus NATL2A
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: PMN2A_1313
+  organism_strain: Prochlorococcus NATL2A
+  product: chaperone protein DnaK
+  score: 5.2186
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: PMN2A_1343
+  organism_strain: Prochlorococcus NATL2A
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins and by disaggregating
+    proteins, also in an autonomous, DnaK-independent fashion. Unfolded proteins bind
+    initially to DnaJ; upon interaction with the DnaJ-bound protein, DnaK hydrolyzes
+    its bound ATP, resulting in the formation of a stable complex. GrpE releases ADP
+    from DnaK; ATP binding to DnaK triggers the release of the substrate protein,
+    thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: Participates actively in
+    the response to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins and by disaggregating proteins, also in an autonomous, DnaK-independent
+    fashion. Unfolded proteins bind initially to DnaJ; upon interaction with the DnaJ-bound
+    protein, DnaK hydrolyzes its bound ATP, resulting in the formation of a stable
+    complex. GrpE releases ADP from DnaK; ATP binding to DnaK triggers the release
+    of the substrate protein, thus completing the reaction cycle. Several rounds of
+    ATP-dependent interactions between DnaJ, DnaK and GrpE are required for fully
+    efficient folding. Also involved, together with DnaK and GrpE, in the DNA replication
+    of plasmids through activation of initiation proteins'
+  locus_tag: PMN2A_1344
+  organism_strain: Prochlorococcus NATL2A
+  product: DnaJ type I chaperone protein
+  score: 2.0369
+- annotation_quality: 3
+  function_description: heat shock protein DnaJ
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: heat shock protein DnaJ'
+  locus_tag: PMN2A_1489
+  organism_strain: Prochlorococcus NATL2A
+  product: DnaJ type III chaperone protein
+  score: 4.2808
+- annotation_quality: 3
+  function_description: Essential for the assembly of the photosystem I (PSI) complex.
+    May act as a chaperone-like factor to guide the assembly of the PSI subunits
+  gene_name: ycf3
+  gene_summary: 'ycf3 :: photosystem I assembly protein Ycf3 :: Essential for the
+    assembly of the photosystem I (PSI) complex. May act as a chaperone-like factor
+    to guide the assembly of the PSI subunits'
+  locus_tag: PMN2A_1498
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem I assembly protein Ycf3
+  score: 2.9546
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: tsaB
+  gene_summary: 'tsaB :: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+    :: Molecular chaperone'
+  locus_tag: PMN2A_1505
+  organism_strain: Prochlorococcus NATL2A
+  product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+  score: 4.5036
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB2
+  gene_summary: 'clpB2 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMN2A_1574
+  organism_strain: Prochlorococcus NATL2A
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 1.8208
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ2
+  gene_summary: 'dnaJ2 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: PMN2A_1582
+  organism_strain: Prochlorococcus NATL2A
+  product: DnaJ type II chaperone protein
+  score: 5.8107
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: PMT0021
+  organism_strain: Prochlorococcus MIT9313
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: ATP binding to DnaK triggers the release of the substrate
+    protein, thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: ATP binding to DnaK triggers
+    the release of the substrate protein, thus completing the reaction cycle. Several
+    rounds of ATP-dependent interactions between DnaJ, DnaK and GrpE are required
+    for fully efficient folding. Also involved, together with DnaK and GrpE, in the
+    DNA replication of plasmids through activation of initiation proteins'
+  locus_tag: PMT0022
+  organism_strain: Prochlorococcus MIT9313
+  product: DnaJ type I chaperone protein
+  score: 3.0416
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: PMT0061
+  organism_strain: Prochlorococcus MIT9313
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: PMT0063
+  organism_strain: Prochlorococcus MIT9313
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE'
+  locus_tag: PMT0449
+  organism_strain: Prochlorococcus MIT9313
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 3.365
+- annotation_quality: 2
+  function_description: null
+  gene_name: null
+  gene_summary: putative gram-negative pili assembly chaperone
+  locus_tag: PMT0498
+  organism_strain: Prochlorococcus MIT9313
+  product: putative gram-negative pili assembly chaperone
+  score: 5.1621
+- annotation_quality: 3
+  function_description: Chaperone protein HtpG
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
+  locus_tag: PMT0696
+  organism_strain: Prochlorococcus MIT9313
+  product: molecular chaperone HtpG
+  score: 6.2746
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK2
+  gene_summary: 'dnaK2 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: PMT0703
+  organism_strain: Prochlorococcus MIT9313
+  product: chaperone protein DnaK
+  score: 5.622
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: PMT0704
+  organism_strain: Prochlorococcus MIT9313
+  product: DnaJ type II chaperone protein
+  score: 5.8616
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: Alternative locus ID'
+  locus_tag: PMT0736
+  organism_strain: Prochlorococcus MIT9313
+  product: DnaJ type IV chaperone protein
+  score: 5.1545
+- annotation_quality: 1
+  function_description: Cyanobacteria-specific chaperone containing DNAJ domain fused
+    to a membrane domain
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: Cyanobacteria-specific chaperone
+    containing DNAJ domain fused to a membrane domain'
+  locus_tag: PMT0789
+  organism_strain: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  score: 5.3862
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: putative trigger factor :: Involved in protein export. Acts
+    as a chaperone by maintaining the newly synthesized protein in an open conformation.
+    Functions as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: PMT1011
+  organism_strain: Prochlorococcus MIT9313
+  product: putative trigger factor
+  score: 3.5368
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpC
+  gene_summary: 'clpC :: ATP-dependent Clp protease ATP-binding subunit ClpC :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMT1061
+  organism_strain: Prochlorococcus MIT9313
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.6921
+- annotation_quality: 3
+  function_description: Belongs to the heat shock protein 70 family
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: Belongs to the heat shock protein
+    70 family'
+  locus_tag: PMT1444
+  organism_strain: Prochlorococcus MIT9313
+  product: chaperone protein DnaK
+  score: 4.0355
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: PMT1450
+  organism_strain: Prochlorococcus MIT9313
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: PMT1495
+  organism_strain: Prochlorococcus MIT9313
+  product: DnaJ type III chaperone protein
+  score: 4.4695
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ2
+  gene_summary: 'dnaJ2 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: PMT1548
+  organism_strain: Prochlorococcus MIT9313
+  product: DnaJ type II chaperone protein
+  score: 5.8107
+- annotation_quality: 3
+  function_description: heat shock protein DnaJ
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: heat shock protein DnaJ'
+  locus_tag: PMT1977
+  organism_strain: Prochlorococcus MIT9313
+  product: DnaJ type III chaperone protein
+  score: 4.2808
+- annotation_quality: 3
+  function_description: Essential for the assembly of the photosystem I (PSI) complex.
+    May act as a chaperone-like factor to guide the assembly of the PSI subunits
+  gene_name: ycf3
+  gene_summary: 'ycf3 :: photosystem I assembly protein Ycf3 :: Essential for the
+    assembly of the photosystem I (PSI) complex. May act as a chaperone-like factor
+    to guide the assembly of the PSI subunits'
+  locus_tag: PMT1992
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem I assembly protein Ycf3
+  score: 2.9546
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: tsaB
+  gene_summary: 'tsaB :: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+    :: Molecular chaperone'
+  locus_tag: PMT1999
+  organism_strain: Prochlorococcus MIT9313
+  product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+  score: 4.5036
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB2
+  gene_summary: 'clpB2 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMT2085
+  organism_strain: Prochlorococcus MIT9313
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 1.8208
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: PMT2255
+  organism_strain: Prochlorococcus MIT9313
+  product: chaperone protein DnaK
+  score: 5.2186
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: PMT9312_0016
+  organism_strain: Prochlorococcus MIT9312
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins and by disaggregating
+    proteins, also in an autonomous, DnaK-independent fashion. Unfolded proteins bind
+    initially to DnaJ; upon interaction with the DnaJ-bound protein, DnaK hydrolyzes
+    its bound ATP, resulting in the formation of a stable complex. GrpE releases ADP
+    from DnaK; ATP binding to DnaK triggers the release of the substrate protein,
+    thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: Participates actively in
+    the response to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins and by disaggregating proteins, also in an autonomous, DnaK-independent
+    fashion. Unfolded proteins bind initially to DnaJ; upon interaction with the DnaJ-bound
+    protein, DnaK hydrolyzes its bound ATP, resulting in the formation of a stable
+    complex. GrpE releases ADP from DnaK; ATP binding to DnaK triggers the release
+    of the substrate protein, thus completing the reaction cycle. Several rounds of
+    ATP-dependent interactions between DnaJ, DnaK and GrpE are required for fully
+    efficient folding. Also involved, together with DnaK and GrpE, in the DNA replication
+    of plasmids through activation of initiation proteins'
+  locus_tag: PMT9312_0017
+  organism_strain: Prochlorococcus MIT9312
+  product: DnaJ type I chaperone protein
+  score: 2.0369
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: PMT9312_0125
+  organism_strain: Prochlorococcus MIT9312
+  product: DnaJ type III chaperone protein
+  score: 4.3635
+- annotation_quality: 3
+  function_description: Essential for the assembly of the photosystem I (PSI) complex.
+    May act as a chaperone-like factor to guide the assembly of the PSI subunits
+  gene_name: ycf3
+  gene_summary: 'ycf3 :: photosystem I assembly protein Ycf3 :: Essential for the
+    assembly of the photosystem I (PSI) complex. May act as a chaperone-like factor
+    to guide the assembly of the PSI subunits'
+  locus_tag: PMT9312_0134
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem I assembly protein Ycf3
+  score: 2.9546
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: tsaB
+  gene_summary: 'tsaB :: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+    :: Molecular chaperone'
+  locus_tag: PMT9312_0141
+  organism_strain: Prochlorococcus MIT9312
+  product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+  score: 4.6157
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB2
+  gene_summary: 'clpB2 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMT9312_0209
+  organism_strain: Prochlorococcus MIT9312
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 1.8208
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMT9312_0580
+  organism_strain: Prochlorococcus MIT9312
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 2.2564
+- annotation_quality: 1
+  function_description: Cyanobacteria-specific chaperone containing DNAJ domain fused
+    to a membrane domain
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: Cyanobacteria-specific chaperone
+    containing DNAJ domain fused to a membrane domain'
+  locus_tag: PMT9312_0664
+  organism_strain: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  score: 5.3862
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: hsp33 family protein :: Redox regulated molecular chaperone.
+    Protects both thermally unfolding and oxidatively damaged proteins from irreversible
+    aggregation. Plays an important role in the bacterial defense system toward oxidative
+    stress'
+  locus_tag: PMT9312_0665
+  organism_strain: Prochlorococcus MIT9312
+  product: hsp33 family protein
+  score: 3.9385
+- annotation_quality: 3
+  function_description: Chaperone protein HtpG
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Chaperone protein HtpG'
+  locus_tag: PMT9312_0899
+  organism_strain: Prochlorococcus MIT9312
+  product: molecular chaperone HtpG
+  score: 6.2746
+- annotation_quality: 3
+  function_description: Acts as a chaperone
+  gene_name: dnaK2
+  gene_summary: 'dnaK2 :: chaperone protein DnaK :: Acts as a chaperone'
+  locus_tag: PMT9312_0903
+  organism_strain: Prochlorococcus MIT9312
+  product: chaperone protein DnaK
+  score: 6.7144
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: DnaJ-class molecular chaperone'
+  locus_tag: PMT9312_0904
+  organism_strain: Prochlorococcus MIT9312
+  product: DnaJ type II chaperone protein
+  score: 5.8107
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: Alternative locus ID'
+  locus_tag: PMT9312_0928
+  organism_strain: Prochlorococcus MIT9312
+  product: DnaJ type IV chaperone protein
+  score: 5.1545
+- annotation_quality: 2
+  function_description: Alternative locus ID
+  gene_name: null
+  gene_summary: 'possible Gram-negative pili assembly chaperone :: Alternative locus
+    ID'
+  locus_tag: PMT9312_1031
+  organism_strain: Prochlorococcus MIT9312
+  product: possible Gram-negative pili assembly chaperone
+  score: 5.4051
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpC
+  gene_summary: 'clpC :: ATP-dependent Clp protease ATP-binding subunit ClpC :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: PMT9312_1099
+  organism_strain: Prochlorococcus MIT9312
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.6921
+- annotation_quality: 3
+  function_description: heat shock protein binding
+  gene_name: dnaJ7
+  gene_summary: 'dnaJ7 :: DnaJ type III chaperone protein :: heat shock protein binding'
+  locus_tag: PMT9312_1138
+  organism_strain: Prochlorococcus MIT9312
+  product: DnaJ type III chaperone protein
+  score: 4.8356
+- annotation_quality: 3
+  function_description: Probably acts as a heme chaperone, transferring heme to an
+    unknown acceptor. Binds one molecule of heme per monomer, possibly covalently.
+    Binds 1 [4Fe-4S] cluster. The cluster is coordinated with 3 cysteines and an exchangeable
+    S-adenosyl-L-methionine
+  gene_name: hemN
+  gene_summary: 'hemN :: oxygen-independent coproporphyrinogen III oxidase :: Probably
+    acts as a heme chaperone, transferring heme to an unknown acceptor. Binds one
+    molecule of heme per monomer, possibly covalently. Binds 1 [4Fe-4S] cluster. The
+    cluster is coordinated with 3 cysteines and an exchangeable S-adenosyl-L-methionine'
+  locus_tag: PMT9312_1408
+  organism_strain: Prochlorococcus MIT9312
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 3.2545
+- annotation_quality: 3
+  function_description: Belongs to the heat shock protein 70 family
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: Belongs to the heat shock protein
+    70 family'
+  locus_tag: PMT9312_1525
+  organism_strain: Prochlorococcus MIT9312
+  product: chaperone protein DnaK
+  score: 4.0355
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: PMT9312_1530
+  organism_strain: Prochlorococcus MIT9312
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: Alternative locus ID
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: Alternative locus ID'
+  locus_tag: PMT9312_1567
+  organism_strain: Prochlorococcus MIT9312
+  product: DnaJ type III chaperone protein
+  score: 4.4695
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: PMT9312_1747
+  organism_strain: Prochlorococcus MIT9312
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: PMT9312_1749
+  organism_strain: Prochlorococcus MIT9312
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: PMT9312_1797
+  organism_strain: Prochlorococcus MIT9312
+  product: chaperone protein DnaK
+  score: 5.2186
+- annotation_quality: 2
+  function_description: null
+  gene_name: null
+  gene_summary: 'possible DnaJ type IV chaperone protein :: -'
+  locus_tag: PMT_2694
+  organism_strain: Prochlorococcus MIT9313
+  product: possible DnaJ type IV chaperone protein
+  score: 5.5724
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: SYNW0023
+  organism_strain: Synechococcus WH8102
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: ATP binding to DnaK triggers the release of the substrate
+    protein, thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: ATP binding to DnaK triggers
+    the release of the substrate protein, thus completing the reaction cycle. Several
+    rounds of ATP-dependent interactions between DnaJ, DnaK and GrpE are required
+    for fully efficient folding. Also involved, together with DnaK and GrpE, in the
+    DNA replication of plasmids through activation of initiation proteins'
+  locus_tag: SYNW0024
+  organism_strain: Synechococcus WH8102
+  product: DnaJ type I chaperone protein
+  score: 3.0416
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: SYNW0063
+  organism_strain: Synechococcus WH8102
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: SYNW0065
+  organism_strain: Synechococcus WH8102
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: Involved in chlorophyll biosynthesis; introduces a magnesium
+    ion into protoporphyrin IX to yield Mg-protoporphyrin IX
+  gene_name: comM
+  gene_summary: 'comM :: putative ATP-dependent protease :: Involved in chlorophyll
+    biosynthesis; introduces a magnesium ion into protoporphyrin IX to yield Mg-protoporphyrin
+    IX'
+  locus_tag: SYNW0327
+  organism_strain: Synechococcus WH8102
+  product: putative ATP-dependent protease
+  score: 1.4987
+- annotation_quality: 1
+  function_description: conserved protein related to C-terminal domain of eukaryotic
+    chaperone, SACSIN
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: conserved protein related to C-terminal
+    domain of eukaryotic chaperone, SACSIN'
+  locus_tag: SYNW0480
+  organism_strain: Synechococcus WH8102
+  product: conserved hypothetical protein
+  score: 4.7605
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: SYNW0513
+  organism_strain: Synechococcus WH8102
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: molecular chaperone
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: molecular chaperone'
+  locus_tag: SYNW0523
+  organism_strain: Synechococcus WH8102
+  product: chaperone protein DnaK
+  score: 6.3309
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: DnaJ-class molecular
+    chaperone'
+  locus_tag: SYNW0627
+  organism_strain: Synechococcus WH8102
+  product: DnaJ type III chaperone protein
+  score: 5.9145
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE. Acts before DnaK, in the processing of protein aggregates. Protein
+    binding stimulates the ATPase activity; ATP hydrolysis unfolds the denatured protein
+    aggregates, which probably helps expose new hydrophobic binding sites on the surface
+    of ClpB-bound aggregates, contributing to the solubilization and refolding of
+    denatured protein aggregates by DnaK
+  gene_name: clpC
+  gene_summary: 'clpC :: ATP-dependent Clp protease ATP-binding subunit ClpC :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE. Acts
+    before DnaK, in the processing of protein aggregates. Protein binding stimulates
+    the ATPase activity; ATP hydrolysis unfolds the denatured protein aggregates,
+    which probably helps expose new hydrophobic binding sites on the surface of ClpB-bound
+    aggregates, contributing to the solubilization and refolding of denatured protein
+    aggregates by DnaK'
+  locus_tag: SYNW0938
+  organism_strain: Synechococcus WH8102
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.6921
+- annotation_quality: 1
+  function_description: Protein CHAPERONE-LIKE PROTEIN OF POR1-like
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: Protein CHAPERONE-LIKE PROTEIN
+    OF POR1-like'
+  locus_tag: SYNW1152
+  organism_strain: Synechococcus WH8102
+  product: conserved hypothetical protein
+  score: 5.7489
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: hsp33 family protein :: Redox regulated molecular chaperone.
+    Protects both thermally unfolding and oxidatively damaged proteins from irreversible
+    aggregation. Plays an important role in the bacterial defense system toward oxidative
+    stress'
+  locus_tag: SYNW1153
+  organism_strain: Synechococcus WH8102
+  product: hsp33 family protein
+  score: 3.9385
+- annotation_quality: 3
+  function_description: COG2214 DnaJ-class molecular chaperone
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: COG2214 DnaJ-class molecular chaperone'
+  locus_tag: SYNW1230
+  organism_strain: Synechococcus WH8102
+  product: DnaJ type IV chaperone protein
+  score: 6.3123
+- annotation_quality: 3
+  function_description: molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: molecular chaperone'
+  locus_tag: SYNW1268
+  organism_strain: Synechococcus WH8102
+  product: DnaJ type II chaperone protein
+  score: 6.0067
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK2
+  gene_summary: 'dnaK2 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: SYNW1269
+  organism_strain: Synechococcus WH8102
+  product: chaperone protein DnaK
+  score: 5.622
+- annotation_quality: 3
+  function_description: Heat shock protein
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Heat shock protein'
+  locus_tag: SYNW1278
+  organism_strain: Synechococcus WH8102
+  product: molecular chaperone HtpG
+  score: 5.0711
 - annotation_quality: 3
   function_description: Molecular chaperone
   gene_name: null
@@ -74,6 +3434,206 @@ rows:
   product: DnaJ type IV chaperone protein
   score: 7.1461
 - annotation_quality: 3
+  function_description: COG2214 DnaJ-class molecular chaperone
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: COG2214 DnaJ-class molecular chaperone'
+  locus_tag: SYNW1429
+  organism_strain: Synechococcus WH8102
+  product: DnaJ type IV chaperone protein
+  score: 6.2826
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE'
+  locus_tag: SYNW1503
+  organism_strain: Synechococcus WH8102
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 3.365
+- annotation_quality: 3
+  function_description: Probably acts as a heme chaperone, transferring heme to an
+    unknown acceptor. Binds one molecule of heme per monomer, possibly covalently.
+    Binds 1 [4Fe-4S] cluster. The cluster is coordinated with 3 cysteines and an exchangeable
+    S-adenosyl-L-methionine
+  gene_name: hemN
+  gene_summary: 'hemN :: oxygen-independent coproporphyrinogen III oxidase :: Probably
+    acts as a heme chaperone, transferring heme to an unknown acceptor. Binds one
+    molecule of heme per monomer, possibly covalently. Binds 1 [4Fe-4S] cluster. The
+    cluster is coordinated with 3 cysteines and an exchangeable S-adenosyl-L-methionine'
+  locus_tag: SYNW1646
+  organism_strain: Synechococcus WH8102
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 3.2545
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: dnaJ2
+  gene_summary: 'dnaJ2 :: DnaJ type II chaperone protein :: Molecular chaperone'
+  locus_tag: SYNW1934
+  organism_strain: Synechococcus WH8102
+  product: DnaJ type II chaperone protein
+  score: 5.9559
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: Molecular chaperone'
+  locus_tag: SYNW2221
+  organism_strain: Synechococcus WH8102
+  product: DnaJ type III chaperone protein
+  score: 6.0067
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: SYNW2508
+  organism_strain: Synechococcus WH8102
+  product: chaperone protein DnaK
+  score: 5.2186
+- annotation_quality: 2
+  function_description: null
+  gene_name: null
+  gene_summary: 'possible DnaJ type IV chaperone protein :: -'
+  locus_tag: TX72_RS02870
+  organism_strain: Synechococcus WH8102
+  product: possible DnaJ type IV chaperone protein
+  score: 5.5724
+- annotation_quality: 3
+  function_description: Participates actively in the response to hyperosmotic and
+    heat shock by preventing the aggregation of stress-denatured proteins, in association
+    with DnaK and GrpE. It is the nucleotide exchange factor for DnaK and may function
+    as a thermosensor. Unfolded proteins bind initially to DnaJ
+  gene_name: grpE
+  gene_summary: 'grpE :: chaperone protein GrpE :: Participates actively in the response
+    to hyperosmotic and heat shock by preventing the aggregation of stress-denatured
+    proteins, in association with DnaK and GrpE. It is the nucleotide exchange factor
+    for DnaK and may function as a thermosensor. Unfolded proteins bind initially
+    to DnaJ'
+  locus_tag: sync_0022
+  organism_strain: Synechococcus CC9311
+  product: chaperone protein GrpE
+  score: 2.5296
+- annotation_quality: 3
+  function_description: ATP binding to DnaK triggers the release of the substrate
+    protein, thus completing the reaction cycle. Several rounds of ATP-dependent interactions
+    between DnaJ, DnaK and GrpE are required for fully efficient folding. Also involved,
+    together with DnaK and GrpE, in the DNA replication of plasmids through activation
+    of initiation proteins
+  gene_name: dnaJ1
+  gene_summary: 'dnaJ1 :: DnaJ type I chaperone protein :: ATP binding to DnaK triggers
+    the release of the substrate protein, thus completing the reaction cycle. Several
+    rounds of ATP-dependent interactions between DnaJ, DnaK and GrpE are required
+    for fully efficient folding. Also involved, together with DnaK and GrpE, in the
+    DNA replication of plasmids through activation of initiation proteins'
+  locus_tag: sync_0023
+  organism_strain: Synechococcus CC9311
+  product: DnaJ type I chaperone protein
+  score: 3.0416
+- annotation_quality: 3
+  function_description: ATP-dependent specificity component of the Clp protease. It
+    directs the protease to specific substrates. Can perform chaperone functions in
+    the absence of ClpP
+  gene_name: clpX
+  gene_summary: 'clpX :: ATP-dependent Clp protease ATP-binding subunit, ClpX :: ATP-dependent
+    specificity component of the Clp protease. It directs the protease to specific
+    substrates. Can perform chaperone functions in the absence of ClpP'
+  locus_tag: sync_0064
+  organism_strain: Synechococcus CC9311
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.7222
+- annotation_quality: 3
+  function_description: Involved in protein export. Acts as a chaperone by maintaining
+    the newly synthesized protein in an open conformation. Functions as a peptidyl-prolyl
+    cis-trans isomerase
+  gene_name: tig
+  gene_summary: 'tig :: trigger factor :: Involved in protein export. Acts as a chaperone
+    by maintaining the newly synthesized protein in an open conformation. Functions
+    as a peptidyl-prolyl cis-trans isomerase'
+  locus_tag: sync_0066
+  organism_strain: Synechococcus CC9311
+  product: trigger factor
+  score: 2.8896
+- annotation_quality: 3
+  function_description: Involved in the biosynthesis of porphyrin-containing compound
+  gene_name: hemN
+  gene_summary: 'hemN :: oxygen-independent coproporphyrinogen III oxidase :: Involved
+    in the biosynthesis of porphyrin-containing compound'
+  locus_tag: sync_0729
+  organism_strain: Synechococcus CC9311
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 1.7785
+- annotation_quality: 1
+  function_description: Protein CHAPERONE-LIKE PROTEIN OF POR1-like
+  gene_name: null
+  gene_summary: 'conserved hypothetical protein :: Protein CHAPERONE-LIKE PROTEIN
+    OF POR1-like'
+  locus_tag: sync_1271
+  organism_strain: Synechococcus CC9311
+  product: conserved hypothetical protein
+  score: 5.7489
+- annotation_quality: 3
+  function_description: Redox regulated molecular chaperone. Protects both thermally
+    unfolding and oxidatively damaged proteins from irreversible aggregation. Plays
+    an important role in the bacterial defense system toward oxidative stress
+  gene_name: hslO
+  gene_summary: 'hslO :: hsp33 family protein :: Redox regulated molecular chaperone.
+    Protects both thermally unfolding and oxidatively damaged proteins from irreversible
+    aggregation. Plays an important role in the bacterial defense system toward oxidative
+    stress'
+  locus_tag: sync_1272
+  organism_strain: Synechococcus CC9311
+  product: hsp33 family protein
+  score: 3.9385
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK4
+  gene_summary: 'dnaK4 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: sync_1293
+  organism_strain: Synechococcus CC9311
+  product: chaperone protein DnaK
+  score: 5.2737
+- annotation_quality: 3
+  function_description: COG2214 DnaJ-class molecular chaperone
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: COG2214 DnaJ-class molecular chaperone'
+  locus_tag: sync_1342
+  organism_strain: Synechococcus CC9311
+  product: DnaJ type IV chaperone protein
+  score: 6.2203
+- annotation_quality: 3
+  function_description: molecular chaperone
+  gene_name: dnaJ3
+  gene_summary: 'dnaJ3 :: DnaJ type II chaperone protein :: molecular chaperone'
+  locus_tag: sync_1388
+  organism_strain: Synechococcus CC9311
+  product: DnaJ type II chaperone protein
+  score: 6.0067
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK2
+  gene_summary: 'dnaK2 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: sync_1389
+  organism_strain: Synechococcus CC9311
+  product: chaperone protein DnaK
+  score: 5.622
+- annotation_quality: 3
+  function_description: Heat shock protein
+  gene_name: htpG
+  gene_summary: 'htpG :: molecular chaperone HtpG :: Heat shock protein'
+  locus_tag: sync_1398
+  organism_strain: Synechococcus CC9311
+  product: molecular chaperone HtpG
+  score: 5.157
+- annotation_quality: 3
+  function_description: COG2214 DnaJ-class molecular chaperone
+  gene_name: null
+  gene_summary: 'DnaJ type IV chaperone protein :: COG2214 DnaJ-class molecular chaperone'
+  locus_tag: sync_1452
+  organism_strain: Synechococcus CC9311
+  product: DnaJ type IV chaperone protein
+  score: 6.2826
+- annotation_quality: 3
   function_description: Molecular chaperone
   gene_name: null
   gene_summary: 'DnaJ type IV chaperone protein :: Molecular chaperone'
@@ -81,3 +3641,83 @@ rows:
   organism_strain: Synechococcus CC9311
   product: DnaJ type IV chaperone protein
   score: 7.1461
+- annotation_quality: 3
+  function_description: Part of a stress-induced multi-chaperone system, it is involved
+    in the recovery of the cell from heat-induced damage, in cooperation with DnaK,
+    DnaJ and GrpE
+  gene_name: clpB1
+  gene_summary: 'clpB1 :: ATP-dependent Clp protease ATP-binding subunit ClpB :: Part
+    of a stress-induced multi-chaperone system, it is involved in the recovery of
+    the cell from heat-induced damage, in cooperation with DnaK, DnaJ and GrpE'
+  locus_tag: sync_1897
+  organism_strain: Synechococcus CC9311
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 3.365
+- annotation_quality: 2
+  function_description: null
+  gene_name: null
+  gene_summary: possible DnaJ type IV chaperone protein
+  locus_tag: sync_2189
+  organism_strain: Synechococcus CC9311
+  product: possible DnaJ type IV chaperone protein
+  score: 5.6907
+- annotation_quality: 3
+  function_description: molecular chaperone
+  gene_name: dnaK1
+  gene_summary: 'dnaK1 :: chaperone protein DnaK :: molecular chaperone'
+  locus_tag: sync_2271
+  organism_strain: Synechococcus CC9311
+  product: chaperone protein DnaK
+  score: 6.3309
+- annotation_quality: 3
+  function_description: Binds to Cpn60 in the presence of Mg-ATP and suppresses the
+    ATPase activity of the latter
+  gene_name: groES
+  gene_summary: 'groES :: co-chaperonin GroES :: Binds to Cpn60 in the presence of
+    Mg-ATP and suppresses the ATPase activity of the latter'
+  locus_tag: sync_2283
+  organism_strain: Synechococcus CC9311
+  product: co-chaperonin GroES
+  score: 1.6467
+- annotation_quality: 3
+  function_description: DnaJ-class molecular chaperone
+  gene_name: dnaJ5
+  gene_summary: 'dnaJ5 :: DnaJ type III chaperone protein :: DnaJ-class molecular
+    chaperone'
+  locus_tag: sync_2345
+  organism_strain: Synechococcus CC9311
+  product: DnaJ type III chaperone protein
+  score: 5.9145
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: dnaJ2
+  gene_summary: 'dnaJ2 :: DnaJ type II chaperone protein :: Molecular chaperone'
+  locus_tag: sync_2399
+  organism_strain: Synechococcus CC9311
+  product: DnaJ type II chaperone protein
+  score: 5.9559
+- annotation_quality: 3
+  function_description: ATPase with chaperone activity
+  gene_name: comM
+  gene_summary: 'comM :: putative ATP-dependent protease :: ATPase with chaperone
+    activity'
+  locus_tag: sync_2468
+  organism_strain: Synechococcus CC9311
+  product: putative ATP-dependent protease
+  score: 4.2686
+- annotation_quality: 3
+  function_description: Molecular chaperone
+  gene_name: dnaJ4
+  gene_summary: 'dnaJ4 :: DnaJ type III chaperone protein :: Molecular chaperone'
+  locus_tag: sync_2576
+  organism_strain: Synechococcus CC9311
+  product: DnaJ type III chaperone protein
+  score: 6.0067
+- annotation_quality: 3
+  function_description: Heat shock 70 kDa protein
+  gene_name: dnaK3
+  gene_summary: 'dnaK3 :: chaperone protein DnaK :: Heat shock 70 kDa protein'
+  locus_tag: sync_2923
+  organism_strain: Synechococcus CC9311
+  product: chaperone protein DnaK
+  score: 5.2186

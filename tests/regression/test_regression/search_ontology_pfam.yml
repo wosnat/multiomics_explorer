@@ -1,5 +1,5 @@
 case_id: search_ontology_pfam
-row_count: 25
+row_count: 44
 rows:
 - id: pfam:PF00078
   name: Reverse transcriptase (RNA-dependent DNA polymerase)
@@ -16,6 +16,9 @@ rows:
 - id: pfam:PF00623
   name: RNA polymerase Rpb1, domain 2
   score: 1.904
+- id: pfam:PF00712
+  name: DNA polymerase III beta subunit, N-terminal domain
+  score: 1.5096
 - id: pfam:PF00940
   name: DNA-dependent RNA polymerase
   score: 2.0856
@@ -25,9 +28,27 @@ rows:
 - id: pfam:PF01192
   name: RNA polymerase Rpb6
   score: 2.3056
+- id: pfam:PF01193
+  name: RNA polymerase Rpb3/Rpb11 dimerisation domain
+  score: 1.7515
 - id: pfam:PF01743
   name: Poly A polymerase head domain
   score: 1.904
+- id: pfam:PF02767
+  name: DNA polymerase III beta subunit, central domain
+  score: 1.6215
+- id: pfam:PF02768
+  name: DNA polymerase III beta subunit, C-terminal domain
+  score: 1.5096
+- id: pfam:PF03104
+  name: DNA polymerase family B, exonuclease domain
+  score: 1.7515
+- id: pfam:PF03118
+  name: Bacterial RNA polymerase, alpha chain C terminal domain
+  score: 1.5096
+- id: pfam:PF04353
+  name: Regulator of RNA polymerase sigma(70) subunit, Rsd/AlgQ
+  score: 1.4121
 - id: pfam:PF04364
   name: DNA polymerase III chi subunit, HolC
   score: 1.7515
@@ -58,21 +79,57 @@ rows:
 - id: pfam:PF06144
   name: DNA polymerase III, delta subunit
   score: 1.904
+- id: pfam:PF07733
+  name: Bacterial DNA polymerase III alpha NTPase domain
+  score: 1.6215
+- id: pfam:PF09115
+  name: DNA polymerase III, delta subunit, C terminal
+  score: 1.6215
+- id: pfam:PF09250
+  name: Bifunctional DNA primase/polymerase, N-terminal
+  score: 1.7515
+- id: pfam:PF10385
+  name: RNA polymerase beta subunit external 1 domain
+  score: 1.6215
 - id: pfam:PF10789
   name: Phage RNA polymerase binding, RpbA
   score: 1.904
 - id: pfam:PF12137
   name: RNA polymerase recycling family C-terminal
   score: 1.7515
+- id: pfam:PF12168
+  name: DNA polymerase III subunits tau domain IV DnaB-binding
+  score: 1.4121
+- id: pfam:PF12169
+  name: DNA polymerase III subunits gamma and tau domain III
+  score: 1.4121
+- id: pfam:PF12170
+  name: DNA polymerase III tau subunit V interacting with alpha
+  score: 1.4121
 - id: pfam:PF12626
   name: Polymerase A arginine-rich C-terminus
   score: 1.7515
+- id: pfam:PF12627
+  name: Probable RNA and SrmB- binding site of polymerase A
+  score: 1.4121
 - id: pfam:PF13177
   name: DNA polymerase III, delta subunit
   score: 1.904
+- id: pfam:PF14700
+  name: DNA-directed RNA polymerase N-terminal
+  score: 1.7515
+- id: pfam:PF17657
+  name: Bacterial DNA polymerase III alpha subunit finger domain
+  score: 1.5096
 - id: pfam:PF18765
   name: Polymerase beta, Nucleotidyltransferase
   score: 2.3056
+- id: pfam:PF21694
+  name: DNA polymerase III delta subunit, C-terminal domain
+  score: 1.5096
 - id: pfam:PF21999
   name: DNA polymerase-iota, thumb domain
   score: 1.904
+- id: pfam:PF22608
+  name: DNA polymerase III clamp loader subunit, ATPase lid domain
+  score: 1.4121

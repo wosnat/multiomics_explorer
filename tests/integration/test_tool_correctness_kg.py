@@ -161,10 +161,10 @@ class TestSearchGenesCorrectnessKG:
     def test_quality_filter_reduces_results(self, conn):
         """Higher min_quality should return fewer or equal results than lower."""
         cypher_low, params_low = build_search_genes(
-            search_text="polymerase", min_quality=0, limit=50,
+            search_text="polymerase", min_quality=0,
         )
         cypher_high, params_high = build_search_genes(
-            search_text="polymerase", min_quality=2, limit=50,
+            search_text="polymerase", min_quality=2,
         )
         results_low = conn.execute_query(cypher_low, **params_low)
         results_high = conn.execute_query(cypher_high, **params_high)
@@ -181,7 +181,7 @@ class TestSearchGenesCorrectnessKG:
     def test_cross_organism_results(self, conn):
         """Search without organism filter returns genes from multiple organisms."""
         cypher, params = build_search_genes(
-            search_text="chaperone", limit=20,
+            search_text="chaperone",
         )
         results = conn.execute_query(cypher, **params)
         orgs = {r["organism_strain"] for r in results}
@@ -229,7 +229,7 @@ class TestGeneOverviewCorrectnessKG:
 
     def test_single_gene_pro(self, conn):
         """PMM1428: verify annotation_types, expression counts, ortholog signals."""
-        cypher, params = build_gene_overview(locus_tags=["PMM1428"])
+        cypher, params = build_gene_overview(gene_ids=["PMM1428"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         r = results[0]
@@ -242,7 +242,7 @@ class TestGeneOverviewCorrectnessKG:
 
     def test_single_gene_alt(self, conn):
         """EZ55_00275: empty annotation_types, no expression, small ortholog group."""
-        cypher, params = build_gene_overview(locus_tags=["EZ55_00275"])
+        cypher, params = build_gene_overview(gene_ids=["EZ55_00275"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         r = results[0]
@@ -253,7 +253,7 @@ class TestGeneOverviewCorrectnessKG:
 
     def test_batch_mixed_organisms(self, conn):
         """[PMM1428, EZ55_00275]: returns 2 rows with correct organism_strain."""
-        cypher, params = build_gene_overview(locus_tags=["PMM1428", "EZ55_00275"])
+        cypher, params = build_gene_overview(gene_ids=["PMM1428", "EZ55_00275"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 2
         orgs = {r["organism_strain"] for r in results}
@@ -261,7 +261,7 @@ class TestGeneOverviewCorrectnessKG:
 
     def test_nonexistent_gene_excluded(self, conn):
         """[PMM1428, FAKE_GENE]: returns 1 row (only PMM1428)."""
-        cypher, params = build_gene_overview(locus_tags=["PMM1428", "FAKE_GENE"])
+        cypher, params = build_gene_overview(gene_ids=["PMM1428", "FAKE_GENE"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         assert results[0]["locus_tag"] == "PMM1428"
@@ -482,14 +482,14 @@ class TestQueryExpressionCorrectnessKG:
 
     def test_med4_has_expression_data(self, conn):
         """MED4 should have expression data in the KG."""
-        cypher, params = build_query_expression(organism="MED4", limit=5)
+        cypher, params = build_query_expression(organism="MED4")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
 
     def test_direction_filter_up(self, conn):
         """Direction filter 'up' should only return upregulated genes."""
         cypher, params = build_query_expression(
-            organism="MED4", direction="up", limit=10,
+            organism="MED4", direction="up",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
@@ -501,7 +501,7 @@ class TestQueryExpressionCorrectnessKG:
     def test_direction_filter_down(self, conn):
         """Direction filter 'down' should only return downregulated genes."""
         cypher, params = build_query_expression(
-            organism="MED4", direction="down", limit=10,
+            organism="MED4", direction="down",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
@@ -513,7 +513,7 @@ class TestQueryExpressionCorrectnessKG:
     def test_min_log2fc_filter(self, conn):
         """All results with min_log2fc=2.0 should have abs(log2fc) >= 2.0."""
         cypher, params = build_query_expression(
-            organism="MED4", min_log2fc=2.0, limit=20,
+            organism="MED4", min_log2fc=2.0,
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
@@ -533,7 +533,7 @@ class TestCompareConditionsCorrectnessKG:
 
     def test_by_organism(self, conn):
         """Filtering by organism MED4 should return expression comparison data."""
-        cypher, params = build_compare_conditions(organisms=["MED4"], limit=10)
+        cypher, params = build_compare_conditions(organisms=["MED4"])
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         assert "gene" in results[0]
@@ -541,7 +541,7 @@ class TestCompareConditionsCorrectnessKG:
     def test_by_gene_ids(self, conn):
         """Filtering by gene_ids should only return matching genes."""
         cypher, params = build_compare_conditions(
-            gene_ids=["PMM0001"], limit=10,
+            gene_ids=["PMM0001"],
         )
         results = conn.execute_query(cypher, **params)
         # PMM0001 may or may not have expression data; if it does, gene should match
@@ -581,7 +581,7 @@ class TestListFilterValuesCorrectnessKG:
             )
 
     def test_all_counts_positive(self, conn):
-        """All gene_count and cnt values must be > 0."""
+        """All gene_count and count values must be > 0."""
         cat_cypher, cat_params = build_list_gene_categories()
         categories = conn.execute_query(cat_cypher, **cat_params)
         for r in categories:
@@ -592,8 +592,8 @@ class TestListFilterValuesCorrectnessKG:
         cond_cypher, cond_params = build_list_condition_types()
         conditions = conn.execute_query(cond_cypher, **cond_params)
         for r in conditions:
-            assert r["cnt"] > 0, (
-                f"Condition type '{r['condition_type']}' has cnt={r['cnt']}"
+            assert r["count"] > 0, (
+                f"Condition type '{r['condition_type']}' has count={r['count']}"
             )
 
     def test_minimum_gene_categories(self, conn):
@@ -625,7 +625,7 @@ class TestListOrganismsCorrectnessKG:
         """Known organisms MED4 and EZ55 must appear in results."""
         cypher, params = build_list_organisms()
         results = conn.execute_query(cypher, **params)
-        names = {r["name"] for r in results}
+        names = {r["organism_name"] for r in results}
         for expected in ["Prochlorococcus MED4", "Alteromonas macleodii EZ55", "MIT9313", "HOT1A3"]:
             assert any(expected in n for n in names), (
                 f"Expected organism containing '{expected}' not found in {sorted(names)}"
@@ -788,10 +788,10 @@ class TestGenesByOntologyCorrectnessKG:
     def test_go_bp_leaf_fewer_than_parent(self, conn):
         """A specific leaf term should return fewer genes than a parent term."""
         cypher_parent, params_parent = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006139"], limit=100,
+            ontology="go_bp", term_ids=["go:0006139"],
         )
         cypher_leaf, params_leaf = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], limit=100,
+            ontology="go_bp", term_ids=["go:0006260"],
         )
         parent_results = conn.execute_query(cypher_parent, **params_parent)
         leaf_results = conn.execute_query(cypher_leaf, **params_leaf)
@@ -835,11 +835,11 @@ class TestGenesByOntologyCorrectnessKG:
     def test_organism_filter(self, conn):
         """Organism filter restricts results to matching organism."""
         cypher_all, params_all = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006139"], limit=500,
+            ontology="go_bp", term_ids=["go:0006139"],
         )
         cypher_filtered, params_filtered = build_genes_by_ontology(
             ontology="go_bp", term_ids=["go:0006139"],
-            organism="MED4", limit=500,
+            organism="MED4",
         )
         all_results = conn.execute_query(cypher_all, **params_all)
         filtered = conn.execute_query(cypher_filtered, **params_filtered)
@@ -996,14 +996,16 @@ class TestGeneOntologyTermsCorrectnessKG:
         # Just verify it returns a list (may be empty or not)
         assert isinstance(results, list)
 
-    def test_limit_caps_results(self, conn):
-        """Limit parameter caps result count."""
+    def test_all_results_returned_without_limit(self, conn):
+        """Without limit in builder, all annotations are returned."""
         cypher, params = build_gene_ontology_terms(
             ontology="go_bp", gene_id="MIT1002_03493",
-            leaf_only=False, limit=5,
+            leaf_only=False,
         )
         results = conn.execute_query(cypher, **params)
-        assert len(results) <= 5
+        assert len(results) >= 50, (
+            f"Expected many results without limit, got {len(results)}"
+        )
 
     def test_mf_annotations(self, conn):
         """Gene with GO:MF annotations returns molecular function terms."""

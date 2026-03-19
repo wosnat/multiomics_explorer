@@ -1,5 +1,5 @@
 case_id: search_ontology_tigr_role
-row_count: 25
+row_count: 31
 rows:
 - id: tigr.role:100
   name: Central intermediary metabolism / Amino sugars
@@ -13,6 +13,9 @@ rows:
 - id: tigr.role:104
   name: Central intermediary metabolism / Polyamine biosynthesis
   score: 0.6195
+- id: tigr.role:105
+  name: Energy metabolism / Biosynthesis and degradation of polysaccharides
+  score: 0.5381
 - id: tigr.role:106
   name: Central intermediary metabolism / Sulfur metabolism
   score: 0.838
@@ -22,6 +25,9 @@ rows:
 - id: tigr.role:109
   name: Energy metabolism / Amino acids and amines
   score: 0.5759
+- id: tigr.role:111
+  name: Energy metabolism / ATP-proton motive force interconversion
+  score: 0.5381
 - id: tigr.role:112
   name: Energy metabolism / Electron transport
   score: 0.6701
@@ -49,12 +55,19 @@ rows:
 - id: tigr.role:121
   name: Fatty acid and phospholipid metabolism / Other
   score: 0.5759
+- id: tigr.role:123
+  name: Purines, pyrimidines, nucleosides, and nucleotides / 2^-Deoxyribonucleotide
+    metabolism
+  score: 0.5049
 - id: tigr.role:130
   name: DNA metabolism / Other
   score: 0.7298
 - id: tigr.role:131
   name: DNA metabolism / Degradation of DNA
   score: 0.6195
+- id: tigr.role:132
+  name: DNA metabolism / DNA replication, recombination, and repair
+  score: 0.5381
 - id: tigr.role:159
   name: Energy metabolism / Methanogenesis
   score: 0.7298
@@ -67,6 +80,12 @@ rows:
 - id: tigr.role:170
   name: DNA metabolism / Chromosome-associated proteins
   score: 0.6195
+- id: tigr.role:176
+  name: Fatty acid and phospholipid metabolism / Biosynthesis
+  score: 0.5759
+- id: tigr.role:177
+  name: Fatty acid and phospholipid metabolism / Degradation
+  score: 0.5759
 - id: tigr.role:183
   name: DNA metabolism / Restriction/modification
   score: 0.6701

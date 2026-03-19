@@ -1,5 +1,5 @@
 case_id: search_genes_alteromonas_only_catalase
-row_count: 10
+row_count: 14
 rows:
 - annotation_quality: 3
   function_description: Catalase
@@ -27,6 +27,16 @@ rows:
   organism_strain: Alteromonas macleodii HOT1A3
   product: catalase/peroxidase HPI
   score: 10.8595
+- annotation_quality: 3
+  function_description: Serves to protect cells from the toxic effects of hydrogen
+    peroxide
+  gene_name: katB
+  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
+    of hydrogen peroxide'
+  locus_tag: ACZ81_16915
+  organism_strain: Alteromonas macleodii HOT1A3
+  product: catalase
+  score: 10.4916
 - annotation_quality: 3
   function_description: Catalase
   gene_name: katA
@@ -62,6 +72,16 @@ rows:
   product: catalase/peroxidase HPI
   score: 10.8595
 - annotation_quality: 3
+  function_description: Serves to protect cells from the toxic effects of hydrogen
+    peroxide
+  gene_name: katB
+  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
+    of hydrogen peroxide'
+  locus_tag: EZ55_03522
+  organism_strain: Alteromonas macleodii EZ55
+  product: catalase
+  score: 10.4916
+- annotation_quality: 3
   function_description: Catalase
   gene_name: katA
   gene_summary: 'katA :: catalase :: Catalase'
@@ -78,6 +98,16 @@ rows:
   product: catalase
   score: 13.4453
 - annotation_quality: 3
+  function_description: Serves to protect cells from the toxic effects of hydrogen
+    peroxide
+  gene_name: katE
+  gene_summary: 'katE :: catalase :: Serves to protect cells from the toxic effects
+    of hydrogen peroxide'
+  locus_tag: MIT1002_02513
+  organism_strain: Alteromonas macleodii MIT1002
+  product: catalase
+  score: 10.3483
+- annotation_quality: 3
   function_description: Bifunctional enzyme with both catalase and broad-spectrum
     peroxidase activity
   gene_name: katG
@@ -87,3 +117,13 @@ rows:
   organism_strain: Alteromonas macleodii MIT1002
   product: catalase/peroxidase HPI
   score: 11.2445
+- annotation_quality: 3
+  function_description: Serves to protect cells from the toxic effects of hydrogen
+    peroxide
+  gene_name: katB
+  gene_summary: 'katB :: catalase :: Serves to protect cells from the toxic effects
+    of hydrogen peroxide'
+  locus_tag: MIT1002_03530
+  organism_strain: Alteromonas macleodii MIT1002
+  product: catalase
+  score: 10.4916

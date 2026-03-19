@@ -1,11 +1,47 @@
 case_id: search_ontology_lucene_wildcard
-row_count: 25
+row_count: 37
 rows:
 - id: ec:1.-.-.-
   name: Oxidoreductases
   score: 1.0
+- id: ec:1.1.1.328
+  name: nicotine blue oxidoreductase
+  score: 1.0
+- id: ec:1.1.1.421
+  name: D-apionate oxidoisomerase
+  score: 1.0
+- id: ec:1.1.98.4
+  name: F420H2:quinone oxidoreductase
+  score: 1.0
+- id: ec:1.1.99.28
+  name: glucose-fructose oxidoreductase
+  score: 1.0
 - id: ec:1.12.5.1
   name: hydrogen:quinone oxidoreductase
+  score: 1.0
+- id: ec:1.2.7.10
+  name: oxalate oxidoreductase
+  score: 1.0
+- id: ec:1.2.7.11
+  name: 2-oxoacid oxidoreductase (ferredoxin)
+  score: 1.0
+- id: ec:1.2.7.5
+  name: aldehyde ferredoxin oxidoreductase
+  score: 1.0
+- id: ec:1.2.7.8
+  name: indolepyruvate ferredoxin oxidoreductase
+  score: 1.0
+- id: ec:1.3.7.2
+  name: 15,16-dihydrobiliverdin:ferredoxin oxidoreductase
+  score: 1.0
+- id: ec:1.3.7.3
+  name: phycoerythrobilin:ferredoxin oxidoreductase
+  score: 1.0
+- id: ec:1.3.7.4
+  name: phytochromobilin:ferredoxin oxidoreductase
+  score: 1.0
+- id: ec:1.3.7.5
+  name: phycocyanobilin:ferredoxin oxidoreductase
   score: 1.0
 - id: ec:1.3.99.16
   name: isoquinoline 1-oxidoreductase

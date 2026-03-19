@@ -1,6 +1,54 @@
 case_id: search_genes_lucene_fuzzy
-row_count: 10
+row_count: 75
 rows:
+- annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  locus_tag: A9601_00001
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, beta subunit
+  score: 0.684
+- annotation_quality: 3
+  function_description: III delta prime subunit
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: III delta prime subunit'
+  locus_tag: A9601_01461
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: A9601_09151
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, alpha subunit
+  score: 1.091
+- annotation_quality: 3
+  function_description: lesion bypass DNA polymerase V (UmuC)
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: lesion bypass DNA polymerase
+    V (UmuC)'
+  locus_tag: A9601_09231
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase V, subunit C
+  score: 1.091
 - annotation_quality: 3
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
@@ -10,6 +58,36 @@ rows:
   organism_strain: Prochlorococcus AS9601
   product: DNA polymerase V, subunit D
   score: 1.3071
+- annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    3^-5^ and 5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
+  locus_tag: A9601_13151
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase I
+  score: 1.0234
+- annotation_quality: 3
+  function_description: III delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit :: III delta subunit'
+  locus_tag: A9601_18561
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, delta subunit
+  score: 1.1683
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: A9601_18671
+  organism_strain: Prochlorococcus AS9601
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9104
 - annotation_quality: 3
   function_description: Negative regulator of replication initiation, which contributes
     to regulation of DNA replication and ensures that replication initiation occurs
@@ -65,6 +143,54 @@ rows:
   product: hypothetical protein
   score: 3.9841
 - annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  locus_tag: NATL1_00001
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase III, beta subunit
+  score: 0.684
+- annotation_quality: 3
+  function_description: III delta prime subunit
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: III delta prime subunit'
+  locus_tag: NATL1_02011
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: NATL1_09341
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase III, alpha subunit
+  score: 1.091
+- annotation_quality: 3
+  function_description: lesion bypass DNA polymerase V (UmuC)
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: lesion bypass DNA polymerase
+    V (UmuC)'
+  locus_tag: NATL1_09431
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase V, subunit C
+  score: 1.091
+- annotation_quality: 3
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -73,6 +199,84 @@ rows:
   organism_strain: Prochlorococcus NATL1A
   product: DNA polymerase V, subunit D
   score: 1.3071
+- annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    3^-5^ and 5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
+  locus_tag: NATL1_15881
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase I
+  score: 1.0234
+- annotation_quality: 3
+  function_description: III delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit :: III delta subunit'
+  locus_tag: NATL1_21151
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase III, delta subunit
+  score: 1.1683
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: NATL1_21271
+  organism_strain: Prochlorococcus NATL1A
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9104
+- annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  locus_tag: P9301_00001
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase III, beta subunit
+  score: 0.684
+- annotation_quality: 3
+  function_description: III delta prime subunit
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: III delta prime subunit'
+  locus_tag: P9301_01481
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: P9301_09131
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase III, alpha subunit
+  score: 1.091
+- annotation_quality: 3
+  function_description: lesion bypass DNA polymerase V (UmuC)
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: lesion bypass DNA polymerase
+    V (UmuC)'
+  locus_tag: P9301_09211
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase V, subunit C
+  score: 1.091
 - annotation_quality: 3
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
@@ -83,6 +287,67 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.3071
 - annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    3^-5^ and 5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
+  locus_tag: P9301_13291
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase I
+  score: 1.0234
+- annotation_quality: 3
+  function_description: III delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit :: III delta subunit'
+  locus_tag: P9301_18371
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase III, delta subunit
+  score: 1.1683
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: P9301_18481
+  organism_strain: Prochlorococcus MIT9301
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9104
+- annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  locus_tag: PMM0001
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, beta subunit
+  score: 0.684
+- annotation_quality: 3
+  function_description: III delta prime subunit
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: III delta prime subunit'
+  locus_tag: PMM0129
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573
+- annotation_quality: 3
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -91,6 +356,70 @@ rows:
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase V, subunit D
   score: 1.3071
+- annotation_quality: 3
+  function_description: lesion bypass DNA polymerase V (UmuC)
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: lesion bypass DNA polymerase
+    V (UmuC)'
+  locus_tag: PMM0937
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase V, subunit C
+  score: 1.091
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: PMM0945
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, alpha subunit
+  score: 1.091
+- annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    3^-5^ and 5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
+  locus_tag: PMM1140
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase I
+  score: 1.0234
+- annotation_quality: 3
+  function_description: III delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit :: III delta subunit'
+  locus_tag: PMM1647
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, delta subunit
+  score: 1.1683
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: PMM1658
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9104
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: PMN2A_0265
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase III, alpha subunit
+  score: 1.091
+- annotation_quality: 3
+  function_description: lesion bypass DNA polymerase V (UmuC)
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: lesion bypass DNA polymerase
+    V (UmuC)'
+  locus_tag: PMN2A_0274
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase V, subunit C
+  score: 1.091
 - annotation_quality: 3
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
@@ -101,6 +430,110 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.3071
 - annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    3^-5^ and 5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
+  locus_tag: PMN2A_0748
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase I
+  score: 1.0234
+- annotation_quality: 3
+  function_description: III delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit :: III delta subunit'
+  locus_tag: PMN2A_1245
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase III, delta subunit
+  score: 1.1683
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: PMN2A_1256
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9104
+- annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  locus_tag: PMN2A_1328
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase III, beta subunit
+  score: 0.684
+- annotation_quality: 3
+  function_description: III delta prime subunit
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: III delta prime subunit'
+  locus_tag: PMN2A_1495
+  organism_strain: Prochlorococcus NATL2A
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573
+- annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  locus_tag: PMT0001
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase III, beta subunit
+  score: 0.684
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: PMT0059
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9104
+- annotation_quality: 3
+  function_description: III delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit :: III delta subunit'
+  locus_tag: PMT0074
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase III, delta subunit
+  score: 1.1683
+- annotation_quality: 3
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -110,6 +543,89 @@ rows:
   product: DNA polymerase V, subunit D
   score: 1.3071
 - annotation_quality: 3
+  function_description: lesion bypass DNA polymerase V (UmuC)
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: lesion bypass DNA polymerase
+    V (UmuC)'
+  locus_tag: PMT0638
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase V, subunit C
+  score: 1.091
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: PMT0647
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase III, alpha subunit
+  score: 1.091
+- annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    3^-5^ and 5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
+  locus_tag: PMT1157
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase I
+  score: 1.0234
+- annotation_quality: 3
+  function_description: III delta prime subunit
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: III delta prime subunit'
+  locus_tag: PMT1989
+  organism_strain: Prochlorococcus MIT9313
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573
+- annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  locus_tag: PMT9312_0001
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase III, beta subunit
+  score: 0.684
+- annotation_quality: 3
+  function_description: III delta prime subunit
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: III delta prime subunit'
+  locus_tag: PMT9312_0131
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: PMT9312_0854
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase III, alpha subunit
+  score: 1.091
+- annotation_quality: 3
+  function_description: lesion bypass DNA polymerase V (UmuC)
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: lesion bypass DNA polymerase
+    V (UmuC)'
+  locus_tag: PMT9312_0862
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase V, subunit C
+  score: 1.091
+- annotation_quality: 3
   function_description: Belongs to the peptidase S24 family
   gene_name: umuD
   gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
@@ -118,3 +634,203 @@ rows:
   organism_strain: Prochlorococcus MIT9312
   product: DNA polymerase V, subunit D
   score: 1.3071
+- annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    3^-5^ and 5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
+  locus_tag: PMT9312_1236
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase I
+  score: 1.0234
+- annotation_quality: 3
+  function_description: III delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit :: III delta subunit'
+  locus_tag: PMT9312_1739
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase III, delta subunit
+  score: 1.1683
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: PMT9312_1750
+  organism_strain: Prochlorococcus MIT9312
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9104
+- annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria; Pol III exhibits
+    3^-5^ exonuclease proofreading activity. The beta chain is required for initiation
+    of replication as well as for processivity of DNA replication
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease proofreading activity.
+    The beta chain is required for initiation of replication as well as for processivity
+    of DNA replication'
+  locus_tag: SYNW0001
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase III, beta subunit
+  score: 0.684
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: SYNW0061
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase III, gamma and tau subunits
+  score: 0.9104
+- annotation_quality: 3
+  function_description: DNA polymerase III, delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit'
+  locus_tag: SYNW0073
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase III, delta subunit
+  score: 1.1683
+- annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    3^-5^ and 5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 3^-5^ and 5^-3^ exonuclease activity'
+  locus_tag: SYNW0702
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase I
+  score: 1.0234
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: SYNW1032
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase III, alpha subunit
+  score: 1.091
+- annotation_quality: 3
+  function_description: Nucleotidyltransferase DNA polymerase involved in DNA repair
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: Nucleotidyltransferase DNA
+    polymerase involved in DNA repair'
+  locus_tag: SYNW1043
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase V, subunit C
+  score: 1.091
+- annotation_quality: 3
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: SYNW1044
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase V, subunit D
+  score: 1.3071
+- annotation_quality: 3
+  function_description: DNA polymerase III
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: DNA polymerase III'
+  locus_tag: SYNW2237
+  organism_strain: Synechococcus WH8102
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573
+- annotation_quality: 3
+  function_description: Confers DNA tethering and processivity to DNA polymerases
+    and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
+    by the clamp-loading complex) which diffuses in an ATP-independent manner freely
+    and bidirectionally along dsDNA. Initially characterized for its ability to contact
+    the catalytic subunit of DNA polymerase III (Pol III), a complex, multichain enzyme
+    responsible for most of the replicative synthesis in bacteria
+  gene_name: dnaN
+  gene_summary: 'dnaN :: DNA polymerase III, beta subunit :: Confers DNA tethering
+    and processivity to DNA polymerases and other proteins. Acts as a clamp, forming
+    a ring around DNA (a reaction catalyzed by the clamp-loading complex) which diffuses
+    in an ATP-independent manner freely and bidirectionally along dsDNA. Initially
+    characterized for its ability to contact the catalytic subunit of DNA polymerase
+    III (Pol III), a complex, multichain enzyme responsible for most of the replicative
+    synthesis in bacteria'
+  locus_tag: sync_0001
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase III, beta subunit
+  score: 0.9104
+- annotation_quality: 3
+  function_description: DNA polymerase III is a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria. This DNA polymerase also exhibits
+    3^ to 5^ exonuclease activity
+  gene_name: dnaX
+  gene_summary: 'dnaX :: DNA polymerase III, gamma and tau subunits :: DNA polymerase
+    III is a complex, multichain enzyme responsible for most of the replicative synthesis
+    in bacteria. This DNA polymerase also exhibits 3^ to 5^ exonuclease activity'
+  locus_tag: sync_0062
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase III, gamma and tau subunits
+  score: 1.091
+- annotation_quality: 3
+  function_description: DNA polymerase III, delta subunit
+  gene_name: holA
+  gene_summary: 'holA :: DNA polymerase III, delta subunit'
+  locus_tag: sync_0077
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase III, delta subunit
+  score: 1.2573
+- annotation_quality: 3
+  function_description: In addition to polymerase activity, this DNA polymerase exhibits
+    5^-3^ exonuclease activity
+  gene_name: polA
+  gene_summary: 'polA :: DNA polymerase I :: In addition to polymerase activity, this
+    DNA polymerase exhibits 5^-3^ exonuclease activity'
+  locus_tag: sync_0928
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase I
+  score: 1.091
+- annotation_quality: 3
+  function_description: Belongs to the peptidase S24 family
+  gene_name: umuD
+  gene_summary: 'umuD :: DNA polymerase V, subunit D :: Belongs to the peptidase S24
+    family'
+  locus_tag: sync_1606
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase V, subunit D
+  score: 1.3071
+- annotation_quality: 3
+  function_description: Nucleotidyltransferase DNA polymerase involved in DNA repair
+  gene_name: umuC
+  gene_summary: 'umuC :: DNA polymerase V, subunit C :: Nucleotidyltransferase DNA
+    polymerase involved in DNA repair'
+  locus_tag: sync_1607
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase V, subunit C
+  score: 1.1683
+- annotation_quality: 3
+  function_description: DNA polymerase
+  gene_name: dnaE
+  gene_summary: 'dnaE :: DNA polymerase III, alpha subunit :: DNA polymerase'
+  locus_tag: sync_1630
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase III, alpha subunit
+  score: 1.1683
+- annotation_quality: 3
+  function_description: DNA polymerase III
+  gene_name: holB
+  gene_summary: 'holB :: DNA polymerase III, delta^ subunit :: DNA polymerase III'
+  locus_tag: sync_2592
+  organism_strain: Synechococcus CC9311
+  product: DNA polymerase III, delta^ subunit
+  score: 1.2573

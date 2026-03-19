@@ -97,12 +97,10 @@ def _normalize(results: list[dict]) -> list[dict]:
         sort_key = "category"
     elif results and "id" in results[0]:
         sort_key = "id"
-    elif results and "name" in results[0]:
-        sort_key = "name"
+    elif results and "organism_name" in results[0]:
+        sort_key = "organism_name"
     elif results and "condition_type" in results[0]:
         sort_key = "condition_type"
-    elif results and "cnt" in results[0]:
-        sort_key = "cnt"
     else:
         sort_key = None
 
@@ -150,10 +148,7 @@ def test_regression(conn, case, data_regression):
     else:
         builder = TOOL_BUILDERS[tool]
         # Strip tool-level params that aren't accepted by query builders
-        builder_params = {k: v for k, v in params.items() if k != "deduplicate"}
-        # gene_overview: map gene_ids -> locus_tags for the query builder
-        if tool == "gene_overview" and "gene_ids" in builder_params:
-            builder_params["locus_tags"] = builder_params.pop("gene_ids")
+        builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit")}
         cypher, query_params = builder(**builder_params)
         results = conn.execute_query(cypher, **query_params)
         # get_gene_details returns g{.*} AS gene — unwrap for flat comparison

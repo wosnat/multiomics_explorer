@@ -229,11 +229,11 @@
   params:
     query: >
       MATCH (e:EnvironmentalCondition)
-      RETURN e.condition_type AS condition_type, count(*) AS cnt
-      ORDER BY cnt DESC
+      RETURN e.condition_type AS condition_type, count(*) AS count
+      ORDER BY count DESC
   expect:
     min_rows: 5
-    columns: [condition_type, cnt]
+    columns: [condition_type, count]
     contains:
       condition_type: nitrogen_stress
 
@@ -246,9 +246,9 @@
   expect:
     min_rows: 10
     max_rows: 25
-    columns: [name, genus, strain, clade, gene_count]
+    columns: [organism_name, genus, strain, clade, gene_count]
     contains:
-      name: Prochlorococcus MED4
+      organism_name: Prochlorococcus MED4
     row0:
       genus: Alphainfluenzavirus
 
@@ -259,15 +259,15 @@
     query: >
       MATCH (o:OrganismTaxon)
       OPTIONAL MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o)
-      RETURN o.preferred_name AS name, o.genus AS genus,
+      RETURN o.preferred_name AS organism_name, o.genus AS genus,
              o.strain_name AS strain, o.clade AS clade,
              count(g) AS gene_count
       ORDER BY o.genus, o.preferred_name
   expect:
     min_rows: 10
-    columns: [name, genus, strain, clade, gene_count]
+    columns: [organism_name, genus, strain, clade, gene_count]
     contains:
-      name: Prochlorococcus MED4
+      organism_name: Prochlorococcus MED4
 
 # ── Validation queries ───────────────────────────────────
 

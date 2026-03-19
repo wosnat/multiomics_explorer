@@ -83,8 +83,8 @@ class TestListFilterValuesWrapper:
             {"category": "Transport", "gene_count": 50},
         ]
         condition_types = [
-            {"condition_type": "nitrogen_stress", "cnt": 10},
-            {"condition_type": "light_stress", "cnt": 8},
+            {"condition_type": "nitrogen_stress", "count": 10},
+            {"condition_type": "light_stress", "count": 8},
         ]
         conn = _conn_from(mock_ctx)
         conn.execute_query.side_effect = [categories, condition_types]
@@ -99,7 +99,7 @@ class TestListFilterValuesWrapper:
     def test_gene_categories_keys(self, tool_fns, mock_ctx):
         """Each gene_categories entry has 'category' and 'gene_count' keys."""
         categories = [{"category": "Photosynthesis", "gene_count": 100}]
-        condition_types = [{"condition_type": "nitrogen_stress", "cnt": 10}]
+        condition_types = [{"condition_type": "nitrogen_stress", "count": 10}]
         conn = _conn_from(mock_ctx)
         conn.execute_query.side_effect = [categories, condition_types]
         mock_ctx.request_context.lifespan_context._filter_values_cache = None
@@ -109,22 +109,22 @@ class TestListFilterValuesWrapper:
         assert "gene_count" in entry
 
     def test_condition_types_keys(self, tool_fns, mock_ctx):
-        """Each condition_types entry has 'condition_type' and 'cnt' keys."""
+        """Each condition_types entry has 'condition_type' and 'count' keys."""
         categories = [{"category": "Photosynthesis", "gene_count": 100}]
-        condition_types = [{"condition_type": "nitrogen_stress", "cnt": 10}]
+        condition_types = [{"condition_type": "nitrogen_stress", "count": 10}]
         conn = _conn_from(mock_ctx)
         conn.execute_query.side_effect = [categories, condition_types]
         mock_ctx.request_context.lifespan_context._filter_values_cache = None
         result = json.loads(tool_fns["list_filter_values"](mock_ctx))
         entry = result["condition_types"][0]
         assert "condition_type" in entry
-        assert "cnt" in entry
+        assert "count" in entry
 
     def test_caching(self, tool_fns, mock_ctx):
         """Second call returns cached value without hitting Neo4j again."""
         cached_response = json.dumps({
             "gene_categories": [{"category": "Cached", "gene_count": 1}],
-            "condition_types": [{"condition_type": "cached_type", "cnt": 1}],
+            "condition_types": [{"condition_type": "cached_type", "count": 1}],
         })
         mock_ctx.request_context.lifespan_context._filter_values_cache = cached_response
         result = tool_fns["list_filter_values"](mock_ctx)
@@ -139,9 +139,9 @@ class TestListOrganismsWrapper:
     def test_returns_json_array(self, tool_fns, mock_ctx):
         """list_organisms returns a JSON array with expected columns."""
         rows = [
-            {"name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
+            {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
              "strain": "MED4", "clade": "HLI", "gene_count": 1929},
-            {"name": "Alteromonas EZ55", "genus": "Alteromonas",
+            {"organism_name": "Alteromonas EZ55", "genus": "Alteromonas",
              "strain": "EZ55", "clade": None, "gene_count": 3800},
         ]
         _conn_from(mock_ctx).execute_query.return_value = rows
@@ -149,7 +149,7 @@ class TestListOrganismsWrapper:
         result = json.loads(tool_fns["list_organisms"](mock_ctx))
         assert isinstance(result, list)
         assert len(result) == 2
-        for col in ["name", "genus", "strain", "clade", "gene_count"]:
+        for col in ["organism_name", "genus", "strain", "clade", "gene_count"]:
             assert col in result[0]
 
     def test_empty_result_message(self, tool_fns, mock_ctx):
@@ -162,7 +162,7 @@ class TestListOrganismsWrapper:
     def test_caching(self, tool_fns, mock_ctx):
         """Second call returns cached value without hitting Neo4j again."""
         cached_response = json.dumps([
-            {"name": "Cached", "genus": "G", "strain": "S",
+            {"organism_name": "Cached", "genus": "G", "strain": "S",
              "clade": None, "gene_count": 1},
         ])
         mock_ctx.request_context.lifespan_context._organisms_cache = cached_response
@@ -258,10 +258,11 @@ class TestSearchGenesWrapper:
         assert result["query"] == "photosystem"
 
     def test_limit_capped_at_50(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["search_genes"](mock_ctx, search_text="x", limit=999)
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args
-        assert call_kwargs.kwargs["limit"] == 50
+        """limit is capped at 50 at the MCP level."""
+        rows = [{"locus_tag": f"PMM{i:04d}", "score": 1.0} for i in range(100)]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="x", limit=999))
+        assert len(result["results"]) <= 50
 
     def test_raises_on_double_failure(self, tool_fns, mock_ctx):
         """When both original and escaped queries fail, exception propagates."""
@@ -361,9 +362,7 @@ class TestSearchGenesWrapper:
         rows = [{"locus_tag": "PMM0001", "score": 5.0}, {"locus_tag": "PMM0002", "score": 3.0}]
         _conn_from(mock_ctx).execute_query.return_value = rows
         result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="x", limit=1))
-        # limit is applied at the query level, not post-filter
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["limit"] == 1
+        assert len(result["results"]) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -388,12 +387,12 @@ class TestGeneOverviewWrapper:
         assert len(result) == 1
         assert result[0]["locus_tag"] == "PMM1428"
 
-    def test_limit_passed_to_query(self, tool_fns, mock_ctx):
-        """Verify limit param forwarded to query builder."""
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428"], limit=10)
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["limit"] == 10
+    def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
+        """Verify limit caps the results returned by the MCP tool."""
+        rows = [{"locus_tag": f"PMM{i:04d}"} for i in range(5)]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_overview"](mock_ctx, gene_ids=["x"], limit=2))
+        assert len(result) == 2
 
 
 class TestGetGeneDetailsWrapper:
@@ -903,12 +902,12 @@ class TestSearchOntologyWrapper:
         with pytest.raises(Neo4jClientError):
             tool_fns["search_ontology"](mock_ctx, search_text="bad [query", ontology="go_bp")
 
-    def test_limit_passed_through(self, tool_fns, mock_ctx):
-        """Limit parameter is forwarded to the query builder."""
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["search_ontology"](mock_ctx, search_text="test", ontology="go_bp", limit=5)
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["limit"] == 5
+    def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
+        """Limit parameter caps results at the MCP level."""
+        rows = [{"id": f"go:{i:07d}", "name": f"term_{i}", "score": 1.0} for i in range(10)]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="test", ontology="go_bp", limit=5))
+        assert len(result["results"]) == 5
 
     def test_go_mf_ontology_accepted(self, tool_fns, mock_ctx):
         """go_mf ontology is accepted without error."""
@@ -1052,14 +1051,15 @@ class TestGenesByOntologyWrapper:
         call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
         assert call_kwargs["organism"] == "MED4"
 
-    def test_limit_passed_through(self, tool_fns, mock_ctx):
-        """Limit parameter is forwarded to the query builder."""
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["genes_by_ontology"](
+    def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
+        """Limit parameter caps results at the MCP level via post-query slicing."""
+        rows = [{"locus_tag": f"PMM{i:04d}", "gene_name": "test", "product": "p",
+                 "organism_strain": "Prochlorococcus MED4"} for i in range(10)]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["genes_by_ontology"](
             mock_ctx, term_ids=["go:0006260"], ontology="go_bp", limit=5,
-        )
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["limit"] == 5
+        ))
+        assert result["total"] == 5
 
 
 # ---------------------------------------------------------------------------
@@ -1094,13 +1094,14 @@ class TestGeneOntologyTermsWrapper:
                 mock_ctx, gene_id="PMM0001", ontology="invalid",
             )
 
-    def test_limit_passed_through(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["gene_ontology_terms"](
+    def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
+        """Limit parameter caps results at the MCP level via post-query slicing."""
+        rows = [{"id": f"go:{i:07d}", "name": f"term_{i}"} for i in range(20)]
+        _conn_from(mock_ctx).execute_query.return_value = rows
+        result = json.loads(tool_fns["gene_ontology_terms"](
             mock_ctx, gene_id="PMM0001", ontology="go_bp", limit=10,
-        )
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["limit"] == 10
+        ))
+        assert result["total"] == 10
 
     def test_go_mf_ontology_accepted(self, tool_fns, mock_ctx):
         """go_mf ontology is accepted without error."""
