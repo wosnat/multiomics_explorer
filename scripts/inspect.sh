@@ -9,5 +9,5 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-exec npx @modelcontextprotocol/inspector \
+exec env LOG_LEVEL=DEBUG npx @modelcontextprotocol/inspector \
     uv run --directory "$PROJECT_DIR" multiomics-kg-mcp

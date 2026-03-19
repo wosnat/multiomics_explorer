@@ -1,6 +1,7 @@
 """MCP tool implementations for the Multiomics Knowledge Graph."""
 
 import json
+import logging
 import re
 
 from mcp.server.fastmcp import Context, FastMCP
@@ -8,6 +9,8 @@ from mcp.server.fastmcp import Context, FastMCP
 import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.queries_lib import build_compare_conditions
+
+logger = logging.getLogger(__name__)
 
 
 def _conn(ctx: Context) -> GraphConnection:
@@ -39,6 +42,7 @@ def register_tools(mcp: FastMCP):
     def get_schema(ctx: Context) -> str:
         """Get the knowledge graph schema: node types with counts, relationship types with
         source/target labels, and property names. Use this first to understand what's queryable."""
+        logger.info("get_schema")
         try:
             from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -46,8 +50,10 @@ def register_tools(mcp: FastMCP):
             schema = load_schema_from_neo4j(conn)
             return schema.to_prompt_string()
         except ValueError as e:
+            logger.warning("get_schema error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("get_schema unexpected error: %s", e)
             return f"Error in get_schema: {e}"
 
     @mcp.tool()
@@ -60,6 +66,7 @@ def register_tools(mcp: FastMCP):
         - condition_types: values for the condition filter on query_expression
           and compare_conditions (e.g. "nitrogen_stress", "light_stress", "coculture")
         """
+        logger.info("list_filter_values")
         try:
             lc = ctx.request_context.lifespan_context
             cached = getattr(lc, "_filter_values_cache", None)
@@ -72,8 +79,10 @@ def register_tools(mcp: FastMCP):
             lc._filter_values_cache = response
             return response
         except ValueError as e:
+            logger.warning("list_filter_values error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("list_filter_values unexpected error: %s", e)
             return f"Error in list_filter_values: {e}"
 
     @mcp.tool()
@@ -85,6 +94,7 @@ def register_tools(mcp: FastMCP):
         The organism filter uses partial matching (CONTAINS), so "MED4",
         "Prochlorococcus MED4", and "Prochlorococcus" all work.
         """
+        logger.info("list_organisms")
         try:
             lc = ctx.request_context.lifespan_context
             cached = getattr(lc, "_organisms_cache", None)
@@ -99,8 +109,10 @@ def register_tools(mcp: FastMCP):
             lc._organisms_cache = response
             return response
         except ValueError as e:
+            logger.warning("list_organisms error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("list_organisms unexpected error: %s", e)
             return f"Error in list_organisms: {e}"
 
     @mcp.tool()
@@ -118,6 +130,7 @@ def register_tools(mcp: FastMCP):
                 old locus tag, or RefSeq protein ID.
             organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
         """
+        logger.info("resolve_gene identifier=%s organism=%s", identifier, organism)
         try:
             conn = _conn(ctx)
             results = api.resolve_gene(identifier, organism=organism, conn=conn)
@@ -132,8 +145,10 @@ def register_tools(mcp: FastMCP):
                 indent=2, default=str,
             )
         except ValueError as e:
+            logger.warning("resolve_gene error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("resolve_gene unexpected error: %s", e)
             return f"Error in resolve_gene: {e}"
 
     @mcp.tool()
@@ -171,6 +186,8 @@ def register_tools(mcp: FastMCP):
                 limit applies to the pre-dedup query, so fewer rows may be
                 returned after collapsing.
         """
+        logger.info("search_genes search_text=%s organism=%s category=%s deduplicate=%s limit=%d",
+                    search_text, organism, category, deduplicate, limit)
         try:
             conn = _conn(ctx)
             limit = min(limit, 50)
@@ -188,8 +205,10 @@ def register_tools(mcp: FastMCP):
                 "results": results, "total": len(results), "query": search_text,
             }, indent=2, default=str)
         except ValueError as e:
+            logger.warning("search_genes error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("search_genes unexpected error: %s", e)
             return f"Error in search_genes: {e}"
 
     @mcp.tool()
@@ -215,6 +234,7 @@ def register_tools(mcp: FastMCP):
                       Use resolve_gene to find locus_tags from other identifiers.
             limit: Max genes to return (default 50).
         """
+        logger.info("gene_overview gene_ids=%s limit=%d", gene_ids, limit)
         try:
             conn = _conn(ctx)
             rows = api.gene_overview(gene_ids, conn=conn)
@@ -222,8 +242,10 @@ def register_tools(mcp: FastMCP):
                 return "No genes found for the given locus_tags."
             return _fmt(rows, limit=limit)
         except ValueError as e:
+            logger.warning("gene_overview error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("gene_overview unexpected error: %s", e)
             return f"Error in gene_overview: {e}"
 
     @mcp.tool()
@@ -241,6 +263,7 @@ def register_tools(mcp: FastMCP):
         Args:
             gene_id: Gene locus_tag (e.g. "PMM0001", "sync_0001").
         """
+        logger.info("get_gene_details gene_id=%s", gene_id)
         try:
             conn = _conn(ctx)
             result = api.get_gene_details(gene_id, conn=conn)
@@ -248,8 +271,10 @@ def register_tools(mcp: FastMCP):
                 return f"Gene '{gene_id}' not found."
             return _fmt([result])
         except ValueError as e:
+            logger.warning("get_gene_details error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("get_gene_details unexpected error: %s", e)
             return f"Error in get_gene_details: {e}"
 
     @mcp.tool()
@@ -283,6 +308,8 @@ def register_tools(mcp: FastMCP):
             max_pvalue: Maximum adjusted p-value.
             limit: Max results (default 50).
         """
+        logger.info("query_expression gene_id=%s organism=%s condition=%s direction=%s limit=%d",
+                    gene_id, organism, condition, direction, limit)
         try:
             conn = _conn(ctx)
             results = api.query_expression(
@@ -294,8 +321,10 @@ def register_tools(mcp: FastMCP):
                 return "No expression data found for the given filters."
             return _fmt(results, limit=limit)
         except ValueError as e:
+            logger.warning("query_expression error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("query_expression unexpected error: %s", e)
             return f"Error in query_expression: {e}"
 
     @mcp.tool()
@@ -318,6 +347,8 @@ def register_tools(mcp: FastMCP):
                         (exact match, unlike query_expression which uses CONTAINS).
             limit: Max results (default 100).
         """
+        logger.info("compare_conditions gene_ids=%s organisms=%s conditions=%s limit=%d",
+                    gene_ids, organisms, conditions, limit)
         try:
             if not any([gene_ids, organisms, conditions]):
                 return "Error: provide at least one of gene_ids, organisms, or conditions."
@@ -332,8 +363,10 @@ def register_tools(mcp: FastMCP):
                 return "No expression data found for the given filters."
             return _fmt(results, limit=limit)
         except ValueError as e:
+            logger.warning("compare_conditions error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("compare_conditions unexpected error: %s", e)
             return f"Error in compare_conditions: {e}"
 
     def _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank):
@@ -404,6 +437,8 @@ def register_tools(mcp: FastMCP):
               cluster (Pro/Syn only), one eggNOG family-level OG, and one
               eggNOG Bacteria-level COG.
         """
+        logger.info("get_homologs gene_id=%s source=%s taxonomic_level=%s include_members=%s",
+                    gene_id, source, taxonomic_level, include_members)
         try:
             conn = _conn(ctx)
             result = api.get_homologs(
@@ -418,8 +453,10 @@ def register_tools(mcp: FastMCP):
                 return _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank)
             return json.dumps(result, indent=2, default=str)
         except ValueError as e:
+            logger.warning("get_homologs error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("get_homologs unexpected error: %s", e)
             return f"Error in get_homologs: {e}"
 
     @mcp.tool()
@@ -433,6 +470,7 @@ def register_tools(mcp: FastMCP):
             query: Cypher query string. A LIMIT clause will be added if not present.
             limit: Max results (default 25, max 200).
         """
+        logger.info("run_cypher limit=%d", limit)
         try:
             limit = min(limit, 200)
 
@@ -447,8 +485,10 @@ def register_tools(mcp: FastMCP):
                 return "Query returned no results."
             return _fmt(results, limit=limit)
         except ValueError as e:
+            logger.warning("run_cypher error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("run_cypher unexpected error: %s", e)
             return f"Error in run_cypher: {e}"
 
     @mcp.tool()
@@ -487,6 +527,8 @@ def register_tools(mcp: FastMCP):
                   kegg.orthology:   (e.g. "K00001 alcohol dehydrogenase")
             limit: Max results (default 25).
         """
+        logger.info("search_ontology search_text=%s ontology=%s limit=%d",
+                    search_text, ontology, limit)
         try:
             conn = _conn(ctx)
             results = api.search_ontology(search_text, ontology, conn=conn)
@@ -499,8 +541,10 @@ def register_tools(mcp: FastMCP):
                 "results": results, "total": len(results), "query": search_text,
             }, indent=2, default=str)
         except ValueError as e:
+            logger.warning("search_ontology error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("search_ontology unexpected error: %s", e)
             return f"Error in search_ontology: {e}"
 
     @mcp.tool()
@@ -526,6 +570,8 @@ def register_tools(mcp: FastMCP):
             organism: Optional organism filter (fuzzy match on strain name).
             limit: Max gene results (default 25).
         """
+        logger.info("genes_by_ontology term_ids=%s ontology=%s organism=%s limit=%d",
+                    term_ids, ontology, organism, limit)
         try:
             conn = _conn(ctx)
             results = api.genes_by_ontology(term_ids, ontology, organism=organism, conn=conn)
@@ -538,8 +584,10 @@ def register_tools(mcp: FastMCP):
                 indent=2, default=str,
             )
         except ValueError as e:
+            logger.warning("genes_by_ontology error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("genes_by_ontology unexpected error: %s", e)
             return f"Error in genes_by_ontology: {e}"
 
     @mcp.tool()
@@ -567,6 +615,8 @@ def register_tools(mcp: FastMCP):
             limit: Max results (default 50). Relevant mainly with
                 leaf_only=False, which can return many ancestor terms.
         """
+        logger.info("gene_ontology_terms gene_id=%s ontology=%s leaf_only=%s limit=%d",
+                    gene_id, ontology, leaf_only, limit)
         try:
             conn = _conn(ctx)
             results = api.gene_ontology_terms(gene_id, ontology, leaf_only=leaf_only, conn=conn)
@@ -577,6 +627,8 @@ def register_tools(mcp: FastMCP):
                 "results": results, "total": len(results),
             }, indent=2, default=str)
         except ValueError as e:
+            logger.warning("gene_ontology_terms error: %s", e)
             return f"Error: {e}"
         except Exception as e:
+            logger.warning("gene_ontology_terms unexpected error: %s", e)
             return f"Error in gene_ontology_terms: {e}"

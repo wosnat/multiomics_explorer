@@ -8,6 +8,7 @@ No JSON formatting — returns Python dicts/lists.
 Validation errors raise ValueError with specific messages.
 """
 
+import logging
 import re
 from collections import defaultdict
 
@@ -37,6 +38,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_ontology,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
+
+logger = logging.getLogger(__name__)
 
 
 def _default_conn(conn: GraphConnection | None) -> GraphConnection:
@@ -82,6 +85,7 @@ def resolve_gene(
     organism_strain.
     """
     if not identifier or not identifier.strip():
+        logger.debug("resolve_gene: empty identifier")
         raise ValueError("identifier must not be empty.")
     conn = _default_conn(conn)
     cypher, params = build_resolve_gene(identifier=identifier, organism=organism)
@@ -114,6 +118,7 @@ def search_genes(
     try:
         results = conn.execute_query(cypher, **params)
     except Neo4jClientError:
+        logger.debug("search_genes: Lucene parse error, retrying with escaped query")
         escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
         cypher, params = build_search_genes(
             search_text=escaped, organism=organism,
@@ -122,6 +127,7 @@ def search_genes(
         results = conn.execute_query(cypher, **params)
 
     if deduplicate:
+        logger.debug("search_genes: deduplicating %d results by orthogroup", len(results))
         results = _deduplicate_by_orthogroup(results, conn)
 
     return results
@@ -220,6 +226,7 @@ def query_expression(
     Raises ValueError if no filter is provided.
     """
     if not any([gene_id, organism, condition]):
+        logger.debug("query_expression: no filters provided")
         raise ValueError(
             "At least one of gene_id, organism, or condition must be provided."
         )
@@ -258,10 +265,12 @@ def get_homologs(
 
     # Validate enum params
     if source is not None and source not in VALID_OG_SOURCES:
+        logger.debug("get_homologs: invalid source '%s'", source)
         raise ValueError(
             f"Invalid source '{source}'. Valid: {sorted(VALID_OG_SOURCES)}"
         )
     if taxonomic_level is not None and taxonomic_level not in VALID_TAXONOMIC_LEVELS:
+        logger.debug("get_homologs: invalid taxonomic_level '%s'", taxonomic_level)
         raise ValueError(
             f"Invalid taxonomic_level '{taxonomic_level}'. "
             f"Valid: {sorted(VALID_TAXONOMIC_LEVELS)}"
@@ -269,16 +278,19 @@ def get_homologs(
     if max_specificity_rank is not None and not (
         0 <= max_specificity_rank <= MAX_SPECIFICITY_RANK
     ):
+        logger.debug("get_homologs: invalid max_specificity_rank %s", max_specificity_rank)
         raise ValueError(
             f"Invalid max_specificity_rank {max_specificity_rank}. "
             f"Valid: 0-{MAX_SPECIFICITY_RANK}."
         )
     if not (1 <= member_limit <= 200):
+        logger.debug("get_homologs: invalid member_limit %s", member_limit)
         raise ValueError(
             f"Invalid member_limit {member_limit}. Valid: 1-200."
         )
 
     # 1. Query gene metadata
+    logger.debug("get_homologs: fetching gene stub for '%s'", gene_id)
     cypher_gene, params_gene = build_gene_stub(gene_id=gene_id)
     gene_rows = conn.execute_query(cypher_gene, **params_gene)
     if not gene_rows:
@@ -286,6 +298,7 @@ def get_homologs(
     query_gene = gene_rows[0]
 
     # 2. Query ortholog groups
+    logger.debug("get_homologs: fetching ortholog groups for '%s'", gene_id)
     cypher_groups, params_groups = build_get_homologs_groups(
         gene_id=gene_id, source=source,
         taxonomic_level=taxonomic_level,
@@ -295,6 +308,7 @@ def get_homologs(
 
     # 3. Optionally fetch members
     if include_members and groups:
+        logger.debug("get_homologs: fetching members for %d groups", len(groups))
         cypher_members, params_members = build_get_homologs_members(
             gene_id=gene_id, source=source,
             taxonomic_level=taxonomic_level,
@@ -330,9 +344,11 @@ def list_filter_values(
     """
     conn = _default_conn(conn)
 
+    logger.debug("list_filter_values: fetching gene categories")
     cat_cypher, cat_params = build_list_gene_categories()
     categories = conn.execute_query(cat_cypher, **cat_params)
 
+    logger.debug("list_filter_values: fetching condition types")
     cond_cypher, cond_params = build_list_condition_types()
     condition_types = conn.execute_query(cond_cypher, **cond_params)
 
@@ -375,6 +391,7 @@ def search_ontology(
     try:
         results = conn.execute_query(cypher, **params)
     except Neo4jClientError:
+        logger.debug("search_ontology: Lucene parse error, retrying with escaped query")
         escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
         cypher, params = build_search_ontology(
             ontology=ontology, search_text=escaped,

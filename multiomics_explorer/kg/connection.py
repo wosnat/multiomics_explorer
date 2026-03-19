@@ -36,7 +36,8 @@ class GraphConnection:
         try:
             self.driver.verify_connectivity()
             return True
-        except (ServiceUnavailable, AuthError):
+        except (ServiceUnavailable, AuthError) as e:
+            logger.warning("Neo4j connectivity check failed: %s", e)
             return False
 
     def execute_query(self, cypher: str, timeout: float = 30, **params: Any) -> list[dict]:
