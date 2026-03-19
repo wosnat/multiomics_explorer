@@ -288,7 +288,7 @@ internal call path. All existing tests should pass unchanged.
 **Tests:** Update unit tests for tool wrappers to mock api/ instead
 of queries_lib. Integration tests should pass unchanged.
 
-#### Step 6: Add error handling pattern
+#### Step 6: Add error handling pattern ✅
 
 Formalize error handling across layers (see architecture doc
 "Error handling"):

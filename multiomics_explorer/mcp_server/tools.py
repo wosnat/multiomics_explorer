@@ -39,11 +39,16 @@ def register_tools(mcp: FastMCP):
     def get_schema(ctx: Context) -> str:
         """Get the knowledge graph schema: node types with counts, relationship types with
         source/target labels, and property names. Use this first to understand what's queryable."""
-        from multiomics_explorer.kg.schema import load_schema_from_neo4j
+        try:
+            from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
-        conn = _conn(ctx)
-        schema = load_schema_from_neo4j(conn)
-        return schema.to_prompt_string()
+            conn = _conn(ctx)
+            schema = load_schema_from_neo4j(conn)
+            return schema.to_prompt_string()
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in get_schema: {e}"
 
     @mcp.tool()
     def list_filter_values(ctx: Context) -> str:
@@ -55,16 +60,21 @@ def register_tools(mcp: FastMCP):
         - condition_types: values for the condition filter on query_expression
           and compare_conditions (e.g. "nitrogen_stress", "light_stress", "coculture")
         """
-        lc = ctx.request_context.lifespan_context
-        cached = getattr(lc, "_filter_values_cache", None)
-        if cached is not None:
-            return cached
+        try:
+            lc = ctx.request_context.lifespan_context
+            cached = getattr(lc, "_filter_values_cache", None)
+            if cached is not None:
+                return cached
 
-        conn = _conn(ctx)
-        result = api.list_filter_values(conn=conn)
-        response = json.dumps(result, indent=2, default=str)
-        lc._filter_values_cache = response
-        return response
+            conn = _conn(ctx)
+            result = api.list_filter_values(conn=conn)
+            response = json.dumps(result, indent=2, default=str)
+            lc._filter_values_cache = response
+            return response
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in list_filter_values: {e}"
 
     @mcp.tool()
     def list_organisms(ctx: Context) -> str:
@@ -75,18 +85,23 @@ def register_tools(mcp: FastMCP):
         The organism filter uses partial matching (CONTAINS), so "MED4",
         "Prochlorococcus MED4", and "Prochlorococcus" all work.
         """
-        lc = ctx.request_context.lifespan_context
-        cached = getattr(lc, "_organisms_cache", None)
-        if cached is not None:
-            return cached
+        try:
+            lc = ctx.request_context.lifespan_context
+            cached = getattr(lc, "_organisms_cache", None)
+            if cached is not None:
+                return cached
 
-        conn = _conn(ctx)
-        results = api.list_organisms(conn=conn)
-        if not results:
-            return "No organisms found in the knowledge graph."
-        response = _fmt(results)
-        lc._organisms_cache = response
-        return response
+            conn = _conn(ctx)
+            results = api.list_organisms(conn=conn)
+            if not results:
+                return "No organisms found in the knowledge graph."
+            response = _fmt(results)
+            lc._organisms_cache = response
+            return response
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in list_organisms: {e}"
 
     @mcp.tool()
     def resolve_gene(
@@ -103,18 +118,23 @@ def register_tools(mcp: FastMCP):
                 old locus tag, or RefSeq protein ID.
             organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
         """
-        conn = _conn(ctx)
-        results = api.resolve_gene(identifier, organism=organism, conn=conn)
-        if not results:
-            msg = f"No gene found for identifier '{identifier}'"
-            if organism:
-                msg += f" in {organism}"
-            return json.dumps({"results": {}, "message": msg})
-        grouped = _group_by_organism(results)
-        return json.dumps(
-            {"results": grouped, "total": len(results)},
-            indent=2, default=str,
-        )
+        try:
+            conn = _conn(ctx)
+            results = api.resolve_gene(identifier, organism=organism, conn=conn)
+            if not results:
+                msg = f"No gene found for identifier '{identifier}'"
+                if organism:
+                    msg += f" in {organism}"
+                return json.dumps({"results": {}, "message": msg})
+            grouped = _group_by_organism(results)
+            return json.dumps(
+                {"results": grouped, "total": len(results)},
+                indent=2, default=str,
+            )
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in resolve_gene: {e}"
 
     @mcp.tool()
     def search_genes(
@@ -151,21 +171,26 @@ def register_tools(mcp: FastMCP):
                 limit applies to the pre-dedup query, so fewer rows may be
                 returned after collapsing.
         """
-        conn = _conn(ctx)
-        limit = min(limit, 50)
-        results = api.search_genes(
-            search_text, organism=organism,
-            category=category, min_quality=min_quality,
-            deduplicate=deduplicate, conn=conn,
-        )
-        results = results[:limit]
-        if not results:
+        try:
+            conn = _conn(ctx)
+            limit = min(limit, 50)
+            results = api.search_genes(
+                search_text, organism=organism,
+                category=category, min_quality=min_quality,
+                deduplicate=deduplicate, conn=conn,
+            )
+            results = results[:limit]
+            if not results:
+                return json.dumps({
+                    "results": [], "total": 0, "query": search_text,
+                })
             return json.dumps({
-                "results": [], "total": 0, "query": search_text,
-            })
-        return json.dumps({
-            "results": results, "total": len(results), "query": search_text,
-        }, indent=2, default=str)
+                "results": results, "total": len(results), "query": search_text,
+            }, indent=2, default=str)
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in search_genes: {e}"
 
     @mcp.tool()
     def gene_overview(ctx: Context, gene_ids: list[str], limit: int = 50) -> str:
@@ -190,11 +215,16 @@ def register_tools(mcp: FastMCP):
                       Use resolve_gene to find locus_tags from other identifiers.
             limit: Max genes to return (default 50).
         """
-        conn = _conn(ctx)
-        rows = api.gene_overview(gene_ids, conn=conn)
-        if not rows:
-            return "No genes found for the given locus_tags."
-        return _fmt(rows, limit=limit)
+        try:
+            conn = _conn(ctx)
+            rows = api.gene_overview(gene_ids, conn=conn)
+            if not rows:
+                return "No genes found for the given locus_tags."
+            return _fmt(rows, limit=limit)
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in gene_overview: {e}"
 
     @mcp.tool()
     def get_gene_details(ctx: Context, gene_id: str) -> str:
@@ -211,11 +241,16 @@ def register_tools(mcp: FastMCP):
         Args:
             gene_id: Gene locus_tag (e.g. "PMM0001", "sync_0001").
         """
-        conn = _conn(ctx)
-        result = api.get_gene_details(gene_id, conn=conn)
-        if result is None:
-            return f"Gene '{gene_id}' not found."
-        return _fmt([result])
+        try:
+            conn = _conn(ctx)
+            result = api.get_gene_details(gene_id, conn=conn)
+            if result is None:
+                return f"Gene '{gene_id}' not found."
+            return _fmt([result])
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in get_gene_details: {e}"
 
     @mcp.tool()
     def query_expression(
@@ -248,18 +283,20 @@ def register_tools(mcp: FastMCP):
             max_pvalue: Maximum adjusted p-value.
             limit: Max results (default 50).
         """
-        conn = _conn(ctx)
         try:
+            conn = _conn(ctx)
             results = api.query_expression(
                 gene_id=gene_id, organism=organism, condition=condition,
                 direction=direction, min_log2fc=min_log2fc,
                 max_pvalue=max_pvalue, conn=conn,
             )
+            if not results:
+                return "No expression data found for the given filters."
+            return _fmt(results, limit=limit)
         except ValueError as e:
             return f"Error: {e}"
-        if not results:
-            return "No expression data found for the given filters."
-        return _fmt(results, limit=limit)
+        except Exception as e:
+            return f"Error in query_expression: {e}"
 
     @mcp.tool()
     def compare_conditions(
@@ -281,18 +318,23 @@ def register_tools(mcp: FastMCP):
                         (exact match, unlike query_expression which uses CONTAINS).
             limit: Max results (default 100).
         """
-        if not any([gene_ids, organisms, conditions]):
-            return "Error: provide at least one of gene_ids, organisms, or conditions."
+        try:
+            if not any([gene_ids, organisms, conditions]):
+                return "Error: provide at least one of gene_ids, organisms, or conditions."
 
-        conn = _conn(ctx)
-        cypher, params = build_compare_conditions(
-            gene_ids=gene_ids, organisms=organisms,
-            conditions=conditions,
-        )
-        results = conn.execute_query(cypher, **params)
-        if not results:
-            return "No expression data found for the given filters."
-        return _fmt(results, limit=limit)
+            conn = _conn(ctx)
+            cypher, params = build_compare_conditions(
+                gene_ids=gene_ids, organisms=organisms,
+                conditions=conditions,
+            )
+            results = conn.execute_query(cypher, **params)
+            if not results:
+                return "No expression data found for the given filters."
+            return _fmt(results, limit=limit)
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in compare_conditions: {e}"
 
     def _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank):
         msg = f"No ortholog groups found for '{gene_id}'"
@@ -362,8 +404,8 @@ def register_tools(mcp: FastMCP):
               cluster (Pro/Syn only), one eggNOG family-level OG, and one
               eggNOG Bacteria-level COG.
         """
-        conn = _conn(ctx)
         try:
+            conn = _conn(ctx)
             result = api.get_homologs(
                 gene_id, source=source,
                 taxonomic_level=taxonomic_level,
@@ -372,11 +414,13 @@ def register_tools(mcp: FastMCP):
                 include_members=include_members,
                 member_limit=member_limit, conn=conn,
             )
+            if not result["ortholog_groups"]:
+                return _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank)
+            return json.dumps(result, indent=2, default=str)
         except ValueError as e:
-            return f"{e}"
-        if not result["ortholog_groups"]:
-            return _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank)
-        return json.dumps(result, indent=2, default=str)
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in get_homologs: {e}"
 
     @mcp.tool()
     def run_cypher(ctx: Context, query: str, limit: int = 25) -> str:
@@ -389,21 +433,23 @@ def register_tools(mcp: FastMCP):
             query: Cypher query string. A LIMIT clause will be added if not present.
             limit: Max results (default 25, max 200).
         """
-        limit = min(limit, 200)
-
-        # Add LIMIT if not present
-        if not re.search(r"\bLIMIT\b", query, re.IGNORECASE):
-            query = query.rstrip().rstrip(";")
-            query += f"\nLIMIT {limit}"
-
-        conn = _conn(ctx)
         try:
+            limit = min(limit, 200)
+
+            # Add LIMIT if not present
+            if not re.search(r"\bLIMIT\b", query, re.IGNORECASE):
+                query = query.rstrip().rstrip(";")
+                query += f"\nLIMIT {limit}"
+
+            conn = _conn(ctx)
             results = api.run_cypher(query, conn=conn)
+            if not results:
+                return "Query returned no results."
+            return _fmt(results, limit=limit)
         except ValueError as e:
             return f"Error: {e}"
-        if not results:
-            return "Query returned no results."
-        return _fmt(results, limit=limit)
+        except Exception as e:
+            return f"Error in run_cypher: {e}"
 
     @mcp.tool()
     def search_ontology(
@@ -441,16 +487,21 @@ def register_tools(mcp: FastMCP):
                   kegg.orthology:   (e.g. "K00001 alcohol dehydrogenase")
             limit: Max results (default 25).
         """
-        conn = _conn(ctx)
-        results = api.search_ontology(search_text, ontology, conn=conn)
-        results = results[:limit]
-        if not results:
+        try:
+            conn = _conn(ctx)
+            results = api.search_ontology(search_text, ontology, conn=conn)
+            results = results[:limit]
+            if not results:
+                return json.dumps({
+                    "results": [], "total": 0, "query": search_text,
+                })
             return json.dumps({
-                "results": [], "total": 0, "query": search_text,
-            })
-        return json.dumps({
-            "results": results, "total": len(results), "query": search_text,
-        }, indent=2, default=str)
+                "results": results, "total": len(results), "query": search_text,
+            }, indent=2, default=str)
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in search_ontology: {e}"
 
     @mcp.tool()
     def genes_by_ontology(
@@ -475,16 +526,21 @@ def register_tools(mcp: FastMCP):
             organism: Optional organism filter (fuzzy match on strain name).
             limit: Max gene results (default 25).
         """
-        conn = _conn(ctx)
-        results = api.genes_by_ontology(term_ids, ontology, organism=organism, conn=conn)
-        results = results[:limit]
-        if not results:
-            return json.dumps({"results": {}, "total": 0})
-        grouped = _group_by_organism(results)
-        return json.dumps(
-            {"results": grouped, "total": len(results)},
-            indent=2, default=str,
-        )
+        try:
+            conn = _conn(ctx)
+            results = api.genes_by_ontology(term_ids, ontology, organism=organism, conn=conn)
+            results = results[:limit]
+            if not results:
+                return json.dumps({"results": {}, "total": 0})
+            grouped = _group_by_organism(results)
+            return json.dumps(
+                {"results": grouped, "total": len(results)},
+                indent=2, default=str,
+            )
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in genes_by_ontology: {e}"
 
     @mcp.tool()
     def gene_ontology_terms(
@@ -511,11 +567,16 @@ def register_tools(mcp: FastMCP):
             limit: Max results (default 50). Relevant mainly with
                 leaf_only=False, which can return many ancestor terms.
         """
-        conn = _conn(ctx)
-        results = api.gene_ontology_terms(gene_id, ontology, leaf_only=leaf_only, conn=conn)
-        results = results[:limit]
-        if not results:
-            return json.dumps({"results": [], "total": 0})
-        return json.dumps({
-            "results": results, "total": len(results),
-        }, indent=2, default=str)
+        try:
+            conn = _conn(ctx)
+            results = api.gene_ontology_terms(gene_id, ontology, leaf_only=leaf_only, conn=conn)
+            results = results[:limit]
+            if not results:
+                return json.dumps({"results": [], "total": 0})
+            return json.dumps({
+                "results": results, "total": len(results),
+            }, indent=2, default=str)
+        except ValueError as e:
+            return f"Error: {e}"
+        except Exception as e:
+            return f"Error in gene_ontology_terms: {e}"

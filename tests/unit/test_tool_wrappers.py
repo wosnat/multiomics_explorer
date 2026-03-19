@@ -252,15 +252,16 @@ class TestSearchGenesWrapper:
         result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="x", limit=999))
         assert len(result["results"]) <= 50
 
-    def test_raises_on_double_failure(self, tool_fns, mock_ctx):
-        """When both original and escaped queries fail, exception propagates."""
+    def test_double_failure_returns_error_string(self, tool_fns, mock_ctx):
+        """When both original and escaped queries fail, returns error string."""
         conn = _conn_from(mock_ctx)
         conn.execute_query.side_effect = [
             Neo4jClientError("parse error"),
             Neo4jClientError("still broken"),
         ]
-        with pytest.raises(Neo4jClientError):
-            tool_fns["search_genes"](mock_ctx, search_text="bad [query")
+        result = tool_fns["search_genes"](mock_ctx, search_text="bad [query")
+        assert "Error in search_genes" in result
+        assert "still broken" in result
 
     def test_organism_filter_passed_through(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
@@ -774,10 +775,11 @@ class TestRunCypherWrapper:
         assert ";" not in called_query
         assert "LIMIT" in called_query
 
-    def test_neo4j_error_propagates(self, tool_fns, mock_ctx):
+    def test_neo4j_error_returns_error_string(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.side_effect = Neo4jClientError("syntax error")
-        with pytest.raises(Neo4jClientError):
-            tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
+        result = tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
+        assert "Error in run_cypher" in result
+        assert "syntax error" in result
 
     def test_foreach_blocked(self, tool_fns, mock_ctx):
         result = tool_fns["run_cypher"](
@@ -841,14 +843,15 @@ class TestSearchOntologyWrapper:
         assert result["total"] == 1
         assert conn.execute_query.call_count == 2
 
-    def test_raises_on_double_failure(self, tool_fns, mock_ctx):
+    def test_double_failure_returns_error_string(self, tool_fns, mock_ctx):
         conn = _conn_from(mock_ctx)
         conn.execute_query.side_effect = [
             Neo4jClientError("parse error"),
             Neo4jClientError("still broken"),
         ]
-        with pytest.raises(Neo4jClientError):
-            tool_fns["search_ontology"](mock_ctx, search_text="bad [query", ontology="go_bp")
+        result = tool_fns["search_ontology"](mock_ctx, search_text="bad [query", ontology="go_bp")
+        assert "Error in search_ontology" in result
+        assert "still broken" in result
 
     def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
         """Limit parameter caps results at the MCP level."""
@@ -929,12 +932,13 @@ class TestGenesByOntologyWrapper:
         assert result["results"] == {}
         assert result["total"] == 0
 
-    def test_invalid_ontology_raises_error(self, tool_fns, mock_ctx):
-        """Invalid ontology value raises ValueError from the builder."""
-        with pytest.raises(ValueError, match="Invalid ontology"):
-            tool_fns["genes_by_ontology"](
-                mock_ctx, term_ids=["x"], ontology="bad_value",
-            )
+    def test_invalid_ontology_returns_error(self, tool_fns, mock_ctx):
+        """Invalid ontology value returns error string (not raises)."""
+        result = tool_fns["genes_by_ontology"](
+            mock_ctx, term_ids=["x"], ontology="bad_value",
+        )
+        assert "Error" in result
+        assert "Invalid ontology" in result
 
     def test_go_mf_ontology_accepted(self, tool_fns, mock_ctx):
         """go_mf ontology is accepted without error."""
@@ -1036,11 +1040,12 @@ class TestGeneOntologyTermsWrapper:
         assert result["results"] == []
         assert result["total"] == 0
 
-    def test_invalid_ontology_raises_error(self, tool_fns, mock_ctx):
-        with pytest.raises(ValueError, match="Invalid ontology"):
-            tool_fns["gene_ontology_terms"](
-                mock_ctx, gene_id="PMM0001", ontology="invalid",
-            )
+    def test_invalid_ontology_returns_error(self, tool_fns, mock_ctx):
+        result = tool_fns["gene_ontology_terms"](
+            mock_ctx, gene_id="PMM0001", ontology="invalid",
+        )
+        assert "Error" in result
+        assert "Invalid ontology" in result
 
     def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
         """Limit parameter caps results at the MCP level via post-query slicing."""
@@ -1113,3 +1118,158 @@ class TestGeneOntologyTermsWrapper:
         )
         called_cypher = _conn_from(mock_ctx).execute_query.call_args[0][0]
         assert "NOT EXISTS" in called_cypher
+
+
+# ---------------------------------------------------------------------------
+# Error handling — all tools catch exceptions and return error strings
+# ---------------------------------------------------------------------------
+class TestErrorHandling:
+    """Every MCP tool must catch ValueError and Exception, returning an error string."""
+
+    def test_get_schema_value_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.kg.schema.load_schema_from_neo4j",
+            side_effect=ValueError("bad schema"),
+        ):
+            result = tool_fns["get_schema"](mock_ctx)
+        assert result == "Error: bad schema"
+
+    def test_get_schema_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.kg.schema.load_schema_from_neo4j",
+            side_effect=RuntimeError("connection lost"),
+        ):
+            result = tool_fns["get_schema"](mock_ctx)
+        assert "Error in get_schema" in result
+        assert "connection lost" in result
+
+    def test_list_filter_values_generic_error(self, tool_fns, mock_ctx):
+        mock_ctx.request_context.lifespan_context._filter_values_cache = None
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            side_effect=RuntimeError("connection lost"),
+        ):
+            result = tool_fns["list_filter_values"](mock_ctx)
+        assert "Error in list_filter_values" in result
+
+    def test_list_organisms_generic_error(self, tool_fns, mock_ctx):
+        mock_ctx.request_context.lifespan_context._organisms_cache = None
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["list_organisms"](mock_ctx)
+        assert "Error in list_organisms" in result
+
+    def test_resolve_gene_value_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            side_effect=ValueError("identifier must not be empty."),
+        ):
+            result = tool_fns["resolve_gene"](mock_ctx, identifier="")
+        assert result == "Error: identifier must not be empty."
+
+    def test_resolve_gene_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
+        assert "Error in resolve_gene" in result
+
+    def test_search_genes_value_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_genes",
+            side_effect=ValueError("bad input"),
+        ):
+            result = tool_fns["search_genes"](mock_ctx, search_text="test")
+        assert result == "Error: bad input"
+
+    def test_search_genes_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_genes",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["search_genes"](mock_ctx, search_text="test")
+        assert "Error in search_genes" in result
+
+    def test_gene_overview_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM0001"])
+        assert "Error in gene_overview" in result
+
+    def test_get_gene_details_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.get_gene_details",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001")
+        assert "Error in get_gene_details" in result
+
+    def test_query_expression_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.query_expression",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["query_expression"](mock_ctx, gene_id="PMM0001")
+        assert "Error in query_expression" in result
+
+    def test_compare_conditions_generic_error(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.side_effect = RuntimeError("timeout")
+        result = tool_fns["compare_conditions"](mock_ctx, gene_ids=["PMM0001"])
+        assert "Error in compare_conditions" in result
+
+    def test_get_homologs_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.get_homologs",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
+        assert "Error in get_homologs" in result
+
+    def test_get_homologs_value_error_has_prefix(self, tool_fns, mock_ctx):
+        """get_homologs ValueError should have 'Error:' prefix (was missing before)."""
+        with patch(
+            "multiomics_explorer.api.functions.get_homologs",
+            side_effect=ValueError("Gene 'FAKE' not found."),
+        ):
+            result = tool_fns["get_homologs"](mock_ctx, gene_id="FAKE")
+        assert result.startswith("Error: ")
+
+    def test_run_cypher_generic_error(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.side_effect = RuntimeError("timeout")
+        result = tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
+        assert "Error in run_cypher" in result
+
+    def test_search_ontology_value_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            side_effect=ValueError("Invalid ontology 'bad'"),
+        ):
+            result = tool_fns["search_ontology"](
+                mock_ctx, search_text="test", ontology="bad",
+            )
+        assert result == "Error: Invalid ontology 'bad'"
+
+    def test_genes_by_ontology_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["genes_by_ontology"](
+                mock_ctx, term_ids=["go:0006260"], ontology="go_bp",
+            )
+        assert "Error in genes_by_ontology" in result
+
+    def test_gene_ontology_terms_generic_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            side_effect=RuntimeError("timeout"),
+        ):
+            result = tool_fns["gene_ontology_terms"](
+                mock_ctx, gene_id="PMM0001", ontology="go_bp",
+            )
+        assert "Error in gene_ontology_terms" in result
