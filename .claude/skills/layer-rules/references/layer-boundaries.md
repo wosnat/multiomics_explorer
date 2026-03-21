@@ -148,9 +148,7 @@ def register_tools(mcp: FastMCP):
 ### Helpers
 
 - `_conn(ctx)` — extracts `GraphConnection` from lifespan context
-- `_fmt(results, limit)` — slices and `json.dumps` with indent=2
 - `_group_by_organism(results)` — groups gene results by `organism_strain`
-- `_no_groups_msg(gene_id)` — standard message for no homolog groups
 
 ### Caching pattern
 
@@ -165,16 +163,29 @@ lc._cache_attr = response
 
 ### Error handling
 
-- `ValueError` from api/: return `f"Error: {e}"`
-- `Exception`: return `f"Error in {tool_name}: {e}"`
-- Never raise — always return a string
+- `ValueError` from api/: `raise ToolError(str(e))`
+- `Exception`: `raise ToolError(f"Error in {tool_name}: {e}")`
+- Empty results: return `[]` — not an error, let the LLM decide what to do
+
+### Return type
+
+- Return `list[dict]` or `dict` — FastMCP handles serialization
+  to structured content (human-readable + machine-readable JSON)
+- No `json.dumps`, no `_fmt` — return Python objects directly
+- When tool has `limit`, use 2-query pattern: summary query
+  (via `build_{name}_summary()`) then data query with LIMIT.
+  Summary returns `total_entries` (all rows) and `total_matching`
+  (after filters). API returns `{total_entries, total_matching, results}`.
+  MCP wrapper adds `returned` and `truncated` to the envelope.
+- Summary query is just counts for simple tools, richer
+  aggregations (breakdowns, distributions) for tools with summary mode
 
 ### Docstring conventions (LLM-facing)
 
 - First paragraph: what the tool does, when to use it
-- `Args:` section with per-parameter descriptions
+- Param descriptions go in `Field(description=...)`, not `Args:`
+- Document return fields in docstring: "Returns per result: field1, field2, ..."
 - Mention related tools for chaining ("Use list_organisms to see valid organisms")
-- Mention valid values or ranges
 
 ### Target pattern (v2, with FastMCP features)
 
@@ -185,7 +196,10 @@ from typing import Annotated, Literal
 from pydantic import Field
 from fastmcp.exceptions import ToolError
 
-@mcp.tool(annotations={"readOnlyHint": True})
+@mcp.tool(
+    tags={"domain_tag", "action_tag"},
+    annotations={"readOnlyHint": True},
+)
 def tool_name(
     ctx: Context,
     param: Annotated[str, Field(description="...")],
@@ -196,13 +210,23 @@ def tool_name(
     limit: Annotated[
         int, Field(ge=1, le=500, description="Max rows in detail mode"),
     ] = 100,
-) -> dict | str:
+) -> list[dict] | dict:
 ```
+
+**Key conventions:**
+- Param descriptions go in `Field(description=...)`, not in docstring `Args:`
+- Use `Literal["val1", "val2"]` for params with fixed valid values
+  known at code time (e.g. mode, ontology). Not for KG-derived values
+  (e.g. treatment_type) — those use `list_filter_values` for discovery.
+- Use `Field(ge=..., le=...)` for numeric constraints
+- Use `ToolError` for errors — always visible to client
+- Use `tags` for categorization (e.g. `{"publications", "discovery"}`)
+- All tools are read-only: `annotations={"readOnlyHint": True}`
 
 ### What this layer must NOT do
 
 - Call `queries_lib` directly — always go through `api/`
-- Raise exceptions to the MCP client
+- Return error strings — use `ToolError` instead
 - Execute raw Cypher (except through `api.run_cypher`)
 
 ---
@@ -261,7 +285,17 @@ Update about-mode content whenever tool return fields change.
 | `ctx` | MCP only | all MCP wrappers (first param, injected by FastMCP) |
 | `limit` | MCP only | tools with large result sets |
 | `mode` | MCP only (v2) | summary/detail/about |
+| `verbose` | all | include heavy text fields (abstract, description) — for small-result-set tools |
 | `summary` | api (v2) | functions with summary variant |
+
+## String matching rules
+
+All string filters must be case-insensitive. Use `toLower()` on both
+sides for CONTAINS/exact matches. Fulltext indexes are inherently
+case-insensitive.
+
+Fulltext search tools must return `score` in RETURN columns and
+ORDER BY score DESC. This lets the LLM see relevance ranking.
 
 ## Standard return field names
 

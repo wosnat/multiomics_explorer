@@ -14,7 +14,7 @@ See [layer boundaries](references/layer-boundaries.md) for full details.
 |---|---|---|---|
 | 1. Query builders | `kg/queries_lib.py` | `tuple[str, dict]` | Execute queries, format output, import from api/ or mcp_server/ |
 | 2. API functions | `api/functions.py` | `list[dict]` or `dict` | Format JSON, apply display limits, import from mcp_server/ |
-| 3. MCP wrappers | `mcp_server/tools.py` | `str` (JSON) | Call queries_lib directly, raise exceptions to caller |
+| 3. MCP wrappers | `mcp_server/tools.py` | `list[dict]` or `dict` | Call queries_lib directly, return error strings (use ToolError) |
 | 4. Skills | `skills/*/references/tools/*.md` | Markdown content | Contain stale examples, disagree with tool behavior |
 
 ## Layer 1: `kg/queries_lib.py`
@@ -31,9 +31,10 @@ Re-exported from `multiomics_explorer/__init__.py`.
 
 ## Layer 3: `mcp_server/tools.py`
 
-Wraps api/ only. `@mcp.tool()` inside `register_tools(mcp)`.
-First param `ctx: Context`. Three modes: summary/detail/about.
-Catches exceptions, returns error strings. Logs every call.
+Wraps api/ only. `@mcp.tool(tags={...}, annotations={"readOnlyHint": True})`
+inside `register_tools(mcp)`. First param `ctx: Context`.
+Use `Annotated[type, Field(description=...)]` for param descriptions.
+Use `ToolError` for errors (not error strings). Logs every call.
 
 ## Layer 4: Skills
 

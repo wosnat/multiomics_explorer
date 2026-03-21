@@ -295,7 +295,7 @@ FastMCP and hidden from the tool schema.
 - Calls `api/` functions, never `queries_lib` directly
 - Three modes: `summary` (default), `detail`, `about`
 - `limit` parameter applies only in detail mode
-- Truncation metadata (total, returned, truncated) in detail mode
+- Truncation metadata (total_entries, total_matching, returned, truncated)
 - Never raises raw exceptions — uses `ToolError` for tool-specific
   messages, lets FastMCP handle the rest
 - Tool docstrings are LLM-facing (see Docstring conventions)
@@ -410,7 +410,7 @@ data, not just counts.
 - Rows ordered by an explicit sort key (|log2FC|, relevance score,
   count — documented per tool)
 - The score value in each row
-- Truncation metadata: `total`, `returned`, `truncated`
+- Truncation metadata: `total_entries`, `total_matching`, `returned`, `truncated`
 
 **Implementation:** Calls `api.func(summary=False, limit=N)`.
 The limit is pushed into the Cypher query (server-side `ORDER BY
@@ -419,9 +419,9 @@ the limit based on the summary — if summary shows 823 genes,
 Claude might request detail with `limit=50` for a quick look or
 `limit=200` for deeper inspection.
 
-Truncation metadata (`total`, `returned`, `truncated`) is added
-by the MCP wrapper. `total` comes from the summary (precomputed),
-not from counting all rows.
+Truncation metadata (`total_entries`, `total_matching`, `returned`,
+`truncated`) is added by the MCP wrapper. `total_entries` is the
+unfiltered count, `total_matching` comes from the summary query.
 
 **Batching:** For large result sets transferred over a remote
 connection, the Neo4j driver handles streaming internally. If
@@ -749,7 +749,7 @@ Every tool supports up to three modes:
 
 ## Key rules
 
-- If `truncated: true`, use `total` from metadata, not `len(rows)`
+- If `truncated: true`, use `total_matching` from metadata, not `len(rows)`
 - Summary first, then decide on limit for detail based on summary stats
 - For bulk data, use package import in a script — not detail mode with high limit
 - Use summary mode for reasoning, detail mode for inspection
@@ -963,7 +963,7 @@ version matching the installed package.
 
 | Result size | Modes | Example tools |
 |---|---|---|
-| Always small (<20 rows) | detail + about (no summary needed) | `list_organisms`, `resolve_gene`, `gene_overview` |
+| Always small (<20 rows) | detail + about (no summary needed) | `list_organisms`, `resolve_gene`, `gene_overview`, `list_publications` |
 | Frequently large (100+ rows) | summary + detail + about | `query_expression`, `search_genes`, `genes_by_ontology` |
 
 Summary mode is not needed when detail mode always returns
@@ -1029,6 +1029,7 @@ queries) or `text` (too generic).
 | `summary` | `bool` | Summary vs full results | api/ |
 | `limit` | `int \| None` | Detail result limit (server-side ORDER BY + LIMIT). Default None = all rows | api/ + MCP |
 | `mode` | `str` | `"summary"`, `"detail"`, `"about"` | MCP only |
+| `verbose` | `bool` | Include heavy text fields (abstract, description). For small-result-set tools where row count is fine but per-row size varies. | all |
 | `conn` | `GraphConnection \| None` | Connection reuse (always last) | api/ |
 | `ctx` | `Context` | MCP context (always first) | MCP only |
 

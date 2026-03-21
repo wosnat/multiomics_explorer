@@ -1,6 +1,6 @@
 ---
 name: add-or-update-tool
-description: Complete lifecycle for adding a new MCP tool or modifying an existing one. Two phases — definition (scope, KG exploration, schema iteration, mode planning) then build (query builder, API, MCP wrapper, tests, skills, review).
+description: Complete lifecycle for adding a new MCP tool or modifying an existing one. Two phases — definition (scope, KG exploration, schema iteration) then build (query builder, API, MCP wrapper, skills (about tool), tests, docs, review).
 disable-model-invocation: true
 argument-hint: "[tool name and description, e.g. 'list_experiments - new tool' or 'search_genes - add min_quality param']"
 ---
@@ -26,20 +26,39 @@ into existing tool chains. Do not assume scope.
 | queries_lib.py | Builder signature, Cypher, RETURN columns, params |
 | api/functions.py | Function signature, validation, special handling |
 | mcp_server/tools.py | Wrapper signature, docstring, formatting, modes |
-| Skills | About-mode content, pipeline skill references |
+| Skills | About content in `multiomics_explorer/skills/multiomics-kg-guide/references/tools/` |
 | Tests | All test classes for this tool across test files |
 | Fixtures | `tests/fixtures/gene_data.py` projection helpers if applicable |
 
-Steps 1–2 loop until scope, modes, and KG schema are all stable.
+Steps 1–2 loop until scope and KG schema are stable.
 
 ### Step 1: Define what's needed
 
 - What the tool does (or what's changing), who calls it, what chains
   it participates in
-- Draft both modes — what would summary and detail return?
-  What aggregations, fields, sort keys?
+- Decide on result-size controls — see **Deciding result-size controls**
 - These requirements drive what the KG needs to support
 - → **Review:** present requirements to user for feedback
+
+#### Deciding result-size controls
+
+Not all tools need the same controls. Choose based on result set size:
+
+| Result size | Controls | Examples |
+|---|---|---|
+| Always small (<30 rows) | No modes needed. Consider `verbose` if some columns are heavy text (abstract, description). | `list_organisms`, `list_publications` |
+| Frequently large (100+ rows) | summary + detail + about modes, `limit` | `query_expression`, `search_genes`, `genes_by_ontology` |
+
+**`verbose`** (bool, default False): Controls per-row column width.
+Omits heavy text fields (abstract, description) by default. The builder
+adds/removes RETURN columns based on this flag. Orthogonal to modes —
+`verbose` controls which columns, modes control which rows.
+
+**`limit`** (int): Only needed for tools with potentially large result sets.
+
+**summary/detail/about modes**: Only for large-result-set tools.
+Summary returns aggregations, detail returns individual rows, about
+returns usage guidance.
 
 ### Step 2: KG exploration + iteration
 
@@ -49,20 +68,17 @@ Steps 1–2 loop until scope, modes, and KG schema are all stable.
   **`docs/kg-specs/{tool-name}.md`** using [template](assets/kg-spec-template.md)
 - User coordinates with KG repo (manual — may involve KG rebuild)
 - After KG changes land, re-query live KG to verify
-- Refine requirements and mode design based on what the KG
-  can actually support — this may reveal new needs
+- Refine requirements based on what the KG can actually support —
+  this may reveal new needs
 - → **Review:** present updated findings to user. Repeat steps 1–2.
 
 ### Output: implementation plan
 
-Once scope, modes, and KG schema are stable, write the implementation
-plan at **`docs/tool-specs/{tool-name}.md`** using
+Once scope and KG schema are stable, write the implementation plan at
+**`docs/tool-specs/{tool-name}.md`** using
 [template](assets/tool-spec-template.md). Document:
 - Purpose, use cases, tool chains
-- **Summary mode:** aggregations, counts/distributions,
-  availability signals, dimensions to break down by
-- **Detail mode:** return fields, sort key, default limit,
-  truncation metadata
+- Result-size controls: modes, verbose, limit — or "none needed"
 - Return field names (use standard names from layer-rules)
 - Any special handling (caching, multi-query orchestration, etc.)
 - → **Gate:** user approves implementation plan before proceeding
@@ -81,42 +97,60 @@ doc-updater in parallel → code-reviewer last.
 
 - `def build_{name}(*, ...) -> tuple[str, dict]`
 - Add summary variant `build_{name}_summary()` if tool has summary mode
+- If tool has `verbose`, use conditional RETURN columns (see checklist)
 - Keyword-only args, `$param` placeholders, `AS snake_case` aliases
+- WHERE clause: build conditions list + params dict, join with AND
+- Every query MUST have `ORDER BY` — use natural sort key or alphabetical fallback
 - → **Gate:** `pytest tests/unit/test_query_builders.py::TestBuild{Name} -v`
 
 ### Layer 2: API function → `api/functions.py`
 
 - Calls builder + `conn.execute_query`
-- `summary` bool param if tool has summary mode
+- Pass through `verbose` and/or `summary` to builder as applicable
 - `conn: GraphConnection | None = None` as keyword-only last param
-- Document return dict keys in docstring
+- Document return dict keys in docstring (note verbose-only keys)
 - Wire exports: add to `api/__init__.py` and
   `multiomics_explorer/__init__.py` `__all__`
 - → **Gate:** `pytest tests/unit/test_api_functions.py::Test{Name} -v`
 
 ### Layer 3: MCP wrapper → `mcp_server/tools.py`
 
-- `@mcp.tool()` inside `register_tools(mcp)`
-- `ctx: Context` first, then tool params, then `mode`, `limit`
-- Summary/detail/about mode dispatch
-- LLM-facing docstring with `Args:` section
+- `@mcp.tool(tags={...}, annotations={"readOnlyHint": True})` inside `register_tools(mcp)`
+- `ctx: Context` first, then tool params, then structural params
+  (`verbose`, `mode`, `limit` as applicable)
+- Use `Annotated[type, Field(description=...)]` for all params —
+  descriptions go in Field, not in docstring `Args:` section
+- Use `Literal["val1", "val2"]` for params with fixed valid values
+  known at code time (e.g. mode, ontology). Not for KG-derived values
+  (e.g. treatment_type) — those use `list_filter_values` for discovery.
+- Use `Field(ge=..., le=...)` for numeric constraints (e.g. limit)
+- Use `ToolError` for errors instead of returning error strings
+- Docstring is tool-level purpose only (when to use, what it returns)
+- Mode dispatch if tool has summary/detail/about modes
 - → **Gate:** `pytest tests/unit/test_tool_wrappers.py::Test{Name}Wrapper -v`
 
-### Layer 4: Skill updates
+### Layer 4: About content
 
-- Write or update about-mode content in
-  `skills/multiomics-kg-guide/references/tools/{name}.md`
+- Write or update per-tool about content in
+  `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`
   using [template](assets/about-content-template.md)
 - Include `example-call` and `expected-keys` tagged blocks
-- Update multiomics-kg-guide `SKILL.md` if the tool changes the landscape
-- Update pipeline skills that reference the tool
-- Sync: `scripts/sync_skills.sh`
-- → **Gate:** skill content matches actual tool behavior
 
-### Tests
+### Unit tests (all three layers)
+
+Run alongside or after each layer. Each layer has its own test class:
+
+| Layer | Test file | Test class |
+|---|---|---|
+| Query builder | `tests/unit/test_query_builders.py` | `TestBuild{Name}` |
+| API function | `tests/unit/test_api_functions.py` | `Test{Name}` |
+| MCP wrapper | `tests/unit/test_tool_wrappers.py` | `Test{Name}Wrapper` + update `EXPECTED_TOOLS` |
+
+→ **Gate:** `pytest tests/unit/ -v`
+
+### Integration + regression tests
 
 - Integration: add/update in `tests/integration/test_mcp_tools.py`
-  and `test_tool_correctness_kg.py`
 - Regression: add/update cases in `tests/evals/cases.yaml`,
   add builder to `TOOL_BUILDERS` in `tests/regression/test_regression.py`
 - Generate baselines: `pytest tests/regression/ --force-regen -m kg`
@@ -127,10 +161,14 @@ doc-updater in parallel → code-reviewer last.
   pytest tests/regression/ -m kg
   ```
 
+### Documentation
+
+- Update `CLAUDE.md` tool table with new/changed tool
+
 ### Code review
 
 Run through code-review checklist.
-Layer boundaries, signatures, tests, naming, skills all verified.
+Layer boundaries, signatures, tests, naming, docs all verified.
 
 ## Cascading renames (modify only)
 
