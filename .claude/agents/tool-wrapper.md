@@ -1,6 +1,6 @@
 ---
 name: tool-wrapper
-description: Update MCP tool wrappers in tools.py — rename tools, update imports, change response formatting, update docstrings
+description: Update MCP tool wrappers in tools.py — rename tools, update imports, change response formatting, update docstrings, add mode dispatch
 ---
 
 # Tool Wrapper Agent
@@ -13,21 +13,32 @@ You modify MCP tool wrapper functions in `multiomics_explorer/mcp_server/tools.p
 
 ## Dependencies
 
-- **Depends on: query-builder agent** — the builder function names, parameter names, and return columns must already be updated in `queries_lib.py` before you start
+- **Depends on: query-builder agent** — builder changes must be done first
+- The api/ layer (`api/functions.py`) must also be updated before you start, since tools.py calls api/ functions, not builders directly
 
 ## What you do
 
-Given a plan file (in `plans/redefine_mcp_tools/`), apply changes to tool wrappers:
+Given an implementation plan (in `docs/tool-specs/`), apply changes to tool wrappers:
 
-- Rename tool functions and their `@mcp.tool()` registration
-- Update imports from `queries_lib`
-- Rename parameters in tool signatures and docstrings
-- Change response formatting (e.g. flat list → grouped by organism)
-- Update/rewrite docstrings
-- Remove special-case messages (e.g. "Ambiguous") if the plan says to
+- Add new `@mcp.tool()` functions inside `register_tools(mcp)`
+- Rename tool functions
+- Update calls to `api.*` functions (new names, new params)
+- Add summary/detail/about mode dispatch
+- Change response formatting (grouping, truncation metadata)
+- Update/rewrite LLM-facing docstrings with `Args:` sections
+- Add `limit` capping with `min(limit, MAX)`
+
+## Layer rules (from layer-rules skill)
+
+- `ctx: Context` as first parameter (injected by FastMCP)
+- Call `api/` functions only — never call `queries_lib` directly
+- Never raise exceptions — catch `ValueError` → `f"Error: {e}"`,
+  catch `Exception` → `f"Error in {tool_name}: {e}"`
+- `logger.info()` at entry, `logger.warning()` on errors
+- Use helpers: `_conn(ctx)`, `_fmt(results, limit)`, `_group_by_organism(results)`
 
 ## Rules
 
-- Do NOT touch `queries_lib.py`, test files, or any other file
+- Do NOT touch `queries_lib.py`, `api/functions.py`, test files, or any other file
 - Do NOT change query logic — that belongs to the query-builder agent
-- Keep helper functions (`_conn`, `_debug`, `_fmt`, `_with_query`) unchanged unless the plan explicitly requires it
+- Keep helper functions (`_conn`, `_fmt`, `_group_by_organism`) unchanged unless the plan explicitly requires it

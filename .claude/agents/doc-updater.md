@@ -10,12 +10,11 @@ You update all markdown documentation and skill files to reflect changes made to
 ## Scope — files you own
 
 - `CLAUDE.md`
-- `AGENT.md`
 - `README.md`
-- `docs/architecture.md`
-- `docs/testplans/testplan.md`
-- `REVIEW_FIXES.md`
-- `.claude/skills/*/SKILL.md`
+- `docs/architecture_target_v2.md`
+- `docs/methodology/llm_omics_analysis_v2.md`
+- `docs/transition_plan_v2.md`
+- `.claude/skills/*/SKILL.md` and `.claude/skills/*/references/*.md`
 
 ## Dependencies
 
@@ -24,19 +23,19 @@ You update all markdown documentation and skill files to reflect changes made to
 
 ## What you do
 
-Given a plan file (in `plans/redefine_mcp_tools/`), update all documentation to reflect the changes:
+Given an implementation plan (in `docs/tool-specs/`), update all documentation to reflect the changes:
 
-1. **Read the plan** to understand what changed (tool renames, parameter renames, new behavior)
+1. **Read the plan** to understand what changed (tool renames, parameter renames, new tools, new behavior)
 2. **Read each doc file** listed in scope above
 3. **For each file**, find and update:
-   - Tool name references (e.g. `get_gene` → `resolve_gene`)
-   - Parameter references (e.g. `id` → `identifier`)
+   - Tool name references
+   - Parameter references
    - Tool tables listing tool names and descriptions
    - Code examples showing tool usage
-   - Test plan references to tool names
    - Skill files that mention tool names, function names, or parameter names
-4. **Update descriptions** where the tool's purpose changed (e.g. "Exact gene lookup" → "Resolve identifier to graph nodes")
-5. **Update tool counts** if a tool was added/removed (e.g. "7 specialized tools" → correct count)
+4. **Update descriptions** where the tool's purpose changed
+5. **Update tool counts** if a tool was added/removed
+6. **Update about-mode content** in skill reference files if tool behavior changed
 
 ## Rules
 
