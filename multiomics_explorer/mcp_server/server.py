@@ -9,7 +9,7 @@ import os
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 from multiomics_explorer.config.settings import get_settings
 from multiomics_explorer.kg.connection import GraphConnection

@@ -4,7 +4,7 @@ import json
 import logging
 import re
 
-from mcp.server.fastmcp import Context, FastMCP
+from fastmcp import Context, FastMCP
 
 import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.connection import GraphConnection

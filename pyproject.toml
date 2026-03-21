@@ -28,7 +28,7 @@ dependencies = [
     "pytest>=9.0.2",
 
     # MCP server
-    "mcp[cli]>=1.0",
+    "fastmcp>=3.0",
 ]
 
 [dependency-groups]
