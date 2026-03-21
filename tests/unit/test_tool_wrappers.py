@@ -36,8 +36,8 @@ def _conn_from(ctx):
 
 EXPECTED_TOOLS = [
     "get_schema", "list_filter_values", "list_organisms", "resolve_gene",
-    "search_genes", "gene_overview", "get_gene_details", "query_expression",
-    "compare_conditions", "get_homologs", "run_cypher",
+    "search_genes", "gene_overview", "get_gene_details",
+    "get_homologs", "run_cypher",
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
 ]
 
@@ -75,55 +75,43 @@ class TestGetSchemaWrapper:
 # list_filter_values
 # ---------------------------------------------------------------------------
 class TestListFilterValuesWrapper:
-    def test_returns_combined_json(self, tool_fns, mock_ctx):
-        """list_filter_values returns gene_categories and condition_types in one JSON response."""
+    def test_returns_gene_categories_json(self, tool_fns, mock_ctx):
+        """list_filter_values returns gene_categories in JSON response."""
         categories = [
             {"category": "Photosynthesis", "gene_count": 100},
             {"category": "Transport", "gene_count": 50},
         ]
-        condition_types = [
-            {"condition_type": "nitrogen_stress", "count": 10},
-            {"condition_type": "light_stress", "count": 8},
-        ]
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [categories, condition_types]
-        # Ensure no cached value
+        conn.execute_query.return_value = categories
         mock_ctx.request_context.lifespan_context._filter_values_cache = None
         result = json.loads(tool_fns["list_filter_values"](mock_ctx))
         assert "gene_categories" in result
-        assert "condition_types" in result
         assert len(result["gene_categories"]) == 2
-        assert len(result["condition_types"]) == 2
+
+    def test_no_condition_types(self, tool_fns, mock_ctx):
+        """condition_types removed in schema migration B1."""
+        categories = [{"category": "Photosynthesis", "gene_count": 100}]
+        conn = _conn_from(mock_ctx)
+        conn.execute_query.return_value = categories
+        mock_ctx.request_context.lifespan_context._filter_values_cache = None
+        result = json.loads(tool_fns["list_filter_values"](mock_ctx))
+        assert "condition_types" not in result
 
     def test_gene_categories_keys(self, tool_fns, mock_ctx):
         """Each gene_categories entry has 'category' and 'gene_count' keys."""
         categories = [{"category": "Photosynthesis", "gene_count": 100}]
-        condition_types = [{"condition_type": "nitrogen_stress", "count": 10}]
         conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [categories, condition_types]
+        conn.execute_query.return_value = categories
         mock_ctx.request_context.lifespan_context._filter_values_cache = None
         result = json.loads(tool_fns["list_filter_values"](mock_ctx))
         entry = result["gene_categories"][0]
         assert "category" in entry
         assert "gene_count" in entry
 
-    def test_condition_types_keys(self, tool_fns, mock_ctx):
-        """Each condition_types entry has 'condition_type' and 'count' keys."""
-        categories = [{"category": "Photosynthesis", "gene_count": 100}]
-        condition_types = [{"condition_type": "nitrogen_stress", "count": 10}]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [categories, condition_types]
-        mock_ctx.request_context.lifespan_context._filter_values_cache = None
-        result = json.loads(tool_fns["list_filter_values"](mock_ctx))
-        entry = result["condition_types"][0]
-        assert "condition_type" in entry
-        assert "count" in entry
-
     def test_caching(self, tool_fns, mock_ctx):
         """Second call returns cached value without hitting Neo4j again."""
         cached_response = json.dumps({
             "gene_categories": [{"category": "Cached", "gene_count": 1}],
-            "condition_types": [{"condition_type": "cached_type", "count": 1}],
         })
         mock_ctx.request_context.lifespan_context._filter_values_cache = cached_response
         result = tool_fns["list_filter_values"](mock_ctx)
@@ -406,78 +394,6 @@ class TestGetGeneDetailsWrapper:
         assert "_homologs" not in result[0]
         assert conn.execute_query.call_count == 1
 
-
-# ---------------------------------------------------------------------------
-# query_expression
-# ---------------------------------------------------------------------------
-class TestQueryExpressionWrapper:
-    def test_no_filters_returns_error(self, tool_fns, mock_ctx):
-        result = tool_fns["query_expression"](mock_ctx)
-        assert "Error" in result
-        assert "At least one" in result
-        # Should NOT have called Neo4j
-        _conn_from(mock_ctx).execute_query.assert_not_called()
-
-    def test_empty_results_message(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["query_expression"](mock_ctx, gene_id="PMM0001")
-        assert "No expression data" in result
-
-    def test_returns_json_with_results(self, tool_fns, mock_ctx):
-        rows = [{"gene": "PMM0001", "log2fc": 2.5, "pvalue": 0.001}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["query_expression"](mock_ctx, organism="MED4"))
-        assert len(result) == 1
-
-    def test_direction_filter_passed_through(self, tool_fns, mock_ctx):
-        rows = [{"gene": "PMM0001", "direction": "up"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", direction="up")
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["dir"] == "up"
-
-    def test_min_log2fc_passed_through(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", min_log2fc=1.5)
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["min_fc"] == 1.5
-
-    def test_max_pvalue_passed_through(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["query_expression"](mock_ctx, gene_id="PMM0001", max_pvalue=0.05)
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["max_pv"] == 0.05
-
-
-# ---------------------------------------------------------------------------
-# compare_conditions
-# ---------------------------------------------------------------------------
-class TestCompareConditionsWrapper:
-    def test_no_filters_returns_error(self, tool_fns, mock_ctx):
-        result = tool_fns["compare_conditions"](mock_ctx)
-        assert "Error" in result
-        assert "at least one" in result
-        _conn_from(mock_ctx).execute_query.assert_not_called()
-
-    def test_empty_results_message(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["compare_conditions"](mock_ctx, organisms=["MED4"])
-        assert "No expression data" in result
-
-    def test_returns_json_with_results(self, tool_fns, mock_ctx):
-        rows = [{"gene": "PMM0001", "condition": "coculture"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(
-            tool_fns["compare_conditions"](mock_ctx, gene_ids=["PMM0001"])
-        )
-        assert len(result) == 1
-
-    def test_conditions_filter_passed_through(self, tool_fns, mock_ctx):
-        rows = [{"gene": "PMM0001"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        tool_fns["compare_conditions"](mock_ctx, conditions=["nitrogen_stress"])
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["conditions"] == ["nitrogen_stress"]
 
 
 # ---------------------------------------------------------------------------
@@ -1208,19 +1124,6 @@ class TestErrorHandling:
         ):
             result = tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001")
         assert "Error in get_gene_details" in result
-
-    def test_query_expression_generic_error(self, tool_fns, mock_ctx):
-        with patch(
-            "multiomics_explorer.api.functions.query_expression",
-            side_effect=RuntimeError("timeout"),
-        ):
-            result = tool_fns["query_expression"](mock_ctx, gene_id="PMM0001")
-        assert "Error in query_expression" in result
-
-    def test_compare_conditions_generic_error(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.side_effect = RuntimeError("timeout")
-        result = tool_fns["compare_conditions"](mock_ctx, gene_ids=["PMM0001"])
-        assert "Error in compare_conditions" in result
 
     def test_get_homologs_generic_error(self, tool_fns, mock_ctx):
         with patch(

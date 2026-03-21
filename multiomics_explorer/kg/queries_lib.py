@@ -74,10 +74,6 @@ ONTOLOGY_CONFIG = {
     },
 }
 
-# Expression relationship types in the current KG schema.
-DIRECT_EXPR_RELS = "Condition_changes_expression_of|Coculture_changes_expression_of"
-
-
 def build_resolve_gene(
     *, identifier: str, organism: str | None = None
 ) -> tuple[str, dict]:
@@ -164,119 +160,6 @@ def build_get_gene_details(*, gene_id: str) -> tuple[str, dict]:
     )
     return cypher, {"gene_id": gene_id}
 
-
-def build_query_expression(
-    *,
-    gene_id: str | None = None,
-    organism: str | None = None,
-    condition: str | None = None,
-    direction: str | None = None,
-    min_log2fc: float | None = None,
-    max_pvalue: float | None = None,
-) -> tuple[str, dict]:
-    expr_rels = DIRECT_EXPR_RELS
-
-    where_clauses: list[str] = []
-    params: dict = {}
-
-    if gene_id:
-        where_clauses.append("g.locus_tag = $gene_id")
-        params["gene_id"] = gene_id
-
-    if organism:
-        where_clauses.append("r.organism_strain CONTAINS $target_strain")
-        params["target_strain"] = organism
-
-    if condition:
-        where_clauses.append(
-            "(CASE WHEN factor:OrganismTaxon "
-            "THEN (factor.genus CONTAINS $cond OR factor.organism_name CONTAINS $cond) "
-            "ELSE (factor.name CONTAINS $cond OR factor.condition_type CONTAINS $cond) "
-            "END)"
-        )
-        params["cond"] = condition
-
-    if direction:
-        where_clauses.append("r.expression_direction = $dir")
-        params["dir"] = direction.lower()
-
-    if min_log2fc is not None:
-        where_clauses.append("abs(r.log2_fold_change) >= $min_fc")
-        params["min_fc"] = min_log2fc
-
-    if max_pvalue is not None:
-        where_clauses.append(
-            "r.adjusted_p_value IS NOT NULL AND r.adjusted_p_value <= $max_pv"
-        )
-        params["max_pv"] = max_pvalue
-
-    where_block = " AND ".join(where_clauses)
-    where_line = f"WHERE {where_block}\n" if where_block else "\n"
-
-    cypher = (
-        f"MATCH (factor)-[r:{expr_rels}]->(g:Gene)\n"
-        f"{where_line}"
-        "RETURN g.locus_tag AS gene, g.product AS product,\n"
-        "       type(r) AS edge_type,\n"
-        "       CASE WHEN factor:OrganismTaxon THEN factor.organism_name\n"
-        "            ELSE factor.name END AS source,\n"
-        "       r.expression_direction AS direction,\n"
-        "       r.log2_fold_change AS log2fc,\n"
-        "       r.adjusted_p_value AS padj,\n"
-        "       r.organism_strain AS organism_strain,\n"
-        "       r.control_condition AS control,\n"
-        "       r.experimental_context AS context,\n"
-        "       r.time_point AS time_point,\n"
-        "       r.publications AS publications\n"
-        "ORDER BY abs(r.log2_fold_change) DESC, g.locus_tag, source"
-    )
-    return cypher, params
-
-
-def build_compare_conditions(
-    *,
-    gene_ids: list[str] | None = None,
-    organisms: list[str] | None = None,
-    conditions: list[str] | None = None,
-) -> tuple[str, dict]:
-    where_clauses: list[str] = []
-    params: dict = {}
-
-    if gene_ids:
-        where_clauses.append("g.locus_tag IN $gene_ids")
-        params["gene_ids"] = gene_ids
-
-    if organisms:
-        where_clauses.append(
-            "any(org IN $organisms WHERE r.organism_strain CONTAINS org)"
-        )
-        params["organisms"] = organisms
-
-    if conditions:
-        where_clauses.append(
-            "CASE WHEN factor:OrganismTaxon "
-            "THEN factor.genus IN $conditions "
-            "ELSE factor.condition_type IN $conditions END"
-        )
-        params["conditions"] = conditions
-
-    where_block = " AND ".join(where_clauses)
-    where_line = f"WHERE {where_block}\n" if where_block else "\n"
-
-    cypher = (
-        f"MATCH (factor)-[r:{DIRECT_EXPR_RELS}]->(g:Gene)\n"
-        f"{where_line}"
-        "RETURN g.locus_tag AS gene, g.product AS product,\n"
-        "       r.organism_strain AS target_strain,\n"
-        "       CASE WHEN factor:OrganismTaxon THEN factor.organism_name\n"
-        "            ELSE factor.name END AS source,\n"
-        "       r.expression_direction AS direction,\n"
-        "       r.log2_fold_change AS log2fc,\n"
-        "       r.adjusted_p_value AS padj,\n"
-        "       r.experimental_context AS context\n"
-        "ORDER BY g.locus_tag, source, r.log2_fold_change"
-    )
-    return cypher, params
 
 
 def build_gene_stub(*, gene_id: str) -> tuple[str, dict]:
@@ -373,14 +256,6 @@ def build_list_gene_categories() -> tuple[str, dict]:
     )
     return cypher, {}
 
-
-def build_list_condition_types() -> tuple[str, dict]:
-    cypher = (
-        "MATCH (e:EnvironmentalCondition)\n"
-        "RETURN e.condition_type AS condition_type, count(*) AS count\n"
-        "ORDER BY count DESC"
-    )
-    return cypher, {}
 
 
 def build_list_organisms() -> tuple[str, dict]:

@@ -13,7 +13,6 @@ So product/description strings in the KG may differ from raw annotation JSONs.
 import pytest
 
 from multiomics_explorer.kg.queries_lib import (
-    build_compare_conditions,
     build_gene_ontology_terms,
     build_gene_overview,
     build_gene_stub,
@@ -21,10 +20,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
-    build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
-    build_query_expression,
     build_resolve_gene,
     build_search_genes,
     build_search_ontology,
@@ -473,85 +470,6 @@ class TestGetHomologsCorrectnessKG:
 
 
 # ---------------------------------------------------------------------------
-# TestQueryExpressionCorrectnessKG
-# ---------------------------------------------------------------------------
-
-@pytest.mark.kg
-class TestQueryExpressionCorrectnessKG:
-    """Validate expression queries return correct filtered data."""
-
-    def test_med4_has_expression_data(self, conn):
-        """MED4 should have expression data in the KG."""
-        cypher, params = build_query_expression(organism="MED4")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-
-    def test_direction_filter_up(self, conn):
-        """Direction filter 'up' should only return upregulated genes."""
-        cypher, params = build_query_expression(
-            organism="MED4", direction="up",
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        for r in results:
-            assert r["direction"] == "up", (
-                f"Expected direction='up', got {r['direction']}"
-            )
-
-    def test_direction_filter_down(self, conn):
-        """Direction filter 'down' should only return downregulated genes."""
-        cypher, params = build_query_expression(
-            organism="MED4", direction="down",
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        for r in results:
-            assert r["direction"] == "down", (
-                f"Expected direction='down', got {r['direction']}"
-            )
-
-    def test_min_log2fc_filter(self, conn):
-        """All results with min_log2fc=2.0 should have abs(log2fc) >= 2.0."""
-        cypher, params = build_query_expression(
-            organism="MED4", min_log2fc=2.0,
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        for r in results:
-            assert abs(r["log2fc"]) >= 2.0, (
-                f"Expected abs(log2fc) >= 2.0, got {r['log2fc']}"
-            )
-
-
-# ---------------------------------------------------------------------------
-# TestCompareConditionsCorrectnessKG
-# ---------------------------------------------------------------------------
-
-@pytest.mark.kg
-class TestCompareConditionsCorrectnessKG:
-    """Validate compare_conditions queries."""
-
-    def test_by_organism(self, conn):
-        """Filtering by organism MED4 should return expression comparison data."""
-        cypher, params = build_compare_conditions(organisms=["MED4"])
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        assert "gene" in results[0]
-
-    def test_by_gene_ids(self, conn):
-        """Filtering by gene_ids should only return matching genes."""
-        cypher, params = build_compare_conditions(
-            gene_ids=["PMM0001"],
-        )
-        results = conn.execute_query(cypher, **params)
-        # PMM0001 may or may not have expression data; if it does, gene should match
-        for r in results:
-            assert r["gene"] == "PMM0001", (
-                f"Expected gene='PMM0001', got {r['gene']}"
-            )
-
-
-# ---------------------------------------------------------------------------
 # TestListFilterValuesCorrectnessKG
 # ---------------------------------------------------------------------------
 
@@ -570,30 +488,13 @@ class TestListFilterValuesCorrectnessKG:
                 f"Expected category '{expected}' not found in {sorted(categories)}"
             )
 
-    def test_known_condition_types_present(self, conn):
-        """Known condition types must be present in results."""
-        cypher, params = build_list_condition_types()
-        results = conn.execute_query(cypher, **params)
-        condition_types = {r["condition_type"] for r in results}
-        for expected in ["nitrogen_stress", "light_stress", "coculture"]:
-            assert expected in condition_types, (
-                f"Expected condition_type '{expected}' not found in {sorted(condition_types)}"
-            )
-
     def test_all_counts_positive(self, conn):
-        """All gene_count and count values must be > 0."""
+        """All gene_count values must be > 0."""
         cat_cypher, cat_params = build_list_gene_categories()
         categories = conn.execute_query(cat_cypher, **cat_params)
         for r in categories:
             assert r["gene_count"] > 0, (
                 f"Category '{r['category']}' has gene_count={r['gene_count']}"
-            )
-
-        cond_cypher, cond_params = build_list_condition_types()
-        conditions = conn.execute_query(cond_cypher, **cond_params)
-        for r in conditions:
-            assert r["count"] > 0, (
-                f"Condition type '{r['condition_type']}' has count={r['count']}"
             )
 
     def test_minimum_gene_categories(self, conn):
@@ -602,14 +503,6 @@ class TestListFilterValuesCorrectnessKG:
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 20, (
             f"Expected >= 20 gene categories, got {len(results)}"
-        )
-
-    def test_minimum_condition_types(self, conn):
-        """At least 5 condition types should be returned."""
-        cypher, params = build_list_condition_types()
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 5, (
-            f"Expected >= 5 condition types, got {len(results)}"
         )
 
 

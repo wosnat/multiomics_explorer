@@ -9,12 +9,10 @@ import json
 import pytest
 
 from multiomics_explorer.kg.queries_lib import (
-    build_compare_conditions,
     build_gene_stub,
     build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
-    build_query_expression,
     build_resolve_gene,
     build_search_genes,
 )
@@ -62,26 +60,6 @@ class TestSearchGenes:
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         assert "locus_tag" in results[0]
-
-
-@pytest.mark.kg
-class TestQueryExpression:
-    def test_direct_expression_returns_results(self, conn):
-        """Direct expression query for MED4 should return results."""
-        cypher, params = build_query_expression(organism="MED4")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-
-
-@pytest.mark.kg
-class TestCompareConditions:
-    def test_compare_two_organisms(self, conn):
-        cypher, params = build_compare_conditions(
-            organisms=["MED4"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        assert "gene" in results[0]
 
 
 @pytest.mark.kg
@@ -144,15 +122,3 @@ class TestEdgeCases:
         # Either empty or gene is None
         assert not results or results[0]["gene"] is None
 
-    def test_query_expression_conflicting_filters(self, conn):
-        """Conflicting filters should return empty results, not crash."""
-        cypher, params = build_query_expression(
-            gene_id="PMM0001",
-            organism="NONEXISTENT_STRAIN_XYZ",
-            direction="up",
-            min_log2fc=999.0,
-            max_pvalue=0.0000001,
-        )
-        results = conn.execute_query(cypher, **params)
-        assert isinstance(results, list)
-        assert len(results) == 0

@@ -110,39 +110,6 @@
     min_rows: 1
     columns: [locus_tag, gene_name, product, organism_strain, gene_category]
 
-# ── Expression ───────────────────────────────────────────
-
-- id: expression_by_gene
-  tool: query_expression
-  desc: Known gene has expression data
-  params:
-    gene_id: PMM0845
-  expect:
-    min_rows: 1
-    columns: [gene, direction, log2fc]
-
-- id: expression_by_organism
-  tool: query_expression
-  desc: MED4 has expression edges
-  params:
-    organism: MED4
-    limit: 5
-  expect:
-    min_rows: 1
-
-- id: expression_coculture_up
-  tool: query_expression
-  desc: Alteromonas coculture produces upregulated genes in MED4
-  params:
-    condition: Alteromonas
-    organism: MED4
-    direction: up
-    limit: 10
-  expect:
-    min_rows: 1
-    contains:
-      direction: up
-
 # ── Homologs ─────────────────────────────────────────────
 
 - id: homologs_exist
@@ -177,18 +144,6 @@
     contains:
       organism_strain: Prochlorococcus MED4
 
-# ── Compare conditions ──────────────────────────────────
-
-- id: compare_conditions_med4
-  tool: compare_conditions
-  desc: Cross-condition comparison for MED4
-  params:
-    organisms: ["MED4"]
-    limit: 10
-  expect:
-    min_rows: 1
-    columns: [gene, source, direction, log2fc]
-
 # ── Homologs with members ───────────────────────────────
 
 - id: homologs_with_members
@@ -203,11 +158,9 @@
 
 - id: list_filter_values
   tool: list_filter_values
-  desc: Returns gene categories and condition types (snapshot-stable, few changes expected)
+  desc: Returns gene categories (snapshot-stable, few changes expected)
   params: {}
   expect:
-    # Combined JSON response: gene_categories + condition_types
-    # These lists change only on KG rebuild, so treat as near-snapshot.
 
 - id: list_filter_values_categories
   tool: raw_cypher
@@ -222,20 +175,6 @@
     columns: [category, gene_count]
     contains:
       category: Photosynthesis
-
-- id: list_filter_values_conditions
-  tool: raw_cypher
-  desc: Snapshot of all condition types with counts
-  params:
-    query: >
-      MATCH (e:EnvironmentalCondition)
-      RETURN e.condition_type AS condition_type, count(*) AS count
-      ORDER BY count DESC
-  expect:
-    min_rows: 5
-    columns: [condition_type, count]
-    contains:
-      condition_type: nitrogen_stress
 
 # ── List organisms ──────────────────────────────────────
 
@@ -507,39 +446,6 @@
   expect:
     min_rows: 1
     columns: [locus_tag, organism_strain]
-
-# ── Expression corner cases ───────────────────────────────
-
-- id: expression_direction_down
-  tool: query_expression
-  desc: Filtering to direction=down returns only downregulated entries
-  params:
-    organism: MED4
-    direction: down
-    limit: 10
-  expect:
-    min_rows: 1
-    contains:
-      direction: down
-
-- id: expression_high_log2fc
-  tool: query_expression
-  desc: High fold-change filter returns strongly regulated genes
-  params:
-    organism: MED4
-    min_log2fc: 2.0
-    limit: 10
-  expect:
-    min_rows: 1
-
-- id: expression_alteromonas_organism
-  tool: query_expression
-  desc: Alteromonas has expression data as the responding organism
-  params:
-    organism: Alteromonas
-    limit: 10
-  expect:
-    min_rows: 1
 
 # ── Homolog corner cases ──────────────────────────────────
 

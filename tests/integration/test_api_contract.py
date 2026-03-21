@@ -117,30 +117,6 @@ class TestGetGeneDetailsContract:
 
 
 # ---------------------------------------------------------------------------
-# query_expression
-# ---------------------------------------------------------------------------
-@pytest.mark.kg
-class TestQueryExpressionContract:
-    def test_returns_list_of_dicts(self, conn):
-        result = api.query_expression(gene_id=KNOWN_GENE, conn=conn)
-        assert isinstance(result, list)
-
-    def test_result_keys_when_data_exists(self, conn):
-        result = api.query_expression(gene_id=KNOWN_GENE, conn=conn)
-        if result:
-            expected_keys = {
-                "gene", "product", "edge_type", "source", "direction",
-                "log2fc", "padj", "organism_strain", "control", "context",
-                "time_point", "publications",
-            }
-            assert set(result[0].keys()) == expected_keys
-
-    def test_no_filter_raises(self, conn):
-        with pytest.raises(ValueError, match="At least one"):
-            api.query_expression(conn=conn)
-
-
-# ---------------------------------------------------------------------------
 # get_homologs
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
@@ -189,19 +165,12 @@ class TestListFilterValuesContract:
         result = api.list_filter_values(conn=conn)
         assert isinstance(result, dict)
         assert "gene_categories" in result
-        assert "condition_types" in result
 
     def test_gene_categories_keys(self, conn):
         result = api.list_filter_values(conn=conn)
         if result["gene_categories"]:
             assert "category" in result["gene_categories"][0]
             assert "gene_count" in result["gene_categories"][0]
-
-    def test_condition_types_keys(self, conn):
-        result = api.list_filter_values(conn=conn)
-        if result["condition_types"]:
-            assert "condition_type" in result["condition_types"][0]
-            assert "count" in result["condition_types"][0]
 
 
 # ---------------------------------------------------------------------------

@@ -7,7 +7,6 @@ import pytest
 
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
-    build_compare_conditions,
     build_gene_ontology_terms,
     build_gene_overview,
     build_gene_stub,
@@ -15,10 +14,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
-    build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
-    build_query_expression,
     build_resolve_gene,
     build_search_genes,
     build_search_ontology,
@@ -148,40 +145,24 @@ class TestBuildGetGeneDetails:
         assert not hasattr(ql, "build_get_gene_details_homologs")
 
 
-class TestBuildQueryExpression:
-    def test_by_gene(self):
-        cypher, params = build_query_expression(gene_id="PMM0845")
-        assert params["gene_id"] == "PMM0845"
-        assert "g.locus_tag = $gene_id" in cypher
+class TestRemovedExpressionBuilders:
+    """Verify old expression builders are removed (schema migration B1)."""
 
-    def test_direction_lowercased(self):
-        _, params = build_query_expression(gene_id="x", direction="UP")
-        assert params["dir"] == "up"
+    def test_build_query_expression_removed(self):
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "build_query_expression")
 
-    def test_no_ortholog_edges_in_query(self):
-        """Query should only use direct expression edges (ortholog edges removed from KG)."""
-        cypher, _ = build_query_expression(gene_id="x")
-        assert "ortholog" not in cypher.lower()
+    def test_build_compare_conditions_removed(self):
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "build_compare_conditions")
 
-    def test_min_log2fc(self):
-        cypher, params = build_query_expression(gene_id="x", min_log2fc=1.5)
-        assert params["min_fc"] == 1.5
-        assert "abs(r.log2_fold_change) >= $min_fc" in cypher
+    def test_build_list_condition_types_removed(self):
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "build_list_condition_types")
 
-    def test_max_pvalue(self):
-        cypher, params = build_query_expression(gene_id="x", max_pvalue=0.05)
-        assert params["max_pv"] == 0.05
-
-
-class TestBuildCompareConditions:
-    def test_by_gene_ids(self):
-        cypher, params = build_compare_conditions(gene_ids=["PMM0001", "PMM0002"])
-        assert params["gene_ids"] == ["PMM0001", "PMM0002"]
-        assert "g.locus_tag IN $gene_ids" in cypher
-
-    def test_by_organisms(self):
-        cypher, params = build_compare_conditions(organisms=["MED4"])
-        assert params["organisms"] == ["MED4"]
+    def test_direct_expr_rels_constant_removed(self):
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "DIRECT_EXPR_RELS")
 
 
 class TestBuildGeneStub:
@@ -365,18 +346,6 @@ class TestBuildListGeneCategories:
         _, params = build_list_gene_categories()
         assert params == {}
 
-
-class TestBuildListConditionTypes:
-    def test_cypher_structure(self):
-        cypher, params = build_list_condition_types()
-        assert "MATCH (e:EnvironmentalCondition)" in cypher
-        assert "condition_type" in cypher
-        assert "count" in cypher
-        assert "ORDER BY count DESC" in cypher
-
-    def test_no_params(self):
-        _, params = build_list_condition_types()
-        assert params == {}
 
 
 class TestBuildListOrganisms:

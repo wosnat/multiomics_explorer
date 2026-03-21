@@ -28,10 +28,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
-    build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
-    build_query_expression,
     build_resolve_gene,
     build_search_genes,
     build_search_genes_dedup_groups,
@@ -205,38 +203,6 @@ def get_gene_details(
     return results[0]["gene"]
 
 
-def query_expression(
-    gene_id: str | None = None,
-    organism: str | None = None,
-    condition: str | None = None,
-    direction: str | None = None,
-    min_log2fc: float | None = None,
-    max_pvalue: float | None = None,
-    *,
-    conn: GraphConnection | None = None,
-) -> list[dict]:
-    """Query differential expression data.
-
-    At least one of gene_id, organism, or condition must be provided.
-
-    Returns list of dicts with keys: gene, product, edge_type, source,
-    direction, log2fc, padj, organism_strain, control, context,
-    time_point, publications.
-
-    Raises ValueError if no filter is provided.
-    """
-    if not any([gene_id, organism, condition]):
-        logger.debug("query_expression: no filters provided")
-        raise ValueError(
-            "At least one of gene_id, organism, or condition must be provided."
-        )
-    conn = _default_conn(conn)
-    cypher, params = build_query_expression(
-        gene_id=gene_id, organism=organism, condition=condition,
-        direction=direction, min_log2fc=min_log2fc, max_pvalue=max_pvalue,
-    )
-    return conn.execute_query(cypher, **params)
-
 
 def get_homologs(
     gene_id: str,
@@ -340,7 +306,6 @@ def list_filter_values(
 
     Returns dict with keys:
       gene_categories: list[dict] with category, gene_count
-      condition_types: list[dict] with condition_type, count
     """
     conn = _default_conn(conn)
 
@@ -348,13 +313,8 @@ def list_filter_values(
     cat_cypher, cat_params = build_list_gene_categories()
     categories = conn.execute_query(cat_cypher, **cat_params)
 
-    logger.debug("list_filter_values: fetching condition types")
-    cond_cypher, cond_params = build_list_condition_types()
-    condition_types = conn.execute_query(cond_cypher, **cond_params)
-
     return {
         "gene_categories": categories,
-        "condition_types": condition_types,
     }
 
 

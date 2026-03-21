@@ -2,9 +2,11 @@
 
 ## Project Overview
 
-Tools for exploring a Prochlorococcus/Alteromonas multi-omics knowledge graph (Neo4j). Provides an MCP server for Claude Code, a CLI, and a LangChain agent.
+Tools for exploring a Prochlorococcus/Alteromonas multi-omics knowledge graph (Neo4j). Provides an MCP server for Claude Code and a CLI.
 
 The KG is built by the separate `multiomics_biocypher_kg` repo. This repo is **read-only** — it never writes to the graph.
+
+**Expression schema:** The KG uses `Experiment` nodes with `Changes_expression_of` edges to Gene. Expression query tools (`query_expression`, `compare_conditions`) have been removed and are being rebuilt with the new schema. Use `run_cypher` for expression queries in the meantime — see few-shot examples in `kg/queries.py`.
 
 ## Build and Run
 
@@ -40,10 +42,8 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `search_genes` | Free-text search across gene functional annotations (Lucene syntax). Supports category filtering and ortholog deduplication. |
 | `get_gene_details` | All Gene node properties via g{.*} — use gene_overview for the common case |
 | `gene_overview` | Batch gene routing: identity + data availability signals (annotation_types, expression counts, ortholog summary). Accepts gene_ids list. |
-| `query_expression` | Expression data with filters (gene, organism, condition, direction, FC, p-value) |
-| `compare_conditions` | Cross-condition or cross-strain expression comparison |
 | `get_homologs` | Orthologs grouped by ortholog group, with filtering by source/level/rank. Excludes paralogs by default. |
-| `list_filter_values` | List valid values for categorical filters (gene categories, condition types) |
+| `list_filter_values` | List valid values for categorical filters (gene categories) |
 | `list_organisms` | All organisms with strain, genus, clade, gene count |
 | `search_ontology` | Browse ontology terms by text search (GO, KEGG, EC). Returns term IDs for use with `genes_by_ontology`. |
 | `genes_by_ontology` | Find genes annotated to ontology term IDs, with hierarchy expansion. Results grouped by organism. |
@@ -81,6 +81,6 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 | `multiomics_explorer/kg/schema.py` | Schema introspection from live KG |
 | `multiomics_explorer/kg/queries.py` | Curated Cypher queries + few-shot examples |
 | `multiomics_explorer/kg/queries_lib.py` | Query builder functions (parameterized Cypher) |
+| `multiomics_explorer/api/functions.py` | Public Python API — wraps query builders + execute |
 | `multiomics_explorer/config/settings.py` | Pydantic settings from .env |
 | `multiomics_explorer/cli/main.py` | Typer CLI |
-| `multiomics_explorer/agents/tools.py` | LangChain agent tools |

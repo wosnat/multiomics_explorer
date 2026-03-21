@@ -15,17 +15,14 @@ import pytest
 import yaml
 
 from multiomics_explorer.kg.queries_lib import (
-    build_compare_conditions,
     build_gene_ontology_terms,
     build_gene_overview,
     build_gene_stub,
     build_genes_by_ontology,
     build_get_gene_details,
     build_get_homologs_groups,
-    build_list_condition_types,
     build_list_gene_categories,
     build_list_organisms,
-    build_query_expression,
     build_resolve_gene,
     build_search_genes,
     build_search_ontology,
@@ -44,8 +41,6 @@ TOOL_BUILDERS = {
     "search_genes": build_search_genes,
     "gene_overview": build_gene_overview,
     "get_gene_details": build_get_gene_details,
-    "query_expression": build_query_expression,
-    "compare_conditions": build_compare_conditions,
     "get_homologs": build_get_homologs_groups,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
@@ -99,8 +94,6 @@ def _normalize(results: list[dict]) -> list[dict]:
         sort_key = "id"
     elif results and "organism_name" in results[0]:
         sort_key = "organism_name"
-    elif results and "condition_type" in results[0]:
-        sort_key = "condition_type"
     else:
         sort_key = None
 
@@ -138,10 +131,7 @@ def test_regression(conn, case, data_regression):
         results = conn.execute_query(params["query"])
     elif tool == "list_filter_values":
         cat_cypher, cat_params = build_list_gene_categories()
-        categories = conn.execute_query(cat_cypher, **cat_params)
-        cond_cypher, cond_params = build_list_condition_types()
-        condition_types = conn.execute_query(cond_cypher, **cond_params)
-        results = categories + condition_types
+        results = conn.execute_query(cat_cypher, **cat_params)
     elif tool == "get_homologs_with_members":
         cypher_groups, params_groups = build_get_homologs_groups(gene_id=params["gene_id"])
         results = conn.execute_query(cypher_groups, **params_groups)

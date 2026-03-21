@@ -31,7 +31,7 @@ RETURN p.locus_tag AS locus_tag LIMIT 20
 """
 
 EXPRESSION_EDGE_COUNT = """
-MATCH ()-[r:Condition_changes_expression_of|Coculture_changes_expression_of]->()
+MATCH ()-[r:Changes_expression_of]->()
 RETURN count(r) AS cnt
 """
 
@@ -81,45 +81,41 @@ ORDER BY og.taxonomic_level, other.locus_tag
 """
 
 EXPRESSION_FOR_GENE = """
-MATCH (factor)-[r:Condition_changes_expression_of|Coculture_changes_expression_of]->(g:Gene {locus_tag: $locus_tag})
-RETURN type(r) AS edge_type,
-       CASE WHEN factor:OrganismTaxon THEN factor.organism_name
-            ELSE factor.name END AS source,
+MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene {locus_tag: $locus_tag})
+RETURN e.name AS experiment, e.treatment_type AS treatment_type,
+       e.organism_strain AS organism_strain,
        r.expression_direction AS direction,
        r.log2_fold_change AS log2fc,
        r.adjusted_p_value AS padj,
-       r.control_condition AS control,
-       r.experimental_context AS context,
-       r.time_point AS time_point,
-       r.publications AS publications
+       r.time_point AS time_point
 ORDER BY abs(r.log2_fold_change) DESC
 """
 
 GENES_UPREGULATED_BY_COCULTURE = """
-MATCH (org:OrganismTaxon)-[r:Coculture_changes_expression_of {expression_direction: 'up'}]->(g:Gene)
-WHERE org.genus = $coculture_genus
-  AND r.organism_strain CONTAINS $target_strain
+MATCH (e:Experiment {treatment_type: 'coculture'})-[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)
+WHERE e.coculture_partner CONTAINS $coculture_genus
+  AND e.organism_strain CONTAINS $target_strain
 RETURN g.locus_tag AS locus_tag, g.product AS product,
        r.log2_fold_change AS log2fc, r.adjusted_p_value AS padj,
-       org.organism_name AS coculture_organism
+       e.coculture_partner AS coculture_organism
 ORDER BY r.log2_fold_change DESC
 LIMIT 50
 """
 
 GENES_AFFECTED_BY_STRESS = """
-MATCH (env:EnvironmentalCondition)-[r:Condition_changes_expression_of]->(g:Gene)
-WHERE env.condition_type = $condition_type
-  AND r.organism_strain CONTAINS $strain
+MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
+WHERE e.treatment_type = $treatment_type
+  AND e.organism_strain CONTAINS $strain
 RETURN g.locus_tag AS locus_tag, g.product AS product,
        r.expression_direction AS direction,
        r.log2_fold_change AS log2fc,
-       env.name AS condition_name
+       e.name AS experiment_name
 ORDER BY abs(r.log2_fold_change) DESC
 LIMIT 50
 """
 
 FUNCTIONAL_ENRICHMENT = """
-MATCH (factor)-[r:Condition_changes_expression_of|Coculture_changes_expression_of]->(g:Gene)
+MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
 WHERE r.expression_direction = $direction
 MATCH (g)-[:Gene_involved_in_biological_process]->(bp:BiologicalProcess)
 RETURN bp.name AS process,
@@ -163,44 +159,44 @@ FEW_SHOT_EXAMPLES = [
     {
         "question": "Which genes are upregulated in MED4 during coculture with Alteromonas?",
         "cypher": (
-            "MATCH (org:OrganismTaxon)-[r:Coculture_changes_expression_of {expression_direction: 'up'}]->(g:Gene)\n"
-            "WHERE org.genus = 'Alteromonas'\n"
-            "  AND r.organism_strain CONTAINS 'MED4'\n"
-            "RETURN g.locus_tag, g.product, r.log2_fold_change\n"
+            "MATCH (e:Experiment {treatment_type: 'coculture'})\n"
+            "      -[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)\n"
+            "WHERE e.coculture_partner CONTAINS 'Alteromonas'\n"
+            "  AND e.organism_strain CONTAINS 'MED4'\n"
+            "RETURN g.locus_tag, g.product, r.log2_fold_change, e.name\n"
             "ORDER BY r.log2_fold_change DESC\n"
             "LIMIT 50"
         ),
         "explanation": (
-            "Coculture expression uses Coculture_changes_expression_of (OrganismTaxon → Gene). "
-            "Source is the genome strain of the coculture partner — filter by org.genus = 'Alteromonas' "
-            "(not organism_name, which is the specific strain like 'HOT1A3'). "
-            "r.organism_strain is the target organism whose genes are affected."
+            "Expression uses Changes_expression_of (Experiment → Gene). "
+            "Coculture experiments have treatment_type='coculture' and coculture_partner "
+            "containing the partner organism name. e.organism_strain is the target organism "
+            "whose genes are affected."
         ),
     },
     {
         "question": "Which genes are affected by nitrogen stress in MED4?",
         "cypher": (
-            "MATCH (env:EnvironmentalCondition {condition_type: 'nutrient_stress'})"
-            "-[r:Condition_changes_expression_of]->(g:Gene)\n"
-            "WHERE r.organism_strain = 'MED4'\n"
-            "  AND env.description CONTAINS 'nitrogen'\n"
+            "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
+            "WHERE e.treatment_type = 'nutrient_stress'\n"
+            "  AND e.organism_strain CONTAINS 'MED4'\n"
+            "  AND e.treatment CONTAINS 'nitrogen'\n"
             "RETURN g.locus_tag, g.product, r.expression_direction, r.log2_fold_change\n"
             "ORDER BY abs(r.log2_fold_change) DESC\n"
             "LIMIT 50"
         ),
         "explanation": (
-            "Environmental stress uses Condition_changes_expression_of (EnvironmentalCondition → Gene). "
-            "Filter by condition_type (e.g. 'nutrient_stress', 'light_stress', 'salt_stress') "
-            "and use description CONTAINS for specific stressors. "
-            "EnvironmentalCondition has NO nitrogen_level/phosphate_level properties."
+            "Experiment nodes have treatment_type (e.g. 'nutrient_stress', 'light_stress', "
+            "'coculture') and treatment (text describing the specific treatment). "
+            "Filter by treatment_type and use CONTAINS on treatment for specifics."
         ),
     },
     {
         "question": "What biological processes are enriched among genes upregulated by Alteromonas coculture?",
         "cypher": (
-            "MATCH (org:OrganismTaxon)-[r:Coculture_changes_expression_of {expression_direction: 'up'}]->"
-            "(g:Gene)\n"
-            "WHERE org.organism_name = 'Alteromonas'\n"
+            "MATCH (e:Experiment {treatment_type: 'coculture'})\n"
+            "      -[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)\n"
+            "WHERE e.coculture_partner CONTAINS 'Alteromonas'\n"
             "MATCH (g)-[:Gene_involved_in_biological_process]->(bp:BiologicalProcess)\n"
             "RETURN bp.name AS process, collect(DISTINCT g.locus_tag) AS genes, "
             "count(DISTINCT g) AS gene_count\n"
@@ -209,28 +205,30 @@ FEW_SHOT_EXAMPLES = [
         ),
         "explanation": (
             "Multi-hop: expression edge → gene → GO biological process. "
-            "Use Gene_involved_in_biological_process (Gene → BiologicalProcess), "
-            "not the old protein_involved_in_biological_process."
+            "Use Gene_involved_in_biological_process (Gene → BiologicalProcess)."
         ),
     },
     {
         "question": "Show gene expression over time for PMM0001 in coculture",
         "cypher": (
-            "MATCH (org:OrganismTaxon)-[r:Coculture_changes_expression_of]->"
-            "(g:Gene {locus_tag: 'PMM0001'})\n"
+            "MATCH (e:Experiment {treatment_type: 'coculture'})\n"
+            "      -[r:Changes_expression_of]->(g:Gene {locus_tag: 'PMM0001'})\n"
             "WHERE r.time_point IS NOT NULL\n"
-            "RETURN org.organism_name, r.time_point, r.log2_fold_change,\n"
+            "RETURN e.name, r.time_point, r.time_point_hours, r.log2_fold_change,\n"
             "       r.expression_direction\n"
-            "ORDER BY r.time_point"
+            "ORDER BY r.time_point_hours"
         ),
-        "explanation": "Time series: filter by gene and order by time_point.",
+        "explanation": (
+            "Time series: filter by gene and order by time_point_hours (numeric hours). "
+            "Experiment nodes have is_time_course='true' for multi-timepoint experiments."
+        ),
     },
     {
         "question": "Which KEGG pathways are enriched among genes downregulated by nitrogen stress?",
         "cypher": (
-            "MATCH (env:EnvironmentalCondition {condition_type: 'nutrient_stress'})"
-            "-[r:Condition_changes_expression_of {expression_direction: 'down'}]->(g:Gene)\n"
-            "WHERE env.description CONTAINS 'nitrogen'\n"
+            "MATCH (e:Experiment)-[r:Changes_expression_of {expression_direction: 'down'}]->(g:Gene)\n"
+            "WHERE e.treatment_type = 'nutrient_stress'\n"
+            "  AND e.treatment CONTAINS 'nitrogen'\n"
             "MATCH (g)-[:Gene_has_kegg_ko]->(ko:KeggTerm {level: 'ko'})"
             "-[:Kegg_term_is_a_kegg_term]->(pw:KeggTerm {level: 'pathway'})\n"
             "RETURN pw.name AS pathway, count(DISTINCT g) AS gene_count\n"

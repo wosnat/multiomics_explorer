@@ -8,7 +8,6 @@ from fastmcp import Context, FastMCP
 
 import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.connection import GraphConnection
-from multiomics_explorer.kg.queries_lib import build_compare_conditions
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +62,6 @@ def register_tools(mcp: FastMCP):
         Returns:
         - gene_categories: values for the category filter on search_genes
           (e.g. "Photosynthesis", "Transport", "Stress response and adaptation")
-        - condition_types: values for the condition filter on query_expression
-          and compare_conditions (e.g. "nitrogen_stress", "light_stress", "coculture")
         """
         logger.info("list_filter_values")
         try:
@@ -122,7 +119,7 @@ def register_tools(mcp: FastMCP):
         organism: str | None = None,
     ) -> str:
         """Resolve a gene identifier to matching graph nodes. Returns locus_tags grouped by
-        organism. Use the returned locus_tag with get_gene_details, query_expression, or
+        organism. Use the returned locus_tag with get_gene_details, get_homologs, or
         other tools.
 
         Args:
@@ -224,7 +221,6 @@ def register_tools(mcp: FastMCP):
           → use gene_ontology_terms with the relevant type
         - expression_edge_count + significant_expression_count: whether
           expression data exists and how much is significant
-          → use query_expression
         - closest_ortholog_group_size + closest_ortholog_genera: whether
           orthologs exist and in which genera
           → use get_homologs for full membership
@@ -258,7 +254,6 @@ def register_tools(mcp: FastMCP):
 
         For organism taxonomy, use list_organisms. For homologs, use
         get_homologs. For ontology annotations, use gene_ontology_terms.
-        For expression data, use query_expression.
 
         Args:
             gene_id: Gene locus_tag (e.g. "PMM0001", "sync_0001").
@@ -276,98 +271,6 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             logger.warning("get_gene_details unexpected error: %s", e)
             return f"Error in get_gene_details: {e}"
-
-    @mcp.tool()
-    def query_expression(
-        ctx: Context,
-        gene_id: str | None = None,
-        organism: str | None = None,
-        condition: str | None = None,
-        direction: str | None = None,
-        min_log2fc: float | None = None,
-        max_pvalue: float | None = None,
-        limit: int = 50,
-    ) -> str:
-        """Query differential expression data from the knowledge graph.
-
-        Expression edges come in two types:
-        - Coculture_changes_expression_of: OrganismTaxon → Gene (coculture experiments)
-        - Condition_changes_expression_of: EnvironmentalCondition → Gene (stress experiments)
-
-        At least one of gene_id, organism, or condition must be provided.
-
-        Args:
-            gene_id: Filter by gene locus_tag (e.g. "PMM0001").
-            organism: Filter by target organism strain (e.g. "MED4") — the organism
-                      whose genes are affected.
-            condition: Filter by expression source — coculture partner name
-                       (e.g. "Alteromonas") or environmental condition name/type
-                       (e.g. "nitrogen_stress", "light_stress").
-            direction: Filter by "up" or "down" regulation.
-            min_log2fc: Minimum absolute log2 fold change.
-            max_pvalue: Maximum adjusted p-value.
-            limit: Max results (default 50).
-        """
-        logger.info("query_expression gene_id=%s organism=%s condition=%s direction=%s limit=%d",
-                    gene_id, organism, condition, direction, limit)
-        try:
-            conn = _conn(ctx)
-            results = api.query_expression(
-                gene_id=gene_id, organism=organism, condition=condition,
-                direction=direction, min_log2fc=min_log2fc,
-                max_pvalue=max_pvalue, conn=conn,
-            )
-            if not results:
-                return "No expression data found for the given filters."
-            return _fmt(results, limit=limit)
-        except ValueError as e:
-            logger.warning("query_expression error: %s", e)
-            return f"Error: {e}"
-        except Exception as e:
-            logger.warning("query_expression unexpected error: %s", e)
-            return f"Error in query_expression: {e}"
-
-    @mcp.tool()
-    def compare_conditions(
-        ctx: Context,
-        gene_ids: list[str] | None = None,
-        organisms: list[str] | None = None,
-        conditions: list[str] | None = None,
-        limit: int = 100,
-    ) -> str:
-        """Compare expression across conditions or strains. Returns one row per
-        gene-source combination for easy comparison.
-
-        At least one filter must be provided.
-
-        Args:
-            gene_ids: List of gene locus_tags to compare.
-            organisms: List of target strain names (whose genes are affected).
-            conditions: List of source names — coculture organism genus or condition_type
-                        (exact match, unlike query_expression which uses CONTAINS).
-            limit: Max results (default 100).
-        """
-        logger.info("compare_conditions gene_ids=%s organisms=%s conditions=%s limit=%d",
-                    gene_ids, organisms, conditions, limit)
-        try:
-            if not any([gene_ids, organisms, conditions]):
-                return "Error: provide at least one of gene_ids, organisms, or conditions."
-
-            conn = _conn(ctx)
-            cypher, params = build_compare_conditions(
-                gene_ids=gene_ids, organisms=organisms,
-                conditions=conditions,
-            )
-            results = conn.execute_query(cypher, **params)
-            if not results:
-                return "No expression data found for the given filters."
-            return _fmt(results, limit=limit)
-        except ValueError as e:
-            logger.warning("compare_conditions error: %s", e)
-            return f"Error: {e}"
-        except Exception as e:
-            logger.warning("compare_conditions unexpected error: %s", e)
-            return f"Error in compare_conditions: {e}"
 
     def _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank):
         msg = f"No ortholog groups found for '{gene_id}'"
@@ -431,8 +334,7 @@ def register_tools(mcp: FastMCP):
             - member_count and organism_count are total group counts from the
               KG (include paralogs). When exclude_paralogs is True, the
               returned members list may be smaller than member_count.
-            - For expression data of orthologs, use query_expression with
-              include_orthologs (separate tool, not part of this response).
+            - Expression query tools are being rebuilt for the new schema.
             - A gene typically belongs to 1-3 groups: one Cyanorak curated
               cluster (Pro/Syn only), one eggNOG family-level OG, and one
               eggNOG Bacteria-level COG.

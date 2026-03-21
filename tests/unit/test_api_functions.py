@@ -26,7 +26,6 @@ class TestTopLevelImports:
             get_schema,
             list_filter_values,
             list_organisms,
-            query_expression,
             resolve_gene,
             run_cypher,
             search_genes,
@@ -34,8 +33,12 @@ class TestTopLevelImports:
         )
         # Each should be the same object as in api.functions
         assert resolve_gene is api.resolve_gene
-        assert query_expression is api.query_expression
         assert get_homologs is api.get_homologs
+
+    def test_query_expression_removed(self):
+        """query_expression is no longer exported (schema migration B1)."""
+        import multiomics_explorer
+        assert not hasattr(multiomics_explorer, "query_expression")
 
 
 @pytest.fixture()
@@ -240,37 +243,6 @@ class TestGetGeneDetails:
         assert result is None
 
 
-# ---------------------------------------------------------------------------
-# query_expression
-# ---------------------------------------------------------------------------
-class TestQueryExpression:
-    def test_returns_list(self, mock_conn):
-        mock_conn.execute_query.return_value = [
-            {"gene": "PMM0001", "product": "p", "edge_type": "Condition_changes_expression_of",
-             "source": "nitrogen_stress", "direction": "up",
-             "log2fc": 2.5, "padj": 0.001,
-             "organism_strain": "MED4", "control": "ctl",
-             "context": "ctx", "time_point": "t0",
-             "publications": None},
-        ]
-        result = api.query_expression(gene_id="PMM0001", conn=mock_conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
-
-    def test_no_filter_raises_valueerror(self, mock_conn):
-        with pytest.raises(ValueError, match="At least one"):
-            api.query_expression(conn=mock_conn)
-
-    def test_organism_only_is_valid(self, mock_conn):
-        mock_conn.execute_query.return_value = []
-        result = api.query_expression(organism="MED4", conn=mock_conn)
-        assert result == []
-
-    def test_condition_only_is_valid(self, mock_conn):
-        mock_conn.execute_query.return_value = []
-        result = api.query_expression(condition="nitrogen_stress", conn=mock_conn)
-        assert result == []
-
 
 # ---------------------------------------------------------------------------
 # get_homologs
@@ -377,21 +349,24 @@ class TestGetHomologs:
 # list_filter_values
 # ---------------------------------------------------------------------------
 class TestListFilterValues:
-    def test_returns_dict_with_keys(self, mock_conn):
+    def test_returns_dict_with_gene_categories(self, mock_conn):
         categories = [{"category": "Photosynthesis", "gene_count": 100}]
-        condition_types = [{"condition_type": "nitrogen_stress", "count": 10}]
-        mock_conn.execute_query.side_effect = [categories, condition_types]
+        mock_conn.execute_query.return_value = categories
         result = api.list_filter_values(conn=mock_conn)
         assert isinstance(result, dict)
         assert "gene_categories" in result
-        assert "condition_types" in result
         assert result["gene_categories"] == categories
-        assert result["condition_types"] == condition_types
 
-    def test_two_queries_executed(self, mock_conn):
-        mock_conn.execute_query.side_effect = [[], []]
+    def test_no_condition_types_key(self, mock_conn):
+        """condition_types removed in schema migration B1."""
+        mock_conn.execute_query.return_value = []
+        result = api.list_filter_values(conn=mock_conn)
+        assert "condition_types" not in result
+
+    def test_one_query_executed(self, mock_conn):
+        mock_conn.execute_query.return_value = []
         api.list_filter_values(conn=mock_conn)
-        assert mock_conn.execute_query.call_count == 2
+        assert mock_conn.execute_query.call_count == 1
 
 
 # ---------------------------------------------------------------------------
