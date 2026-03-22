@@ -66,12 +66,37 @@
 
 ## Cross-layer consistency
 
-- [ ] Parameter names match across all 3 code layers?
+- [ ] Parameter names match across all 3 code layers (including `mode`
+      at both MCP and API — not `summary` bool at API)?
 - [ ] Return field names match between Cypher RETURN, API docstring,
       and about content `expected-keys`?
 - [ ] MCP tool name matches API function name?
 - [ ] Builder name follows `build_{api_function_name}` pattern?
 - [ ] Default values consistent across layers?
+- [ ] About content example calls use correct param names for other
+      tools referenced in chaining examples?
+
+## Mode-based tools (summary/detail)
+
+- [ ] Unified response model — breakdowns + results in same type?
+- [ ] Summary mode: `results=[]`, `returned=0`, `truncated=True`?
+- [ ] Detail mode: breakdowns also populated (from summary query)?
+- [ ] Both modes run summary query, detail additionally runs detail query?
+- [ ] Summary query uses `apoc.coll.frequencies` for breakdowns?
+- [ ] API renames `{item, count}` to domain keys, sorts descending?
+- [ ] Fulltext tools include `score_max`/`score_median` in summary?
+
+## Precomputed stats / sentinel values
+
+- [ ] If reading Neo4j array properties, handle sentinel values?
+      (`""` → None for labels, `-1.0` → None for hours)
+- [ ] Non-applicable fields omitted (e.g. time_points for non-time-course)?
+
+## List-type filter params
+
+- [ ] `list[str] | None` for exact-match multi-value filters?
+- [ ] Case normalization in Python before Cypher `IN` clause?
+- [ ] CONTAINS filters stay as single `str`?
 
 ## Test coverage
 

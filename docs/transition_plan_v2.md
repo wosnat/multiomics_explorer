@@ -269,17 +269,23 @@ This stress-tests the modify-tool skill on cascading changes.
 
 **Gate:** Tool updated with modes. All tests pass.
 
-#### D3: Code review + retrospective (round 2)
+#### D3: Code review + retrospective (round 2) — partial (2026-03-22)
 
-Run `code-review` skill against D1 and D2 changes.
+D1 retrospective complete. Code review checklist updated with:
+- Mode-based tool checks (unified model, truncated=True in summary,
+  breakdowns in both modes, apoc.coll.frequencies)
+- Precomputed stats / sentinel value handling
+- List-type filter param checks (list[str], case normalization)
+- Cross-layer param name consistency (mode at both layers)
+- About content chaining example param name verification
 
-**Update:**
-- Dev skills — add-tool and modify-tool now cover mode steps,
-  complex filtering, multi-query orchestration
-- Architecture doc — mode design refined from real experience,
-  summary fields per tool, FastMCP patterns
-- Methodology doc — principle refinements from building modes
-- Code-review skill — was the checklist sufficient for modes?
+Skills updated during D1 (add-or-update-tool, layer-rules, checklist).
+D2 retrospective will complete D3.
+
+**Remaining for D3 after D2:**
+- Architecture doc — mode design refined from real experience
+- Methodology doc — principle refinements
+- Verify code-review checklist catches D2 issues
 
 #### D4: Roll out modes to remaining tools
 
