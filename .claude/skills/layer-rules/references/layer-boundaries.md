@@ -104,9 +104,17 @@ Every API function must be:
 ### What this layer must NOT do
 
 - Format JSON or produce strings for display
-- Apply display limits (no `limit` parameter — callers slice)
 - Import from `mcp_server/`
 - Catch exceptions silently (except Lucene retry)
+
+### Limit handling
+
+For tools with filters: no limit in API — MCP wrapper passes limit to
+builder, API runs 2-query pattern (summary + data with LIMIT).
+
+For tools without filters (e.g. `list_organisms`): API accepts `limit`,
+runs single query (no LIMIT in Cypher), slices in Python. This gives
+`total_entries` from the full result set without a separate count query.
 
 ---
 
@@ -122,12 +130,12 @@ These will be migrated to v2 in Phase D.
 ```python
 def register_tools(mcp: FastMCP):
     class {Name}Result(BaseModel):
-        field1: str
-        field2: int = Field(default=0, description="What this means")
+        field1: str = Field(description="What this is (e.g. 'example')")
+        field2: int = Field(default=0, description="What this means (e.g. 42)")
 
     class {Name}Response(BaseModel):
         total_entries: int = Field(description="Total rows in KG")
-        total_matching: int = Field(description="Rows matching filters")
+        total_matching: int = Field(description="Rows matching filters")  # only for tools with filters
         returned: int = Field(description="Rows in this response")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[{Name}Result]
@@ -192,11 +200,14 @@ lc._cache_attr = response
 - Return Pydantic model instances — FastMCP handles serialization
 - No `json.dumps`, no `_fmt` — return model instances directly
 - Pydantic models at MCP boundary only. API layer returns plain `dict`.
-- When tool has `limit`, use 2-query pattern: summary query
+- **Tools with filters + limit:** Use 2-query pattern: summary query
   (via `build_{name}_summary()`) then data query with LIMIT.
   Summary returns `total_entries` (all rows) and `total_matching`
   (after filters). API returns `{total_entries, total_matching, results}`.
   MCP wrapper adds `returned` and `truncated` to the envelope.
+- **Tools without filters + limit:** Single query, slice in Python.
+  API returns `{total_entries, results}` (no `total_matching`).
+  MCP wrapper adds `returned` and `truncated`.
 - Summary query is just counts for simple tools, richer
   aggregations (breakdowns, distributions) for tools with summary mode
 
@@ -204,7 +215,8 @@ lc._cache_attr = response
 
 - First paragraph: what the tool does, when to use it
 - Param descriptions go in `Field(description=...)`, not `Args:`
-- Document return fields in docstring: "Returns per result: field1, field2, ..."
+- Return schema is in Pydantic models (auto-generated as `outputSchema`) —
+  do not duplicate return fields in the docstring
 - Mention related tools for chaining ("Use list_organisms to see valid organisms")
 
 ### Target pattern (v2, with FastMCP features)
@@ -305,9 +317,9 @@ Update about content whenever tool return fields change.
 | `category` | all | search_genes |
 | `conn` | api only | all api functions (keyword-only, last) |
 | `ctx` | MCP only | all MCP wrappers (first param, injected by FastMCP) |
-| `limit` | MCP only | tools with large result sets |
+| `limit` | MCP + api | tools with large or growing result sets |
 | `mode` | MCP only (v2) | summary/detail (about content served via MCP resource `docs://tools/{name}`) |
-| `verbose` | all | include heavy text fields (abstract, description) — for small-result-set tools |
+| `verbose` | all | include secondary columns (heavy text, taxonomy hierarchies) — for small-result-set tools |
 | `summary` | api (v2) | functions with summary variant |
 
 ## String matching rules
@@ -339,4 +351,4 @@ ORDER BY score DESC. This lets the LLM see relevance ranking.
 |---|---|---|
 | `queries_lib.py` | Developers | Brief: what Cypher pattern, what RETURN columns |
 | `api/functions.py` | Developers + scripts | Return dict keys listed, exceptions documented |
-| `mcp_server/tools.py` | LLMs | Full `Args:` section, chaining hints, valid values |
+| `mcp_server/tools.py` | LLMs | Purpose + when to use. Param descriptions in `Field()`, not `Args:`. Return schema in Pydantic models. |

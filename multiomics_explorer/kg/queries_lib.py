@@ -407,13 +407,43 @@ def build_list_gene_categories() -> tuple[str, dict]:
 
 
 
-def build_list_organisms() -> tuple[str, dict]:
+def build_list_organisms(
+    *,
+    verbose: bool = False,
+) -> tuple[str, dict]:
+    """Build Cypher for listing all organisms with data-availability signals.
+
+    RETURN keys (compact): organism_name, genus, species, strain, clade,
+    ncbi_taxon_id, gene_count, publication_count, experiment_count,
+    treatment_types, omics_types.
+    RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
+    superkingdom, lineage.
+    """
+    verbose_cols = (
+        ",\n       o.family AS family,"
+        "\n       o.order AS order,"
+        "\n       o.tax_class AS tax_class,"
+        "\n       o.phylum AS phylum,"
+        "\n       o.kingdom AS kingdom,"
+        "\n       o.superkingdom AS superkingdom,"
+        "\n       o.lineage AS lineage"
+        if verbose else ""
+    )
+
     cypher = (
         "MATCH (o:OrganismTaxon)\n"
-        "OPTIONAL MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o)\n"
-        "RETURN o.preferred_name AS organism_name, o.genus AS genus,\n"
-        "       o.strain_name AS strain, o.clade AS clade,\n"
-        "       count(g) AS gene_count\n"
+        "RETURN o.preferred_name AS organism_name,\n"
+        "       o.genus AS genus,\n"
+        "       o.species AS species,\n"
+        "       o.strain_name AS strain,\n"
+        "       o.clade AS clade,\n"
+        "       o.ncbi_taxon_id AS ncbi_taxon_id,\n"
+        "       o.gene_count AS gene_count,\n"
+        "       o.publication_count AS publication_count,\n"
+        "       o.experiment_count AS experiment_count,\n"
+        "       o.treatment_types AS treatment_types,\n"
+        "       o.omics_types AS omics_types"
+        f"{verbose_cols}\n"
         "ORDER BY o.genus, o.preferred_name"
     )
     return cypher, {}

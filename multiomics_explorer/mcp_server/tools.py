@@ -85,35 +85,71 @@ def register_tools(mcp: FastMCP):
             logger.warning("list_filter_values unexpected error: %s", e)
             return f"Error in list_filter_values: {e}"
 
-    @mcp.tool()
-    def list_organisms(ctx: Context) -> str:
-        """List all organisms in the knowledge graph with strain, genus, clade,
-        and gene count.
+    class OrganismResult(BaseModel):
+        organism_name: str = Field(description="Display name (e.g. 'Prochlorococcus MED4'). Use for organism filters in other tools.")
+        genus: str | None = Field(default=None, description="Genus (e.g. 'Prochlorococcus', 'Alteromonas')")
+        species: str | None = Field(default=None, description="Binomial species name (e.g. 'Prochlorococcus marinus')")
+        strain: str | None = Field(default=None, description="Strain identifier (e.g. 'MED4', 'EZ55')")
+        clade: str | None = Field(default=None, description="Ecotype clade, Prochlorococcus-specific (e.g. 'HLI', 'LLIV')")
+        ncbi_taxon_id: int | None = Field(default=None, description="NCBI Taxonomy ID for cross-referencing external databases (e.g. 59919)")
+        gene_count: int = Field(description="Number of genes in the KG for this organism (e.g. 1976)")
+        publication_count: int = Field(description="Number of publications studying this organism (e.g. 11)")
+        experiment_count: int = Field(description="Total experiments across all publications (e.g. 46)")
+        treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress'])")
+        omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS'])")
+        # verbose-only fields
+        family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae')")
+        order: str | None = Field(default=None, description="Taxonomic order (e.g. 'Synechococcales')")
+        tax_class: str | None = Field(default=None, description="Taxonomic class (e.g. 'Cyanophyceae')")
+        phylum: str | None = Field(default=None, description="Taxonomic phylum (e.g. 'Cyanobacteriota')")
+        kingdom: str | None = Field(default=None, description="Taxonomic kingdom (e.g. 'Bacillati')")
+        superkingdom: str | None = Field(default=None, description="Taxonomic superkingdom (e.g. 'Bacteria')")
+        lineage: str | None = Field(default=None, description="Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus')")
 
-        Use this to discover valid organism names for filtering in other tools.
-        The organism filter uses partial matching (CONTAINS), so "MED4",
-        "Prochlorococcus MED4", and "Prochlorococcus" all work.
+    class ListOrganismsResponse(BaseModel):
+        total_entries: int = Field(description="Total organisms in the KG")
+        returned: int = Field(description="Number of results returned")
+        truncated: bool = Field(description="True if results were truncated by limit")
+        results: list[OrganismResult]
+
+    @mcp.tool(
+        tags={"organisms", "discovery"},
+        annotations={"readOnlyHint": True},
+    )
+    async def list_organisms(
+        ctx: Context,
+        verbose: Annotated[bool, Field(
+            description="Include full taxonomy hierarchy "
+            "(family, order, class, phylum, kingdom, superkingdom, lineage).",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 50,
+    ) -> ListOrganismsResponse:
+        """List all organisms with sequenced genomes in the knowledge graph.
+
+        Returns taxonomy, gene counts, and publication counts for each organism.
+        Use the returned organism names as filter values in search_genes,
+        resolve_gene, genes_by_ontology, list_publications, etc. The organism
+        filter uses partial matching — "MED4", "Prochlorococcus MED4", and
+        "Prochlorococcus" all work.
         """
-        logger.info("list_organisms")
+        await ctx.info(f"list_organisms verbose={verbose} limit={limit}")
         try:
-            lc = ctx.request_context.lifespan_context
-            cached = getattr(lc, "_organisms_cache", None)
-            if cached is not None:
-                return cached
-
             conn = _conn(ctx)
-            results = api.list_organisms(conn=conn)
-            if not results:
-                return "No organisms found in the knowledge graph."
-            response = _fmt(results)
-            lc._organisms_cache = response
+            result = api.list_organisms(verbose=verbose, limit=limit, conn=conn)
+            organisms = [OrganismResult(**r) for r in result["results"]]
+            response = ListOrganismsResponse(
+                total_entries=result["total_entries"],
+                returned=len(organisms),
+                truncated=result["total_entries"] > len(organisms),
+                results=organisms,
+            )
+            await ctx.info(f"Returning {response.returned} of {response.total_entries} organisms")
             return response
-        except ValueError as e:
-            logger.warning("list_organisms error: %s", e)
-            return f"Error: {e}"
         except Exception as e:
-            logger.warning("list_organisms unexpected error: %s", e)
-            return f"Error in list_organisms: {e}"
+            await ctx.error(f"list_organisms unexpected error: {e}")
+            raise ToolError(f"Error in list_organisms: {e}")
 
     @mcp.tool()
     def resolve_gene(

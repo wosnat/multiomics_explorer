@@ -135,39 +135,82 @@ class TestListFilterValuesWrapper:
 # list_organisms
 # ---------------------------------------------------------------------------
 class TestListOrganismsWrapper:
-    def test_returns_json_array(self, tool_fns, mock_ctx):
-        """list_organisms returns a JSON array with expected columns."""
-        rows = [
-            {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
-             "strain": "MED4", "clade": "HLI", "gene_count": 1929},
-            {"organism_name": "Alteromonas EZ55", "genus": "Alteromonas",
-             "strain": "EZ55", "clade": None, "gene_count": 3800},
-        ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        mock_ctx.request_context.lifespan_context._organisms_cache = None
-        result = json.loads(tool_fns["list_organisms"](mock_ctx))
-        assert isinstance(result, list)
-        assert len(result) == 2
-        for col in ["organism_name", "genus", "strain", "clade", "gene_count"]:
-            assert col in result[0]
+    _SAMPLE_ORG = {
+        "organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
+        "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI",
+        "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11,
+        "experiment_count": 46,
+        "treatment_types": ["coculture", "light_stress"],
+        "omics_types": ["RNASEQ", "PROTEOMICS"],
+    }
 
-    def test_empty_result_message(self, tool_fns, mock_ctx):
-        """Empty result returns descriptive message."""
-        _conn_from(mock_ctx).execute_query.return_value = []
-        mock_ctx.request_context.lifespan_context._organisms_cache = None
-        result = tool_fns["list_organisms"](mock_ctx)
-        assert result == "No organisms found in the knowledge graph."
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, mock_ctx):
+        """Response has total_entries, returned, truncated, results."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={"total_entries": 15, "results": [self._SAMPLE_ORG]},
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        assert result.total_entries == 15
+        assert result.returned == 1
+        assert result.truncated is True  # 15 > 1
+        assert len(result.results) == 1
 
-    def test_caching(self, tool_fns, mock_ctx):
-        """Second call returns cached value without hitting Neo4j again."""
-        cached_response = json.dumps([
-            {"organism_name": "Cached", "genus": "G", "strain": "S",
-             "clade": None, "gene_count": 1},
-        ])
-        mock_ctx.request_context.lifespan_context._organisms_cache = cached_response
-        result = tool_fns["list_organisms"](mock_ctx)
-        assert result == cached_response
-        _conn_from(mock_ctx).execute_query.assert_not_called()
+    @pytest.mark.asyncio
+    async def test_expected_columns_compact(self, tool_fns, mock_ctx):
+        """Compact result has 11 fields, no taxonomy hierarchy."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={"total_entries": 1, "results": [self._SAMPLE_ORG]},
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        org = result.results[0]
+        for col in ["organism_name", "genus", "species", "strain", "clade",
+                     "ncbi_taxon_id", "gene_count", "publication_count",
+                     "experiment_count", "treatment_types", "omics_types"]:
+            assert hasattr(org, col)
+
+    @pytest.mark.asyncio
+    async def test_expected_columns_verbose(self, tool_fns, mock_ctx):
+        """Verbose result includes taxonomy hierarchy fields."""
+        verbose_org = {**self._SAMPLE_ORG,
+                       "family": "Prochlorococcaceae", "order": "Synechococcales",
+                       "tax_class": "Cyanophyceae", "phylum": "Cyanobacteriota",
+                       "kingdom": "Bacillati", "superkingdom": "Bacteria",
+                       "lineage": "cellular organisms; Bacteria; ..."}
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={"total_entries": 1, "results": [verbose_org]},
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx, verbose=True)
+        org = result.results[0]
+        assert org.family == "Prochlorococcaceae"
+        assert org.lineage == "cellular organisms; Bacteria; ..."
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        """Empty results return envelope with total_entries=0."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={"total_entries": 0, "results": []},
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        assert result.total_entries == 0
+        assert result.returned == 0
+        assert result.truncated is False
+        assert result.results == []
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """returned == len(results), truncated == (total > returned)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={"total_entries": 2, "results": [self._SAMPLE_ORG, self._SAMPLE_ORG]},
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        assert result.returned == 2
+        assert result.truncated is False  # 2 == 2
 
 
 # ---------------------------------------------------------------------------
@@ -1080,14 +1123,15 @@ class TestErrorHandling:
             result = tool_fns["list_filter_values"](mock_ctx)
         assert "Error in list_filter_values" in result
 
-    def test_list_organisms_generic_error(self, tool_fns, mock_ctx):
-        mock_ctx.request_context.lifespan_context._organisms_cache = None
+    @pytest.mark.asyncio
+    async def test_list_organisms_generic_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
             side_effect=RuntimeError("timeout"),
         ):
-            result = tool_fns["list_organisms"](mock_ctx)
-        assert "Error in list_organisms" in result
+            with pytest.raises(ToolError, match="Error in list_organisms"):
+                await tool_fns["list_organisms"](mock_ctx)
 
     def test_resolve_gene_value_error(self, tool_fns, mock_ctx):
         with patch(

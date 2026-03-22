@@ -1,93 +1,221 @@
 case_id: list_organisms_raw
-row_count: 18
+row_count: 15
 rows:
 - clade: null
+  experiment_count: 0
   gene_count: 0
   genus: Alteromonas
+  ncbi_taxon_id: 28108
+  omics_types: []
   organism_name: Alteromonas
+  publication_count: 0
+  species: null
   strain: null
+  treatment_types: []
 - clade: null
+  experiment_count: 13
   gene_count: 4136
   genus: Alteromonas
+  ncbi_taxon_id: 28108
+  omics_types:
+  - RNASEQ
   organism_name: Alteromonas macleodii EZ55
+  publication_count: 2
+  species: Alteromonas macleodii
   strain: EZ55
+  treatment_types:
+  - carbon_stress
+  - coculture
 - clade: null
+  experiment_count: 15
   gene_count: 4031
   genus: Alteromonas
+  ncbi_taxon_id: 28108
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
+  publication_count: 2
+  species: Alteromonas macleodii
   strain: HOT1A3
+  treatment_types:
+  - coculture
+  - nitrogen_stress
 - clade: null
+  experiment_count: 8
   gene_count: 4028
   genus: Alteromonas
+  ncbi_taxon_id: 28108
+  omics_types:
+  - RNASEQ
   organism_name: Alteromonas macleodii MIT1002
+  publication_count: 3
+  species: Alteromonas macleodii
   strain: MIT1002
+  treatment_types:
+  - coculture
+  - darkness
 - clade: null
-  gene_count: 0
-  genus: Masdevallia
-  organism_name: Marinobacter
-  strain: null
-- clade: null
+  experiment_count: 6
   gene_count: 0
   genus: null
+  ncbi_taxon_id: 10239
+  omics_types:
+  - MICROARRAY
+  - RNASEQ
   organism_name: Phage
+  publication_count: 3
+  species: null
   strain: null
+  treatment_types:
+  - light_stress
+  - viral
 - clade: HLII
+  experiment_count: 1
   gene_count: 1951
   genus: Prochlorococcus
+  ncbi_taxon_id: 146891
+  omics_types:
+  - RNASEQ
   organism_name: Prochlorococcus AS9601
+  publication_count: 1
+  species: Prochlorococcus marinus
   strain: AS9601
+  treatment_types:
+  - salt_stress
 - clade: HLI
+  experiment_count: 46
   gene_count: 1976
   genus: Prochlorococcus
+  ncbi_taxon_id: 59919
+  omics_types:
+  - MICROARRAY
+  - PROTEOMICS
+  - RNASEQ
   organism_name: Prochlorococcus MED4
+  publication_count: 11
+  species: Prochlorococcus marinus
   strain: MED4
+  treatment_types:
+  - carbon_stress
+  - coculture
+  - iron_stress
+  - light_stress
+  - nitrogen_stress
+  - phosphorus_stress
+  - salt_stress
+  - viral
 - clade: HLII
+  experiment_count: 1
   gene_count: 1935
   genus: Prochlorococcus
+  ncbi_taxon_id: 167546
+  omics_types:
+  - RNASEQ
   organism_name: Prochlorococcus MIT9301
+  publication_count: 1
+  species: Prochlorococcus marinus
   strain: MIT9301
+  treatment_types:
+  - growth_state
 - clade: HLII
+  experiment_count: 17
   gene_count: 1978
   genus: Prochlorococcus
+  ncbi_taxon_id: 74546
+  omics_types:
+  - RNASEQ
   organism_name: Prochlorococcus MIT9312
+  publication_count: 3
+  species: Prochlorococcus marinus
   strain: MIT9312
+  treatment_types:
+  - carbon_stress
+  - coculture
+  - plastic_stress
 - clade: LLIV
+  experiment_count: 19
   gene_count: 2948
   genus: Prochlorococcus
+  ncbi_taxon_id: 74547
+  omics_types:
+  - MICROARRAY
+  - RNASEQ
   organism_name: Prochlorococcus MIT9313
+  publication_count: 5
+  species: Prochlorococcus marinus
   strain: MIT9313
+  treatment_types:
+  - coculture
+  - iron_stress
+  - nitrogen_stress
+  - phosphorus_stress
+  - viral
 - clade: LLII
+  experiment_count: 2
   gene_count: 2226
   genus: Prochlorococcus
+  ncbi_taxon_id: 167555
+  omics_types:
+  - RNASEQ
   organism_name: Prochlorococcus NATL1A
+  publication_count: 1
+  species: Prochlorococcus marinus
   strain: NATL1A
+  treatment_types:
+  - salt_stress
 - clade: LLII
+  experiment_count: 14
   gene_count: 2214
   genus: Prochlorococcus
+  ncbi_taxon_id: 59920
+  omics_types:
+  - RNASEQ
   organism_name: Prochlorococcus NATL2A
+  publication_count: 5
+  species: Prochlorococcus marinus
   strain: NATL2A
+  treatment_types:
+  - coculture
+  - darkness
+  - phosphorus_stress
+  - plastic_stress
 - clade: HLI
+  experiment_count: 0
   gene_count: 1870
   genus: Prochlorococcus
+  ncbi_taxon_id: 1924285
+  omics_types: []
   organism_name: Prochlorococcus RSP50
+  publication_count: 0
+  species: null
   strain: RSP50
+  treatment_types: []
 - clade: null
-  gene_count: 0
-  genus: Alphainfluenzavirus
-  organism_name: Pseudohoeflea
-  strain: null
-- clade: null
+  experiment_count: 10
   gene_count: 3052
   genus: Synechococcus
+  ncbi_taxon_id: 64471
+  omics_types:
+  - RNASEQ
   organism_name: Synechococcus CC9311
+  publication_count: 1
+  species: null
   strain: CC9311
+  treatment_types:
+  - carbon_stress
+  - coculture
 - clade: null
+  experiment_count: 10
   gene_count: 2881
   genus: Parasynechococcus
+  ncbi_taxon_id: 84588
+  omics_types:
+  - RNASEQ
   organism_name: Synechococcus WH8102
+  publication_count: 1
+  species: Parasynechococcus marenigrum
   strain: WH8102
-- clade: null
-  gene_count: 0
-  genus: null
-  organism_name: Thalassospira
-  strain: null
+  treatment_types:
+  - carbon_stress
+  - coculture

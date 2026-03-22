@@ -31,6 +31,10 @@ examples:
       Step 3: search_genes(search_text="photosystem", organism="MED4")
               → find genes of interest
 
+verbose_fields:
+  - abstract
+  - description
+
 chaining:
   - "list_publications → list_experiments → query_expression"
   - "list_publications → search_genes"

@@ -44,7 +44,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `gene_overview` | Batch gene routing: identity + data availability signals (annotation_types, expression counts, ortholog summary). Accepts gene_ids list. |
 | `get_homologs` | Orthologs grouped by ortholog group, with filtering by source/level/rank. Excludes paralogs by default. |
 | `list_filter_values` | List valid values for categorical filters (gene categories) |
-| `list_organisms` | All organisms with strain, genus, clade, gene count |
+| `list_organisms` | All organisms with taxonomy, gene/publication/experiment counts, treatment and omics types. Verbose adds full taxonomy hierarchy. |
 | `list_publications` | Publications with experiment summaries, filterable by organism/treatment/search/author |
 | `search_ontology` | Browse ontology terms by text search (GO, KEGG, EC). Returns term IDs for use with `genes_by_ontology`. |
 | `genes_by_ontology` | Find genes annotated to ontology term IDs, with hierarchy expansion. Results grouped by organism. |

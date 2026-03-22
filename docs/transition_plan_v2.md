@@ -177,37 +177,40 @@ misses steps or has wrong conventions, fix the skill.
 
 **Gate:** Tool works end-to-end. Skill is validated or updated.
 
-#### C3: Exercise modify-tool skill → `list_organisms`
+#### C3: Exercise modify-tool skill → `list_organisms` ✓ (2026-03-22)
 
-Use the `modify-tool` skill to update `list_organisms` — an
-existing simple tool. Target changes (pick appropriate ones):
-- Leverage FastMCP features (Annotated, Field, annotations)
-- Improve docstring for LLM audience
-- Update tests
+Updated `list_organisms` from minimal 5-column tool to full
+data-availability discovery tool:
+- Precomputed stats on OrganismTaxon (gene_count, publication_count,
+  experiment_count, treatment_types, omics_types) — KG spec driven
+- Added species, ncbi_taxon_id, verbose taxonomy hierarchy
+- Full v2 pattern: async, Pydantic models, ToolError, tags, Field
+  descriptions with examples, about content via build script
+- KG fixes: 3 garbage nodes removed, species populated, name alignment
+- Tool spec: `docs/tool-specs/list_organisms.md`
+- KG spec: `docs/kg-specs/kg-spec-list-organisms.md`
 
-Follow the skill's pipeline:
-1. Read current stack
-2. Apply changes at each layer
-3. Update tests
-4. Verify — all tests pass
+**Gate:** ✓ All 409 unit + 356 integration/regression tests pass.
 
-**Gate:** Tool updated. Skill is validated or updated.
+#### C4: Code review + retrospective (round 1) ✓ (2026-03-22)
 
-#### C4: Code review + retrospective (round 1)
+Code review passed all checklist items. Retrospective found and fixed
+skill gaps:
+- verbose description broadened (not just heavy text)
+- limit guidance updated (MCP + API for growing result sets)
+- KG spec filename convention (kg-spec-{tool}.md)
+- Response envelope total_matching documented as optional
+- Docstring convention: return schema in Pydantic models, not docstring
+- Field descriptions: examples on all fields, not just "non-obvious"
+- About content: YAML format documented (verbose_fields, two mistake
+  formats), build script fixed (package import keys, verbose field
+  separation, "Good to know" heading for plain notes)
 
-Run the `code-review` dev skill against C2 and C3 changes:
-- Layer boundaries respected?
-- Tests cover all layers?
-- Naming conventions followed?
-- Docstrings match architecture conventions?
-
-Then retrospective on the dev skills themselves: did they guide
-correctly? What was missing? What was wrong?
-
-**Update:**
-- Dev skills based on what was learned
-- Architecture doc if conventions need revision
-- Methodology doc if principles need clarification
+**Updated:**
+- add-or-update-tool skill (SKILL.md, checklist, template)
+- layer-rules (layer-boundaries.md)
+- code-review (review-checklist.md)
+- build_about_content.py (skeleton, rendering)
 
 The dev skills are now validated on simple tools. Phase D
 stress-tests them on complex tools while introducing modes.

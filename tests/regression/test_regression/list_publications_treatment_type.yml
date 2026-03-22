@@ -53,7 +53,7 @@ rows:
   omics_types:
   - RNASEQ
   organisms:
-  - Alteromonas MIT1002
+  - Alteromonas macleodii MIT1002
   - Prochlorococcus NATL2A
   study_type: RNA-seq / Transcriptomics
   title: 'Torn apart and reunited: impact of a heterotroph on the transcriptome of

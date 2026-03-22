@@ -373,16 +373,43 @@ class TestListFilterValues:
 # list_organisms
 # ---------------------------------------------------------------------------
 class TestListOrganisms:
-    def test_returns_list(self, mock_conn):
-        mock_conn.execute_query.return_value = [
-            {"organism_name": "Prochlorococcus marinus MED4",
-             "genus": "Prochlorococcus", "strain": "MED4",
-             "clade": "HLI", "gene_count": 1716},
-        ]
+    _ROWS = [
+        {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
+         "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI",
+         "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11,
+         "experiment_count": 46, "treatment_types": ["coculture", "light_stress"],
+         "omics_types": ["RNASEQ", "PROTEOMICS"]},
+        {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas",
+         "species": "Alteromonas macleodii", "strain": "EZ55", "clade": None,
+         "ncbi_taxon_id": 28108, "gene_count": 4136, "publication_count": 2,
+         "experiment_count": 13, "treatment_types": ["carbon_stress"],
+         "omics_types": ["RNASEQ"]},
+    ]
+
+    def test_returns_dict(self, mock_conn):
+        mock_conn.execute_query.return_value = self._ROWS
         result = api.list_organisms(conn=mock_conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert result[0]["organism_name"] == "Prochlorococcus marinus MED4"
+        assert isinstance(result, dict)
+        assert result["total_entries"] == 2
+        assert len(result["results"]) == 2
+        assert result["results"][0]["organism_name"] == "Prochlorococcus MED4"
+
+    def test_passes_verbose(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        api.list_organisms(verbose=True, conn=mock_conn)
+        cypher = mock_conn.execute_query.call_args[0][0]
+        assert "family" in cypher
+
+    def test_limit_slices_results(self, mock_conn):
+        mock_conn.execute_query.return_value = self._ROWS
+        result = api.list_organisms(limit=1, conn=mock_conn)
+        assert result["total_entries"] == 2
+        assert len(result["results"]) == 1
+
+    def test_limit_none_returns_all(self, mock_conn):
+        mock_conn.execute_query.return_value = self._ROWS
+        result = api.list_organisms(conn=mock_conn)
+        assert len(result["results"]) == 2
 
 
 # ---------------------------------------------------------------------------

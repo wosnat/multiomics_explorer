@@ -209,7 +209,8 @@ Define Pydantic response models (`{Name}Result` + `{Name}Response`)
 and the `@mcp.tool()` wrapper. FastMCP auto-generates `outputSchema`
 from the return type annotation.
 
-(Show response models with `Field(description=...)` on non-obvious fields.
+(Show response models with `Field(description=...)` on all fields.
+Include examples in descriptions — e.g. `"Genus (e.g. 'Prochlorococcus')"`.
 Show full wrapper code with Annotated/Field/ToolError/tags/annotations.
 Return type is the response model, not `dict`.)
 
@@ -299,7 +300,18 @@ input YAML. Served via MCP resource at `docs://tools/{name}`.
 **File:** `multiomics_explorer/inputs/tools/{name}.yaml`
 
 Create with `uv run python scripts/build_about_content.py --skeleton {name}`,
-then fill in examples, chaining patterns, common mistakes.
+then fill in:
+
+- **examples** — each with `title` + `call` (single tool) or `steps`
+  (multi-step chain), and optional `response` (truncated example output)
+- **verbose_fields** — list of field names only returned with
+  `verbose=True`. Splits per-result table into compact + verbose sections.
+- **chaining** — tool flow patterns (e.g. `"tool_a → tool_b → tool_c"`)
+- **mistakes** — plain strings (→ "Good to know" section) or
+  `wrong`/`right` dicts (→ "Common mistakes" section)
+
+See `multiomics_explorer/inputs/tools/list_organisms.yaml` and
+`list_publications.yaml` for working examples.
 
 ### Build
 

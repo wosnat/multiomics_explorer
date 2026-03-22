@@ -354,12 +354,38 @@ class TestBuildListOrganisms:
     def test_cypher_structure(self):
         cypher, params = build_list_organisms()
         assert "MATCH (o:OrganismTaxon)" in cypher
-        assert "OPTIONAL MATCH" in cypher
-        assert "Gene_belongs_to_organism" in cypher
+        # Precomputed stats — no joins
+        assert "OPTIONAL MATCH" not in cypher
 
     def test_returns_expected_columns(self):
+        """Compact mode returns 11 columns from precomputed properties."""
         cypher, _ = build_list_organisms()
-        for col in ["organism_name", "genus", "strain", "clade", "gene_count"]:
+        for col in [
+            "organism_name", "genus", "species", "strain", "clade",
+            "ncbi_taxon_id", "gene_count", "publication_count",
+            "experiment_count", "treatment_types", "omics_types",
+        ]:
+            assert col in cypher
+
+    def test_reads_precomputed_props(self):
+        """All stats read from node properties, no joins."""
+        cypher, _ = build_list_organisms()
+        assert "o.gene_count AS gene_count" in cypher
+        assert "o.publication_count AS publication_count" in cypher
+        assert "o.experiment_count AS experiment_count" in cypher
+
+    def test_verbose_false(self):
+        """Compact mode excludes taxonomy hierarchy columns."""
+        cypher, _ = build_list_organisms(verbose=False)
+        for col in ["family", "order", "tax_class", "phylum", "kingdom",
+                     "superkingdom", "lineage"]:
+            assert col not in cypher
+
+    def test_verbose_true(self):
+        """Verbose mode adds taxonomy hierarchy columns."""
+        cypher, _ = build_list_organisms(verbose=True)
+        for col in ["family", "order", "tax_class", "phylum", "kingdom",
+                     "superkingdom", "lineage"]:
             assert col in cypher
 
     def test_no_params(self):

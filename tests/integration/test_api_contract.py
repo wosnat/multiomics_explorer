@@ -178,15 +178,21 @@ class TestListFilterValuesContract:
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
 class TestListOrganismsContract:
-    def test_returns_list_of_dicts(self, conn):
+    def test_returns_dict_with_results(self, conn):
         result = api.list_organisms(conn=conn)
-        assert isinstance(result, list)
-        assert len(result) >= 1
+        assert isinstance(result, dict)
+        assert "total_entries" in result
+        assert "results" in result
+        assert len(result["results"]) >= 1
 
     def test_result_keys(self, conn):
         result = api.list_organisms(conn=conn)
-        expected_keys = {"organism_name", "genus", "strain", "clade", "gene_count"}
-        assert set(result[0].keys()) == expected_keys
+        expected_keys = {
+            "organism_name", "genus", "species", "strain", "clade",
+            "ncbi_taxon_id", "gene_count", "publication_count",
+            "experiment_count", "treatment_types", "omics_types",
+        }
+        assert set(result["results"][0].keys()) == expected_keys
 
 
 # ---------------------------------------------------------------------------

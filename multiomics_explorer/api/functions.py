@@ -321,17 +321,26 @@ def list_filter_values(
 
 
 def list_organisms(
+    verbose: bool = False,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
+) -> dict:
     """List all organisms in the knowledge graph.
 
-    Returns list of dicts with keys: organism_name, genus, strain,
-    clade, gene_count.
+    Returns dict with keys: total_entries, results.
+    Per result: organism_name, genus, species, strain, clade,
+    ncbi_taxon_id, gene_count, publication_count, experiment_count,
+    treatment_types, omics_types.
+    When verbose=True, also includes: family, order, tax_class, phylum,
+    kingdom, superkingdom, lineage.
     """
     conn = _default_conn(conn)
-    cypher, params = build_list_organisms()
-    return conn.execute_query(cypher, **params)
+    cypher, params = build_list_organisms(verbose=verbose)
+    all_results = conn.execute_query(cypher, **params)
+    total = len(all_results)
+    results = all_results[:limit] if limit else all_results
+    return {"total_entries": total, "results": results}
 
 
 def list_publications(

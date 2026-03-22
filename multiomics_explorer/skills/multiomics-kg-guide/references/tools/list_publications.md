@@ -50,6 +50,11 @@ total_entries, total_matching, returned, truncated, results
 | treatment_types | list[string] (optional) | Experiment treatment types (e.g. coculture, nitrogen_stress) |
 | omics_types | list[string] (optional) | Omics data types (e.g. RNASEQ, PROTEOMICS) |
 | score | float \| None (optional) | Lucene relevance score (only with search_text) |
+
+**Verbose-only fields** (included when `verbose=True`):
+
+| Field | Type | Description |
+|---|---|---|
 | abstract | string \| None (optional) | Publication abstract (only with verbose=True) |
 | description | string \| None (optional) | Curated study description (only with verbose=True) |
 

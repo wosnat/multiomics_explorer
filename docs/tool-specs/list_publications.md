@@ -222,7 +222,7 @@ if author:
   and results are sorted by year DESC
 - No experiment join needed — `experiment_count`, `treatment_types`,
   `omics_types` are precomputed properties on Publication node
-  (see `docs/kg-specs/list_publications.md`)
+  (see `docs/kg-specs/kg-spec-list-publications.md`)
 - All filters work on Publication node properties directly:
   `p.organism` (list), `p.treatment_types` (list), `p.authors` (list)
 - Publications without experiments have `experiment_count=0` and

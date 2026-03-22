@@ -46,15 +46,17 @@ Not all tools need the same controls. Choose based on result set size:
 
 | Result size | Controls | Examples |
 |---|---|---|
-| Always small (<30 rows) | No modes needed. Consider `verbose` if some columns are heavy text (abstract, description). | `list_organisms`, `list_publications` |
+| Always small (<30 rows) | No modes needed. Consider `verbose` if some columns are secondary (heavy text, taxonomy hierarchies). Consider `limit` if set will grow. | `list_organisms`, `list_publications` |
 | Frequently large (100+ rows) | summary + detail modes, `limit` | `query_expression`, `search_genes`, `genes_by_ontology` |
 
 **`verbose`** (bool, default False): Controls per-row column width.
-Omits heavy text fields (abstract, description) by default. The builder
+Omits secondary columns by default — heavy text (abstract, description),
+taxonomy hierarchies, or other fields not needed for routing. The builder
 adds/removes RETURN columns based on this flag. Orthogonal to modes —
 `verbose` controls which columns, modes control which rows.
 
-**`limit`** (int): Only needed for tools with potentially large result sets.
+**`limit`** (int): For tools with large or growing result sets. Also
+appropriate for currently-small tools expected to grow.
 
 **summary/detail modes**: Only for large-result-set tools.
 Summary returns aggregations, detail returns individual rows.
@@ -68,7 +70,7 @@ not as a tool mode parameter. Markdown files live at
 - Query live KG (`run_cypher`) to check whether current nodes,
   edges, properties, and data volumes support the requirements
 - If schema changes needed, write a KG change spec at
-  **`docs/kg-specs/{tool-name}.md`** using [template](assets/kg-spec-template.md)
+  **`docs/kg-specs/kg-spec-{tool-name}.md`** using [template](assets/kg-spec-template.md)
 - User coordinates with KG repo (manual — may involve KG rebuild)
 - After KG changes land, re-query live KG to verify
 - Refine requirements based on what the KG can actually support —
@@ -131,8 +133,16 @@ doc-updater in parallel → code-reviewer last.
 - `async def` — tools are async. Use `await ctx.info()`, `await ctx.warning()`,
   `await ctx.error()` for MCP client-visible logging (replaces `logger.info/warning`)
 - Define Pydantic `BaseModel` classes for response: `{Name}Result` (per-row)
-  and `{Name}Response` (envelope with total_entries/total_matching/returned/truncated/results).
+  and `{Name}Response` (envelope). Envelope fields:
+  - `total_entries` — always (total in KG)
+  - `total_matching` — only for tools with filters (count after filtering)
+  - `returned` — always (len of results list)
+  - `truncated` — always (True if limit cut results)
+  - `results` — always (list of `{Name}Result`)
   Return type annotation → FastMCP auto-generates `outputSchema`.
+- Include examples in `Field(description=...)` for all result fields
+  (e.g. `"Genus (e.g. 'Prochlorococcus')"`) — helps Claude and
+  researchers understand the data shape from the schema alone.
 - Docstring is tool-level purpose only (when to use, what it returns) —
   return schema is in the Pydantic models, not the docstring
 - Mode dispatch if tool has summary/detail modes
@@ -147,8 +157,35 @@ input YAML, then served via MCP resource at `docs://tools/{name}`.
    ```bash
    uv run python scripts/build_about_content.py --skeleton {name}
    ```
-   Edit `multiomics_explorer/inputs/tools/{name}.yaml` — add examples,
-   chaining patterns, common mistakes.
+   Edit `multiomics_explorer/inputs/tools/{name}.yaml`:
+
+   ```yaml
+   examples:
+     - title: Short description of this example
+       call: tool_name(param="value")        # tool call to show
+       response: |                            # optional — truncated example response
+         {"total_entries": 15, "results": [{"field": "value", ...}]}
+
+     - title: Multi-step chaining example
+       steps: |                               # use steps instead of call for chains
+         Step 1: first_tool(param="value")
+                 → what to extract from result
+
+         Step 2: tool_name(param=extracted_value)
+                 → what to do next
+
+   verbose_fields:                            # fields only returned with verbose=True
+     - abstract                               # splits per-result table in generated about
+     - description
+
+   chaining:                                  # tool flow patterns
+     - "previous_tool → tool_name → next_tool"
+
+   mistakes:                                  # notes/gotchas or wrong/right pairs
+     - "plain note renders as bullet"         # → "Good to know" section
+     - wrong: "len(results)  # wrong"         # → "Common mistakes" section
+       right: "response['total_matching']"
+   ```
 
 2. Build the about markdown:
    ```bash

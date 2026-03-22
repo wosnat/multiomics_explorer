@@ -21,7 +21,7 @@
 - [ ] `conn: GraphConnection | None = None` as keyword-only last param?
 - [ ] Uses `_default_conn(conn)` at function start?
 - [ ] Returns `list[dict]` or `dict` (no strings, no JSON)?
-- [ ] No display limits (callers slice)?
+- [ ] Limit handling correct? (Tools with filters: no limit in API, 2-query pattern. Tools without filters: limit in API, single query, Python slice.)
 - [ ] No JSON formatting?
 - [ ] No imports from `mcp_server/`?
 - [ ] Validates inputs, raises `ValueError` with specific messages?
@@ -45,10 +45,10 @@
 - [ ] Uses `Field(ge=..., le=...)` for numeric constraints?
 - [ ] `tags` and `annotations={"readOnlyHint": True}` set?
 - [ ] Docstring is tool-level purpose (no `Args:` — descriptions in Field)?
-- [ ] Docstring documents return envelope fields?
 - [ ] Docstring mentions related tools for chaining?
+- [ ] Return schema is in Pydantic models (not duplicated in docstring)?
 - [ ] Pydantic response models defined (`{Name}Result` + `{Name}Response`)?
-- [ ] `{Name}Result` fields have `Field(description=...)` on non-obvious fields?
+- [ ] `{Name}Result` fields have `Field(description=...)` with examples on all fields?
 - [ ] Return type annotation is the response model (→ auto outputSchema)?
 - [ ] Returns model instances (not dicts)?
 - [ ] Empty results return model with `results=[]` (not ToolError)?

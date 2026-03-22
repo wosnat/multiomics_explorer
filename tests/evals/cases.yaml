@@ -180,31 +180,37 @@
 
 - id: list_organisms
   tool: list_organisms
-  desc: Returns all organisms with metadata (snapshot-stable, few changes expected)
+  desc: Returns all organisms with precomputed stats
   params: {}
   expect:
-    min_rows: 10
+    min_rows: 13
     max_rows: 25
-    columns: [organism_name, genus, strain, clade, gene_count]
+    columns: [organism_name, genus, species, strain, clade, ncbi_taxon_id,
+              gene_count, publication_count, experiment_count,
+              treatment_types, omics_types]
     contains:
       organism_name: Prochlorococcus MED4
-    row0:
-      genus: Alphainfluenzavirus
 
 - id: list_organisms_raw
   tool: raw_cypher
-  desc: Snapshot of all organisms with metadata
+  desc: Snapshot of all organisms with precomputed stats
   params:
     query: >
       MATCH (o:OrganismTaxon)
-      OPTIONAL MATCH (g:Gene)-[:Gene_belongs_to_organism]->(o)
       RETURN o.preferred_name AS organism_name, o.genus AS genus,
-             o.strain_name AS strain, o.clade AS clade,
-             count(g) AS gene_count
+             o.species AS species, o.strain_name AS strain,
+             o.clade AS clade, o.ncbi_taxon_id AS ncbi_taxon_id,
+             o.gene_count AS gene_count,
+             o.publication_count AS publication_count,
+             o.experiment_count AS experiment_count,
+             o.treatment_types AS treatment_types,
+             o.omics_types AS omics_types
       ORDER BY o.genus, o.preferred_name
   expect:
-    min_rows: 10
-    columns: [organism_name, genus, strain, clade, gene_count]
+    min_rows: 13
+    columns: [organism_name, genus, species, strain, clade, ncbi_taxon_id,
+              gene_count, publication_count, experiment_count,
+              treatment_types, omics_types]
     contains:
       organism_name: Prochlorococcus MED4
 

@@ -106,18 +106,24 @@ from fastmcp.exceptions import ToolError
 # FastMCP auto-generates outputSchema from the return type annotation.
 
 class {Name}Result(BaseModel):
-    key1: str
-    key2: int
-    optional_key: str | None = None
-    # Add Field(description=...) on non-obvious fields:
-    domain_field: list[str] = Field(default=[], description="What this field means")
+    key1: str = Field(description="What this is (e.g. 'example_value')")
+    key2: int = Field(description="What this means (e.g. 42)")
+    optional_key: str | None = Field(default=None, description="Description (e.g. 'example')")
+    domain_field: list[str] = Field(default=[], description="What this field means (e.g. ['val1', 'val2'])")
+
+# Include Field(description=...) with examples on ALL result fields.
 
 class {Name}Response(BaseModel):
     total_entries: int = Field(description="Total rows in KG (unfiltered)")
-    total_matching: int = Field(description="Rows matching filters")
+    total_matching: int = Field(description="Rows matching filters")  # only for tools with filters
     returned: int = Field(description="Rows in this response")
     truncated: bool = Field(description="True if total_matching > returned")
     results: list[{Name}Result]
+
+# Envelope notes:
+# - total_matching: only include for tools with filters. Omit for
+#   no-filter tools (e.g. list_organisms) — use total_entries instead.
+# - truncated: compare against total_matching (if present) or total_entries.
 
 @mcp.tool(
     tags={"tag1", "tag2"},

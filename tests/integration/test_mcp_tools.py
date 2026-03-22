@@ -13,6 +13,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
+    build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
     build_resolve_gene,
@@ -172,4 +173,58 @@ class TestListPublications:
 
         assert summary["total_matching"] == len(data)
         assert summary["total_entries"] >= summary["total_matching"]
+
+
+@pytest.mark.kg
+class TestListOrganisms:
+    def test_returns_all_organisms(self, conn):
+        """Returns all OrganismTaxon nodes with precomputed stats."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 13  # at least 13 strain-level organisms
+
+    def test_expected_columns(self, conn):
+        """Each result has all 11 compact columns."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        for col in ["organism_name", "genus", "species", "strain", "clade",
+                     "ncbi_taxon_id", "gene_count", "publication_count",
+                     "experiment_count", "treatment_types", "omics_types"]:
+            assert col in results[0], f"Missing column: {col}"
+
+    def test_verbose_adds_taxonomy(self, conn):
+        """Verbose mode adds taxonomy hierarchy columns."""
+        cypher, params = build_list_organisms(verbose=True)
+        results = conn.execute_query(cypher, **params)
+        for col in ["family", "order", "tax_class", "phylum",
+                     "kingdom", "superkingdom", "lineage"]:
+            assert col in results[0], f"Missing verbose column: {col}"
+
+    def test_precomputed_gene_count_matches(self, conn):
+        """Precomputed gene_count matches live count for MED4."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        med4 = [r for r in results if r["organism_name"] == "Prochlorococcus MED4"][0]
+        assert med4["gene_count"] > 1900
+
+    def test_precomputed_publication_count(self, conn):
+        """MED4 has the most publications."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        med4 = [r for r in results if r["organism_name"] == "Prochlorococcus MED4"][0]
+        assert med4["publication_count"] >= 10
+
+    def test_treatment_types_not_empty(self, conn):
+        """Organisms with publications have non-empty treatment_types."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        med4 = [r for r in results if r["organism_name"] == "Prochlorococcus MED4"][0]
+        assert len(med4["treatment_types"]) >= 5
+
+    def test_ordered_by_genus(self, conn):
+        """Results are ordered by genus, then organism_name."""
+        cypher, params = build_list_organisms()
+        results = conn.execute_query(cypher, **params)
+        genera = [r["genus"] for r in results if r["genus"] is not None]
+        assert genera == sorted(genera)
 

@@ -161,9 +161,10 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         type_escaped = p['type'].replace('|', '\\|')
         lines.append(f"| {p['name']} | {type_escaped} | {p['default']} | {p['description']} |")
     lines.append("")
-    lines.append("**Discovery:** use `list_filter_values` for valid treatment types,")
-    lines.append("`list_organisms` for valid organism names.")
-    lines.append("")
+    if tool_name != "list_organisms":
+        lines.append("**Discovery:** use `list_filter_values` for valid treatment types,")
+        lines.append("`list_organisms` for valid organism names.")
+        lines.append("")
 
     # Response format (auto-generated)
     envelope, result_fields = extract_response_fields(schema)
@@ -185,16 +186,34 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append("")
 
     if result_fields:
+        verbose_fields = set(
+            (input_data or {}).get("verbose_fields", [])
+        )
+        compact = [f for f in result_fields if f["name"] not in verbose_fields]
+        verbose = [f for f in result_fields if f["name"] in verbose_fields]
+
         lines.append("### Per-result fields")
         lines.append("")
         lines.append("| Field | Type | Description |")
         lines.append("|---|---|---|")
-        for f in result_fields:
+        for f in compact:
             req = "" if f["required"] else " (optional)"
             desc = f["description"] or ""
             type_escaped = f["type"].replace("|", "\\|")
             lines.append(f"| {f['name']} | {type_escaped}{req} | {desc} |")
         lines.append("")
+
+        if verbose:
+            lines.append("**Verbose-only fields** (included when `verbose=True`):")
+            lines.append("")
+            lines.append("| Field | Type | Description |")
+            lines.append("|---|---|---|")
+            for f in verbose:
+                req = "" if f["required"] else " (optional)"
+                desc = f["description"] or ""
+                type_escaped = f["type"].replace("|", "\\|")
+                lines.append(f"| {f['name']} | {type_escaped}{req} | {desc} |")
+            lines.append("")
 
     # Few-shot examples (from input YAML)
     if input_data and input_data.get("examples"):
@@ -240,18 +259,29 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append("")
 
     # Common mistakes (from input YAML)
+    # Supports two formats:
+    #   - plain string: rendered as a note/gotcha
+    #   - dict with wrong/right: rendered as mistake/correction pair
     if input_data and input_data.get("mistakes"):
-        lines.append("## Common mistakes")
+        # Use "Good to know" if all entries are plain strings (notes/gotchas),
+        # "Common mistakes" if any are wrong/right pairs
+        has_pairs = any(isinstance(m, dict) for m in input_data["mistakes"])
+        heading = "Common mistakes" if has_pairs else "Good to know"
+        lines.append(f"## {heading}")
         lines.append("")
         for m in input_data["mistakes"]:
-            lines.append("```mistake")
-            lines.append(m["wrong"])
-            lines.append("```")
-            lines.append("")
-            lines.append("```correction")
-            lines.append(m["right"])
-            lines.append("```")
-            lines.append("")
+            if isinstance(m, str):
+                lines.append(f"- {m}")
+                lines.append("")
+            else:
+                lines.append("```mistake")
+                lines.append(m["wrong"])
+                lines.append("```")
+                lines.append("")
+                lines.append("```correction")
+                lines.append(m["right"])
+                lines.append("```")
+                lines.append("")
 
     # Package import (auto-generated)
     lines.append("## Package import equivalent")
@@ -260,7 +290,11 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
     lines.append(f"from multiomics_explorer import {tool_name}")
     lines.append("")
     lines.append(f'result = {tool_name}()')
-    lines.append('# returns dict with keys: total_entries, total_matching, results')
+    # API returns a subset of the MCP envelope (no returned/truncated wrapper)
+    api_keys = [f["name"] for f in envelope if f["name"] not in ("returned", "truncated")]
+    api_keys.append("results")
+    envelope_keys = ", ".join(api_keys)
+    lines.append(f'# returns dict with keys: {envelope_keys}')
     lines.append("```")
     lines.append("")
     lines.append("Use package import for bulk data extraction in scripts.")
@@ -272,6 +306,12 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
 
 def generate_skeleton(tool_name: str, schema: dict) -> str:
     """Generate input YAML skeleton for a tool."""
+    # Check if tool has a verbose param
+    has_verbose = any(
+        p.get("name") == "verbose"
+        for p in schema.get("parameters", {}).get("properties", {}).values()
+    ) or "verbose" in schema.get("parameters", {}).get("properties", {})
+
     lines = [
         f"# Human-authored content for {tool_name} about page.",
         "# Auto-generated sections (params, response format, expected-keys)",
@@ -291,12 +331,27 @@ def generate_skeleton(tool_name: str, schema: dict) -> str:
         "  #     Step 1: ...",
         "  #     Step 2: ...",
         "",
+    ]
+
+    if has_verbose:
+        lines += [
+            "# Fields only returned with verbose=True.",
+            "# Splits per-result table into compact + verbose sections.",
+            "verbose_fields: []",
+            "  # - field_name",
+            "",
+        ]
+
+    lines += [
         "chaining:",
         f'  # - "{tool_name} → next_tool"',
         "",
+        "# Plain strings → 'Good to know' section.",
+        "# Dicts with wrong/right → 'Common mistakes' section.",
         "mistakes: []",
-        "  # - wrong: \"len(results)  # gives limit, not real total\"",
-        "  #   right: \"response['total_matching']  # real count\"",
+        "  # - \"plain note about this tool\"",
+        "  # - wrong: \"common mistake\"",
+        "  #   right: \"correct approach\"",
         "",
     ]
     return "\n".join(lines)
