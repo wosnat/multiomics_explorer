@@ -1,0 +1,51 @@
+# Human-authored content for list_organisms about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Browse all organisms
+    call: list_organisms()
+    response: |
+      {
+        "total_entries": 15,
+        "returned": 15,
+        "truncated": false,
+        "results": [
+          {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"]},
+          {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas", "gene_count": 4136, "publication_count": 2, ...}
+        ]
+      }
+
+  - title: Full taxonomy
+    call: list_organisms(verbose=True)
+
+  - title: Chaining to genes and publications
+    steps: |
+      Step 1: list_organisms()
+              → discover available organisms and data coverage
+
+      Step 2: search_genes(search_text="photosystem", organism="MED4")
+              → search genes within a specific organism
+
+      Step 3: list_publications(organism="MED4")
+              → find publications studying that organism
+
+chaining:
+  - "list_organisms → search_genes"
+  - "list_organisms → list_publications"
+  - "list_organisms → resolve_gene"
+  - "list_organisms → genes_by_ontology"
+
+verbose_fields:
+  - family
+  - order
+  - tax_class
+  - phylum
+  - kingdom
+  - superkingdom
+  - lineage
+
+mistakes:
+  - "gene_count and publication_count are counts of data in the KG, not biological totals"
+  - "Organisms with gene_count=0 are parent/umbrella taxonomy nodes (e.g. genus-level 'Alteromonas')"
+  - "The organism filter in other tools uses partial matching — 'MED4', 'Prochlorococcus MED4', and 'Prochlorococcus' all work"
