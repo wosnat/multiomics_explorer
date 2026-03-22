@@ -956,3 +956,77 @@
   expect:
     min_rows: 2
     columns: [doi, title, authors]
+
+# ── Experiments ──────────────────────────────────────────
+
+- id: list_experiments_all
+  tool: list_experiments
+  desc: All experiments returned when no filters
+  params: {}
+  expect:
+    min_rows: 50
+    columns: [experiment_id, publication_doi, organism_strain,
+              treatment_type, omics_type, is_time_course, gene_count]
+
+- id: list_experiments_organism
+  tool: list_experiments
+  desc: Filter by organism
+  params:
+    organism: "MED4"
+  expect:
+    min_rows: 10
+    columns: [experiment_id, organism_strain, gene_count]
+
+- id: list_experiments_treatment_types
+  tool: list_experiments
+  desc: Filter by multiple treatment types
+  params:
+    treatment_type: ["coculture", "nitrogen_stress"]
+  expect:
+    min_rows: 20
+    columns: [experiment_id, treatment_type]
+
+- id: list_experiments_coculture_partner
+  tool: list_experiments
+  desc: Filter by coculture partner
+  params:
+    coculture_partner: "Alteromonas"
+  expect:
+    min_rows: 3
+    columns: [experiment_id, coculture_partner]
+
+- id: list_experiments_time_course
+  tool: list_experiments
+  desc: Time-course experiments only
+  params:
+    time_course_only: true
+  expect:
+    min_rows: 20
+    columns: [experiment_id, is_time_course]
+
+- id: list_experiments_proteomics
+  tool: list_experiments
+  desc: Proteomics experiments
+  params:
+    omics_type: ["PROTEOMICS"]
+  expect:
+    min_rows: 1
+    columns: [experiment_id, omics_type]
+
+- id: list_experiments_summary_all
+  tool: list_experiments_summary
+  desc: Summary breakdowns for all experiments
+  params: {}
+  expect:
+    min_rows: 1
+    columns: [total_matching, time_course_count, by_organism,
+              by_treatment_type, by_omics_type, by_publication]
+
+- id: list_experiments_summary_organism
+  tool: list_experiments_summary
+  desc: Summary with organism filter
+  params:
+    organism: "MED4"
+  expect:
+    min_rows: 1
+    columns: [total_matching, by_organism]

@@ -22,6 +22,25 @@ def build_{name}(
 - Organism filter pattern: `ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word)`
 - NULL-safe optional filters: `$param IS NULL OR ...`
 - For ontology queries, use `ONTOLOGY_CONFIG` dict
+- **APOC is available.** Use `apoc.coll.frequencies()` for per-dimension
+  breakdowns in summary queries, `apoc.coll.max/min/sort` for
+  distributions. Prefer APOC over multi-pass UNWIND aggregation.
+
+### List-type filter parameters
+
+For exact-match filters where multiple values make sense (e.g.
+treatment types, omics types, DOIs), use `list[str] | None` with
+Cypher `IN` matching. Normalize case in Python before passing to
+Cypher (`toLower`/`toUpper` as appropriate).
+
+```python
+if treatment_type:
+    conditions.append("toLower(e.treatment_type) IN $treatment_types")
+    params["treatment_types"] = [t.lower() for t in treatment_type]
+```
+
+CONTAINS filters stay as single `str` (fuzzy match doesn't combine
+well as a list).
 
 ### What this layer must NOT do
 
@@ -109,10 +128,18 @@ Every API function must be:
 
 ### Limit handling
 
-For tools with filters: no limit in API — MCP wrapper passes limit to
-builder, API runs 2-query pattern (summary + data with LIMIT).
+**Tools with summary/detail modes:** API runs 2-query pattern:
+1. Summary query (via `build_{name}_summary()`) — returns `total_entries`,
+   `total_matching`, and breakdowns
+2. Detail query (via `build_{name}()`) with LIMIT in Cypher — returns rows
 
-For tools without filters (e.g. `list_organisms`): API accepts `limit`,
+Both modes always run the summary query. Detail additionally runs the
+detail query. API returns breakdowns + results in a unified dict.
+
+**Tools with filters but no modes:** Same 2-query pattern but summary
+query is just counts (`total_entries`, `total_matching`).
+
+**Tools without filters (e.g. `list_organisms`):** API accepts `limit`,
 runs single query (no LIMIT in Cypher), slices in Python. This gives
 `total_entries` from the full result set without a separate count query.
 
@@ -200,16 +227,22 @@ lc._cache_attr = response
 - Return Pydantic model instances — FastMCP handles serialization
 - No `json.dumps`, no `_fmt` — return model instances directly
 - Pydantic models at MCP boundary only. API layer returns plain `dict`.
-- **Tools with filters + limit:** Use 2-query pattern: summary query
-  (via `build_{name}_summary()`) then data query with LIMIT.
-  Summary returns `total_entries` (all rows) and `total_matching`
-  (after filters). API returns `{total_entries, total_matching, results}`.
-  MCP wrapper adds `returned` and `truncated` to the envelope.
+- **Tools with summary/detail modes:** Use unified response model.
+  Envelope includes breakdowns (from summary query) + results (from
+  detail query). Both modes return the same `{Name}Response` type:
+  - Summary mode: breakdowns populated, `results: []`, `returned: 0`,
+    `truncated: True` (signals results exist but aren't shown)
+  - Detail mode: breakdowns populated, results populated, `returned`
+    and `truncated` reflect the limit
+  Both modes always run the summary query (cheap aggregation).
+  Detail additionally runs the detail query with LIMIT in Cypher.
+- **Tools with filters but no modes:** 2-query pattern: summary query
+  for `total_entries` + `total_matching`, data query with LIMIT.
+  API returns `{total_entries, total_matching, results}`.
+  MCP wrapper adds `returned` and `truncated`.
 - **Tools without filters + limit:** Single query, slice in Python.
   API returns `{total_entries, results}` (no `total_matching`).
   MCP wrapper adds `returned` and `truncated`.
-- Summary query is just counts for simple tools, richer
-  aggregations (breakdowns, distributions) for tools with summary mode
 
 ### Docstring conventions (LLM-facing)
 
@@ -237,12 +270,16 @@ async def tool_name(
     param: Annotated[str, Field(description="...")],
     mode: Annotated[
         Literal["summary", "detail"],
-        Field(description="Response mode"),
+        Field(description="'summary' returns breakdowns to guide filtering. "
+              "'detail' returns individual rows. Start with summary."),
     ] = "summary",
+    verbose: Annotated[bool, Field(
+        description="Detail mode only. Include secondary fields.",
+    )] = False,
     limit: Annotated[
-        int, Field(ge=1, le=500, description="Max rows in detail mode"),
-    ] = 100,
-) -> list[dict] | dict:
+        int, Field(ge=1, le=500, description="Detail mode only. Max rows."),
+    ] = 50,
+) -> {Name}Response:
 ```
 
 **Key conventions:**
@@ -318,9 +355,8 @@ Update about content whenever tool return fields change.
 | `conn` | api only | all api functions (keyword-only, last) |
 | `ctx` | MCP only | all MCP wrappers (first param, injected by FastMCP) |
 | `limit` | MCP + api | tools with large or growing result sets |
-| `mode` | MCP only (v2) | summary/detail (about content served via MCP resource `docs://tools/{name}`) |
-| `verbose` | all | include secondary columns (heavy text, taxonomy hierarchies) — for small-result-set tools |
-| `summary` | api (v2) | functions with summary variant |
+| `mode` | MCP + api (v2) | `Literal["summary", "detail"]` at MCP, `str` at API. Same name at both layers for LLM consistency. About content served via MCP resource `docs://tools/{name}`, not a mode value |
+| `verbose` | all | include secondary columns (heavy text, taxonomy hierarchies, descriptive fields). Orthogonal to modes — verbose controls columns, modes control rows |
 
 ## String matching rules
 
@@ -330,6 +366,9 @@ case-insensitive.
 
 Fulltext search tools must return `score` in RETURN columns and
 ORDER BY score DESC. This lets the LLM see relevance ranking.
+In summary mode, include `score_max` and `score_median` for distribution
+context — lets Claude judge if top results are highly relevant or barely
+matching.
 
 ## Standard return field names
 
@@ -340,10 +379,16 @@ ORDER BY score DESC. This lets the LLM see relevance ranking.
 | `product` | resolve_gene, search_genes, gene_overview, homologs |
 | `organism_strain` | resolve_gene, search_genes, gene_overview, genes_by_ontology, homologs |
 | `annotation_quality` | search_genes, gene_overview |
-| `score` | search_genes, search_ontology |
+| `score` | search_genes, search_ontology, list_experiments (when search_text used) |
+| `score_max`, `score_median` | summary mode of fulltext search tools |
 | `id`, `name` | search_ontology, gene_ontology_terms |
 | `gene_category` | gene_overview |
 | `gene_summary` | search_genes, gene_overview |
+| `experiment_id` | list_experiments |
+| `experiment_count` | list_experiments summary breakdowns |
+| `treatment_type` | list_experiments |
+| `omics_type` | list_experiments |
+| `publication_doi` | list_experiments, list_publications |
 
 ## Docstring conventions by layer
 

@@ -1,0 +1,1118 @@
+case_id: list_experiments_time_course
+row_count: 29
+rows:
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
+  gene_count: 4452
+  is_time_course: 'true'
+  omics_type: PROTEOMICS
+  organism_strain: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 1011
+  time_point_count: 2
+  time_point_hours:
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significants:
+  - '0'
+  - '1011'
+  time_point_totals:
+  - '2226'
+  - '2226'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
+  gene_count: 11130
+  is_time_course: 'true'
+  omics_type: PROTEOMICS
+  organism_strain: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 2382
+  time_point_count: 5
+  time_point_hours:
+  - '-1.0'
+  - '1440.0'
+  - '2136.0'
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  - day 60
+  - day 89
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significants:
+  - '150'
+  - '422'
+  - '586'
+  - '601'
+  - '623'
+  time_point_totals:
+  - '2226'
+  - '2226'
+  - '2226'
+  - '2226'
+  - '2226'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
+  gene_count: 11850
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 2426
+  time_point_count: 3
+  time_point_hours:
+  - '-1.0'
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significants:
+  - '1240'
+  - '517'
+  - '669'
+  time_point_totals:
+  - '3950'
+  - '3950'
+  - '3950'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
+  gene_count: 19750
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 4124
+  time_point_count: 5
+  time_point_hours:
+  - '-1.0'
+  - '1440.0'
+  - '2136.0'
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  - day 60
+  - day 89
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significants:
+  - '663'
+  - '853'
+  - '863'
+  - '871'
+  - '874'
+  time_point_totals:
+  - '3950'
+  - '3950'
+  - '3950'
+  - '3950'
+  - '3950'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  gene_count: 4272
+  is_time_course: 'true'
+  omics_type: PROTEOMICS
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 1155
+  time_point_count: 3
+  time_point_hours:
+  - '2136.0'
+  - '336.0'
+  - '744.0'
+  time_point_labels:
+  - day 14
+  - day 31
+  - day 89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significants:
+  - '135'
+  - '499'
+  - '521'
+  time_point_totals:
+  - '1424'
+  - '1424'
+  - '1424'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  gene_count: 7120
+  is_time_course: 'true'
+  omics_type: PROTEOMICS
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 1003
+  time_point_count: 5
+  time_point_hours:
+  - '-1.0'
+  - '1440.0'
+  - '2136.0'
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  - day 60
+  - day 89
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significants:
+  - '219'
+  - '234'
+  - '248'
+  - '253'
+  - '49'
+  time_point_totals:
+  - '1424'
+  - '1424'
+  - '1424'
+  - '1424'
+  - '1424'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
+  gene_count: 3698
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 1242
+  time_point_count: 2
+  time_point_hours:
+  - '-1.0'
+  - '336.0'
+  time_point_labels:
+  - day 14
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significants:
+  - '365'
+  - '877'
+  time_point_totals:
+  - '1849'
+  - '1849'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  gene_count: 9245
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 1387
+  time_point_count: 5
+  time_point_hours:
+  - '-1.0'
+  - '1440.0'
+  - '2136.0'
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  - day 60
+  - day 89
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significants:
+  - '267'
+  - '285'
+  - '360'
+  - '391'
+  - '84'
+  time_point_totals:
+  - '1849'
+  - '1849'
+  - '1849'
+  - '1849'
+  - '1849'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq
+  gene_count: 26992
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Alteromonas macleodii MIT1002
+  publication_doi: 10.1093/ismeco/ycae131
+  significant_count: 648
+  time_point_count: 7
+  time_point_hours:
+  - '0.0'
+  - '13.0'
+  - '16.0'
+  - '20.0'
+  - '24.0'
+  - '4.0'
+  - '8.0'
+  time_point_labels:
+  - 0h
+  - 13h
+  - 16h
+  - 20h
+  - 24h
+  - 4h
+  - 8h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significants:
+  - '110'
+  - '114'
+  - '132'
+  - '140'
+  - '47'
+  - '51'
+  - '54'
+  time_point_totals:
+  - '3856'
+  - '3856'
+  - '3856'
+  - '3856'
+  - '3856'
+  - '3856'
+  - '3856'
+  treatment_type: darkness
+- coculture_partner: null
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  gene_count: 14105
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus NATL2A
+  publication_doi: 10.1093/ismeco/ycae131
+  significant_count: 8108
+  time_point_count: 7
+  time_point_hours:
+  - '0.0'
+  - '13.0'
+  - '16.0'
+  - '20.0'
+  - '24.0'
+  - '4.0'
+  - '8.0'
+  time_point_labels:
+  - 0h
+  - 13h
+  - 16h
+  - 20h
+  - 24h
+  - 4h
+  - 8h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significants:
+  - '1369'
+  - '1408'
+  - '1497'
+  - '1608'
+  - '613'
+  - '746'
+  - '867'
+  time_point_totals:
+  - '2015'
+  - '2015'
+  - '2015'
+  - '2015'
+  - '2015'
+  - '2015'
+  - '2015'
+  treatment_type: darkness
+- coculture_partner: Phage
+  experiment_id: 10.1111/1462-2920.14513_viral_viral_dom_vdom_addition_mit9313_rnaseq
+  gene_count: 3852
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.14513
+  significant_count: 834
+  time_point_count: 9
+  time_point_hours:
+  - '0.5'
+  - '1.0'
+  - '12.0'
+  - '2.0'
+  - '24.0'
+  - '4.0'
+  - '48.0'
+  - '72.0'
+  - '8.0'
+  time_point_labels:
+  - 0.5h
+  - 12h
+  - 1h
+  - 24h
+  - 2h
+  - 48h
+  - 4h
+  - 72h
+  - 8h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  - '9'
+  time_point_significants:
+  - '106'
+  - '141'
+  - '177'
+  - '180'
+  - '22'
+  - '31'
+  - '79'
+  - '89'
+  - '9'
+  time_point_totals:
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  treatment_type: viral
+- coculture_partner: null
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_mit1002_rnaseq
+  gene_count: 350
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Alteromonas macleodii MIT1002
+  publication_doi: 10.1128/mSystems.00040-18
+  significant_count: 350
+  time_point_count: 2
+  time_point_hours:
+  - '1.0'
+  - '5.0'
+  time_point_labels:
+  - 1h extended darkness
+  - 5h extended darkness
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significants:
+  - '175'
+  - '175'
+  time_point_totals:
+  - '175'
+  - '175'
+  treatment_type: darkness
+- coculture_partner: null
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
+  gene_count: 5862
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus NATL2A
+  publication_doi: 10.1128/mSystems.00040-18
+  significant_count: 3243
+  time_point_count: 3
+  time_point_hours:
+  - '36.0'
+  - '40.0'
+  - '48.0'
+  time_point_labels:
+  - 13h extended darkness (48h)
+  - 1h extended darkness (36h)
+  - 5h extended darkness (40h)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significants:
+  - '1261'
+  - '1674'
+  - '308'
+  time_point_totals:
+  - '1954'
+  - '1954'
+  - '1954'
+  treatment_type: darkness
+- coculture_partner: null
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
+  gene_count: 5862
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus NATL2A
+  publication_doi: 10.1128/mSystems.00040-18
+  significant_count: 2201
+  time_point_count: 3
+  time_point_hours:
+  - '36.0'
+  - '40.0'
+  - '48.0'
+  time_point_labels:
+  - 13h extended darkness (48h)
+  - 1h extended darkness (36h)
+  - 5h extended darkness (40h)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significants:
+  - '1232'
+  - '237'
+  - '732'
+  time_point_totals:
+  - '1954'
+  - '1954'
+  - '1954'
+  treatment_type: darkness
+- coculture_partner: null
+  experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
+  gene_count: 2534
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2017.88
+  significant_count: 597
+  time_point_count: 3
+  time_point_hours:
+  - '12.0'
+  - '24.0'
+  - '3.0'
+  time_point_labels:
+  - 12h
+  - 24h
+  - 3h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significants:
+  - '101'
+  - '215'
+  - '281'
+  time_point_totals:
+  - '840'
+  - '841'
+  - '853'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
+  gene_count: 51
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0165375
+  significant_count: 51
+  time_point_count: 5
+  time_point_hours:
+  - '0.5'
+  - '1.5'
+  - '2.5'
+  - '4.5'
+  - '8.5'
+  time_point_labels:
+  - 0.5h post-inoculation
+  - 1.5h post-inoculation
+  - 2.5h post-inoculation
+  - 4.5h post-inoculation
+  - 8.5h post-inoculation
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significants:
+  - '1'
+  - '10'
+  - '29'
+  - '3'
+  - '8'
+  time_point_totals:
+  - '1'
+  - '10'
+  - '29'
+  - '3'
+  - '8'
+  treatment_type: light_stress
+- coculture_partner: null
+  experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
+  gene_count: 49
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0165375
+  significant_count: 49
+  time_point_count: 4
+  time_point_hours:
+  - '1.5'
+  - '2.5'
+  - '4.5'
+  - '8.5'
+  time_point_labels:
+  - 1.5h post-inoculation
+  - 2.5h post-inoculation
+  - 4.5h post-inoculation
+  - 8.5h post-inoculation
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  time_point_significants:
+  - '1'
+  - '14'
+  - '3'
+  - '31'
+  time_point_totals:
+  - '1'
+  - '14'
+  - '3'
+  - '31'
+  treatment_type: light_stress
+- coculture_partner: Phage
+  experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_dark
+  gene_count: 29
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0165375
+  significant_count: 29
+  time_point_count: 3
+  time_point_hours:
+  - '2.5'
+  - '4.5'
+  - '8.5'
+  time_point_labels:
+  - 2.5h post-inoculation
+  - 4.5h post-inoculation
+  - 8.5h post-inoculation
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significants:
+  - '16'
+  - '6'
+  - '7'
+  time_point_totals:
+  - '16'
+  - '6'
+  - '7'
+  treatment_type: viral
+- coculture_partner: Phage
+  experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light
+  gene_count: 32
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0165375
+  significant_count: 32
+  time_point_count: 5
+  time_point_hours:
+  - '0.5'
+  - '1.5'
+  - '2.5'
+  - '4.5'
+  - '8.5'
+  time_point_labels:
+  - 0.5h post-inoculation
+  - 1.5h post-inoculation
+  - 2.5h post-inoculation
+  - 4.5h post-inoculation
+  - 8.5h post-inoculation
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significants:
+  - '13'
+  - '3'
+  - '3'
+  - '5'
+  - '8'
+  time_point_totals:
+  - '13'
+  - '3'
+  - '3'
+  - '5'
+  - '8'
+  treatment_type: viral
+- coculture_partner: Alteromonas macleodii MIT1002
+  experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
+  gene_count: 2471
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus NATL2A
+  publication_doi: 10.1038/ismej.2016.82
+  significant_count: 573
+  time_point_count: 7
+  time_point_hours:
+  - '-12.0'
+  - '12.0'
+  - '2.0'
+  - '24.0'
+  - '4.0'
+  - '48.0'
+  - '6.0'
+  time_point_labels:
+  - -12h
+  - 12h
+  - 24h
+  - 2h
+  - 48h
+  - 4h
+  - 6h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significants:
+  - '0'
+  - '0'
+  - '0'
+  - '12'
+  - '218'
+  - '258'
+  - '85'
+  time_point_totals:
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  treatment_type: coculture
+- coculture_partner: null
+  experiment_id: 10.1111/1462-2920.13104_phosphorus_stress_plimited_natl2a_rnaseq_uninfected
+  gene_count: 204
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus NATL2A
+  publication_doi: 10.1111/1462-2920.13104
+  significant_count: 45
+  time_point_count: 6
+  time_point_hours:
+  - '24.0'
+  - '4.0'
+  - '46.0'
+  - '50.0'
+  - '59.0'
+  - '59.0'
+  time_point_labels:
+  - 24h
+  - 46h
+  - 4h
+  - 50h (P added)
+  - 59h
+  - 59h (P added)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  time_point_significants:
+  - '10'
+  - '18'
+  - '2'
+  - '4'
+  - '4'
+  - '7'
+  time_point_totals:
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  treatment_type: phosphorus_stress
+- coculture_partner: null
+  experiment_id: 10.1111/1462-2920.13104_phosphorus_stress_plimited_natl2a_rnaseq_infected
+  gene_count: 272
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus NATL2A
+  publication_doi: 10.1111/1462-2920.13104
+  significant_count: 118
+  time_point_count: 8
+  time_point_hours:
+  - '47.0'
+  - '48.0'
+  - '49.0'
+  - '51.0'
+  - '55.0'
+  - '55.0'
+  - '59.0'
+  - '59.0'
+  time_point_labels:
+  - 47h
+  - 48h
+  - 49h
+  - 51h
+  - 55h
+  - 55h (P added)
+  - 59h
+  - 59h (P added)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  time_point_significants:
+  - '13'
+  - '16'
+  - '18'
+  - '18'
+  - '18'
+  - '18'
+  - '8'
+  - '9'
+  time_point_totals:
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  treatment_type: phosphorus_stress
+- coculture_partner: null
+  experiment_id: 10.1038/ismej.2011.49_iron_stress_iron_starvation_med4_med4_microarray_light
+  gene_count: 224
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2011.49
+  significant_count: 125
+  time_point_count: 2
+  time_point_hours:
+  - '12.0'
+  - '24.0'
+  time_point_labels:
+  - 12h
+  - 24h
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significants:
+  - '52'
+  - '73'
+  time_point_totals:
+  - '112'
+  - '112'
+  treatment_type: iron_stress
+- coculture_partner: null
+  experiment_id: 10.1038/ismej.2011.49_iron_stress_iron_starvation_mit9313_mit9313_microarray
+  gene_count: 291
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_strain: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2011.49
+  significant_count: 114
+  time_point_count: 3
+  time_point_hours:
+  - '16.0'
+  - '28.0'
+  - '53.0'
+  time_point_labels:
+  - 16h
+  - 28h
+  - 53h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significants:
+  - '12'
+  - '22'
+  - '80'
+  time_point_totals:
+  - '97'
+  - '97'
+  - '97'
+  treatment_type: iron_stress
+- coculture_partner: Phage
+  experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
+  gene_count: 360
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1038/nature06130
+  significant_count: 117
+  time_point_count: 8
+  time_point_hours:
+  - '1.0'
+  - '2.0'
+  - '3.0'
+  - '4.0'
+  - '5.0'
+  - '6.0'
+  - '7.0'
+  - '8.0'
+  time_point_labels:
+  - 1h
+  - 2h
+  - 3h
+  - 4h
+  - 5h
+  - 6h
+  - 7h
+  - 8h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  time_point_significants:
+  - '12'
+  - '15'
+  - '16'
+  - '18'
+  - '20'
+  - '23'
+  - '6'
+  - '7'
+  time_point_totals:
+  - '45'
+  - '45'
+  - '45'
+  - '45'
+  - '45'
+  - '45'
+  - '45'
+  - '45'
+  treatment_type: viral
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  gene_count: 10176
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1038/msb4100087
+  significant_count: 868
+  time_point_count: 6
+  time_point_hours:
+  - '0.0'
+  - '12.0'
+  - '24.0'
+  - '3.0'
+  - '48.0'
+  - '6.0'
+  time_point_labels:
+  - 0h
+  - 12h
+  - 24h
+  - 3h
+  - 48h
+  - 6h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  time_point_significants:
+  - '13'
+  - '216'
+  - '236'
+  - '307'
+  - '6'
+  - '90'
+  time_point_totals:
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1073/pnas.0601301103_phosphorus_stress_phosphate_starvation_med4_microarray
+  gene_count: 170
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1073/pnas.0601301103
+  significant_count: 54
+  time_point_count: 5
+  time_point_hours:
+  - '0.0'
+  - '12.0'
+  - '24.0'
+  - '4.0'
+  - '48.0'
+  time_point_labels:
+  - 0h
+  - 12h
+  - 24h
+  - 48h
+  - 4h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significants:
+  - '0'
+  - '11'
+  - '2'
+  - '34'
+  - '7'
+  time_point_totals:
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  treatment_type: phosphorus_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  gene_count: 13446
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_strain: Prochlorococcus MIT9313
+  publication_doi: 10.1038/msb4100087
+  significant_count: 909
+  time_point_count: 6
+  time_point_hours:
+  - '0.0'
+  - '12.0'
+  - '24.0'
+  - '3.0'
+  - '48.0'
+  - '6.0'
+  time_point_labels:
+  - 0h
+  - 12h
+  - 24h
+  - 3h
+  - 48h
+  - 6h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  time_point_significants:
+  - '0'
+  - '1'
+  - '129'
+  - '246'
+  - '462'
+  - '71'
+  time_point_totals:
+  - '2241'
+  - '2241'
+  - '2241'
+  - '2241'
+  - '2241'
+  - '2241'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1073/pnas.0601301103_phosphorus_stress_phosphate_starvation_mit9313_microarray
+  gene_count: 708
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_strain: Prochlorococcus MIT9313
+  publication_doi: 10.1073/pnas.0601301103
+  significant_count: 182
+  time_point_count: 4
+  time_point_hours:
+  - '0.0'
+  - '12.0'
+  - '24.0'
+  - '4.0'
+  time_point_labels:
+  - 0h
+  - 12h
+  - 24h
+  - 4h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  time_point_significants:
+  - '0'
+  - '0'
+  - '177'
+  - '5'
+  time_point_totals:
+  - '177'
+  - '177'
+  - '177'
+  - '177'
+  treatment_type: phosphorus_stress

@@ -59,7 +59,11 @@ adds/removes RETURN columns based on this flag. Orthogonal to modes —
 appropriate for currently-small tools expected to grow.
 
 **summary/detail modes**: Only for large-result-set tools.
-Summary returns aggregations, detail returns individual rows.
+Both modes return a unified response model with breakdowns + results.
+Summary: breakdowns populated, `results: []`, `truncated: True`.
+Detail: breakdowns populated, results populated with LIMIT.
+Both modes always run the summary query (cheap). Detail additionally
+runs the detail query with LIMIT in Cypher.
 
 **About content**: Served via MCP resource `docs://tools/{tool_name}`,
 not as a tool mode parameter. Markdown files live at
@@ -101,17 +105,24 @@ doc-updater in parallel → code-reviewer last.
 ### Layer 1: Query builder → `kg/queries_lib.py`
 
 - `def build_{name}(*, ...) -> tuple[str, dict]`
-- Add summary variant `build_{name}_summary()` if tool has summary mode
+- Add summary variant `build_{name}_summary()` if tool has summary mode.
+  Summary builder uses `apoc.coll.frequencies()` for per-dimension
+  breakdowns. For fulltext search tools, also collect `score_max` and
+  `score_median`.
 - If tool has `verbose`, use conditional RETURN columns (see checklist)
 - Keyword-only args, `$param` placeholders, `AS snake_case` aliases
 - WHERE clause: build conditions list + params dict, join with AND
+- For exact-match filters where multiple values make sense, use
+  `list[str] | None` with Cypher `IN`. CONTAINS filters stay as `str`.
 - Every query MUST have `ORDER BY` — use natural sort key or alphabetical fallback
+- APOC is available — prefer `apoc.coll.*` for aggregations over
+  multi-pass UNWIND patterns
 - → **Gate:** `pytest tests/unit/test_query_builders.py::TestBuild{Name} -v`
 
 ### Layer 2: API function → `api/functions.py`
 
 - Calls builder + `conn.execute_query`
-- Pass through `verbose` and/or `summary` to builder as applicable
+- Pass through `verbose` and/or `mode` to dispatch as applicable
 - `conn: GraphConnection | None = None` as keyword-only last param
 - Document return dict keys in docstring (note verbose-only keys)
 - Wire exports: add to `api/__init__.py` and
@@ -137,8 +148,12 @@ doc-updater in parallel → code-reviewer last.
   - `total_entries` — always (total in KG)
   - `total_matching` — only for tools with filters (count after filtering)
   - `returned` — always (len of results list)
-  - `truncated` — always (True if limit cut results)
+  - `truncated` — always (True if limit cut results; True in summary mode)
   - `results` — always (list of `{Name}Result`)
+  For tools with summary/detail modes, use a **unified response model**.
+  Add breakdown fields (e.g. `by_organism`, `by_treatment_type`) to the
+  same `{Name}Response`. Both modes return the same type — summary has
+  `results: []`, detail has results populated. Breakdowns always populated.
   Return type annotation → FastMCP auto-generates `outputSchema`.
 - Include examples in `Field(description=...)` for all result fields
   (e.g. `"Genus (e.g. 'Prochlorococcus')"`) — helps Claude and

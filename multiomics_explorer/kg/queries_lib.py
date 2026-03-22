@@ -449,6 +449,223 @@ def build_list_organisms(
     return cypher, {}
 
 
+def _list_experiments_where(
+    *,
+    organism: str | None = None,
+    treatment_type: list[str] | None = None,
+    omics_type: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    coculture_partner: str | None = None,
+    search_text: str | None = None,
+    time_course_only: bool = False,
+) -> tuple[str, dict]:
+    """Build WHERE clause and params for experiment queries.
+
+    Shared between build_list_experiments and build_list_experiments_summary.
+    search_text is not added to WHERE — it controls which Cypher variant
+    is used (fulltext entry point vs MATCH). The $search_text param is
+    added to params when search_text is provided.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if search_text:
+        params["search_text"] = search_text
+
+    if organism:
+        conditions.append(
+            "(ALL(word IN split(toLower($org), ' ')"
+            " WHERE toLower(e.organism_strain) CONTAINS word)"
+            " OR ALL(word IN split(toLower($org), ' ')"
+            " WHERE toLower(e.coculture_partner) CONTAINS word))"
+        )
+        params["org"] = organism
+
+    if treatment_type:
+        conditions.append("toLower(e.treatment_type) IN $treatment_types")
+        params["treatment_types"] = [t.lower() for t in treatment_type]
+
+    if omics_type:
+        conditions.append("toUpper(e.omics_type) IN $omics_types")
+        params["omics_types"] = [t.upper() for t in omics_type]
+
+    if publication_doi:
+        conditions.append("toLower(p.doi) IN $dois")
+        params["dois"] = [d.lower() for d in publication_doi]
+
+    if coculture_partner:
+        conditions.append(
+            "toLower(e.coculture_partner) CONTAINS toLower($partner)"
+        )
+        params["partner"] = coculture_partner
+
+    if time_course_only:
+        conditions.append("e.is_time_course = 'true'")
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+    return where_block, params
+
+
+def build_list_experiments(
+    *,
+    organism: str | None = None,
+    treatment_type: list[str] | None = None,
+    omics_type: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    coculture_partner: str | None = None,
+    search_text: str | None = None,
+    time_course_only: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build Cypher for listing experiments with precomputed gene count stats.
+
+    RETURN keys (compact): experiment_id, publication_doi,
+    organism_strain, treatment_type, coculture_partner, omics_type,
+    is_time_course, gene_count, significant_count, time_point_count,
+    time_point_labels, time_point_orders, time_point_hours,
+    time_point_totals, time_point_significants.
+    RETURN keys (verbose): adds name, publication_title, treatment,
+    control, light_condition, light_intensity, medium, temperature,
+    statistical_test, experimental_context.
+    RETURN keys (search_text): adds score.
+    """
+    where_block, params = _list_experiments_where(
+        organism=organism, treatment_type=treatment_type,
+        omics_type=omics_type, publication_doi=publication_doi,
+        coculture_partner=coculture_partner, search_text=search_text,
+        time_course_only=time_course_only,
+    )
+
+    verbose_cols = (
+        ",\n       e.name AS name,"
+        "\n       p.title AS publication_title,"
+        "\n       e.treatment AS treatment,"
+        "\n       e.control AS control,"
+        "\n       e.light_condition AS light_condition,"
+        "\n       e.light_intensity AS light_intensity,"
+        "\n       e.medium AS medium,"
+        "\n       e.temperature AS temperature,"
+        "\n       e.statistical_test AS statistical_test,"
+        "\n       e.experimental_context AS experimental_context"
+        if verbose else ""
+    )
+
+    if limit is not None:
+        limit_clause = "LIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    return_cols = (
+        "e.id AS experiment_id,\n"
+        "       p.doi AS publication_doi,\n"
+        "       e.organism_strain AS organism_strain,\n"
+        "       e.treatment_type AS treatment_type,\n"
+        "       e.coculture_partner AS coculture_partner,\n"
+        "       e.omics_type AS omics_type,\n"
+        "       e.is_time_course AS is_time_course,\n"
+        "       e.gene_count AS gene_count,\n"
+        "       e.significant_count AS significant_count,\n"
+        "       e.time_point_count AS time_point_count,\n"
+        "       e.time_point_labels AS time_point_labels,\n"
+        "       e.time_point_orders AS time_point_orders,\n"
+        "       e.time_point_hours AS time_point_hours,\n"
+        "       e.time_point_totals AS time_point_totals,\n"
+        "       e.time_point_significants AS time_point_significants"
+    )
+
+    if search_text:
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('experimentFullText', $search_text)\n"
+            "YIELD node AS e, score\n"
+            "MATCH (p:Publication)-[:Has_experiment]->(e)\n"
+            f"{where_block}"
+            f"RETURN {return_cols},\n"
+            f"       score{verbose_cols}\n"
+            f"ORDER BY score DESC, e.organism_strain, e.name\n"
+            f"{limit_clause}"
+        )
+    else:
+        cypher = (
+            "MATCH (p:Publication)-[:Has_experiment]->(e:Experiment)\n"
+            f"{where_block}"
+            f"RETURN {return_cols}{verbose_cols}\n"
+            f"ORDER BY p.publication_year DESC, e.organism_strain, e.name\n"
+            f"{limit_clause}"
+        )
+
+    return cypher, params
+
+
+def build_list_experiments_summary(
+    *,
+    organism: str | None = None,
+    treatment_type: list[str] | None = None,
+    omics_type: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    coculture_partner: str | None = None,
+    search_text: str | None = None,
+    time_course_only: bool = False,
+) -> tuple[str, dict]:
+    """Build summary aggregation Cypher for list_experiments.
+
+    Returns breakdowns by organism, treatment type, omics type, and
+    publication using apoc.coll.frequencies.
+
+    RETURN keys: total_matching, time_course_count, by_organism,
+    by_treatment_type, by_omics_type, by_publication.
+    RETURN keys (search_text): adds score_max, score_median.
+    """
+    where_block, params = _list_experiments_where(
+        organism=organism, treatment_type=treatment_type,
+        omics_type=omics_type, publication_doi=publication_doi,
+        coculture_partner=coculture_partner, search_text=search_text,
+        time_course_only=time_course_only,
+    )
+
+    collect_cols = (
+        "collect(e.organism_strain) AS orgs,\n"
+        "     collect(e.treatment_type) AS tts,\n"
+        "     collect(e.omics_type) AS omics,\n"
+        "     collect(p.doi) AS dois,\n"
+        "     collect(e.is_time_course) AS tc"
+    )
+
+    return_cols = (
+        "size(orgs) AS total_matching,\n"
+        "       size([x IN tc WHERE x = 'true']) AS time_course_count,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(tts) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(omics) AS by_omics_type,\n"
+        "       apoc.coll.frequencies(dois) AS by_publication"
+    )
+
+    if search_text:
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('experimentFullText', $search_text)\n"
+            "YIELD node AS e, score\n"
+            "MATCH (p:Publication)-[:Has_experiment]->(e)\n"
+            f"{where_block}"
+            f"WITH {collect_cols},\n"
+            "     collect(score) AS scores\n"
+            f"RETURN {return_cols},\n"
+            "       apoc.coll.max(scores) AS score_max,\n"
+            "       apoc.coll.sort(scores)[size(scores)/2] AS score_median"
+        )
+    else:
+        cypher = (
+            "MATCH (p:Publication)-[:Has_experiment]->(e:Experiment)\n"
+            f"{where_block}"
+            f"WITH {collect_cols}\n"
+            f"RETURN {return_cols}"
+        )
+
+    # total_entries: unfiltered count appended as a subquery
+    # API layer runs this separately or uses UNION — implementation detail
+    return cypher, params
+
+
 def build_search_ontology(
     *, ontology: str, search_text: str,
 ) -> tuple[str, dict]:

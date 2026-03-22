@@ -13,12 +13,15 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
+    build_list_experiments,
+    build_list_experiments_summary,
     build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
     build_resolve_gene,
     build_search_genes,
 )
+from multiomics_explorer.api import functions as api
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 from multiomics_explorer.api.functions import _WRITE_KEYWORDS
 
@@ -227,4 +230,147 @@ class TestListOrganisms:
         results = conn.execute_query(cypher, **params)
         genera = [r["genus"] for r in results if r["genus"] is not None]
         assert genera == sorted(genera)
+
+
+@pytest.mark.kg
+class TestListExperiments:
+    """Integration tests for list_experiments against live KG."""
+
+    # --- Summary mode ---
+
+    def test_summary_no_filters(self, conn):
+        """Summary returns all experiments with breakdowns."""
+        result = api.list_experiments(mode="summary", conn=conn)
+        assert result["total_matching"] == result["total_entries"]
+        assert result["total_matching"] >= 70
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert result["results"] == []
+        assert len(result["by_organism"]) >= 8
+        assert len(result["by_treatment_type"]) >= 8
+        assert len(result["by_omics_type"]) >= 2
+
+    def test_summary_organism_filter(self, conn):
+        """Organism filter narrows summary."""
+        result = api.list_experiments(organism="MED4", mode="summary", conn=conn)
+        assert result["total_matching"] < result["total_entries"]
+        assert result["total_matching"] >= 20
+
+    def test_summary_breakdown_counts_sum(self, conn):
+        """by_organism experiment_counts sum to total_matching."""
+        result = api.list_experiments(mode="summary", conn=conn)
+        org_total = sum(b["experiment_count"] for b in result["by_organism"])
+        assert org_total == result["total_matching"]
+
+    def test_summary_treatment_type_counts_sum(self, conn):
+        """by_treatment_type experiment_counts sum to total_matching."""
+        result = api.list_experiments(mode="summary", conn=conn)
+        tt_total = sum(b["experiment_count"] for b in result["by_treatment_type"])
+        assert tt_total == result["total_matching"]
+
+    def test_summary_omics_type_counts_sum(self, conn):
+        """by_omics_type experiment_counts sum to total_matching."""
+        result = api.list_experiments(mode="summary", conn=conn)
+        omics_total = sum(b["experiment_count"] for b in result["by_omics_type"])
+        assert omics_total == result["total_matching"]
+
+    # --- Detail mode ---
+
+    def test_detail_no_filters(self, conn):
+        """Detail returns experiments up to limit."""
+        result = api.list_experiments(mode="detail", limit=50, conn=conn)
+        assert result["returned"] == min(50, result["total_matching"])
+        assert len(result["results"]) == result["returned"]
+        # Breakdowns also present
+        assert len(result["by_organism"]) >= 8
+
+    def test_detail_organism_filter(self, conn):
+        """Organism filter returns MED4 experiments."""
+        result = api.list_experiments(organism="MED4", mode="detail", conn=conn)
+        assert result["total_matching"] >= 20
+        for r in result["results"]:
+            assert "MED4" in r["organism_strain"] or (
+                r.get("coculture_partner") and "MED4" in r.get("coculture_partner", "")
+            )
+
+    def test_detail_treatment_type_filter(self, conn):
+        """Treatment type list filter works."""
+        result = api.list_experiments(
+            treatment_type=["coculture"], mode="detail", conn=conn,
+        )
+        assert result["total_matching"] >= 10
+        for r in result["results"]:
+            assert r["treatment_type"] == "coculture"
+
+    def test_detail_omics_type_filter(self, conn):
+        """Omics type list filter works."""
+        result = api.list_experiments(
+            omics_type=["PROTEOMICS"], mode="detail", conn=conn,
+        )
+        assert result["total_matching"] >= 1
+        for r in result["results"]:
+            assert r["omics_type"] == "PROTEOMICS"
+
+    def test_detail_time_course_only(self, conn):
+        """time_course_only returns only time-course experiments."""
+        result = api.list_experiments(
+            time_course_only=True, mode="detail", conn=conn,
+        )
+        assert result["total_matching"] >= 20
+        for r in result["results"]:
+            assert r["is_time_course"] is True
+
+    def test_detail_expected_columns(self, conn):
+        """Each result has compact columns."""
+        result = api.list_experiments(mode="detail", limit=5, conn=conn)
+        for r in result["results"]:
+            for col in ["experiment_id", "publication_doi", "organism_strain",
+                        "treatment_type", "omics_type", "is_time_course",
+                        "gene_count", "significant_count"]:
+                assert col in r, f"Missing column: {col}"
+
+    def test_detail_is_time_course_is_bool(self, conn):
+        """is_time_course is bool, not string."""
+        result = api.list_experiments(mode="detail", limit=5, conn=conn)
+        for r in result["results"]:
+            assert isinstance(r["is_time_course"], bool)
+
+    def test_detail_gene_count_nonnegative(self, conn):
+        """gene_count and significant_count are >= 0."""
+        result = api.list_experiments(mode="detail", conn=conn)
+        for r in result["results"]:
+            assert r["gene_count"] >= 0
+            assert r["significant_count"] >= 0
+
+    def test_detail_time_course_has_time_points(self, conn):
+        """Time-course experiments have time_points with >1 entry."""
+        result = api.list_experiments(
+            time_course_only=True, mode="detail", limit=5, conn=conn,
+        )
+        for r in result["results"]:
+            assert "time_points" in r
+            assert len(r["time_points"]) > 1
+            tp = r["time_points"][0]
+            assert "label" in tp
+            assert "order" in tp
+            assert "total" in tp
+            assert "significant" in tp
+
+    def test_detail_non_time_course_no_time_points(self, conn):
+        """Non-time-course experiments have no time_points key."""
+        result = api.list_experiments(mode="detail", conn=conn)
+        non_tc = [r for r in result["results"] if not r["is_time_course"]]
+        assert len(non_tc) > 0
+        for r in non_tc:
+            assert "time_points" not in r
+
+    # --- Consistency ---
+
+    def test_summary_consistency(self, conn):
+        """Summary total_matching == detail total row count (same filters)."""
+        kwargs = dict(organism="MED4", treatment_type=["coculture"])
+        summary = api.list_experiments(**kwargs, mode="summary", conn=conn)
+        detail = api.list_experiments(**kwargs, mode="detail", limit=500, conn=conn)
+        assert summary["total_matching"] == detail["total_matching"]
+        assert summary["total_matching"] == len(detail["results"])
 

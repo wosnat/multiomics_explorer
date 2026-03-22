@@ -3,7 +3,7 @@
 import json
 import logging
 import re
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
@@ -658,3 +658,181 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"list_publications unexpected error: {e}")
             raise ToolError(f"Error in list_publications: {e}")
+
+    # --- list_experiments (v2 pattern: unified response, summary/detail modes) ---
+
+    class TimePoint(BaseModel):
+        label: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)')")
+        order: int = Field(description="Sort order within experiment (e.g. 1, 2, 3)")
+        hours: float | None = Field(default=None, description="Time in hours, null if unknown (e.g. 24.0)")
+        total: int = Field(description="Total genes with expression data at this time point (e.g. 1696)")
+        significant: int = Field(description="Genes with significant differential expression (e.g. 423)")
+
+    class ExperimentResult(BaseModel):
+        # compact fields (always returned)
+        experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq')")
+        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
+        organism_strain: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4')")
+        treatment_type: str = Field(description="Treatment category (e.g. 'coculture', 'nitrogen_stress')")
+        coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism (e.g. 'Alteromonas macleodii HOT1A3', 'Phage')")
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS')")
+        is_time_course: bool = Field(description="Whether experiment has multiple time points")
+        time_points: list[TimePoint] | None = Field(default=None, description="Per-time-point gene counts. Omitted for non-time-course experiments.")
+        gene_count: int = Field(description="Total genes with expression data (e.g. 1696)")
+        significant_count: int = Field(description="Genes with significant differential expression (e.g. 423)")
+        score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
+        # verbose-only fields
+        name: str | None = Field(default=None, description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")
+        publication_title: str | None = Field(default=None, description="Publication title")
+        treatment: str | None = Field(default=None, description="Treatment description (e.g. 'Coculture with Alteromonas HOT1A3')")
+        control: str | None = Field(default=None, description="Control description (e.g. 'Pro99 medium growth conditions')")
+        light_condition: str | None = Field(default=None, description="Light regime (e.g. 'continuous light')")
+        light_intensity: str | None = Field(default=None, description="Light intensity (e.g. '10 umol photons m-2 s-1')")
+        medium: str | None = Field(default=None, description="Growth medium (e.g. 'Pro99')")
+        temperature: str | None = Field(default=None, description="Temperature (e.g. '24C')")
+        statistical_test: str | None = Field(default=None, description="Statistical method (e.g. 'Rockhopper')")
+        experimental_context: str | None = Field(default=None, description="Context summary (e.g. 'in Pro99 medium under continuous light')")
+
+    class OrganismBreakdown(BaseModel):
+        organism_strain: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
+        experiment_count: int = Field(description="Number of experiments for this organism (e.g. 46)")
+
+    class TreatmentTypeBreakdown(BaseModel):
+        treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
+        experiment_count: int = Field(description="Number of experiments (e.g. 16)")
+
+    class OmicsTypeBreakdown(BaseModel):
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
+        experiment_count: int = Field(description="Number of experiments (e.g. 48)")
+
+    class PublicationBreakdown(BaseModel):
+        publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
+        experiment_count: int = Field(description="Number of experiments from this publication (e.g. 5)")
+
+    class ListExperimentsResponse(BaseModel):
+        total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
+        total_matching: int = Field(description="Experiments matching filters")
+        returned: int = Field(description="Number of results returned (0 in summary mode)")
+        truncated: bool = Field(description="True if results were truncated by limit, or summary mode")
+        by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted by count descending")
+        by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted by count descending")
+        by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted by count descending")
+        by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted by count descending")
+        time_course_count: int = Field(description="Number of time-course experiments in matching set")
+        score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
+        score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
+        results: list[ExperimentResult] = Field(description="Individual experiments (empty in summary mode, populated in detail mode)")
+
+    @mcp.tool(
+        tags={"experiments", "expression", "discovery"},
+        annotations={"readOnlyHint": True},
+    )
+    async def list_experiments(
+        ctx: Context,
+        organism: Annotated[str | None, Field(
+            description="Filter by organism name (case-insensitive partial match "
+            "on profiled organism and coculture partner). "
+            "E.g. 'MED4', 'Alteromonas'.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Filter by treatment type(s) (case-insensitive exact match). "
+            "E.g. ['coculture', 'nitrogen_stress']. "
+            "Use list_filter_values to see valid values.",
+        )] = None,
+        omics_type: Annotated[list[str] | None, Field(
+            description="Filter by omics platform(s) (case-insensitive). "
+            "E.g. ['RNASEQ', 'PROTEOMICS'].",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Filter by publication DOI(s) (case-insensitive exact match). "
+            "Get DOIs from list_publications. "
+            "E.g. ['10.1038/ismej.2016.70'].",
+        )] = None,
+        coculture_partner: Annotated[str | None, Field(
+            description="Filter by coculture partner organism (case-insensitive "
+            "partial match). Narrows coculture experiments. "
+            "E.g. 'Alteromonas', 'HOT1A3'.",
+        )] = None,
+        search_text: Annotated[str | None, Field(
+            description="Free-text search on experiment name, treatment, control, "
+            "experimental context, and light condition (Lucene fulltext, "
+            "case-insensitive). E.g. 'continuous light', 'diel'.",
+        )] = None,
+        time_course_only: Annotated[bool, Field(
+            description="If true, return only time-course experiments "
+            "(multiple time points).",
+        )] = False,
+        mode: Annotated[Literal["summary", "detail"], Field(
+            description="'summary' returns breakdowns by organism, treatment type, "
+            "and omics type to guide filtering. 'detail' returns individual "
+            "experiments with gene counts. Start with summary to orient, "
+            "then use detail with filters.",
+        )] = "summary",
+        verbose: Annotated[bool, Field(
+            description="Detail mode only. Include experiment name, publication "
+            "title, treatment/control descriptions, and experimental conditions "
+            "(light, medium, temperature, statistical test, context).",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Detail mode only. Max results.", ge=1,
+        )] = 50,
+    ) -> ListExperimentsResponse:
+        """List differential expression experiments in the knowledge graph.
+
+        Start with mode='summary' to see experiment counts by organism, treatment
+        type, and omics type. Then use mode='detail' with filters to browse
+        individual experiments. Pass experiment IDs to query_expression for
+        gene-level results.
+        """
+        await ctx.info(f"list_experiments mode={mode} organism={organism} "
+                       f"treatment_type={treatment_type} search_text={search_text}")
+        try:
+            conn = _conn(ctx)
+            result = api.list_experiments(
+                organism=organism, treatment_type=treatment_type,
+                omics_type=omics_type, publication_doi=publication_doi,
+                coculture_partner=coculture_partner, search_text=search_text,
+                time_course_only=time_course_only,
+                mode=mode,
+                verbose=verbose, limit=limit, conn=conn,
+            )
+
+            # Build breakdown models
+            by_organism = [OrganismBreakdown(**b) for b in result["by_organism"]]
+            by_treatment_type = [TreatmentTypeBreakdown(**b) for b in result["by_treatment_type"]]
+            by_omics_type = [OmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
+            by_publication = [PublicationBreakdown(**b) for b in result["by_publication"]]
+
+            # Build result models (empty list in summary mode)
+            experiments = []
+            for r in result["results"]:
+                tp_data = r.get("time_points")
+                tp_list = [TimePoint(**tp) for tp in tp_data] if tp_data else None
+                experiments.append(ExperimentResult(
+                    **{k: v for k, v in r.items() if k != "time_points"},
+                    time_points=tp_list,
+                ))
+
+            response = ListExperimentsResponse(
+                total_entries=result["total_entries"],
+                total_matching=result["total_matching"],
+                returned=result["returned"],
+                truncated=result["truncated"],
+                by_organism=by_organism,
+                by_treatment_type=by_treatment_type,
+                by_omics_type=by_omics_type,
+                by_publication=by_publication,
+                time_course_count=result["time_course_count"],
+                score_max=result.get("score_max"),
+                score_median=result.get("score_median"),
+                results=experiments,
+            )
+            await ctx.info(f"Returning {response.returned} of {response.total_matching} "
+                           f"matching experiments ({response.total_entries} total in KG)")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"list_experiments error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"list_experiments unexpected error: {e}")
+            raise ToolError(f"Error in list_experiments: {e}")

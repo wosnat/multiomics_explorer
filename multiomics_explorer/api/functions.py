@@ -32,6 +32,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
+    build_list_experiments,
+    build_list_experiments_summary,
     build_resolve_gene,
     build_search_genes,
     build_search_genes_dedup_groups,
@@ -393,6 +395,156 @@ def list_publications(
         "total_matching": summary["total_matching"],
         "results": results,
     }
+
+
+def list_experiments(
+    organism: str | None = None,
+    treatment_type: list[str] | None = None,
+    omics_type: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    coculture_partner: str | None = None,
+    search_text: str | None = None,
+    time_course_only: bool = False,
+    mode: str = "summary",
+    verbose: bool = False,
+    limit: int | None = None,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """List experiments with gene count statistics.
+
+    Always returns: total_entries, total_matching, by_organism,
+    by_treatment_type, by_omics_type, by_publication, time_course_count,
+    returned, truncated, results.
+
+    When mode='summary': results is empty list, truncated=True.
+    When mode='detail': results populated with experiments.
+    Per result: experiment_id, publication_doi, organism_strain,
+    treatment_type, coculture_partner, omics_type, is_time_course (bool),
+    time_points (list, omitted if not time-course), gene_count,
+    significant_count.
+    When verbose=True, also includes: name, publication_title, treatment,
+    control, light_condition, light_intensity, medium, temperature,
+    statistical_test, experimental_context.
+    When search_text is provided, detail results include score.
+    """
+    conn = _default_conn(conn)
+    filter_kwargs = dict(
+        organism=organism, treatment_type=treatment_type,
+        omics_type=omics_type, publication_doi=publication_doi,
+        coculture_partner=coculture_partner, search_text=search_text,
+        time_course_only=time_course_only,
+    )
+
+    def _run_summary(st=search_text):
+        kw = {**filter_kwargs, "search_text": st}
+        cypher, params = build_list_experiments_summary(**kw)
+        return conn.execute_query(cypher, **params)[0]
+
+    def _run_detail(st=search_text):
+        kw = {**filter_kwargs, "search_text": st}
+        cypher, params = build_list_experiments(
+            **kw, verbose=verbose, limit=limit,
+        )
+        return conn.execute_query(cypher, **params)
+
+    # Both modes run summary query
+    try:
+        raw_summary = _run_summary()
+    except Neo4jClientError:
+        if search_text:
+            logger.debug("list_experiments: Lucene parse error, retrying with escaped query")
+            escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            raw_summary = _run_summary(st=escaped)
+            # Update search_text for detail query too
+            filter_kwargs["search_text"] = escaped
+        else:
+            raise
+
+    # Get total_entries (unfiltered count)
+    total_cypher, total_params = build_list_experiments_summary()
+    total_raw = conn.execute_query(total_cypher, **total_params)[0]
+    total_entries = total_raw["total_matching"]
+
+    # Rename apoc.coll.frequencies {item, count} to domain keys, sort desc
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "experiment_count": f["count"]} for f in freq_list],
+            key=lambda x: x["experiment_count"],
+            reverse=True,
+        )
+
+    envelope = {
+        "total_entries": total_entries,
+        "total_matching": raw_summary["total_matching"],
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_strain"),
+        "by_treatment_type": _rename_freq(raw_summary["by_treatment_type"], "treatment_type"),
+        "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
+        "by_publication": _rename_freq(raw_summary["by_publication"], "publication_doi"),
+        "time_course_count": raw_summary["time_course_count"],
+    }
+
+    # Score distribution (only when search_text used)
+    if "score_max" in raw_summary:
+        envelope["score_max"] = raw_summary["score_max"]
+        envelope["score_median"] = raw_summary["score_median"]
+    else:
+        envelope["score_max"] = None
+        envelope["score_median"] = None
+
+    if mode == "summary":
+        envelope["returned"] = 0
+        envelope["truncated"] = True
+        envelope["results"] = []
+        return envelope
+
+    # Detail mode: run detail query
+    try:
+        results = _run_detail()
+    except Neo4jClientError:
+        if search_text and filter_kwargs["search_text"] == search_text:
+            # Not yet escaped (summary succeeded without retry)
+            logger.debug("list_experiments detail: Lucene parse error, retrying")
+            escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            results = _run_detail(st=escaped)
+        else:
+            raise
+
+    # Post-process results
+    processed = []
+    for row in results:
+        r = dict(row)
+        # Cast is_time_course string to bool
+        r["is_time_course"] = r["is_time_course"] == "true"
+
+        # Assemble time_points from parallel arrays
+        tp_count = r.pop("time_point_count", 0)
+        tp_labels = r.pop("time_point_labels", [])
+        tp_orders = r.pop("time_point_orders", [])
+        tp_hours = r.pop("time_point_hours", [])
+        tp_totals = r.pop("time_point_totals", [])
+        tp_sigs = r.pop("time_point_significants", [])
+
+        if r["is_time_course"] and tp_count > 0:
+            time_points = []
+            for i in range(tp_count):
+                tp = {
+                    "label": tp_labels[i] if tp_labels[i] != "" else None,
+                    "order": tp_orders[i],
+                    "hours": tp_hours[i] if tp_hours[i] != -1.0 else None,
+                    "total": tp_totals[i],
+                    "significant": tp_sigs[i],
+                }
+                time_points.append(tp)
+            r["time_points"] = time_points
+        # Non-time-course: omit time_points key entirely
+
+        processed.append(r)
+
+    envelope["returned"] = len(processed)
+    envelope["truncated"] = envelope["total_matching"] > len(processed)
+    envelope["results"] = processed
+    return envelope
 
 
 def search_ontology(

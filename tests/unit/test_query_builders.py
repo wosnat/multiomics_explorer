@@ -18,6 +18,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
+    build_list_experiments,
+    build_list_experiments_summary,
     build_resolve_gene,
     build_search_genes,
     build_search_ontology,
@@ -815,5 +817,183 @@ class TestBuildListPublicationsSummary:
         cypher, params = build_list_publications_summary(author="Chisholm")
         assert "ANY(a IN p.authors WHERE toLower(a) CONTAINS toLower($author))" in cypher
         assert params["author"] == "Chisholm"
+
+
+class TestBuildListExperiments:
+    def test_no_filters(self):
+        """No filters produces MATCH with no WHERE, no fulltext CALL."""
+        cypher, params = build_list_experiments()
+        assert "MATCH (p:Publication)-[:Has_experiment]->(e:Experiment)" in cypher
+        assert "WHERE" not in cypher
+        assert "fulltext" not in cypher
+        assert params == {}
+
+    def test_organism_filter(self):
+        """Organism filter uses ALL(word IN split) on organism_strain OR coculture_partner."""
+        cypher, params = build_list_experiments(organism="MED4")
+        assert "ALL(word IN split(toLower($org)" in cypher
+        assert "toLower(e.organism_strain) CONTAINS word" in cypher
+        assert "toLower(e.coculture_partner) CONTAINS word" in cypher
+        assert params["org"] == "MED4"
+
+    def test_treatment_type_filter(self):
+        """Treatment type filter uses toLower IN with list param."""
+        cypher, params = build_list_experiments(treatment_type=["coculture", "nitrogen_stress"])
+        assert "toLower(e.treatment_type) IN $treatment_types" in cypher
+        assert params["treatment_types"] == ["coculture", "nitrogen_stress"]
+
+    def test_treatment_type_case_insensitive(self):
+        """Treatment type list values are lowercased."""
+        _, params = build_list_experiments(treatment_type=["COCULTURE"])
+        assert params["treatment_types"] == ["coculture"]
+
+    def test_omics_type_filter(self):
+        """Omics type filter uses toUpper IN with list param."""
+        cypher, params = build_list_experiments(omics_type=["rnaseq", "proteomics"])
+        assert "toUpper(e.omics_type) IN $omics_types" in cypher
+        assert params["omics_types"] == ["RNASEQ", "PROTEOMICS"]
+
+    def test_publication_doi_filter(self):
+        """Publication DOI filter uses toLower IN with list param."""
+        cypher, params = build_list_experiments(publication_doi=["10.1038/ismej.2016.70"])
+        assert "toLower(p.doi) IN $dois" in cypher
+        assert params["dois"] == ["10.1038/ismej.2016.70"]
+
+    def test_coculture_partner_filter(self):
+        """Coculture partner filter uses toLower CONTAINS."""
+        cypher, params = build_list_experiments(coculture_partner="Alteromonas")
+        assert "toLower(e.coculture_partner) CONTAINS toLower($partner)" in cypher
+        assert params["partner"] == "Alteromonas"
+
+    def test_search_text_fulltext(self):
+        """search_text uses experimentFullText index and orders by score DESC."""
+        cypher, params = build_list_experiments(search_text="continuous light")
+        assert "experimentFullText" in cypher
+        assert "YIELD node AS e, score" in cypher
+        assert "score DESC" in cypher
+        assert "score" in cypher
+        assert params["search_text"] == "continuous light"
+
+    def test_search_text_none(self):
+        """No fulltext CALL when search_text is None."""
+        cypher, _ = build_list_experiments(search_text=None)
+        assert "fulltext" not in cypher
+        assert "score" not in cypher
+
+    def test_time_course_only(self):
+        """time_course_only adds WHERE is_time_course = 'true'."""
+        cypher, _ = build_list_experiments(time_course_only=True)
+        assert "e.is_time_course = 'true'" in cypher
+
+    def test_combined_filters(self):
+        """Multiple filters produce AND-joined WHERE."""
+        cypher, params = build_list_experiments(
+            organism="MED4", treatment_type=["coculture"], omics_type=["RNASEQ"],
+        )
+        assert "WHERE" in cypher
+        assert " AND " in cypher
+        assert params["org"] == "MED4"
+        assert params["treatment_types"] == ["coculture"]
+        assert params["omics_types"] == ["RNASEQ"]
+
+    def test_returns_expected_columns(self):
+        """RETURN clause has all expected compact columns."""
+        cypher, _ = build_list_experiments()
+        for col in [
+            "experiment_id", "publication_doi", "organism_strain",
+            "treatment_type", "coculture_partner", "omics_type",
+            "is_time_course", "gene_count", "significant_count",
+            "time_point_count", "time_point_labels", "time_point_orders",
+            "time_point_hours", "time_point_totals", "time_point_significants",
+        ]:
+            assert col in cypher
+
+    def test_verbose_false(self):
+        """Compact mode does not include verbose columns."""
+        cypher, _ = build_list_experiments(verbose=False)
+        assert "e.name AS name" not in cypher
+        assert "publication_title" not in cypher
+        assert "e.treatment AS treatment" not in cypher
+        assert "light_condition" not in cypher
+
+    def test_verbose_true(self):
+        """Verbose mode includes name, publication_title, treatment, etc."""
+        cypher, _ = build_list_experiments(verbose=True)
+        assert "e.name AS name" in cypher
+        assert "p.title AS publication_title" in cypher
+        assert "e.treatment AS treatment" in cypher
+        assert "e.control AS control" in cypher
+        assert "e.light_condition AS light_condition" in cypher
+        assert "e.medium AS medium" in cypher
+        assert "e.temperature AS temperature" in cypher
+        assert "e.statistical_test AS statistical_test" in cypher
+        assert "e.experimental_context AS experimental_context" in cypher
+
+    def test_order_by(self):
+        """Without search_text, orders by year DESC, organism, name."""
+        cypher, _ = build_list_experiments()
+        assert "ORDER BY p.publication_year DESC, e.organism_strain, e.name" in cypher
+
+    def test_limit_clause(self):
+        """LIMIT is added when limit is provided."""
+        cypher, params = build_list_experiments(limit=10)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        """No LIMIT when limit is None."""
+        cypher, _ = build_list_experiments(limit=None)
+        assert "LIMIT" not in cypher
+
+
+class TestBuildListExperimentsSummary:
+    def test_no_filters(self):
+        """Returns aggregation columns via apoc.coll.frequencies."""
+        cypher, params = build_list_experiments_summary()
+        assert "total_matching" in cypher
+        assert "time_course_count" in cypher
+        assert "apoc.coll.frequencies" in cypher
+        assert "by_organism" in cypher
+        assert "by_treatment_type" in cypher
+        assert "by_omics_type" in cypher
+        assert "by_publication" in cypher
+        assert params == {}
+
+    def test_with_filters(self):
+        """Filters are applied to the summary query."""
+        cypher, params = build_list_experiments_summary(organism="MED4")
+        assert "ALL(word IN split(toLower($org)" in cypher
+        assert params["org"] == "MED4"
+
+    def test_search_text_fulltext(self):
+        """search_text uses experimentFullText index and includes score distribution."""
+        cypher, params = build_list_experiments_summary(search_text="nitrogen")
+        assert "experimentFullText" in cypher
+        assert "score_max" in cypher
+        assert "score_median" in cypher
+        assert params["search_text"] == "nitrogen"
+
+    def test_search_text_none_no_scores(self):
+        """No score distribution when search_text is None."""
+        cypher, _ = build_list_experiments_summary()
+        assert "score_max" not in cypher
+        assert "score_median" not in cypher
+
+    def test_shares_where_clause(self):
+        """Same filter logic as detail builder — treatment_type list works."""
+        cypher, params = build_list_experiments_summary(
+            treatment_type=["coculture", "nitrogen_stress"]
+        )
+        assert "toLower(e.treatment_type) IN $treatment_types" in cypher
+        assert params["treatment_types"] == ["coculture", "nitrogen_stress"]
+
+    def test_returns_aggregation_keys(self):
+        """RETURN has all expected aggregation keys."""
+        cypher, _ = build_list_experiments_summary()
+        for key in [
+            "total_matching", "time_course_count",
+            "by_organism", "by_treatment_type", "by_omics_type", "by_publication",
+        ]:
+            assert key in cypher
 
 

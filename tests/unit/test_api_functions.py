@@ -593,3 +593,211 @@ class TestListPublications:
         """from multiomics_explorer import list_publications works."""
         from multiomics_explorer import list_publications
         assert list_publications is api.list_publications
+
+
+class TestListExperiments:
+    """Tests for list_experiments API function."""
+
+    def _summary_result(self, total_matching=76, time_course_count=29):
+        """Helper: mock summary query result."""
+        return [{
+            "total_matching": total_matching,
+            "time_course_count": time_course_count,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 30}],
+            "by_treatment_type": [{"item": "coculture", "count": 16}],
+            "by_omics_type": [{"item": "RNASEQ", "count": 48}],
+            "by_publication": [{"item": "10.1038/ismej.2016.70", "count": 5}],
+        }]
+
+    def _detail_row(self, **overrides):
+        """Helper: mock detail query result row."""
+        row = {
+            "experiment_id": "test_exp_1",
+            "publication_doi": "10.1234/test",
+            "organism_strain": "Prochlorococcus MED4",
+            "treatment_type": "coculture",
+            "coculture_partner": "Alteromonas macleodii HOT1A3",
+            "omics_type": "RNASEQ",
+            "is_time_course": "false",
+            "gene_count": 1696,
+            "significant_count": 423,
+            "time_point_count": 1,
+            "time_point_labels": ["20h"],
+            "time_point_orders": [1],
+            "time_point_hours": [20.0],
+            "time_point_totals": [1696],
+            "time_point_significants": [423],
+        }
+        row.update(overrides)
+        return row
+
+    def _tc_detail_row(self):
+        """Helper: mock time-course detail row."""
+        return self._detail_row(
+            experiment_id="test_tc_1",
+            is_time_course="true",
+            time_point_count=3,
+            time_point_labels=["2h", "12h", "24h"],
+            time_point_orders=[1, 2, 3],
+            time_point_hours=[2.0, 12.0, 24.0],
+            time_point_totals=[353, 353, 353],
+            time_point_significants=[0, 85, 258],
+        )
+
+    def test_detail_returns_dict(self, mock_conn):
+        """Detail mode returns dict with breakdowns + results."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),       # filtered summary
+            self._summary_result(),       # unfiltered total_entries
+            [self._detail_row()],         # detail query
+        ]
+        result = api.list_experiments(mode="detail", conn=mock_conn)
+        assert isinstance(result, dict)
+        assert "total_entries" in result
+        assert "total_matching" in result
+        assert "by_organism" in result
+        assert "by_treatment_type" in result
+        assert "results" in result
+        assert len(result["results"]) == 1
+
+    def test_summary_returns_dict(self, mock_conn):
+        """Summary mode returns dict with breakdowns + empty results."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),  # filtered summary
+            self._summary_result(),  # unfiltered total_entries
+        ]
+        result = api.list_experiments(mode="summary", conn=mock_conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert result["by_organism"][0]["organism_strain"] == "Prochlorococcus MED4"
+        assert result["by_organism"][0]["experiment_count"] == 30
+        # No detail query call — only 2 execute_query calls
+        assert mock_conn.execute_query.call_count == 2
+
+    def test_passes_params(self, mock_conn):
+        """All filter params forwarded to builders."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=5),
+            self._summary_result(),
+            [self._detail_row()],
+        ]
+        api.list_experiments(
+            organism="MED4", treatment_type=["coculture"],
+            omics_type=["RNASEQ"], publication_doi=["10.1234/test"],
+            coculture_partner="Alteromonas", time_course_only=True,
+            mode="detail", verbose=True, limit=10, conn=mock_conn,
+        )
+        # Summary query has filter params
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        assert "org" in summary_call[1]
+        assert "treatment_types" in summary_call[1]
+        # Detail query has verbose + limit
+        detail_call = mock_conn.execute_query.call_args_list[2]
+        assert "e.name AS name" in detail_call[0][0]
+        assert "LIMIT $limit" in detail_call[0][0]
+
+    def test_is_time_course_cast(self, mock_conn):
+        """is_time_course string cast to bool."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._detail_row(is_time_course="true"),
+             self._detail_row(is_time_course="false")],
+        ]
+        result = api.list_experiments(mode="detail", conn=mock_conn)
+        assert result["results"][0]["is_time_course"] is True
+        assert result["results"][1]["is_time_course"] is False
+
+    def test_time_points_assembled(self, mock_conn):
+        """Parallel arrays assembled into time_points list of dicts for time-course."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._tc_detail_row()],
+        ]
+        result = api.list_experiments(mode="detail", conn=mock_conn)
+        row = result["results"][0]
+        assert "time_points" in row
+        assert len(row["time_points"]) == 3
+        tp = row["time_points"][0]
+        assert tp["label"] == "2h"
+        assert tp["order"] == 1
+        assert tp["hours"] == 2.0
+        assert tp["total"] == 353
+        assert tp["significant"] == 0
+
+    def test_time_points_omitted(self, mock_conn):
+        """Non-time-course results have no time_points key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._detail_row(is_time_course="false")],
+        ]
+        result = api.list_experiments(mode="detail", conn=mock_conn)
+        assert "time_points" not in result["results"][0]
+
+    def test_sentinel_conversion(self, mock_conn):
+        """Sentinel values converted: '' label -> None, -1.0 hours -> None."""
+        tc_row = self._detail_row(
+            is_time_course="true",
+            time_point_count=1,
+            time_point_labels=[""],
+            time_point_orders=[1],
+            time_point_hours=[-1.0],
+            time_point_totals=[100],
+            time_point_significants=[10],
+        )
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [tc_row],
+        ]
+        result = api.list_experiments(mode="detail", conn=mock_conn)
+        tp = result["results"][0]["time_points"][0]
+        assert tp["label"] is None
+        assert tp["hours"] is None
+
+    def test_limit_slices_results(self, mock_conn):
+        """Limit passed to builder, total_matching from summary."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=76),
+            self._summary_result(),
+            [self._detail_row()],  # only 1 returned due to limit
+        ]
+        result = api.list_experiments(mode="detail", limit=1, conn=mock_conn)
+        assert result["total_matching"] == 76
+        assert result["returned"] == 1
+        assert result["truncated"] is True
+
+    def test_breakdowns_computed(self, mock_conn):
+        """Breakdowns renamed from apoc format to domain keys."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+        ]
+        result = api.list_experiments(mode="summary", conn=mock_conn)
+        assert result["by_organism"][0]["organism_strain"] == "Prochlorococcus MED4"
+        assert result["by_organism"][0]["experiment_count"] == 30
+        assert result["by_treatment_type"][0]["treatment_type"] == "coculture"
+        assert result["by_omics_type"][0]["omics_type"] == "RNASEQ"
+        assert result["by_publication"][0]["publication_doi"] == "10.1038/ismej.2016.70"
+
+    def test_creates_conn_when_none(self):
+        """Default conn used when None."""
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                self._summary_result(total_matching=0),
+                self._summary_result(total_matching=0),
+            ]
+            result = api.list_experiments(mode="summary")
+        MockConn.assert_called_once()
+        assert result["total_matching"] == 0
+
+    def test_importable_from_package(self):
+        """from multiomics_explorer import list_experiments works."""
+        from multiomics_explorer import list_experiments
+        assert list_experiments is api.list_experiments

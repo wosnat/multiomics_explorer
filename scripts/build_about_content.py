@@ -83,10 +83,14 @@ def _type_string(prop: dict) -> str:
         nullable = any(t.get("type") == "null" for t in prop["anyOf"])
         base = types[0] if types else "any"
         return f"{base} | None" if nullable else base
+    # Handle $ref to named model (e.g. {"$ref": "#/$defs/OrganismBreakdown"})
+    if "$ref" in prop:
+        ref = prop["$ref"]
+        return ref.rsplit("/", 1)[-1]
     t = prop.get("type", "any")
     if t == "array":
         items = prop.get("items", {})
-        item_type = items.get("type", "any")
+        item_type = _type_string(items)
         return f"list[{item_type}]"
     if t == "integer":
         return "int"

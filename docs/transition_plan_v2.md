@@ -35,7 +35,7 @@ MCP server  →  returns formatted text
 
 - All tools use the **old KG schema** (EnvironmentalCondition nodes,
   split expression edge types)
-- No summary/detail/about modes
+- No summary/detail modes + about content
 - No skills
 - No precomputed statistics in KG
 - `fastmcp>=3.0` installed but not yet leveraging new features
@@ -219,35 +219,38 @@ stress-tests them on complex tools while introducing modes.
 
 ### Phase D: Modes + complex tools
 
-Introduce summary/detail/about modes by building them into
+Introduce summary/detail modes + about content by building them into
 complex tools. This exercises the dev skills on hard problems
 while delivering the core v2 architectural change.
 
-#### D1: Add `list_experiments` with modes (add-tool skill)
+#### D1: Add `list_experiments` with modes (add-tool skill) — in progress
 
 Use the `add-tool` skill to add `list_experiments` — the first
-tool built with summary/detail/about modes from the start.
+tool built with summary/detail modes from the start.
 
-Complex because:
-- Multiple filterable properties (organism, treatment_type,
-  omics_type, is_time_course)
-- Joins to Publication via `Has_experiment`
-- Joins to OrganismTaxon via `Tests_coculture_with` (optional)
-- Potentially large result set — needs summary mode
+**Phase 1 (definition) complete.** Key design decisions:
+- Summary/detail modes with unified response model (breakdowns +
+  results in same Pydantic type). Summary: results=[], truncated=True.
+  Detail: results populated, breakdowns also populated.
+- Both modes run summary query. Detail additionally runs detail query
+  with LIMIT in Cypher.
+- Summary uses `apoc.coll.frequencies()` for per-dimension breakdowns
+  (by_organism, by_treatment_type, by_omics_type, by_publication).
+- Fulltext search via existing `experimentFullText` index.
+  Score distribution (score_max, score_median) in summary mode.
+- List-type filter params for exact-match filters (treatment_type,
+  omics_type, publication_doi) with case-insensitive IN matching.
+- Precomputed stats on Experiment nodes (gene_count, significant_count,
+  time_point arrays) — KG spec written.
+- 10 compact fields, 9 verbose fields. About via MCP resource.
+- Specs: `docs/tool-specs/list_experiments.md`,
+  `docs/kg-specs/kg-spec-list-experiments.md`
 
-Build the full stack:
-1. `build_list_experiments()` — detail query
-2. `build_list_experiments_summary()` — aggregation query
-3. API function with `summary` + `limit` params
-4. MCP tool with `mode` parameter (Annotated, Literal, Field)
-5. About-mode content with examples
-6. Full test suite including summary consistency
+**Waiting on:** KG changes (coculture_partner fix + precomputed stats)
+before Phase 2 build.
 
-This introduces the mode pattern through a concrete tool, not
-as abstract infrastructure.
-
-**Gate:** Tool works with all three modes. Add-tool skill
-updated for mode steps.
+**Gate:** Tool works with both modes. Add-tool skill updated for
+mode steps (done — skills updated with learnings from D1 definition).
 
 #### D2: Update `get_homologs` with modes (modify-tool skill)
 
@@ -256,7 +259,7 @@ complex existing tool (multi-query orchestration, member grouping,
 per-group truncation).
 
 Target changes:
-- Add summary/detail/about modes
+- Add summary/detail modes + about content
 - Leverage FastMCP features (Annotated, Field, ToolError)
 - Rename `locus_tag` parameter (cascading rename)
 - About-mode content with chaining examples
@@ -284,7 +287,7 @@ Apply the mode pattern to remaining tools that need it, using
 the now-proven dev skills:
 - `search_genes` — summary + detail + about
 - `genes_by_ontology` — summary + detail + about
-- Other tools — about mode only (small result sets)
+- Other tools — about content only via MCP resources (small result sets)
 
 **Gate:** All tools have appropriate modes. Unit + integration
 tests.
@@ -292,7 +295,7 @@ tests.
 #### D5: Rebuild `query_expression` with new schema
 
 Rebuild `query_expression` properly with the new Experiment
-schema, using summary/detail/about modes:
+schema, using summary/detail modes + about content:
 1. `build_query_expression()` — new schema Cypher
 2. `build_query_expression_summary()` — aggregation query
 3. API function with `summary` + `limit` params

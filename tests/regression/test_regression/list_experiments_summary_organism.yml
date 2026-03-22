@@ -1,0 +1,33 @@
+case_id: list_experiments_summary_organism
+row_count: 1
+rows:
+- by_omics_type:
+  - '{''count'': 11, ''item'': ''RNASEQ''}'
+  - '{''count'': 18, ''item'': ''MICROARRAY''}'
+  - '{''count'': 2, ''item'': ''PROTEOMICS''}'
+  by_organism:
+  - '{''count'': 1, ''item'': ''Alteromonas macleodii HOT1A3''}'
+  - '{''count'': 30, ''item'': ''Prochlorococcus MED4''}'
+  by_publication:
+  - '{''count'': 1, ''item'': ''10.1038/ismej.2016.70''}'
+  - '{''count'': 1, ''item'': ''10.1038/ismej.2017.88''}'
+  - '{''count'': 1, ''item'': ''10.1038/nature06130''}'
+  - '{''count'': 1, ''item'': ''10.1073/pnas.0601301103''}'
+  - '{''count'': 1, ''item'': ''10.3389/fmicb.2022.1038136''}'
+  - '{''count'': 3, ''item'': ''10.1038/ismej.2011.49''}'
+  - '{''count'': 3, ''item'': ''10.1038/msb4100087''}'
+  - '{''count'': 4, ''item'': ''10.1038/ismej.2015.36''}'
+  - '{''count'': 4, ''item'': ''10.1371/journal.pone.0165375''}'
+  - '{''count'': 6, ''item'': ''10.1101/2025.11.24.690089''}'
+  - '{''count'': 6, ''item'': ''10.1128/JB.01097-06''}'
+  by_treatment_type:
+  - '{''count'': 1, ''item'': ''phosphorus_stress''}'
+  - '{''count'': 1, ''item'': ''salt_stress''}'
+  - '{''count'': 3, ''item'': ''coculture''}'
+  - '{''count'': 3, ''item'': ''iron_stress''}'
+  - '{''count'': 3, ''item'': ''viral''}'
+  - '{''count'': 4, ''item'': ''carbon_stress''}'
+  - '{''count'': 8, ''item'': ''light_stress''}'
+  - '{''count'': 8, ''item'': ''nitrogen_stress''}'
+  time_course_count: 13
+  total_matching: 31

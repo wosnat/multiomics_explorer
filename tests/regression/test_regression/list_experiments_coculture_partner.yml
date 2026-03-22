@@ -1,0 +1,133 @@
+case_id: list_experiments_coculture_partner
+row_count: 5
+rows:
+- coculture_partner: Alteromonas macleodii HOT1A3
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  gene_count: 1849
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_count: 62
+  time_point_count: 1
+  time_point_hours:
+  - '264.0'
+  time_point_labels:
+  - day 11
+  time_point_orders:
+  - '1'
+  time_point_significants:
+  - '62'
+  time_point_totals:
+  - '1849'
+  treatment_type: coculture
+- coculture_partner: Alteromonas macleodii HOT1A3
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
+  gene_count: 1714
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2016.70
+  significant_count: 296
+  time_point_count: 1
+  time_point_hours:
+  - '20.0'
+  time_point_labels:
+  - 20h
+  time_point_orders:
+  - '1'
+  time_point_significants:
+  - '296'
+  time_point_totals:
+  - '1714'
+  treatment_type: coculture
+- coculture_partner: Alteromonas macleodii HOT1A3
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
+  gene_count: 2267
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2016.70
+  significant_count: 198
+  time_point_count: 1
+  time_point_hours:
+  - '20.0'
+  time_point_labels:
+  - 20h
+  time_point_orders:
+  - '1'
+  time_point_significants:
+  - '198'
+  time_point_totals:
+  - '2267'
+  treatment_type: coculture
+- coculture_partner: Alteromonas macleodii HOT1A3
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
+  gene_count: 2268
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2016.70
+  significant_count: 99
+  time_point_count: 1
+  time_point_hours:
+  - '20.0'
+  time_point_labels:
+  - 20h
+  time_point_orders:
+  - '1'
+  time_point_significants:
+  - '99'
+  time_point_totals:
+  - '2268'
+  treatment_type: coculture
+- coculture_partner: Alteromonas macleodii MIT1002
+  experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
+  gene_count: 2471
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_strain: Prochlorococcus NATL2A
+  publication_doi: 10.1038/ismej.2016.82
+  significant_count: 573
+  time_point_count: 7
+  time_point_hours:
+  - '-12.0'
+  - '12.0'
+  - '2.0'
+  - '24.0'
+  - '4.0'
+  - '48.0'
+  - '6.0'
+  time_point_labels:
+  - -12h
+  - 12h
+  - 24h
+  - 2h
+  - 48h
+  - 4h
+  - 6h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significants:
+  - '0'
+  - '0'
+  - '0'
+  - '12'
+  - '218'
+  - '258'
+  - '85'
+  time_point_totals:
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  treatment_type: coculture

@@ -51,6 +51,7 @@ EXPECTED_TOOLS = [
     "get_homologs", "run_cypher",
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
     "list_publications",
+    "list_experiments",
 ]
 
 
@@ -1334,3 +1335,234 @@ class TestListPublicationsWrapper:
         ):
             with pytest.raises(ToolError, match="bad param"):
                 await tool_fns["list_publications"](mock_ctx)
+
+
+class TestListExperimentsWrapper:
+    _SAMPLE_SUMMARY = {
+        "total_entries": 76,
+        "total_matching": 76,
+        "by_organism": [{"organism_strain": "Prochlorococcus MED4", "experiment_count": 30}],
+        "by_treatment_type": [{"treatment_type": "coculture", "experiment_count": 16}],
+        "by_omics_type": [{"omics_type": "RNASEQ", "experiment_count": 48}],
+        "by_publication": [{"publication_doi": "10.1038/ismej.2016.70", "experiment_count": 5}],
+        "time_course_count": 29,
+        "score_max": None,
+        "score_median": None,
+        "returned": 0,
+        "truncated": True,
+        "results": [],
+    }
+
+    _SAMPLE_EXP = {
+        "experiment_id": "test_exp_1",
+        "publication_doi": "10.1234/test",
+        "organism_strain": "Prochlorococcus MED4",
+        "treatment_type": "coculture",
+        "coculture_partner": "Alteromonas macleodii HOT1A3",
+        "omics_type": "RNASEQ",
+        "is_time_course": False,
+        "gene_count": 1696,
+        "significant_count": 423,
+    }
+
+    _SAMPLE_DETAIL = {
+        **_SAMPLE_SUMMARY,
+        "returned": 1,
+        "truncated": True,
+        "results": [_SAMPLE_EXP],
+    }
+
+    @pytest.mark.asyncio
+    async def test_summary_mode_empty_results(self, tool_fns, mock_ctx):
+        """Summary mode returns breakdowns + results=[]."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_SUMMARY,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        assert result.returned == 0
+        assert result.truncated is True
+        assert result.results == []
+        assert len(result.by_organism) == 1
+        assert result.by_organism[0].organism_strain == "Prochlorococcus MED4"
+        assert result.by_organism[0].experiment_count == 30
+        assert result.time_course_count == 29
+
+    @pytest.mark.asyncio
+    async def test_detail_mode_has_results(self, tool_fns, mock_ctx):
+        """Detail mode returns breakdowns + results."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_DETAIL,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+        assert result.returned == 1
+        assert len(result.results) == 1
+        assert result.results[0].experiment_id == "test_exp_1"
+        # Breakdowns also present
+        assert len(result.by_organism) == 1
+
+    @pytest.mark.asyncio
+    async def test_default_mode_is_summary(self, tool_fns, mock_ctx):
+        """No mode param defaults to summary."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_SUMMARY,
+        ) as mock_api:
+            await tool_fns["list_experiments"](mock_ctx)
+        call_kwargs = mock_api.call_args[1]
+        assert call_kwargs["mode"] == "summary"
+
+    @pytest.mark.asyncio
+    async def test_both_modes_have_breakdowns(self, tool_fns, mock_ctx):
+        """Breakdowns populated in both modes."""
+        for mode_val, api_result in [
+            ("summary", self._SAMPLE_SUMMARY),
+            ("detail", self._SAMPLE_DETAIL),
+        ]:
+            with patch(
+                "multiomics_explorer.api.functions.list_experiments",
+                return_value=api_result,
+            ):
+                result = await tool_fns["list_experiments"](mock_ctx, mode=mode_val)
+            assert len(result.by_organism) > 0
+            assert len(result.by_treatment_type) > 0
+            assert len(result.by_omics_type) > 0
+            assert len(result.by_publication) > 0
+
+    @pytest.mark.asyncio
+    async def test_detail_empty_results(self, tool_fns, mock_ctx):
+        """Detail mode with no matches returns empty results."""
+        empty = {**self._SAMPLE_SUMMARY,
+                 "total_matching": 0, "returned": 0, "truncated": False,
+                 "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                 "by_publication": [], "time_course_count": 0, "results": []}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=empty,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+        assert result.returned == 0
+        assert result.results == []
+
+    @pytest.mark.asyncio
+    async def test_detail_params_forwarded(self, tool_fns, mock_ctx):
+        """All params passed through to api."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_DETAIL,
+        ) as mock_api:
+            await tool_fns["list_experiments"](
+                mock_ctx,
+                organism="MED4",
+                treatment_type=["coculture"],
+                omics_type=["RNASEQ"],
+                publication_doi=["10.1234/test"],
+                coculture_partner="Alteromonas",
+                search_text="light",
+                time_course_only=True,
+                mode="detail",
+                verbose=True,
+                limit=10,
+            )
+        kw = mock_api.call_args[1]
+        assert kw["organism"] == "MED4"
+        assert kw["treatment_type"] == ["coculture"]
+        assert kw["omics_type"] == ["RNASEQ"]
+        assert kw["publication_doi"] == ["10.1234/test"]
+        assert kw["coculture_partner"] == "Alteromonas"
+        assert kw["search_text"] == "light"
+        assert kw["time_course_only"] is True
+        assert kw["mode"] == "detail"
+        assert kw["verbose"] is True
+        assert kw["limit"] == 10
+
+    @pytest.mark.asyncio
+    async def test_detail_truncation_metadata(self, tool_fns, mock_ctx):
+        """returned == len(results), truncated reflects total_matching."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_DETAIL,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+        assert result.returned == len(result.results)
+        assert result.truncated is True  # 76 > 1
+
+    @pytest.mark.asyncio
+    async def test_detail_verbose_fields_present(self, tool_fns, mock_ctx):
+        """verbose=True includes name, treatment, etc. when present in api result."""
+        verbose_exp = {**self._SAMPLE_EXP,
+                       "name": "Test experiment", "publication_title": "Test paper",
+                       "treatment": "Coculture", "control": "Axenic",
+                       "light_condition": "continuous light"}
+        detail = {**self._SAMPLE_SUMMARY, "returned": 1, "truncated": False,
+                  "results": [verbose_exp]}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=detail,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, mode="detail", verbose=True)
+        r = result.results[0]
+        assert r.name == "Test experiment"
+        assert r.publication_title == "Test paper"
+        assert r.light_condition == "continuous light"
+
+    @pytest.mark.asyncio
+    async def test_detail_verbose_fields_absent(self, tool_fns, mock_ctx):
+        """verbose=False: verbose-only fields are None."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_DETAIL,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+        r = result.results[0]
+        assert r.name is None
+        assert r.publication_title is None
+        assert r.light_condition is None
+
+    @pytest.mark.asyncio
+    async def test_summary_with_filters(self, tool_fns, mock_ctx):
+        """Filters applied to summary breakdowns."""
+        filtered = {**self._SAMPLE_SUMMARY, "total_matching": 30}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=filtered,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, organism="MED4")
+        assert result.total_matching == 30
+
+    @pytest.mark.asyncio
+    async def test_time_points_model(self, tool_fns, mock_ctx):
+        """time_points assembled into TimePoint models."""
+        tc_exp = {
+            **self._SAMPLE_EXP,
+            "is_time_course": True,
+            "time_points": [
+                {"label": "2h", "order": 1, "hours": 2.0, "total": 353, "significant": 0},
+                {"label": "24h", "order": 2, "hours": 24.0, "total": 353, "significant": 258},
+            ],
+        }
+        detail = {**self._SAMPLE_SUMMARY, "returned": 1, "truncated": False,
+                  "results": [tc_exp]}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=detail,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+        r = result.results[0]
+        assert r.is_time_course is True
+        assert len(r.time_points) == 2
+        assert r.time_points[0].label == "2h"
+        assert r.time_points[0].hours == 2.0
+        assert r.time_points[1].significant == 258
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from api raises ToolError."""
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            side_effect=ValueError("bad param"),
+        ):
+            with pytest.raises(ToolError, match="bad param"):
+                await tool_fns["list_experiments"](mock_ctx)

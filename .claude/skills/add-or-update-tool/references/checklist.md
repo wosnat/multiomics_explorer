@@ -95,6 +95,63 @@ def {name}(
     return conn.execute_query(cypher, **params)
 ```
 
+## Template: API function (with summary/detail modes)
+
+```python
+def {name}(
+    optional_param: str | None = None,
+    mode: str = "summary",
+    verbose: bool = False,
+    limit: int | None = None,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Description.
+
+    Always returns dict with keys: total_entries, total_matching,
+    by_dimension1, by_dimension2, ..., returned, truncated, results.
+
+    When summary=True: results is empty list, truncated=True.
+    When summary=False (detail): results populated with rows.
+    Breakdowns always populated (from summary query).
+    """
+    conn = _default_conn(conn)
+    # Always run summary query for breakdowns + counts
+    sum_cypher, sum_params = build_{name}_summary(
+        optional_param=optional_param,
+    )
+    sum_result = conn.execute_query(sum_cypher, **sum_params)
+    # ... extract breakdowns, total_matching, total_entries ...
+
+    if mode == "summary":
+        return {
+            "total_entries": total_entries,
+            "total_matching": total_matching,
+            "by_dimension1": by_dimension1,  # rename item/count keys
+            "returned": 0,
+            "truncated": True,
+            "results": [],
+        }
+
+    # Detail: also run detail query with LIMIT
+    det_cypher, det_params = build_{name}(
+        optional_param=optional_param,
+        verbose=verbose,
+        limit=limit,
+    )
+    results = conn.execute_query(det_cypher, **det_params)
+    # ... post-process results ...
+
+    return {
+        "total_entries": total_entries,
+        "total_matching": total_matching,
+        "by_dimension1": by_dimension1,
+        "returned": len(results),
+        "truncated": total_matching > len(results),
+        "results": results,
+    }
+```
+
 ## Template: MCP wrapper
 
 ```python
@@ -115,15 +172,12 @@ class {Name}Result(BaseModel):
 
 class {Name}Response(BaseModel):
     total_entries: int = Field(description="Total rows in KG (unfiltered)")
-    total_matching: int = Field(description="Rows matching filters")  # only for tools with filters
+    # Include total_matching only for tools with filters. Omit for
+    # no-filter tools (e.g. list_organisms) — use total_entries instead.
+    total_matching: int = Field(description="Rows matching filters")
     returned: int = Field(description="Rows in this response")
-    truncated: bool = Field(description="True if total_matching > returned")
+    truncated: bool = Field(description="True if total_matching > returned, or summary mode")
     results: list[{Name}Result]
-
-# Envelope notes:
-# - total_matching: only include for tools with filters. Omit for
-#   no-filter tools (e.g. list_organisms) — use total_entries instead.
-# - truncated: compare against total_matching (if present) or total_entries.
 
 @mcp.tool(
     tags={"tag1", "tag2"},
@@ -182,6 +236,84 @@ returns plain `dict` — the wrapper validates and wraps into models.
     columns: [key1, key2, key3]
 ```
 
+## Template: summary builder (with apoc)
+
+For tools with summary/detail modes. Uses `apoc.coll.frequencies()`
+for per-dimension breakdowns in a single Cypher pass.
+
+```python
+def build_{name}_summary(
+    *, optional_param: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary aggregation Cypher for {name}.
+
+    RETURN keys: total_matching, by_dimension1, by_dimension2, ...
+    RETURN keys (search_text): adds score_max, score_median.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+    # ... same WHERE construction as detail builder ...
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    cypher = (
+        "MATCH (n:NodeType)\n"
+        f"{where_block}"
+        "WITH collect(n.dim1) AS d1, collect(n.dim2) AS d2\n"
+        "RETURN size(d1) AS total_matching,\n"
+        "       apoc.coll.frequencies(d1) AS by_dimension1,\n"
+        "       apoc.coll.frequencies(d2) AS by_dimension2"
+    )
+    return cypher, params
+```
+
+`apoc.coll.frequencies()` returns `[{item, count}]` — API layer renames
+`item`/`count` to domain-specific keys and sorts by count descending.
+
+For fulltext search tools, also collect scores:
+```python
+"       apoc.coll.max(scores) AS score_max,\n"
+"       apoc.coll.sort(scores)[size(scores)/2] AS score_median"
+```
+
+## Template: unified response model (with modes)
+
+For tools with summary/detail modes. Both modes return the same type.
+
+```python
+class {Name}Breakdown(BaseModel):
+    dimension_value: str = Field(description="Category value (e.g. 'coculture')")
+    experiment_count: int = Field(description="Number of items (e.g. 16)")
+
+class {Name}Response(BaseModel):
+    total_entries: int = Field(description="Total in KG (unfiltered)")
+    total_matching: int = Field(description="Matching filters")
+    returned: int = Field(description="Results returned (0 in summary mode)")
+    truncated: bool = Field(description="True if results truncated or summary mode")
+    by_dimension: list[{Name}Breakdown] = Field(description="Breakdown by dimension")
+    results: list[{Name}Result] = Field(description="Empty in summary, populated in detail")
+```
+
+Summary mode: breakdowns populated, `results: []`, `returned: 0`, `truncated: True`.
+Detail mode: breakdowns populated, results populated, `truncated` reflects limit.
+
+## Template: list-type filter parameter
+
+For exact-match filters where multiple values make sense:
+
+```python
+# Builder
+if treatment_type:
+    conditions.append("toLower(e.treatment_type) IN $treatment_types")
+    params["treatment_types"] = [t.lower() for t in treatment_type]
+
+# MCP wrapper
+treatment_type: Annotated[list[str] | None, Field(
+    description="Filter by type(s) (case-insensitive). E.g. ['coculture', 'nitrogen_stress'].",
+)] = None,
+```
+
+CONTAINS filters stay as single `str` — fuzzy match doesn't combine well.
+
 ## Common gotchas
 
 - Forgetting to add to `__init__.py` exports (both `api/` and package root)
@@ -190,6 +322,9 @@ returns plain `dict` — the wrapper validates and wraps into models.
 - Forgetting to update `CLAUDE.md` tool table
 - Every query MUST have `ORDER BY` — if no natural sort key, sort alphabetically by primary identifier. Non-deterministic results break regression tests.
 - String filters must be case-insensitive — use `toLower()` on both sides
-- Fulltext search tools must return `score` in RETURN columns and ORDER BY score DESC
+- Fulltext search tools must return `score` in RETURN columns and ORDER BY score DESC. Summary mode needs `score_max`/`score_median`.
 - Using f-strings for user input in Cypher instead of `$param` placeholders
 - Forgetting `_default_conn(conn)` call in API function
+- Summary mode `truncated` must be `True` — signals results exist but aren't shown
+- `apoc.coll.frequencies()` returns `{item, count}` — rename to domain keys in API layer
+- List-type filter params need case normalization in Python before passing to Cypher
