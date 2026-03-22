@@ -307,6 +307,16 @@
     row0:
       locus_tag: PMT9312_0342
 
+- id: resolve_gene_case_insensitive
+  tool: resolve_gene
+  desc: Case-insensitive matching works
+  params:
+    identifier: pmm0001
+  expect:
+    min_rows: 1
+    row0:
+      locus_tag: PMM0001
+
 # ── Search genes corner cases ────────────────────────────────
 
 - id: search_genes_synechococcus_filter

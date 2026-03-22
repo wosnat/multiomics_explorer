@@ -37,19 +37,21 @@ class TestGetSchemaContract:
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
 class TestResolveGeneContract:
-    def test_returns_list_of_dicts(self, conn):
+    def test_returns_dict_envelope(self, conn):
         result = api.resolve_gene(KNOWN_GENE, conn=conn)
-        assert isinstance(result, list)
-        assert len(result) >= 1
+        assert isinstance(result, dict)
+        assert "total_matching" in result
+        assert "results" in result
+        assert result["total_matching"] >= 1
 
     def test_result_keys(self, conn):
         result = api.resolve_gene(KNOWN_GENE, conn=conn)
         expected_keys = {"locus_tag", "gene_name", "product", "organism_strain"}
-        assert set(result[0].keys()) == expected_keys
+        assert set(result["results"][0].keys()) == expected_keys
 
     def test_not_found_returns_empty(self, conn):
         result = api.resolve_gene("NONEXISTENT_GENE_XYZ", conn=conn)
-        assert result == []
+        assert result == {"total_matching": 0, "results": []}
 
 
 # ---------------------------------------------------------------------------

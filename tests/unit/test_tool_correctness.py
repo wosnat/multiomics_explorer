@@ -7,7 +7,7 @@ wrapper logic (validation, error messages, LIMIT injection) with minimal mocks.
 
 import asyncio
 import json
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastmcp import FastMCP
@@ -57,120 +57,136 @@ def _conn_from(ctx):
 class TestResolveGeneCorrectness:
     """Verify resolve_gene returns correct data for realistic mock responses."""
 
+    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "locus_tag",
         [g["locus_tag"] for g in GENES],
         ids=[g["locus_tag"] for g in GENES],
     )
-    def test_single_gene_lookup_all_fixtures(self, tool_fns, mock_ctx, locus_tag):
+    async def test_single_gene_lookup_all_fixtures(self, tool_fns, mock_ctx, locus_tag):
         """Each fixture gene returns correct locus_tag, product, organism."""
         gene = GENES_BY_LOCUS[locus_tag]
         row = as_resolve_gene_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 1, "results": [row]},
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier=locus_tag)
 
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier=locus_tag))
+        assert result.total_matching == 1
+        assert len(result.results) == 1
+        r = result.results[0]
+        assert r.locus_tag == locus_tag
+        assert r.product == gene.get("product")
+        assert r.organism_strain == gene.get("organism_strain")
 
-        org = gene.get("organism_strain")
-        assert org in result["results"]
-        entries = result["results"][org]
-        assert len(entries) == 1
-        r = entries[0]
-        assert r["locus_tag"] == locus_tag
-        assert r["product"] == gene.get("product")
-
-    def test_lookup_by_gene_name_dnaN(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_lookup_by_gene_name_dnaN(self, tool_fns, mock_ctx):
         """Looking up 'dnaN' with a single mock result returns the correct gene."""
         gene = GENES_BY_LOCUS["PMM0001"]
         row = as_resolve_gene_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 1, "results": [row]},
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="dnaN")
 
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="dnaN"))
+        assert result.results[0].locus_tag == "PMM0001"
+        assert result.results[0].gene_name == "dnaN"
 
-        org = "Prochlorococcus MED4"
-        assert result["results"][org][0]["locus_tag"] == "PMM0001"
-        assert result["results"][org][0]["gene_name"] == "dnaN"
-
-    def test_dnaN_multiple_organisms_grouped(self, tool_fns, mock_ctx):
-        """dnaN exists in MED4 and MIT9312; results are grouped by organism."""
+    @pytest.mark.asyncio
+    async def test_dnaN_multiple_organisms_flat_list(self, tool_fns, mock_ctx):
+        """dnaN exists in MED4 and MIT9312; results are a flat list."""
         med4 = as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"])
         mit9312 = as_resolve_gene_result(GENES_BY_LOCUS["PMT9312_0001"])
-        _conn_from(mock_ctx).execute_query.return_value = [med4, mit9312]
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 2, "results": [med4, mit9312]},
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="dnaN")
 
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="dnaN"))
-
-        assert result["total"] == 2
-        assert "Prochlorococcus MED4" in result["results"]
-        assert "Prochlorococcus MIT9312" in result["results"]
-        loci = set()
-        for entries in result["results"].values():
-            for e in entries:
-                loci.add(e["locus_tag"])
+        assert result.total_matching == 2
+        assert result.returned == 2
+        loci = {r.locus_tag for r in result.results}
         assert loci == {"PMM0001", "PMT9312_0001"}
+        organisms = {r.organism_strain for r in result.results}
+        assert "Prochlorococcus MED4" in organisms
+        assert "Prochlorococcus MIT9312" in organisms
 
-    def test_lookup_by_identifier_refseq(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_lookup_by_identifier_refseq(self, tool_fns, mock_ctx):
         """PMM0446 can be found via RefSeq protein ID WP_011132082.1."""
         gene = GENES_BY_LOCUS["PMM0446"]
         row = as_resolve_gene_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 1, "results": [row]},
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="WP_011132082.1")
 
-        result = json.loads(
-            tool_fns["resolve_gene"](mock_ctx, identifier="WP_011132082.1")
-        )
+        r = result.results[0]
+        assert r.locus_tag == "PMM0446"
+        assert r.gene_name == "ctaCI"
+        assert r.organism_strain == gene["organism_strain"]
 
-        org = gene["organism_strain"]
-        assert result["results"][org][0]["locus_tag"] == "PMM0446"
-        assert result["results"][org][0]["gene_name"] == "ctaCI"
-
-    def test_gene_without_real_gene_name(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_gene_without_real_gene_name(self, tool_fns, mock_ctx):
         """S8102_04001 has no gene_name field — result shows None."""
         gene = GENES_BY_LOCUS["S8102_04001"]
         row = as_resolve_gene_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 1, "results": [row]},
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="S8102_04001")
 
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="S8102_04001"))
+        r = result.results[0]
+        assert r.locus_tag == "S8102_04001"
+        assert r.gene_name is None
 
-        org = gene["organism_strain"]
-        r = result["results"][org][0]
-        assert r["locus_tag"] == "S8102_04001"
-        assert r["gene_name"] is None
-
-    def test_gene_without_gene_name(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_gene_without_gene_name(self, tool_fns, mock_ctx):
         """ALT831_RS00180 has no gene_name (None)."""
         gene = GENES_BY_LOCUS["ALT831_RS00180"]
         row = as_resolve_gene_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 1, "results": [row]},
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="ALT831_RS00180")
 
-        result = json.loads(
-            tool_fns["resolve_gene"](mock_ctx, identifier="ALT831_RS00180")
-        )
+        r = result.results[0]
+        assert r.gene_name is None
 
-        org = gene["organism_strain"]
-        r = result["results"][org][0]
-        assert r["gene_name"] is None
-
-    def test_organism_filter_narrows_results(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_organism_filter_narrows_results(self, tool_fns, mock_ctx):
         """With organism='MED4', only the MED4 dnaN is returned."""
         med4 = as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"])
-        _conn_from(mock_ctx).execute_query.return_value = [med4]
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 1, "results": [med4]},
+        ):
+            result = await tool_fns["resolve_gene"](
+                mock_ctx, identifier="dnaN", organism="MED4",
+            )
 
-        result = json.loads(
-            tool_fns["resolve_gene"](mock_ctx, identifier="dnaN", organism="MED4")
-        )
+        assert result.total_matching == 1
+        assert result.results[0].organism_strain == "Prochlorococcus MED4"
 
-        assert result["total"] == 1
-        assert "Prochlorococcus MED4" in result["results"]
-
-    def test_alternate_identifier_lookup(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_alternate_identifier_lookup(self, tool_fns, mock_ctx):
         """PMM0001 all_identifiers includes TX50_RS00020 (alternate locus tag)."""
         gene = GENES_BY_LOCUS["PMM0001"]
         row = as_resolve_gene_result(gene)
-        _conn_from(mock_ctx).execute_query.return_value = [row]
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 1, "results": [row]},
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="TX50_RS00020")
 
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="TX50_RS00020"))
-
-        org = gene["organism_strain"]
-        assert result["results"][org][0]["locus_tag"] == "PMM0001"
-        assert result["results"][org][0]["gene_name"] == "dnaN"
+        r = result.results[0]
+        assert r.locus_tag == "PMM0001"
+        assert r.gene_name == "dnaN"
 
 
 # ---------------------------------------------------------------------------

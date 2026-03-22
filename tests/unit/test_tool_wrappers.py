@@ -218,56 +218,132 @@ class TestListOrganismsWrapper:
 # resolve_gene
 # ---------------------------------------------------------------------------
 class TestResolveGeneWrapper:
-    def test_not_found_message(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="FAKE_GENE"))
-        assert result["results"] == {}
-        assert "No gene found" in result["message"]
+    @pytest.mark.asyncio
+    async def test_single_match_returns_response(self, tool_fns, mock_ctx):
+        """Mock API returns single result, verify response model fields."""
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={
+                "total_matching": 1,
+                "results": [
+                    {"locus_tag": "PMM0001", "gene_name": "dnaN",
+                     "product": "DNA pol III beta",
+                     "organism_strain": "Prochlorococcus MED4"},
+                ],
+            },
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
 
-    def test_not_found_with_organism(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="FAKE", organism="MED4"))
-        assert "MED4" in result["message"]
+        assert result.total_matching == 1
+        assert result.returned == 1
+        assert result.truncated is False
+        assert len(result.results) == 1
+        r = result.results[0]
+        assert r.locus_tag == "PMM0001"
+        assert r.gene_name == "dnaN"
+        assert r.product == "DNA pol III beta"
+        assert r.organism_strain == "Prochlorococcus MED4"
 
-    def test_single_match(self, tool_fns, mock_ctx):
-        row = {"locus_tag": "PMM0001", "gene_name": "dnaN", "organism_strain": "Prochlorococcus MED4"}
-        _conn_from(mock_ctx).execute_query.return_value = [row]
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001"))
-        assert result["total"] == 1
-        assert "Prochlorococcus MED4" in result["results"]
+    @pytest.mark.asyncio
+    async def test_not_found_empty_results(self, tool_fns, mock_ctx):
+        """Mock API returns no results, verify empty response."""
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 0, "results": []},
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="FAKE_GENE")
 
-    def test_multi_match_grouped(self, tool_fns, mock_ctx):
-        rows = [
-            {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4"},
-            {"locus_tag": "PMT9312_0001", "organism_strain": "Prochlorococcus MIT9312"},
-            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102"},
-        ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="dnaN"))
-        assert result["total"] == 3
-        assert len(result["results"]) == 3  # 3 organism groups
+        assert result.total_matching == 0
+        assert result.returned == 0
+        assert result.results == []
 
-    def test_same_organism_grouped_together(self, tool_fns, mock_ctx):
-        """Multiple genes from the same organism land under one key."""
-        rows = [
-            {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "p1", "organism_strain": "Prochlorococcus MED4"},
-            {"locus_tag": "PMM0002", "gene_name": "dnaN2", "product": "p2", "organism_strain": "Prochlorococcus MED4"},
-        ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="dnaN"))
-        assert result["total"] == 2
-        assert len(result["results"]) == 1  # single organism group
-        assert len(result["results"]["Prochlorococcus MED4"]) == 2
-        # organism_strain should be stripped from individual entries
-        for entry in result["results"]["Prochlorococcus MED4"]:
-            assert "organism_strain" not in entry
+    @pytest.mark.asyncio
+    async def test_multi_match_flat_list(self, tool_fns, mock_ctx):
+        """Multiple results from different organisms are a flat list, not grouped."""
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={
+                "total_matching": 3,
+                "results": [
+                    {"locus_tag": "PMM0001", "gene_name": "dnaN",
+                     "product": "p1", "organism_strain": "Prochlorococcus MED4"},
+                    {"locus_tag": "PMT9312_0001", "gene_name": "dnaN",
+                     "product": "p2", "organism_strain": "Prochlorococcus MIT9312"},
+                    {"locus_tag": "SYNW0305", "gene_name": None,
+                     "product": "p3", "organism_strain": "Synechococcus WH8102"},
+                ],
+            },
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="dnaN")
 
-    def test_missing_organism_strain_grouped_as_unknown(self, tool_fns, mock_ctx):
-        """Row without organism_strain is grouped under 'Unknown'."""
-        rows = [{"locus_tag": "PMM0001", "gene_name": "x", "product": "y"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001"))
-        assert "Unknown" in result["results"]
+        assert result.total_matching == 3
+        assert result.returned == 3
+        assert len(result.results) == 3
+        # Flat list — each entry has organism_strain as an attribute
+        organisms = {r.organism_strain for r in result.results}
+        assert organisms == {"Prochlorococcus MED4", "Prochlorococcus MIT9312", "Synechococcus WH8102"}
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """Verify identifier, organism, limit are all passed through to API."""
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={"total_matching": 0, "results": []},
+        ) as mock_api:
+            await tool_fns["resolve_gene"](
+                mock_ctx, identifier="dnaN", organism="MED4", limit=10,
+            )
+
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.args[0] == "dnaN" or call_kwargs.kwargs.get("identifier") == "dnaN"
+        assert call_kwargs.kwargs["organism"] == "MED4"
+        assert call_kwargs.kwargs["limit"] == 10
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """When total_matching > returned, truncated=True."""
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={
+                "total_matching": 5,
+                "results": [
+                    {"locus_tag": "PMM0001", "gene_name": "a",
+                     "product": "p1", "organism_strain": "Org1"},
+                    {"locus_tag": "PMM0002", "gene_name": "b",
+                     "product": "p2", "organism_strain": "Org2"},
+                ],
+            },
+        ):
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="dnaN")
+
+        assert result.total_matching == 5
+        assert result.returned == 2
+        assert result.truncated is True
+
+    @pytest.mark.asyncio
+    async def test_empty_identifier_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            side_effect=ValueError("identifier must not be empty."),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["resolve_gene"](mock_ctx, identifier="")
+
+    @pytest.mark.asyncio
+    async def test_generic_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """RuntimeError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            side_effect=RuntimeError("timeout"),
+        ):
+            with pytest.raises(ToolError, match="Error in resolve_gene"):
+                await tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
 
 
 
@@ -1134,21 +1210,25 @@ class TestErrorHandling:
             with pytest.raises(ToolError, match="Error in list_organisms"):
                 await tool_fns["list_organisms"](mock_ctx)
 
-    def test_resolve_gene_value_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_resolve_gene_value_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
             side_effect=ValueError("identifier must not be empty."),
         ):
-            result = tool_fns["resolve_gene"](mock_ctx, identifier="")
-        assert result == "Error: identifier must not be empty."
+            with pytest.raises(ToolError):
+                await tool_fns["resolve_gene"](mock_ctx, identifier="")
 
-    def test_resolve_gene_generic_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_resolve_gene_generic_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
             side_effect=RuntimeError("timeout"),
         ):
-            result = tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
-        assert "Error in resolve_gene" in result
+            with pytest.raises(ToolError, match="Error in resolve_gene"):
+                await tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
 
     def test_search_genes_value_error(self, tool_fns, mock_ctx):
         with patch(

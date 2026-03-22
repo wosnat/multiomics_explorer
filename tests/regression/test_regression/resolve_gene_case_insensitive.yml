@@ -1,0 +1,7 @@
+case_id: resolve_gene_case_insensitive
+row_count: 1
+rows:
+- gene_name: dnaN
+  locus_tag: PMM0001
+  organism_strain: Prochlorococcus MED4
+  product: DNA polymerase III, beta subunit

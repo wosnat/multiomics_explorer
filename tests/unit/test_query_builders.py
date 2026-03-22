@@ -59,11 +59,18 @@ class TestBuildResolveGene:
     def test_matches_all_identifiers(self):
         """Query checks all_identifiers list for alternate IDs (old locus tags, RefSeq IDs)."""
         cypher, _ = build_resolve_gene(identifier="x")
-        assert "$identifier IN g.all_identifiers" in cypher
+        assert "ANY(id IN g.all_identifiers WHERE toLower(id) = toLower($identifier))" in cypher
 
-    def test_order_by_locus_tag(self):
+    def test_order_by_organism_then_locus_tag(self):
         cypher, _ = build_resolve_gene(identifier="x")
-        assert "ORDER BY g.locus_tag" in cypher
+        assert "ORDER BY g.organism_strain, g.locus_tag" in cypher
+
+    def test_identifier_uses_tolower(self):
+        """All three identifier match conditions use toLower for case-insensitive matching."""
+        cypher, _ = build_resolve_gene(identifier="PMM0001")
+        assert "toLower(g.locus_tag) = toLower($identifier)" in cypher
+        assert "toLower(g.gene_name) = toLower($identifier)" in cypher
+        assert "ANY(id IN g.all_identifiers WHERE toLower(id) = toLower($identifier))" in cypher
 
 
 class TestBuildSearchGenes:

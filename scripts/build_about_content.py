@@ -165,9 +165,17 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         type_escaped = p['type'].replace('|', '\\|')
         lines.append(f"| {p['name']} | {type_escaped} | {p['default']} | {p['description']} |")
     lines.append("")
-    if tool_name != "list_organisms":
-        lines.append("**Discovery:** use `list_filter_values` for valid treatment types,")
-        lines.append("`list_organisms` for valid organism names.")
+    # Discovery hints — only for tools with relevant filter params
+    param_names = {p["name"] for p in params}
+    has_organism = "organism" in param_names
+    has_category = "category" in param_names or "treatment_type" in param_names
+    if has_organism or has_category:
+        hints = []
+        if has_category:
+            hints.append("`list_filter_values` for valid filter values")
+        if has_organism:
+            hints.append("`list_organisms` for valid organism names")
+        lines.append(f"**Discovery:** use {', '.join(hints)}.")
         lines.append("")
 
     # Response format (auto-generated)
@@ -293,7 +301,15 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
     lines.append("```python")
     lines.append(f"from multiomics_explorer import {tool_name}")
     lines.append("")
-    lines.append(f'result = {tool_name}()')
+    # Build example call with required params
+    required_params = [p for p in params if p["default"] == "—"]
+    if required_params:
+        example_args = ", ".join(
+            f'{p["name"]}=...' for p in required_params
+        )
+        lines.append(f'result = {tool_name}({example_args})')
+    else:
+        lines.append(f'result = {tool_name}()')
     # API returns a subset of the MCP envelope (no returned/truncated wrapper)
     api_keys = [f["name"] for f in envelope if f["name"] not in ("returned", "truncated")]
     api_keys.append("results")

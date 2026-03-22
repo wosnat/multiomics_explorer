@@ -19,8 +19,7 @@ specific experiments with list_experiments or genes with search_genes.
 | verbose | bool | False | Include abstract and description. Default compact for routing. |
 | limit | int | 50 | Max results. |
 
-**Discovery:** use `list_filter_values` for valid treatment types,
-`list_organisms` for valid organism names.
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
 ## Response format
 

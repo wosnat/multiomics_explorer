@@ -1,0 +1,52 @@
+# Human-authored content for resolve_gene about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Resolve by locus_tag
+    call: resolve_gene(identifier="PMM0001")
+    response: |
+      {
+        "total_matching": 1,
+        "returned": 1,
+        "truncated": false,
+        "results": [
+          {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MED4"}
+        ]
+      }
+
+  - title: Resolve gene name across organisms
+    call: resolve_gene(identifier="dnaN")
+    response: |
+      {
+        "total_matching": 15,
+        "returned": 15,
+        "truncated": false,
+        "results": [
+          {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MED4"},
+          {"locus_tag": "PMT9312_0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MIT9312"},
+          ...
+        ]
+      }
+
+  - title: Scoped to one organism
+    call: resolve_gene(identifier="dnaN", organism="MED4")
+
+  - title: Chain to gene overview
+    steps: |
+      Step 1: resolve_gene(identifier="psbA")
+              → collect locus_tags from results
+
+      Step 2: gene_overview(gene_ids=["PMM1070", "PMT9312_1073", ...])
+              → compare function and data availability across organisms
+
+chaining:
+  - "resolve_gene → gene_overview → get_homologs"
+  - "resolve_gene → get_gene_details"
+  - "resolve_gene → gene_ontology_terms"
+
+mistakes:
+  - "Case-insensitive matching: 'pmm0001', 'PMM0001', and 'Pmm0001' all work"
+  - "The organism filter uses partial matching — 'MED4' and 'Prochlorococcus MED4' both work"
+  - wrong: "search_genes(search_text='PMM0001')  # wrong tool for ID lookup"
+    right: "resolve_gene(identifier='PMM0001')  # exact identity resolution"

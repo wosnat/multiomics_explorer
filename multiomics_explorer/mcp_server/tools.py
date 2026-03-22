@@ -151,41 +151,64 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"list_organisms unexpected error: {e}")
             raise ToolError(f"Error in list_organisms: {e}")
 
-    @mcp.tool()
-    def resolve_gene(
-        ctx: Context,
-        identifier: str,
-        organism: str | None = None,
-    ) -> str:
-        """Resolve a gene identifier to matching graph nodes. Returns locus_tags grouped by
-        organism. Use the returned locus_tag with get_gene_details, get_homologs, or
-        other tools.
+    class GeneMatch(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
+        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
+        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III, beta subunit')")
+        organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
 
-        Args:
-            identifier: Gene identifier — locus_tag (e.g. "PMM0001"), gene name (e.g. "dnaN"),
-                old locus tag, or RefSeq protein ID.
-            organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
+    class ResolveGeneResponse(BaseModel):
+        total_matching: int = Field(description="Total genes matching identifier + organism filter (e.g. 3)")
+        returned: int = Field(description="Genes in this response (e.g. 3)")
+        truncated: bool = Field(description="True if total_matching > returned")
+        results: list[GeneMatch] = Field(description="Matching genes sorted by organism_strain, locus_tag")
+
+    @mcp.tool(
+        tags={"genes", "discovery"},
+        annotations={"readOnlyHint": True},
+    )
+    async def resolve_gene(
+        ctx: Context,
+        identifier: Annotated[str, Field(
+            description="Gene identifier (case-insensitive) — locus_tag "
+            "(e.g. 'PMM0001'), gene name (e.g. 'dnaN'), old locus tag, "
+            "or RefSeq protein ID.",
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter by organism (case-insensitive partial match). "
+            "E.g. 'MED4', 'Prochlorococcus MED4'.",
+        )] = None,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 50,
+    ) -> ResolveGeneResponse:
+        """Resolve a gene identifier to matching genes in the knowledge graph.
+
+        Matching is case-insensitive — 'pmm0001', 'PMM0001', and 'Pmm0001'
+        all work. Use the returned locus_tags with gene_overview,
+        get_gene_details, get_homologs, or gene_ontology_terms. The organism
+        filter uses case-insensitive partial matching — 'MED4' and
+        'Prochlorococcus MED4' both work.
         """
-        logger.info("resolve_gene identifier=%s organism=%s", identifier, organism)
+        await ctx.info(f"resolve_gene identifier={identifier} organism={organism}")
         try:
             conn = _conn(ctx)
-            results = api.resolve_gene(identifier, organism=organism, conn=conn)
-            if not results:
-                msg = f"No gene found for identifier '{identifier}'"
-                if organism:
-                    msg += f" in {organism}"
-                return json.dumps({"results": {}, "message": msg})
-            grouped = _group_by_organism(results)
-            return json.dumps(
-                {"results": grouped, "total": len(results)},
-                indent=2, default=str,
+            result = api.resolve_gene(
+                identifier, organism=organism, limit=limit, conn=conn,
+            )
+            genes = [GeneMatch(**r) for r in result["results"]]
+            return ResolveGeneResponse(
+                total_matching=result["total_matching"],
+                returned=len(genes),
+                truncated=result["total_matching"] > len(genes),
+                results=genes,
             )
         except ValueError as e:
-            logger.warning("resolve_gene error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"resolve_gene error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("resolve_gene unexpected error: %s", e)
-            return f"Error in resolve_gene: {e}"
+            await ctx.error(f"resolve_gene unexpected error: {e}")
+            raise ToolError(f"Error in resolve_gene: {e}")
 
     @mcp.tool()
     def search_genes(

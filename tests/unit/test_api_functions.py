@@ -84,21 +84,24 @@ class TestGetSchema:
 # resolve_gene
 # ---------------------------------------------------------------------------
 class TestResolveGene:
-    def test_returns_list(self, mock_conn):
+    def test_returns_dict_with_total_and_results(self, mock_conn):
         mock_conn.execute_query.return_value = [
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
              "product": "DNA polymerase III subunit beta",
              "organism_strain": "Prochlorococcus marinus MED4"},
         ]
         result = api.resolve_gene("PMM0001", conn=mock_conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert result[0]["locus_tag"] == "PMM0001"
+        assert isinstance(result, dict)
+        assert "total_matching" in result
+        assert "results" in result
+        assert result["total_matching"] == 1
+        assert len(result["results"]) == 1
+        assert result["results"][0]["locus_tag"] == "PMM0001"
 
     def test_empty_results(self, mock_conn):
         mock_conn.execute_query.return_value = []
         result = api.resolve_gene("FAKE0001", conn=mock_conn)
-        assert result == []
+        assert result == {"total_matching": 0, "results": []}
 
     def test_empty_identifier_raises(self, mock_conn):
         with pytest.raises(ValueError, match="identifier must not be empty"):
@@ -113,6 +116,26 @@ class TestResolveGene:
         api.resolve_gene("dnaN", organism="MED4", conn=mock_conn)
         _, kwargs = mock_conn.execute_query.call_args
         assert kwargs["organism"] == "MED4"
+
+    def test_limit_slices_results(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"locus_tag": f"PMM000{i}", "gene_name": "g",
+             "product": "p", "organism_strain": "MED4"}
+            for i in range(3)
+        ]
+        result = api.resolve_gene("PMM", limit=2, conn=mock_conn)
+        assert result["total_matching"] == 3
+        assert len(result["results"]) == 2
+
+    def test_total_matching_reflects_full_count(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"locus_tag": f"PMM000{i}", "gene_name": "g",
+             "product": "p", "organism_strain": "MED4"}
+            for i in range(5)
+        ]
+        result = api.resolve_gene("PMM", limit=2, conn=mock_conn)
+        assert result["total_matching"] == 5
+        assert len(result["results"]) == 2
 
 
 # ---------------------------------------------------------------------------

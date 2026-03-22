@@ -24,8 +24,7 @@ gene-level results.
 | verbose | bool | False | Detail mode only. Include experiment name, publication title, treatment/control descriptions, and experimental conditions (light, medium, temperature, statistical test, context). |
 | limit | int | 50 | Detail mode only. Max results. |
 
-**Discovery:** use `list_filter_values` for valid treatment types,
-`list_organisms` for valid organism names.
+**Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
 ## Response format
 

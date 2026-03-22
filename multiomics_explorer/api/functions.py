@@ -78,20 +78,24 @@ def get_schema(
 def resolve_gene(
     identifier: str,
     organism: str | None = None,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
+) -> dict:
     """Resolve a gene identifier to matching graph nodes.
 
-    Returns list of dicts with keys: locus_tag, gene_name, product,
-    organism_strain.
+    Returns dict with keys: total_matching, results.
+    Per result: locus_tag, gene_name, product, organism_strain.
     """
     if not identifier or not identifier.strip():
         logger.debug("resolve_gene: empty identifier")
         raise ValueError("identifier must not be empty.")
     conn = _default_conn(conn)
     cypher, params = build_resolve_gene(identifier=identifier, organism=organism)
-    return conn.execute_query(cypher, **params)
+    all_results = conn.execute_query(cypher, **params)
+    total = len(all_results)
+    results = all_results[:limit] if limit else all_results
+    return {"total_matching": total, "results": results}
 
 
 def search_genes(

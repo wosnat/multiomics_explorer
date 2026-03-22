@@ -80,14 +80,14 @@ def build_resolve_gene(
     cypher = (
         "MATCH (g:Gene)\n"
         "WHERE (\n"
-        "    g.locus_tag = $identifier\n"
-        "    OR g.gene_name = $identifier\n"
-        "    OR $identifier IN g.all_identifiers\n"
+        "    toLower(g.locus_tag) = toLower($identifier)\n"
+        "    OR toLower(g.gene_name) = toLower($identifier)\n"
+        "    OR ANY(id IN g.all_identifiers WHERE toLower(id) = toLower($identifier))\n"
         "  )\n"
         "  AND ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word))\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.organism_strain AS organism_strain\n"
-        "ORDER BY g.locus_tag"
+        "ORDER BY g.organism_strain, g.locus_tag"
     )
     return cypher, {"identifier": identifier, "organism": organism}
 
