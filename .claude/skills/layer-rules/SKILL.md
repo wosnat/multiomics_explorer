@@ -34,10 +34,15 @@ Re-exported from `multiomics_explorer/__init__.py`.
 Wraps api/ only. `@mcp.tool(tags={...}, annotations={"readOnlyHint": True})`
 inside `register_tools(mcp)`. First param `ctx: Context`.
 Use `Annotated[type, Field(description=...)]` for param descriptions.
-Use `ToolError` for errors (not error strings). Logs every call.
+Use `ToolError` for errors (not error strings).
+`async def` tools with `await ctx.info/warning/error()` for
+MCP client-visible logging.
+Define Pydantic `BaseModel` response models — FastMCP auto-generates
+`outputSchema`. API layer stays plain dicts; models at MCP boundary only.
 
-## Layer 4: Skills
+## Layer 4: Skills (MCP resources)
 
-About-mode content in `skills/multiomics-kg-guide/references/tools/{tool-name}.md`.
+Per-tool about content in `skills/multiomics-kg-guide/references/tools/{tool-name}.md`.
+Served via MCP resource at URI `docs://tools/{tool-name}` (not a tool mode parameter).
 Uses `example-call`, `expected-keys` tagged blocks for testable examples.
 Update when tool behavior changes. Sync via `scripts/sync_skills.sh`.

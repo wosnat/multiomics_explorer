@@ -489,3 +489,80 @@ class TestRunCypher:
         mock_conn.execute_query.return_value = []
         result = api.run_cypher("MATCH (n) RETURN n LIMIT 10", conn=mock_conn)
         assert result == []
+
+
+# ---------------------------------------------------------------------------
+# list_publications
+# ---------------------------------------------------------------------------
+class TestListPublications:
+    def test_returns_dict(self, mock_conn):
+        """Runs summary + data queries, returns dict with total_entries/total_matching/results."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21, "total_matching": 21}],  # summary query
+            [{"doi": "10.1234/test", "title": "Test"}],      # data query
+        ]
+        result = api.list_publications(conn=mock_conn)
+        assert isinstance(result, dict)
+        assert result["total_entries"] == 21
+        assert result["total_matching"] == 21
+        assert len(result["results"]) == 1
+        assert mock_conn.execute_query.call_count == 2
+
+    def test_passes_params(self, mock_conn):
+        """All filter params are forwarded to builders."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21, "total_matching": 5}],
+            [{"doi": "10.1234/test"}],
+        ]
+        result = api.list_publications(
+            organism="MED4", treatment_type="coculture",
+            search_text="nitrogen", author="Sher",
+            verbose=True, limit=10, conn=mock_conn,
+        )
+        # Verify summary query was called with filter params
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        assert "$search_text" in summary_call[0][0]
+        assert "organism" in summary_call[1]  # kwargs contain param keys
+        # Verify data query was called with verbose + limit
+        data_call = mock_conn.execute_query.call_args_list[1]
+        assert "abstract" in data_call[0][0]  # verbose columns in Cypher
+        assert "LIMIT $limit" in data_call[0][0]
+
+    def test_creates_conn_when_none(self):
+        """Default conn used when None."""
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                [{"total_entries": 0, "total_matching": 0}],
+                [],
+            ]
+            result = api.list_publications()
+        MockConn.assert_called_once()
+        assert result["total_matching"] == 0
+
+    def test_lucene_escape_retry(self, mock_conn):
+        """Neo4jClientError with search_text triggers escaped retry."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = [
+            Neo4jClientError("Lucene parse error"),
+            # Retry calls:
+            [{"total_entries": 21, "total_matching": 1}],
+            [{"doi": "10.1234/test"}],
+        ]
+        result = api.list_publications(search_text="DNA [repair", conn=mock_conn)
+        assert result["total_matching"] == 1
+        assert mock_conn.execute_query.call_count == 3  # 1 failed + 2 retry
+
+    def test_lucene_error_without_search_text_raises(self, mock_conn):
+        """Neo4jClientError without search_text is not caught."""
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        mock_conn.execute_query.side_effect = Neo4jClientError("Some error")
+        with pytest.raises(Neo4jClientError):
+            api.list_publications(conn=mock_conn)
+
+    def test_importable_from_package(self):
+        """from multiomics_explorer import list_publications works."""
+        from multiomics_explorer import list_publications
+        assert list_publications is api.list_publications

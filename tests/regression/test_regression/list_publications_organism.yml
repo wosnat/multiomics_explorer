@@ -1,0 +1,220 @@
+case_id: list_publications_organism
+row_count: 11
+rows:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  doi: 10.1101/2025.11.24.690089
+  experiment_count: 10
+  journal: bioRxiv
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii HOT1A3
+  - Prochlorococcus MED4
+  study_type: Transcriptomics and Proteomics (multi-omics)
+  title: Transcriptomic and Proteomic Analysis Reveals Nitrogen Recycling as a Core
+    Mechanism for Prochlorococcus Prolonged Survival
+  treatment_types:
+  - coculture
+  - nitrogen_stress
+  year: 2025
+- authors:
+  - Huan Liu
+  - Junde Dong
+  - Lijuan Long
+  - Sijun Huang
+  - Xiayu He
+  doi: 10.3389/fmicb.2022.1038136
+  experiment_count: 2
+  journal: Frontiers in Microbiology
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus NATL1A
+  study_type: RNA-seq / Transcriptomics
+  title: Acclimation and stress response of Prochlorococcus to low salinity.
+  treatment_types:
+  - salt_stress
+  year: 2022
+- authors:
+  - Andres Cubillos-Ruiz
+  - Iva Neveux
+  - Joseph J Grzymski
+  - Paul M Berube
+  - Robert W Read
+  - Sallie W Chisholm
+  - Steven J Biller
+  doi: 10.1038/ismej.2017.88
+  experiment_count: 1
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Transcriptomics (transcription start site mapping)
+  title: Nitrogen cost minimization is promoted by structural changes in the transcriptome
+    of N-deprived Prochlorococcus cells
+  treatment_types:
+  - nitrogen_stress
+  year: 2017
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  doi: 10.1371/journal.pone.0165375
+  experiment_count: 4
+  journal: PLOS ONE
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Phage
+  - Prochlorococcus MED4
+  study_type: Transcriptomics (RNA-seq)
+  title: Gene Expression Patterns during Light and Dark Infection of Prochlorococcus
+    by Cyanophage
+  treatment_types:
+  - light_stress
+  - viral
+  year: 2016
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  doi: 10.1038/ismej.2016.70
+  experiment_count: 5
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii HOT1A3
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: RNA-seq
+  title: 'Transcriptional response of Prochlorococcus to co-culture with a marine
+    Alteromonas: differences between strains and the involvement of putative infochemicals'
+  treatment_types:
+  - coculture
+  year: 2016
+- authors:
+  - Sallie W Chisholm
+  - Sarah C Bagby
+  doi: 10.1038/ismej.2015.36
+  experiment_count: 4
+  journal: ISME Journal
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Transcriptomics
+  title: Response of Prochlorococcus to varying CO2:O2 ratios
+  treatment_types:
+  - carbon_stress
+  year: 2015
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  doi: 10.1038/ismej.2011.49
+  experiment_count: 5
+  journal: The ISME Journal
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Transcriptomics (microarray)
+  title: Transcriptome response of high- and low-light-adapted Prochlorococcus strains
+    to changing iron availability
+  treatment_types:
+  - iron_stress
+  year: 2011
+- authors:
+  - Debbie Lindell
+  - George M. Church
+  - Gregory Kettler
+  - Ilka M. Axmann
+  - Jacob D. Jaffe
+  - Matthew B. Sullivan
+  - Matthias E. Futschik
+  - Maureen L. Coleman
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  - Wolfgang R. Hess
+  doi: 10.1038/nature06130
+  experiment_count: 1
+  journal: Nature
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Phage
+  - Prochlorococcus MED4
+  study_type: Transcriptomics
+  title: Genome-wide expression dynamics of a marine virus and host reveal features
+    of co-evolution
+  treatment_types:
+  - viral
+  year: 2007
+- authors:
+  - Claudia Steglich
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  doi: 10.1128/JB.01097-06
+  experiment_count: 6
+  journal: Journal of Bacteriology
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Microarray (transcriptomics)
+  title: Genome-Wide Analysis of Light Sensing in Prochlorococcus/H17188
+  treatment_types:
+  - light_stress
+  year: 2006
+- authors:
+  - Andrew C Tolonen
+  - Debbie Lindell
+  - George M Church
+  - John Aach
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  - Zackary I Johnson
+  doi: 10.1038/msb4100087
+  experiment_count: 6
+  journal: Molecular Systems Biology
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Transcriptomics (microarray)
+  title: Global gene expression of Prochlorococcus ecotypes in response to changes
+    in nitrogen availability
+  treatment_types:
+  - nitrogen_stress
+  year: 2006
+- authors:
+  - Adam C. Martiny
+  - Maureen L. Coleman
+  - Sallie W. Chisholm
+  doi: 10.1073/pnas.0601301103
+  experiment_count: 2
+  journal: PNAS
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Microarray
+  title: 'Phosphate acquisition genes in Prochlorococcus ecotypes: Evidence for genome-wide
+    adaptation'
+  treatment_types:
+  - phosphorus_stress
+  year: 2006

@@ -5,10 +5,10 @@ error messages, LIMIT injection) by mocking the Neo4j connection.
 """
 
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from neo4j.exceptions import ClientError as Neo4jClientError
 
 from multiomics_explorer.mcp_server.tools import register_tools
@@ -17,16 +17,27 @@ from multiomics_explorer.mcp_server.tools import register_tools
 @pytest.fixture(scope="module")
 def tool_fns():
     """Register tools on a fresh FastMCP and return a dict of {name: fn}."""
+    import asyncio
     mcp = FastMCP("test")
     register_tools(mcp)
-    return {name: t.fn for name, t in mcp._tool_manager._tools.items()}
+    tools = asyncio.run(mcp.list_tools())
+    return {t.name: asyncio.run(mcp.get_tool(t.name)).fn for t in tools}
 
 
 @pytest.fixture()
 def mock_ctx():
-    """MCP Context mock whose .conn returns a MagicMock GraphConnection."""
+    """MCP Context mock whose .conn returns a MagicMock GraphConnection.
+
+    Also mocks async logging methods (info, warning, error, debug)
+    for async tools.
+    """
     ctx = MagicMock()
     ctx.request_context.lifespan_context.conn = MagicMock()
+    # Mock async context logging methods
+    ctx.info = AsyncMock()
+    ctx.warning = AsyncMock()
+    ctx.error = AsyncMock()
+    ctx.debug = AsyncMock()
     return ctx
 
 
@@ -39,6 +50,7 @@ EXPECTED_TOOLS = [
     "search_genes", "gene_overview", "get_gene_details",
     "get_homologs", "run_cypher",
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
+    "list_publications",
 ]
 
 
@@ -1176,3 +1188,105 @@ class TestErrorHandling:
                 mock_ctx, gene_id="PMM0001", ontology="go_bp",
             )
         assert "Error in gene_ontology_terms" in result
+
+
+# ---------------------------------------------------------------------------
+# list_publications
+# ---------------------------------------------------------------------------
+class TestListPublicationsWrapper:
+    _SAMPLE_PUB = {
+        "doi": "10.1234/a", "title": "Paper A",
+        "authors": ["Author One"], "year": 2025,
+        "journal": "J Test", "study_type": "RNA-seq",
+        "organisms": ["Prochlorococcus MED4"],
+        "experiment_count": 3, "treatment_types": ["coculture"],
+        "omics_types": ["RNASEQ"],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_dict_envelope(self, tool_fns, mock_ctx):
+        """Response has total_entries, total_matching, returned, truncated, results."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 21,
+                "total_matching": 21,
+                "results": [self._SAMPLE_PUB],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        assert result.total_entries == 21
+        assert result.total_matching == 21
+        assert result.returned == 1
+        assert result.truncated is True  # 21 > 1
+        assert len(result.results) == 1
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        """Empty results return envelope with returned=0."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 21,
+                "total_matching": 0,
+                "results": [],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        assert result.returned == 0
+        assert result.truncated is False
+        assert result.results == []
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """All params passed through to api."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={"total_entries": 0, "total_matching": 0, "results": []},
+        ) as mock_api:
+            await tool_fns["list_publications"](
+                mock_ctx,
+                organism="MED4",
+                treatment_type="coculture",
+                search_text="nitrogen",
+                author="Sher",
+                verbose=True,
+                limit=10,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.kwargs["organism"] == "MED4"
+        assert call_kwargs.kwargs["treatment_type"] == "coculture"
+        assert call_kwargs.kwargs["search_text"] == "nitrogen"
+        assert call_kwargs.kwargs["author"] == "Sher"
+        assert call_kwargs.kwargs["verbose"] is True
+        assert call_kwargs.kwargs["limit"] == 10
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """returned == len(results), truncated == (total_matching > returned)."""
+        pubs = [{**self._SAMPLE_PUB, "doi": f"10.1234/{i}"} for i in range(8)]
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 50,
+                "total_matching": 8,
+                "results": pubs,
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        assert result.returned == 8
+        assert result.returned == len(result.results)
+        assert result.truncated is False  # 8 == 8
+        assert result.total_entries == 50
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from api raises ToolError."""
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            side_effect=ValueError("bad param"),
+        ):
+            with pytest.raises(ToolError, match="bad param"):
+                await tool_fns["list_publications"](mock_ctx)

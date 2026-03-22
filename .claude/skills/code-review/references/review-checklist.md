@@ -35,30 +35,40 @@
 - [ ] `@mcp.tool()` inside `register_tools(mcp)`?
 - [ ] `ctx: Context` as first parameter?
 - [ ] Calls `api/` functions (not `queries_lib` directly)?
-- [ ] Catches `ValueError` → `f"Error: {e}"`?
-- [ ] Catches `Exception` → `f"Error in {tool_name}: {e}"`?
-- [ ] Never raises exceptions to caller?
-- [ ] `logger.info()` at entry with key params?
-- [ ] `logger.warning()` on errors?
-- [ ] Limit capped with `min(limit, MAX)`?
-- [ ] LLM-facing docstring with `Args:` section?
+- [ ] Catches `ValueError` → `raise ToolError(str(e))`?
+- [ ] Catches `Exception` → `raise ToolError(f"Error in {tool_name}: {e}")`?
+- [ ] Uses `ToolError` for errors (not error strings)?
+- [ ] `async def` tool function?
+- [ ] `await ctx.info()` at entry with key params?
+- [ ] `await ctx.warning()` on ValueError, `await ctx.error()` on Exception?
+- [ ] Uses `Annotated[type, Field(description=...)]` for all params?
+- [ ] Uses `Field(ge=..., le=...)` for numeric constraints?
+- [ ] `tags` and `annotations={"readOnlyHint": True}` set?
+- [ ] Docstring is tool-level purpose (no `Args:` — descriptions in Field)?
+- [ ] Docstring documents return envelope fields?
 - [ ] Docstring mentions related tools for chaining?
-- [ ] Empty results handled with informative message?
+- [ ] Pydantic response models defined (`{Name}Result` + `{Name}Response`)?
+- [ ] `{Name}Result` fields have `Field(description=...)` on non-obvious fields?
+- [ ] Return type annotation is the response model (→ auto outputSchema)?
+- [ ] Returns model instances (not dicts)?
+- [ ] Empty results return model with `results=[]` (not ToolError)?
 
-## Layer 4: Skills
+## Layer 4: Skills (MCP resources)
 
-- [ ] About-mode content exists/updated at `skills/.../tools/{name}.md`?
+- [ ] Input YAML exists at `inputs/tools/{name}.yaml`?
+- [ ] About content built via `scripts/build_about_content.py {name}`?
 - [ ] Content includes `example-call` and `expected-keys` tagged blocks?
 - [ ] `expected-keys` match actual tool return fields?
 - [ ] Chaining patterns documented?
 - [ ] Common mistakes section if applicable?
-- [ ] Pipeline skills updated if they reference this tool?
+- [ ] `pytest tests/unit/test_about_content.py` passes (consistency)?
+- [ ] `pytest tests/integration/test_about_examples.py` passes (examples execute)?
 
 ## Cross-layer consistency
 
 - [ ] Parameter names match across all 3 code layers?
 - [ ] Return field names match between Cypher RETURN, API docstring,
-      and about-mode `expected-keys`?
+      and about content `expected-keys`?
 - [ ] MCP tool name matches API function name?
 - [ ] Builder name follows `build_{api_function_name}` pattern?
 - [ ] Default values consistent across layers?

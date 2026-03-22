@@ -23,7 +23,7 @@ Given an implementation plan (in `docs/tool-specs/`), apply changes to tool wrap
 - Add new `@mcp.tool()` functions inside `register_tools(mcp)`
 - Rename tool functions
 - Update calls to `api.*` functions (new names, new params)
-- Add summary/detail/about mode dispatch
+- Add summary/detail mode dispatch (about content served via MCP resource, not a mode)
 - Change response formatting (grouping, truncation metadata)
 - Update/rewrite LLM-facing docstrings with `Args:` sections
 - Add `limit` capping with `min(limit, MAX)`

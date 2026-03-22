@@ -47,7 +47,7 @@ Not all tools need the same controls. Choose based on result set size:
 | Result size | Controls | Examples |
 |---|---|---|
 | Always small (<30 rows) | No modes needed. Consider `verbose` if some columns are heavy text (abstract, description). | `list_organisms`, `list_publications` |
-| Frequently large (100+ rows) | summary + detail + about modes, `limit` | `query_expression`, `search_genes`, `genes_by_ontology` |
+| Frequently large (100+ rows) | summary + detail modes, `limit` | `query_expression`, `search_genes`, `genes_by_ontology` |
 
 **`verbose`** (bool, default False): Controls per-row column width.
 Omits heavy text fields (abstract, description) by default. The builder
@@ -56,9 +56,12 @@ adds/removes RETURN columns based on this flag. Orthogonal to modes —
 
 **`limit`** (int): Only needed for tools with potentially large result sets.
 
-**summary/detail/about modes**: Only for large-result-set tools.
-Summary returns aggregations, detail returns individual rows, about
-returns usage guidance.
+**summary/detail modes**: Only for large-result-set tools.
+Summary returns aggregations, detail returns individual rows.
+
+**About content**: Served via MCP resource `docs://tools/{tool_name}`,
+not as a tool mode parameter. Markdown files live at
+`multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`.
 
 ### Step 2: KG exploration + iteration
 
@@ -125,16 +128,39 @@ doc-updater in parallel → code-reviewer last.
   (e.g. treatment_type) — those use `list_filter_values` for discovery.
 - Use `Field(ge=..., le=...)` for numeric constraints (e.g. limit)
 - Use `ToolError` for errors instead of returning error strings
-- Docstring is tool-level purpose only (when to use, what it returns)
-- Mode dispatch if tool has summary/detail/about modes
+- `async def` — tools are async. Use `await ctx.info()`, `await ctx.warning()`,
+  `await ctx.error()` for MCP client-visible logging (replaces `logger.info/warning`)
+- Define Pydantic `BaseModel` classes for response: `{Name}Result` (per-row)
+  and `{Name}Response` (envelope with total_entries/total_matching/returned/truncated/results).
+  Return type annotation → FastMCP auto-generates `outputSchema`.
+- Docstring is tool-level purpose only (when to use, what it returns) —
+  return schema is in the Pydantic models, not the docstring
+- Mode dispatch if tool has summary/detail modes
 - → **Gate:** `pytest tests/unit/test_tool_wrappers.py::Test{Name}Wrapper -v`
 
-### Layer 4: About content
+### Layer 4: About content (MCP resource)
 
-- Write or update per-tool about content in
-  `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`
-  using [template](assets/about-content-template.md)
-- Include `example-call` and `expected-keys` tagged blocks
+About content is auto-generated from Pydantic models + human-authored
+input YAML, then served via MCP resource at `docs://tools/{name}`.
+
+1. Create input YAML (or generate skeleton):
+   ```bash
+   uv run python scripts/build_about_content.py --skeleton {name}
+   ```
+   Edit `multiomics_explorer/inputs/tools/{name}.yaml` — add examples,
+   chaining patterns, common mistakes.
+
+2. Build the about markdown:
+   ```bash
+   uv run python scripts/build_about_content.py {name}
+   ```
+   Outputs to `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`.
+   Params table, response format, expected-keys are auto-generated from
+   Pydantic models. Examples and chaining come from the input YAML.
+
+3. Verify:
+   - → **Gate:** `pytest tests/unit/test_about_content.py -v` (consistency)
+   - → **Gate:** `pytest tests/integration/test_about_examples.py -v` (examples execute against KG)
 
 ### Unit tests (all three layers)
 

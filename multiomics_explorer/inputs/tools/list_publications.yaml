@@ -1,0 +1,38 @@
+# Human-authored content for list_publications about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Browse all studies
+    call: list_publications()
+    response: |
+      {
+        "total_entries": 21,
+        "total_matching": 21,
+        "returned": 21,
+        "truncated": false,
+        "results": [
+          {"doi": "10.1101/2025.11.24.690089", "title": "Transcriptomic and Proteomic...", "year": 2025, "experiment_count": 10, ...},
+          {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "experiment_count": 5, ...}
+        ]
+      }
+
+  - title: Find coculture studies
+    call: list_publications(treatment_type="coculture")
+
+  - title: Chaining to experiments
+    steps: |
+      Step 1: list_publications(organism="MED4")
+              → find papers studying MED4
+
+      Step 2: list_experiments(doi=result["doi"])
+              → drill into experiments from a specific paper
+
+      Step 3: search_genes(search_text="photosystem", organism="MED4")
+              → find genes of interest
+
+chaining:
+  - "list_publications → list_experiments → query_expression"
+  - "list_publications → search_genes"
+
+mistakes: []

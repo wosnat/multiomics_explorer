@@ -112,37 +112,54 @@ Every API function must be:
 
 ## Layer 3: `mcp_server/tools.py`
 
-### Registration pattern
+### Registration pattern (v1 — existing tools, being migrated)
+
+Existing tools use sync `def`, `logger`, `_fmt`, error strings.
+These will be migrated to v2 in Phase D.
+
+### Registration pattern (v2 — new tools)
 
 ```python
 def register_tools(mcp: FastMCP):
-    @mcp.tool()
-    def tool_name(
-        ctx: Context,
-        param1: str,
-        param2: str | None = None,
-        limit: int = 10,
-    ) -> str:
-        """LLM-facing docstring.
+    class {Name}Result(BaseModel):
+        field1: str
+        field2: int = Field(default=0, description="What this means")
 
-        Args:
-            param1: Description visible to MCP clients.
-            param2: Optional filter description.
-            limit: Max results (default N, max M).
-        """
-        logger.info("tool_name param1=%s", param1)
+    class {Name}Response(BaseModel):
+        total_entries: int = Field(description="Total rows in KG")
+        total_matching: int = Field(description="Rows matching filters")
+        returned: int = Field(description="Rows in this response")
+        truncated: bool = Field(description="True if total_matching > returned")
+        results: list[{Name}Result]
+
+    @mcp.tool(
+        tags={"domain", "action"},
+        annotations={"readOnlyHint": True},
+    )
+    async def tool_name(
+        ctx: Context,
+        param: Annotated[str, Field(description="...")],
+        limit: Annotated[int, Field(description="Max results.", ge=1)] = 50,
+    ) -> {Name}Response:
+        """Tool purpose. What it does and when to use it."""
+        await ctx.info(f"tool_name param={param}")
         try:
             conn = _conn(ctx)
-            results = api.tool_name(param1, param2=param2, conn=conn)
-            if not results:
-                return "No results found."
-            return _fmt(results, limit=limit)
+            result = api.tool_name(param, limit=limit, conn=conn)
+            rows = [{Name}Result(**r) for r in result["results"]]
+            return {Name}Response(
+                total_entries=result["total_entries"],
+                total_matching=result["total_matching"],
+                returned=len(rows),
+                truncated=result["total_matching"] > len(rows),
+                results=rows,
+            )
         except ValueError as e:
-            logger.warning("tool_name error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"tool_name error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("tool_name unexpected error: %s", e)
-            return f"Error in tool_name: {e}"
+            await ctx.error(f"tool_name unexpected error: {e}")
+            raise ToolError(f"Error in tool_name: {e}")
 ```
 
 ### Helpers
@@ -169,9 +186,12 @@ lc._cache_attr = response
 
 ### Return type
 
-- Return `list[dict]` or `dict` — FastMCP handles serialization
-  to structured content (human-readable + machine-readable JSON)
-- No `json.dumps`, no `_fmt` — return Python objects directly
+- Define Pydantic `BaseModel` response models (`{Name}Result` per row,
+  `{Name}Response` envelope). Return type annotation on the tool
+  function → FastMCP auto-generates `outputSchema` in the MCP tool def.
+- Return Pydantic model instances — FastMCP handles serialization
+- No `json.dumps`, no `_fmt` — return model instances directly
+- Pydantic models at MCP boundary only. API layer returns plain `dict`.
 - When tool has `limit`, use 2-query pattern: summary query
   (via `build_{name}_summary()`) then data query with LIMIT.
   Summary returns `total_entries` (all rows) and `total_matching`
@@ -200,11 +220,11 @@ from fastmcp.exceptions import ToolError
     tags={"domain_tag", "action_tag"},
     annotations={"readOnlyHint": True},
 )
-def tool_name(
+async def tool_name(
     ctx: Context,
     param: Annotated[str, Field(description="...")],
     mode: Annotated[
-        Literal["summary", "detail", "about"],
+        Literal["summary", "detail"],
         Field(description="Response mode"),
     ] = "summary",
     limit: Annotated[
@@ -220,6 +240,7 @@ def tool_name(
   (e.g. treatment_type) — those use `list_filter_values` for discovery.
 - Use `Field(ge=..., le=...)` for numeric constraints
 - Use `ToolError` for errors — always visible to client
+- `async def` tools with `await ctx.info/warning/error()` for MCP client-visible logging
 - Use `tags` for categorization (e.g. `{"publications", "discovery"}`)
 - All tools are read-only: `annotations={"readOnlyHint": True}`
 
@@ -231,11 +252,12 @@ def tool_name(
 
 ---
 
-## Layer 4: Skills
+## Layer 4: Skills (MCP resources)
 
-### About-mode content
+### About content
 
 Per-tool files at `skills/multiomics-kg-guide/references/tools/{tool-name}.md`.
+Served via MCP resource at URI `docs://tools/{tool-name}` (not a tool mode parameter).
 
 Content per tool:
 - What the tool does (beyond the docstring)
@@ -265,7 +287,7 @@ Research skills source: `multiomics_explorer/skills/`
 Dev copy: `.claude/skills/research/` (gitignored)
 Sync: `scripts/sync_skills.sh`
 
-Update about-mode content whenever tool return fields change.
+Update about content whenever tool return fields change.
 
 ---
 
@@ -284,7 +306,7 @@ Update about-mode content whenever tool return fields change.
 | `conn` | api only | all api functions (keyword-only, last) |
 | `ctx` | MCP only | all MCP wrappers (first param, injected by FastMCP) |
 | `limit` | MCP only | tools with large result sets |
-| `mode` | MCP only (v2) | summary/detail/about |
+| `mode` | MCP only (v2) | summary/detail (about content served via MCP resource `docs://tools/{name}`) |
 | `verbose` | all | include heavy text fields (abstract, description) — for small-result-set tools |
 | `summary` | api (v2) | functions with summary variant |
 

@@ -26,6 +26,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_homologs_groups,
     build_list_gene_categories,
     build_list_organisms,
+    build_list_publications,
     build_resolve_gene,
     build_search_genes,
     build_search_genes_dedup_groups,
@@ -54,6 +55,7 @@ TOOL_BUILDERS = {
     "search_ontology": build_search_ontology,
     "genes_by_ontology": build_genes_by_ontology,
     "gene_ontology_terms": build_gene_ontology_terms,
+    "list_publications": build_list_publications,
 }
 
 

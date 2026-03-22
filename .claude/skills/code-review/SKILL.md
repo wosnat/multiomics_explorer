@@ -19,7 +19,7 @@ checklist.
 
 3. **Check cross-layer consistency** — do signatures match across
    layers? Do return field names match between Cypher RETURN, API
-   docstring, and about-mode content?
+   docstring, and about content (MCP resource)?
 
 4. **Verify test coverage** — does every changed layer have
    corresponding test updates?
@@ -40,4 +40,4 @@ Before diving into the full checklist, verify these common issues:
 - [ ] New builder added to `TOOL_BUILDERS`?
 - [ ] No f-string interpolation of user input in Cypher?
 - [ ] `ORDER BY` in every query for deterministic results?
-- [ ] About-mode content updated if tool behavior changed?
+- [ ] About content (MCP resource) updated if tool behavior changed?

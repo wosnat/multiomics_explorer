@@ -20,10 +20,10 @@ Given an implementation plan (in `docs/tool-specs/`), verify that the implementa
    - `kg/queries_lib.py` — keyword-only args, tuple return, $param placeholders, AS aliases, ORDER BY
    - `api/functions.py` — calls builders, conn kwarg, ValueError, return keys in docstring, exports wired
    - `mcp_server/tools.py` — calls api/ (not queries_lib), ctx first, error handling, docstrings, modes
-   - Skills — about-mode content matches tool behavior, expected-keys match return fields
+   - Skills — about content (MCP resource) matches tool behavior, expected-keys match return fields
 3. **Check cross-layer consistency**:
    - Parameter names match across all layers
-   - Return field names match between Cypher RETURN, API docstring, MCP wrapper, and about-mode expected-keys
+   - Return field names match between Cypher RETURN, API docstring, MCP wrapper, and about content expected-keys
    - Builder name follows `build_{api_function_name}` pattern
 4. **Read a sample of changed test files** and verify:
    - Old names are fully gone (grep for old names across the repo)

@@ -16,6 +16,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_homologs_members,
     build_list_gene_categories,
     build_list_organisms,
+    build_list_publications,
+    build_list_publications_summary,
     build_resolve_gene,
     build_search_genes,
     build_search_ontology,
@@ -665,5 +667,127 @@ class TestBuildGeneOntologyTerms:
         )
         assert "NOT EXISTS" in cypher
         assert "Cyanorak_role_is_a_cyanorak_role" in cypher
+
+
+# ---------------------------------------------------------------------------
+# list_publications
+# ---------------------------------------------------------------------------
+class TestBuildListPublications:
+    def test_no_filters(self):
+        """No filters produces MATCH with no WHERE, no fulltext CALL."""
+        cypher, params = build_list_publications()
+        assert "MATCH (p:Publication)" in cypher
+        assert "WHERE" not in cypher
+        assert "fulltext" not in cypher
+        assert params == {}
+
+    def test_organism_filter(self):
+        """Organism filter uses ANY on p.organisms with toLower CONTAINS."""
+        cypher, params = build_list_publications(organism="MED4")
+        assert "ANY(o IN p.organisms WHERE toLower(o) CONTAINS toLower($organism))" in cypher
+        assert params["organism"] == "MED4"
+
+    def test_treatment_type_filter(self):
+        """Treatment type filter uses ANY on p.treatment_types with toLower match."""
+        cypher, params = build_list_publications(treatment_type="coculture")
+        assert "ANY(t IN p.treatment_types WHERE toLower(t) = toLower($treatment_type))" in cypher
+        assert params["treatment_type"] == "coculture"
+
+    def test_search_text(self):
+        """search_text uses fulltext CALL and orders by score DESC."""
+        cypher, params = build_list_publications(search_text="nitrogen")
+        assert "publicationFullText" in cypher
+        assert "YIELD node AS p, score" in cypher
+        assert "score DESC" in cypher
+        assert "score" in cypher  # in RETURN
+        assert params["search_text"] == "nitrogen"
+
+    def test_search_text_none(self):
+        """No fulltext CALL when search_text is None."""
+        cypher, _ = build_list_publications(search_text=None)
+        assert "fulltext" not in cypher
+        assert "score" not in cypher
+
+    def test_author_filter(self):
+        """Author filter uses ANY on p.authors with toLower CONTAINS."""
+        cypher, params = build_list_publications(author="Sher")
+        assert "ANY(a IN p.authors WHERE toLower(a) CONTAINS toLower($author))" in cypher
+        assert params["author"] == "Sher"
+
+    def test_combined_filters(self):
+        """All filters produce AND-joined WHERE."""
+        cypher, params = build_list_publications(
+            organism="MED4", treatment_type="coculture", author="Sher",
+        )
+        assert "WHERE" in cypher
+        assert " AND " in cypher
+        assert params["organism"] == "MED4"
+        assert params["treatment_type"] == "coculture"
+        assert params["author"] == "Sher"
+
+    def test_returns_expected_columns(self):
+        """RETURN clause has all expected compact columns."""
+        cypher, _ = build_list_publications()
+        for col in [
+            "doi", "title", "authors", "year", "journal",
+            "study_type", "organisms", "experiment_count",
+            "treatment_types", "omics_types",
+        ]:
+            assert col in cypher
+
+    def test_order_by(self):
+        """Without search_text, orders by year DESC then title."""
+        cypher, _ = build_list_publications()
+        assert "ORDER BY p.publication_year DESC, p.title" in cypher
+
+    def test_verbose_false(self):
+        """Compact mode does not include abstract or description."""
+        cypher, _ = build_list_publications(verbose=False)
+        assert "abstract" not in cypher
+        assert "description" not in cypher
+
+    def test_verbose_true(self):
+        """Verbose mode includes abstract and description in RETURN."""
+        cypher, _ = build_list_publications(verbose=True)
+        assert "p.abstract AS abstract" in cypher
+        assert "p.description AS description" in cypher
+
+    def test_limit_clause(self):
+        """LIMIT is added when limit is provided."""
+        cypher, params = build_list_publications(limit=10)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        """No LIMIT when limit is None."""
+        cypher, _ = build_list_publications(limit=None)
+        assert "LIMIT" not in cypher
+
+
+class TestBuildListPublicationsSummary:
+    def test_no_filters(self):
+        """Returns total_entries and total_matching."""
+        cypher, params = build_list_publications_summary()
+        assert "total_entries" in cypher
+        assert "total_matching" in cypher
+        assert params == {}
+
+    def test_with_filters(self):
+        """Filters are applied to the matching count."""
+        cypher, params = build_list_publications_summary(organism="MED4")
+        assert "toLower($organism)" in cypher
+        assert params["organism"] == "MED4"
+
+    def test_search_text_uses_fulltext(self):
+        """search_text uses fulltext CALL in summary query."""
+        cypher, params = build_list_publications_summary(search_text="nitrogen")
+        assert "publicationFullText" in cypher
+        assert params["search_text"] == "nitrogen"
+
+    def test_shares_where_clause(self):
+        """Same filter logic as data builder — author filter works."""
+        cypher, params = build_list_publications_summary(author="Chisholm")
+        assert "ANY(a IN p.authors WHERE toLower(a) CONTAINS toLower($author))" in cypher
+        assert params["author"] == "Chisholm"
 
 

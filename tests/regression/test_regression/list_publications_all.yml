@@ -1,0 +1,431 @@
+case_id: list_publications_all
+row_count: 21
+rows:
+- authors:
+  - James I. Mullet
+  - Katelyn G. Jones
+  - Kurt G. Castro
+  - Maya I. Anjur-Dietrich
+  - Nhi N. Vo
+  - Sallie W. Chisholm
+  - Sierra M. Parker
+  doi: 10.1101/2025.08.05.668435
+  experiment_count: 1
+  journal: bioRxiv
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MIT9301
+  study_type: Ecology, Microbiology
+  title: Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus
+  treatment_types:
+  - growth_state
+  year: 2025
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  doi: 10.1101/2025.11.24.690089
+  experiment_count: 10
+  journal: bioRxiv
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii HOT1A3
+  - Prochlorococcus MED4
+  study_type: Transcriptomics and Proteomics (multi-omics)
+  title: Transcriptomic and Proteomic Analysis Reveals Nitrogen Recycling as a Core
+    Mechanism for Prochlorococcus Prolonged Survival
+  treatment_types:
+  - coculture
+  - nitrogen_stress
+  year: 2025
+- authors:
+  - Aldo Arellano
+  - Allison Coe
+  - Christina Bliem
+  - Claudia Steglich
+  - Elaina Thomas
+  - Jef Huisman
+  - Konnor von Emster
+  - Michelle DeMers
+  - Nhi N. Vo
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  doi: 10.1093/ismeco/ycae131
+  experiment_count: 2
+  journal: ISME Communications
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas MIT1002
+  - Prochlorococcus NATL2A
+  study_type: Metatranscriptomics
+  title: Emergence of metabolic coupling to the heterotroph Alteromonas promotes dark
+    survival in Prochlorococcus
+  treatment_types:
+  - darkness
+  year: 2024
+- authors:
+  - Huan Liu
+  - Junde Dong
+  - Lijuan Long
+  - Sijun Huang
+  - Xiayu He
+  doi: 10.3389/fmicb.2022.1038136
+  experiment_count: 2
+  journal: Frontiers in Microbiology
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus NATL1A
+  study_type: RNA-seq / Transcriptomics
+  title: Acclimation and stress response of Prochlorococcus to low salinity.
+  treatment_types:
+  - salt_stress
+  year: 2022
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  doi: 10.1038/s43705-022-00197-2
+  experiment_count: 10
+  journal: ISME Communications
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii EZ55
+  - Prochlorococcus MIT9312
+  - Synechococcus CC9311
+  - Synechococcus WH8102
+  study_type: RNA-seq
+  title: Community context and pCO 2 impact the transcriptome of the “helper” bacterium
+    Alteromonas in co-culture with picocyanobacteria
+  treatment_types:
+  - carbon_stress
+  - coculture
+  year: 2022
+- authors:
+  - Ian T. Paulsen
+  - Indrani Sarker
+  - Liam D.H. Elbourne
+  - Lisa R. Moore
+  - Russell Pickford
+  - Sasha G. Tetu
+  - Verena Schrameyer
+  doi: 10.1038/s42003-019-0410-x
+  experiment_count: 4
+  journal: Communications Biology
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus NATL2A
+  study_type: Transcriptomics
+  title: Plastic leachates impair growth and oxygen production in Prochlorococcus,
+    the ocean^s most abundant photosynthetic bacteria
+  treatment_types:
+  - plastic_stress
+  year: 2019
+- authors:
+  - Gang Li
+  - Qi-Long Qin
+  - Qinglu Zeng
+  - Riyue Liu
+  - Wan Chan
+  - Wolfgang R. Hess
+  - Xiaoting Fang
+  - Yao Zhao
+  - Yaxin Liu
+  - Yu-Zhong Zhang
+  - Yue Chen
+  doi: 10.1111/1462-2920.14513
+  experiment_count: 1
+  journal: Environmental Microbiology
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Phage
+  - Prochlorococcus MIT9313
+  study_type: RNA-seq, Transcriptomics
+  title: Transcriptomic responses of the marine cyanobacterium Prochlorococcus to
+    viral lysis products
+  treatment_types:
+  - viral
+  year: 2019
+- authors:
+  - Allison Coe
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  doi: 10.1128/mSystems.00040-18
+  experiment_count: 3
+  journal: mSystems
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas MIT1002
+  - Prochlorococcus NATL2A
+  study_type: RNA-seq
+  title: Heterotroph interactions alter Prochlorococcus transcriptome dynamics during
+    extended periods of darkness
+  treatment_types:
+  - darkness
+  year: 2018
+- authors:
+  - Alexander R Durrant
+  - Elizabeth Entwistle
+  - Erik R Zinser
+  - Gwenn MM Hennon
+  - J Jeffrey Morris
+  - Sheean T Haley
+  - Sonya T Dyhrman
+  - Terje Dokland
+  doi: 10.1038/ismej.2017.189
+  experiment_count: 3
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii EZ55
+  - Prochlorococcus MIT9312
+  study_type: Transcriptomics
+  title: The impact of elevated CO 2 on Prochlorococcus and microbial interactions
+    with ‘helper’ bacterium Alteromonas
+  treatment_types:
+  - carbon_stress
+  year: 2018
+- authors:
+  - Andres Cubillos-Ruiz
+  - Iva Neveux
+  - Joseph J Grzymski
+  - Paul M Berube
+  - Robert W Read
+  - Sallie W Chisholm
+  - Steven J Biller
+  doi: 10.1038/ismej.2017.88
+  experiment_count: 1
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Transcriptomics (transcription start site mapping)
+  title: Nitrogen cost minimization is promoted by structural changes in the transcriptome
+    of N-deprived Prochlorococcus cells
+  treatment_types:
+  - nitrogen_stress
+  year: 2017
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  doi: 10.1371/journal.pone.0165375
+  experiment_count: 4
+  journal: PLOS ONE
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Phage
+  - Prochlorococcus MED4
+  study_type: Transcriptomics (RNA-seq)
+  title: Gene Expression Patterns during Light and Dark Infection of Prochlorococcus
+    by Cyanophage
+  treatment_types:
+  - light_stress
+  - viral
+  year: 2016
+- authors:
+  - Allison Coe
+  - Sallie W Chisholm
+  - Steven J Biller
+  doi: 10.1038/ismej.2016.82
+  experiment_count: 3
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas MIT1002
+  - Prochlorococcus NATL2A
+  study_type: RNA-seq / Transcriptomics
+  title: 'Torn apart and reunited: impact of a heterotroph on the transcriptome of
+    Prochlorococcus'
+  treatment_types:
+  - coculture
+  year: 2016
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  doi: 10.1038/ismej.2016.70
+  experiment_count: 5
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii HOT1A3
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: RNA-seq
+  title: 'Transcriptional response of Prochlorococcus to co-culture with a marine
+    Alteromonas: differences between strains and the involvement of putative infochemicals'
+  treatment_types:
+  - coculture
+  year: 2016
+- authors:
+  - Andreas Henschel
+  - Lina F. Yousef
+  - Mai M. Oudah
+  - Sumaya Al-Hosani
+  doi: 10.1016/j.micres.2015.04.006
+  experiment_count: 1
+  journal: Microbiological Research
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus AS9601
+  study_type: RNA-seq
+  title: Global transcriptome analysis of salt acclimated Prochlorococcus AS9601
+  treatment_types:
+  - salt_stress
+  year: 2015
+- authors:
+  - Sallie W Chisholm
+  - Sarah C Bagby
+  doi: 10.1038/ismej.2015.36
+  experiment_count: 4
+  journal: ISME Journal
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Transcriptomics
+  title: Response of Prochlorococcus to varying CO2:O2 ratios
+  treatment_types:
+  - carbon_stress
+  year: 2015
+- authors:
+  - Huiming Ding
+  - Qinglu Zeng
+  - Xingqin Lin
+  doi: 10.1111/1462-2920.13104
+  experiment_count: 2
+  journal: Environmental Microbiology
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus NATL2A
+  study_type: RNA-seq, Transcriptomics
+  title: Transcriptomic response during phage infection of a marine cyanobacterium
+    under phosphorus-limited conditions
+  treatment_types:
+  - phosphorus_stress
+  year: 2015
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  doi: 10.1038/ismej.2011.49
+  experiment_count: 5
+  journal: The ISME Journal
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Transcriptomics (microarray)
+  title: Transcriptome response of high- and low-light-adapted Prochlorococcus strains
+    to changing iron availability
+  treatment_types:
+  - iron_stress
+  year: 2011
+- authors:
+  - Debbie Lindell
+  - George M. Church
+  - Gregory Kettler
+  - Ilka M. Axmann
+  - Jacob D. Jaffe
+  - Matthew B. Sullivan
+  - Matthias E. Futschik
+  - Maureen L. Coleman
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  - Wolfgang R. Hess
+  doi: 10.1038/nature06130
+  experiment_count: 1
+  journal: Nature
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Phage
+  - Prochlorococcus MED4
+  study_type: Transcriptomics
+  title: Genome-wide expression dynamics of a marine virus and host reveal features
+    of co-evolution
+  treatment_types:
+  - viral
+  year: 2007
+- authors:
+  - Claudia Steglich
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  doi: 10.1128/JB.01097-06
+  experiment_count: 6
+  journal: Journal of Bacteriology
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Microarray (transcriptomics)
+  title: Genome-Wide Analysis of Light Sensing in Prochlorococcus/H17188
+  treatment_types:
+  - light_stress
+  year: 2006
+- authors:
+  - Andrew C Tolonen
+  - Debbie Lindell
+  - George M Church
+  - John Aach
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  - Zackary I Johnson
+  doi: 10.1038/msb4100087
+  experiment_count: 6
+  journal: Molecular Systems Biology
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Transcriptomics (microarray)
+  title: Global gene expression of Prochlorococcus ecotypes in response to changes
+    in nitrogen availability
+  treatment_types:
+  - nitrogen_stress
+  year: 2006
+- authors:
+  - Adam C. Martiny
+  - Maureen L. Coleman
+  - Sallie W. Chisholm
+  doi: 10.1073/pnas.0601301103
+  experiment_count: 2
+  journal: PNAS
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Microarray
+  title: 'Phosphate acquisition genes in Prochlorococcus ecotypes: Evidence for genome-wide
+    adaptation'
+  treatment_types:
+  - phosphorus_stress
+  year: 2006

@@ -18,8 +18,9 @@ authors, DOI.
 
 ## Out of Scope
 
-- Summary/detail/about modes — this is a Phase C exercise tool, modes
-  come in Phase D
+- Summary/detail modes — this is a Phase C exercise tool, modes
+  come in Phase D. About content is served via MCP resource
+  `docs://tools/list_publications`.
 - Phase 2 temporal profiling tools — see `expression_tools_redesign.md`
 
 ---
@@ -31,7 +32,7 @@ authors, DOI.
     tags={"publications", "discovery"},
     annotations={"readOnlyHint": True},
 )
-def list_publications(
+async def list_publications(
     ctx: Context,
     organism: Annotated[str | None, Field(
         description="Filter by organism name (case-insensitive). "
@@ -56,17 +57,12 @@ def list_publications(
     limit: Annotated[int, Field(
         description="Max results.", ge=1,
     )] = 50,
-) -> dict:
+) -> ListPublicationsResponse:
     """List publications with expression data in the knowledge graph.
 
     Returns publication metadata and experiment summaries. Use this as
     an entry point to discover what studies exist, then drill into
     specific experiments with list_experiments or genes with search_genes.
-
-    Response: {total_entries, total_matching, returned, truncated, results: [...]}.
-    Per publication: doi, title, authors, year, journal, study_type,
-    organisms, experiment_count, treatment_types, omics_types.
-    With search_text, also: score. With verbose=True, also: abstract, description.
     """
 ```
 
@@ -315,7 +311,7 @@ from fastmcp.exceptions import ToolError
     tags={"publications", "discovery"},
     annotations={"readOnlyHint": True},
 )
-def list_publications(
+async def list_publications(
     ctx: Context,
     organism: Annotated[str | None, Field(
         description="Filter by organism name (case-insensitive). "
@@ -340,20 +336,15 @@ def list_publications(
     limit: Annotated[int, Field(
         description="Max results.", ge=1,
     )] = 50,
-) -> dict:
+) -> ListPublicationsResponse:
     """List publications with expression data in the knowledge graph.
 
     Returns publication metadata and experiment summaries. Use this as
     an entry point to discover what studies exist, then drill into
     specific experiments with list_experiments or genes with search_genes.
-
-    Response: {total_entries, total_matching, returned, truncated, results: [...]}.
-    Per publication: doi, title, authors, year, journal, study_type,
-    organisms, experiment_count, treatment_types, omics_types.
-    With search_text, also: score. With verbose=True, also: abstract, description.
     """
-    logger.info("list_publications organism=%s treatment_type=%s search_text=%s author=%s verbose=%s",
-                organism, treatment_type, search_text, author, verbose)
+    await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
+                   f"search_text={search_text} author={author}")
     try:
         conn = _conn(ctx)
         result = api.list_publications(
@@ -361,18 +352,22 @@ def list_publications(
             search_text=search_text, author=author,
             verbose=verbose, limit=limit, conn=conn,
         )
-        return {
-            "total_entries": result["total_entries"],
-            "total_matching": result["total_matching"],
-            "returned": len(result["results"]),
-            "truncated": result["total_matching"] > len(result["results"]),
-            "results": result["results"],
-        }
+        results = [PublicationResult(**r) for r in result["results"]]
+        response = ListPublicationsResponse(
+            total_entries=result["total_entries"],
+            total_matching=result["total_matching"],
+            returned=len(results),
+            truncated=result["total_matching"] > len(results),
+            results=results,
+        )
+        await ctx.info(f"Returning {response.returned} of {response.total_matching} "
+                       f"matching publications ({response.total_entries} total in KG)")
+        return response
     except ValueError as e:
-        logger.warning("list_publications error: %s", e)
+        await ctx.warning(f"list_publications error: {e}")
         raise ToolError(str(e))
     except Exception as e:
-        logger.warning("list_publications unexpected error: %s", e)
+        await ctx.error(f"list_publications unexpected error: {e}")
         raise ToolError(f"Error in list_publications: {e}")
 ```
 

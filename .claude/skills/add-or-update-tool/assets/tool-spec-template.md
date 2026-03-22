@@ -35,7 +35,7 @@ Link to KG spec if schema changes were needed: `docs/kg-specs/{tool-name}.md`
     tags={"tag1", "tag2"},
     annotations={"readOnlyHint": True},
 )
-def {name}(
+async def {name}(
     ctx: Context,
     param: Annotated[str, Field(
         description="Description.",
@@ -49,12 +49,10 @@ def {name}(
     limit: Annotated[int, Field(
         description="Max results.", ge=1,
     )] = 50,
-) -> dict:
+) -> {Name}Response:
     """Tool-level purpose description.
 
-    Response: {total_entries, total_matching, returned, truncated, results: [...]}.
-    Per result: field1, field2, field3.
-    With verbose=True, also: heavy_field1, heavy_field2.
+    Return schema is in Pydantic models (auto-generated as outputSchema).
     """
 ```
 
@@ -84,7 +82,10 @@ If yes — what fields are omitted by default and included with
 - Compact (default): field1, field2, ...
 - Verbose adds: heavy_field1, heavy_field2, ...
 
-### Option B: Large result set (summary/detail/about modes)
+### Option B: Large result set (summary/detail modes)
+
+About content is served via MCP resource `docs://tools/{name}`, not as
+a tool mode parameter.
 
 #### Summary mode
 
@@ -204,8 +205,13 @@ Notes on 2-query pattern, Lucene retry, validation, etc.
 
 **File:** `mcp_server/tools.py`
 
-(Show full wrapper code with Annotated/Field/ToolError/tags/annotations.
-Include the truncation envelope construction.)
+Define Pydantic response models (`{Name}Result` + `{Name}Response`)
+and the `@mcp.tool()` wrapper. FastMCP auto-generates `outputSchema`
+from the return type annotation.
+
+(Show response models with `Field(description=...)` on non-obvious fields.
+Show full wrapper code with Annotated/Field/ToolError/tags/annotations.
+Return type is the response model, not `dict`.)
 
 ---
 
@@ -285,27 +291,33 @@ Add to `TOOL_BUILDERS`:
 
 ## About Content
 
-**File:** `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`
+About content is auto-generated from Pydantic models + human-authored
+input YAML. Served via MCP resource at `docs://tools/{name}`.
 
-Using the about-content template:
+### Input YAML
 
-- **What it does:**
-- **Parameters:**
-- **Response:**
-- **Chaining:**
-- **Package import:**
+**File:** `multiomics_explorer/inputs/tools/{name}.yaml`
 
-Tagged blocks:
+Create with `uv run python scripts/build_about_content.py --skeleton {name}`,
+then fill in examples, chaining patterns, common mistakes.
 
-````
-```example-call
-{name}(param="value")
+### Build
+
+```bash
+uv run python scripts/build_about_content.py {name}
 ```
 
-```expected-keys
-total_entries, total_matching, returned, truncated, results
+**Output:** `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`
+
+Auto-generated from Pydantic models: parameters table, response format,
+expected-keys, package import. From input YAML: examples, chaining, mistakes.
+
+### Verify
+
+```bash
+pytest tests/unit/test_about_content.py -v          # consistency with tool schema
+pytest tests/integration/test_about_examples.py -v  # examples execute against KG
 ```
-````
 
 ---
 

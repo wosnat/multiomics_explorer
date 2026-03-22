@@ -42,7 +42,10 @@ Set `verbose=True` to include heavy text fields:
 field1, field2, field3, abstract, description, ...
 ```
 
-### Option B: Summary/detail/about modes
+### Option B: Summary/detail modes
+
+About content (this file) is served via MCP resource
+`docs://tools/{tool_name}`, not as a tool mode parameter.
 
 #### Summary mode (default)
 
@@ -53,7 +56,7 @@ Returns aggregated statistics without fetching individual rows.
 ```
 
 ```expected-keys
-total, breakdown_field, ...
+total_entries, total_matching, breakdown_field, ...
 ```
 
 #### Detail mode

@@ -30,6 +30,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_homologs_members,
     build_list_gene_categories,
     build_list_organisms,
+    build_list_publications,
+    build_list_publications_summary,
     build_resolve_gene,
     build_search_genes,
     build_search_genes_dedup_groups,
@@ -330,6 +332,58 @@ def list_organisms(
     conn = _default_conn(conn)
     cypher, params = build_list_organisms()
     return conn.execute_query(cypher, **params)
+
+
+def list_publications(
+    organism: str | None = None,
+    treatment_type: str | None = None,
+    search_text: str | None = None,
+    author: str | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """List publications with expression data.
+
+    Returns dict with keys: total_entries, total_matching, results.
+    Per result: doi, title, authors, year, journal, study_type, organisms,
+    experiment_count, treatment_types, omics_types.
+    When verbose=True, also includes abstract, description.
+    When search_text is provided, also includes score.
+    """
+    conn = _default_conn(conn)
+    filter_kwargs = dict(
+        organism=organism, treatment_type=treatment_type,
+        search_text=search_text, author=author,
+    )
+
+    def _execute(st=search_text):
+        kw = {**filter_kwargs, "search_text": st}
+        summary_cypher, summary_params = build_list_publications_summary(**kw)
+        summary = conn.execute_query(summary_cypher, **summary_params)[0]
+
+        data_cypher, data_params = build_list_publications(
+            **kw, verbose=verbose, limit=limit,
+        )
+        results = conn.execute_query(data_cypher, **data_params)
+        return summary, results
+
+    try:
+        summary, results = _execute()
+    except Neo4jClientError:
+        if search_text:
+            logger.debug("list_publications: Lucene parse error, retrying with escaped query")
+            escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            summary, results = _execute(st=escaped)
+        else:
+            raise
+
+    return {
+        "total_entries": summary["total_entries"],
+        "total_matching": summary["total_matching"],
+        "results": results,
+    }
 
 
 def search_ontology(

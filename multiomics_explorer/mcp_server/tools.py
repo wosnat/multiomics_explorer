@@ -3,8 +3,11 @@
 import json
 import logging
 import re
+from typing import Annotated
 
 from fastmcp import Context, FastMCP
+from fastmcp.exceptions import ToolError
+from pydantic import BaseModel, Field
 
 import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.connection import GraphConnection
@@ -534,3 +537,88 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             logger.warning("gene_ontology_terms unexpected error: %s", e)
             return f"Error in gene_ontology_terms: {e}"
+
+    class PublicationResult(BaseModel):
+        doi: str
+        title: str
+        authors: list[str]
+        year: int
+        journal: str | None = None
+        study_type: str | None = None
+        organisms: list[str] = Field(default=[], description="Organisms studied in this publication")
+        experiment_count: int = Field(default=0, description="Number of experiments in KG from this publication")
+        treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen_stress)")
+        omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS)")
+        score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
+        abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
+        description: str | None = Field(default=None, description="Curated study description (only with verbose=True)")
+
+    class ListPublicationsResponse(BaseModel):
+        total_entries: int = Field(description="Total publications in KG (unfiltered)")
+        total_matching: int = Field(description="Publications matching filters")
+        returned: int = Field(description="Publications in this response")
+        truncated: bool = Field(description="True if total_matching > returned")
+        results: list[PublicationResult]
+
+    @mcp.tool(
+        tags={"publications", "discovery"},
+        annotations={"readOnlyHint": True},
+    )
+    async def list_publications(
+        ctx: Context,
+        organism: Annotated[str | None, Field(
+            description="Filter by organism name (case-insensitive). "
+            "E.g. 'MED4', 'HOT1A3'.",
+        )] = None,
+        treatment_type: Annotated[str | None, Field(
+            description="Filter by experiment treatment type. "
+            "Use list_filter_values for valid values.",
+        )] = None,
+        search_text: Annotated[str | None, Field(
+            description="Free-text search on title, abstract, and description "
+            "(Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'.",
+        )] = None,
+        author: Annotated[str | None, Field(
+            description="Filter by author name (case-insensitive). "
+            "E.g. 'Sher', 'Chisholm'.",
+        )] = None,
+        verbose: Annotated[bool, Field(
+            description="Include abstract and description. "
+            "Default compact for routing.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 50,
+    ) -> ListPublicationsResponse:
+        """List publications with expression data in the knowledge graph.
+
+        Returns publication metadata and experiment summaries. Use this as
+        an entry point to discover what studies exist, then drill into
+        specific experiments with list_experiments or genes with search_genes.
+        """
+        await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
+                       f"search_text={search_text} author={author}")
+        try:
+            conn = _conn(ctx)
+            result = api.list_publications(
+                organism=organism, treatment_type=treatment_type,
+                search_text=search_text, author=author,
+                verbose=verbose, limit=limit, conn=conn,
+            )
+            results = [PublicationResult(**r) for r in result["results"]]
+            response = ListPublicationsResponse(
+                total_entries=result["total_entries"],
+                total_matching=result["total_matching"],
+                returned=len(results),
+                truncated=result["total_matching"] > len(results),
+                results=results,
+            )
+            await ctx.info(f"Returning {response.returned} of {response.total_matching} "
+                           f"matching publications ({response.total_entries} total in KG)")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"list_publications error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"list_publications unexpected error: {e}")
+            raise ToolError(f"Error in list_publications: {e}")

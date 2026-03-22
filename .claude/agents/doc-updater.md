@@ -35,7 +35,7 @@ Given an implementation plan (in `docs/tool-specs/`), update all documentation t
    - Skill files that mention tool names, function names, or parameter names
 4. **Update descriptions** where the tool's purpose changed
 5. **Update tool counts** if a tool was added/removed
-6. **Update about-mode content** in skill reference files if tool behavior changed
+6. **Update about content** (MCP resource files) in skill reference files if tool behavior changed
 
 ## Rules
 

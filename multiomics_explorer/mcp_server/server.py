@@ -40,11 +40,33 @@ async def lifespan(server: FastMCP):
 
 mcp = FastMCP(
     "multiomics-kg",
-    instructions="Multi-omics knowledge graph for Prochlorococcus and Alteromonas",
+    instructions=(
+        "Multi-omics knowledge graph for Prochlorococcus and Alteromonas. "
+        "For detailed usage guides on any tool, read the resource at "
+        "docs://tools/{tool_name} (e.g. docs://tools/list_publications)."
+    ),
     lifespan=lifespan,
 )
 
 register_tools(mcp)
+
+
+# --- About-mode resources: per-tool documentation ---
+from pathlib import Path
+
+_TOOLS_DOCS_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "skills" / "multiomics-kg-guide" / "references" / "tools"
+)
+
+
+@mcp.resource("docs://tools/{tool_name}")
+def tool_docs(tool_name: str) -> str:
+    """Usage guide for a specific tool: parameters, response format, examples, chaining patterns."""
+    path = _TOOLS_DOCS_DIR / f"{tool_name}.md"
+    if not path.exists():
+        return f"No documentation found for tool '{tool_name}'."
+    return path.read_text()
 
 
 def main():

@@ -13,6 +13,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_get_gene_details,
     build_get_homologs_groups,
     build_get_homologs_members,
+    build_list_publications,
+    build_list_publications_summary,
     build_resolve_gene,
     build_search_genes,
 )
@@ -121,4 +123,53 @@ class TestEdgeCases:
         results = conn.execute_query(cypher, **params)
         # Either empty or gene is None
         assert not results or results[0]["gene"] is None
+
+
+@pytest.mark.kg
+class TestListPublications:
+    def test_no_filters_returns_all(self, conn):
+        """Unfiltered query returns all publications."""
+        cypher, params = build_list_publications()
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 15
+        for r in results:
+            assert "doi" in r
+            assert "title" in r
+            assert "experiment_count" in r
+
+    def test_organism_filter(self, conn):
+        """Organism filter returns subset with MED4 experiments."""
+        cypher, params = build_list_publications(organism="MED4")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 5
+
+    def test_treatment_type_filter(self, conn):
+        """Treatment type filter returns papers with coculture experiments."""
+        cypher, params = build_list_publications(treatment_type="coculture")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 3
+
+    def test_author_filter(self, conn):
+        """Author filter returns Chisholm lab papers."""
+        cypher, params = build_list_publications(author="Chisholm")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 2
+
+    def test_experiment_count_positive(self, conn):
+        """All publications with experiments have experiment_count > 0."""
+        cypher, params = build_list_publications()
+        results = conn.execute_query(cypher, **params)
+        with_experiments = [r for r in results if r["experiment_count"] > 0]
+        assert len(with_experiments) >= 15
+
+    def test_summary_matches_data(self, conn):
+        """Summary total_matching equals actual data row count (no limit)."""
+        summary_cypher, summary_params = build_list_publications_summary(organism="MED4")
+        summary = conn.execute_query(summary_cypher, **summary_params)[0]
+
+        data_cypher, data_params = build_list_publications(organism="MED4")
+        data = conn.execute_query(data_cypher, **data_params)
+
+        assert summary["total_matching"] == len(data)
+        assert summary["total_entries"] >= summary["total_matching"]
 

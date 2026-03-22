@@ -248,6 +248,155 @@ def build_get_homologs_members(
     return cypher, params
 
 
+def _list_publications_where(
+    *,
+    organism: str | None = None,
+    treatment_type: str | None = None,
+    search_text: str | None = None,
+    author: str | None = None,
+) -> tuple[str, dict]:
+    """Build WHERE clause and params for publication queries.
+
+    Shared between build_list_publications and build_list_publications_summary.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if search_text:
+        params["search_text"] = search_text
+
+    if organism:
+        conditions.append(
+            "ANY(o IN p.organisms WHERE toLower(o) CONTAINS toLower($organism))"
+        )
+        params["organism"] = organism
+
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN p.treatment_types WHERE toLower(t) = toLower($treatment_type))"
+        )
+        params["treatment_type"] = treatment_type
+
+    if author:
+        conditions.append(
+            "ANY(a IN p.authors WHERE toLower(a) CONTAINS toLower($author))"
+        )
+        params["author"] = author
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+    return where_block, params
+
+
+def build_list_publications(
+    *,
+    organism: str | None = None,
+    treatment_type: str | None = None,
+    search_text: str | None = None,
+    author: str | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build Cypher for listing publications with experiment summaries.
+
+    RETURN keys (compact): doi, title, authors, year, journal, study_type,
+    organisms, experiment_count, treatment_types, omics_types.
+    When search_text is provided, also: score.
+    RETURN keys (verbose): adds abstract, description.
+    """
+    where_block, params = _list_publications_where(
+        organism=organism, treatment_type=treatment_type,
+        search_text=search_text, author=author,
+    )
+
+    verbose_cols = (
+        ",\n       p.abstract AS abstract, p.description AS description"
+        if verbose else ""
+    )
+    if limit is not None:
+        limit_clause = "LIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    if search_text:
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('publicationFullText', $search_text)\n"
+            "YIELD node AS p, score\n"
+            f"{where_block}"
+            "RETURN p.doi AS doi,\n"
+            "       p.title AS title,\n"
+            "       p.authors AS authors,\n"
+            "       p.publication_year AS year,\n"
+            "       p.journal AS journal,\n"
+            "       p.study_type AS study_type,\n"
+            "       p.organisms AS organisms,\n"
+            "       p.experiment_count AS experiment_count,\n"
+            "       p.treatment_types AS treatment_types,\n"
+            "       p.omics_types AS omics_types,\n"
+            f"       score{verbose_cols}\n"
+            f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
+            f"{limit_clause}"
+        )
+    else:
+        cypher = (
+            "MATCH (p:Publication)\n"
+            f"{where_block}"
+            "RETURN p.doi AS doi,\n"
+            "       p.title AS title,\n"
+            "       p.authors AS authors,\n"
+            "       p.publication_year AS year,\n"
+            "       p.journal AS journal,\n"
+            "       p.study_type AS study_type,\n"
+            "       p.organisms AS organisms,\n"
+            "       p.experiment_count AS experiment_count,\n"
+            "       p.treatment_types AS treatment_types,\n"
+            f"       p.omics_types AS omics_types{verbose_cols}\n"
+            f"ORDER BY p.publication_year DESC, p.title\n"
+            f"{limit_clause}"
+        )
+
+    return cypher, params
+
+
+def build_list_publications_summary(
+    *,
+    organism: str | None = None,
+    treatment_type: str | None = None,
+    search_text: str | None = None,
+    author: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for matching publications.
+
+    RETURN keys: total_entries, total_matching.
+    total_entries is the unfiltered count of all publications.
+    total_matching is the count after applying filters.
+    """
+    where_block, params = _list_publications_where(
+        organism=organism, treatment_type=treatment_type,
+        search_text=search_text, author=author,
+    )
+
+    if search_text:
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('publicationFullText', $search_text)\n"
+            "YIELD node AS p, score\n"
+            f"{where_block}"
+            "WITH count(p) AS total_matching\n"
+            "MATCH (p2:Publication)\n"
+            "RETURN count(p2) AS total_entries, total_matching"
+        )
+    else:
+        cypher = (
+            "MATCH (p:Publication)\n"
+            "WITH count(p) AS total_entries\n"
+            "MATCH (p:Publication)\n"
+            f"{where_block}"
+            "RETURN total_entries, count(p) AS total_matching"
+        )
+
+    return cypher, params
+
+
 def build_list_gene_categories() -> tuple[str, dict]:
     cypher = (
         "MATCH (g:Gene) WHERE g.gene_category IS NOT NULL\n"

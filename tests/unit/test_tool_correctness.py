@@ -5,11 +5,12 @@ real gene annotation data. Complements test_tool_wrappers.py which tests
 wrapper logic (validation, error messages, LIMIT injection) with minimal mocks.
 """
 
+import asyncio
 import json
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 from multiomics_explorer.mcp_server.tools import register_tools
 from tests.fixtures.gene_data import (
@@ -30,7 +31,8 @@ def tool_fns():
     """Register tools on a fresh FastMCP and return a dict of {name: fn}."""
     mcp = FastMCP("test")
     register_tools(mcp)
-    return {name: t.fn for name, t in mcp._tool_manager._tools.items()}
+    tools = asyncio.run(mcp.list_tools())
+    return {t.name: asyncio.run(mcp.get_tool(t.name)).fn for t in tools}
 
 
 @pytest.fixture()
@@ -38,6 +40,10 @@ def mock_ctx():
     """MCP Context mock whose .conn returns a MagicMock GraphConnection."""
     ctx = MagicMock()
     ctx.request_context.lifespan_context.conn = MagicMock()
+    ctx.info = AsyncMock()
+    ctx.warning = AsyncMock()
+    ctx.error = AsyncMock()
+    ctx.debug = AsyncMock()
     return ctx
 
 

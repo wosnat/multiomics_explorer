@@ -912,3 +912,41 @@
   expect:
     min_rows: 0
     columns: [id, name]
+
+# ── Publications ──────────────────────────────────────────
+
+- id: list_publications_all
+  tool: list_publications
+  desc: All publications returned when no filters
+  params: {}
+  expect:
+    min_rows: 15
+    columns: [doi, title, authors, year, experiment_count, organisms,
+              treatment_types, omics_types]
+
+- id: list_publications_organism
+  tool: list_publications
+  desc: Filter by organism returns subset
+  params:
+    organism: "MED4"
+  expect:
+    min_rows: 5
+    columns: [doi, title, experiment_count]
+
+- id: list_publications_treatment_type
+  tool: list_publications
+  desc: Coculture treatment type filter
+  params:
+    treatment_type: "coculture"
+  expect:
+    min_rows: 3
+    columns: [doi, title, experiment_count]
+
+- id: list_publications_author
+  tool: list_publications
+  desc: Filter by author name
+  params:
+    author: "Chisholm"
+  expect:
+    min_rows: 2
+    columns: [doi, title, authors]

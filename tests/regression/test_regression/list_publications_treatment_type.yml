@@ -1,0 +1,81 @@
+case_id: list_publications_treatment_type
+row_count: 4
+rows:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  doi: 10.1101/2025.11.24.690089
+  experiment_count: 10
+  journal: bioRxiv
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii HOT1A3
+  - Prochlorococcus MED4
+  study_type: Transcriptomics and Proteomics (multi-omics)
+  title: Transcriptomic and Proteomic Analysis Reveals Nitrogen Recycling as a Core
+    Mechanism for Prochlorococcus Prolonged Survival
+  treatment_types:
+  - coculture
+  - nitrogen_stress
+  year: 2025
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  doi: 10.1038/s43705-022-00197-2
+  experiment_count: 10
+  journal: ISME Communications
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii EZ55
+  - Prochlorococcus MIT9312
+  - Synechococcus CC9311
+  - Synechococcus WH8102
+  study_type: RNA-seq
+  title: Community context and pCO 2 impact the transcriptome of the “helper” bacterium
+    Alteromonas in co-culture with picocyanobacteria
+  treatment_types:
+  - carbon_stress
+  - coculture
+  year: 2022
+- authors:
+  - Allison Coe
+  - Sallie W Chisholm
+  - Steven J Biller
+  doi: 10.1038/ismej.2016.82
+  experiment_count: 3
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas MIT1002
+  - Prochlorococcus NATL2A
+  study_type: RNA-seq / Transcriptomics
+  title: 'Torn apart and reunited: impact of a heterotroph on the transcriptome of
+    Prochlorococcus'
+  treatment_types:
+  - coculture
+  year: 2016
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  doi: 10.1038/ismej.2016.70
+  experiment_count: 5
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii HOT1A3
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: RNA-seq
+  title: 'Transcriptional response of Prochlorococcus to co-culture with a marine
+    Alteromonas: differences between strains and the involvement of putative infochemicals'
+  treatment_types:
+  - coculture
+  year: 2016
