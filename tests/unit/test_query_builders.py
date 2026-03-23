@@ -7,13 +7,12 @@ import pytest
 
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
+    build_gene_homologs,
+    build_gene_homologs_summary,
     build_gene_ontology_terms,
     build_gene_overview,
-    build_gene_stub,
     build_genes_by_ontology,
     build_get_gene_details,
-    build_get_homologs_groups,
-    build_get_homologs_members,
     build_list_gene_categories,
     build_list_organisms,
     build_list_publications,
@@ -176,160 +175,167 @@ class TestRemovedExpressionBuilders:
         assert not hasattr(ql, "DIRECT_EXPR_RELS")
 
 
-class TestBuildGeneStub:
-    def test_returns_expected_columns(self):
-        cypher, params = build_gene_stub(gene_id="PMM0001")
-        assert params["lt"] == "PMM0001"
-        for col in ["locus_tag", "gene_name", "product", "organism_strain"]:
-            assert col in cypher
+class TestBuildGeneHomologs:
+    def test_no_filters(self):
+        """No filters: UNWIND + MATCH pattern, no WHERE clause."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM0845"])
+        assert "UNWIND $locus_tags" in cypher
+        assert "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)" in cypher
+        assert "WHERE" not in cypher
+        assert params["locus_tags"] == ["PMM0845"]
 
-    def test_matches_by_locus_tag(self):
-        cypher, _ = build_gene_stub(gene_id="PMM0001")
-        assert "locus_tag: $lt" in cypher
-
-
-class TestBuildGetHomologsGroups:
-    def test_returns_og_enrichment_properties(self):
-        cypher, params = build_get_homologs_groups(gene_id="PMM0845")
-        assert params["lt"] == "PMM0845"
+    def test_returns_compact_columns(self):
+        """Compact mode (verbose=False) returns 7 columns."""
+        cypher, _ = build_gene_homologs(locus_tags=["PMM0845"])
         for col in [
-            "consensus_product", "consensus_gene_name",
-            "member_count", "organism_count",
-            "genera", "has_cross_genus_members",
+            "locus_tag", "organism_strain", "group_id",
+            "consensus_gene_name", "consensus_product",
+            "taxonomic_level", "source",
         ]:
             assert col in cypher
 
-    def test_orders_by_specificity_rank_source(self):
-        cypher, _ = build_get_homologs_groups(gene_id="x")
-        assert "ORDER BY og.specificity_rank, og.source" in cypher
+    def test_order_by(self):
+        """ORDER BY locus_tag, specificity_rank, source."""
+        cypher, _ = build_gene_homologs(locus_tags=["x"])
+        assert "ORDER BY g.locus_tag, og.specificity_rank, og.source" in cypher
 
     def test_source_filter(self):
-        cypher, params = build_get_homologs_groups(gene_id="x", source="cyanorak")
+        cypher, params = build_gene_homologs(locus_tags=["x"], source="cyanorak")
         assert "og.source = $source" in cypher
         assert params["source"] == "cyanorak"
 
     def test_taxonomic_level_filter(self):
-        cypher, params = build_get_homologs_groups(gene_id="x", taxonomic_level="Bacteria")
+        cypher, params = build_gene_homologs(locus_tags=["x"], taxonomic_level="Bacteria")
         assert "og.taxonomic_level = $level" in cypher
         assert params["level"] == "Bacteria"
 
     def test_max_specificity_rank_filter(self):
-        cypher, params = build_get_homologs_groups(gene_id="x", max_specificity_rank=1)
+        cypher, params = build_gene_homologs(locus_tags=["x"], max_specificity_rank=1)
         assert "og.specificity_rank <= $max_rank" in cypher
         assert params["max_rank"] == 1
 
-    def test_no_filter_when_all_none(self):
-        cypher, params = build_get_homologs_groups(gene_id="x")
-        assert "WHERE" not in cypher
-        assert params == {"lt": "x"}
-
-    def test_gene_in_ortholog_group(self):
-        cypher, _ = build_get_homologs_groups(gene_id="x")
-        assert "Gene_in_ortholog_group" in cypher
-        assert "OrthologGroup" in cypher
-
-    def test_source_and_taxonomic_level_combined(self):
-        """Both source and taxonomic_level filters appear in WHERE."""
-        cypher, params = build_get_homologs_groups(
-            gene_id="x", source="cyanorak", taxonomic_level="curated",
-        )
-        assert "og.source = $source" in cypher
-        assert "og.taxonomic_level = $level" in cypher
-        assert params["source"] == "cyanorak"
-        assert params["level"] == "curated"
-
-    def test_source_and_max_specificity_rank_combined(self):
-        """Both source and max_specificity_rank filters appear in WHERE."""
-        cypher, params = build_get_homologs_groups(
-            gene_id="x", source="eggnog", max_specificity_rank=2,
-        )
-        assert "og.source = $source" in cypher
-        assert "og.specificity_rank <= $max_rank" in cypher
-        assert params["source"] == "eggnog"
-        assert params["max_rank"] == 2
-
-    def test_all_three_filters_combined(self):
+    def test_combined_filters(self):
         """All three filters (source, taxonomic_level, max_specificity_rank) in WHERE."""
-        cypher, params = build_get_homologs_groups(
-            gene_id="x", source="eggnog", taxonomic_level="Bacteria",
+        cypher, params = build_gene_homologs(
+            locus_tags=["x"], source="eggnog", taxonomic_level="Bacteria",
             max_specificity_rank=3,
         )
         assert "og.source = $source" in cypher
         assert "og.taxonomic_level = $level" in cypher
         assert "og.specificity_rank <= $max_rank" in cypher
-        assert params == {"lt": "x", "source": "eggnog", "level": "Bacteria", "max_rank": 3}
+        assert params["source"] == "eggnog"
+        assert params["level"] == "Bacteria"
+        assert params["max_rank"] == 3
+
+    def test_no_filter_when_all_none(self):
+        """No WHERE clause when all filters are None."""
+        cypher, params = build_gene_homologs(locus_tags=["x"])
+        assert "WHERE" not in cypher
+        assert params == {"locus_tags": ["x"]}
+
+    def test_verbose_false_no_extra_columns(self):
+        """Compact mode excludes specificity_rank, member_count, genera columns."""
+        cypher, _ = build_gene_homologs(locus_tags=["x"], verbose=False)
+        assert "specificity_rank" not in cypher.split("RETURN")[1].split("ORDER BY")[0] or \
+               "AS specificity_rank" not in cypher
+        assert "member_count" not in cypher
+        assert "organism_count" not in cypher
+        assert "genera" not in cypher
+        assert "has_cross_genus_members" not in cypher
+
+    def test_verbose_true_includes_extra_columns(self):
+        """Verbose mode adds specificity_rank, member_count, organism_count, genera, has_cross_genus_members."""
+        cypher, _ = build_gene_homologs(locus_tags=["x"], verbose=True)
+        assert "og.specificity_rank AS specificity_rank" in cypher
+        assert "og.member_count AS member_count" in cypher
+        assert "og.organism_count AS organism_count" in cypher
+        assert "og.genera AS genera" in cypher
+        assert "og.has_cross_genus_members AS has_cross_genus_members" in cypher
+
+    def test_limit_clause(self):
+        """LIMIT is added when limit is provided."""
+        cypher, params = build_gene_homologs(locus_tags=["x"], limit=50)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 50
+
+    def test_limit_none(self):
+        """No LIMIT when limit is None."""
+        cypher, _ = build_gene_homologs(locus_tags=["x"], limit=None)
+        assert "LIMIT" not in cypher
+
+    def test_gene_in_ortholog_group(self):
+        """Uses Gene_in_ortholog_group relationship and OrthologGroup label."""
+        cypher, _ = build_gene_homologs(locus_tags=["x"])
+        assert "Gene_in_ortholog_group" in cypher
+        assert "OrthologGroup" in cypher
 
     @pytest.mark.parametrize("rank", [0, 1, 2, 3])
     def test_max_specificity_rank_boundary_values(self, rank):
         """Each valid rank value (0-3) produces correct WHERE clause."""
-        cypher, params = build_get_homologs_groups(gene_id="x", max_specificity_rank=rank)
+        cypher, params = build_gene_homologs(locus_tags=["x"], max_specificity_rank=rank)
         assert "og.specificity_rank <= $max_rank" in cypher
         assert params["max_rank"] == rank
 
+    def test_multiple_locus_tags(self):
+        """Accepts multiple locus tags."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM0845", "PMM1428"])
+        assert params["locus_tags"] == ["PMM0845", "PMM1428"]
 
-class TestBuildGetHomologsMembers:
-    def test_includes_other_neq_g(self):
-        cypher, _ = build_get_homologs_members(gene_id="x")
-        assert "other <> g" in cypher
 
-    def test_exclude_paralogs_true_adds_organism_filter(self):
-        cypher, _ = build_get_homologs_members(gene_id="x", exclude_paralogs=True)
-        assert "other.organism_strain <> g.organism_strain" in cypher
-
-    def test_exclude_paralogs_false_omits_organism_filter(self):
-        cypher, _ = build_get_homologs_members(gene_id="x", exclude_paralogs=False)
-        assert "other.organism_strain <> g.organism_strain" not in cypher
-
-    def test_returns_expected_columns(self):
-        cypher, _ = build_get_homologs_members(gene_id="x")
-        for col in ["og_name", "locus_tag", "gene_name", "product", "organism_strain"]:
+class TestBuildGeneHomologsSummary:
+    def test_returns_summary_columns(self):
+        """Returns total_matching, by_organism, by_source, not_found, no_groups."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["PMM0845"])
+        for col in ["total_matching", "by_organism", "by_source", "not_found", "no_groups"]:
             assert col in cypher
+        assert params["locus_tags"] == ["PMM0845"]
 
-    def test_orders_correctly(self):
-        cypher, _ = build_get_homologs_members(gene_id="x")
-        assert "ORDER BY og.specificity_rank, og.source, other.organism_strain, other.locus_tag" in cypher
+    def test_uses_optional_match(self):
+        """Summary uses OPTIONAL MATCH for gene and OG lookups."""
+        cypher, _ = build_gene_homologs_summary(locus_tags=["x"])
+        assert "OPTIONAL MATCH" in cypher
 
-    def test_source_filter(self):
-        cypher, params = build_get_homologs_members(gene_id="x", source="eggnog")
+    def test_has_unwind(self):
+        """Has UNWIND $locus_tags."""
+        cypher, _ = build_gene_homologs_summary(locus_tags=["x"])
+        assert "UNWIND $locus_tags" in cypher
+
+    def test_source_filter_forwarded(self):
+        """Source filter is forwarded to WHERE clause."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["x"], source="cyanorak")
         assert "og.source = $source" in cypher
-        assert params["source"] == "eggnog"
+        assert params["source"] == "cyanorak"
 
-    def test_taxonomic_level_filter(self):
-        cypher, params = build_get_homologs_members(gene_id="x", taxonomic_level="Cyanobacteria")
+    def test_taxonomic_level_filter_forwarded(self):
+        """Taxonomic level filter is forwarded to WHERE clause."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["x"], taxonomic_level="Bacteria")
         assert "og.taxonomic_level = $level" in cypher
-        assert params["level"] == "Cyanobacteria"
+        assert params["level"] == "Bacteria"
 
-    def test_max_specificity_rank_filter(self):
-        cypher, params = build_get_homologs_members(gene_id="x", max_specificity_rank=2)
+    def test_max_specificity_rank_filter_forwarded(self):
+        """Max specificity rank filter is forwarded to WHERE clause."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["x"], max_specificity_rank=2)
         assert "og.specificity_rank <= $max_rank" in cypher
         assert params["max_rank"] == 2
 
-    def test_source_and_taxonomic_level_combined(self):
-        """Both source and taxonomic_level filters appear in WHERE."""
-        cypher, params = build_get_homologs_members(
-            gene_id="x", source="cyanorak", taxonomic_level="curated",
-        )
-        assert "og.source = $source" in cypher
-        assert "og.taxonomic_level = $level" in cypher
+    def test_no_filter_when_all_none(self):
+        """No OG filter WHERE clause when all filters are None."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["x"])
+        # No og.source / og.taxonomic_level / og.specificity_rank conditions
+        assert "og.source" not in cypher
+        assert "og.taxonomic_level" not in cypher
+        assert "og.specificity_rank" not in cypher
+        assert params == {"locus_tags": ["x"]}
 
-    def test_all_filters_combined_with_exclude_paralogs(self):
-        """All filters plus exclude_paralogs=True all appear in WHERE."""
-        cypher, params = build_get_homologs_members(
-            gene_id="x", source="eggnog", taxonomic_level="Bacteria",
-            max_specificity_rank=3, exclude_paralogs=True,
+    def test_combined_filters(self):
+        """All three filters appear in WHERE."""
+        cypher, params = build_gene_homologs_summary(
+            locus_tags=["x"], source="eggnog", taxonomic_level="Bacteria",
+            max_specificity_rank=3,
         )
         assert "og.source = $source" in cypher
         assert "og.taxonomic_level = $level" in cypher
         assert "og.specificity_rank <= $max_rank" in cypher
-        assert "other.organism_strain <> g.organism_strain" in cypher
-        assert "other <> g" in cypher
-
-    @pytest.mark.parametrize("rank", [0, 1, 2, 3])
-    def test_max_specificity_rank_boundary_values(self, rank):
-        """Each valid rank value (0-3) produces correct WHERE clause."""
-        cypher, params = build_get_homologs_members(gene_id="x", max_specificity_rank=rank)
-        assert "og.specificity_rank <= $max_rank" in cypher
-        assert params["max_rank"] == rank
 
 
 class TestBuildGetHomologsOldRemoved:
@@ -342,6 +348,16 @@ class TestBuildGetHomologsOldRemoved:
         """Old build_homolog_expression function should not exist in queries_lib."""
         import multiomics_explorer.kg.queries_lib as ql
         assert not hasattr(ql, "build_homolog_expression")
+
+    def test_old_build_get_homologs_groups_no_longer_exists(self):
+        """Old build_get_homologs_groups function should not exist in queries_lib."""
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "build_get_homologs_groups")
+
+    def test_old_build_get_homologs_members_no_longer_exists(self):
+        """Old build_get_homologs_members function should not exist in queries_lib."""
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "build_get_homologs_members")
 
 
 class TestBuildListGeneCategories:

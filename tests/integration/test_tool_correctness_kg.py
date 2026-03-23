@@ -18,8 +18,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_stub,
     build_genes_by_ontology,
     build_get_gene_details,
-    build_get_homologs_groups,
-    build_get_homologs_members,
+    build_gene_homologs,
+    build_gene_homologs_summary,
     build_list_gene_categories,
     build_list_organisms,
     build_resolve_gene,
@@ -265,208 +265,108 @@ class TestGeneOverviewCorrectnessKG:
 
 
 # ---------------------------------------------------------------------------
-# TestGetHomologsCorrectnessKG
+# TestGeneHomologsCorrectnessKG
 # ---------------------------------------------------------------------------
 
 @pytest.mark.kg
-class TestGetHomologsCorrectnessKG:
-    """Validate homolog queries return correct data with group-centric API."""
+class TestGeneHomologsCorrectnessKG:
+    """Validate gene_homologs queries return correct data (flat long format)."""
 
-    def test_pmm1375_has_three_ortholog_groups(self, conn):
-        """PMM1375 should belong to 3 ortholog groups (cyanorak, Prochloraceae eggnog, Bacteria eggnog)."""
-        cypher, params = build_get_homologs_groups(gene_id="PMM1375")
+    def test_pmm1375_has_three_groups(self, conn):
+        """PMM1375 should belong to 3 ortholog groups."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM1375"])
         results = conn.execute_query(cypher, **params)
-        assert len(results) == 3, (
-            f"Expected 3 ortholog groups for PMM1375, got {len(results)}"
-        )
+        assert len(results) == 3
 
-    def test_groups_ordered_by_specificity_rank(self, conn):
-        """Groups should be ordered by specificity_rank ascending."""
-        cypher, params = build_get_homologs_groups(gene_id="PMM1375")
+    def test_results_have_compact_columns(self, conn):
+        """Each result has compact columns."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM1375"])
+        results = conn.execute_query(cypher, **params)
+        for r in results:
+            for col in ("locus_tag", "organism_strain", "group_id",
+                        "consensus_gene_name", "consensus_product",
+                        "taxonomic_level", "source"):
+                assert col in r, f"Missing compact column: {col}"
+
+    def test_verbose_adds_columns(self, conn):
+        """verbose=True adds group metadata columns."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM1375"], verbose=True)
+        results = conn.execute_query(cypher, **params)
+        for r in results:
+            for col in ("specificity_rank", "member_count", "organism_count",
+                        "genera", "has_cross_genus_members"):
+                assert col in r, f"Missing verbose column: {col}"
+
+    def test_ordered_by_locus_rank_source(self, conn):
+        """Results ordered by locus_tag, specificity_rank, source."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM1375"], verbose=True)
         results = conn.execute_query(cypher, **params)
         ranks = [r["specificity_rank"] for r in results]
-        assert ranks == sorted(ranks), (
-            f"Groups not ordered by specificity_rank: {ranks}"
-        )
+        assert ranks == sorted(ranks)
 
-    def test_groups_have_enrichment_properties(self, conn):
-        """Each group has enrichment properties (consensus_product, member_count, etc.)."""
-        cypher, params = build_get_homologs_groups(gene_id="PMM1375")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        for r in results:
-            assert "og_name" in r
-            assert "source" in r
-            assert "taxonomic_level" in r
-            assert "specificity_rank" in r
-            assert "consensus_product" in r
-            assert "consensus_gene_name" in r
-            assert "member_count" in r
-            assert "organism_count" in r
-            assert "genera" in r
-            assert "has_cross_genus_members" in r
-            assert r["member_count"] is not None and r["member_count"] > 0
-
-    def test_source_cyanorak_filter(self, conn):
-        """source='cyanorak' filter returns only cyanorak group."""
-        cypher, params = build_get_homologs_groups(gene_id="PMM1375", source="cyanorak")
+    def test_source_filter(self, conn):
+        """source='cyanorak' returns only cyanorak groups."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM1375"], source="cyanorak")
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
         for r in results:
             assert r["source"] == "cyanorak"
 
-    def test_exclude_paralogs_default(self, conn):
-        """exclude_paralogs=True (default): no members with same organism_strain as query gene."""
-        # First get the query gene's organism
-        cypher_gene, params_gene = build_gene_stub(gene_id="PMM1375")
-        gene_rows = conn.execute_query(cypher_gene, **params_gene)
-        query_org = gene_rows[0]["organism_strain"]
-
-        cypher, params = build_get_homologs_members(gene_id="PMM1375", exclude_paralogs=True)
+    def test_max_specificity_rank_0(self, conn):
+        """max_specificity_rank=0 returns only curated groups."""
+        cypher, params = build_gene_homologs(
+            locus_tags=["PMM1375"], max_specificity_rank=0, verbose=True,
+        )
         results = conn.execute_query(cypher, **params)
         for r in results:
-            assert r["organism_strain"] != query_org, (
-                f"Paralog found with same organism: {r['locus_tag']} ({r['organism_strain']})"
-            )
+            assert r["specificity_rank"] == 0
 
-    def test_exclude_paralogs_false(self, conn):
-        """exclude_paralogs=False: query does not filter by organism_strain."""
-        cypher, params = build_get_homologs_members(gene_id="PMM1375", exclude_paralogs=False)
+    def test_batch_multiple_genes(self, conn):
+        """Batch query returns rows for multiple genes."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM0001", "PMM0845"])
         results = conn.execute_query(cypher, **params)
-        # Just verify it runs without error and returns members
-        assert isinstance(results, list)
+        loci = {r["locus_tag"] for r in results}
+        assert loci == {"PMM0001", "PMM0845"}
 
-    def test_default_no_members_key(self, conn):
-        """Default mode (groups query) returns group metadata, not member genes."""
-        cypher, params = build_get_homologs_groups(gene_id="PMM1375")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        for r in results:
-            assert "members" not in r
-
-    def test_include_members_returns_member_genes(self, conn):
-        """Members query returns member genes with locus_tag, gene_name, product, organism_strain."""
-        cypher, params = build_get_homologs_members(gene_id="PMM1375")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-        for r in results:
-            assert "og_name" in r
-            assert "locus_tag" in r
-            assert "gene_name" in r
-            assert "product" in r
-            assert "organism_strain" in r
-
-    def test_alteromonas_no_cyanorak_group(self, conn):
-        """Alteromonas gene (MIT1002_00002) should not have cyanorak group."""
-        cypher, params = build_get_homologs_groups(gene_id="MIT1002_00002")
+    def test_alteromonas_no_cyanorak(self, conn):
+        """Alteromonas gene has no cyanorak groups."""
+        cypher, params = build_gene_homologs(locus_tags=["MIT1002_00002"])
         results = conn.execute_query(cypher, **params)
         sources = {r["source"] for r in results}
-        assert "cyanorak" not in sources, (
-            f"Alteromonas gene should not have cyanorak group, got sources: {sources}"
-        )
+        assert "cyanorak" not in sources
 
-    def test_gene_stub_returns_metadata(self, conn):
-        """build_gene_stub returns query gene metadata."""
-        cypher, params = build_gene_stub(gene_id="PMM1375")
+    def test_synechococcus_has_eggnog(self, conn):
+        """Synechococcus gene has eggnog groups."""
+        cypher, params = build_gene_homologs(locus_tags=["SYNW0305"])
         results = conn.execute_query(cypher, **params)
-        assert len(results) == 1
-        r = results[0]
-        assert r["locus_tag"] == "PMM1375"
-        assert "gene_name" in r
-        assert "product" in r
-        assert "organism_strain" in r
-
-    def test_known_gene_has_homolog_groups(self, conn):
-        """PMM0001 (dnaN) should have ortholog groups."""
-        cypher, params = build_get_homologs_groups(gene_id="PMM0001")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 0
-
-    def test_homolog_groups_have_source_and_level(self, conn):
-        """All groups should have non-null source and taxonomic_level."""
-        cypher, params = build_get_homologs_groups(gene_id="PMM0001")
-        results = conn.execute_query(cypher, **params)
-        for r in results:
-            assert r["source"] is not None, f"Null source for {r['og_name']}"
-            assert r["taxonomic_level"] is not None, f"Null taxonomic_level for {r['og_name']}"
-
-    # -- Non-Prochlorococcus gene tests --
-
-    def test_synechococcus_gene_has_eggnog_groups(self, conn):
-        """Synechococcus gene (SYNW0305) should have eggnog ortholog groups."""
-        cypher, params = build_get_homologs_groups(gene_id="SYNW0305")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
         sources = {r["source"] for r in results}
         assert "eggnog" in sources
 
-    def test_alteromonas_gene_has_members(self, conn):
-        """Alteromonas gene should have homolog members across organisms."""
-        cypher, params = build_get_homologs_members(gene_id="ALT831_RS00180")
+    def test_summary_not_found(self, conn):
+        """Fake gene appears in not_found."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["FAKE_GENE_XYZ"])
+        result = conn.execute_query(cypher, **params)[0]
+        assert "FAKE_GENE_XYZ" in result["not_found"]
+
+    def test_summary_no_groups(self, conn):
+        """Gene with no OGs appears in no_groups."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["A9601_RS13285"])
+        result = conn.execute_query(cypher, **params)[0]
+        assert "A9601_RS13285" in result["no_groups"]
+
+    def test_summary_breakdowns(self, conn):
+        """Summary returns by_organism and by_source breakdowns."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["PMM0001"])
+        result = conn.execute_query(cypher, **params)[0]
+        assert result["total_matching"] >= 2
+        assert len(result["by_organism"]) >= 1
+        assert len(result["by_source"]) >= 1
+
+    def test_limit(self, conn):
+        """LIMIT caps results."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM0001"], limit=1)
         results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-        orgs = {r["organism_strain"] for r in results}
-        assert len(orgs) >= 1
-
-    # -- Filter combination tests --
-
-    def test_source_and_max_specificity_rank_combined(self, conn):
-        """Combining source + max_specificity_rank narrows results correctly."""
-        # Unfiltered groups for PMM0001
-        cypher_all, params_all = build_get_homologs_groups(gene_id="PMM0001")
-        all_groups = conn.execute_query(cypher_all, **params_all)
-
-        # Filtered: eggnog only with rank <= 3
-        cypher_filtered, params_filtered = build_get_homologs_groups(
-            gene_id="PMM0001", source="eggnog", max_specificity_rank=3,
-        )
-        filtered = conn.execute_query(cypher_filtered, **params_filtered)
-        assert len(filtered) <= len(all_groups)
-        for r in filtered:
-            assert r["source"] == "eggnog"
-            assert r["specificity_rank"] <= 3
-
-    def test_max_specificity_rank_0_curated_only(self, conn):
-        """max_specificity_rank=0 returns only curated groups (rank 0)."""
-        cypher, params = build_get_homologs_groups(
-            gene_id="PMM1375", max_specificity_rank=0,
-        )
-        results = conn.execute_query(cypher, **params)
-        for r in results:
-            assert r["specificity_rank"] == 0, (
-                f"Expected rank 0, got {r['specificity_rank']} for {r['og_name']}"
-            )
-
-    # -- Member ordering correctness test --
-
-    def test_members_ordered_by_specificity_organism_locus(self, conn):
-        """Members query results are ordered by specificity_rank, source, organism, locus_tag."""
-        cypher, params = build_get_homologs_members(gene_id="PMM0001")
-        results = conn.execute_query(cypher, **params)
-        assert len(results) > 1
-        # Check organism_strain + locus_tag ordering within each og_name group
-        prev_org = ""
-        prev_locus = ""
-        prev_og = ""
-        for r in results:
-            if r["og_name"] == prev_og:
-                if r["organism_strain"] == prev_org:
-                    assert r["locus_tag"] >= prev_locus, (
-                        f"Locus tags not sorted: {prev_locus} > {r['locus_tag']}"
-                    )
-            prev_og = r["og_name"]
-            prev_org = r["organism_strain"]
-            prev_locus = r["locus_tag"]
-
-    # -- Gene with zero ortholog groups --
-
-    def test_hypothetical_gene_may_lack_groups(self, conn):
-        """A hypothetical protein may have fewer ortholog groups."""
-        # PMT9312_0342 is a hypothetical protein — may have 0 or few groups
-        cypher, params = build_get_homologs_groups(gene_id="PMT9312_0342")
-        results = conn.execute_query(cypher, **params)
-        # Just verify the query runs and returns a list
-        assert isinstance(results, list)
+        assert len(results) == 1
 
 
 # ---------------------------------------------------------------------------

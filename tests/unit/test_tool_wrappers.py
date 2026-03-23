@@ -48,7 +48,7 @@ def _conn_from(ctx):
 EXPECTED_TOOLS = [
     "get_schema", "list_filter_values", "list_organisms", "resolve_gene",
     "search_genes", "gene_overview", "get_gene_details",
-    "get_homologs", "run_cypher",
+    "gene_homologs", "run_cypher",
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
     "list_publications",
     "list_experiments",
@@ -529,257 +529,152 @@ class TestGetGeneDetailsWrapper:
 
 
 # ---------------------------------------------------------------------------
-# get_homologs
+# gene_homologs
 # ---------------------------------------------------------------------------
-class TestGetHomologsWrapper:
-    def _gene_stub(self):
-        return {"locus_tag": "PMM0001", "gene_name": "dnaN",
-                "product": "DNA polymerase III, beta subunit",
-                "organism_strain": "Prochlorococcus MED4"}
+class TestGeneHomologsWrapper:
+    _SAMPLE_API_RETURN = {
+        "total_matching": 2,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1},
+                        {"organism_name": "Synechococcus WH8102", "count": 1}],
+        "by_source": [{"source": "cyanorak", "count": 2}],
+        "returned": 2,
+        "truncated": False,
+        "not_found": [],
+        "no_groups": [],
+        "results": [
+            {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
+             "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+             "consensus_product": "DNA polymerase III subunit beta",
+             "taxonomic_level": "curated", "source": "cyanorak"},
+            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102",
+             "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+             "consensus_product": "DNA polymerase III subunit beta",
+             "taxonomic_level": "curated", "source": "cyanorak"},
+        ],
+    }
 
-    def _sample_groups(self):
-        return [
-            {"og_name": "CK_00000364", "source": "cyanorak",
-             "taxonomic_level": "curated", "specificity_rank": 0,
-             "consensus_product": "DNA polymerase III beta subunit",
-             "consensus_gene_name": "dnaN", "member_count": 72,
-             "organism_count": 72, "genera": "Prochlorococcus;Synechococcus",
-             "has_cross_genus_members": True},
-            {"og_name": "COG0592@2", "source": "eggnog",
-             "taxonomic_level": "Bacteria", "specificity_rank": 3,
-             "consensus_product": "DNA polymerase III beta subunit",
-             "consensus_gene_name": "dnaN", "member_count": 150,
-             "organism_count": 140, "genera": "Prochlorococcus;Synechococcus;Alteromonas",
-             "has_cross_genus_members": True},
-        ]
-
-    def test_gene_not_found_message(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["get_homologs"](mock_ctx, gene_id="FAKE")
-        assert "not found" in result
-
-    def test_no_ortholog_groups_message(self, tool_fns, mock_ctx):
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],  # gene stub
-            [],                   # no groups
-        ]
-        result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        assert "No ortholog groups" in result
-
-    def test_default_mode_has_query_gene_and_groups_without_members(self, tool_fns, mock_ctx):
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-        result = json.loads(tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001"))
-        assert "query_gene" in result
-        assert "ortholog_groups" in result
-        assert result["query_gene"]["locus_tag"] == "PMM0001"
-        for g in result["ortholog_groups"]:
-            assert "members" not in g
-
-    def test_include_members_has_members_lists(self, tool_fns, mock_ctx):
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
-             "gene_name": "dnaN", "product": "DNA pol III beta",
-             "organism_strain": "Prochlorococcus MIT9312"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-            members,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", include_members=True)
-        )
-        # At least one group should have members
-        has_members = any("members" in g for g in result["ortholog_groups"])
-        assert has_members
-
-    def test_source_filter_passed_through(self, tool_fns, mock_ctx):
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups()[:1],  # only cyanorak group
-        ]
-        tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", source="cyanorak")
-        # The groups query (2nd call) should have source param
-        groups_call = conn.execute_query.call_args_list[1]
-        groups_kwargs = groups_call.kwargs
-        assert groups_kwargs.get("source") == "cyanorak"
-
-    def test_exclude_paralogs_passed_to_members_builder(self, tool_fns, mock_ctx):
-        """exclude_paralogs=True adds organism_strain filter in members query."""
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
-             "gene_name": "dnaN", "product": "p",
-             "organism_strain": "Prochlorococcus MIT9312"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-            members,
-        ]
-        tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", include_members=True, exclude_paralogs=True,
-        )
-        # Members query is the 3rd call
-        members_cypher = conn.execute_query.call_args_list[2][0][0]
-        assert "other.organism_strain <> g.organism_strain" in members_cypher
-
-    def test_include_expression_parameter_no_longer_exists(self, tool_fns, mock_ctx):
-        """include_expression is no longer accepted by get_homologs."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-        with pytest.raises(TypeError):
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_expression=True,
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, mock_ctx):
+        """Response has total_matching, by_organism, by_source, returned, truncated, results."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_homologs"](
+                mock_ctx, locus_tags=["PMM0001"],
             )
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert result.truncated is False
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.locus_tag == "PMM0001"
+        assert r.group_id == "CK_00000364"
+        assert r.consensus_gene_name == "dnaN"
+        assert r.source == "cyanorak"
 
-    def test_response_is_json(self, tool_fns, mock_ctx):
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-        raw = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        result = json.loads(raw)
-        assert isinstance(result, dict)
-
-    def test_invalid_source_returns_error(self, tool_fns, mock_ctx):
-        result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", source="bad")
-        assert "Invalid source" in result
-        assert "cyanorak" in result
-        assert "eggnog" in result
-
-    def test_invalid_taxonomic_level_returns_error(self, tool_fns, mock_ctx):
-        result = tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", taxonomic_level="bad",
-        )
-        assert "Invalid taxonomic_level" in result
-
-    def test_invalid_max_specificity_rank_returns_error(self, tool_fns, mock_ctx):
-        result = tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", max_specificity_rank=5,
-        )
-        assert "Invalid max_specificity_rank" in result
-
-    def test_invalid_member_limit_zero_returns_error(self, tool_fns, mock_ctx):
-        result = tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", member_limit=0,
-        )
-        assert "Invalid member_limit" in result
-
-    def test_invalid_member_limit_300_returns_error(self, tool_fns, mock_ctx):
-        result = tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", member_limit=300,
-        )
-        assert "Invalid member_limit" in result
-
-    def test_member_limit_truncates_and_sets_flag(self, tool_fns, mock_ctx):
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": f"PMT{i:04d}",
-             "gene_name": "x", "product": "p", "organism_strain": f"Strain{i}"}
-            for i in range(5)
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups()[:1],  # one group
-            members,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=2,
+    @pytest.mark.asyncio
+    async def test_summary_mode(self, tool_fns, mock_ctx):
+        """summary=True returns results=[]."""
+        summary_return = {
+            **self._SAMPLE_API_RETURN,
+            "returned": 0,
+            "truncated": True,
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value=summary_return,
+        ):
+            result = await tool_fns["gene_homologs"](
+                mock_ctx, locus_tags=["PMM0001"], summary=True,
             )
-        )
-        g = result["ortholog_groups"][0]
-        assert len(g["members"]) == 2
-        assert g["truncated"] is True
+        assert result.returned == 0
+        assert result.truncated is True
+        assert result.results == []
 
-    def test_groups_below_limit_no_truncated_key(self, tool_fns, mock_ctx):
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "PMT0001",
-             "gene_name": "x", "product": "p", "organism_strain": "Strain1"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups()[:1],
-            members,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=50,
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """All params passed through to api."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_homologs"](
+                mock_ctx,
+                locus_tags=["PMM0001", "PMM0845"],
+                source="cyanorak",
+                taxonomic_level="curated",
+                max_specificity_rank=0,
+                summary=False,
+                verbose=True,
+                limit=10,
             )
-        )
-        g = result["ortholog_groups"][0]
-        assert "truncated" not in g
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.args[0] == ["PMM0001", "PMM0845"]
+        assert call_kwargs.kwargs["source"] == "cyanorak"
+        assert call_kwargs.kwargs["taxonomic_level"] == "curated"
+        assert call_kwargs.kwargs["max_specificity_rank"] == 0
+        assert call_kwargs.kwargs["summary"] is False
+        assert call_kwargs.kwargs["verbose"] is True
+        assert call_kwargs.kwargs["limit"] == 10
 
-    # -- member_limit edge cases ------------------------------------------
-
-    def test_member_limit_1_accepts(self, tool_fns, mock_ctx):
-        """member_limit=1 is the minimum valid value."""
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "PMT0001",
-             "gene_name": "x", "product": "p", "organism_strain": "Strain1"},
-            {"og_name": "CK_00000364", "locus_tag": "PMT0002",
-             "gene_name": "x", "product": "p", "organism_strain": "Strain2"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups()[:1],
-            members,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=1,
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """returned/truncated from api are preserved."""
+        truncated_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 10,
+            "returned": 2,
+            "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value=truncated_return,
+        ):
+            result = await tool_fns["gene_homologs"](
+                mock_ctx, locus_tags=["PMM0001"],
             )
-        )
-        g = result["ortholog_groups"][0]
-        assert len(g["members"]) == 1
-        assert g["truncated"] is True
+        assert result.total_matching == 10
+        assert result.returned == 2
+        assert result.truncated is True
 
-    def test_member_limit_200_accepts(self, tool_fns, mock_ctx):
-        """member_limit=200 is the maximum valid value (accepted, not error)."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-        result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001", member_limit=200)
-        # Should not error — returns valid JSON
-        assert "Invalid member_limit" not in result
-
-    def test_member_limit_exact_no_truncation(self, tool_fns, mock_ctx):
-        """When members == member_limit, no truncation occurs."""
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": f"PMT{i:04d}",
-             "gene_name": "x", "product": "p", "organism_strain": f"Strain{i}"}
-            for i in range(3)
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups()[:1],
-            members,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=3,
+    @pytest.mark.asyncio
+    async def test_not_found_and_no_groups(self, tool_fns, mock_ctx):
+        """not_found and no_groups fields present in response."""
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 0,
+            "returned": 0,
+            "truncated": False,
+            "not_found": ["FAKE0001"],
+            "no_groups": ["PMM9999"],
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value=data,
+        ):
+            result = await tool_fns["gene_homologs"](
+                mock_ctx, locus_tags=["FAKE0001", "PMM9999"],
             )
-        )
-        g = result["ortholog_groups"][0]
-        assert len(g["members"]) == 3
-        assert "truncated" not in g
+        assert "FAKE0001" in result.not_found
+        assert "PMM9999" in result.no_groups
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            side_effect=ValueError("Invalid source 'bad'. Valid: ['cyanorak', 'eggnog']"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["gene_homologs"](
+                    mock_ctx, locus_tags=["PMM0001"], source="bad",
+                )
 
 
 
@@ -1262,22 +1157,26 @@ class TestErrorHandling:
             result = tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001")
         assert "Error in get_gene_details" in result
 
-    def test_get_homologs_generic_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_gene_homologs_generic_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
-            "multiomics_explorer.api.functions.get_homologs",
+            "multiomics_explorer.api.functions.gene_homologs",
             side_effect=RuntimeError("timeout"),
         ):
-            result = tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        assert "Error in get_homologs" in result
+            with pytest.raises(ToolError, match="Error in gene_homologs"):
+                await tool_fns["gene_homologs"](mock_ctx, locus_tags=["PMM0001"])
 
-    def test_get_homologs_value_error_has_prefix(self, tool_fns, mock_ctx):
-        """get_homologs ValueError should have 'Error:' prefix (was missing before)."""
+    @pytest.mark.asyncio
+    async def test_gene_homologs_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """gene_homologs ValueError is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
         with patch(
-            "multiomics_explorer.api.functions.get_homologs",
-            side_effect=ValueError("Gene 'FAKE' not found."),
+            "multiomics_explorer.api.functions.gene_homologs",
+            side_effect=ValueError("Invalid source 'bad'. Valid: ['cyanorak', 'eggnog']"),
         ):
-            result = tool_fns["get_homologs"](mock_ctx, gene_id="FAKE")
-        assert result.startswith("Error: ")
+            with pytest.raises(ToolError):
+                await tool_fns["gene_homologs"](mock_ctx, locus_tags=["PMM0001"])
 
     def test_run_cypher_generic_error(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.side_effect = RuntimeError("timeout")

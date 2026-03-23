@@ -119,43 +119,31 @@ class TestGetGeneDetailsContract:
 
 
 # ---------------------------------------------------------------------------
-# get_homologs
+# gene_homologs
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
-class TestGetHomologsContract:
-    def test_returns_dict_with_keys(self, conn):
-        result = api.get_homologs(KNOWN_GENE, conn=conn)
+class TestGeneHomologsContract:
+    def test_returns_dict_with_envelope(self, conn):
+        result = api.gene_homologs([KNOWN_GENE], conn=conn)
         assert isinstance(result, dict)
-        assert "query_gene" in result
-        assert "ortholog_groups" in result
+        for key in ("total_matching", "by_organism", "by_source",
+                     "returned", "truncated", "not_found", "no_groups", "results"):
+            assert key in result
 
-    def test_query_gene_keys(self, conn):
-        result = api.get_homologs(KNOWN_GENE, conn=conn)
-        expected_keys = {"locus_tag", "gene_name", "product", "organism_strain"}
-        assert set(result["query_gene"].keys()) == expected_keys
-
-    def test_group_keys(self, conn):
-        result = api.get_homologs(KNOWN_GENE, conn=conn)
-        assert len(result["ortholog_groups"]) >= 1
-        group = result["ortholog_groups"][0]
+    def test_result_keys_compact(self, conn):
+        result = api.gene_homologs([KNOWN_GENE], conn=conn)
+        assert len(result["results"]) >= 1
         expected_keys = {
-            "og_name", "source", "taxonomic_level", "specificity_rank",
-            "consensus_product", "consensus_gene_name",
-            "member_count", "organism_count", "genera",
-            "has_cross_genus_members",
+            "locus_tag", "organism_strain", "group_id",
+            "consensus_gene_name", "consensus_product",
+            "taxonomic_level", "source",
         }
-        assert set(group.keys()) == expected_keys
+        assert set(result["results"][0].keys()) == expected_keys
 
-    def test_gene_not_found_raises(self, conn):
-        with pytest.raises(ValueError, match="not found"):
-            api.get_homologs("NONEXISTENT_GENE_XYZ", conn=conn)
-
-    def test_include_members_adds_members_key(self, conn):
-        result = api.get_homologs(
-            KNOWN_GENE, include_members=True, conn=conn,
-        )
-        for group in result["ortholog_groups"]:
-            assert "members" in group
+    def test_not_found(self, conn):
+        result = api.gene_homologs(["NONEXISTENT_GENE_XYZ"], conn=conn)
+        assert "NONEXISTENT_GENE_XYZ" in result["not_found"]
+        assert result["total_matching"] == 0
 
 
 # ---------------------------------------------------------------------------

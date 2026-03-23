@@ -202,7 +202,7 @@ def register_tools(mcp: FastMCP):
         field2: int = Field(default=0, description="What this means (e.g. 42)")
 
     class {Name}Response(BaseModel):
-        total_matching: int = Field(description="Total matching filters (or total in KG if no filters)")
+        total_entries: int = Field(description="Total in KG (unfiltered)")
         total_matching: int = Field(description="Rows matching filters")
         returned: int = Field(description="Rows in this response")
         truncated: bool = Field(description="True if total_matching > returned")

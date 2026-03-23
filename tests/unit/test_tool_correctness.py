@@ -391,252 +391,90 @@ class TestGeneOverviewCorrectness:
 
 
 # ---------------------------------------------------------------------------
-# TestGetHomologsCorrectness
+# TestGeneHomologsCorrectness
 # ---------------------------------------------------------------------------
-class TestGetHomologsCorrectness:
-    """Verify get_homologs returns correct homolog data with new group-based API."""
+class TestGeneHomologsCorrectness:
+    """Verify gene_homologs returns correct flat long-format data."""
 
-    def _gene_stub(self):
-        return {"locus_tag": "PMM0001", "gene_name": "dnaN",
-                "product": "DNA polymerase III, beta subunit",
-                "organism_strain": "Prochlorococcus MED4"}
+    _SAMPLE_SUMMARY = {
+        "total_matching": 3,
+        "by_organism": [{"item": "Prochlorococcus MED4", "count": 3}],
+        "by_source": [{"item": "cyanorak", "count": 1}, {"item": "eggnog", "count": 2}],
+        "not_found": [],
+        "no_groups": [],
+    }
 
-    def _sample_groups(self):
-        return [
-            {"og_name": "CK_00000364", "source": "cyanorak",
-             "taxonomic_level": "curated", "specificity_rank": 0,
-             "consensus_product": "DNA polymerase III beta subunit",
-             "consensus_gene_name": "dnaN", "member_count": 72,
-             "organism_count": 72, "genera": "Prochlorococcus;Synechococcus",
-             "has_cross_genus_members": True},
-            {"og_name": "COG0592@2", "source": "eggnog",
-             "taxonomic_level": "Bacteria", "specificity_rank": 3,
-             "consensus_product": "DNA polymerase III beta subunit",
-             "consensus_gene_name": "dnaN", "member_count": 150,
-             "organism_count": 140, "genera": "Prochlorococcus;Synechococcus;Alteromonas",
-             "has_cross_genus_members": True},
+    _SAMPLE_RESULTS = [
+        {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
+         "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+         "consensus_product": "DNA polymerase III, beta subunit",
+         "taxonomic_level": "curated", "source": "cyanorak"},
+        {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
+         "group_id": "COG0592@2", "consensus_gene_name": "dnaN",
+         "consensus_product": "DNA polymerase III, beta subunit",
+         "taxonomic_level": "Bacteria", "source": "eggnog"},
+    ]
+
+    @pytest.mark.asyncio
+    async def test_flat_format_has_compact_columns(self, tool_fns, mock_ctx):
+        """Each result row has compact columns."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value={
+                **self._SAMPLE_SUMMARY,
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 3}],
+                "by_source": [{"source": "cyanorak", "count": 1}, {"source": "eggnog", "count": 2}],
+                "returned": 2, "truncated": True, "results": self._SAMPLE_RESULTS,
+            },
+        ):
+            result = await tool_fns["gene_homologs"](mock_ctx, locus_tags=["PMM0001"])
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.locus_tag == "PMM0001"
+        assert r.group_id == "CK_00000364"
+        assert r.source == "cyanorak"
+        assert r.consensus_product == "DNA polymerase III, beta subunit"
+
+    @pytest.mark.asyncio
+    async def test_batch_input_multiple_genes(self, tool_fns, mock_ctx):
+        """Batch query returns rows for multiple genes."""
+        batch_results = self._SAMPLE_RESULTS + [
+            {"locus_tag": "PMM0845", "organism_strain": "Prochlorococcus MED4",
+             "group_id": "CK_00000853", "consensus_gene_name": "ndhV",
+             "consensus_product": "NADH dehydrogenase subunit NdhV",
+             "taxonomic_level": "curated", "source": "cyanorak"},
         ]
-
-    def test_cross_organism_homologs_via_groups(self, tool_fns, mock_ctx):
-        """Groups from different sources are returned with query_gene."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-
-        result = json.loads(
-            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        )
-
-        assert result["query_gene"]["locus_tag"] == "PMM0001"
-        assert len(result["ortholog_groups"]) == 2
-        sources = {g["source"] for g in result["ortholog_groups"]}
-        assert sources == {"cyanorak", "eggnog"}
-
-    def test_include_members_shows_cross_organism_members(self, tool_fns, mock_ctx):
-        """include_members=True returns member genes from multiple organisms."""
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
-             "gene_name": "dnaN", "product": "DNA pol III beta",
-             "organism_strain": "Prochlorococcus MIT9312"},
-            {"og_name": "CK_00000364", "locus_tag": "SYNW0305",
-             "gene_name": "ftsH1", "product": "metalloprotease",
-             "organism_strain": "Synechococcus WH8102"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups()[:1],  # one group
-            members,
-        ]
-
-        result = json.loads(
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_members=True,
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value={
+                "total_matching": 3,
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 3}],
+                "by_source": [{"source": "cyanorak", "count": 2}, {"source": "eggnog", "count": 1}],
+                "not_found": [], "no_groups": [],
+                "returned": 3, "truncated": False, "results": batch_results,
+            },
+        ):
+            result = await tool_fns["gene_homologs"](
+                mock_ctx, locus_tags=["PMM0001", "PMM0845"],
             )
-        )
+        loci = {r.locus_tag for r in result.results}
+        assert loci == {"PMM0001", "PMM0845"}
 
-        g = result["ortholog_groups"][0]
-        assert "members" in g
-        orgs = {m["organism_strain"] for m in g["members"]}
-        assert "Prochlorococcus MIT9312" in orgs
-        assert "Synechococcus WH8102" in orgs
-
-    def test_default_mode_two_queries(self, tool_fns, mock_ctx):
-        """Without include_members, two queries are executed (gene stub + groups)."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-
-        tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-
-        assert conn.execute_query.call_count == 2
-
-    def test_include_members_three_queries(self, tool_fns, mock_ctx):
-        """With include_members, three queries are executed (stub + groups + members)."""
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
-             "gene_name": "dnaN", "product": "p",
-             "organism_strain": "Prochlorococcus MIT9312"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-            members,
-        ]
-
-        tool_fns["get_homologs"](
-            mock_ctx, gene_id="PMM0001", include_members=True,
-        )
-
-        assert conn.execute_query.call_count == 3
-
-    def test_group_enrichment_fields_in_response(self, tool_fns, mock_ctx):
-        """Response includes OG enrichment fields like consensus_product."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-
-        result = json.loads(
-            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        )
-
-        g = result["ortholog_groups"][0]
-        assert g["consensus_product"] == "DNA polymerase III beta subunit"
-        assert g["consensus_gene_name"] == "dnaN"
-        assert g["member_count"] == 72
-
-    def test_query_gene_has_all_expected_fields(self, tool_fns, mock_ctx):
-        """query_gene block contains all gene stub fields."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        )
-        qg = result["query_gene"]
-        assert qg["locus_tag"] == "PMM0001"
-        assert qg["gene_name"] == "dnaN"
-        assert qg["product"] == "DNA polymerase III, beta subunit"
-        assert qg["organism_strain"] == "Prochlorococcus MED4"
-
-    def test_null_consensus_gene_name_preserved(self, tool_fns, mock_ctx):
-        """Groups with null consensus_gene_name serialize correctly."""
-        groups = [
-            {"og_name": "COG9999@2", "source": "eggnog",
-             "taxonomic_level": "Bacteria", "specificity_rank": 3,
-             "consensus_product": "hypothetical protein",
-             "consensus_gene_name": None, "member_count": 10,
-             "organism_count": 5, "genera": "Prochlorococcus",
-             "has_cross_genus_members": False},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            groups,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        )
-        g = result["ortholog_groups"][0]
-        assert g["consensus_gene_name"] is None
-
-    def test_field_types_in_response(self, tool_fns, mock_ctx):
-        """Response fields have correct types (int, str, bool)."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](mock_ctx, gene_id="PMM0001")
-        )
-        g = result["ortholog_groups"][0]
-        assert isinstance(g["member_count"], int)
-        assert isinstance(g["organism_count"], int)
-        assert isinstance(g["specificity_rank"], int)
-        assert isinstance(g["source"], str)
-        assert isinstance(g["og_name"], str)
-        assert isinstance(g["has_cross_genus_members"], bool)
-
-    def test_member_fields_structure(self, tool_fns, mock_ctx):
-        """Each member dict has exactly the expected keys."""
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "PMT9312_0001",
-             "gene_name": "dnaN", "product": "DNA pol III beta",
-             "organism_strain": "Prochlorococcus MIT9312"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups()[:1],
-            members,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_members=True,
+    @pytest.mark.asyncio
+    async def test_not_found_and_no_groups(self, tool_fns, mock_ctx):
+        """not_found and no_groups are populated correctly."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value={
+                "total_matching": 0,
+                "by_organism": [], "by_source": [],
+                "not_found": ["FAKE_GENE"], "no_groups": ["A9601_RS13285"],
+                "returned": 0, "truncated": False, "results": [],
+            },
+        ):
+            result = await tool_fns["gene_homologs"](
+                mock_ctx, locus_tags=["FAKE_GENE", "A9601_RS13285"],
             )
-        )
-        m = result["ortholog_groups"][0]["members"][0]
-        assert set(m.keys()) == {"locus_tag", "gene_name", "product", "organism_strain"}
-
-    def test_per_group_member_limit_applied_independently(self, tool_fns, mock_ctx):
-        """member_limit is applied per group, not globally."""
-        members = [
-            # 3 members in group CK_00000364
-            {"og_name": "CK_00000364", "locus_tag": f"PMT{i:04d}",
-             "gene_name": "x", "product": "p", "organism_strain": f"Strain{i}"}
-            for i in range(3)
-        ] + [
-            # 1 member in group COG0592@2
-            {"og_name": "COG0592@2", "locus_tag": "ALT001",
-             "gene_name": "y", "product": "q", "organism_strain": "Alt1"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-            members,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_members=True, member_limit=2,
-            )
-        )
-        g0 = result["ortholog_groups"][0]  # CK_00000364: 3 members, limit 2
-        g1 = result["ortholog_groups"][1]  # COG0592@2: 1 member, under limit
-        assert len(g0["members"]) == 2
-        assert g0["truncated"] is True
-        assert len(g1["members"]) == 1
-        assert "truncated" not in g1
-
-    def test_empty_members_for_group_without_matches(self, tool_fns, mock_ctx):
-        """A group with no matching members gets an empty members list."""
-        # Members only for the second group, none for the first
-        members = [
-            {"og_name": "COG0592@2", "locus_tag": "ALT001",
-             "gene_name": "y", "product": "q", "organism_strain": "Alt1"},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            [self._gene_stub()],
-            self._sample_groups(),
-            members,
-        ]
-        result = json.loads(
-            tool_fns["get_homologs"](
-                mock_ctx, gene_id="PMM0001", include_members=True,
-            )
-        )
-        g0 = result["ortholog_groups"][0]  # CK_00000364: no members returned
-        g1 = result["ortholog_groups"][1]  # COG0592@2: 1 member
-        assert g0["members"] == []
-        assert len(g1["members"]) == 1
+        assert result.not_found == ["FAKE_GENE"]
+        assert result.no_groups == ["A9601_RS13285"]
+        assert result.results == []

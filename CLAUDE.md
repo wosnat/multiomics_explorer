@@ -42,7 +42,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `search_genes` | Free-text search across gene functional annotations (Lucene syntax). Supports category filtering and ortholog deduplication. |
 | `get_gene_details` | All Gene node properties via g{.*} — use gene_overview for the common case |
 | `gene_overview` | Batch gene routing: identity + data availability signals (annotation_types, expression counts, ortholog summary). Accepts gene_ids list. |
-| `get_homologs` | Orthologs grouped by ortholog group, with filtering by source/level/rank. Excludes paralogs by default. |
+| `gene_homologs` | Batch: gene locus_tags → ortholog group memberships. Flat long format (one row per gene × group). Filterable by source/level/rank. |
 | `list_filter_values` | List valid values for categorical filters (gene categories) |
 | `list_organisms` | All organisms with taxonomy, gene/publication/experiment counts, treatment and omics types. Verbose adds full taxonomy hierarchy. |
 | `list_publications` | Publications with experiment summaries, filterable by organism/treatment/search/author |

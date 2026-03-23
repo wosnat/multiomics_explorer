@@ -191,7 +191,7 @@ def register_tools(mcp: FastMCP):
 
         Matching is case-insensitive — 'pmm0001', 'PMM0001', and 'Pmm0001'
         all work. Use the returned locus_tags with gene_overview,
-        get_gene_details, get_homologs, or gene_ontology_terms. The organism
+        get_gene_details, gene_homologs, or gene_ontology_terms. The organism
         filter uses case-insensitive partial matching — 'MED4' and
         'Prochlorococcus MED4' both work.
         """
@@ -246,7 +246,7 @@ def register_tools(mcp: FastMCP):
             deduplicate: If True, collapse orthologs by ortholog group and return
                 one representative per group with collapsed_count and
                 group_organisms summary. Counts reflect hits within the result
-                set, not total group membership — use get_homologs for full
+                set, not total group membership — use gene_homologs for full
                 ortholog inventory.
             limit: Max results (default 10, max 50). When deduplicate=True, the
                 limit applies to the pre-dedup query, so fewer rows may be
@@ -282,7 +282,7 @@ def register_tools(mcp: FastMCP):
         """Get an overview of one or more genes: identity and data availability.
 
         Use this after resolve_gene, search_genes, genes_by_ontology, or
-        get_homologs to understand what each gene is and what follow-up data
+        gene_homologs to understand what each gene is and what follow-up data
         exists.
 
         Returns one row per gene with routing signals:
@@ -292,7 +292,7 @@ def register_tools(mcp: FastMCP):
           expression data exists and how much is significant
         - closest_ortholog_group_size + closest_ortholog_genera: whether
           orthologs exist and in which genera
-          → use get_homologs for full membership
+          → use gene_homologs for full membership
 
         Args:
             gene_ids: List of gene locus_tags.
@@ -322,7 +322,7 @@ def register_tools(mcp: FastMCP):
         (catalytic_activities, transporter_classification, cazy_ids, etc.).
 
         For organism taxonomy, use list_organisms. For homologs, use
-        get_homologs. For ontology annotations, use gene_ontology_terms.
+        gene_homologs. For ontology annotations, use gene_ontology_terms.
 
         Args:
             gene_id: Gene locus_tag (e.g. "PMM0001", "sync_0001").
@@ -341,94 +341,116 @@ def register_tools(mcp: FastMCP):
             logger.warning("get_gene_details unexpected error: %s", e)
             return f"Error in get_gene_details: {e}"
 
-    def _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank):
-        msg = f"No ortholog groups found for '{gene_id}'"
-        filters = []
-        if source:
-            filters.append(f"source={source}")
-        if taxonomic_level:
-            filters.append(f"taxonomic_level={taxonomic_level}")
-        if max_specificity_rank is not None:
-            filters.append(f"max_specificity_rank={max_specificity_rank}")
-        if filters:
-            msg += f" with constraints: {', '.join(filters)}"
-        return msg + "."
+    # --- gene_homologs ---
 
-    @mcp.tool()
-    def get_homologs(
+    class GeneHomologResult(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
+        organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        group_id: str = Field(description="Ortholog group identifier (e.g. 'CK_00000364', 'COG0592@2')")
+        consensus_gene_name: str | None = Field(default=None, description="Consensus gene name across group members (e.g. 'dnaN'). Often null.")
+        consensus_product: str | None = Field(default=None, description="Consensus product across group members (e.g. 'DNA polymerase III, beta subunit')")
+        taxonomic_level: str = Field(description="Taxonomic scope (e.g. 'curated', 'Prochloraceae', 'Bacteria')")
+        source: str = Field(description="Source database (e.g. 'cyanorak', 'eggnog')")
+        # verbose-only
+        specificity_rank: int | None = Field(default=None, description="Group breadth: 0=curated, 1=family, 2=order, 3=domain (e.g. 0)")
+        member_count: int | None = Field(default=None, description="Total genes in group (e.g. 9)")
+        organism_count: int | None = Field(default=None, description="Distinct organisms in group (e.g. 9)")
+        genera: list[str] | None = Field(default=None, description="Genera represented (e.g. ['Prochlorococcus', 'Synechococcus'])")
+        has_cross_genus_members: str | None = Field(default=None, description="'cross_genus' or 'single_genus'")
+
+    class HomologOrganismBreakdown(BaseModel):
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
+        count: int = Field(description="Gene×group rows for this organism (e.g. 3)")
+
+    class HomologSourceBreakdown(BaseModel):
+        source: str = Field(description="OG source (e.g. 'cyanorak')")
+        count: int = Field(description="Gene×group rows from this source (e.g. 5)")
+
+    class GeneHomologsResponse(BaseModel):
+        total_matching: int = Field(description="Total gene×group rows matching filters")
+        by_organism: list[HomologOrganismBreakdown] = Field(description="Gene×group counts per organism, sorted by count descending")
+        by_source: list[HomologSourceBreakdown] = Field(description="Gene×group counts per source, sorted by count descending")
+        returned: int = Field(description="Results in this response (0 when summary=true)")
+        truncated: bool = Field(description="True if total_matching > returned")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
+        no_groups: list[str] = Field(default_factory=list, description="Genes that exist but have zero matching ortholog groups")
+        results: list[GeneHomologResult] = Field(default_factory=list, description="One row per gene × ortholog group")
+
+    @mcp.tool(
+        tags={"genes", "homology"},
+        annotations={"readOnlyHint": True},
+    )
+    async def gene_homologs(
         ctx: Context,
-        gene_id: str,
-        source: str | None = None,
-        taxonomic_level: str | None = None,
-        max_specificity_rank: int | None = None,
-        exclude_paralogs: bool = True,
-        include_members: bool = False,
-        member_limit: int = 50,
-    ) -> str:
-        """Find orthologs of a gene, grouped by ortholog group.
+        locus_tags: Annotated[list[str], Field(
+            description="Gene locus tags to look up. "
+            "E.g. ['PMM0001', 'PMM0845'].",
+        )],
+        source: Annotated[str | None, Field(
+            description="Filter by OG source: 'cyanorak' or 'eggnog'.",
+        )] = None,
+        taxonomic_level: Annotated[str | None, Field(
+            description="Filter by taxonomic level. "
+            "E.g. 'curated', 'Prochloraceae', 'Bacteria'.",
+        )] = None,
+        max_specificity_rank: Annotated[int | None, Field(
+            description="Cap group breadth. 0=curated only, 1=+family, "
+            "2=+order, 3=+domain (all).",
+            ge=0, le=3,
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include group metadata: specificity_rank, member_count, "
+            "organism_count, genera, has_cross_genus_members.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> GeneHomologsResponse:
+        """Get ortholog group memberships for genes.
 
-        Returns ortholog groups the gene belongs to, ordered from most specific
-        (curated) to broadest (Bacteria-level COG). Each group includes its
-        consensus function, member/organism counts, and genera.
+        Returns which ortholog groups each gene belongs to, ordered from most
+        specific (curated) to broadest. Use for gene characterization and
+        cross-organism bridging. A gene typically belongs to 1-3 groups.
 
-        By default returns group summaries only. Set include_members=True to
-        get the full list of member genes per group.
-
-        Args:
-            gene_id: Gene locus_tag (e.g. "PMM0001").
-            source: Filter by OG source: "cyanorak" or "eggnog".
-            taxonomic_level: Filter by level: "curated", "Prochloraceae",
-                "Synechococcus", "Alteromonadaceae", "Cyanobacteria",
-                "Gammaproteobacteria", "Bacteria".
-            max_specificity_rank: Cap breadth — 0=curated only, 1=+family,
-                2=+order, 3=+domain (all). Overrides source/taxonomic_level.
-            exclude_paralogs: If True (default), exclude members from the same
-                organism strain as the query gene. Set False to include paralogs.
-                Only applies when include_members=True.
-            include_members: If True, include full member gene lists per group.
-                Default False returns group summaries (counts, consensus function,
-                genera) without individual member genes.
-            member_limit: Max members returned per group (default 50, max 200).
-                Only applies when include_members=True. Groups exceeding the
-                limit include a "truncated" flag.
-
-        Raises:
-            ValueError if source is not in {"cyanorak", "eggnog"} or
-            taxonomic_level is not in {"curated", "Prochloraceae",
-            "Synechococcus", "Alteromonadaceae", "Cyanobacteria",
-            "Gammaproteobacteria", "Bacteria"} or max_specificity_rank
-            is not in 0-3 or member_limit is not in 1-200.
-
-        Notes:
-            - member_count and organism_count are total group counts from the
-              KG (include paralogs). When exclude_paralogs is True, the
-              returned members list may be smaller than member_count.
-            - Expression query tools are being rebuilt for the new schema.
-            - A gene typically belongs to 1-3 groups: one Cyanorak curated
-              cluster (Pro/Syn only), one eggNOG family-level OG, and one
-              eggNOG Bacteria-level COG.
+        For member genes within a group, use genes_by_homolog_group.
+        For text search on group names, use search_homolog_groups.
         """
-        logger.info("get_homologs gene_id=%s source=%s taxonomic_level=%s include_members=%s",
-                    gene_id, source, taxonomic_level, include_members)
+        await ctx.info(f"gene_homologs locus_tags={locus_tags} source={source} "
+                       f"taxonomic_level={taxonomic_level}")
         try:
             conn = _conn(ctx)
-            result = api.get_homologs(
-                gene_id, source=source,
+            data = api.gene_homologs(
+                locus_tags, source=source,
                 taxonomic_level=taxonomic_level,
                 max_specificity_rank=max_specificity_rank,
-                exclude_paralogs=exclude_paralogs,
-                include_members=include_members,
-                member_limit=member_limit, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, conn=conn,
             )
-            if not result["ortholog_groups"]:
-                return _no_groups_msg(gene_id, source, taxonomic_level, max_specificity_rank)
-            return json.dumps(result, indent=2, default=str)
+            by_organism = [HomologOrganismBreakdown(**b) for b in data["by_organism"]]
+            by_source = [HomologSourceBreakdown(**b) for b in data["by_source"]]
+            results = [GeneHomologResult(**r) for r in data["results"]]
+            response = GeneHomologsResponse(
+                total_matching=data["total_matching"],
+                by_organism=by_organism,
+                by_source=by_source,
+                returned=data["returned"],
+                truncated=data["truncated"],
+                not_found=data["not_found"],
+                no_groups=data["no_groups"],
+                results=results,
+            )
+            await ctx.info(f"Returning {response.returned} of {response.total_matching} "
+                           f"gene×group rows ({len(response.not_found)} not found, "
+                           f"{len(response.no_groups)} no groups)")
+            return response
         except ValueError as e:
-            logger.warning("get_homologs error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"gene_homologs error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("get_homologs unexpected error: %s", e)
-            return f"Error in get_homologs: {e}"
+            await ctx.error(f"gene_homologs unexpected error: {e}")
+            raise ToolError(f"Error in gene_homologs: {e}")
 
     @mcp.tool()
     def run_cypher(ctx: Context, query: str, limit: int = 25) -> str:

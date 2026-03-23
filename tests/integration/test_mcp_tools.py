@@ -11,8 +11,8 @@ import pytest
 from multiomics_explorer.kg.queries_lib import (
     build_gene_stub,
     build_get_gene_details,
-    build_get_homologs_groups,
-    build_get_homologs_members,
+    build_gene_homologs,
+    build_gene_homologs_summary,
     build_list_experiments,
     build_list_experiments_summary,
     build_list_organisms,
@@ -69,36 +69,34 @@ class TestSearchGenes:
 
 
 @pytest.mark.kg
-class TestGetHomologs:
-    def test_gene_stub_returns_metadata(self, conn):
-        """build_gene_stub returns query gene metadata."""
-        cypher, params = build_gene_stub(gene_id="PMM0845")
+class TestGeneHomologs:
+    def test_detail_returns_flat_rows(self, conn):
+        """build_gene_homologs returns flat gene×group rows."""
+        cypher, params = build_gene_homologs(locus_tags=["PMM0845"])
         results = conn.execute_query(cypher, **params)
-        assert len(results) == 1
-        assert results[0]["locus_tag"] == "PMM0845"
-        assert "gene_name" in results[0]
-        assert "product" in results[0]
-        assert "organism_strain" in results[0]
+        assert len(results) > 0
+        for r in results:
+            assert r["locus_tag"] == "PMM0845"
+            assert "group_id" in r
+            assert "source" in r
+            assert "consensus_product" in r
+            assert "organism_strain" in r
 
-    def test_groups_query_returns_ortholog_groups(self, conn):
-        """build_get_homologs_groups returns group metadata for PMM0845."""
-        cypher, params = build_get_homologs_groups(gene_id="PMM0845")
-        groups = conn.execute_query(cypher, **params)
-        assert len(groups) > 0
-        for g in groups:
-            assert "og_name" in g
-            assert "source" in g
-            assert "consensus_product" in g
+    def test_summary_returns_counts(self, conn):
+        """build_gene_homologs_summary returns counts + breakdowns."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["PMM0845"])
+        result = conn.execute_query(cypher, **params)[0]
+        assert result["total_matching"] > 0
+        assert len(result["by_organism"]) > 0
+        assert len(result["by_source"]) > 0
+        assert result["not_found"] == []
+        assert result["no_groups"] == []
 
-    def test_members_query_returns_homolog_genes(self, conn):
-        """build_get_homologs_members returns member genes."""
-        cypher, params = build_get_homologs_members(gene_id="PMM0845")
-        members = conn.execute_query(cypher, **params)
-        assert len(members) > 0
-        for m in members:
-            assert "locus_tag" in m
-            assert "og_name" in m
-            assert "organism_strain" in m
+    def test_summary_not_found(self, conn):
+        """Fake gene appears in not_found."""
+        cypher, params = build_gene_homologs_summary(locus_tags=["FAKE_GENE_XYZ"])
+        result = conn.execute_query(cypher, **params)[0]
+        assert "FAKE_GENE_XYZ" in result["not_found"]
 
 
 @pytest.mark.kg

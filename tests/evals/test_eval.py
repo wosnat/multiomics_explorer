@@ -23,7 +23,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_stub,
     build_genes_by_ontology,
     build_get_gene_details,
-    build_get_homologs_groups,
+    build_gene_homologs,
     build_list_gene_categories,
     build_list_experiments,
     build_list_experiments_summary,
@@ -52,7 +52,7 @@ TOOL_BUILDERS = {
     "search_genes": build_search_genes,
     "gene_overview": build_gene_overview,
     "get_gene_details": build_get_gene_details,
-    "get_homologs": build_get_homologs_groups,
+    "gene_homologs": build_gene_homologs,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
     "genes_by_ontology": build_genes_by_ontology,
@@ -73,9 +73,10 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         categories = conn.execute_query(cat_cypher, **cat_params)
         return categories
 
-    if tool == "get_homologs_with_members":
-        cypher_groups, params_groups = build_get_homologs_groups(gene_id=params["gene_id"])
-        return conn.execute_query(cypher_groups, **params_groups)
+    if tool == "gene_homologs_with_members":
+        # Legacy eval case — run detail query for batch locus_tags
+        cypher, params_b = build_gene_homologs(locus_tags=params["locus_tags"])
+        return conn.execute_query(cypher, **params_b)
 
     builder = TOOL_BUILDERS[tool]
     deduplicate = params.get("deduplicate", False)

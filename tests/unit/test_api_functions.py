@@ -18,11 +18,11 @@ class TestTopLevelImports:
     def test_all_api_functions_importable_from_package(self):
         """from multiomics_explorer import <fn> works for every api function."""
         from multiomics_explorer import (
+            gene_homologs,
             gene_ontology_terms,
             gene_overview,
             genes_by_ontology,
             get_gene_details,
-            get_homologs,
             get_schema,
             list_filter_values,
             list_organisms,
@@ -33,7 +33,7 @@ class TestTopLevelImports:
         )
         # Each should be the same object as in api.functions
         assert resolve_gene is api.resolve_gene
-        assert get_homologs is api.get_homologs
+        assert gene_homologs is api.gene_homologs
 
     def test_query_expression_removed(self):
         """query_expression is no longer exported (schema migration B1)."""
@@ -268,104 +268,138 @@ class TestGetGeneDetails:
 
 
 # ---------------------------------------------------------------------------
-# get_homologs
+# gene_homologs
 # ---------------------------------------------------------------------------
-class TestGetHomologs:
-    def _gene_stub(self):
-        return [{"locus_tag": "PMM0001", "gene_name": "dnaN",
-                 "product": "DNA polymerase III subunit beta",
-                 "organism_strain": "Prochlorococcus marinus MED4"}]
+class TestGeneHomologs:
+    def _summary_result(self, total=2, not_found=None, no_groups=None):
+        """Helper: mock summary query result."""
+        return [{
+            "total_matching": total,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 1},
+                            {"item": "Synechococcus WH8102", "count": 1}],
+            "by_source": [{"item": "cyanorak", "count": 2}],
+            "not_found": not_found or [],
+            "no_groups": no_groups or [],
+        }]
 
-    def _groups(self):
+    def _detail_rows(self):
+        """Helper: mock detail query result rows."""
         return [
-            {"og_name": "CK_00000364", "source": "cyanorak",
-             "taxonomic_level": "curated", "specificity_rank": 0,
+            {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
+             "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
-             "consensus_gene_name": "dnaN",
-             "member_count": 25, "organism_count": 20,
-             "genera": "Prochlorococcus,Synechococcus",
-             "has_cross_genus_members": True},
+             "taxonomic_level": "curated", "source": "cyanorak"},
+            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102",
+             "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+             "consensus_product": "DNA polymerase III subunit beta",
+             "taxonomic_level": "curated", "source": "cyanorak"},
         ]
 
-    def test_returns_dict_with_keys(self, mock_conn):
-        mock_conn.execute_query.side_effect = [self._gene_stub(), self._groups()]
-        result = api.get_homologs("PMM0001", conn=mock_conn)
+    def test_returns_dict(self, mock_conn):
+        """Runs summary + detail queries, returns dict with envelope keys."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.gene_homologs(["PMM0001"], conn=mock_conn)
         assert isinstance(result, dict)
-        assert "query_gene" in result
-        assert "ortholog_groups" in result
-        assert result["query_gene"]["locus_tag"] == "PMM0001"
+        assert result["total_matching"] == 2
+        assert "by_organism" in result
+        assert "by_source" in result
+        assert "returned" in result
+        assert "truncated" in result
+        assert "not_found" in result
+        assert "no_groups" in result
+        assert len(result["results"]) == 2
+        assert result["results"][0]["locus_tag"] == "PMM0001"
+        assert mock_conn.execute_query.call_count == 2
 
-    def test_gene_not_found_raises(self, mock_conn):
-        mock_conn.execute_query.return_value = []
-        with pytest.raises(ValueError, match="not found"):
-            api.get_homologs("FAKE0001", conn=mock_conn)
+    def test_summary_mode(self, mock_conn):
+        """summary=True returns results=[], returned=0."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+        ]
+        result = api.gene_homologs(["PMM0001"], summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        # Only summary query called — no detail query
+        assert mock_conn.execute_query.call_count == 1
 
-    def test_no_groups_returns_empty_list(self, mock_conn):
-        mock_conn.execute_query.side_effect = [self._gene_stub(), []]
-        result = api.get_homologs("PMM0001", conn=mock_conn)
-        assert result["ortholog_groups"] == []
+    def test_not_found(self, mock_conn):
+        """Locus tags not in KG appear in not_found."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total=0, not_found=["FAKE0001"]),
+        ]
+        result = api.gene_homologs(
+            ["FAKE0001"], summary=True, conn=mock_conn,
+        )
+        assert "FAKE0001" in result["not_found"]
+
+    def test_no_groups(self, mock_conn):
+        """Genes that exist but have zero OG matches appear in no_groups."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total=0, no_groups=["PMM9999"]),
+        ]
+        result = api.gene_homologs(
+            ["PMM9999"], summary=True, conn=mock_conn,
+        )
+        assert "PMM9999" in result["no_groups"]
+
+    def test_filters_forwarded(self, mock_conn):
+        """source/taxonomic_level/max_specificity_rank passed through."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total=1),
+            self._detail_rows()[:1],
+        ]
+        api.gene_homologs(
+            ["PMM0001"], source="cyanorak", taxonomic_level="curated",
+            max_specificity_rank=0, conn=mock_conn,
+        )
+        # Summary query (1st call) should have filter params
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        params = summary_call[1]
+        assert params.get("source") == "cyanorak"
+        assert params.get("level") == "curated"
+        assert params.get("max_rank") == 0
 
     def test_invalid_source_raises(self, mock_conn):
         with pytest.raises(ValueError, match="Invalid source"):
-            api.get_homologs("PMM0001", source="invalid", conn=mock_conn)
+            api.gene_homologs(["PMM0001"], source="invalid", conn=mock_conn)
 
     def test_invalid_taxonomic_level_raises(self, mock_conn):
         with pytest.raises(ValueError, match="Invalid taxonomic_level"):
-            api.get_homologs("PMM0001", taxonomic_level="invalid", conn=mock_conn)
+            api.gene_homologs(
+                ["PMM0001"], taxonomic_level="invalid", conn=mock_conn,
+            )
 
     def test_invalid_specificity_rank_raises(self, mock_conn):
         with pytest.raises(ValueError, match="Invalid max_specificity_rank"):
-            api.get_homologs("PMM0001", max_specificity_rank=5, conn=mock_conn)
+            api.gene_homologs(
+                ["PMM0001"], max_specificity_rank=5, conn=mock_conn,
+            )
 
-    def test_invalid_member_limit_raises(self, mock_conn):
-        with pytest.raises(ValueError, match="Invalid member_limit"):
-            api.get_homologs("PMM0001", member_limit=0, conn=mock_conn)
+    def test_creates_conn_when_none(self):
+        """Default conn used when None."""
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                [{  # summary
+                    "total_matching": 0,
+                    "by_organism": [], "by_source": [],
+                    "not_found": [], "no_groups": [],
+                }],
+            ]
+            result = api.gene_homologs(["PMM0001"], summary=True)
+        MockConn.assert_called_once()
+        assert result["total_matching"] == 0
 
-    def test_include_members(self, mock_conn):
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": "sync_0001",
-             "gene_name": "dnaN", "product": "p",
-             "organism_strain": "Synechococcus WH8102"},
-            {"og_name": "CK_00000364", "locus_tag": "sync_0002",
-             "gene_name": "dnaN", "product": "p",
-             "organism_strain": "Synechococcus WH7803"},
-        ]
-        mock_conn.execute_query.side_effect = [
-            self._gene_stub(), self._groups(), members,
-        ]
-        result = api.get_homologs("PMM0001", include_members=True, conn=mock_conn)
-        group = result["ortholog_groups"][0]
-        assert "members" in group
-        assert len(group["members"]) == 2
-
-    def test_member_limit_truncates(self, mock_conn):
-        members = [
-            {"og_name": "CK_00000364", "locus_tag": f"g{i}",
-             "gene_name": None, "product": "p",
-             "organism_strain": f"org{i}"}
-            for i in range(5)
-        ]
-        mock_conn.execute_query.side_effect = [
-            self._gene_stub(), self._groups(), members,
-        ]
-        result = api.get_homologs(
-            "PMM0001", include_members=True, member_limit=3, conn=mock_conn,
-        )
-        group = result["ortholog_groups"][0]
-        assert len(group["members"]) == 3
-        assert group["truncated"] is True
-
-    def test_valid_sources_accepted(self, mock_conn):
-        mock_conn.execute_query.side_effect = [self._gene_stub(), self._groups()]
-        result = api.get_homologs("PMM0001", source="cyanorak", conn=mock_conn)
-        assert "ortholog_groups" in result
-
-    def test_valid_taxonomic_level_accepted(self, mock_conn):
-        mock_conn.execute_query.side_effect = [self._gene_stub(), self._groups()]
-        result = api.get_homologs(
-            "PMM0001", taxonomic_level="curated", conn=mock_conn,
-        )
-        assert "ortholog_groups" in result
+    def test_importable_from_package(self):
+        """from multiomics_explorer import gene_homologs works."""
+        from multiomics_explorer import gene_homologs
+        assert gene_homologs is api.gene_homologs
 
 
 # ---------------------------------------------------------------------------

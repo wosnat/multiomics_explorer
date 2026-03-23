@@ -1,0 +1,57 @@
+# Human-authored content for gene_homologs about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Look up ortholog groups for a gene
+    call: gene_homologs(locus_tags=["PMM0001"])
+    response: |
+      {
+        "total_matching": 3,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 3}],
+        "by_source": [{"source": "eggnog", "count": 2}, {"source": "cyanorak", "count": 1}],
+        "returned": 3, "truncated": false, "not_found": [], "no_groups": [],
+        "results": [
+          {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4", "group_id": "CK_00000364", "consensus_gene_name": "dnaN", "consensus_product": "DNA polymerase III, beta subunit", "taxonomic_level": "curated", "source": "cyanorak"},
+          {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4", "group_id": "1MKTR@1212", ...},
+          ...
+        ]
+      }
+
+  - title: Batch query for multiple genes
+    call: gene_homologs(locus_tags=["PMM0001", "PMM0845", "ALT831_RS00180"])
+
+  - title: Filter to cyanorak groups only
+    call: gene_homologs(locus_tags=["PMM0001"], source="cyanorak")
+
+  - title: Summary only (no individual rows)
+    call: gene_homologs(locus_tags=["PMM0001", "PMM0845"], summary=True)
+
+  - title: From resolve_gene to homologs
+    steps: |
+      Step 1: resolve_gene(identifier="dnaN")
+              → collect locus_tags from results
+
+      Step 2: gene_homologs(locus_tags=["PMM0001", "PMT9312_0001", ...])
+              → see which ortholog groups each gene belongs to
+
+      Step 3: genes_by_homolog_group(group_ids=["CK_00000364"])
+              → get all member genes in a group
+
+verbose_fields:
+  - specificity_rank
+  - member_count
+  - organism_count
+  - genera
+  - has_cross_genus_members
+
+chaining:
+  - "resolve_gene → gene_homologs → genes_by_homolog_group"
+  - "search_homolog_groups → genes_by_homolog_group → gene_homologs"
+
+mistakes:
+  - "A gene typically belongs to 1-3 groups: cyanorak curated (Pro/Syn only), eggNOG family, eggNOG Bacteria-level COG"
+  - "not_found means the gene doesn't exist in the KG; no_groups means the gene exists but has no ortholog group membership"
+  - "For member genes within a group, use genes_by_homolog_group (not this tool)"
+  - wrong: "gene_homologs(locus_tags='PMM0001')"
+    right: "gene_homologs(locus_tags=['PMM0001']) — always a list"

@@ -113,14 +113,14 @@
 # ── Homologs ─────────────────────────────────────────────
 
 - id: homologs_exist
-  tool: get_homologs
-  desc: Known gene has ortholog groups
+  tool: gene_homologs
+  desc: Known gene has ortholog groups (flat format)
   params:
-    gene_id: PMM0845
+    locus_tags: [PMM0845]
   expect:
     min_rows: 1
-    columns: [og_name, source, taxonomic_level, specificity_rank,
-              consensus_product, member_count, organism_count]
+    columns: [locus_tag, organism_strain, group_id, consensus_gene_name,
+              consensus_product, taxonomic_level, source]
 
 # ── Full-text search ────────────────────────────────────
 
@@ -147,10 +147,10 @@
 # ── Homologs with members ───────────────────────────────
 
 - id: homologs_with_members
-  tool: get_homologs_with_members
-  desc: Ortholog groups of PMM0845 (used to verify group metadata)
+  tool: gene_homologs_with_members
+  desc: Ortholog groups of PMM0845 (flat detail rows)
   params:
-    gene_id: PMM0845
+    locus_tags: [PMM0845]
   expect:
     min_rows: 1
 
@@ -466,33 +466,32 @@
 # ── Homolog corner cases ──────────────────────────────────
 
 - id: homologs_dnan_cross_strain
-  tool: get_homologs
+  tool: gene_homologs
   desc: dnaN (PMM0001) has ortholog groups from multiple sources
   params:
-    gene_id: PMM0001
+    locus_tags: [PMM0001]
   expect:
     min_rows: 2
-    columns: [og_name, source, taxonomic_level, specificity_rank,
-              consensus_product, member_count, organism_count]
+    columns: [locus_tag, organism_strain, group_id, consensus_gene_name,
+              consensus_product, taxonomic_level, source]
 
 - id: homologs_source_filter_cyanorak
-  tool: get_homologs
+  tool: gene_homologs
   desc: Source filter cyanorak returns only cyanorak groups
   params:
-    gene_id: PMM1375
+    locus_tags: [PMM1375]
     source: cyanorak
   expect:
     min_rows: 1
-    columns: [og_name, source, taxonomic_level, specificity_rank,
-              consensus_product, member_count, organism_count]
+    columns: [locus_tag, group_id, source, taxonomic_level, consensus_product]
     contains:
       source: cyanorak
 
 - id: homologs_source_filter_eggnog
-  tool: get_homologs
+  tool: gene_homologs
   desc: Source filter eggnog returns only eggnog groups
   params:
-    gene_id: PMM0001
+    locus_tags: [PMM0001]
     source: eggnog
   expect:
     min_rows: 1
@@ -500,42 +499,41 @@
       source: eggnog
 
 - id: homologs_max_rank_0_curated
-  tool: get_homologs
+  tool: gene_homologs
   desc: max_specificity_rank=0 returns only curated groups
   params:
-    gene_id: PMM1375
+    locus_tags: [PMM1375]
     max_specificity_rank: 0
   expect:
     min_rows: 1
-    columns: [og_name, source, specificity_rank]
+    columns: [locus_tag, group_id, source]
 
 - id: homologs_alteromonas_gene
-  tool: get_homologs
+  tool: gene_homologs
   desc: Alteromonas gene has eggnog but not cyanorak groups
   params:
-    gene_id: ALT831_RS00180
+    locus_tags: [ALT831_RS00180]
   expect:
     min_rows: 1
-    columns: [og_name, source, taxonomic_level]
+    columns: [locus_tag, group_id, source, taxonomic_level]
 
 - id: homologs_synechococcus_gene
-  tool: get_homologs
+  tool: gene_homologs
   desc: Synechococcus gene has ortholog groups
   params:
-    gene_id: SYNW0305
+    locus_tags: [SYNW0305]
   expect:
     min_rows: 1
-    columns: [og_name, source, taxonomic_level]
+    columns: [locus_tag, group_id, source, taxonomic_level]
 
-- id: homologs_with_members_pmm0001
-  tool: get_homologs_with_members
-  desc: dnaN members query returns group metadata
+- id: homologs_batch_two_genes
+  tool: gene_homologs
+  desc: Batch query for two genes returns rows for both
   params:
-    gene_id: PMM0001
+    locus_tags: [PMM0001, PMM0845]
   expect:
-    min_rows: 1
-    columns: [og_name, source, taxonomic_level, specificity_rank,
-              consensus_product, member_count, organism_count]
+    min_rows: 4
+    columns: [locus_tag, group_id, source]
 
 # ── Validation queries ─────────────────────────────────────
 

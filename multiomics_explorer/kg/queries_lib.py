@@ -171,16 +171,15 @@ def build_gene_stub(*, gene_id: str) -> tuple[str, dict]:
     return cypher, {"lt": gene_id}
 
 
-def build_get_homologs_groups(
+def _gene_homologs_og_where(
     *,
-    gene_id: str,
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
-) -> tuple[str, dict]:
+) -> tuple[list[str], dict]:
+    """Build OG filter conditions + params shared by gene_homologs builders."""
     conditions: list[str] = []
-    params: dict = {"lt": gene_id}
-
+    params: dict = {}
     if source is not None:
         conditions.append("og.source = $source")
         params["source"] = source
@@ -190,60 +189,102 @@ def build_get_homologs_groups(
     if max_specificity_rank is not None:
         conditions.append("og.specificity_rank <= $max_rank")
         params["max_rank"] = max_specificity_rank
+    return conditions, params
 
-    where_block = " AND ".join(conditions)
-    where_line = f"WHERE {where_block}\n" if where_block else ""
+
+def build_gene_homologs_summary(
+    *,
+    locus_tags: list[str],
+    source: str | None = None,
+    taxonomic_level: str | None = None,
+    max_specificity_rank: int | None = None,
+) -> tuple[str, dict]:
+    """Build summary + not_found/no_groups for gene_homologs.
+
+    RETURN keys: total_matching, by_organism, by_source, not_found, no_groups.
+    """
+    conditions, params = _gene_homologs_og_where(
+        source=source, taxonomic_level=taxonomic_level,
+        max_specificity_rank=max_specificity_rank,
+    )
+    params["locus_tags"] = locus_tags
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
     cypher = (
-        "MATCH (g:Gene {locus_tag: $lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
-        f"{where_line}"
-        "RETURN og.name AS og_name, og.source AS source,\n"
-        "       og.taxonomic_level AS taxonomic_level,\n"
-        "       og.specificity_rank AS specificity_rank,\n"
-        "       og.consensus_product AS consensus_product,\n"
-        "       og.consensus_gene_name AS consensus_gene_name,\n"
-        "       og.member_count AS member_count,\n"
-        "       og.organism_count AS organism_count,\n"
-        "       og.genera AS genera,\n"
-        "       og.has_cross_genus_members AS has_cross_genus_members\n"
-        "ORDER BY og.specificity_rank, og.source"
+        "UNWIND $locus_tags AS lt\n"
+        "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
+        "OPTIONAL MATCH (g)-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+        f"{where_block}"
+        "WITH lt, g, collect(og) AS groups\n"
+        "WITH\n"
+        "  collect(CASE WHEN g IS NULL THEN lt END) AS nf_raw,\n"
+        "  collect(CASE WHEN g IS NOT NULL AND size(groups) = 0 THEN lt END) AS ng_raw,\n"
+        "  [row IN collect({org: CASE WHEN size(groups) > 0 THEN g.organism_strain END,\n"
+        "                    srcs: [x IN groups | x.source]})\n"
+        "   WHERE row.org IS NOT NULL] AS matched\n"
+        "UNWIND CASE WHEN size(matched) = 0 THEN [null] ELSE matched END AS m\n"
+        "WITH nf_raw, ng_raw,\n"
+        "     [x IN collect(m.org) WHERE x IS NOT NULL] AS orgs,\n"
+        "     apoc.coll.flatten([x IN collect(m.srcs) WHERE x IS NOT NULL]) AS sources\n"
+        "RETURN size(sources) AS total_matching,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(sources) AS by_source,\n"
+        "       [x IN nf_raw WHERE x IS NOT NULL] AS not_found,\n"
+        "       [x IN ng_raw WHERE x IS NOT NULL] AS no_groups"
     )
     return cypher, params
 
 
-def build_get_homologs_members(
+def build_gene_homologs(
     *,
-    gene_id: str,
+    locus_tags: list[str],
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
-    exclude_paralogs: bool = True,
+    verbose: bool = False,
+    limit: int | None = None,
 ) -> tuple[str, dict]:
-    conditions: list[str] = ["other <> g"]
-    params: dict = {"lt": gene_id}
+    """Build detail Cypher for gene_homologs.
 
-    if exclude_paralogs:
-        conditions.append("other.organism_strain <> g.organism_strain")
-    if source is not None:
-        conditions.append("og.source = $source")
-        params["source"] = source
-    if taxonomic_level is not None:
-        conditions.append("og.taxonomic_level = $level")
-        params["level"] = taxonomic_level
-    if max_specificity_rank is not None:
-        conditions.append("og.specificity_rank <= $max_rank")
-        params["max_rank"] = max_specificity_rank
+    RETURN keys (compact): locus_tag, organism_strain, group_id,
+    consensus_gene_name, consensus_product, taxonomic_level, source.
+    RETURN keys (verbose): adds specificity_rank, member_count,
+    organism_count, genera, has_cross_genus_members.
+    """
+    conditions, params = _gene_homologs_og_where(
+        source=source, taxonomic_level=taxonomic_level,
+        max_specificity_rank=max_specificity_rank,
+    )
+    params["locus_tags"] = locus_tags
 
-    where_block = " AND ".join(conditions)
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    verbose_cols = (
+        ",\n       og.specificity_rank AS specificity_rank"
+        ",\n       og.member_count AS member_count"
+        ",\n       og.organism_count AS organism_count"
+        ",\n       og.genera AS genera"
+        ",\n       og.has_cross_genus_members AS has_cross_genus_members"
+        if verbose else ""
+    )
+
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
 
     cypher = (
-        "MATCH (g:Gene {locus_tag: $lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
-        "      <-[:Gene_in_ortholog_group]-(other:Gene)\n"
-        f"WHERE {where_block}\n"
-        "RETURN og.name AS og_name,\n"
-        "       other.locus_tag AS locus_tag, other.gene_name AS gene_name,\n"
-        "       other.product AS product, other.organism_strain AS organism_strain\n"
-        "ORDER BY og.specificity_rank, og.source, other.organism_strain, other.locus_tag"
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+        f"{where_block}"
+        "RETURN g.locus_tag AS locus_tag, g.organism_strain AS organism_strain,\n"
+        "       og.name AS group_id,\n"
+        "       og.consensus_gene_name AS consensus_gene_name,\n"
+        "       og.consensus_product AS consensus_product,\n"
+        f"       og.taxonomic_level AS taxonomic_level, og.source AS source{verbose_cols}\n"
+        f"ORDER BY g.locus_tag, og.specificity_rank, og.source{limit_clause}"
     )
     return cypher, params
 

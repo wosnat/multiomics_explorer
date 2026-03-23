@@ -20,7 +20,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_stub,
     build_genes_by_ontology,
     build_get_gene_details,
-    build_get_homologs_groups,
+    build_gene_homologs,
     build_list_experiments,
     build_list_experiments_summary,
     build_list_gene_categories,
@@ -44,7 +44,7 @@ TOOL_BUILDERS = {
     "search_genes": build_search_genes,
     "gene_overview": build_gene_overview,
     "get_gene_details": build_get_gene_details,
-    "get_homologs": build_get_homologs_groups,
+    "gene_homologs": build_gene_homologs,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
     "genes_by_ontology": build_genes_by_ontology,
@@ -138,9 +138,9 @@ def test_regression(conn, case, data_regression):
     elif tool == "list_filter_values":
         cat_cypher, cat_params = build_list_gene_categories()
         results = conn.execute_query(cat_cypher, **cat_params)
-    elif tool == "get_homologs_with_members":
-        cypher_groups, params_groups = build_get_homologs_groups(gene_id=params["gene_id"])
-        results = conn.execute_query(cypher_groups, **params_groups)
+    elif tool == "gene_homologs_with_members":
+        cypher, params_b = build_gene_homologs(locus_tags=params["locus_tags"])
+        results = conn.execute_query(cypher, **params_b)
     else:
         builder = TOOL_BUILDERS[tool]
         # Strip tool-level params that aren't accepted by query builders

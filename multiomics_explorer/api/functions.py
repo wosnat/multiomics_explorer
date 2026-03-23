@@ -10,7 +10,6 @@ Validation errors raise ValueError with specific messages.
 
 import logging
 import re
-from collections import defaultdict
 
 from neo4j.exceptions import ClientError as Neo4jClientError
 
@@ -23,11 +22,10 @@ from multiomics_explorer.kg.constants import (
 from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
-    build_gene_stub,
     build_genes_by_ontology,
     build_get_gene_details,
-    build_get_homologs_groups,
-    build_get_homologs_members,
+    build_gene_homologs,
+    build_gene_homologs_summary,
     build_list_gene_categories,
     build_list_organisms,
     build_list_publications,
@@ -231,39 +229,41 @@ def get_gene_details(
 
 
 
-def get_homologs(
-    gene_id: str,
+def gene_homologs(
+    locus_tags: list[str],
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
-    exclude_paralogs: bool = True,
-    include_members: bool = False,
-    member_limit: int = 50,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Find orthologs grouped by ortholog group.
+    """Get ortholog group memberships for genes.
 
-    Returns dict with keys:
-      query_gene: dict with locus_tag, gene_name, product, organism_strain
-      ortholog_groups: list[dict] with og_name, source, taxonomic_level,
-        specificity_rank, consensus_product, consensus_gene_name,
-        member_count, organism_count, genera, has_cross_genus_members.
-        When include_members=True, each group also has a members list
-        and optionally a truncated flag.
+    Returns dict with keys: total_matching, by_organism, by_source,
+    returned, truncated, not_found, no_groups, results.
+    Per result (compact): locus_tag, organism_strain, group_id,
+    consensus_gene_name, consensus_product, taxonomic_level, source.
+    Per result (verbose): adds specificity_rank, member_count,
+    organism_count, genera, has_cross_genus_members.
 
-    Raises ValueError if gene not found or params invalid.
+    summary=True is sugar for limit=0: results=[], summary fields only.
+    not_found: input locus_tags not in KG.
+    no_groups: genes that exist but have zero matching OGs.
     """
+    if summary:
+        limit = 0
+
     conn = _default_conn(conn)
 
     # Validate enum params
     if source is not None and source not in VALID_OG_SOURCES:
-        logger.debug("get_homologs: invalid source '%s'", source)
         raise ValueError(
             f"Invalid source '{source}'. Valid: {sorted(VALID_OG_SOURCES)}"
         )
     if taxonomic_level is not None and taxonomic_level not in VALID_TAXONOMIC_LEVELS:
-        logger.debug("get_homologs: invalid taxonomic_level '%s'", taxonomic_level)
         raise ValueError(
             f"Invalid taxonomic_level '{taxonomic_level}'. "
             f"Valid: {sorted(VALID_TAXONOMIC_LEVELS)}"
@@ -271,58 +271,54 @@ def get_homologs(
     if max_specificity_rank is not None and not (
         0 <= max_specificity_rank <= MAX_SPECIFICITY_RANK
     ):
-        logger.debug("get_homologs: invalid max_specificity_rank %s", max_specificity_rank)
         raise ValueError(
             f"Invalid max_specificity_rank {max_specificity_rank}. "
             f"Valid: 0-{MAX_SPECIFICITY_RANK}."
         )
-    if not (1 <= member_limit <= 200):
-        logger.debug("get_homologs: invalid member_limit %s", member_limit)
-        raise ValueError(
-            f"Invalid member_limit {member_limit}. Valid: 1-200."
-        )
 
-    # 1. Query gene metadata
-    logger.debug("get_homologs: fetching gene stub for '%s'", gene_id)
-    cypher_gene, params_gene = build_gene_stub(gene_id=gene_id)
-    gene_rows = conn.execute_query(cypher_gene, **params_gene)
-    if not gene_rows:
-        raise ValueError(f"Gene '{gene_id}' not found.")
-    query_gene = gene_rows[0]
-
-    # 2. Query ortholog groups
-    logger.debug("get_homologs: fetching ortholog groups for '%s'", gene_id)
-    cypher_groups, params_groups = build_get_homologs_groups(
-        gene_id=gene_id, source=source,
-        taxonomic_level=taxonomic_level,
+    filter_kwargs = dict(
+        source=source, taxonomic_level=taxonomic_level,
         max_specificity_rank=max_specificity_rank,
     )
-    groups = conn.execute_query(cypher_groups, **params_groups)
 
-    # 3. Optionally fetch members
-    if include_members and groups:
-        logger.debug("get_homologs: fetching members for %d groups", len(groups))
-        cypher_members, params_members = build_get_homologs_members(
-            gene_id=gene_id, source=source,
-            taxonomic_level=taxonomic_level,
-            max_specificity_rank=max_specificity_rank,
-            exclude_paralogs=exclude_paralogs,
+    # Summary query — always runs
+    sum_cypher, sum_params = build_gene_homologs_summary(
+        locus_tags=locus_tags, **filter_kwargs,
+    )
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    def _sorted_breakdown(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
         )
-        members = conn.execute_query(cypher_members, **params_members)
 
-        members_by_og: dict[str, list] = defaultdict(list)
-        for m in members:
-            members_by_og[m.pop("og_name")].append(m)
+    envelope = {
+        "total_matching": raw_summary["total_matching"],
+        "by_organism": _sorted_breakdown(raw_summary["by_organism"], "organism_name"),
+        "by_source": _sorted_breakdown(raw_summary["by_source"], "source"),
+        "not_found": raw_summary["not_found"],
+        "no_groups": raw_summary["no_groups"],
+    }
 
-        for g in groups:
-            og_members = members_by_og.get(g["og_name"], [])
-            if len(og_members) > member_limit:
-                g["members"] = og_members[:member_limit]
-                g["truncated"] = True
-            else:
-                g["members"] = og_members
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["truncated"] = envelope["total_matching"] > 0
+        envelope["results"] = []
+        return envelope
 
-    return {"query_gene": query_gene, "ortholog_groups": groups}
+    det_cypher, det_params = build_gene_homologs(
+        locus_tags=locus_tags, **filter_kwargs,
+        verbose=verbose, limit=limit,
+    )
+    results = conn.execute_query(det_cypher, **det_params)
+
+    envelope["returned"] = len(results)
+    envelope["truncated"] = envelope["total_matching"] > len(results)
+    envelope["results"] = results
+    return envelope
 
 
 def list_filter_values(
