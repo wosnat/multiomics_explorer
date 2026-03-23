@@ -150,7 +150,7 @@ class TestListOrganismsWrapper:
         """Response has total_entries, returned, truncated, results."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 15, "results": [self._SAMPLE_ORG]},
+            return_value={"total_entries": 15, "returned": 1, "truncated": True, "results": [self._SAMPLE_ORG]},
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
         assert result.total_entries == 15
@@ -163,7 +163,7 @@ class TestListOrganismsWrapper:
         """Compact result has 11 fields, no taxonomy hierarchy."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 1, "results": [self._SAMPLE_ORG]},
+            return_value={"total_entries": 1, "returned": 1, "truncated": False, "results": [self._SAMPLE_ORG]},
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
         org = result.results[0]
@@ -182,7 +182,7 @@ class TestListOrganismsWrapper:
                        "lineage": "cellular organisms; Bacteria; ..."}
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 1, "results": [verbose_org]},
+            return_value={"total_entries": 1, "returned": 1, "truncated": False, "results": [verbose_org]},
         ):
             result = await tool_fns["list_organisms"](mock_ctx, verbose=True)
         org = result.results[0]
@@ -194,7 +194,7 @@ class TestListOrganismsWrapper:
         """Empty results return envelope with total_entries=0."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 0, "results": []},
+            return_value={"total_entries": 0, "returned": 0, "truncated": False, "results": []},
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
         assert result.total_entries == 0
@@ -207,7 +207,7 @@ class TestListOrganismsWrapper:
         """returned == len(results), truncated == (total > returned)."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 2, "results": [self._SAMPLE_ORG, self._SAMPLE_ORG]},
+            return_value={"total_entries": 2, "returned": 2, "truncated": False, "results": [self._SAMPLE_ORG, self._SAMPLE_ORG]},
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
         assert result.returned == 2
@@ -224,7 +224,7 @@ class TestResolveGeneWrapper:
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
             return_value={
-                "total_matching": 1,
+                "total_matching": 1, "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}], "returned": 1, "truncated": False,
                 "results": [
                     {"locus_tag": "PMM0001", "gene_name": "dnaN",
                      "product": "DNA pol III beta",
@@ -249,7 +249,7 @@ class TestResolveGeneWrapper:
         """Mock API returns no results, verify empty response."""
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 0, "results": []},
+            return_value={"total_matching": 0, "by_organism": [], "returned": 0, "truncated": False, "results": []},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="FAKE_GENE")
 
@@ -263,7 +263,7 @@ class TestResolveGeneWrapper:
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
             return_value={
-                "total_matching": 3,
+                "total_matching": 3, "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}, {"organism_name": "Prochlorococcus MIT9312", "gene_count": 1}, {"organism_name": "Synechococcus WH8102", "gene_count": 1}], "returned": 3, "truncated": False,
                 "results": [
                     {"locus_tag": "PMM0001", "gene_name": "dnaN",
                      "product": "p1", "organism_strain": "Prochlorococcus MED4"},
@@ -288,7 +288,7 @@ class TestResolveGeneWrapper:
         """Verify identifier, organism, limit are all passed through to API."""
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 0, "results": []},
+            return_value={"total_matching": 0, "by_organism": [], "returned": 0, "truncated": False, "results": []},
         ) as mock_api:
             await tool_fns["resolve_gene"](
                 mock_ctx, identifier="dnaN", organism="MED4", limit=10,
@@ -306,7 +306,7 @@ class TestResolveGeneWrapper:
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
             return_value={
-                "total_matching": 5,
+                "total_matching": 5, "by_organism": [{"organism_name": "Org1", "gene_count": 3}, {"organism_name": "Org2", "gene_count": 2}], "returned": 2, "truncated": True,
                 "results": [
                     {"locus_tag": "PMM0001", "gene_name": "a",
                      "product": "p1", "organism_strain": "Org1"},
@@ -1336,6 +1336,11 @@ class TestListPublicationsWrapper:
             return_value={
                 "total_entries": 21,
                 "total_matching": 21,
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "publication_count": 1}],
+                "by_treatment_type": [{"treatment_type": "coculture", "publication_count": 1}],
+                "by_omics_type": [{"omics_type": "RNASEQ", "publication_count": 1}],
+                "returned": 1,
+                "truncated": True,
                 "results": [self._SAMPLE_PUB],
             },
         ):
@@ -1354,6 +1359,9 @@ class TestListPublicationsWrapper:
             return_value={
                 "total_entries": 21,
                 "total_matching": 0,
+                "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                "returned": 0,
+                "truncated": False,
                 "results": [],
             },
         ):
@@ -1367,7 +1375,7 @@ class TestListPublicationsWrapper:
         """All params passed through to api."""
         with patch(
             "multiomics_explorer.api.functions.list_publications",
-            return_value={"total_entries": 0, "total_matching": 0, "results": []},
+            return_value={"total_entries": 0, "total_matching": 0, "by_organism": [], "by_treatment_type": [], "by_omics_type": [], "returned": 0, "truncated": False, "results": []},
         ) as mock_api:
             await tool_fns["list_publications"](
                 mock_ctx,
@@ -1396,6 +1404,9 @@ class TestListPublicationsWrapper:
             return_value={
                 "total_entries": 50,
                 "total_matching": 8,
+                "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                "returned": 8,
+                "truncated": False,
                 "results": pubs,
             },
         ):

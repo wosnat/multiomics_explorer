@@ -101,7 +101,7 @@ class TestResolveGene:
     def test_empty_results(self, mock_conn):
         mock_conn.execute_query.return_value = []
         result = api.resolve_gene("FAKE0001", conn=mock_conn)
-        assert result == {"total_matching": 0, "results": []}
+        assert result == {"total_matching": 0, "by_organism": [], "returned": 0, "truncated": False, "results": []}
 
     def test_empty_identifier_raises(self, mock_conn):
         with pytest.raises(ValueError, match="identifier must not be empty"):
@@ -555,6 +555,9 @@ class TestListPublications:
         assert isinstance(result, dict)
         assert result["total_entries"] == 21
         assert result["total_matching"] == 21
+        assert "by_organism" in result
+        assert "by_treatment_type" in result
+        assert "by_omics_type" in result
         assert len(result["results"]) == 1
         assert mock_conn.execute_query.call_count == 2
 
@@ -573,10 +576,9 @@ class TestListPublications:
         summary_call = mock_conn.execute_query.call_args_list[0]
         assert "$search_text" in summary_call[0][0]
         assert "organism" in summary_call[1]  # kwargs contain param keys
-        # Verify data query was called with verbose + limit
+        # Verify data query was called with verbose (no LIMIT — slicing done in Python)
         data_call = mock_conn.execute_query.call_args_list[1]
         assert "abstract" in data_call[0][0]  # verbose columns in Cypher
-        assert "LIMIT $limit" in data_call[0][0]
 
     def test_creates_conn_when_none(self):
         """Default conn used when None."""

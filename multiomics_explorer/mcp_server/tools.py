@@ -124,7 +124,7 @@ def register_tools(mcp: FastMCP):
         )] = False,
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
-        )] = 50,
+        )] = 5,
     ) -> ListOrganismsResponse:
         """List all organisms with sequenced genomes in the knowledge graph.
 
@@ -141,8 +141,8 @@ def register_tools(mcp: FastMCP):
             organisms = [OrganismResult(**r) for r in result["results"]]
             response = ListOrganismsResponse(
                 total_entries=result["total_entries"],
-                returned=len(organisms),
-                truncated=result["total_entries"] > len(organisms),
+                returned=result["returned"],
+                truncated=result["truncated"],
                 results=organisms,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_entries} organisms")
@@ -157,8 +157,13 @@ def register_tools(mcp: FastMCP):
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III, beta subunit')")
         organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
 
+    class ResolveOrganismBreakdown(BaseModel):
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
+        gene_count: int = Field(description="Number of matching genes in this organism (e.g. 1)")
+
     class ResolveGeneResponse(BaseModel):
         total_matching: int = Field(description="Total genes matching identifier + organism filter (e.g. 3)")
+        by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted by count descending")
         returned: int = Field(description="Genes in this response (e.g. 3)")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[GeneMatch] = Field(description="Matching genes sorted by organism_strain, locus_tag")
@@ -180,7 +185,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
-        )] = 50,
+        )] = 5,
     ) -> ResolveGeneResponse:
         """Resolve a gene identifier to matching genes in the knowledge graph.
 
@@ -197,10 +202,12 @@ def register_tools(mcp: FastMCP):
                 identifier, organism=organism, limit=limit, conn=conn,
             )
             genes = [GeneMatch(**r) for r in result["results"]]
+            by_organism = [ResolveOrganismBreakdown(**b) for b in result["by_organism"]]
             return ResolveGeneResponse(
                 total_matching=result["total_matching"],
-                returned=len(genes),
-                truncated=result["total_matching"] > len(genes),
+                by_organism=by_organism,
+                returned=result["returned"],
+                truncated=result["truncated"],
                 results=genes,
             )
         except ValueError as e:
@@ -612,9 +619,24 @@ def register_tools(mcp: FastMCP):
         abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
         description: str | None = Field(default=None, description="Curated study description (only with verbose=True)")
 
+    class PubOrganismBreakdown(BaseModel):
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
+        publication_count: int = Field(description="Number of publications studying this organism (e.g. 11)")
+
+    class PubTreatmentTypeBreakdown(BaseModel):
+        treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
+        publication_count: int = Field(description="Number of publications (e.g. 5)")
+
+    class PubOmicsTypeBreakdown(BaseModel):
+        omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
+        publication_count: int = Field(description="Number of publications (e.g. 12)")
+
     class ListPublicationsResponse(BaseModel):
         total_entries: int = Field(description="Total publications in KG (unfiltered)")
         total_matching: int = Field(description="Publications matching filters")
+        by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted by count descending")
+        by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted by count descending")
+        by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted by count descending")
         returned: int = Field(description="Publications in this response")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[PublicationResult]
@@ -647,7 +669,7 @@ def register_tools(mcp: FastMCP):
         )] = False,
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
-        )] = 50,
+        )] = 5,
     ) -> ListPublicationsResponse:
         """List publications with expression data in the knowledge graph.
 
@@ -665,11 +687,17 @@ def register_tools(mcp: FastMCP):
                 verbose=verbose, limit=limit, conn=conn,
             )
             results = [PublicationResult(**r) for r in result["results"]]
+            by_organism = [PubOrganismBreakdown(**b) for b in result["by_organism"]]
+            by_treatment_type = [PubTreatmentTypeBreakdown(**b) for b in result["by_treatment_type"]]
+            by_omics_type = [PubOmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
             response = ListPublicationsResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
-                returned=len(results),
-                truncated=result["total_matching"] > len(results),
+                by_organism=by_organism,
+                by_treatment_type=by_treatment_type,
+                by_omics_type=by_omics_type,
+                returned=result["returned"],
+                truncated=result["truncated"],
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "
@@ -682,7 +710,7 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"list_publications unexpected error: {e}")
             raise ToolError(f"Error in list_publications: {e}")
 
-    # --- list_experiments (v2 pattern: unified response, summary/detail modes) ---
+    # --- list_experiments ---
 
     class TimePoint(BaseModel):
         label: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)')")

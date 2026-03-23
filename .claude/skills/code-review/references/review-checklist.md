@@ -85,7 +85,7 @@
 ## Tools with rich summary fields
 
 - [ ] Unified response model — summary fields + results in same dict/type?
-- [ ] `summary=True` → `results=[]`, `returned=0`, `truncated=True`?
+- [ ] `summary=True` → `limit=0` → `results=[]`, `returned=0`, `truncated=(total_matching > 0)`?
 - [ ] Summary fields always populated (both when summary=True and False)?
 - [ ] 2-query pattern: summary query always runs, detail skipped when `limit=0`?
 - [ ] Summary query uses `apoc.coll.frequencies` for breakdowns?
@@ -113,6 +113,7 @@
 - [ ] Builder in `TOOL_BUILDERS` dict?
 - [ ] Eval cases in `cases.yaml`?
 - [ ] Integration tests if tool touches new data?
+- [ ] Contract tests (`test_api_contract.py`) updated if return shape changed?
 - [ ] Tests for every optional parameter?
 - [ ] Tests for validation errors?
 - [ ] Tests for empty results?

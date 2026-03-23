@@ -17,7 +17,7 @@ specific experiments with list_experiments or genes with search_genes.
 | search_text | string \| None | None | Free-text search on title, abstract, and description (Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'. |
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
 | verbose | bool | False | Include abstract and description. Default compact for routing. |
-| limit | int | 50 | Max results. |
+| limit | int | 5 | Max results. |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
@@ -26,11 +26,14 @@ specific experiments with list_experiments or genes with search_genes.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, truncated, results
+total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, returned, truncated, results
 ```
 
 - **total_entries** (int): Total publications in KG (unfiltered)
 - **total_matching** (int): Publications matching filters
+- **by_organism** (list[PubOrganismBreakdown]): Publication counts per organism, sorted by count descending
+- **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted by count descending
+- **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted by count descending
 - **returned** (int): Publications in this response
 - **truncated** (bool): True if total_matching > returned
 
@@ -67,10 +70,11 @@ list_publications()
 
 ```example-response
 {
-  "total_entries": 21,
-  "total_matching": 21,
-  "returned": 21,
-  "truncated": false,
+  "total_entries": 21, "total_matching": 21,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "publication_count": 11}, ...],
+  "by_treatment_type": [{"treatment_type": "coculture", "publication_count": 5}, ...],
+  "by_omics_type": [{"omics_type": "RNASEQ", "publication_count": 12}, ...],
+  "returned": 5, "truncated": true,
   "results": [
     {"doi": "10.1101/2025.11.24.690089", "title": "Transcriptomic and Proteomic...", "year": 2025, "experiment_count": 10, ...},
     {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "experiment_count": 5, ...}
@@ -110,7 +114,7 @@ list_publications → search_genes
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, results
 ```
 
 Use package import for bulk data extraction in scripts.

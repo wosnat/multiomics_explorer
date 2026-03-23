@@ -69,7 +69,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier=locus_tag)
 
@@ -87,7 +87,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="dnaN")
 
@@ -101,7 +101,7 @@ class TestResolveGeneCorrectness:
         mit9312 = as_resolve_gene_result(GENES_BY_LOCUS["PMT9312_0001"])
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 2, "results": [med4, mit9312]},
+            return_value={"total_matching": 2, "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}, {"organism_name": "Prochlorococcus MIT9312", "gene_count": 1}], "returned": 2, "truncated": False, "results": [med4, mit9312]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="dnaN")
 
@@ -120,7 +120,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="WP_011132082.1")
 
@@ -136,7 +136,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="S8102_04001")
 
@@ -151,7 +151,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="ALT831_RS00180")
 
@@ -164,7 +164,7 @@ class TestResolveGeneCorrectness:
         med4 = as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"])
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "results": [med4]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}], "returned": 1, "truncated": False, "results": [med4]},
         ):
             result = await tool_fns["resolve_gene"](
                 mock_ctx, identifier="dnaN", organism="MED4",
@@ -180,7 +180,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="TX50_RS00020")
 

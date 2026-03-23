@@ -16,7 +16,7 @@ filter uses case-insensitive partial matching — 'MED4' and
 |---|---|---|---|
 | identifier | string | — | Gene identifier (case-insensitive) — locus_tag (e.g. 'PMM0001'), gene name (e.g. 'dnaN'), old locus tag, or RefSeq protein ID. |
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). E.g. 'MED4', 'Prochlorococcus MED4'. |
-| limit | int | 50 | Max results. |
+| limit | int | 5 | Max results. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -25,10 +25,11 @@ filter uses case-insensitive partial matching — 'MED4' and
 ### Envelope
 
 ```expected-keys
-total_matching, returned, truncated, results
+total_matching, by_organism, returned, truncated, results
 ```
 
 - **total_matching** (int): Total genes matching identifier + organism filter (e.g. 3)
+- **by_organism** (list[ResolveOrganismBreakdown]): Match counts per organism, sorted by count descending
 - **returned** (int): Genes in this response (e.g. 3)
 - **truncated** (bool): True if total_matching > returned
 
@@ -52,6 +53,7 @@ resolve_gene(identifier="PMM0001")
 ```example-response
 {
   "total_matching": 1,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}],
   "returned": 1,
   "truncated": false,
   "results": [
@@ -69,11 +71,12 @@ resolve_gene(identifier="dnaN")
 ```example-response
 {
   "total_matching": 15,
-  "returned": 15,
-  "truncated": false,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}, {"organism_name": "Prochlorococcus MIT9312", "gene_count": 1}, ...],
+  "returned": 5,
+  "truncated": true,
   "results": [
-    {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MED4"},
-    {"locus_tag": "PMT9312_0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MIT9312"},
+    {"locus_tag": "PMM0001", "gene_name": "dnaN", ...},
+    {"locus_tag": "PMT9312_0001", "gene_name": "dnaN", ...},
     ...
   ]
 }
@@ -123,7 +126,7 @@ resolve_gene(identifier='PMM0001')  # exact identity resolution
 from multiomics_explorer import resolve_gene
 
 result = resolve_gene(identifier=...)
-# returns dict with keys: total_matching, results
+# returns dict with keys: total_matching, by_organism, results
 ```
 
 Use package import for bulk data extraction in scripts.

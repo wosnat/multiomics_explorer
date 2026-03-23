@@ -84,7 +84,8 @@ def resolve_gene(
 ) -> dict:
     """Resolve a gene identifier to matching graph nodes.
 
-    Returns dict with keys: total_matching, results.
+    Returns dict with keys: total_matching, by_organism, returned, truncated,
+    results.
     Per result: locus_tag, gene_name, product, organism_strain.
     """
     if not identifier or not identifier.strip():
@@ -94,8 +95,26 @@ def resolve_gene(
     cypher, params = build_resolve_gene(identifier=identifier, organism=organism)
     all_results = conn.execute_query(cypher, **params)
     total = len(all_results)
+
+    # Compute by_organism from all matching results
+    org_counts: dict[str, int] = {}
+    for row in all_results:
+        org = row.get("organism_strain", "Unknown")
+        org_counts[org] = org_counts.get(org, 0) + 1
+    by_organism = sorted(
+        [{"organism_name": k, "gene_count": v} for k, v in org_counts.items()],
+        key=lambda x: x["gene_count"],
+        reverse=True,
+    )
+
     results = all_results[:limit] if limit else all_results
-    return {"total_matching": total, "results": results}
+    return {
+        "total_matching": total,
+        "by_organism": by_organism,
+        "returned": len(results),
+        "truncated": total > len(results),
+        "results": results,
+    }
 
 
 def search_genes(
@@ -334,7 +353,7 @@ def list_organisms(
 ) -> dict:
     """List all organisms in the knowledge graph.
 
-    Returns dict with keys: total_entries, results.
+    Returns dict with keys: total_entries, returned, truncated, results.
     Per result: organism_name, genus, species, strain, clade,
     ncbi_taxon_id, gene_count, publication_count, experiment_count,
     treatment_types, omics_types.
@@ -346,7 +365,12 @@ def list_organisms(
     all_results = conn.execute_query(cypher, **params)
     total = len(all_results)
     results = all_results[:limit] if limit else all_results
-    return {"total_entries": total, "results": results}
+    return {
+        "total_entries": total,
+        "returned": len(results),
+        "truncated": total > len(results),
+        "results": results,
+    }
 
 
 def list_publications(
@@ -361,7 +385,8 @@ def list_publications(
 ) -> dict:
     """List publications with expression data.
 
-    Returns dict with keys: total_entries, total_matching, results.
+    Returns dict with keys: total_entries, total_matching, returned, truncated,
+    by_organism, by_treatment_type, by_omics_type, results.
     Per result: doi, title, authors, year, journal, study_type, organisms,
     experiment_count, treatment_types, omics_types.
     When verbose=True, also includes abstract, description.
@@ -378,25 +403,52 @@ def list_publications(
         summary_cypher, summary_params = build_list_publications_summary(**kw)
         summary = conn.execute_query(summary_cypher, **summary_params)[0]
 
+        # Fetch all matching for breakdowns, then slice for results
         data_cypher, data_params = build_list_publications(
-            **kw, verbose=verbose, limit=limit,
+            **kw, verbose=verbose,
         )
-        results = conn.execute_query(data_cypher, **data_params)
-        return summary, results
+        all_results = conn.execute_query(data_cypher, **data_params)
+        return summary, all_results
 
     try:
-        summary, results = _execute()
+        summary, all_results = _execute()
     except Neo4jClientError:
         if search_text:
             logger.debug("list_publications: Lucene parse error, retrying with escaped query")
             escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            summary, results = _execute(st=escaped)
+            summary, all_results = _execute(st=escaped)
         else:
             raise
+
+    # Compute breakdowns from all matching publications
+    org_counts: dict[str, int] = {}
+    tt_counts: dict[str, int] = {}
+    omics_counts: dict[str, int] = {}
+    for pub in all_results:
+        for org in pub.get("organisms", []):
+            org_counts[org] = org_counts.get(org, 0) + 1
+        for tt in pub.get("treatment_types", []):
+            tt_counts[tt] = tt_counts.get(tt, 0) + 1
+        for ot in pub.get("omics_types", []):
+            omics_counts[ot] = omics_counts.get(ot, 0) + 1
+
+    def _sorted_breakdown(counts, key_name):
+        return sorted(
+            [{key_name: k, "publication_count": v} for k, v in counts.items()],
+            key=lambda x: x["publication_count"],
+            reverse=True,
+        )
+
+    results = all_results[:limit] if limit else all_results
 
     return {
         "total_entries": summary["total_entries"],
         "total_matching": summary["total_matching"],
+        "by_organism": _sorted_breakdown(org_counts, "organism_name"),
+        "by_treatment_type": _sorted_breakdown(tt_counts, "treatment_type"),
+        "by_omics_type": _sorted_breakdown(omics_counts, "omics_type"),
+        "returned": len(results),
+        "truncated": summary["total_matching"] > len(results),
         "results": results,
     }
 
@@ -421,8 +473,9 @@ def list_experiments(
     by_treatment_type, by_omics_type, by_publication, time_course_count,
     returned, truncated, results.
 
-    When summary=True: results is empty list, returned=0, truncated=True.
-    When summary=False: results populated with experiments.
+    summary=True is sugar for limit=0: results is empty list,
+    returned=0, truncated=True.
+    When summary=False (default): results populated with experiments.
     Per result: experiment_id, publication_doi, organism_strain,
     treatment_type, coculture_partner, omics_type, is_time_course (bool),
     time_points (list, omitted if not time-course), gene_count,
@@ -432,6 +485,9 @@ def list_experiments(
     statistical_test, experimental_context.
     When search_text is provided, detail results include score.
     """
+    if summary:
+        limit = 0
+
     conn = _default_conn(conn)
     filter_kwargs = dict(
         organism=organism, treatment_type=treatment_type,
@@ -496,9 +552,9 @@ def list_experiments(
         envelope["score_max"] = None
         envelope["score_median"] = None
 
-    if summary:
+    if limit == 0:
         envelope["returned"] = 0
-        envelope["truncated"] = True
+        envelope["truncated"] = envelope["total_matching"] > 0
         envelope["results"] = []
         return envelope
 

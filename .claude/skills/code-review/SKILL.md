@@ -26,9 +26,9 @@ checklist.
 
 5. **Run tests** — verify everything passes:
    ```bash
-   pytest tests/unit/ -v
-   pytest -m kg -v
-   pytest tests/regression/ -m kg
+   pytest tests/unit/ -v                        # unit tests (no Neo4j)
+   pytest tests/integration/ -v                  # contract, about-examples, KG tests
+   pytest tests/regression/ -m kg                # regression golden files
    ```
 
 ## Quick checks

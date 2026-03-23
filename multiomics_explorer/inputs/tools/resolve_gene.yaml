@@ -8,6 +8,7 @@ examples:
     response: |
       {
         "total_matching": 1,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}],
         "returned": 1,
         "truncated": false,
         "results": [
@@ -20,11 +21,12 @@ examples:
     response: |
       {
         "total_matching": 15,
-        "returned": 15,
-        "truncated": false,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}, {"organism_name": "Prochlorococcus MIT9312", "gene_count": 1}, ...],
+        "returned": 5,
+        "truncated": true,
         "results": [
-          {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MED4"},
-          {"locus_tag": "PMT9312_0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MIT9312"},
+          {"locus_tag": "PMM0001", "gene_name": "dnaN", ...},
+          {"locus_tag": "PMT9312_0001", "gene_name": "dnaN", ...},
           ...
         ]
       }

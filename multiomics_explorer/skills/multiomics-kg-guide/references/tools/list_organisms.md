@@ -15,7 +15,7 @@ filter uses partial matching — "MED4", "Prochlorococcus MED4", and
 | Name | Type | Default | Description |
 |---|---|---|---|
 | verbose | bool | False | Include full taxonomy hierarchy (family, order, class, phylum, kingdom, superkingdom, lineage). |
-| limit | int | 50 | Max results. |
+| limit | int | 5 | Max results. |
 
 ## Response format
 

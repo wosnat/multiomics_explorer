@@ -51,7 +51,7 @@ class TestResolveGeneContract:
 
     def test_not_found_returns_empty(self, conn):
         result = api.resolve_gene("NONEXISTENT_GENE_XYZ", conn=conn)
-        assert result == {"total_matching": 0, "results": []}
+        assert result == {"total_matching": 0, "by_organism": [], "returned": 0, "truncated": False, "results": []}
 
 
 # ---------------------------------------------------------------------------
