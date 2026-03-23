@@ -3,25 +3,15 @@ row_count: 2
 rows:
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
-  genera:
-  - Prochlorococcus
-  has_cross_genus_members: single_genus
-  member_count: 8
-  og_name: 1MKTR@1212
-  organism_count: 8
+  group_id: 1MKTR@1212
+  locus_tag: PMM0001
+  organism_strain: Prochlorococcus MED4
   source: eggnog
-  specificity_rank: 1
   taxonomic_level: Prochloraceae
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
-  genera:
-  - Alteromonas
-  - Prochlorococcus
-  - Synechococcus
-  has_cross_genus_members: cross_genus
-  member_count: 13
-  og_name: COG0592@2
-  organism_count: 13
+  group_id: COG0592@2
+  locus_tag: PMM0001
+  organism_strain: Prochlorococcus MED4
   source: eggnog
-  specificity_rank: 3
   taxonomic_level: Bacteria

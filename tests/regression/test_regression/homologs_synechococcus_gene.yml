@@ -3,37 +3,22 @@ row_count: 3
 rows:
 - consensus_gene_name: ftsH1
   consensus_product: cell division protein FtsH1
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  has_cross_genus_members: cross_genus
-  member_count: 9
-  og_name: CK_00008085
-  organism_count: 9
+  group_id: CK_00008085
+  locus_tag: SYNW0305
+  organism_strain: Synechococcus WH8102
   source: cyanorak
-  specificity_rank: 0
   taxonomic_level: curated
 - consensus_gene_name: ftsH1
   consensus_product: cell division protein FtsH1
-  genera:
-  - Synechococcus
-  has_cross_genus_members: single_genus
-  member_count: 2
-  og_name: 1GYE1@1129
-  organism_count: 2
+  group_id: 1GYE1@1129
+  locus_tag: SYNW0305
+  organism_strain: Synechococcus WH8102
   source: eggnog
-  specificity_rank: 1
   taxonomic_level: Synechococcus
 - consensus_gene_name: ftsH1
   consensus_product: cell division protein FtsH1
-  genera:
-  - Alteromonas
-  - Prochlorococcus
-  - Synechococcus
-  has_cross_genus_members: cross_genus
-  member_count: 45
-  og_name: COG0465@2
-  organism_count: 13
+  group_id: COG0465@2
+  locus_tag: SYNW0305
+  organism_strain: Synechococcus WH8102
   source: eggnog
-  specificity_rank: 3
   taxonomic_level: Bacteria
