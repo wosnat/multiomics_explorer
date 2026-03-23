@@ -7,12 +7,15 @@
 ```python
 def build_{name}(
     *, param1: str, param2: str | None = None,
+    verbose: bool = False,
 ) -> tuple[str, dict]:
 ```
 
 - All parameters are keyword-only (after `*`)
 - Returns `(cypher_string, params_dict)`
 - No `conn` parameter — this layer has no knowledge of connections
+- `verbose` controls RETURN columns — compact by default, heavy
+  text fields (abstract, description, full annotations) when True
 
 ### Cypher conventions
 
@@ -22,9 +25,16 @@ def build_{name}(
 - Organism filter pattern: `ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word)`
 - NULL-safe optional filters: `$param IS NULL OR ...`
 - For ontology queries, use `ONTOLOGY_CONFIG` dict
-- **APOC is available.** Use `apoc.coll.frequencies()` for per-dimension
-  breakdowns in summary queries, `apoc.coll.max/min/sort` for
-  distributions. Prefer APOC over multi-pass UNWIND aggregation.
+- **APOC is available.** Use throughout:
+  - `apoc.coll.frequencies()` for per-dimension breakdowns in summary queries
+  - `apoc.coll.max/min/sort` for distributions
+  - `apoc.map.fromPairs` / `apoc.map.merge` for dynamic result dicts
+    (e.g., verbose vs compact RETURN without duplicating the query)
+  - `apoc.convert.fromJsonMap` for parsing JSON-encoded precomputed
+    properties stored as strings
+  - `apoc.text.join` for string aggregation
+  - Don't use APOC for things Cypher does natively (aggregation, path
+    traversal, basic filtering)
 
 ### List-type filter parameters
 
@@ -47,17 +57,17 @@ well as a list).
 - Execute queries (no `conn.execute_query`)
 - Import from `api/` or `mcp_server/`
 - Format output (no JSON, no grouping)
-- Handle modes or limits (those belong in api/ or tools.py)
+- Handle modes or limits (those belong in api/)
 - Log (no logger calls)
 
 ### Naming
 
-Target convention for new tools: `build_{name}` where `{name}` matches
-the api function name.
+Target convention: `build_{name}` where `{name}` matches the api
+function name. Summary variant: `build_{name}_summary`.
 
-Existing variations:
-- `build_get_gene_details` → `get_gene_details`
-- `build_get_homologs_groups` + `build_get_homologs_members` → `get_homologs`
+Existing variations (transitional):
+- `build_get_gene_details` → being retired
+- `build_get_homologs_groups` + `build_get_homologs_members` → `gene_homologs`
 - `build_gene_stub` (helper, not a tool)
 - `build_list_gene_categories` (used by `list_filter_values`)
 
@@ -71,48 +81,92 @@ Multi-query tools may have multiple builders (e.g., `_groups` + `_members`).
 
 ```python
 def {name}(
-    positional_arg: str,
-    optional_arg: str | None = None,
+    locus_tags: list[str],              # ID params are always lists
+    organism: str | None = None,         # filters are singular
+    summary: bool = False,               # mode switches are booleans
+    verbose: bool = False,
+    limit: int | None = None,            # None = all rows
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
+) -> dict:
 ```
 
 - Positional args first, then keyword-only with `conn` always last
 - `conn` defaults to `None` — uses `_default_conn(conn)` to create if needed
-- Returns `list[dict]` or `dict` (for single-entity lookups like `get_gene_details`)
+- Always returns `dict` with summary fields + `results` list
 
-### Module docstring contract
+### Parameter guidelines
 
+- **ID parameters are always lists** — `locus_tags`, `experiment_ids`,
+  `group_ids`. Never singular `locus_tag` or `group_id`. Exception:
+  `identifier` in `resolve_gene` (ambiguous input, not ID lookup).
+- **Any tool that accepts an ID list is a batch tool.** Batch input
+  can be arbitrarily large. Therefore every ID-list tool supports
+  `limit`, `summary`, summary fields, and `not_found`.
+- **Filters are singular** — `organism`, `direction`, `source`.
+- **Booleans for mode switches** — `summary`, `verbose`.
+
+### Response dict — api/ assembles everything
+
+The api/ layer owns the complete response dict. MCP just wraps it.
+
+```python
+return {
+    # Summary fields (always present, computed over full result set)
+    "total_matching": matching,        # count matching all filters (full set)
+    "total_entries": total,            # total in KG before filtering (omit for no-filter tools)
+    "returned": len(results),
+    "truncated": total_matching > len(results),
+    "not_found": missing_ids,         # batch tools only — list of input IDs not matched
+    "direction_breakdown": {...},     # tool-specific summary fields
+    # Results (flat list of dicts, long form)
+    "results": results,
+}
 ```
-No limit parameters — callers slice results as needed.
-No JSON formatting — returns Python dicts/lists.
-Validation errors raise ValueError with specific messages.
+
+- `total_matching` — count of results matching all filters. For no-filter tools, equals total in KG.
+- Both can be present. Always include at least one.
+- `not_found` — present on batch tools (accept ID lists). Empty list when all matched.
+- `returned` and `truncated` computed here, not in MCP.
+
+### `summary` and `limit`
+
+- `summary=True` → sets `limit=0` (sugar for "summary fields only, no rows")
+- `summary=False` (default in api/) → `results` populated, capped by `limit`
+- `limit=None` (default in api/) → all rows
+
+### 2-query pattern
+
+For tools with summary fields:
+1. Summary query (via `build_{name}_summary()`) — always runs (cheap)
+2. Detail query (via `build_{name}()`) — only runs when `limit != 0`
+
+```python
+# Summary query — always runs
+sum_cypher, sum_params = queries_lib.build_{name}_summary(...)
+result = conn.execute_query(sum_cypher, **sum_params)
+
+# Detail query — skip when summary only
+if limit == 0:
+    result["results"] = []
+else:
+    det_cypher, det_params = queries_lib.build_{name}(...)
+    all_rows = conn.execute_query(det_cypher, **det_params)
+    result["results"] = all_rows[:limit] if limit else all_rows
+
+result["returned"] = len(result["results"])
+result["truncated"] = result["total_matching"] > result["returned"]
+return result
 ```
+
+For tools without filters (e.g. `list_organisms`): single query,
+slice in Python. `total_matching` from full result set.
 
 ### Error handling
 
 - Raise `ValueError` with specific messages for invalid inputs
-  (e.g., `"identifier must not be empty."`)
 - Lucene retry pattern for fulltext queries: catch `Neo4jClientError`,
   escape special chars with `_LUCENE_SPECIAL`, retry once
-
-### Lucene retry pattern (actual code)
-
-```python
-try:
-    results = conn.execute_query(cypher, **params)
-except Neo4jClientError:
-    logger.debug("...: Lucene parse error, retrying with escaped query")
-    escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-    cypher, params = build_search_...(search_text=escaped, ...)
-    results = conn.execute_query(cypher, **params)
-```
-
-### Docstring conventions
-
-- First line: what the function does
-- `Returns list of dicts with keys: key1, key2, ...` — this is the contract
 
 ### Exports
 
@@ -126,33 +180,20 @@ Every API function must be:
 - Import from `mcp_server/`
 - Catch exceptions silently (except Lucene retry)
 
-### Limit handling
-
-**Tools with summary/detail modes:** API runs 2-query pattern:
-1. Summary query (via `build_{name}_summary()`) — returns `total_entries`,
-   `total_matching`, and breakdowns
-2. Detail query (via `build_{name}()`) with LIMIT in Cypher — returns rows
-
-Both modes always run the summary query. Detail additionally runs the
-detail query. API returns breakdowns + results in a unified dict.
-
-**Tools with filters but no modes:** Same 2-query pattern but summary
-query is just counts (`total_entries`, `total_matching`).
-
-**Tools without filters (e.g. `list_organisms`):** API accepts `limit`,
-runs single query (no LIMIT in Cypher), slices in Python. This gives
-`total_entries` from the full result set without a separate count query.
-
 ---
 
 ## Layer 3: `mcp_server/tools.py`
 
-### Registration pattern (v1 — existing tools, being migrated)
+### MCP wrappers are thin
 
-Existing tools use sync `def`, `logger`, `_fmt`, error strings.
-These will be migrated to v2 in Phase D.
+The api/ layer assembles the complete response dict. MCP just:
+1. Forwards parameters (adds default `limit`, e.g. 5)
+2. Validates via `Response(**data)`
+3. Logs via `ctx.info/warning/error`
 
-### Registration pattern (v2 — new tools)
+No field computation in MCP. If the dict is wrong, fix it in api/.
+
+### Registration pattern
 
 ```python
 def register_tools(mcp: FastMCP):
@@ -161,11 +202,12 @@ def register_tools(mcp: FastMCP):
         field2: int = Field(default=0, description="What this means (e.g. 42)")
 
     class {Name}Response(BaseModel):
-        total_entries: int = Field(description="Total rows in KG")
-        total_matching: int = Field(description="Rows matching filters")  # only for tools with filters
+        total_matching: int = Field(description="Total matching filters (or total in KG if no filters)")
+        total_matching: int = Field(description="Rows matching filters")
         returned: int = Field(description="Rows in this response")
         truncated: bool = Field(description="True if total_matching > returned")
-        results: list[{Name}Result]
+        not_found: list[str] = Field(default_factory=list, description="Input IDs not found")
+        results: list[{Name}Result] = Field(default_factory=list)
 
     @mcp.tool(
         tags={"domain", "action"},
@@ -173,22 +215,24 @@ def register_tools(mcp: FastMCP):
     )
     async def tool_name(
         ctx: Context,
-        param: Annotated[str, Field(description="...")],
-        limit: Annotated[int, Field(description="Max results.", ge=1)] = 50,
+        locus_tags: Annotated[list[str], Field(description="Gene locus tags")],
+        summary: Annotated[bool, Field(
+            description="If true, return summary fields only (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include secondary fields in results rows.",
+        )] = False,
+        limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
     ) -> {Name}Response:
         """Tool purpose. What it does and when to use it."""
-        await ctx.info(f"tool_name param={param}")
+        await ctx.info(f"tool_name limit={limit}")
         try:
             conn = _conn(ctx)
-            result = api.tool_name(param, limit=limit, conn=conn)
-            rows = [{Name}Result(**r) for r in result["results"]]
-            return {Name}Response(
-                total_entries=result["total_entries"],
-                total_matching=result["total_matching"],
-                returned=len(rows),
-                truncated=result["total_matching"] > len(rows),
-                results=rows,
-            )
+            data = api.tool_name(
+                locus_tags=locus_tags, summary=summary,
+                verbose=verbose, limit=limit, conn=conn)
+            data["results"] = [{Name}Result(**r) for r in data["results"]]
+            return {Name}Response(**data)
         except ValueError as e:
             await ctx.warning(f"tool_name error: {e}")
             raise ToolError(str(e))
@@ -196,6 +240,19 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"tool_name unexpected error: {e}")
             raise ToolError(f"Error in tool_name: {e}")
 ```
+
+### Key conventions
+
+- `ctx: Context` first, then tool params, then structural params
+  (`summary`, `verbose`, `limit`)
+- Param descriptions go in `Field(description=...)`, not in docstring
+- Use `Literal["val1", "val2"]` for fixed valid values known at code time
+- Use `Field(ge=..., le=...)` for numeric constraints
+- `ToolError` for errors — always visible to client
+- `async def` with `await ctx.info/warning/error()`
+- Tags for categorization, `annotations={"readOnlyHint": True}` always
+- Pydantic `Field(description=...)` with examples on all result fields
+- Docstring is tool-level purpose only — return schema in Pydantic models
 
 ### Helpers
 
@@ -213,89 +270,10 @@ if cached is not None:
 lc._cache_attr = response
 ```
 
-### Error handling
-
-- `ValueError` from api/: `raise ToolError(str(e))`
-- `Exception`: `raise ToolError(f"Error in {tool_name}: {e}")`
-- Empty results: return `[]` — not an error, let the LLM decide what to do
-
-### Return type
-
-- Define Pydantic `BaseModel` response models (`{Name}Result` per row,
-  `{Name}Response` envelope). Return type annotation on the tool
-  function → FastMCP auto-generates `outputSchema` in the MCP tool def.
-- Return Pydantic model instances — FastMCP handles serialization
-- No `json.dumps`, no `_fmt` — return model instances directly
-- Pydantic models at MCP boundary only. API layer returns plain `dict`.
-- **Tools with summary/detail modes:** Use unified response model.
-  Envelope includes breakdowns (from summary query) + results (from
-  detail query). Both modes return the same `{Name}Response` type:
-  - Summary mode: breakdowns populated, `results: []`, `returned: 0`,
-    `truncated: True` (signals results exist but aren't shown)
-  - Detail mode: breakdowns populated, results populated, `returned`
-    and `truncated` reflect the limit
-  Both modes always run the summary query (cheap aggregation).
-  Detail additionally runs the detail query with LIMIT in Cypher.
-- **Tools with filters but no modes:** 2-query pattern: summary query
-  for `total_entries` + `total_matching`, data query with LIMIT.
-  API returns `{total_entries, total_matching, results}`.
-  MCP wrapper adds `returned` and `truncated`.
-- **Tools without filters + limit:** Single query, slice in Python.
-  API returns `{total_entries, results}` (no `total_matching`).
-  MCP wrapper adds `returned` and `truncated`.
-
-### Docstring conventions (LLM-facing)
-
-- First paragraph: what the tool does, when to use it
-- Param descriptions go in `Field(description=...)`, not `Args:`
-- Return schema is in Pydantic models (auto-generated as `outputSchema`) —
-  do not duplicate return fields in the docstring
-- Mention related tools for chaining ("Use list_organisms to see valid organisms")
-
-### Target pattern (v2, with FastMCP features)
-
-New tools should use `Annotated`, `Field`, `Literal`, `ToolError`:
-
-```python
-from typing import Annotated, Literal
-from pydantic import Field
-from fastmcp.exceptions import ToolError
-
-@mcp.tool(
-    tags={"domain_tag", "action_tag"},
-    annotations={"readOnlyHint": True},
-)
-async def tool_name(
-    ctx: Context,
-    param: Annotated[str, Field(description="...")],
-    mode: Annotated[
-        Literal["summary", "detail"],
-        Field(description="'summary' returns breakdowns to guide filtering. "
-              "'detail' returns individual rows. Start with summary."),
-    ] = "summary",
-    verbose: Annotated[bool, Field(
-        description="Detail mode only. Include secondary fields.",
-    )] = False,
-    limit: Annotated[
-        int, Field(ge=1, le=500, description="Detail mode only. Max rows."),
-    ] = 50,
-) -> {Name}Response:
-```
-
-**Key conventions:**
-- Param descriptions go in `Field(description=...)`, not in docstring `Args:`
-- Use `Literal["val1", "val2"]` for params with fixed valid values
-  known at code time (e.g. mode, ontology). Not for KG-derived values
-  (e.g. treatment_type) — those use `list_filter_values` for discovery.
-- Use `Field(ge=..., le=...)` for numeric constraints
-- Use `ToolError` for errors — always visible to client
-- `async def` tools with `await ctx.info/warning/error()` for MCP client-visible logging
-- Use `tags` for categorization (e.g. `{"publications", "discovery"}`)
-- All tools are read-only: `annotations={"readOnlyHint": True}`
-
 ### What this layer must NOT do
 
 - Call `queries_lib` directly — always go through `api/`
+- Compute response fields (`returned`, `truncated`, `not_found`) — api/ owns that
 - Return error strings — use `ToolError` instead
 - Execute raw Cypher (except through `api.run_cypher`)
 
@@ -305,30 +283,18 @@ async def tool_name(
 
 ### About content
 
-Per-tool files at `skills/multiomics-kg-guide/references/tools/{tool-name}.md`.
-Served via MCP resource at URI `docs://tools/{tool-name}` (not a tool mode parameter).
+Auto-generated from Pydantic models + human-authored input YAML.
+No hand-written tagged blocks needed — params table, response
+format, and expected keys come from the Pydantic models.
 
-Content per tool:
-- What the tool does (beyond the docstring)
-- Parameter guide with valid values
-- Response guide: fields in summary and detail modes
-- Examples using tagged fenced blocks
-- Common mistakes with corrections
-- Chaining patterns
+**Source files:**
+- Input YAML: `multiomics_explorer/inputs/tools/{name}.yaml`
+- Build script: `scripts/build_about_content.py`
+- Output: `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`
+- Served via MCP resource at `docs://tools/{tool-name}`
 
-### Tagged block format
-
-````markdown
-```example-call
-tool_name(param="value", mode="summary")
-```
-
-```expected-keys
-key1, key2, key3
-```
-````
-
-Tests extract `expected-keys` blocks and verify against actual tool output.
+**Human authors the YAML** (examples, chaining, mistakes).
+**Script extracts from Pydantic** (params, response format, keys).
 
 ### Sync
 
@@ -336,27 +302,31 @@ Research skills source: `multiomics_explorer/skills/`
 Dev copy: `.claude/skills/research/` (gitignored)
 Sync: `scripts/sync_skills.sh`
 
-Update about content whenever tool return fields change.
+Update YAML + rebuild when tool behavior changes.
 
 ---
 
 ## Standard parameter names
 
-| Name | Layer | Used in |
-|---|---|---|
-| `identifier` | all | resolve_gene |
-| `gene_id` | builders + api | get_gene_details, get_homologs, gene_ontology_terms |
-| `gene_ids` | builders + api | gene_overview |
-| `search_text` | all | search_genes, search_ontology |
-| `organism` | all | resolve_gene, search_genes, genes_by_ontology |
-| `ontology` | all | search_ontology, genes_by_ontology, gene_ontology_terms |
-| `term_ids` | all | genes_by_ontology |
-| `category` | all | search_genes |
-| `conn` | api only | all api functions (keyword-only, last) |
-| `ctx` | MCP only | all MCP wrappers (first param, injected by FastMCP) |
-| `limit` | MCP + api | tools with large or growing result sets |
-| `mode` | MCP + api (v2) | `Literal["summary", "detail"]` at MCP, `str` at API. Same name at both layers for LLM consistency. About content served via MCP resource `docs://tools/{name}`, not a mode value |
-| `verbose` | all | include secondary columns (heavy text, taxonomy hierarchies, descriptive fields). Orthogonal to modes — verbose controls columns, modes control rows |
+| Name | Type | Layer | Used in |
+|---|---|---|---|
+| `identifier` | `str` | all | resolve_gene |
+| `locus_tags` | `list[str]` | all | gene_overview, gene_ontology_terms, gene_homologs, differential_expression_by_gene |
+| `experiment_ids` | `list[str]` | all | differential_expression_by_gene, differential_expression_by_ortholog |
+| `group_ids` | `list[str]` | all | genes_by_homolog_group |
+| `search_text` | `str` | all | genes_by_function, search_ontology |
+| `organism` | `str \| None` | all | resolve_gene, genes_by_function, genes_by_ontology |
+| `ontology` | `str` | all | search_ontology, genes_by_ontology, gene_ontology_terms |
+| `term_ids` | `list[str]` | all | genes_by_ontology |
+| `category` | `str \| None` | all | genes_by_function |
+| `summary` | `bool` | api/ + MCP | sugar for `limit=0`. Default False in api/, False in MCP (small default limit gives rows) |
+| `verbose` | `bool` | all | include secondary columns. Controls which columns, not which rows. |
+| `limit` | `int \| None` | api/ + MCP | caps `results` length. Default None in api/, small cap (e.g. 5) in MCP |
+| `conn` | `GraphConnection \| None` | api/ only | keyword-only, always last |
+| `ctx` | `Context` | MCP only | first param, injected by FastMCP |
+
+**ID params are always lists.** No singular `locus_tag`, `group_id`, etc.
+Callers never check whether to pass a string or list.
 
 ## String matching rules
 
@@ -366,34 +336,44 @@ case-insensitive.
 
 Fulltext search tools must return `score` in RETURN columns and
 ORDER BY score DESC. This lets the LLM see relevance ranking.
-In summary mode, include `score_max` and `score_median` for distribution
-context — lets Claude judge if top results are highly relevant or barely
-matching.
+In summary queries, include `score_max` and `score_median` for
+distribution context.
 
 ## Standard return field names
 
 | Field | Used in |
 |---|---|
-| `locus_tag` | resolve_gene, search_genes, gene_overview, genes_by_ontology, homologs |
-| `gene_name` | resolve_gene, search_genes, gene_overview, homologs |
-| `product` | resolve_gene, search_genes, gene_overview, homologs |
-| `organism_strain` | resolve_gene, search_genes, gene_overview, genes_by_ontology, homologs |
-| `annotation_quality` | search_genes, gene_overview |
-| `score` | search_genes, search_ontology, list_experiments (when search_text used) |
-| `score_max`, `score_median` | summary mode of fulltext search tools |
+| `locus_tag` | resolve_gene, genes_by_function, gene_overview, genes_by_ontology, gene_homologs |
+| `gene_name` | resolve_gene, genes_by_function, gene_overview, gene_homologs |
+| `product` | resolve_gene, genes_by_function, gene_overview, gene_homologs |
+| `organism_strain` | resolve_gene, genes_by_function, gene_overview, genes_by_ontology, gene_homologs |
+| `annotation_quality` | genes_by_function, gene_overview |
+| `score` | genes_by_function, search_ontology, list_experiments (when search_text used) |
+| `score_max`, `score_median` | summary fields of fulltext search tools |
 | `id`, `name` | search_ontology, gene_ontology_terms |
 | `gene_category` | gene_overview |
-| `gene_summary` | search_genes, gene_overview |
+| `gene_summary` | genes_by_function, gene_overview |
 | `experiment_id` | list_experiments |
 | `experiment_count` | list_experiments summary breakdowns |
 | `treatment_type` | list_experiments |
 | `omics_type` | list_experiments |
 | `publication_doi` | list_experiments, list_publications |
 
+### Envelope fields
+
+| Field | When present | Meaning |
+|---|---|---|
+| `total_matching` | Always | Count of results matching all filters (full set, not capped by limit) |
+| `total_entries` | Tools with filters | Total in KG before filtering. Gives filter selectivity context ("3 of 15"). Omit for no-filter tools. |
+| `returned` | Always | `len(results)` — rows in this response |
+| `truncated` | Always | `True` when `total_matching > returned` (including `summary=True` with matches) |
+| `not_found` | Batch tools only (accept ID lists) | Input IDs with no match. Empty list when all matched. Not on search tools. |
+| `results` | Always | Flat `list[dict]`, long form (one row per entity × dimension) |
+
 ## Docstring conventions by layer
 
 | Layer | Audience | Content |
 |---|---|---|
-| `queries_lib.py` | Developers | Brief: what Cypher pattern, what RETURN columns |
-| `api/functions.py` | Developers + scripts | Return dict keys listed, exceptions documented |
-| `mcp_server/tools.py` | LLMs | Purpose + when to use. Param descriptions in `Field()`, not `Args:`. Return schema in Pydantic models. |
+| `queries_lib.py` | Developers | Brief: what Cypher pattern, what RETURN columns, verbose-only keys |
+| `api/functions.py` | Developers + scripts | Return dict keys listed (summary fields + result keys), exceptions documented |
+| `mcp_server/tools.py` | LLMs | Purpose + when to use. Param descriptions in `Field()`. Return schema in Pydantic models. |

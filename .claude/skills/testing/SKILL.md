@@ -15,7 +15,7 @@ and [regression guide](references/regression-guide.md) for golden-file tests.
 |---|---|---|
 | `tests/unit/test_query_builders.py` | Cypher structure + params | No |
 | `tests/unit/test_api_functions.py` | API logic with mocked conn | No |
-| `tests/unit/test_tool_wrappers.py` | MCP wrapper formatting + errors | No |
+| `tests/unit/test_tool_wrappers.py` | MCP wrapper Pydantic models + ToolError | No |
 | `tests/unit/test_tool_correctness.py` | Fixture-based correctness (mocked) | No |
 | `tests/unit/test_write_blocking.py` | Write keyword regex | No |
 | `tests/integration/test_tool_correctness_kg.py` | Fixture-based correctness (live KG) | Yes |

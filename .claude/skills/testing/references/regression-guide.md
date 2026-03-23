@@ -28,19 +28,23 @@
 
 ## TOOL_BUILDERS dict
 
-Maps tool/case names to query builder functions:
+Maps tool/case names to query builder functions. Uses **target**
+names after v3 migration (update as tools are renamed):
 
 ```python
 TOOL_BUILDERS = {
     "resolve_gene": build_resolve_gene,
-    "search_genes": build_search_genes,
+    "genes_by_function": build_genes_by_function,  # was: search_genes
     "gene_overview": build_gene_overview,
-    # ...
+    "gene_homologs": ...,  # was: get_homologs (multi-step)
     # Per-ontology partial entries
     "search_ontology_go_bp": partial(build_search_ontology, ontology="go_bp"),
     # ...
 }
 ```
+
+**Note:** During transition, old builder names remain in the actual
+code until each tool is renamed. The above shows the target state.
 
 When adding a new tool:
 1. Add builder to `TOOL_BUILDERS`
@@ -52,13 +56,15 @@ When adding a new tool:
 Some tools have custom handling:
 - `raw_cypher` — uses `run_cypher` directly
 - `list_filter_values` — calls `build_list_gene_categories`
-- `get_homologs_with_members` — multi-step (groups → members)
+- `gene_homologs` (was `get_homologs_with_members`) — multi-step
+  (groups → members)
 
 ## When to regenerate baselines
 
 - After intentional Cypher changes (new RETURN columns, different ORDER BY)
 - After KG rebuild (data may have changed)
 - After KG schema changes
+- After tool renames (new builder names in TOOL_BUILDERS)
 
 ```bash
 pytest tests/regression/ --force-regen -m kg

@@ -20,8 +20,11 @@
 
 - [ ] `conn: GraphConnection | None = None` as keyword-only last param?
 - [ ] Uses `_default_conn(conn)` at function start?
-- [ ] Returns `list[dict]` or `dict` (no strings, no JSON)?
-- [ ] Limit handling correct? (Tools with filters: no limit in API, 2-query pattern. Tools without filters: limit in API, single query, Python slice.)
+- [ ] Returns `dict` with summary fields + `results` list (no strings, no JSON)?
+- [ ] Assembles complete response dict (summary fields, `returned`, `truncated`, `not_found` for batch tools)? MCP must not compute these.
+- [ ] `summary=True` sets `limit=0`?
+- [ ] 2-query pattern: summary query always runs, detail query skipped when `limit=0`?
+- [ ] Batch tools (accept ID lists) include `not_found` field?
 - [ ] No JSON formatting?
 - [ ] No imports from `mcp_server/`?
 - [ ] Validates inputs, raises `ValueError` with specific messages?
@@ -50,15 +53,16 @@
 - [ ] Pydantic response models defined (`{Name}Result` + `{Name}Response`)?
 - [ ] `{Name}Result` fields have `Field(description=...)` with examples on all fields?
 - [ ] Return type annotation is the response model (→ auto outputSchema)?
-- [ ] Returns model instances (not dicts)?
+- [ ] No field computation — api/ dict → `Response(**data)`?
+- [ ] Default `limit` is small (e.g. 5) — not 50 or 100?
 - [ ] Empty results return model with `results=[]` (not ToolError)?
 
 ## Layer 4: Skills (MCP resources)
 
 - [ ] Input YAML exists at `inputs/tools/{name}.yaml`?
 - [ ] About content built via `scripts/build_about_content.py {name}`?
-- [ ] Content includes `example-call` and `expected-keys` tagged blocks?
-- [ ] `expected-keys` match actual tool return fields?
+- [ ] About content auto-generated from Pydantic + YAML (not hand-written)?
+- [ ] Params table, response format, expected keys match current Pydantic models?
 - [ ] Chaining patterns documented?
 - [ ] Common mistakes section if applicable?
 - [ ] `pytest tests/unit/test_about_content.py` passes (consistency)?
@@ -66,8 +70,10 @@
 
 ## Cross-layer consistency
 
-- [ ] Parameter names match across all 3 code layers (including `mode`
-      at both MCP and API — not `summary` bool at API)?
+- [ ] Parameter names match across all 3 code layers (`summary`, `verbose`,
+      `limit` — same names at api/ and MCP)?
+- [ ] ID params are lists (`locus_tags`, `experiment_ids`, `group_ids`)
+      — no singular forms?
 - [ ] Return field names match between Cypher RETURN, API docstring,
       and about content `expected-keys`?
 - [ ] MCP tool name matches API function name?
@@ -76,15 +82,15 @@
 - [ ] About content example calls use correct param names for other
       tools referenced in chaining examples?
 
-## Mode-based tools (summary/detail)
+## Tools with rich summary fields
 
-- [ ] Unified response model — breakdowns + results in same type?
-- [ ] Summary mode: `results=[]`, `returned=0`, `truncated=True`?
-- [ ] Detail mode: breakdowns also populated (from summary query)?
-- [ ] Both modes run summary query, detail additionally runs detail query?
+- [ ] Unified response model — summary fields + results in same dict/type?
+- [ ] `summary=True` → `results=[]`, `returned=0`, `truncated=True`?
+- [ ] Summary fields always populated (both when summary=True and False)?
+- [ ] 2-query pattern: summary query always runs, detail skipped when `limit=0`?
 - [ ] Summary query uses `apoc.coll.frequencies` for breakdowns?
 - [ ] API renames `{item, count}` to domain keys, sorts descending?
-- [ ] Fulltext tools include `score_max`/`score_median` in summary?
+- [ ] Fulltext tools include `score_max`/`score_median` in summary fields?
 
 ## Precomputed stats / sentinel values
 
@@ -116,7 +122,7 @@
 - [ ] Return field names use standard names where applicable?
       (`locus_tag`, `gene_name`, `product`, `organism_strain`, `score`)
 - [ ] New parameter names follow existing conventions?
-      (`organism`, `search_text`, `ontology`, `category`, `limit`, `mode`)
+      (`organism`, `search_text`, `ontology`, `category`, `limit`, `summary`, `verbose`)
 - [ ] Test class naming follows conventions?
       (`TestBuild{Name}`, `Test{Name}`, `Test{Name}Wrapper`)
 

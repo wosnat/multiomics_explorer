@@ -72,18 +72,20 @@ def build_{name}(
     return cypher, {"required_param": required_param}
 ```
 
-## Template: API function
+## Template: API function (simple — small result sets)
 
 ```python
 def {name}(
     required_param: str,
     optional_param: str | None = None,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
+) -> dict:
     """Description.
 
-    Returns list of dicts with keys: key1, key2, key3.
+    Returns dict with keys: total_matching, returned, truncated, results.
+    Per result: key1, key2, key3.
     """
     if not required_param or not required_param.strip():
         raise ValueError("required_param must not be empty.")
@@ -92,15 +94,23 @@ def {name}(
         required_param=required_param,
         optional_param=optional_param,
     )
-    return conn.execute_query(cypher, **params)
+    all_results = conn.execute_query(cypher, **params)
+    total = len(all_results)
+    results = all_results[:limit] if limit else all_results
+    return {
+        "total_matching": total,
+        "returned": len(results),
+        "truncated": total > len(results),
+        "results": results,
+    }
 ```
 
-## Template: API function (with summary/detail modes)
+## Template: API function (with summary fields)
 
 ```python
 def {name}(
     optional_param: str | None = None,
-    mode: str = "summary",
+    summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
     *,
@@ -108,46 +118,73 @@ def {name}(
 ) -> dict:
     """Description.
 
-    Always returns dict with keys: total_entries, total_matching,
-    by_dimension1, by_dimension2, ..., returned, truncated, results.
+    Returns dict with keys: total_matching, by_dimension1,
+    by_dimension2, ..., returned, truncated, results.
 
-    When summary=True: results is empty list, truncated=True.
-    When summary=False (detail): results populated with rows.
-    Breakdowns always populated (from summary query).
+    summary=True: results=[], summary fields only.
+    summary=False: results populated with rows (capped by limit).
+    Summary fields always present in both cases.
     """
     conn = _default_conn(conn)
-    # Always run summary query for breakdowns + counts
+    if summary:
+        limit = 0
+
+    # Summary query — always runs (cheap)
     sum_cypher, sum_params = build_{name}_summary(
         optional_param=optional_param,
     )
     sum_result = conn.execute_query(sum_cypher, **sum_params)
-    # ... extract breakdowns, total_matching, total_entries ...
+    # ... extract total_matching, breakdowns ...
 
-    if mode == "summary":
-        return {
-            "total_entries": total_entries,
-            "total_matching": total_matching,
-            "by_dimension1": by_dimension1,  # rename item/count keys
-            "returned": 0,
-            "truncated": True,
-            "results": [],
-        }
+    # Detail query — skip when limit=0 (summary only)
+    if limit == 0:
+        results = []
+    else:
+        det_cypher, det_params = build_{name}(
+            optional_param=optional_param,
+            verbose=verbose,
+            limit=limit,
+        )
+        all_rows = conn.execute_query(det_cypher, **det_params)
+        results = all_rows[:limit] if limit else all_rows
 
-    # Detail: also run detail query with LIMIT
-    det_cypher, det_params = build_{name}(
-        optional_param=optional_param,
-        verbose=verbose,
-        limit=limit,
-    )
-    results = conn.execute_query(det_cypher, **det_params)
-    # ... post-process results ...
-
+    # api/ assembles the complete response dict — MCP just wraps it
     return {
-        "total_entries": total_entries,
         "total_matching": total_matching,
-        "by_dimension1": by_dimension1,
+        "by_dimension1": by_dimension1,  # rename item/count keys
         "returned": len(results),
         "truncated": total_matching > len(results),
+        "results": results,
+    }
+```
+
+## Template: API function (batch — accepts ID lists)
+
+```python
+def {name}(
+    locus_tags: list[str],
+    verbose: bool = False,
+    limit: int | None = None,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Description.
+
+    Returns dict with keys: total_matching, returned, truncated,
+    not_found, results.
+    """
+    conn = _default_conn(conn)
+    cypher, params = build_{name}(locus_tags=locus_tags, verbose=verbose)
+    all_results = conn.execute_query(cypher, **params)
+    found_tags = {r["locus_tag"] for r in all_results}
+    not_found = [t for t in locus_tags if t not in found_tags]
+    total = len(all_results)
+    results = all_results[:limit] if limit else all_results
+    return {
+        "total_matching": total,
+        "returned": len(results),
+        "truncated": total > len(results),
+        "not_found": not_found,
         "results": results,
     }
 ```
@@ -166,18 +203,15 @@ class {Name}Result(BaseModel):
     key1: str = Field(description="What this is (e.g. 'example_value')")
     key2: int = Field(description="What this means (e.g. 42)")
     optional_key: str | None = Field(default=None, description="Description (e.g. 'example')")
-    domain_field: list[str] = Field(default=[], description="What this field means (e.g. ['val1', 'val2'])")
 
 # Include Field(description=...) with examples on ALL result fields.
 
 class {Name}Response(BaseModel):
-    total_entries: int = Field(description="Total rows in KG (unfiltered)")
-    # Include total_matching only for tools with filters. Omit for
-    # no-filter tools (e.g. list_organisms) — use total_entries instead.
-    total_matching: int = Field(description="Rows matching filters")
+    total_matching: int = Field(description="Total matching filters (or total in KG if no filters)")
     returned: int = Field(description="Rows in this response")
-    truncated: bool = Field(description="True if total_matching > returned, or summary mode")
-    results: list[{Name}Result]
+    truncated: bool = Field(description="True if total_matching > returned")
+    not_found: list[str] = Field(default_factory=list, description="Input IDs not found (batch tools only)")
+    results: list[{Name}Result] = Field(default_factory=list)
 
 @mcp.tool(
     tags={"tag1", "tag2"},
@@ -191,27 +225,30 @@ async def {name}(
     optional_param: Annotated[str | None, Field(
         description="Optional filter.",
     )] = None,
+    summary: Annotated[bool, Field(
+        description="If true, return summary fields only (results=[]).",
+    )] = False,
+    verbose: Annotated[bool, Field(
+        description="Include secondary fields in results rows.",
+    )] = False,
     limit: Annotated[int, Field(
         description="Max results.", ge=1,
-    )] = 50,
+    )] = 5,
 ) -> {Name}Response:
     """LLM-facing description (purpose + when to use).
 
     Return schema is in the Pydantic models (auto-generated as
     outputSchema), not in the docstring.
     """
-    await ctx.info(f"{name} required_param={required_param}")
+    await ctx.info(f"{name} limit={limit}")
     try:
         conn = _conn(ctx)
-        result = api.{name}(required_param, optional_param=optional_param, limit=limit, conn=conn)
-        rows = [{Name}Result(**r) for r in result["results"]]
-        return {Name}Response(
-            total_entries=result["total_entries"],
-            total_matching=result["total_matching"],
-            returned=len(rows),
-            truncated=result["total_matching"] > len(rows),
-            results=rows,
-        )
+        # api/ returns the complete dict — MCP just validates via Pydantic
+        data = api.{name}(
+            required_param, optional_param=optional_param,
+            summary=summary, verbose=verbose, limit=limit, conn=conn)
+        data["results"] = [{Name}Result(**r) for r in data["results"]]
+        return {Name}Response(**data)
     except ValueError as e:
         await ctx.warning(f"{name} error: {e}")
         raise ToolError(str(e))
@@ -220,8 +257,9 @@ async def {name}(
         raise ToolError(f"Error in {name}: {e}")
 ```
 
-**Note:** Pydantic models are at the MCP boundary only. The API layer
-returns plain `dict` — the wrapper validates and wraps into models.
+**Note:** api/ assembles the complete response dict (summary fields,
+`returned`, `truncated`, `not_found`). MCP just validates via
+`Response(**data)`. No field computation in MCP.
 
 ## Template: cases.yaml entry
 
@@ -238,7 +276,7 @@ returns plain `dict` — the wrapper validates and wraps into models.
 
 ## Template: summary builder (with apoc)
 
-For tools with summary/detail modes. Uses `apoc.coll.frequencies()`
+For tools with rich summary fields. Uses `apoc.coll.frequencies()`
 for per-dimension breakdowns in a single Cypher pass.
 
 ```python
@@ -275,9 +313,9 @@ For fulltext search tools, also collect scores:
 "       apoc.coll.sort(scores)[size(scores)/2] AS score_median"
 ```
 
-## Template: unified response model (with modes)
+## Template: unified response model (with summary fields)
 
-For tools with summary/detail modes. Both modes return the same type.
+Both `summary=True` and `summary=False` return the same type.
 
 ```python
 class {Name}Breakdown(BaseModel):
@@ -285,16 +323,15 @@ class {Name}Breakdown(BaseModel):
     experiment_count: int = Field(description="Number of items (e.g. 16)")
 
 class {Name}Response(BaseModel):
-    total_entries: int = Field(description="Total in KG (unfiltered)")
-    total_matching: int = Field(description="Matching filters")
-    returned: int = Field(description="Results returned (0 in summary mode)")
-    truncated: bool = Field(description="True if results truncated or summary mode")
+    total_matching: int = Field(description="Total matching filters (or total in KG if no filters)")
+    returned: int = Field(description="Results returned")
+    truncated: bool = Field(description="True if total_matching > returned")
     by_dimension: list[{Name}Breakdown] = Field(description="Breakdown by dimension")
-    results: list[{Name}Result] = Field(description="Empty in summary, populated in detail")
+    results: list[{Name}Result] = Field(default_factory=list)
 ```
 
-Summary mode: breakdowns populated, `results: []`, `returned: 0`, `truncated: True`.
-Detail mode: breakdowns populated, results populated, `truncated` reflects limit.
+summary=True: breakdowns populated, `results=[]`, `returned=0`, `truncated=True`.
+summary=False: breakdowns populated, results populated, `truncated` reflects limit.
 
 ## Template: list-type filter parameter
 
@@ -322,9 +359,9 @@ CONTAINS filters stay as single `str` — fuzzy match doesn't combine well.
 - Forgetting to update `CLAUDE.md` tool table
 - Every query MUST have `ORDER BY` — if no natural sort key, sort alphabetically by primary identifier. Non-deterministic results break regression tests.
 - String filters must be case-insensitive — use `toLower()` on both sides
-- Fulltext search tools must return `score` in RETURN columns and ORDER BY score DESC. Summary mode needs `score_max`/`score_median`.
+- Fulltext search tools must return `score` in RETURN columns and ORDER BY score DESC. Summary needs `score_max`/`score_median`.
 - Using f-strings for user input in Cypher instead of `$param` placeholders
 - Forgetting `_default_conn(conn)` call in API function
-- Summary mode `truncated` must be `True` — signals results exist but aren't shown
+- `summary=True` sets `truncated=True` — signals results exist but aren't shown
 - `apoc.coll.frequencies()` returns `{item, count}` — rename to domain keys in API layer
 - List-type filter params need case normalization in Python before passing to Cypher

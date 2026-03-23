@@ -30,6 +30,13 @@ class TestBuildNewTool:
         assert params["optional_param"] == "filter_value"
         # assert the WHERE clause references it
 
+    def test_verbose_adds_columns(self):
+        """verbose=True adds heavy text columns."""
+        cypher_compact, _ = build_new_tool(required_param="x")
+        cypher_verbose, _ = build_new_tool(required_param="x", verbose=True)
+        assert "heavy_text_field" not in cypher_compact
+        assert "heavy_text_field" in cypher_verbose
+
     def test_order_by(self):
         cypher, _ = build_new_tool(required_param="x")
         assert "ORDER BY" in cypher
@@ -67,32 +74,79 @@ def mock_conn():
 
 ```python
 class TestNewTool:
-    def test_returns_list(self, mock_conn):
+    def test_returns_dict_with_results(self, mock_conn):
+        """API returns dict with summary fields + results list."""
         mock_conn.execute_query.return_value = [
             {"locus_tag": "PMM0001", "gene_name": "dnaN"}
         ]
         result = api.new_tool("param", conn=mock_conn)
-        assert isinstance(result, list)
-        assert result[0]["locus_tag"] == "PMM0001"
+        assert isinstance(result, dict)
+        assert "results" in result
+        assert "total_matching" in result
+        assert "returned" in result
+        assert "truncated" in result
+        assert result["results"][0]["locus_tag"] == "PMM0001"
 
     def test_empty_results(self, mock_conn):
         mock_conn.execute_query.return_value = []
         result = api.new_tool("param", conn=mock_conn)
-        assert result == []
+        assert result["results"] == []
+        assert result["total_matching"] == 0
+        assert result["returned"] == 0
+        assert result["truncated"] is False
+
+    def test_limit_caps_results(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"locus_tag": f"PMM{i:04d}"} for i in range(20)
+        ]
+        result = api.new_tool("param", limit=5, conn=mock_conn)
+        assert result["total_matching"] == 20
+        assert result["returned"] == 5
+        assert result["truncated"] is True
+        assert len(result["results"]) == 5
+
+    def test_summary_returns_empty_results(self, mock_conn):
+        """summary=True returns results=[] with summary fields."""
+        mock_conn.execute_query.return_value = [...]  # summary query result
+        result = api.new_tool("param", summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
 
     def test_invalid_param_raises(self, mock_conn):
         with pytest.raises(ValueError, match="must not be empty"):
             api.new_tool("", conn=mock_conn)
-
-    def test_conn_defaults(self):
-        """Function creates connection if None provided."""
-        # Usually tested implicitly; explicit test if needed
 ```
 
-### Multi-query functions
+### Batch tool tests (tools accepting ID lists)
 
 ```python
-mock_conn.execute_query.side_effect = [result1, result2]
+class TestBatchTool:
+    def test_not_found_field(self, mock_conn):
+        """Batch tools include not_found for missing IDs."""
+        mock_conn.execute_query.return_value = [
+            {"locus_tag": "PMM0001", "gene_name": "dnaN"}
+        ]
+        result = api.batch_tool(
+            locus_tags=["PMM0001", "FAKE999"], conn=mock_conn)
+        assert "not_found" in result
+        assert "FAKE999" in result["not_found"]
+        assert len(result["results"]) == 1
+
+    def test_all_found(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"locus_tag": "PMM0001"}, {"locus_tag": "PMM0002"}
+        ]
+        result = api.batch_tool(
+            locus_tags=["PMM0001", "PMM0002"], conn=mock_conn)
+        assert result["not_found"] == []
+```
+
+### Multi-query functions (2-query pattern)
+
+```python
+# Summary query returns first, detail query returns second
+mock_conn.execute_query.side_effect = [summary_result, detail_result]
 ```
 
 ### Lucene retry test
@@ -106,7 +160,7 @@ def test_lucene_retry(self, mock_conn):
         [{"locus_tag": "PMM0001"}],
     ]
     result = api.search_tool("query+with+special", conn=mock_conn)
-    assert len(result) == 1
+    assert len(result["results"]) == 1
     assert mock_conn.execute_query.call_count == 2
 ```
 
@@ -137,50 +191,71 @@ def _conn_from(ctx):
 
 `class TestNewToolWrapper:` — tool name + "Wrapper".
 
-### Minimal test set
+### Minimal test set (v3 pattern — Pydantic response models)
 
 ```python
 class TestNewToolWrapper:
-    def test_returns_json(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, mock_ctx):
+        """Wrapper returns Pydantic response model."""
         _conn_from(mock_ctx).execute_query.return_value = [
             {"locus_tag": "PMM0001", "gene_name": "dnaN"}
         ]
-        result = tool_fns["new_tool"](mock_ctx, param="value")
-        parsed = json.loads(result)
-        assert len(parsed) >= 1
+        result = await tool_fns["new_tool"](mock_ctx, param="value")
+        assert hasattr(result, "results")
+        assert hasattr(result, "total_matching")
+        assert hasattr(result, "returned")
+        assert hasattr(result, "truncated")
 
-    def test_empty_results(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["new_tool"](mock_ctx, param="value")
-        # Check for appropriate empty message
-        assert "No" in result or result == "[]"
+        result = await tool_fns["new_tool"](mock_ctx, param="value")
+        assert result.results == []
+        assert result.returned == 0
 
-    def test_limit_capped(self, tool_fns, mock_ctx):
-        """Limit is capped at max value."""
+    @pytest.mark.asyncio
+    async def test_default_limit_is_small(self, tool_fns, mock_ctx):
+        """MCP default limit should be small (e.g. 5)."""
         _conn_from(mock_ctx).execute_query.return_value = [
-            {"locus_tag": f"PMM{i:04d}"} for i in range(100)
+            {"locus_tag": f"PMM{i:04d}"} for i in range(20)
         ]
-        result = tool_fns["new_tool"](mock_ctx, param="x", limit=999)
-        parsed = json.loads(result)
-        assert len(parsed) <= 50  # or whatever the tool's max is
+        result = await tool_fns["new_tool"](mock_ctx, param="x")
+        assert result.returned <= 5  # default limit
 
-    def test_error_returns_string(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.side_effect = ValueError("bad input")
-        result = tool_fns["new_tool"](mock_ctx, param="x")
-        assert "Error" in result
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from api/ becomes ToolError."""
+        _conn_from(mock_ctx).execute_query.side_effect = ValueError("bad")
+        with pytest.raises(ToolError):
+            await tool_fns["new_tool"](mock_ctx, param="x")
+
+    @pytest.mark.asyncio
+    async def test_unexpected_error_raises_tool_error(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.side_effect = RuntimeError("boom")
+        with pytest.raises(ToolError):
+            await tool_fns["new_tool"](mock_ctx, param="x")
 ```
 
 ### Important: update EXPECTED_TOOLS
 
 ```python
 EXPECTED_TOOLS = [
-    "get_schema", "list_filter_values", "list_organisms", "resolve_gene",
-    "search_genes", "gene_overview", "get_gene_details",
-    "get_homologs", "run_cypher",
+    "kg_schema", "list_filter_values", "list_organisms", "resolve_gene",
+    "genes_by_function", "gene_overview",
+    "gene_homologs", "run_cypher",
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
-    # Add new tool here
+    "list_publications", "list_experiments",
+    # New tools as they're built:
+    # "search_homolog_groups", "genes_by_homolog_group",
+    # "differential_expression_by_gene", "differential_expression_by_ortholog",
 ]
 ```
+
+**Note:** The list above shows the **target** names after v3 migration.
+During transition, old names remain until each tool is renamed.
+Current names: `get_schema`, `search_genes`, `get_gene_details`,
+`get_homologs`.
 
 ---
 
@@ -201,3 +276,29 @@ EXPECTED_TOOLS = [
 ### API contract (`tests/integration/test_api_contract.py`)
 
 - Verifies API function return types and key presence against live KG
+- Check `result` is `dict`, has `results` key, has `total_matching`/`returned`/`truncated`
+
+---
+
+## Regression tests
+
+See [regression guide](regression-guide.md) for golden-file tests.
+
+### TOOL_BUILDERS dict
+
+Maps tool/case names to query builder functions. Uses **target** names
+after v3 migration (update as tools are renamed):
+
+```python
+TOOL_BUILDERS = {
+    "resolve_gene": build_resolve_gene,
+    "genes_by_function": build_genes_by_function,  # was: search_genes
+    "gene_overview": build_gene_overview,
+    "gene_homologs": ...,  # was: get_homologs (multi-step)
+    # Per-ontology partial entries
+    "search_ontology_go_bp": partial(build_search_ontology, ontology="go_bp"),
+    # ...
+}
+```
+
+**Note:** During transition, old builder names remain until renamed.

@@ -2,7 +2,7 @@
 name: add-or-update-tool
 description: Complete lifecycle for adding a new MCP tool or modifying an existing one. Two phases — definition (scope, KG exploration, schema iteration) then build (query builder, API, MCP wrapper, skills (about tool), tests, docs, review).
 disable-model-invocation: true
-argument-hint: "[tool name and description, e.g. 'list_experiments - new tool' or 'search_genes - add min_quality param']"
+argument-hint: "[tool name and description, e.g. 'list_experiments - new tool' or 'genes_by_function - add min_quality param']"
 ---
 
 # Add or update a tool
@@ -24,9 +24,9 @@ into existing tool chains. Do not assume scope.
 | Layer | What to read |
 |---|---|
 | queries_lib.py | Builder signature, Cypher, RETURN columns, params |
-| api/functions.py | Function signature, validation, special handling |
-| mcp_server/tools.py | Wrapper signature, docstring, formatting, modes |
-| Skills | About content in `multiomics_explorer/skills/multiomics-kg-guide/references/tools/` |
+| api/functions.py | Function signature, validation, response dict assembly |
+| mcp_server/tools.py | Pydantic models, wrapper, docstring |
+| Skills | About YAML in `multiomics_explorer/inputs/tools/` |
 | Tests | All test classes for this tool across test files |
 | Fixtures | `tests/fixtures/gene_data.py` projection helpers if applicable |
 
@@ -42,32 +42,38 @@ Steps 1–2 loop until scope and KG schema are stable.
 
 #### Deciding result-size controls
 
-Not all tools need the same controls. Choose based on result set size:
+All tools return the uniform response shape: summary fields + `results`
+list. The question is which summary fields are useful and what
+defaults to use.
+
+**ID params are always lists.** Any tool accepting an ID list is a
+batch tool — batch input can be arbitrarily large. Therefore every
+ID-list tool supports `limit`, `summary`, summary fields, and
+`not_found`.
 
 | Result size | Controls | Examples |
 |---|---|---|
-| Always small (<30 rows) | No modes needed. Consider `verbose` if some columns are secondary (heavy text, taxonomy hierarchies). Consider `limit` if set will grow. | `list_organisms`, `list_publications` |
-| Frequently large (100+ rows) | summary + detail modes, `limit` | `query_expression`, `search_genes`, `genes_by_ontology` |
+| Always small (<30 rows) | `verbose` for column control. Consider `limit` if set will grow. Minimal summary fields (total). | `list_organisms`, `resolve_gene` |
+| Batch input (ID lists) | `summary`, `verbose`, `limit`. Rich summary fields. `not_found` for missing IDs. | `gene_overview`, `gene_ontology_terms`, `gene_homologs` |
+| Frequently large (100+ rows) | `summary`, `verbose`, `limit`. Rich summary fields (breakdowns, distributions). | `differential_expression_by_gene`, `genes_by_function`, `genes_by_ontology` |
+
+**`summary`** (bool, default False): Sugar for `limit=0`. Returns
+summary fields only, `results=[]`. Useful when the LLM just needs
+counts/breakdowns without any rows.
 
 **`verbose`** (bool, default False): Controls per-row column width.
 Omits secondary columns by default — heavy text (abstract, description),
 taxonomy hierarchies, or other fields not needed for routing. The builder
-adds/removes RETURN columns based on this flag. Orthogonal to modes —
-`verbose` controls which columns, modes control which rows.
+adds/removes RETURN columns based on this flag. Orthogonal to summary —
+`verbose` controls which columns, `limit` controls which rows.
 
-**`limit`** (int): For tools with large or growing result sets. Also
-appropriate for currently-small tools expected to grow.
-
-**summary/detail modes**: Only for large-result-set tools.
-Both modes return a unified response model with breakdowns + results.
-Summary: breakdowns populated, `results: []`, `truncated: True`.
-Detail: breakdowns populated, results populated with LIMIT.
-Both modes always run the summary query (cheap). Detail additionally
-runs the detail query with LIMIT in Cypher.
+**`limit`** (int | None): Caps `results` length. Default None in api/
+(all rows), small default in MCP (e.g. 5) so the LLM gets summary
+fields + a few example rows in one call.
 
 **About content**: Served via MCP resource `docs://tools/{tool_name}`,
-not as a tool mode parameter. Markdown files live at
-`multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`.
+not as a tool parameter. Auto-generated from Pydantic models + input
+YAML.
 
 ### Step 2: KG exploration + iteration
 
@@ -87,7 +93,7 @@ Once scope and KG schema are stable, write the implementation plan at
 **`docs/tool-specs/{tool-name}.md`** using
 [template](assets/tool-spec-template.md). Document:
 - Purpose, use cases, tool chains
-- Result-size controls: modes, verbose, limit — or "none needed"
+- Result-size controls: summary, verbose, limit — or "none needed"
 - Return field names (use standard names from layer-rules)
 - Any special handling (caching, multi-query orchestration, etc.)
 - → **Gate:** user approves implementation plan before proceeding
@@ -105,24 +111,31 @@ doc-updater in parallel → code-reviewer last.
 ### Layer 1: Query builder → `kg/queries_lib.py`
 
 - `def build_{name}(*, ...) -> tuple[str, dict]`
-- Add summary variant `build_{name}_summary()` if tool has summary mode.
-  Summary builder uses `apoc.coll.frequencies()` for per-dimension
-  breakdowns. For fulltext search tools, also collect `score_max` and
-  `score_median`.
+- Add summary variant `build_{name}_summary()` if tool has rich
+  summary fields. Summary builder uses `apoc.coll.frequencies()` for
+  per-dimension breakdowns. For fulltext search tools, also collect
+  `score_max` and `score_median`.
 - If tool has `verbose`, use conditional RETURN columns (see checklist)
 - Keyword-only args, `$param` placeholders, `AS snake_case` aliases
 - WHERE clause: build conditions list + params dict, join with AND
-- For exact-match filters where multiple values make sense, use
-  `list[str] | None` with Cypher `IN`. CONTAINS filters stay as `str`.
+- ID params are always `list[str] | None` with Cypher `IN`.
+  CONTAINS filters stay as `str`.
 - Every query MUST have `ORDER BY` — use natural sort key or alphabetical fallback
-- APOC is available — prefer `apoc.coll.*` for aggregations over
-  multi-pass UNWIND patterns
+- APOC is available — use `apoc.coll.*` for aggregations,
+  `apoc.map.*` for dynamic result construction,
+  `apoc.convert.fromJsonMap` for JSON properties
 - → **Gate:** `pytest tests/unit/test_query_builders.py::TestBuild{Name} -v`
 
 ### Layer 2: API function → `api/functions.py`
 
 - Calls builder + `conn.execute_query`
-- Pass through `verbose` and/or `mode` to dispatch as applicable
+- **Assembles the complete response dict** — summary fields, results,
+  `returned`, `truncated`, `not_found` (for batch tools). MCP just
+  wraps it.
+- Accepts `summary`, `verbose`, `limit` as applicable
+- `summary=True` → sets `limit=0` internally
+- 2-query pattern: summary query always runs, detail query skipped
+  when `limit=0`
 - `conn: GraphConnection | None = None` as keyword-only last param
 - Document return dict keys in docstring (note verbose-only keys)
 - Wire exports: add to `api/__init__.py` and
@@ -131,36 +144,35 @@ doc-updater in parallel → code-reviewer last.
 
 ### Layer 3: MCP wrapper → `mcp_server/tools.py`
 
+- Thin wrapper — calls api/, validates via `Response(**data)`
 - `@mcp.tool(tags={...}, annotations={"readOnlyHint": True})` inside `register_tools(mcp)`
 - `ctx: Context` first, then tool params, then structural params
-  (`verbose`, `mode`, `limit` as applicable)
+  (`summary`, `verbose`, `limit`)
+- Default `limit` is small (e.g. 5) — LLM gets summary + example rows
 - Use `Annotated[type, Field(description=...)]` for all params —
   descriptions go in Field, not in docstring `Args:` section
 - Use `Literal["val1", "val2"]` for params with fixed valid values
-  known at code time (e.g. mode, ontology). Not for KG-derived values
-  (e.g. treatment_type) — those use `list_filter_values` for discovery.
+  known at code time. Not for KG-derived values — those use
+  `list_filter_values` for discovery.
 - Use `Field(ge=..., le=...)` for numeric constraints (e.g. limit)
 - Use `ToolError` for errors instead of returning error strings
 - `async def` — tools are async. Use `await ctx.info()`, `await ctx.warning()`,
-  `await ctx.error()` for MCP client-visible logging (replaces `logger.info/warning`)
+  `await ctx.error()` for MCP client-visible logging
 - Define Pydantic `BaseModel` classes for response: `{Name}Result` (per-row)
   and `{Name}Response` (envelope). Envelope fields:
-  - `total_entries` — always (total in KG)
-  - `total_matching` — only for tools with filters (count after filtering)
+  - `total_matching` — always (count matching all filters)
+  - `total_entries` — tools with filters only (total in KG before
+    filtering; gives selectivity context: "3 of 15")
   - `returned` — always (len of results list)
-  - `truncated` — always (True if limit cut results; True in summary mode)
+  - `truncated` — always (`True` when `total_matching > returned`,
+    including when `summary=True` with matches)
+  - `not_found` — batch tools (accept ID lists). Empty list when
+    all matched. Not on search tools.
   - `results` — always (list of `{Name}Result`)
-  For tools with summary/detail modes, use a **unified response model**.
-  Add breakdown fields (e.g. `by_organism`, `by_treatment_type`) to the
-  same `{Name}Response`. Both modes return the same type — summary has
-  `results: []`, detail has results populated. Breakdowns always populated.
-  Return type annotation → FastMCP auto-generates `outputSchema`.
 - Include examples in `Field(description=...)` for all result fields
-  (e.g. `"Genus (e.g. 'Prochlorococcus')"`) — helps Claude and
-  researchers understand the data shape from the schema alone.
-- Docstring is tool-level purpose only (when to use, what it returns) —
-  return schema is in the Pydantic models, not the docstring
-- Mode dispatch if tool has summary/detail modes
+  (e.g. `"Genus (e.g. 'Prochlorococcus')"`)
+- Docstring is tool-level purpose only — return schema in Pydantic models
+- No field computation — api/ dict → `Response(**data)`
 - → **Gate:** `pytest tests/unit/test_tool_wrappers.py::Test{Name}Wrapper -v`
 
 ### Layer 4: About content (MCP resource)
@@ -177,16 +189,16 @@ input YAML, then served via MCP resource at `docs://tools/{name}`.
    ```yaml
    examples:
      - title: Short description of this example
-       call: tool_name(param="value")        # tool call to show
-       response: |                            # optional — truncated example response
-         {"total_entries": 15, "results": [{"field": "value", ...}]}
+       call: tool_name(locus_tags=["PMM0001"])    # tool call to show
+       response: |                                 # optional example response
+         {"total_matching": 1, "results": [{"locus_tag": "PMM0001", ...}]}
 
      - title: Multi-step chaining example
-       steps: |                               # use steps instead of call for chains
+       steps: |                                    # use steps for chains
          Step 1: first_tool(param="value")
                  → what to extract from result
 
-         Step 2: tool_name(param=extracted_value)
+         Step 2: tool_name(locus_tags=extracted_tags)
                  → what to do next
 
    verbose_fields:                            # fields only returned with verbose=True
