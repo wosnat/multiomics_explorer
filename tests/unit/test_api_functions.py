@@ -674,7 +674,7 @@ class TestListExperiments:
             self._summary_result(),       # unfiltered total_entries
             [self._detail_row()],         # detail query
         ]
-        result = api.list_experiments(mode="detail", conn=mock_conn)
+        result = api.list_experiments(conn=mock_conn)
         assert isinstance(result, dict)
         assert "total_entries" in result
         assert "total_matching" in result
@@ -689,7 +689,7 @@ class TestListExperiments:
             self._summary_result(),  # filtered summary
             self._summary_result(),  # unfiltered total_entries
         ]
-        result = api.list_experiments(mode="summary", conn=mock_conn)
+        result = api.list_experiments(summary=True, conn=mock_conn)
         assert result["results"] == []
         assert result["returned"] == 0
         assert result["truncated"] is True
@@ -709,7 +709,7 @@ class TestListExperiments:
             organism="MED4", treatment_type=["coculture"],
             omics_type=["RNASEQ"], publication_doi=["10.1234/test"],
             coculture_partner="Alteromonas", time_course_only=True,
-            mode="detail", verbose=True, limit=10, conn=mock_conn,
+            verbose=True, limit=10, conn=mock_conn,
         )
         # Summary query has filter params
         summary_call = mock_conn.execute_query.call_args_list[0]
@@ -728,7 +728,7 @@ class TestListExperiments:
             [self._detail_row(is_time_course="true"),
              self._detail_row(is_time_course="false")],
         ]
-        result = api.list_experiments(mode="detail", conn=mock_conn)
+        result = api.list_experiments(conn=mock_conn)
         assert result["results"][0]["is_time_course"] is True
         assert result["results"][1]["is_time_course"] is False
 
@@ -739,7 +739,7 @@ class TestListExperiments:
             self._summary_result(),
             [self._tc_detail_row()],
         ]
-        result = api.list_experiments(mode="detail", conn=mock_conn)
+        result = api.list_experiments(conn=mock_conn)
         row = result["results"][0]
         assert "time_points" in row
         assert len(row["time_points"]) == 3
@@ -757,7 +757,7 @@ class TestListExperiments:
             self._summary_result(),
             [self._detail_row(is_time_course="false")],
         ]
-        result = api.list_experiments(mode="detail", conn=mock_conn)
+        result = api.list_experiments(conn=mock_conn)
         assert "time_points" not in result["results"][0]
 
     def test_sentinel_conversion(self, mock_conn):
@@ -776,7 +776,7 @@ class TestListExperiments:
             self._summary_result(),
             [tc_row],
         ]
-        result = api.list_experiments(mode="detail", conn=mock_conn)
+        result = api.list_experiments(conn=mock_conn)
         tp = result["results"][0]["time_points"][0]
         assert tp["label"] is None
         assert tp["hours"] is None
@@ -788,7 +788,7 @@ class TestListExperiments:
             self._summary_result(),
             [self._detail_row()],  # only 1 returned due to limit
         ]
-        result = api.list_experiments(mode="detail", limit=1, conn=mock_conn)
+        result = api.list_experiments(limit=1, conn=mock_conn)
         assert result["total_matching"] == 76
         assert result["returned"] == 1
         assert result["truncated"] is True
@@ -799,7 +799,7 @@ class TestListExperiments:
             self._summary_result(),
             self._summary_result(),
         ]
-        result = api.list_experiments(mode="summary", conn=mock_conn)
+        result = api.list_experiments(summary=True, conn=mock_conn)
         assert result["by_organism"][0]["organism_strain"] == "Prochlorococcus MED4"
         assert result["by_organism"][0]["experiment_count"] == 30
         assert result["by_treatment_type"][0]["treatment_type"] == "coculture"
@@ -816,7 +816,7 @@ class TestListExperiments:
                 self._summary_result(total_matching=0),
                 self._summary_result(total_matching=0),
             ]
-            result = api.list_experiments(mode="summary")
+            result = api.list_experiments(summary=True)
         MockConn.assert_called_once()
         assert result["total_matching"] == 0
 

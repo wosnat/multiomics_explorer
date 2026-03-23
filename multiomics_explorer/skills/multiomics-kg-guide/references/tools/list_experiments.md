@@ -4,10 +4,9 @@
 
 List differential expression experiments in the knowledge graph.
 
-Start with mode='summary' to see experiment counts by organism, treatment
-type, and omics type. Then use mode='detail' with filters to browse
-individual experiments. Pass experiment IDs to query_expression for
-gene-level results.
+Returns summary breakdowns (by organism, treatment type, omics type) plus
+individual experiments. Use summary=true to see only breakdowns, then
+drill into detail with filters.
 
 ## Parameters
 
@@ -20,9 +19,9 @@ gene-level results.
 | coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive partial match). Narrows coculture experiments. E.g. 'Alteromonas', 'HOT1A3'. |
 | search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
-| mode | string | summary | 'summary' returns breakdowns by organism, treatment type, and omics type to guide filtering. 'detail' returns individual experiments with gene counts. Start with summary to orient, then use detail with filters. |
-| verbose | bool | False | Detail mode only. Include experiment name, publication title, treatment/control descriptions, and experimental conditions (light, medium, temperature, statistical test, context). |
-| limit | int | 50 | Detail mode only. Max results. |
+| summary | bool | False | When true, return only summary breakdowns (by organism, treatment type, omics type) with no individual experiments. Use to orient before drilling into detail. |
+| verbose | bool | False | Include experiment name, publication title, treatment/control descriptions, and experimental conditions (light, medium, temperature, statistical test, context). |
+| limit | int | 5 | Max results. |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
@@ -36,8 +35,8 @@ total_entries, total_matching, returned, truncated, by_organism, by_treatment_ty
 
 - **total_entries** (int): Total experiments in the KG (unfiltered)
 - **total_matching** (int): Experiments matching filters
-- **returned** (int): Number of results returned (0 in summary mode)
-- **truncated** (bool): True if results were truncated by limit, or summary mode
+- **returned** (int): Number of results returned (0 when summary=true)
+- **truncated** (bool): True if results were truncated by limit or summary=true
 - **by_organism** (list[OrganismBreakdown]): Experiment counts per organism, sorted by count descending
 - **by_treatment_type** (list[TreatmentTypeBreakdown]): Experiment counts per treatment type, sorted by count descending
 - **by_omics_type** (list[OmicsTypeBreakdown]): Experiment counts per omics platform, sorted by count descending
@@ -82,7 +81,7 @@ total_entries, total_matching, returned, truncated, by_organism, by_treatment_ty
 ### Example 1: Orient — what experiments exist?
 
 ```example-call
-list_experiments()
+list_experiments(summary=True)
 ```
 
 ```example-response
@@ -96,19 +95,19 @@ list_experiments()
 ### Example 2: Summary for MED4 only
 
 ```example-call
-list_experiments(organism="MED4")
+list_experiments(summary=True, organism="MED4")
 ```
 
 ### Example 3: Browse coculture experiments with Alteromonas
 
 ```example-call
-list_experiments(mode="detail", treatment_type=["coculture"], coculture_partner="Alteromonas")
+list_experiments(treatment_type=["coculture"], coculture_partner="Alteromonas")
 ```
 
 ### Example 4: Time-course nitrogen stress in MED4
 
 ```example-call
-list_experiments(mode="detail", organism="MED4", treatment_type=["nitrogen_stress"], time_course_only=True)
+list_experiments(organism="MED4", treatment_type=["nitrogen_stress"], time_course_only=True)
 ```
 
 ### Example 5: From publication to expression data
@@ -117,7 +116,7 @@ list_experiments(mode="detail", organism="MED4", treatment_type=["nitrogen_stres
 Step 1: list_publications(search_text="Biller")
         → get DOI from results
 
-Step 2: list_experiments(mode="detail", publication_doi=["10.1038/ismej.2016.70"])
+Step 2: list_experiments(publication_doi=["10.1038/ismej.2016.70"])
         → browse experiments, pick experiment_id
 
 Step 3: query_expression(experiment_id="...")
@@ -127,10 +126,10 @@ Step 3: query_expression(experiment_id="...")
 ### Example 6: Orient then drill down
 
 ```
-Step 1: list_experiments()
+Step 1: list_experiments(summary=True)
         → see 76 total, by_organism: MED4 (30), by_treatment_type: coculture (16), by_omics_type: RNASEQ (48)
 
-Step 2: list_experiments(mode="detail", organism="MED4", treatment_type=["coculture"])
+Step 2: list_experiments(organism="MED4", treatment_type=["coculture"])
         → browse the MED4 coculture experiments
 
 Step 3: query_expression(experiment_id="...")
@@ -148,13 +147,13 @@ list_experiments → query_expression
 
 ## Common mistakes
 
-- Default mode is summary — use mode='detail' to see individual experiments
+- Default is detail (summary=false) — use summary=true to see only breakdowns
 
 - gene_count is total genes with expression data, not total significant genes — use significant_count for that
 
 - time_points is omitted for non-time-course experiments, not an empty list
 
-- verbose and limit only apply to detail mode, ignored in summary
+- When summary=true, verbose and limit have no effect
 
 ```mistake
 list_experiments(publication='Biller 2018')

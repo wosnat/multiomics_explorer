@@ -3,7 +3,7 @@
 import json
 import logging
 import re
-from typing import Annotated, Literal
+from typing import Annotated
 
 from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
@@ -735,8 +735,8 @@ def register_tools(mcp: FastMCP):
     class ListExperimentsResponse(BaseModel):
         total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
         total_matching: int = Field(description="Experiments matching filters")
-        returned: int = Field(description="Number of results returned (0 in summary mode)")
-        truncated: bool = Field(description="True if results were truncated by limit, or summary mode")
+        returned: int = Field(description="Number of results returned (0 when summary=true)")
+        truncated: bool = Field(description="True if results were truncated by limit or summary=true")
         by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted by count descending")
         by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted by count descending")
         by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted by count descending")
@@ -744,7 +744,7 @@ def register_tools(mcp: FastMCP):
         time_course_count: int = Field(description="Number of time-course experiments in matching set")
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
-        results: list[ExperimentResult] = Field(description="Individual experiments (empty in summary mode, populated in detail mode)")
+        results: list[ExperimentResult] = Field(description="Individual experiments (empty when summary=true)")
 
     @mcp.tool(
         tags={"experiments", "expression", "discovery"},
@@ -785,29 +785,27 @@ def register_tools(mcp: FastMCP):
             description="If true, return only time-course experiments "
             "(multiple time points).",
         )] = False,
-        mode: Annotated[Literal["summary", "detail"], Field(
-            description="'summary' returns breakdowns by organism, treatment type, "
-            "and omics type to guide filtering. 'detail' returns individual "
-            "experiments with gene counts. Start with summary to orient, "
-            "then use detail with filters.",
-        )] = "summary",
+        summary: Annotated[bool, Field(
+            description="When true, return only summary breakdowns (by organism, "
+            "treatment type, omics type) with no individual experiments. "
+            "Use to orient before drilling into detail.",
+        )] = False,
         verbose: Annotated[bool, Field(
-            description="Detail mode only. Include experiment name, publication "
-            "title, treatment/control descriptions, and experimental conditions "
+            description="Include experiment name, publication title, "
+            "treatment/control descriptions, and experimental conditions "
             "(light, medium, temperature, statistical test, context).",
         )] = False,
         limit: Annotated[int, Field(
-            description="Detail mode only. Max results.", ge=1,
-        )] = 50,
+            description="Max results.", ge=1,
+        )] = 5,
     ) -> ListExperimentsResponse:
         """List differential expression experiments in the knowledge graph.
 
-        Start with mode='summary' to see experiment counts by organism, treatment
-        type, and omics type. Then use mode='detail' with filters to browse
-        individual experiments. Pass experiment IDs to query_expression for
-        gene-level results.
+        Returns summary breakdowns (by organism, treatment type, omics type) plus
+        individual experiments. Use summary=true to see only breakdowns, then
+        drill into detail with filters.
         """
-        await ctx.info(f"list_experiments mode={mode} organism={organism} "
+        await ctx.info(f"list_experiments summary={summary} organism={organism} "
                        f"treatment_type={treatment_type} search_text={search_text}")
         try:
             conn = _conn(ctx)
@@ -816,7 +814,7 @@ def register_tools(mcp: FastMCP):
                 omics_type=omics_type, publication_doi=publication_doi,
                 coculture_partner=coculture_partner, search_text=search_text,
                 time_course_only=time_course_only,
-                mode=mode,
+                summary=summary,
                 verbose=verbose, limit=limit, conn=conn,
             )
 
@@ -826,7 +824,7 @@ def register_tools(mcp: FastMCP):
             by_omics_type = [OmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
             by_publication = [PublicationBreakdown(**b) for b in result["by_publication"]]
 
-            # Build result models (empty list in summary mode)
+            # Build result models (empty list when summary=True)
             experiments = []
             for r in result["results"]:
                 tp_data = r.get("time_points")

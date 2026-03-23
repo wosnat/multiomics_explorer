@@ -1459,7 +1459,7 @@ class TestListExperimentsWrapper:
             "multiomics_explorer.api.functions.list_experiments",
             return_value=self._SAMPLE_SUMMARY,
         ):
-            result = await tool_fns["list_experiments"](mock_ctx)
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
         assert result.returned == 0
         assert result.truncated is True
         assert result.results == []
@@ -1475,7 +1475,7 @@ class TestListExperimentsWrapper:
             "multiomics_explorer.api.functions.list_experiments",
             return_value=self._SAMPLE_DETAIL,
         ):
-            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+            result = await tool_fns["list_experiments"](mock_ctx)
         assert result.returned == 1
         assert len(result.results) == 1
         assert result.results[0].experiment_id == "test_exp_1"
@@ -1483,28 +1483,28 @@ class TestListExperimentsWrapper:
         assert len(result.by_organism) == 1
 
     @pytest.mark.asyncio
-    async def test_default_mode_is_summary(self, tool_fns, mock_ctx):
-        """No mode param defaults to summary."""
+    async def test_default_is_detail(self, tool_fns, mock_ctx):
+        """No summary param defaults to detail (summary=False)."""
         with patch(
             "multiomics_explorer.api.functions.list_experiments",
-            return_value=self._SAMPLE_SUMMARY,
+            return_value=self._SAMPLE_DETAIL,
         ) as mock_api:
             await tool_fns["list_experiments"](mock_ctx)
         call_kwargs = mock_api.call_args[1]
-        assert call_kwargs["mode"] == "summary"
+        assert call_kwargs["summary"] is False
 
     @pytest.mark.asyncio
     async def test_both_modes_have_breakdowns(self, tool_fns, mock_ctx):
-        """Breakdowns populated in both modes."""
-        for mode_val, api_result in [
-            ("summary", self._SAMPLE_SUMMARY),
-            ("detail", self._SAMPLE_DETAIL),
+        """Breakdowns populated in both summary and detail."""
+        for summary_val, api_result in [
+            (True, self._SAMPLE_SUMMARY),
+            (False, self._SAMPLE_DETAIL),
         ]:
             with patch(
                 "multiomics_explorer.api.functions.list_experiments",
                 return_value=api_result,
             ):
-                result = await tool_fns["list_experiments"](mock_ctx, mode=mode_val)
+                result = await tool_fns["list_experiments"](mock_ctx, summary=summary_val)
             assert len(result.by_organism) > 0
             assert len(result.by_treatment_type) > 0
             assert len(result.by_omics_type) > 0
@@ -1521,7 +1521,7 @@ class TestListExperimentsWrapper:
             "multiomics_explorer.api.functions.list_experiments",
             return_value=empty,
         ):
-            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+            result = await tool_fns["list_experiments"](mock_ctx)
         assert result.returned == 0
         assert result.results == []
 
@@ -1541,7 +1541,6 @@ class TestListExperimentsWrapper:
                 coculture_partner="Alteromonas",
                 search_text="light",
                 time_course_only=True,
-                mode="detail",
                 verbose=True,
                 limit=10,
             )
@@ -1553,7 +1552,7 @@ class TestListExperimentsWrapper:
         assert kw["coculture_partner"] == "Alteromonas"
         assert kw["search_text"] == "light"
         assert kw["time_course_only"] is True
-        assert kw["mode"] == "detail"
+        assert kw["summary"] is False
         assert kw["verbose"] is True
         assert kw["limit"] == 10
 
@@ -1564,7 +1563,7 @@ class TestListExperimentsWrapper:
             "multiomics_explorer.api.functions.list_experiments",
             return_value=self._SAMPLE_DETAIL,
         ):
-            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+            result = await tool_fns["list_experiments"](mock_ctx)
         assert result.returned == len(result.results)
         assert result.truncated is True  # 76 > 1
 
@@ -1581,7 +1580,7 @@ class TestListExperimentsWrapper:
             "multiomics_explorer.api.functions.list_experiments",
             return_value=detail,
         ):
-            result = await tool_fns["list_experiments"](mock_ctx, mode="detail", verbose=True)
+            result = await tool_fns["list_experiments"](mock_ctx, verbose=True)
         r = result.results[0]
         assert r.name == "Test experiment"
         assert r.publication_title == "Test paper"
@@ -1594,7 +1593,7 @@ class TestListExperimentsWrapper:
             "multiomics_explorer.api.functions.list_experiments",
             return_value=self._SAMPLE_DETAIL,
         ):
-            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+            result = await tool_fns["list_experiments"](mock_ctx)
         r = result.results[0]
         assert r.name is None
         assert r.publication_title is None
@@ -1628,7 +1627,7 @@ class TestListExperimentsWrapper:
             "multiomics_explorer.api.functions.list_experiments",
             return_value=detail,
         ):
-            result = await tool_fns["list_experiments"](mock_ctx, mode="detail")
+            result = await tool_fns["list_experiments"](mock_ctx)
         r = result.results[0]
         assert r.is_time_course is True
         assert len(r.time_points) == 2

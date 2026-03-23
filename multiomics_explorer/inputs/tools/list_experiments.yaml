@@ -4,7 +4,7 @@
 
 examples:
   - title: Orient — what experiments exist?
-    call: list_experiments()
+    call: list_experiments(summary=True)
     response: |
       {"total_entries": 76, "total_matching": 76,
        "by_organism": [{"organism_strain": "Prochlorococcus MED4", "experiment_count": 30}, ...],
@@ -13,20 +13,20 @@ examples:
        "time_course_count": 29, "returned": 0, "truncated": true, "results": []}
 
   - title: Summary for MED4 only
-    call: list_experiments(organism="MED4")
+    call: list_experiments(summary=True, organism="MED4")
 
   - title: Browse coculture experiments with Alteromonas
-    call: list_experiments(mode="detail", treatment_type=["coculture"], coculture_partner="Alteromonas")
+    call: list_experiments(treatment_type=["coculture"], coculture_partner="Alteromonas")
 
   - title: Time-course nitrogen stress in MED4
-    call: list_experiments(mode="detail", organism="MED4", treatment_type=["nitrogen_stress"], time_course_only=True)
+    call: list_experiments(organism="MED4", treatment_type=["nitrogen_stress"], time_course_only=True)
 
   - title: From publication to expression data
     steps: |
       Step 1: list_publications(search_text="Biller")
               → get DOI from results
 
-      Step 2: list_experiments(mode="detail", publication_doi=["10.1038/ismej.2016.70"])
+      Step 2: list_experiments(publication_doi=["10.1038/ismej.2016.70"])
               → browse experiments, pick experiment_id
 
       Step 3: query_expression(experiment_id="...")
@@ -34,10 +34,10 @@ examples:
 
   - title: Orient then drill down
     steps: |
-      Step 1: list_experiments()
+      Step 1: list_experiments(summary=True)
               → see 76 total, by_organism: MED4 (30), by_treatment_type: coculture (16), by_omics_type: RNASEQ (48)
 
-      Step 2: list_experiments(mode="detail", organism="MED4", treatment_type=["coculture"])
+      Step 2: list_experiments(organism="MED4", treatment_type=["coculture"])
               → browse the MED4 coculture experiments
 
       Step 3: query_expression(experiment_id="...")
@@ -62,9 +62,9 @@ chaining:
   - "list_experiments → query_expression"
 
 mistakes:
-  - "Default mode is summary — use mode='detail' to see individual experiments"
+  - "Default is detail (summary=false) — use summary=true to see only breakdowns"
   - "gene_count is total genes with expression data, not total significant genes — use significant_count for that"
   - "time_points is omitted for non-time-course experiments, not an empty list"
-  - "verbose and limit only apply to detail mode, ignored in summary"
+  - "When summary=true, verbose and limit have no effect"
   - wrong: "list_experiments(publication='Biller 2018')"
     right: "list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])"

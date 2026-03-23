@@ -409,7 +409,7 @@ def list_experiments(
     coculture_partner: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
-    mode: str = "summary",
+    summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
     *,
@@ -421,8 +421,8 @@ def list_experiments(
     by_treatment_type, by_omics_type, by_publication, time_course_count,
     returned, truncated, results.
 
-    When mode='summary': results is empty list, truncated=True.
-    When mode='detail': results populated with experiments.
+    When summary=True: results is empty list, returned=0, truncated=True.
+    When summary=False: results populated with experiments.
     Per result: experiment_id, publication_doi, organism_strain,
     treatment_type, coculture_partner, omics_type, is_time_course (bool),
     time_points (list, omitted if not time-course), gene_count,
@@ -452,7 +452,7 @@ def list_experiments(
         )
         return conn.execute_query(cypher, **params)
 
-    # Both modes run summary query
+    # Always run summary query
     try:
         raw_summary = _run_summary()
     except Neo4jClientError:
@@ -496,13 +496,13 @@ def list_experiments(
         envelope["score_max"] = None
         envelope["score_median"] = None
 
-    if mode == "summary":
+    if summary:
         envelope["returned"] = 0
         envelope["truncated"] = True
         envelope["results"] = []
         return envelope
 
-    # Detail mode: run detail query
+    # Detail: run detail query
     try:
         results = _run_detail()
     except Neo4jClientError:
