@@ -1,0 +1,61 @@
+# Human-authored content for genes_by_ontology about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Find genes in a GO biological process
+    call: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
+    response: |
+      {
+        "total_matching": 411,
+        "by_organism": [{"organism": "Alteromonas macleodii EZ55", "count": 44}, ...],
+        "by_category": [{"category": "Replication and repair", "count": 321}, ...],
+        "by_term": [{"term_id": "go:0006260", "count": 411}],
+        "returned": 5, "truncated": true,
+        "results": [
+          {"locus_tag": "A9601_00001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus AS9601", "gene_category": "Replication and repair"},
+          ...
+        ]
+      }
+
+  - title: Compare gene counts across terms
+    call: genes_by_ontology(term_ids=["go:0006260", "go:0006412"], ontology="go_bp", summary=True)
+    response: |
+      {
+        "total_matching": 1742,
+        "by_organism": [{"organism": "Alteromonas macleodii EZ55", "count": 152}, ...],
+        "by_category": [{"category": "Translation", "count": 1182}, ...],
+        "by_term": [{"term_id": "go:0006412", "count": 1331}, {"term_id": "go:0006260", "count": 411}],
+        "returned": 0, "truncated": true, "results": []
+      }
+
+  - title: Filter by organism
+    call: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp", organism="MED4")
+
+  - title: From term search to gene discovery
+    steps: |
+      Step 1: search_ontology(search_text="replication", ontology="go_bp")
+              → collect term IDs from results (e.g. "go:0006260")
+
+      Step 2: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
+              → find genes annotated to these terms (with hierarchy expansion)
+
+      Step 3: gene_overview(locus_tags=["PMM0845", ...])
+              → check data availability for discovered genes
+
+verbose_fields:
+  - matched_terms
+  - gene_summary
+  - function_description
+
+chaining:
+  - "search_ontology → genes_by_ontology"
+  - "genes_by_ontology → gene_overview"
+  - "genes_by_ontology → gene_ontology_terms"
+
+mistakes:
+  - "term_ids must come from the SAME ontology — don't mix GO and KEGG IDs"
+  - "by_term counts can overlap — a gene annotated to 2 input terms is counted in both"
+  - "Results are distinct genes, not per-term rows"
+  - wrong: "genes_by_ontology(term_ids=['replication'], ontology='go_bp')  # passing text, not IDs"
+    right: "search_ontology(search_text='replication', ontology='go_bp')  # search first, then use IDs"

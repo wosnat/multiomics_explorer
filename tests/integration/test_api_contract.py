@@ -227,15 +227,37 @@ class TestSearchOntologyContract:
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
 class TestGenesByOntologyContract:
-    def test_returns_list_of_dicts(self, conn):
+    def test_returns_dict_envelope(self, conn):
         result = api.genes_by_ontology(["go:0006260"], "go_bp", conn=conn)
-        assert isinstance(result, list)
-        assert len(result) >= 1
+        assert isinstance(result, dict)
+        for key in ("total_matching", "by_organism", "by_category",
+                     "by_term", "returned", "truncated", "results"):
+            assert key in result
+        assert result["total_matching"] >= 1
+        assert result["returned"] >= 1
 
     def test_result_keys(self, conn):
         result = api.genes_by_ontology(["go:0006260"], "go_bp", conn=conn)
-        expected_keys = {"locus_tag", "gene_name", "product", "organism_strain"}
-        assert set(result[0].keys()) == expected_keys
+        expected_keys = {"locus_tag", "gene_name", "product",
+                         "organism_strain", "gene_category"}
+        assert set(result["results"][0].keys()) == expected_keys
+
+    def test_summary_mode(self, conn):
+        result = api.genes_by_ontology(
+            ["go:0006260"], "go_bp", summary=True, conn=conn,
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] >= 1
+
+    def test_verbose_adds_columns(self, conn):
+        result = api.genes_by_ontology(
+            ["go:0006260"], "go_bp", verbose=True, limit=1, conn=conn,
+        )
+        row = result["results"][0]
+        assert "matched_terms" in row
+        assert "gene_summary" in row
+        assert "function_description" in row
 
 
 # ---------------------------------------------------------------------------

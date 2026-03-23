@@ -1,1171 +1,1462 @@
 case_id: find_genes_with_organism
 row_count: 291
 rows:
-- gene_name: dnaN
+- gene_category: Replication and repair
+  gene_name: dnaN
   locus_tag: PMM0001
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, beta subunit
-- gene_name: purL
+- gene_category: Nucleotide metabolism
+  gene_name: purL
   locus_tag: PMM0003
   organism_strain: Prochlorococcus MED4
   product: phosphoribosylformylglycinamidine synthase, synthetase domain
-- gene_name: purF
+- gene_category: Nucleotide metabolism
+  gene_name: purF
   locus_tag: PMM0004
   organism_strain: Prochlorococcus MED4
   product: amidophosphoribosyltransferase
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM0005
   organism_strain: Prochlorococcus MED4
   product: DNA gyrase/topoisomerase IV, subunit A family protein
-- gene_name: queG
+- gene_category: Translation
+  gene_name: queG
   locus_tag: PMM0007
   organism_strain: Prochlorococcus MED4
   product: epoxyqueuosine reductase
-- gene_name: nusB
+- gene_category: Transcription
+  gene_name: nusB
   locus_tag: PMM0009
   organism_strain: Prochlorococcus MED4
   product: transcription antitermination protein NusB
-- gene_name: null
+- gene_category: Regulatory functions
+  gene_name: null
   locus_tag: PMM0013
   organism_strain: Prochlorococcus MED4
   product: RNA-binding domain RNP-1 (RNA recognition motif) containing protein
-- gene_name: dusA
+- gene_category: Translation
+  gene_name: dusA
   locus_tag: PMM0014
   organism_strain: Prochlorococcus MED4
   product: tRNA dihydrouridine synthase
-- gene_name: guaA
+- gene_category: Nucleotide metabolism
+  gene_name: guaA
   locus_tag: PMM0037
   organism_strain: Prochlorococcus MED4
   product: GMP synthase (glutamine-hydrolyzing), N-terminal domain
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM0038
   organism_strain: Prochlorococcus MED4
   product: putative restriction endonuclease
-- gene_name: alaS
+- gene_category: Translation
+  gene_name: alaS
   locus_tag: PMM0044
   organism_strain: Prochlorococcus MED4
   product: alanyl-tRNA synthetase
-- gene_name: ndk
+- gene_category: Nucleotide metabolism
+  gene_name: ndk
   locus_tag: PMM0046
   organism_strain: Prochlorococcus MED4
   product: nucleoside diphosphate kinase
-- gene_name: gatB
+- gene_category: Translation
+  gene_name: gatB
   locus_tag: PMM0048
   organism_strain: Prochlorococcus MED4
   product: aspartyl-tRNA(Asn)/glutamyl-tRNA(Gln) amidotransferase subunit B
-- gene_name: coaE
+- gene_category: Coenzyme metabolism
+  gene_name: coaE
   locus_tag: PMM0049
   organism_strain: Prochlorococcus MED4
   product: dephospho-CoA kinase
-- gene_name: ypsC
+- gene_category: Replication and repair
+  gene_name: ypsC
   locus_tag: PMM0053
   organism_strain: Prochlorococcus MED4
   product: putative N6-adenine-specific DNA methylase
-- gene_name: accC
+- gene_category: Lipid metabolism
+  gene_name: accC
   locus_tag: PMM0060
   organism_strain: Prochlorococcus MED4
   product: acetyl-CoA carboxylase, biotin carboxylase subunit
-- gene_name: null
+- gene_category: Transcription
+  gene_name: null
   locus_tag: PMM0075
   organism_strain: Prochlorococcus MED4
   product: conserved hypothetical protein
-- gene_name: rarA
+- gene_category: Replication and repair
+  gene_name: rarA
   locus_tag: PMM0077
   organism_strain: Prochlorococcus MED4
   product: recombination factor
-- gene_name: coaX
+- gene_category: Coenzyme metabolism
+  gene_name: coaX
   locus_tag: PMM0080
   organism_strain: Prochlorococcus MED4
   product: type III pantothenate kinase
-- gene_name: nadB
+- gene_category: Coenzyme metabolism
+  gene_name: nadB
   locus_tag: PMM0100
   organism_strain: Prochlorococcus MED4
   product: L-aspartate oxidase
-- gene_name: rimO
+- gene_category: Translation
+  gene_name: rimO
   locus_tag: PMM0102
   organism_strain: Prochlorococcus MED4
   product: ribosomal protein S12 methylthiotransferase
-- gene_name: queD
+- gene_category: Translation
+  gene_name: queD
   locus_tag: PMM0106
   organism_strain: Prochlorococcus MED4
   product: queuosine biosynthesis protein QueD
-- gene_name: rbfA
+- gene_category: Transcription
+  gene_name: rbfA
   locus_tag: PMM0112
   organism_strain: Prochlorococcus MED4
   product: ribosome-binding factor A
-- gene_name: holB
+- gene_category: Replication and repair
+  gene_name: holB
   locus_tag: PMM0129
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, delta^ subunit
-- gene_name: tmk
+- gene_category: Nucleotide metabolism
+  gene_name: tmk
   locus_tag: PMM0130
   organism_strain: Prochlorococcus MED4
   product: dTMP kinase
-- gene_name: radA
+- gene_category: Replication and repair
+  gene_name: radA
   locus_tag: PMM0133
   organism_strain: Prochlorococcus MED4
   product: DNA repair protein Sms/RadA
-- gene_name: pcnB
+- gene_category: Transcription
+  gene_name: pcnB
   locus_tag: PMM0141
   organism_strain: Prochlorococcus MED4
   product: tRNA nucleotidyltransferase (CCA-adding enzyme)
-- gene_name: cugP
+- gene_category: Central intermediary metabolism
+  gene_name: cugP
   locus_tag: PMM0152
   organism_strain: Prochlorococcus MED4
   product: mannose-1-phosphate guanylyltransferase
-- gene_name: pedR
+- gene_category: Regulatory functions
+  gene_name: pedR
   locus_tag: PMM0154
   organism_strain: Prochlorococcus MED4
   product: redox-responsive LuxR-type transcriptional regulator PedR
-- gene_name: nadK
+- gene_category: Coenzyme metabolism
+  gene_name: nadK
   locus_tag: PMM0156
   organism_strain: Prochlorococcus MED4
   product: NAD kinase
-- gene_name: purE
+- gene_category: Nucleotide metabolism
+  gene_name: purE
   locus_tag: PMM0167
   organism_strain: Prochlorococcus MED4
   product: N5-carboxyaminoimidazole ribonucleotide mutase
-- gene_name: rsmH
+- gene_category: Translation
+  gene_name: rsmH
   locus_tag: PMM0171
   organism_strain: Prochlorococcus MED4
   product: 16S rRNA (cytosine(1402)-N(4))-methyltransferase
-- gene_name: yqfG
+- gene_category: Translation
+  gene_name: yqfG
   locus_tag: PMM0182
   organism_strain: Prochlorococcus MED4
   product: endoribonuclease YqfG
-- gene_name: argS
+- gene_category: Translation
+  gene_name: argS
   locus_tag: PMM0187
   organism_strain: Prochlorococcus MED4
   product: arginine--tRNA ligase
-- gene_name: nadC
+- gene_category: Coenzyme metabolism
+  gene_name: nadC
   locus_tag: PMM0188
   organism_strain: Prochlorococcus MED4
   product: nicotinate-nucleotide diphosphorylase
-- gene_name: trmE
+- gene_category: Translation
+  gene_name: trmE
   locus_tag: PMM0189
   organism_strain: Prochlorococcus MED4
   product: tRNA modification GTPase
-- gene_name: spoT
+- gene_category: Stress response and adaptation
+  gene_name: spoT
   locus_tag: PMM0191
   organism_strain: Prochlorococcus MED4
   product: bifunctional GTP diphosphokinase / guanosine-3^,5^-bis(diphosphate) 3^-diphosphatase
-- gene_name: rluD
+- gene_category: Translation
+  gene_name: rluD
   locus_tag: PMM0193
   organism_strain: Prochlorococcus MED4
   product: 23S rRNA pseudouridine synthase
-- gene_name: pgk
+- gene_category: Energy production
+  gene_name: pgk
   locus_tag: PMM0195
   organism_strain: Prochlorococcus MED4
   product: phosphoglycerate kinase
-- gene_name: pyrD
+- gene_category: Nucleotide metabolism
+  gene_name: pyrD
   locus_tag: PMM0199
   organism_strain: Prochlorococcus MED4
   product: dihydroorotate dehydrogenase, class 2
-- gene_name: rnhA
+- gene_category: Transcription
+  gene_name: rnhA
   locus_tag: PMM0200
   organism_strain: Prochlorococcus MED4
   product: ribonuclease HI
-- gene_name: rplA
+- gene_category: Translation
+  gene_name: rplA
   locus_tag: PMM0203
   organism_strain: Prochlorococcus MED4
   product: 50S ribosomal protein L1
-- gene_name: nusG
+- gene_category: Transcription
+  gene_name: nusG
   locus_tag: PMM0205
   organism_strain: Prochlorococcus MED4
   product: transcription termination/antitermination factor NusG
-- gene_name: eno
+- gene_category: Carbohydrate metabolism
+  gene_name: eno
   locus_tag: PMM0208
   organism_strain: Prochlorococcus MED4
   product: enolase
-- gene_name: mutS2
+- gene_category: Replication and repair
+  gene_name: mutS2
   locus_tag: PMM0217
   organism_strain: Prochlorococcus MED4
   product: DNA mismatch repair protein, MutS family
-- gene_name: coaBC
+- gene_category: Coenzyme metabolism
+  gene_name: coaBC
   locus_tag: PMM0229
   organism_strain: Prochlorococcus MED4
   product: phosphopantothenoylcysteine decarboxylase / phosphopantothenate--cysteine
     ligase
-- gene_name: pyrB
+- gene_category: Nucleotide metabolism
+  gene_name: pyrB
   locus_tag: PMM0233
   organism_strain: Prochlorococcus MED4
   product: aspartate carbamoyltransferase
-- gene_name: mpg
+- gene_category: Replication and repair
+  gene_name: mpg
   locus_tag: PMM0234
   organism_strain: Prochlorococcus MED4
   product: DNA-3-methyladenine glycosylase
-- gene_name: gatC
+- gene_category: Stress response and adaptation
+  gene_name: gatC
   locus_tag: PMM0235
   organism_strain: Prochlorococcus MED4
   product: aspartyl-tRNA(Asn)/glutamyl-tRNA(Gln) amidotransferase subunit C
-- gene_name: ileS
+- gene_category: Translation
+  gene_name: ileS
   locus_tag: PMM0238
   organism_strain: Prochlorococcus MED4
   product: isoleucyl-tRNA synthetase
-- gene_name: trmB
+- gene_category: Translation
+  gene_name: trmB
   locus_tag: PMM0240
   organism_strain: Prochlorococcus MED4
   product: tRNA (guanine-N(7)-)-methyltransferase
-- gene_name: thyx
+- gene_category: Nucleotide metabolism
+  gene_name: thyx
   locus_tag: PMM0243
   organism_strain: Prochlorococcus MED4
   product: thymidylate synthase
-- gene_name: dcd
+- gene_category: Nucleotide metabolism
+  gene_name: dcd
   locus_tag: PMM0244
   organism_strain: Prochlorococcus MED4
   product: deoxycytidine triphosphate deaminase
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM0248
   organism_strain: Prochlorococcus MED4
   product: polynucleotidyl transferase, ribonuclease H fold superfamily
-- gene_name: purH
+- gene_category: Nucleotide metabolism
+  gene_name: purH
   locus_tag: PMM0266
   organism_strain: Prochlorococcus MED4
   product: bifunctional purine biosynthesis protein (AICAR transformylase/IMP cyclohydrolase)
-- gene_name: tgt
+- gene_category: Translation
+  gene_name: tgt
   locus_tag: PMM0271
   organism_strain: Prochlorococcus MED4
   product: queuine tRNA-ribosyltransferase
-- gene_name: pyrE
+- gene_category: Nucleotide metabolism
+  gene_name: pyrE
   locus_tag: PMM0275
   organism_strain: Prochlorococcus MED4
   product: orotate phosphoribosyltransferase
-- gene_name: pgmA
+- gene_category: Carbohydrate metabolism
+  gene_name: pgmA
   locus_tag: PMM0278
   organism_strain: Prochlorococcus MED4
   product: phosphoglucomutase
-- gene_name: rdgB
+- gene_category: Nucleotide metabolism
+  gene_name: rdgB
   locus_tag: PMM0279
   organism_strain: Prochlorococcus MED4
   product: XTP/dITP diphosphohydrolase
-- gene_name: phrA
+- gene_category: Stress response and adaptation
+  gene_name: phrA
   locus_tag: PMM0285
   organism_strain: Prochlorococcus MED4
   product: deoxyribodipyrimidine photolyase (DNA photolyase) (photoreactivating enzyme)
-- gene_name: nudF
+- gene_category: Nucleotide metabolism
+  gene_name: nudF
   locus_tag: PMM0286
   organism_strain: Prochlorococcus MED4
   product: ADP-ribose diphosphatase, NUDIX hydrolase superfamily
-- gene_name: mtnP
+- gene_category: Nucleotide metabolism
+  gene_name: mtnP
   locus_tag: PMM0301
   organism_strain: Prochlorococcus MED4
   product: methylthioadenosine phosphorylase
-- gene_name: pcnB
+- gene_category: Transcription
+  gene_name: pcnB
   locus_tag: PMM0303
   organism_strain: Prochlorococcus MED4
   product: poly(A) polymerase
-- gene_name: uvrD
+- gene_category: Replication and repair
+  gene_name: uvrD
   locus_tag: PMM0304
   organism_strain: Prochlorococcus MED4
   product: DNA-dependent ATPase I and helicase II
-- gene_name: tsaC
+- gene_category: Translation
+  gene_name: tsaC
   locus_tag: PMM0319
   organism_strain: Prochlorococcus MED4
   product: L-threonylcarbamoyladenylate synthase
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: PMM0323
   organism_strain: Prochlorococcus MED4
   product: HD domain-containing protein
-- gene_name: mutM
+- gene_category: Replication and repair
+  gene_name: mutM
   locus_tag: PMM0328
   organism_strain: Prochlorococcus MED4
   product: formamidopyrimidine-DNA glycolase
-- gene_name: miaE
+- gene_category: Translation
+  gene_name: miaE
   locus_tag: PMM0388
   organism_strain: Prochlorococcus MED4
   product: putative tRNA-(MS[2]IO[6]A)-hydroxylase
-- gene_name: recO
+- gene_category: Replication and repair
+  gene_name: recO
   locus_tag: PMM0398
   organism_strain: Prochlorococcus MED4
   product: gap repair protein RecO
-- gene_name: deoC
+- gene_category: Nucleotide metabolism
+  gene_name: deoC
   locus_tag: PMM0399
   organism_strain: Prochlorococcus MED4
   product: deoC/LacD aldolase family protein
-- gene_name: pdhC
+- gene_category: Carbohydrate metabolism
+  gene_name: pdhC
   locus_tag: PMM0405
   organism_strain: Prochlorococcus MED4
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
-- gene_name: queA
+- gene_category: Translation
+  gene_name: queA
   locus_tag: PMM0406
   organism_strain: Prochlorococcus MED4
   product: S-adenosylmethionine:tRNA ribosyltransferase-isomerase
-- gene_name: trmH
+- gene_category: Translation
+  gene_name: trmH
   locus_tag: PMM0422
   organism_strain: Prochlorococcus MED4
   product: tRNA guanosine-2^-O-methyltransferase
-- gene_name: null
+- gene_category: Stress response and adaptation
+  gene_name: null
   locus_tag: PMM0425
   organism_strain: Prochlorococcus MED4
   product: deoxyribodipyrimidine photolyase-like, FAD-domain containing protein
-- gene_name: sun
+- gene_category: Translation
+  gene_name: sun
   locus_tag: PMM0426
   organism_strain: Prochlorococcus MED4
   product: ribosomal RNA small subunit methyltransferase B
-- gene_name: topA
+- gene_category: Replication and repair
+  gene_name: topA
   locus_tag: PMM0436
   organism_strain: Prochlorococcus MED4
   product: DNA topoisomerase I, omega subunit
-- gene_name: ctaCI
+- gene_category: Carbohydrate metabolism
+  gene_name: ctaCI
   locus_tag: PMM0446
   organism_strain: Prochlorococcus MED4
   product: cytochrome c oxidase subunit II
-- gene_name: gmk
+- gene_category: Nucleotide metabolism
+  gene_name: gmk
   locus_tag: PMM0467
   organism_strain: Prochlorococcus MED4
   product: guanylate kinase
-- gene_name: tsaD
+- gene_category: Translation
+  gene_name: tsaD
   locus_tag: PMM0470
   organism_strain: Prochlorococcus MED4
   product: N6-L-threonylcarbamoyladenine synthase
-- gene_name: gltX
+- gene_category: Translation
+  gene_name: gltX
   locus_tag: PMM0473
   organism_strain: Prochlorococcus MED4
   product: glutamyl-tRNA synthetase
-- gene_name: xthA
+- gene_category: Stress response and adaptation
+  gene_name: xthA
   locus_tag: PMM0484
   organism_strain: Prochlorococcus MED4
   product: exodeoxyribonuclease III
-- gene_name: rpoD1
+- gene_category: Stress response and adaptation
+  gene_name: rpoD1
   locus_tag: PMM0496
   organism_strain: Prochlorococcus MED4
   product: major RNA polymerase sigma factor, type I
-- gene_name: priA
+- gene_category: Replication and repair
+  gene_name: priA
   locus_tag: PMM0497
   organism_strain: Prochlorococcus MED4
   product: primosomal protein N^
-- gene_name: ycf41
+- gene_category: Transport
+  gene_name: ycf41
   locus_tag: PMM0502
   organism_strain: Prochlorococcus MED4
   product: possible single-stranded DNA-binding protein
-- gene_name: purA
+- gene_category: Nucleotide metabolism
+  gene_name: purA
   locus_tag: PMM0506
   organism_strain: Prochlorococcus MED4
   product: adenylosuccinate synthase
-- gene_name: proS
+- gene_category: Amino acid metabolism
+  gene_name: proS
   locus_tag: PMM0508
   organism_strain: Prochlorococcus MED4
   product: proline--tRNA ligase
-- gene_name: pyrC
+- gene_category: Nucleotide metabolism
+  gene_name: pyrC
   locus_tag: PMM0514
   organism_strain: Prochlorococcus MED4
   product: putative dihydroorotase
-- gene_name: talA
+- gene_category: Carbohydrate metabolism
+  gene_name: talA
   locus_tag: PMM0519
   organism_strain: Prochlorococcus MED4
   product: transaldolase
-- gene_name: pyrH
+- gene_category: Nucleotide metabolism
+  gene_name: pyrH
   locus_tag: PMM0522
   organism_strain: Prochlorococcus MED4
   product: uridylate kinase
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM0524
   organism_strain: Prochlorococcus MED4
   product: phage integrase family protein
-- gene_name: null
+- gene_category: Post-translational modification
+  gene_name: null
   locus_tag: PMM0538
   organism_strain: Prochlorococcus MED4
   product: metallopeptidase M50 family protein
-- gene_name: rdgB
+- gene_category: Nucleotide metabolism
+  gene_name: rdgB
   locus_tag: PMM0548
   organism_strain: Prochlorococcus MED4
   product: dITP/XTP pyrophosphatase
-- gene_name: ridA
+- gene_category: Transcription
+  gene_name: ridA
   locus_tag: PMM0558
   organism_strain: Prochlorococcus MED4
   product: reactive intermediate/imine deaminase A
-- gene_name: dnaA
+- gene_category: Replication and repair
+  gene_name: dnaA
   locus_tag: PMM0565
   organism_strain: Prochlorococcus MED4
   product: chromosomal replication initiator protein
-- gene_name: pyrC
+- gene_category: Nucleotide metabolism
+  gene_name: pyrC
   locus_tag: PMM0569
   organism_strain: Prochlorococcus MED4
   product: dihydroorotase, homodimeric type
-- gene_name: rpoD7
+- gene_category: Transcription
+  gene_name: rpoD7
   locus_tag: PMM0577
   organism_strain: Prochlorococcus MED4
   product: RNA polymerase sigma factor, type II
-- gene_name: null
+- gene_category: Cellular processes
+  gene_name: null
   locus_tag: PMM0579
   organism_strain: Prochlorococcus MED4
   product: putative 6-pyruvoyl tetrahydropterin synthase
-- gene_name: glk
+- gene_category: Carbohydrate metabolism
+  gene_name: glk
   locus_tag: PMM0596
   organism_strain: Prochlorococcus MED4
   product: glucokinase
-- gene_name: thrS
+- gene_category: Translation
+  gene_name: thrS
   locus_tag: PMM0597
   organism_strain: Prochlorococcus MED4
   product: threonyl-tRNA synthetase
-- gene_name: trpS
+- gene_category: Translation
+  gene_name: trpS
   locus_tag: PMM0598
   organism_strain: Prochlorococcus MED4
   product: tryptophan--tRNA ligase
-- gene_name: acs
+- gene_category: Carbohydrate metabolism
+  gene_name: acs
   locus_tag: PMM0619
   organism_strain: Prochlorococcus MED4
   product: acetate--CoA ligase
-- gene_name: dnaQ
+- gene_category: Replication and repair
+  gene_name: dnaQ
   locus_tag: PMM0621
   organism_strain: Prochlorococcus MED4
   product: exonuclease family protein
-- gene_name: hisS
+- gene_category: Translation
+  gene_name: hisS
   locus_tag: PMM0623
   organism_strain: Prochlorococcus MED4
   product: histidine--tRNA ligase
-- gene_name: rsuA
+- gene_category: Translation
+  gene_name: rsuA
   locus_tag: PMM0658
   organism_strain: Prochlorococcus MED4
   product: pseudouridine synthase
-- gene_name: nrdJ
+- gene_category: Coenzyme metabolism
+  gene_name: nrdJ
   locus_tag: PMM0661
   organism_strain: Prochlorococcus MED4
   product: ribonucleoside-diphosphate reductase
-- gene_name: rsmE
+- gene_category: Translation
+  gene_name: rsmE
   locus_tag: PMM0668
   organism_strain: Prochlorococcus MED4
   product: RNA methyltransferase, RsmE family protein
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM0675
   organism_strain: Prochlorococcus MED4
   product: uracil-DNA glycosylase
-- gene_name: nadA
+- gene_category: Coenzyme metabolism
+  gene_name: nadA
   locus_tag: PMM0678
   organism_strain: Prochlorococcus MED4
   product: quinolinate synthetase complex, A subunit
-- gene_name: purK
+- gene_category: Nucleotide metabolism
+  gene_name: purK
   locus_tag: PMM0683
   organism_strain: Prochlorococcus MED4
   product: N5-carboxyaminoimidazole ribonucleotide synthetase monomer
-- gene_name: arsR
+- gene_category: Stress response and adaptation
+  gene_name: arsR
   locus_tag: PMM0714
   organism_strain: Prochlorococcus MED4
   product: bacterial regulatory protein, ArsR family
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM0728
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent Lhr-N-terminus-like helicase
-- gene_name: lig
+- gene_category: Replication and repair
+  gene_name: lig
   locus_tag: PMM0729
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA ligase
-- gene_name: recG
+- gene_category: Replication and repair
+  gene_name: recG
   locus_tag: PMM0756
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA helicase
-- gene_name: glyS
+- gene_category: Translation
+  gene_name: glyS
   locus_tag: PMM0759
   organism_strain: Prochlorococcus MED4
   product: glycyl-tRNA synthetase, beta subunit
-- gene_name: rpe
+- gene_category: Carbohydrate metabolism
+  gene_name: rpe
   locus_tag: PMM0766
   organism_strain: Prochlorococcus MED4
   product: ribulose-phosphate 3-epimerase
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: PMM0770
   organism_strain: Prochlorococcus MED4
   product: 6-phosphogluconate dehydrogenase
-- gene_name: pgl
+- gene_category: Stress response and adaptation
+  gene_name: pgl
   locus_tag: PMM0771
   organism_strain: Prochlorococcus MED4
   product: 6-phosphogluconolactonase
-- gene_name: purS
+- gene_category: Nucleotide metabolism
+  gene_name: purS
   locus_tag: PMM0779
   organism_strain: Prochlorococcus MED4
   product: phosphoribosylformylglycinamidine (FGAM) synthase, PurS component
-- gene_name: purQ
+- gene_category: Nucleotide metabolism
+  gene_name: purQ
   locus_tag: PMM0780
   organism_strain: Prochlorococcus MED4
   product: phosphoribosylformylglycinamidine (FGAM) synthase, glutamine amidotransferase
     domain
-- gene_name: fbaA
+- gene_category: Carbohydrate metabolism
+  gene_name: fbaA
   locus_tag: PMM0781
   organism_strain: Prochlorococcus MED4
   product: fructose-1,6-bisphosphate aldolase, class II
-- gene_name: yqgF
+- gene_category: Transcription
+  gene_name: yqgF
   locus_tag: PMM0791
   organism_strain: Prochlorococcus MED4
   product: DNA damage response protein YqgF / putative pre-16S rRNA nuclease
-- gene_name: nth
+- gene_category: Replication and repair
+  gene_name: nth
   locus_tag: PMM0802
   organism_strain: Prochlorococcus MED4
   product: endonuclease III
-- gene_name: carB
+- gene_category: Nucleotide metabolism
+  gene_name: carB
   locus_tag: PMM0825
   organism_strain: Prochlorococcus MED4
   product: carbamoyl-phosphate synthase, large subunit
-- gene_name: tpiA
+- gene_category: Carbohydrate metabolism
+  gene_name: tpiA
   locus_tag: PMM0829
   organism_strain: Prochlorococcus MED4
   product: triosephosphate isomerase
-- gene_name: mfd
+- gene_category: Replication and repair
+  gene_name: mfd
   locus_tag: PMM0839
   organism_strain: Prochlorococcus MED4
   product: transcription-repair coupling factor
-- gene_name: fmt
+- gene_category: Translation
+  gene_name: fmt
   locus_tag: PMM0841
   organism_strain: Prochlorococcus MED4
   product: methionyl-tRNA formyltransferase
-- gene_name: trmL
+- gene_category: Translation
+  gene_name: trmL
   locus_tag: PMM0862
   organism_strain: Prochlorococcus MED4
   product: tRNA (cytidine/uridine-2^-O)-ribose methyltransferase
-- gene_name: metG
+- gene_category: Translation
+  gene_name: metG
   locus_tag: PMM0867
   organism_strain: Prochlorococcus MED4
   product: methionine--tRNA ligase
-- gene_name: rnb
+- gene_category: Transcription
+  gene_name: rnb
   locus_tag: PMM0868
   organism_strain: Prochlorococcus MED4
   product: exoribonuclease II
-- gene_name: pheT
+- gene_category: Translation
+  gene_name: pheT
   locus_tag: PMM0871
   organism_strain: Prochlorococcus MED4
   product: phenylalanine--tRNA ligase, beta subunit
-- gene_name: apa2
+- gene_category: Nucleotide metabolism
+  gene_name: apa2
   locus_tag: PMM0874
   organism_strain: Prochlorococcus MED4
   product: ATP adenylyltransferase
-- gene_name: uvrC
+- gene_category: Replication and repair
+  gene_name: uvrC
   locus_tag: PMM0882
   organism_strain: Prochlorococcus MED4
   product: excinuclease UvrABC complex, endonuclease subunit
-- gene_name: coaD
+- gene_category: Coenzyme metabolism
+  gene_name: coaD
   locus_tag: PMM0884
   organism_strain: Prochlorococcus MED4
   product: pantetheine-phosphate adenylyltransferase
-- gene_name: leuS
+- gene_category: Translation
+  gene_name: leuS
   locus_tag: PMM0889
   organism_strain: Prochlorococcus MED4
   product: leucine--tRNA ligase
-- gene_name: pgi
+- gene_category: Carbohydrate metabolism
+  gene_name: pgi
   locus_tag: PMM0890
   organism_strain: Prochlorococcus MED4
   product: glucose-6-phosphate isomerase
-- gene_name: purN
+- gene_category: Nucleotide metabolism
+  gene_name: purN
   locus_tag: PMM0891
   organism_strain: Prochlorococcus MED4
   product: phosphoribosylglycinamide formyltransferase
-- gene_name: dnaK2
+- gene_category: Post-translational modification
+  gene_name: dnaK2
   locus_tag: PMM0897
   organism_strain: Prochlorococcus MED4
   product: chaperone protein DnaK
-- gene_name: pyk
+- gene_category: Carbohydrate metabolism
+  gene_name: pyk
   locus_tag: PMM0912
   organism_strain: Prochlorococcus MED4
   product: pyruvate kinase
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: PMM0916
   organism_strain: Prochlorococcus MED4
   product: 50S ribosome-binding GTPase family protein
-- gene_name: cumB
+- gene_category: Nucleotide metabolism
+  gene_name: cumB
   locus_tag: PMM0918
   organism_strain: Prochlorococcus MED4
   product: cytidine and deoxycytidylate deaminase zinc-binding region family protein
-- gene_name: selU
+- gene_category: Translation
+  gene_name: selU
   locus_tag: PMM0925
   organism_strain: Prochlorococcus MED4
   product: tRNA 2-selenouridine synthase
-- gene_name: phdB
+- gene_category: Carbohydrate metabolism
+  gene_name: phdB
   locus_tag: PMM0930
   organism_strain: Prochlorococcus MED4
   product: pyruvate dehydrogenase E1 component beta subunit
-- gene_name: ksgA
+- gene_category: Translation
+  gene_name: ksgA
   locus_tag: PMM0933
   organism_strain: Prochlorococcus MED4
   product: dimethyladenosine transferase
-- gene_name: rlmH
+- gene_category: Translation
+  gene_name: rlmH
   locus_tag: PMM0935
   organism_strain: Prochlorococcus MED4
   product: putative SPOUT methyltransferase family protein
-- gene_name: umuD
+- gene_category: Replication and repair
+  gene_name: umuD
   locus_tag: PMM0936
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase V, subunit D
-- gene_name: umuC
+- gene_category: Replication and repair
+  gene_name: umuC
   locus_tag: PMM0937
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase V, subunit C
-- gene_name: dnaG
+- gene_category: Replication and repair
+  gene_name: dnaG
   locus_tag: PMM0939
   organism_strain: Prochlorococcus MED4
   product: DNA primase
-- gene_name: ruvA
+- gene_category: Replication and repair
+  gene_name: ruvA
   locus_tag: PMM0942
   organism_strain: Prochlorococcus MED4
   product: holliday junction ATP-dependent DNA helicase RuvA
-- gene_name: dnaE
+- gene_category: Replication and repair
+  gene_name: dnaE
   locus_tag: PMM0945
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, alpha subunit
-- gene_name: gatA
+- gene_category: Translation
+  gene_name: gatA
   locus_tag: PMM0946
   organism_strain: Prochlorococcus MED4
   product: aspartyl-tRNA(Asn)/glutamyl-tRNA(Gln) amidotransferase subunit A
-- gene_name: rlmB
+- gene_category: Translation
+  gene_name: rlmB
   locus_tag: PMM0948
   organism_strain: Prochlorococcus MED4
   product: 23S rRNA (guanosine2251-2^-O)-methyltransferase
-- gene_name: mrnC
+- gene_category: Stress response and adaptation
+  gene_name: mrnC
   locus_tag: PMM0949
   organism_strain: Prochlorococcus MED4
   product: ribonuclease III domain protein
-- gene_name: carA
+- gene_category: Central intermediary metabolism
+  gene_name: carA
   locus_tag: PMM0951
   organism_strain: Prochlorococcus MED4
   product: carbamoyl-phosphate synthase small subunit
-- gene_name: null
+- gene_category: Nucleotide metabolism
+  gene_name: null
   locus_tag: PMM0985
   organism_strain: Prochlorococcus MED4
   product: phosphoribosyl transferase domain containing protein
-- gene_name: null
+- gene_category: Nucleotide metabolism
+  gene_name: null
   locus_tag: PMM0986
   organism_strain: Prochlorococcus MED4
   product: nucleoside 2-deoxyribosyltransferase family protein
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM0988
   organism_strain: Prochlorococcus MED4
   product: helix-hairpin-helix DNA-binding motif class 1-containing protein
-- gene_name: purT
+- gene_category: Nucleotide metabolism
+  gene_name: purT
   locus_tag: PMM1004
   organism_strain: Prochlorococcus MED4
   product: formate-dependent phosphoribosyl glycinamide formyl transferase
-- gene_name: dusB
+- gene_category: Coenzyme metabolism
+  gene_name: dusB
   locus_tag: PMM1009
   organism_strain: Prochlorococcus MED4
   product: TIM-barrel , nifR3 family protein
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM1014
   organism_strain: Prochlorococcus MED4
   product: type II-like restriction endonuclease
-- gene_name: ruvC
+- gene_category: Replication and repair
+  gene_name: ruvC
   locus_tag: PMM1054
   organism_strain: Prochlorococcus MED4
   product: crossover junction endodeoxyribonuclease RuvC
-- gene_name: trmJ
+- gene_category: Stress response and adaptation
+  gene_name: trmJ
   locus_tag: PMM1056
   organism_strain: Prochlorococcus MED4
   product: RNA methyltransferase, TrmH , group 1 family protein
-- gene_name: rsmD
+- gene_category: Translation
+  gene_name: rsmD
   locus_tag: PMM1059
   organism_strain: Prochlorococcus MED4
   product: 16S rRNA m2G966 methyltransferase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: PMM1062
   organism_strain: Prochlorococcus MED4
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: gyrA
+- gene_category: Replication and repair
+  gene_name: gyrA
   locus_tag: PMM1063
   organism_strain: Prochlorococcus MED4
   product: DNA gyrase, A subunit
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: PMM1074
   organism_strain: Prochlorococcus MED4
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: prsA
+- gene_category: Carbohydrate metabolism
+  gene_name: prsA
   locus_tag: PMM1080
   organism_strain: Prochlorococcus MED4
   product: ribose-phosphate pyrophosphokinase
-- gene_name: disA
+- gene_category: Signal transduction
+  gene_name: disA
   locus_tag: PMM1091
   organism_strain: Prochlorococcus MED4
   product: diadenylate cyclase
-- gene_name: recR
+- gene_category: Replication and repair
+  gene_name: recR
   locus_tag: PMM1097
   organism_strain: Prochlorococcus MED4
   product: recombination protein RecR
-- gene_name: recD
+- gene_category: Replication and repair
+  gene_name: recD
   locus_tag: PMM1102
   organism_strain: Prochlorococcus MED4
   product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
-- gene_name: recB
+- gene_category: Replication and repair
+  gene_name: recB
   locus_tag: PMM1103
   organism_strain: Prochlorococcus MED4
   product: exodeoxyribonuclease V (RecBCD complex), beta subunit
-- gene_name: recC
+- gene_category: Replication and repair
+  gene_name: recC
   locus_tag: PMM1105
   organism_strain: Prochlorococcus MED4
   product: exodeoxyribonuclease V (RecBCD complex), gamma subunit
-- gene_name: trmFO
+- gene_category: Translation
+  gene_name: trmFO
   locus_tag: PMM1116
   organism_strain: Prochlorococcus MED4
   product: methylenetetrahydrofolate--tRNA-(uracil(54)-C(5))-methyltransferase (FADH(2)-oxidizing)
-- gene_name: apt
+- gene_category: Nucleotide metabolism
+  gene_name: apt
   locus_tag: PMM1122
   organism_strain: Prochlorococcus MED4
   product: adenine phosphoribosyltransferase
-- gene_name: polA
+- gene_category: Replication and repair
+  gene_name: polA
   locus_tag: PMM1140
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase I
-- gene_name: cysS
+- gene_category: Translation
+  gene_name: cysS
   locus_tag: PMM1141
   organism_strain: Prochlorococcus MED4
   product: cysteinyl-tRNA synthetase
-- gene_name: pntB
+- gene_category: Coenzyme metabolism
+  gene_name: pntB
   locus_tag: PMM1145
   organism_strain: Prochlorococcus MED4
   product: pyridine nucleotide transhydrogenase beta subunit
-- gene_name: pntA2
+- gene_category: Coenzyme metabolism
+  gene_name: pntA2
   locus_tag: PMM1146
   organism_strain: Prochlorococcus MED4
   product: pyridine nucleotide transhydrogenase, subunit alpha2 (A2)
-- gene_name: pntA1
+- gene_category: Coenzyme metabolism
+  gene_name: pntA1
   locus_tag: PMM1147
   organism_strain: Prochlorococcus MED4
   product: pyridine nucleotide transhydrogenase, subunit alpha1 (A1)
-- gene_name: maf
+- gene_category: Cell cycle and division
+  gene_name: maf
   locus_tag: PMM1159
   organism_strain: Prochlorococcus MED4
   product: septum formation protein
-- gene_name: glyQ
+- gene_category: Translation
+  gene_name: glyQ
   locus_tag: PMM1165
   organism_strain: Prochlorococcus MED4
   product: glycine--tRNA ligase, alpha subunit
-- gene_name: rnpA
+- gene_category: Transcription
+  gene_name: rnpA
   locus_tag: PMM1184
   organism_strain: Prochlorococcus MED4
   product: ribonuclease P protein component
-- gene_name: serS
+- gene_category: Translation
+  gene_name: serS
   locus_tag: PMM1188
   organism_strain: Prochlorococcus MED4
   product: serine--tRNA ligase
-- gene_name: pnp
+- gene_category: Transcription
+  gene_name: pnp
   locus_tag: PMM1191
   organism_strain: Prochlorococcus MED4
   product: polyribonucleotide nucleotidyltransferase
-- gene_name: rsmI
+- gene_category: Translation
+  gene_name: rsmI
   locus_tag: PMM1193
   organism_strain: Prochlorococcus MED4
   product: 2-O-methyltransferase
-- gene_name: manC
+- gene_category: Cell wall and membrane
+  gene_name: manC
   locus_tag: PMM1196
   organism_strain: Prochlorococcus MED4
   product: mannose-1-phosphate guanylyltransferase
-- gene_name: wcaG
+- gene_category: Central intermediary metabolism
+  gene_name: wcaG
   locus_tag: PMM1207
   organism_strain: Prochlorococcus MED4
   product: GDP-L-fucose synthase
-- gene_name: gmd
+- gene_category: Cell wall and membrane
+  gene_name: gmd
   locus_tag: PMM1208
   organism_strain: Prochlorococcus MED4
   product: GDP-mannose 4,6-dehydratase
-- gene_name: pdhA
+- gene_category: Amino acid metabolism
+  gene_name: pdhA
   locus_tag: PMM1229
   organism_strain: Prochlorococcus MED4
   product: pyruvate dehydrogenase E1 component alpha subunit
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: PMM1233
   organism_strain: Prochlorococcus MED4
   product: dTDP-4-dehydrorhamnose reductase protein family
-- gene_name: uxs
+- gene_category: Central intermediary metabolism
+  gene_name: uxs
   locus_tag: PMM1260
   organism_strain: Prochlorococcus MED4
   product: UDP-glucuronate decarboxylase
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: PMM1261
   organism_strain: Prochlorococcus MED4
   product: UDP-glucose 6-dehydrogenase
-- gene_name: lexA
+- gene_category: Regulatory functions
+  gene_name: lexA
   locus_tag: PMM1262
   organism_strain: Prochlorococcus MED4
   product: SOS-response transcriptional repressor
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: PMM1265
   organism_strain: Prochlorococcus MED4
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: ppnK
+- gene_category: Coenzyme metabolism
+  gene_name: ppnK
   locus_tag: PMM1269
   organism_strain: Prochlorococcus MED4
   product: ATP-NAD kinase family protein
-- gene_name: pheS
+- gene_category: Translation
+  gene_name: pheS
   locus_tag: PMM1270
   organism_strain: Prochlorococcus MED4
   product: phenylalanine--tRNA ligase, alpha subunit
-- gene_name: ribF
+- gene_category: Coenzyme metabolism
+  gene_name: ribF
   locus_tag: PMM1273
   organism_strain: Prochlorococcus MED4
   product: riboflavin kinase / FMN adenylyltransferase
-- gene_name: cpmA
+- gene_category: Cellular processes
+  gene_name: cpmA
   locus_tag: PMM1278
   organism_strain: Prochlorococcus MED4
   product: circadian phase modifier CpmA
-- gene_name: trmD-ispF
+- gene_category: Amino acid metabolism
+  gene_name: trmD-ispF
   locus_tag: PMM1280
   organism_strain: Prochlorococcus MED4
   product: bifunctional tRNA-(guanine-N1)-methyltransferase / 2-C-methyl-D-erythritol
     2,4-cyclodiphosphate synthase
-- gene_name: pdhA
+- gene_category: Carbohydrate metabolism
+  gene_name: pdhA
   locus_tag: PMM1288
   organism_strain: Prochlorococcus MED4
   product: pyruvate dehydrogenase E1 component complex alpha subunit
-- gene_name: rpoD6
+- gene_category: Transcription
+  gene_name: rpoD6
   locus_tag: PMM1289
   organism_strain: Prochlorococcus MED4
   product: RNA polymerase sigma factor, type II
-- gene_name: yjef
+- gene_category: Nucleotide metabolism
+  gene_name: yjef
   locus_tag: PMM1290
   organism_strain: Prochlorococcus MED4
   product: bifunctional NAD(P)HX epimerase / NAD(P)HX dehydratase
-- gene_name: trmU
+- gene_category: Translation
+  gene_name: trmU
   locus_tag: PMM1291
   organism_strain: Prochlorococcus MED4
   product: tRNA (5-methylaminomethyl-2-thiouridylate)-methyltransferase
-- gene_name: spoU
+- gene_category: Translation
+  gene_name: spoU
   locus_tag: PMM1299
   organism_strain: Prochlorococcus MED4
   product: RNA methyltransferase, TrmH family
-- gene_name: murA
+- gene_category: Cell wall and membrane
+  gene_name: murA
   locus_tag: PMM1300
   organism_strain: Prochlorococcus MED4
   product: UDP-N-acetylglucosamine 1-carboxyvinyltransferase
-- gene_name: codA
+- gene_category: Amino acid metabolism
+  gene_name: codA
   locus_tag: PMM1304
   organism_strain: Prochlorococcus MED4
   product: cytosine deaminase
-- gene_name: miaB
+- gene_category: Translation
+  gene_name: miaB
   locus_tag: PMM1305
   organism_strain: Prochlorococcus MED4
   product: tRNA-2-methylthio-N6-dimethylallyladenosine synthase
-- gene_name: hupB
+- gene_category: Regulatory functions
+  gene_name: hupB
   locus_tag: PMM1321
   organism_strain: Prochlorococcus MED4
   product: DNA-binding protein HU-beta
-- gene_name: pyrF
+- gene_category: Nucleotide metabolism
+  gene_name: pyrF
   locus_tag: PMM1328
   organism_strain: Prochlorococcus MED4
   product: orotidine 5-phosphate decarboxylase
-- gene_name: tyrS
+- gene_category: Stress response and adaptation
+  gene_name: tyrS
   locus_tag: PMM1329
   organism_strain: Prochlorococcus MED4
   product: tyrosyl-tRNA synthetase
-- gene_name: purC
+- gene_category: Nucleotide metabolism
+  gene_name: purC
   locus_tag: PMM1339
   organism_strain: Prochlorococcus MED4
   product: phosphoribosylaminoimidazolesuccinocarboxamide synthase
-- gene_name: purD
+- gene_category: Nucleotide metabolism
+  gene_name: purD
   locus_tag: PMM1340
   organism_strain: Prochlorococcus MED4
   product: phosphoribosylamine--glycine ligase
-- gene_name: truB
+- gene_category: Translation
+  gene_name: truB
   locus_tag: PMM1347
   organism_strain: Prochlorococcus MED4
   product: tRNA pseudouridine(55) synthase
-- gene_name: rnz
+- gene_category: Transcription
+  gene_name: rnz
   locus_tag: PMM1349
   organism_strain: Prochlorococcus MED4
   product: ribonuclease Z
-- gene_name: null
+- gene_category: Stress response and adaptation
+  gene_name: null
   locus_tag: PMM1360
   organism_strain: Prochlorococcus MED4
   product: FAD binding domain of DNA photolyase
-- gene_name: rbpD
+- gene_category: Transcription
+  gene_name: rbpD
   locus_tag: PMM1376
   organism_strain: Prochlorococcus MED4
   product: nucleotide-binding alpha-beta plait domain-containing protein
-- gene_name: yedK
+- gene_category: Replication and repair
+  gene_name: yedK
   locus_tag: PMM1381
   organism_strain: Prochlorococcus MED4
   product: putative SOS response associated peptidase
-- gene_name: rpoZ
+- gene_category: Transcription
+  gene_name: rpoZ
   locus_tag: PMM1431
   organism_strain: Prochlorococcus MED4
   product: DNA-directed RNA polymerase omega subunit
-- gene_name: dnaK1
+- gene_category: Post-translational modification
+  gene_name: dnaK1
   locus_tag: PMM1432
   organism_strain: Prochlorococcus MED4
   product: chaperone protein DnaK
-- gene_name: pyrR
+- gene_category: Transcription
+  gene_name: pyrR
   locus_tag: PMM1433
   organism_strain: Prochlorococcus MED4
   product: bifunctional pyrimidine operon regulatory protein/uracil phosphoribosyltransferase
-- gene_name: gpmI
+- gene_category: Carbohydrate metabolism
+  gene_name: gpmI
   locus_tag: PMM1434
   organism_strain: Prochlorococcus MED4
   product: 2,3-bisphosphoglycerate-independent phosphoglycerate mutase
-- gene_name: atpB
+- gene_category: Photosynthesis
+  gene_name: atpB
   locus_tag: PMM1438
   organism_strain: Prochlorococcus MED4
   product: ATP synthase beta chain
-- gene_name: atpE
+- gene_category: Photosynthesis
+  gene_name: atpE
   locus_tag: PMM1439
   organism_strain: Prochlorococcus MED4
   product: ATP synthase epsilon chain
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: PMM1444
   organism_strain: Prochlorococcus MED4
   product: GTP-binding protein of unknown function (DUF697)
-- gene_name: nadD
+- gene_category: Coenzyme metabolism
+  gene_name: nadD
   locus_tag: PMM1445
   organism_strain: Prochlorococcus MED4
   product: nicotinate (nicotinamide) nucleotide adenylyltransferase
-- gene_name: nadE
+- gene_category: Coenzyme metabolism
+  gene_name: nadE
   locus_tag: PMM1446
   organism_strain: Prochlorococcus MED4
   product: NAD+ synthase (glutamine-hydrolysing)
-- gene_name: atpC
+- gene_category: Photosynthesis
+  gene_name: atpC
   locus_tag: PMM1450
   organism_strain: Prochlorococcus MED4
   product: ATP synthase gamma chain
-- gene_name: atpA
+- gene_category: Photosynthesis
+  gene_name: atpA
   locus_tag: PMM1451
   organism_strain: Prochlorococcus MED4
   product: ATP synthase alpha chain
-- gene_name: atpD
+- gene_category: Photosynthesis
+  gene_name: atpD
   locus_tag: PMM1452
   organism_strain: Prochlorococcus MED4
   product: ATP synthase delta chain
-- gene_name: atpF
+- gene_category: Photosynthesis
+  gene_name: atpF
   locus_tag: PMM1453
   organism_strain: Prochlorococcus MED4
   product: ATP synthase subunit B
-- gene_name: atpG
+- gene_category: Photosynthesis
+  gene_name: atpG
   locus_tag: PMM1454
   organism_strain: Prochlorococcus MED4
   product: ATP synthase B^
-- gene_name: atpH
+- gene_category: Photosynthesis
+  gene_name: atpH
   locus_tag: PMM1455
   organism_strain: Prochlorococcus MED4
   product: ATP synthase C chain
-- gene_name: atpI
+- gene_category: Photosynthesis
+  gene_name: atpI
   locus_tag: PMM1456
   organism_strain: Prochlorococcus MED4
   product: ATP synthase A chain
-- gene_name: atp1
+- gene_category: Photosynthesis
+  gene_name: atp1
   locus_tag: PMM1457
   organism_strain: Prochlorococcus MED4
   product: ATP synthase protein I
-- gene_name: queF
+- gene_category: Coenzyme metabolism
+  gene_name: queF
   locus_tag: PMM1461
   organism_strain: Prochlorococcus MED4
   product: 7-cyano-7-deazaguanine reductase
-- gene_name: glnB
+- gene_category: Stress response and adaptation
+  gene_name: glnB
   locus_tag: PMM1463
   organism_strain: Prochlorococcus MED4
   product: nitrogen regulatory protein P-II
-- gene_name: purB
+- gene_category: Nucleotide metabolism
+  gene_name: purB
   locus_tag: PMM1465
   organism_strain: Prochlorococcus MED4
   product: adenylosuccinate lyase
-- gene_name: ski2
+- gene_category: Replication and repair
+  gene_name: ski2
   locus_tag: PMM1467
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA/RNA helicase, superfamily 1/2
-- gene_name: gidB
+- gene_category: Translation
+  gene_name: gidB
   locus_tag: PMM1475
   organism_strain: Prochlorococcus MED4
   product: 16S rRNA (guanine(527)-N(7))-methyltransferase GidB
-- gene_name: rlmN
+- gene_category: Translation
+  gene_name: rlmN
   locus_tag: PMM1481
   organism_strain: Prochlorococcus MED4
   product: 23S rRNA (adenine2503-C2)-methyltransferase
-- gene_name: rpoC2
+- gene_category: Transcription
+  gene_name: rpoC2
   locus_tag: PMM1483
   organism_strain: Prochlorococcus MED4
   product: DNA-directed RNA polymerase, beta^^ subunit
-- gene_name: rpoC1
+- gene_category: Transcription
+  gene_name: rpoC1
   locus_tag: PMM1484
   organism_strain: Prochlorococcus MED4
   product: DNA-directed RNA polymerase complex, gamma subunit
-- gene_name: rpoB
+- gene_category: Transcription
+  gene_name: rpoB
   locus_tag: PMM1485
   organism_strain: Prochlorococcus MED4
   product: DNA-directed RNA polymerase, beta subunit
-- gene_name: tatD
+- gene_category: Replication and repair
+  gene_name: tatD
   locus_tag: PMM1486
   organism_strain: Prochlorococcus MED4
   product: Mg-dependent DNase
-- gene_name: rpiA
+- gene_category: Carbohydrate metabolism
+  gene_name: rpiA
   locus_tag: PMM1489
   organism_strain: Prochlorococcus MED4
   product: ribose 5-phosphate isomerase A
-- gene_name: nusA
+- gene_category: Transcription
+  gene_name: nusA
   locus_tag: PMM1492
   organism_strain: Prochlorococcus MED4
   product: transcription termination factor NusA
-- gene_name: rne
+- gene_category: Transcription
+  gene_name: rne
   locus_tag: PMM1501
   organism_strain: Prochlorococcus MED4
   product: ribonuclease E
-- gene_name: rnhB
+- gene_category: Transcription
+  gene_name: rnhB
   locus_tag: PMM1502
   organism_strain: Prochlorococcus MED4
   product: ribonuclease HII
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM1515
   organism_strain: Prochlorococcus MED4
   product: site-specific recombinase
-- gene_name: rpsI
+- gene_category: Translation
+  gene_name: rpsI
   locus_tag: PMM1531
   organism_strain: Prochlorococcus MED4
   product: 30S ribosomal protein S9
-- gene_name: truA
+- gene_category: Translation
+  gene_name: truA
   locus_tag: PMM1533
   organism_strain: Prochlorococcus MED4
   product: tRNA pseudouridine(38-40) synthase
-- gene_name: rpoA
+- gene_category: Transcription
+  gene_name: rpoA
   locus_tag: PMM1535
   organism_strain: Prochlorococcus MED4
   product: DNA-directed RNA polymerase, alpha subunit
-- gene_name: adk
+- gene_category: Nucleotide metabolism
+  gene_name: adk
   locus_tag: PMM1539
   organism_strain: Prochlorococcus MED4
   product: adenylate kinase
-- gene_name: recA
+- gene_category: Replication and repair
+  gene_name: recA
   locus_tag: PMM1562
   organism_strain: Prochlorococcus MED4
   product: recombinase A
-- gene_name: dinG
+- gene_category: Replication and repair
+  gene_name: dinG
   locus_tag: PMM1564
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent helicase C-terminal domain-containing protein
-- gene_name: larE
+- gene_category: Unknown
+  gene_name: larE
   locus_tag: PMM1571
   organism_strain: Prochlorococcus MED4
   product: possible pyridinium-3,5-biscarboxylic acid mononucleotide sulfurtransferase
-- gene_name: recF
+- gene_category: Replication and repair
+  gene_name: recF
   locus_tag: PMM1573
   organism_strain: Prochlorococcus MED4
   product: DNA replication and repair protein recF
-- gene_name: rnd
+- gene_category: Transcription
+  gene_name: rnd
   locus_tag: PMM1584
   organism_strain: Prochlorococcus MED4
   product: ribonuclease D
-- gene_name: purM
+- gene_category: Nucleotide metabolism
+  gene_name: purM
   locus_tag: PMM1589
   organism_strain: Prochlorococcus MED4
   product: phosphoribosylformylglycinamidine cyclo-ligase
-- gene_name: panC-cmk
+- gene_category: Nucleotide metabolism
+  gene_name: panC-cmk
   locus_tag: PMM1590
   organism_strain: Prochlorococcus MED4
   product: bifunctional pantoate ligase/cytidylate kinase
-- gene_name: rnc
+- gene_category: Transcription
+  gene_name: rnc
   locus_tag: PMM1603
   organism_strain: Prochlorococcus MED4
   product: ribonuclease III
-- gene_name: rimM
+- gene_category: Transcription
+  gene_name: rimM
   locus_tag: PMM1605
   organism_strain: Prochlorococcus MED4
   product: 16S rRNA processing protein RimM
-- gene_name: glmS
+- gene_category: Amino acid metabolism
+  gene_name: glmS
   locus_tag: PMM1606
   organism_strain: Prochlorococcus MED4
   product: glutamine---fructose-6-phosphate transaminase (isomerizing)
-- gene_name: tktA
+- gene_category: Carbohydrate metabolism
+  gene_name: tktA
   locus_tag: PMM1610
   organism_strain: Prochlorococcus MED4
   product: transketolase
-- gene_name: ruvB
+- gene_category: Replication and repair
+  gene_name: ruvB
   locus_tag: PMM1615
   organism_strain: Prochlorococcus MED4
   product: holliday junction ATP-dependent DNA helicase RuvB
-- gene_name: lysS
+- gene_category: Translation
+  gene_name: lysS
   locus_tag: PMM1618
   organism_strain: Prochlorococcus MED4
   product: lysine--tRNA ligase
-- gene_name: ssb
+- gene_category: Replication and repair
+  gene_name: ssb
   locus_tag: PMM1623
   organism_strain: Prochlorococcus MED4
   product: single-stranded DNA-binding protein
-- gene_name: ahcY
+- gene_category: Carbohydrate metabolism
+  gene_name: ahcY
   locus_tag: PMM1625
   organism_strain: Prochlorococcus MED4
   product: adenosylhomocysteinase
-- gene_name: tsaE
+- gene_category: Translation
+  gene_name: tsaE
   locus_tag: PMM1626
   organism_strain: Prochlorococcus MED4
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaE
-- gene_name: rpoD8
+- gene_category: Stress response and adaptation
+  gene_name: rpoD8
   locus_tag: PMM1629
   organism_strain: Prochlorococcus MED4
   product: RNA polymerase sigma factor, type II
-- gene_name: gyrB
+- gene_category: Replication and repair
+  gene_name: gyrB
   locus_tag: PMM1634
   organism_strain: Prochlorococcus MED4
   product: DNA gyrase, B subunit
-- gene_name: miaA
+- gene_category: Translation
+  gene_name: miaA
   locus_tag: PMM1635
   organism_strain: Prochlorococcus MED4
   product: tRNA delta-2-isopentenylpyrophosphate (IPP) adenosine transferase
-- gene_name: mutS
+- gene_category: Replication and repair
+  gene_name: mutS
   locus_tag: PMM1645
   organism_strain: Prochlorococcus MED4
   product: DNA mismatch repair protein MutS
-- gene_name: holA
+- gene_category: Replication and repair
+  gene_name: holA
   locus_tag: PMM1647
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, delta subunit
-- gene_name: uvrB
+- gene_category: Replication and repair
+  gene_name: uvrB
   locus_tag: PMM1649
   organism_strain: Prochlorococcus MED4
   product: excinuclease UvrABC complex, helicase subunit
-- gene_name: tilS
+- gene_category: Translation
+  gene_name: tilS
   locus_tag: PMM1651
   organism_strain: Prochlorococcus MED4
   product: tRNA(Ile)-lysidine synthetase
-- gene_name: rnjA
+- gene_category: Transcription
+  gene_name: rnjA
   locus_tag: PMM1652
   organism_strain: Prochlorococcus MED4
   product: ribonuclease J
-- gene_name: dnaX
+- gene_category: Replication and repair
+  gene_name: dnaX
   locus_tag: PMM1658
   organism_strain: Prochlorococcus MED4
   product: DNA polymerase III, gamma and tau subunits
-- gene_name: dnaB
+- gene_category: Replication and repair
+  gene_name: dnaB
   locus_tag: PMM1674
   organism_strain: Prochlorococcus MED4
   product: replicative DNA helicase
-- gene_name: gidA
+- gene_category: Translation
+  gene_name: gidA
   locus_tag: PMM1675
   organism_strain: Prochlorococcus MED4
   product: tRNA uridine 5-carboxymethylaminomethyl modification enzyme GidA
-- gene_name: ligA
+- gene_category: Replication and repair
+  gene_name: ligA
   locus_tag: PMM1679
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA ligase
-- gene_name: valS
+- gene_category: Translation
+  gene_name: valS
   locus_tag: PMM1682
   organism_strain: Prochlorococcus MED4
   product: valyl-tRNA synthetase
-- gene_name: mazG
+- gene_category: Unknown
+  gene_name: mazG
   locus_tag: PMM1684
   organism_strain: Prochlorococcus MED4
   product: nucleoside triphosphate pyrophosphohydrolase
-- gene_name: aspS
+- gene_category: Translation
+  gene_name: aspS
   locus_tag: PMM1688
   organism_strain: Prochlorococcus MED4
   product: aspartyl-tRNA synthetase
-- gene_name: pyrG
+- gene_category: Nucleotide metabolism
+  gene_name: pyrG
   locus_tag: PMM1689
   organism_strain: Prochlorococcus MED4
   product: CTP synthase
-- gene_name: queE
+- gene_category: Coenzyme metabolism
+  gene_name: queE
   locus_tag: PMM1690
   organism_strain: Prochlorococcus MED4
   product: 7-carboxy-7-deazaguanine synthase
-- gene_name: queC
+- gene_category: Coenzyme metabolism
+  gene_name: queC
   locus_tag: PMM1691
   organism_strain: Prochlorococcus MED4
   product: 7-cyano-7-deazaguanine synthase
-- gene_name: rpoD4
+- gene_category: Transcription
+  gene_name: rpoD4
   locus_tag: PMM1697
   organism_strain: Prochlorococcus MED4
   product: RNA polymerase sigma factor, type II
-- gene_name: purU
+- gene_category: Nucleotide metabolism
+  gene_name: purU
   locus_tag: PMM1702
   organism_strain: Prochlorococcus MED4
   product: formyltetrahydrofolate deformylase
-- gene_name: uvrA
+- gene_category: Replication and repair
+  gene_name: uvrA
   locus_tag: PMM1712
   organism_strain: Prochlorococcus MED4
   product: excinuclease UvrABC complex, ATPase subunit
-- gene_name: recN
+- gene_category: Stress response and adaptation
+  gene_name: recN
   locus_tag: PMM1713
   organism_strain: Prochlorococcus MED4
   product: ATP-dependent DNA repair protein RecN
-- gene_name: null
+- gene_category: Replication and repair
+  gene_name: null
   locus_tag: PMM1841
   organism_strain: Prochlorococcus MED4
   product: Putative Type III restriction-modification system, R subunit

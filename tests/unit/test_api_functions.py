@@ -706,26 +706,87 @@ class TestSearchOntology:
 # genes_by_ontology
 # ---------------------------------------------------------------------------
 class TestGenesByOntology:
-    def test_returns_list(self, mock_conn):
-        mock_conn.execute_query.return_value = [
+    def _summary_result(self, total_matching=5):
+        """Helper: mock summary query result."""
+        return [{
+            "total_matching": total_matching,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 3},
+                           {"item": "Alteromonas macleodii EZ55", "count": 2}],
+            "by_category": [{"item": "Replication and repair", "count": 4},
+                           {"item": "Unknown", "count": 1}],
+            "by_term": [{"item": "go:0006260", "count": 5}],
+        }]
+
+    def _detail_rows(self):
+        """Helper: mock detail query result rows."""
+        return [
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
-             "product": "p", "organism_strain": "MED4"},
+             "product": "DNA polymerase III", "organism_strain": "Prochlorococcus MED4",
+             "gene_category": "Replication and repair"},
         ]
-        result = api.genes_by_ontology(["GO:0006260"], "go_bp", conn=mock_conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
+
+    def test_returns_dict(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.genes_by_ontology(["go:0006260"], "go_bp", conn=mock_conn)
+        assert isinstance(result, dict)
+        assert "total_matching" in result
+        assert "by_organism" in result
+        assert "by_category" in result
+        assert "by_term" in result
+        assert "returned" in result
+        assert "truncated" in result
+        assert "results" in result
+        assert result["total_matching"] == 5
+        assert result["returned"] == 1
+        assert mock_conn.execute_query.call_count == 2
+
+    def test_summary_sets_limit_zero(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=5),
+        ]
+        result = api.genes_by_ontology(
+            ["go:0006260"], "go_bp", summary=True, conn=mock_conn,
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_passes_params(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.genes_by_ontology(
+            ["go:0006260"], "go_bp", organism="MED4",
+            verbose=True, limit=10, conn=mock_conn,
+        )
+        assert mock_conn.execute_query.call_count == 2
+
+    def test_creates_conn_when_none(self, monkeypatch):
+        mock = MagicMock()
+        mock.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        monkeypatch.setattr("multiomics_explorer.api.functions._default_conn", lambda c: mock)
+        result = api.genes_by_ontology(["go:0006260"], "go_bp")
+        assert isinstance(result, dict)
+
+    def test_empty_term_ids_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="term_ids must not be empty"):
+            api.genes_by_ontology([], "go_bp", conn=mock_conn)
 
     def test_invalid_ontology_raises(self, mock_conn):
         with pytest.raises(ValueError, match="Invalid ontology"):
-            api.genes_by_ontology(["GO:0006260"], "invalid", conn=mock_conn)
+            api.genes_by_ontology(["go:0006260"], "invalid", conn=mock_conn)
 
-    def test_organism_filter_passed(self, mock_conn):
-        mock_conn.execute_query.return_value = []
-        api.genes_by_ontology(
-            ["GO:0006260"], "go_bp", organism="MED4", conn=mock_conn,
-        )
-        _, kwargs = mock_conn.execute_query.call_args
-        assert kwargs["organism"] == "MED4"
+    def test_importable_from_package(self):
+        from multiomics_explorer import genes_by_ontology as fn
+        assert callable(fn)
 
 
 # ---------------------------------------------------------------------------

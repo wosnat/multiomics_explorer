@@ -26,6 +26,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function,
     build_genes_by_function_summary,
     build_genes_by_ontology,
+    build_genes_by_ontology_summary,
     build_get_gene_details,
     build_gene_homologs,
     build_gene_homologs_summary,
@@ -747,21 +748,65 @@ def genes_by_ontology(
     term_ids: list[str],
     ontology: str,
     organism: str | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
+) -> dict:
     """Find genes annotated to ontology terms, with hierarchy expansion.
 
-    Returns list of dicts with keys: locus_tag, gene_name, product,
-    organism_strain.
-
-    Raises ValueError if ontology is invalid (raised by query builder).
+    Returns dict with keys: total_matching, by_organism, by_category,
+    by_term, returned, truncated, results.
+    Per result: locus_tag, gene_name, product, organism_strain,
+    gene_category.
+    Verbose adds: matched_terms, gene_summary, function_description.
     """
+    if not term_ids:
+        raise ValueError("term_ids must not be empty.")
+    if summary:
+        limit = 0
+
     conn = _default_conn(conn)
-    cypher, params = build_genes_by_ontology(
+
+    # Summary query — always runs
+    sum_cypher, sum_params = build_genes_by_ontology_summary(
         ontology=ontology, term_ids=term_ids, organism=organism,
     )
-    return conn.execute_query(cypher, **params)
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_matching": total_matching,
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism"),
+        "by_category": _rename_freq(raw_summary["by_category"], "category"),
+        "by_term": _rename_freq(raw_summary["by_term"], "term_id"),
+    }
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    det_cypher, det_params = build_genes_by_ontology(
+        ontology=ontology, term_ids=term_ids, organism=organism,
+        verbose=verbose, limit=limit,
+    )
+    results = conn.execute_query(det_cypher, **det_params)
+
+    envelope["returned"] = len(results)
+    envelope["truncated"] = total_matching > len(results)
+    envelope["results"] = results
+    return envelope
 
 
 def gene_ontology_terms(

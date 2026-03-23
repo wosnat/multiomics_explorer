@@ -932,10 +932,8 @@ def build_search_ontology(
     return cypher, params
 
 
-def build_genes_by_ontology(
-    *, ontology: str, term_ids: list[str],
-    organism: str | None = None,
-) -> tuple[str, dict]:
+def _genes_by_ontology_cfg(ontology: str) -> dict:
+    """Validate ontology and return ONTOLOGY_CONFIG entry + derived clauses."""
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     cfg = ONTOLOGY_CONFIG[ontology]
@@ -943,10 +941,16 @@ def build_genes_by_ontology(
     gene_rel = cfg["gene_rel"]
     hierarchy_rels = cfg["hierarchy_rels"]
     level_filter = cfg.get("gene_connects_to_level")
+    parent_label = cfg.get("parent_label")
 
     level_clause = (
         f"\nWITH DISTINCT descendant\nWHERE descendant.level = '{level_filter}'"
         if level_filter else "\nWITH DISTINCT descendant"
+    )
+    # Variant that preserves tid for UNWIND-based queries (summary + verbose)
+    level_clause_tid = (
+        f"\nWITH DISTINCT descendant, tid\nWHERE descendant.level = '{level_filter}'"
+        if level_filter else "\nWITH DISTINCT descendant, tid"
     )
 
     if hierarchy_rels:
@@ -955,29 +959,131 @@ def build_genes_by_ontology(
     else:
         expansion = "WITH root AS descendant"
 
-    parent_label = cfg.get("parent_label")
+    # Per-tid root match (for UNWIND-based queries: verbose + summary)
     if parent_label:
-        root_match = (
+        per_tid_root = (
+            f"MATCH (root) WHERE (root:{label} OR root:{parent_label})\n"
+            "  AND root.id = tid"
+        )
+    else:
+        per_tid_root = f"MATCH (root:{label}) WHERE root.id = tid"
+
+    # Batch root match (for compact detail query)
+    if parent_label:
+        batch_root = (
             f"MATCH (root) WHERE (root:{label} OR root:{parent_label})\n"
             f"  AND root.id IN $term_ids"
         )
     else:
-        root_match = f"MATCH (root:{label}) WHERE root.id IN $term_ids"
+        batch_root = f"MATCH (root:{label}) WHERE root.id IN $term_ids"
+
+    return {
+        "gene_rel": gene_rel,
+        "expansion": expansion,
+        "level_clause": level_clause,
+        "level_clause_tid": level_clause_tid,
+        "per_tid_root": per_tid_root,
+        "batch_root": batch_root,
+    }
+
+
+def build_genes_by_ontology_summary(
+    *,
+    ontology: str,
+    term_ids: list[str],
+    organism: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for genes_by_ontology.
+
+    RETURN keys: total_matching, by_organism, by_category, by_term.
+    """
+    c = _genes_by_ontology_cfg(ontology)
 
     cypher = (
-        f"{root_match}\n"
-        f"{expansion}"
-        f"{level_clause}\n"
-        f"MATCH (g:Gene)-[:{gene_rel}]->(descendant)\n"
+        "UNWIND $term_ids AS tid\n"
+        f"{c['per_tid_root']}\n"
+        f"{c['expansion']}"
+        f"{c['level_clause_tid']}\n"
+        f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
         "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
         "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
-        "RETURN DISTINCT g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.product AS product, g.organism_strain AS organism_strain\n"
-        "ORDER BY g.locus_tag"
+        "WITH DISTINCT tid AS root_tid, g.locus_tag AS lt, g.organism_strain AS org,\n"
+        "     coalesce(g.gene_category, 'Unknown') AS cat\n"
+        "WITH collect({lt: lt, org: org, cat: cat, tid: root_tid}) AS rows\n"
+        "WITH rows,\n"
+        "     size(apoc.coll.toSet([r IN rows | r.lt])) AS total_matching,\n"
+        "     apoc.coll.frequencies([r IN rows | r.tid]) AS by_term\n"
+        "WITH total_matching, by_term, rows,\n"
+        "     apoc.coll.toSet([r IN rows | r.lt]) AS unique_lts\n"
+        "UNWIND unique_lts AS lt\n"
+        "WITH total_matching, by_term,\n"
+        "     [r IN rows WHERE r.lt = lt][0] AS rep\n"
+        "WITH total_matching, by_term,\n"
+        "     collect(rep.org) AS orgs, collect(rep.cat) AS cats\n"
+        "RETURN total_matching, by_term,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(cats) AS by_category"
     )
-    return cypher, {
-        "term_ids": term_ids, "organism": organism,
-    }
+    return cypher, {"term_ids": term_ids, "organism": organism}
+
+
+def build_genes_by_ontology(
+    *,
+    ontology: str,
+    term_ids: list[str],
+    organism: str | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build detail Cypher for genes_by_ontology.
+
+    RETURN keys (compact): locus_tag, gene_name, product,
+    organism_strain, gene_category.
+    RETURN keys (verbose): adds matched_terms, gene_summary,
+    function_description.
+    """
+    c = _genes_by_ontology_cfg(ontology)
+
+    params: dict = {"term_ids": term_ids, "organism": organism}
+    limit_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+
+    if verbose:
+        cypher = (
+            "UNWIND $term_ids AS tid\n"
+            f"{c['per_tid_root']}\n"
+            f"{c['expansion']}"
+            f"{c['level_clause_tid']}\n"
+            f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
+            "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
+            "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+            "WITH DISTINCT tid, g\n"
+            "WITH g, collect(DISTINCT tid) AS matched_terms\n"
+            "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+            "       g.product AS product, g.organism_strain AS organism_strain,\n"
+            "       g.gene_category AS gene_category,\n"
+            "       matched_terms,\n"
+            "       g.gene_summary AS gene_summary,\n"
+            "       g.function_description AS function_description\n"
+            "ORDER BY g.organism_strain, g.locus_tag" + limit_clause
+        )
+    else:
+        cypher = (
+            f"{c['batch_root']}\n"
+            f"{c['expansion']}"
+            f"{c['level_clause']}\n"
+            f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
+            "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
+            "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+            "RETURN DISTINCT g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+            "       g.product AS product, g.organism_strain AS organism_strain,\n"
+            "       g.gene_category AS gene_category\n"
+            "ORDER BY g.organism_strain, g.locus_tag" + limit_clause
+        )
+
+    return cypher, params
 
 
 def build_gene_ontology_terms(

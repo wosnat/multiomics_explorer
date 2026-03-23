@@ -45,6 +45,7 @@ Field descriptions, about content):
 | `genes_by_function` | v3 complete (was `search_genes`) |
 | `gene_overview` | v3 complete |
 | `search_ontology` | v3 complete |
+| `genes_by_ontology` | v3 complete |
 
 **Tools in v1 pattern** (sync `def`, JSON string returns, `logger`,
 no Pydantic models):
@@ -54,7 +55,6 @@ no Pydantic models):
 | `get_schema` | v1 (to be renamed `kg_schema`) |
 | `list_filter_values` | v1 |
 | `get_gene_details` | v1 (to be retired) |
-| `genes_by_ontology` | v1 |
 | `gene_ontology_terms` | v1 |
 | `run_cypher` | v1 |
 
@@ -205,7 +205,7 @@ Migrate each to v3 (order flexible). Code review after each tool.
 |---|---|---|
 | `gene_overview` | Batch tool: `locus_tags`, `not_found`, `summary`/`verbose`/`limit`, rich summary fields (by_organism, by_category, by_annotation_type, has_expression/significant/orthologs). Verbose adds gene_summary, function_description, all_identifiers. | ✅ done 2026-03-23 |
 | `search_ontology` | v3 upgrade: summary fields (total_entries, score_max/median), 2-query pattern, async, Pydantic. No verbose (all fields lightweight). No KG changes needed. | ✅ done 2026-03-23 |
-| `genes_by_ontology` | v3 upgrade, rich summary fields | |
+| `genes_by_ontology` | v3 upgrade: summary fields (total_matching, by_organism, by_category, by_term), 2-query pattern, async, Pydantic, Literal ontology. Verbose adds matched_terms, gene_summary, function_description. | ✅ done 2026-03-23 |
 | `gene_ontology_terms` | Batch tool: `locus_tags` list, `not_found` | |
 | `get_schema` → `kg_schema` | Rename + v3 upgrade | |
 | `list_filter_values` | v3 upgrade (simple, small result set) | |

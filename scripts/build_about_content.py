@@ -87,6 +87,11 @@ def _type_string(prop: dict) -> str:
     if "$ref" in prop:
         ref = prop["$ref"]
         return ref.rsplit("/", 1)[-1]
+    # Handle enum (Literal types) — show as the base type
+    if "enum" in prop:
+        t = prop.get("type", "string")
+        vals = ", ".join(f"'{v}'" for v in prop["enum"])
+        return f"{t} ({vals})"
     t = prop.get("type", "any")
     if t == "array":
         items = prop.get("items", {})

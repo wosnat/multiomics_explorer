@@ -15,6 +15,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function,
     build_genes_by_function_summary,
     build_genes_by_ontology,
+    build_genes_by_ontology_summary,
     build_get_gene_details,
     build_list_gene_categories,
     build_list_organisms,
@@ -793,6 +794,80 @@ class TestBuildGenesByOntology:
                 ontology=ontology, term_ids=["test:001"],
             )
             assert "OR root:" not in cypher, f"{ontology} should not have multi-label root"
+
+    def test_verbose_false_no_gene_summary(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], verbose=False,
+        )
+        assert "gene_summary" not in cypher
+        assert "function_description" not in cypher
+        assert "matched_terms" not in cypher
+
+    def test_verbose_true_adds_columns(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], verbose=True,
+        )
+        assert "gene_summary" in cypher
+        assert "function_description" in cypher
+        assert "matched_terms" in cypher
+
+    def test_limit_clause(self):
+        cypher, params = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], limit=10,
+        )
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"],
+        )
+        assert "LIMIT" not in cypher
+
+    def test_order_by_organism_then_locus(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"],
+        )
+        assert "ORDER BY g.organism_strain, g.locus_tag" in cypher
+
+    def test_gene_category_in_compact(self):
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"],
+        )
+        assert "gene_category" in cypher
+
+
+class TestBuildGenesByOntologySummary:
+    def test_returns_summary_keys(self):
+        cypher, _ = build_genes_by_ontology_summary(
+            ontology="go_bp", term_ids=["go:0006260"],
+        )
+        for key in ["total_matching", "by_organism", "by_category", "by_term"]:
+            assert key in cypher
+
+    def test_uses_apoc_frequencies(self):
+        cypher, _ = build_genes_by_ontology_summary(
+            ontology="go_bp", term_ids=["go:0006260"],
+        )
+        assert "apoc.coll.frequencies" in cypher
+
+    def test_organism_filter(self):
+        cypher, params = build_genes_by_ontology_summary(
+            ontology="go_bp", term_ids=["go:0006260"], organism="MED4",
+        )
+        assert params["organism"] == "MED4"
+        assert "toLower($organism)" in cypher
+
+    def test_invalid_ontology_raises_valueerror(self):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_genes_by_ontology_summary(ontology="bad", term_ids=["x"])
+
+    def test_pfam_parent_label(self):
+        cypher, _ = build_genes_by_ontology_summary(
+            ontology="pfam", term_ids=["PF00001"],
+        )
+        assert "Pfam" in cypher
+        assert "PfamClan" in cypher
 
 
 class TestBuildGeneOntologyTerms:

@@ -3,7 +3,7 @@
 import json
 import logging
 import re
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastmcp import Context, FastMCP
 from fastmcp.exceptions import ToolError
@@ -660,48 +660,108 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"search_ontology unexpected error: {e}")
             raise ToolError(f"Error in search_ontology: {e}")
 
-    @mcp.tool()
-    def genes_by_ontology(
+    # --- genes_by_ontology ---
+
+    class GenesByOntologyResult(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
+        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
+        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III, beta subunit')")
+        organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair')")
+        # verbose only
+        matched_terms: list[str] | None = Field(default=None, description="Input term IDs this gene was matched through (e.g. ['go:0006260'])")
+        gene_summary: str | None = Field(default=None, description="Concatenated summary text")
+        function_description: str | None = Field(default=None, description="Curated functional description")
+
+    class OntologyOrganismBreakdown(BaseModel):
+        organism: str = Field(description="Organism strain (e.g. 'Prochlorococcus MED4')")
+        count: int = Field(description="Number of matching genes (e.g. 131)")
+
+    class OntologyCategoryBreakdown(BaseModel):
+        category: str = Field(description="Gene category (e.g. 'Replication and repair')")
+        count: int = Field(description="Number of matching genes (e.g. 321)")
+
+    class OntologyTermBreakdown(BaseModel):
+        term_id: str = Field(description="Input term ID (e.g. 'go:0006260')")
+        count: int = Field(description="Genes annotated to this term or descendants (e.g. 411)")
+
+    class GenesByOntologyResponse(BaseModel):
+        total_matching: int = Field(description="Distinct genes matching (e.g. 1742)")
+        by_organism: list[OntologyOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
+        by_category: list[OntologyCategoryBreakdown] = Field(description="Gene counts per gene_category, sorted desc")
+        by_term: list[OntologyTermBreakdown] = Field(description="Gene counts per input term, sorted desc (can overlap)")
+        returned: int = Field(description="Results in this response (0 when summary=true)")
+        truncated: bool = Field(description="True if total_matching > returned")
+        results: list[GenesByOntologyResult] = Field(
+            default_factory=list, description="One row per distinct gene",
+        )
+
+    @mcp.tool(
+        tags={"genes", "ontology"},
+        annotations={"readOnlyHint": True},
+    )
+    async def genes_by_ontology(
         ctx: Context,
-        term_ids: list[str],
-        ontology: str,
-        organism: str | None = None,
-        limit: int = 25,
-    ) -> str:
+        term_ids: Annotated[list[str], Field(
+            description="Ontology term IDs (from search_ontology). "
+            "E.g. ['go:0006260', 'go:0006412'].",
+        )],
+        ontology: Annotated[Literal[
+            "go_bp", "go_mf", "go_cc", "kegg", "ec",
+            "cog_category", "cyanorak_role", "tigr_role", "pfam",
+        ], Field(
+            description="Ontology the term IDs belong to.",
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter by organism (case-insensitive substring). "
+            "E.g. 'MED4', 'Alteromonas'. "
+            "Use list_organisms to see valid values.",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include matched_terms, gene_summary, function_description.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> GenesByOntologyResponse:
         """Find genes annotated to ontology terms, with hierarchy expansion.
 
-        Takes ontology term IDs (from search_ontology) and finds all genes
-        annotated to those terms or any of their descendant terms in the
-        ontology hierarchy.
+        Takes term IDs from search_ontology and finds all genes annotated to
+        those terms or any descendant terms in the ontology hierarchy.
+        Results are distinct genes (deduplicated across terms).
 
-        Args:
-            term_ids: One or more ontology term IDs (from search_ontology).
-            ontology: Which ontology the IDs belong to. One of:
-                "go_bp" (biological process), "go_mf" (molecular function),
-                "go_cc" (cellular component), "kegg", "ec",
-                "cog_category", "cyanorak_role", "tigr_role", "pfam".
-            organism: Optional organism filter (fuzzy match on strain name).
-            limit: Max gene results (default 25).
+        For term discovery, use search_ontology first.
+        For per-gene ontology details, use gene_ontology_terms.
         """
-        logger.info("genes_by_ontology term_ids=%s ontology=%s organism=%s limit=%d",
-                    term_ids, ontology, organism, limit)
+        await ctx.info(f"genes_by_ontology term_ids={term_ids} ontology={ontology} organism={organism}")
         try:
             conn = _conn(ctx)
-            results = api.genes_by_ontology(term_ids, ontology, organism=organism, conn=conn)
-            results = results[:limit]
-            if not results:
-                return json.dumps({"results": {}, "total": 0})
-            grouped = _group_by_organism(results)
-            return json.dumps(
-                {"results": grouped, "total": len(results)},
-                indent=2, default=str,
+            data = api.genes_by_ontology(
+                term_ids, ontology, organism=organism,
+                summary=summary, verbose=verbose, limit=limit, conn=conn,
+            )
+            by_organism = [OntologyOrganismBreakdown(**b) for b in data["by_organism"]]
+            by_category = [OntologyCategoryBreakdown(**b) for b in data["by_category"]]
+            by_term = [OntologyTermBreakdown(**b) for b in data["by_term"]]
+            results = [GenesByOntologyResult(**r) for r in data["results"]]
+            return GenesByOntologyResponse(
+                total_matching=data["total_matching"],
+                by_organism=by_organism,
+                by_category=by_category,
+                by_term=by_term,
+                returned=data["returned"],
+                truncated=data["truncated"],
+                results=results,
             )
         except ValueError as e:
-            logger.warning("genes_by_ontology error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"genes_by_ontology error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("genes_by_ontology unexpected error: %s", e)
-            return f"Error in genes_by_ontology: {e}"
+            await ctx.error(f"genes_by_ontology unexpected error: {e}")
+            raise ToolError(f"Error in genes_by_ontology: {e}")
 
     @mcp.tool()
     def gene_ontology_terms(

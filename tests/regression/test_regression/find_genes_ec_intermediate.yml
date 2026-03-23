@@ -1,2056 +1,2566 @@
 case_id: find_genes_ec_intermediate
 row_count: 510
 rows:
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: A9601_00271
   organism_strain: Prochlorococcus AS9601
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: tas
+- gene_category: Coenzyme metabolism
+  gene_name: tas
   locus_tag: A9601_00621
   organism_strain: Prochlorococcus AS9601
   product: pyridoxine 4-dehydrogenase
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: A9601_01221
   organism_strain: Prochlorococcus AS9601
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: A9601_04161
   organism_strain: Prochlorococcus AS9601
   product: short chain dehydrogenase family protein
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: A9601_04421
   organism_strain: Prochlorococcus AS9601
   product: ribosome-associated GTPase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: A9601_04701
   organism_strain: Prochlorococcus AS9601
   product: malate:quinone oxidoreductase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: A9601_05091
   organism_strain: Prochlorococcus AS9601
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: null
+- gene_category: Stress response and adaptation
+  gene_name: null
   locus_tag: A9601_05911
   organism_strain: Prochlorococcus AS9601
   product: beta-ketoacyl-(acyl-carrier-protein) reductase protein family
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: A9601_06381
   organism_strain: Prochlorococcus AS9601
   product: short chain dehydrogenase family protein
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: A9601_07571
   organism_strain: Prochlorococcus AS9601
   product: short-chain dehydrogenase/reductase (SDR) superfamily
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: A9601_08321
   organism_strain: Prochlorococcus AS9601
   product: 6-phosphogluconate dehydrogenase
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: A9601_08501
   organism_strain: Prochlorococcus AS9601
   product: 3-isopropylmalate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: A9601_11561
   organism_strain: Prochlorococcus AS9601
   product: homoserine dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: A9601_11671
   organism_strain: Prochlorococcus AS9601
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: A9601_11801
   organism_strain: Prochlorococcus AS9601
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: A9601_11931
   organism_strain: Prochlorococcus AS9601
   product: glycerol dehydrogenase
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: A9601_13171
   organism_strain: Prochlorococcus AS9601
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: A9601_13901
   organism_strain: Prochlorococcus AS9601
   product: UDP-glucose 6-dehydrogenase
-- gene_name: wcaG
+- gene_category: Central intermediary metabolism
+  gene_name: wcaG
   locus_tag: A9601_14001
   organism_strain: Prochlorococcus AS9601
   product: GDP-L-fucose synthase
-- gene_name: bplA
+- gene_category: Transport
+  gene_name: bplA
   locus_tag: A9601_14101
   organism_strain: Prochlorococcus AS9601
   product: Predicted oxidoreductase
-- gene_name: lhgO
+- gene_category: Energy production
+  gene_name: lhgO
   locus_tag: A9601_14181
   organism_strain: Prochlorococcus AS9601
   product: FAD/NAD-binding oxidoreductase
-- gene_name: null
+- gene_category: Cell wall and membrane
+  gene_name: null
   locus_tag: A9601_14191
   organism_strain: Prochlorococcus AS9601
   product: polysaccharide biosynthesis family protein
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: A9601_14221
   organism_strain: Prochlorococcus AS9601
   product: NAD dependent epimerase/dehydratase family protein
-- gene_name: null
+- gene_category: Cell wall and membrane
+  gene_name: null
   locus_tag: A9601_14431
   organism_strain: Prochlorococcus AS9601
   product: polysaccharide biosynthesis family protein
-- gene_name: adhC
+- gene_category: Regulatory functions
+  gene_name: adhC
   locus_tag: A9601_14521
   organism_strain: Prochlorococcus AS9601
   product: alcohol dehydrogenase protein superfamily, zinc-type
-- gene_name: wcaG
+- gene_category: Carbohydrate metabolism
+  gene_name: wcaG
   locus_tag: A9601_14581
   organism_strain: Prochlorococcus AS9601
   product: NAD dependent epimerase/dehydratase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: A9601_14641
   organism_strain: Prochlorococcus AS9601
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: A9601_15021
   organism_strain: Prochlorococcus AS9601
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: A9601_15141
   organism_strain: Prochlorococcus AS9601
   product: ketol-acid reductoisomerase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: A9601_15551
   organism_strain: Prochlorococcus AS9601
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: A9601_16211
   organism_strain: Prochlorococcus AS9601
   product: putative lysine decarboxylase family protein
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: A9601_16921
   organism_strain: Prochlorococcus AS9601
   product: histidinol dehydrogenase
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: A9601_18051
   organism_strain: Prochlorococcus AS9601
   product: isocitrate dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: A9601_19151
   organism_strain: Prochlorococcus AS9601
   product: shikimate 5-dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: ACZ81_00145
   organism_strain: Alteromonas macleodii HOT1A3
   product: shikimate dehydrogenase
-- gene_name: tdh
+- gene_category: Energy production
+  gene_name: tdh
   locus_tag: ACZ81_00315
   organism_strain: Alteromonas macleodii HOT1A3
   product: L-threonine 3-dehydrogenase
-- gene_name: glpD
+- gene_category: Energy production
+  gene_name: glpD
   locus_tag: ACZ81_01030
   organism_strain: Alteromonas macleodii HOT1A3
   product: glycerol-3-phosphate dehydrogenase
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: ACZ81_01595
   organism_strain: Alteromonas macleodii HOT1A3
   product: gluconate 2-dehydrogenase subunit 3 family protein
-- gene_name: eutG
+- gene_category: Energy production
+  gene_name: eutG
   locus_tag: ACZ81_01605
   organism_strain: Alteromonas macleodii HOT1A3
   product: iron-containing alcohol dehydrogenase
-- gene_name: maeA
+- gene_category: Energy production
+  gene_name: maeA
   locus_tag: ACZ81_02005
   organism_strain: Alteromonas macleodii HOT1A3
   product: NAD-dependent malic enzyme
-- gene_name: gpsA
+- gene_category: Lipid metabolism
+  gene_name: gpsA
   locus_tag: ACZ81_02145
   organism_strain: Alteromonas macleodii HOT1A3
   product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: ACZ81_02345
   organism_strain: Alteromonas macleodii HOT1A3
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: fadB
+- gene_category: Lipid metabolism
+  gene_name: fadB
   locus_tag: ACZ81_02660
   organism_strain: Alteromonas macleodii HOT1A3
   product: fatty acid oxidation complex subunit alpha FadB
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: ACZ81_02780
   organism_strain: Alteromonas macleodii HOT1A3
   product: zinc-dependent alcohol dehydrogenase family protein
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: ACZ81_03220
   organism_strain: Alteromonas macleodii HOT1A3
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: yliI
+- gene_category: Carbohydrate metabolism
+  gene_name: yliI
   locus_tag: ACZ81_03430
   organism_strain: Alteromonas macleodii HOT1A3
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: ACZ81_03505
   organism_strain: Alteromonas macleodii HOT1A3
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: ACZ81_03585
   organism_strain: Alteromonas macleodii HOT1A3
   product: hydroxymethylglutaryl-CoA reductase
-- gene_name: leuB
+- gene_category: Energy production
+  gene_name: leuB
   locus_tag: ACZ81_04565
   organism_strain: Alteromonas macleodii HOT1A3
   product: 3-isopropylmalate dehydrogenase
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: ACZ81_04745
   organism_strain: Alteromonas macleodii HOT1A3
   product: isocitrate dehydrogenase
-- gene_name: ispC
+- gene_category: Lipid metabolism
+  gene_name: ispC
   locus_tag: ACZ81_04865
   organism_strain: Alteromonas macleodii HOT1A3
   product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
-- gene_name: dkgB
+- gene_category: Unknown
+  gene_name: dkgB
   locus_tag: ACZ81_05660
   organism_strain: Alteromonas macleodii HOT1A3
   product: 2,5-didehydrogluconate reductase DkgB
-- gene_name: pedE
+- gene_category: Carbohydrate metabolism
+  gene_name: pedE
   locus_tag: ACZ81_05725
   organism_strain: Alteromonas macleodii HOT1A3
   product: methanol/ethanol family PQQ-dependent dehydrogenase
-- gene_name: panE
+- gene_category: Coenzyme metabolism
+  gene_name: panE
   locus_tag: ACZ81_05815
   organism_strain: Alteromonas macleodii HOT1A3
   product: ketopantoate reductase family protein
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: ACZ81_05950
   organism_strain: Alteromonas macleodii HOT1A3
   product: SDR family oxidoreductase
-- gene_name: fadJ
+- gene_category: Lipid metabolism
+  gene_name: fadJ
   locus_tag: ACZ81_06160
   organism_strain: Alteromonas macleodii HOT1A3
   product: fatty acid oxidation complex subunit alpha FadJ
-- gene_name: null
+- gene_category: Coenzyme metabolism
+  gene_name: null
   locus_tag: ACZ81_06505
   organism_strain: Alteromonas macleodii HOT1A3
   product: 2-dehydropantoate 2-reductase
-- gene_name: dkgB
+- gene_category: Unknown
+  gene_name: dkgB
   locus_tag: ACZ81_06945
   organism_strain: Alteromonas macleodii HOT1A3
   product: 2,5-didehydrogluconate reductase DkgB
-- gene_name: bdhA
+- gene_category: Lipid metabolism
+  gene_name: bdhA
   locus_tag: ACZ81_07005
   organism_strain: Alteromonas macleodii HOT1A3
   product: 3-hydroxybutyrate dehydrogenase
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: ACZ81_07220
   organism_strain: Alteromonas macleodii HOT1A3
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: ahr
+- gene_category: Unknown
+  gene_name: ahr
   locus_tag: ACZ81_07295
   organism_strain: Alteromonas macleodii HOT1A3
   product: NADPH-dependent aldehyde reductase Ahr
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: ACZ81_08565
   organism_strain: Alteromonas macleodii HOT1A3
   product: 3-oxoacyl-ACP reductase FabG
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: ACZ81_08640
   organism_strain: Alteromonas macleodii HOT1A3
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: fadN
+- gene_category: Lipid metabolism
+  gene_name: fadN
   locus_tag: ACZ81_08650
   organism_strain: Alteromonas macleodii HOT1A3
   product: 3-hydroxyacyl-CoA dehydrogenase NAD-binding domain-containing protein
-- gene_name: mtlD
+- gene_category: Carbohydrate metabolism
+  gene_name: mtlD
   locus_tag: ACZ81_08695
   organism_strain: Alteromonas macleodii HOT1A3
   product: mannitol dehydrogenase family protein
-- gene_name: icd
+- gene_category: Energy production
+  gene_name: icd
   locus_tag: ACZ81_09190
   organism_strain: Alteromonas macleodii HOT1A3
   product: NADP-dependent isocitrate dehydrogenase
-- gene_name: ldhA
+- gene_category: Energy production
+  gene_name: ldhA
   locus_tag: ACZ81_09925
   organism_strain: Alteromonas macleodii HOT1A3
   product: 2-hydroxyacid dehydrogenase
-- gene_name: garR
+- gene_category: Lipid metabolism
+  gene_name: garR
   locus_tag: ACZ81_09935
   organism_strain: Alteromonas macleodii HOT1A3
   product: NAD(P)-dependent oxidoreductase
-- gene_name: SO2179
+- gene_category: Coenzyme metabolism
+  gene_name: SO2179
   locus_tag: ACZ81_09975
   organism_strain: Alteromonas macleodii HOT1A3
   product: 6-carboxytetrahydropterin synthase
-- gene_name: lvr
+- gene_category: Lipid metabolism
+  gene_name: lvr
   locus_tag: ACZ81_11085
   organism_strain: Alteromonas macleodii HOT1A3
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: gndA
+- gene_category: Carbohydrate metabolism
+  gene_name: gndA
   locus_tag: ACZ81_11695
   organism_strain: Alteromonas macleodii HOT1A3
   product: NADP-dependent phosphogluconate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: ACZ81_11745
   organism_strain: Alteromonas macleodii HOT1A3
   product: glucose-6-phosphate dehydrogenase
-- gene_name: kduD
+- gene_category: Lipid metabolism
+  gene_name: kduD
   locus_tag: ACZ81_11835
   organism_strain: Alteromonas macleodii HOT1A3
   product: 2-dehydro-3-deoxy-D-gluconate 5-dehydrogenase KduD
-- gene_name: uxuB
+- gene_category: Carbohydrate metabolism
+  gene_name: uxuB
   locus_tag: ACZ81_11875
   organism_strain: Alteromonas macleodii HOT1A3
   product: mannitol dehydrogenase family protein
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: ACZ81_12190
   organism_strain: Alteromonas macleodii HOT1A3
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: pdxB
+- gene_category: Coenzyme metabolism
+  gene_name: pdxB
   locus_tag: ACZ81_12300
   organism_strain: Alteromonas macleodii HOT1A3
   product: 4-phosphoerythronate dehydrogenase
-- gene_name: betA
+- gene_category: Amino acid metabolism
+  gene_name: betA
   locus_tag: ACZ81_12490
   organism_strain: Alteromonas macleodii HOT1A3
   product: GMC family oxidoreductase
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: ACZ81_12700
   organism_strain: Alteromonas macleodii HOT1A3
   product: histidinol dehydrogenase
-- gene_name: dld
+- gene_category: Energy production
+  gene_name: dld
   locus_tag: ACZ81_12885
   organism_strain: Alteromonas macleodii HOT1A3
   product: D-lactate dehydrogenase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: ACZ81_13030
   organism_strain: Alteromonas macleodii HOT1A3
   product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
     reductase RibD
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: ACZ81_13420
   organism_strain: Alteromonas macleodii HOT1A3
   product: IMP dehydrogenase
-- gene_name: betA
+- gene_category: Amino acid metabolism
+  gene_name: betA
   locus_tag: ACZ81_14050
   organism_strain: Alteromonas macleodii HOT1A3
   product: choline dehydrogenase
-- gene_name: yliI
+- gene_category: Carbohydrate metabolism
+  gene_name: yliI
   locus_tag: ACZ81_14415
   organism_strain: Alteromonas macleodii HOT1A3
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: ACZ81_14590
   organism_strain: Alteromonas macleodii HOT1A3
   product: phosphoglycerate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: ACZ81_15060
   organism_strain: Alteromonas macleodii HOT1A3
   product: bifunctional aspartate kinase/homoserine dehydrogenase I
-- gene_name: frmA
+- gene_category: Energy production
+  gene_name: frmA
   locus_tag: ACZ81_15070
   organism_strain: Alteromonas macleodii HOT1A3
   product: S-(hydroxymethyl)glutathione dehydrogenase/class III alcohol dehydrogenase
-- gene_name: ghrA
+- gene_category: Amino acid metabolism
+  gene_name: ghrA
   locus_tag: ACZ81_15445
   organism_strain: Alteromonas macleodii HOT1A3
   product: D-2-hydroxyacid dehydrogenase
-- gene_name: gfo
+- gene_category: Unknown
+  gene_name: gfo
   locus_tag: ACZ81_15745
   organism_strain: Alteromonas macleodii HOT1A3
   product: Gfo/Idh/MocA family protein
-- gene_name: pedH
+- gene_category: Carbohydrate metabolism
+  gene_name: pedH
   locus_tag: ACZ81_15890
   organism_strain: Alteromonas macleodii HOT1A3
   product: PQQ-dependent methanol/ethanol family dehydrogenase
-- gene_name: mmsB
+- gene_category: Lipid metabolism
+  gene_name: mmsB
   locus_tag: ACZ81_16015
   organism_strain: Alteromonas macleodii HOT1A3
   product: 3-hydroxyisobutyrate dehydrogenase
-- gene_name: lldD
+- gene_category: Energy production
+  gene_name: lldD
   locus_tag: ACZ81_16050
   organism_strain: Alteromonas macleodii HOT1A3
   product: FMN-dependent L-lactate dehydrogenase LldD
-- gene_name: dld
+- gene_category: Energy production
+  gene_name: dld
   locus_tag: ACZ81_16055
   organism_strain: Alteromonas macleodii HOT1A3
   product: D-lactate dehydrogenase
-- gene_name: rutE
+- gene_category: Energy production
+  gene_name: rutE
   locus_tag: ACZ81_16585
   organism_strain: Alteromonas macleodii HOT1A3
   product: malonic semialdehyde reductase
-- gene_name: mdh
+- gene_category: Energy production
+  gene_name: mdh
   locus_tag: ACZ81_16725
   organism_strain: Alteromonas macleodii HOT1A3
   product: malate dehydrogenase
-- gene_name: tas
+- gene_category: Energy production
+  gene_name: tas
   locus_tag: ACZ81_16860
   organism_strain: Alteromonas macleodii HOT1A3
   product: aldo/keto reductase
-- gene_name: ugd
+- gene_category: Cell wall and membrane
+  gene_name: ugd
   locus_tag: ACZ81_17030
   organism_strain: Alteromonas macleodii HOT1A3
   product: nucleotide sugar dehydrogenase
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: ACZ81_17040
   organism_strain: Alteromonas macleodii HOT1A3
   product: dTDP-4-dehydrorhamnose reductase
-- gene_name: fcl
+- gene_category: Carbohydrate metabolism
+  gene_name: fcl
   locus_tag: ACZ81_17080
   organism_strain: Alteromonas macleodii HOT1A3
   product: GDP-L-fucose synthase
-- gene_name: maeB
+- gene_category: Energy production
+  gene_name: maeB
   locus_tag: ACZ81_17700
   organism_strain: Alteromonas macleodii HOT1A3
   product: malic enzyme-like NAD(P)-binding protein
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: ACZ81_17970
   organism_strain: Alteromonas macleodii HOT1A3
   product: alpha-hydroxy acid oxidase
-- gene_name: ytbE
+- gene_category: Unknown
+  gene_name: ytbE
   locus_tag: ACZ81_18510
   organism_strain: Alteromonas macleodii HOT1A3
   product: aldo/keto reductase
-- gene_name: ydgJ
+- gene_category: Unknown
+  gene_name: ydgJ
   locus_tag: ACZ81_18850
   organism_strain: Alteromonas macleodii HOT1A3
   product: Gfo/Idh/MocA family oxidoreductase
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: ACZ81_19615
   organism_strain: Alteromonas macleodii HOT1A3
   product: ketol-acid reductoisomerase
-- gene_name: hprA
+- gene_category: Energy production
+  gene_name: hprA
   locus_tag: ACZ81_19660
   organism_strain: Alteromonas macleodii HOT1A3
   product: D-2-hydroxyacid dehydrogenase
-- gene_name: dxr
+- gene_category: Lipid metabolism
+  gene_name: dxr
   locus_tag: BSR22_00290
   organism_strain: Prochlorococcus RSP50
   product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
-- gene_name: ugd
+- gene_category: Cell wall and membrane
+  gene_name: ugd
   locus_tag: BSR22_00640
   organism_strain: Prochlorococcus RSP50
   product: nucleotide sugar dehydrogenase
-- gene_name: fcl
+- gene_category: Carbohydrate metabolism
+  gene_name: fcl
   locus_tag: BSR22_00650
   organism_strain: Prochlorococcus RSP50
   product: GDP-L-fucose synthase family protein
-- gene_name: null
+- gene_category: Translation
+  gene_name: null
   locus_tag: BSR22_00770
   organism_strain: Prochlorococcus RSP50
   product: nucleoside-diphosphate-sugar pyrophosphorylase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: BSR22_00815
   organism_strain: Prochlorococcus RSP50
   product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
     reductase RibD
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: BSR22_01070
   organism_strain: Prochlorococcus RSP50
   product: ketol-acid reductoisomerase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: BSR22_01275
   organism_strain: Prochlorococcus RSP50
   product: phosphoglycerate dehydrogenase
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: BSR22_01895
   organism_strain: Prochlorococcus RSP50
   product: histidinol dehydrogenase
-- gene_name: icd
+- gene_category: Energy production
+  gene_name: icd
   locus_tag: BSR22_02440
   organism_strain: Prochlorococcus RSP50
   product: NADP-dependent isocitrate dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: BSR22_03005
   organism_strain: Prochlorococcus RSP50
   product: shikimate dehydrogenase
-- gene_name: pdxA
+- gene_category: Energy production
+  gene_name: pdxA
   locus_tag: BSR22_03205
   organism_strain: Prochlorococcus RSP50
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: tas
+- gene_category: Energy production
+  gene_name: tas
   locus_tag: BSR22_03325
   organism_strain: Prochlorococcus RSP50
   product: aldo/keto reductase
-- gene_name: ribG
+- gene_category: Coenzyme metabolism
+  gene_name: ribG
   locus_tag: BSR22_03605
   organism_strain: Prochlorococcus RSP50
   product: dihydrofolate reductase family protein
-- gene_name: der
+- gene_category: Unknown
+  gene_name: der
   locus_tag: BSR22_05035
   organism_strain: Prochlorococcus RSP50
   product: ribosome biogenesis GTPase Der
-- gene_name: mqo
+- gene_category: Energy production
+  gene_name: mqo
   locus_tag: BSR22_05175
   organism_strain: Prochlorococcus RSP50
   product: malate:quinone oxidoreductase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: BSR22_05365
   organism_strain: Prochlorococcus RSP50
   product: 3-oxoacyl-[acyl-carrier-protein] reductase
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: BSR22_05785
   organism_strain: Prochlorococcus RSP50
   product: SDR family oxidoreductase
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: BSR22_06025
   organism_strain: Prochlorococcus RSP50
   product: NAD-dependent epimerase/dehydratase family protein
-- gene_name: gndA
+- gene_category: Coenzyme metabolism
+  gene_name: gndA
   locus_tag: BSR22_07140
   organism_strain: Prochlorococcus RSP50
   product: NADP-dependent phosphogluconate dehydrogenase
-- gene_name: leuB
+- gene_category: Energy production
+  gene_name: leuB
   locus_tag: BSR22_07220
   organism_strain: Prochlorococcus RSP50
   product: 3-isopropylmalate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: BSR22_08660
   organism_strain: Prochlorococcus RSP50
   product: homoserine dehydrogenase
-- gene_name: guaB
+- gene_category: Energy production
+  gene_name: guaB
   locus_tag: BSR22_08715
   organism_strain: Prochlorococcus RSP50
   product: GuaB3 family IMP dehydrogenase-related protein
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: BSR22_08775
   organism_strain: Prochlorococcus RSP50
   product: glucose-6-phosphate dehydrogenase
-- gene_name: gldA
+- gene_category: Energy production
+  gene_name: gldA
   locus_tag: BSR22_08845
   organism_strain: Prochlorococcus RSP50
   product: iron-containing alcohol dehydrogenase
-- gene_name: glpD
+- gene_category: Energy production
+  gene_name: glpD
   locus_tag: BSR22_09065
   organism_strain: Prochlorococcus RSP50
   product: glycerol-3-phosphate dehydrogenase/oxidase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: EZ55_00050
   organism_strain: Alteromonas macleodii EZ55
   product: shikimate dehydrogenase
-- gene_name: tdh
+- gene_category: Energy production
+  gene_name: tdh
   locus_tag: EZ55_00089
   organism_strain: Alteromonas macleodii EZ55
   product: L-threonine 3-dehydrogenase
-- gene_name: glpD
+- gene_category: Energy production
+  gene_name: glpD
   locus_tag: EZ55_00215
   organism_strain: Alteromonas macleodii EZ55
   product: glycerol-3-phosphate dehydrogenase
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: EZ55_00343
   organism_strain: Alteromonas macleodii EZ55
   product: gluconate 2-dehydrogenase subunit 3 family protein
-- gene_name: eutG
+- gene_category: Energy production
+  gene_name: eutG
   locus_tag: EZ55_00345
   organism_strain: Alteromonas macleodii EZ55
   product: iron-containing alcohol dehydrogenase
-- gene_name: maeA
+- gene_category: Energy production
+  gene_name: maeA
   locus_tag: EZ55_00429
   organism_strain: Alteromonas macleodii EZ55
   product: NAD-dependent malic enzyme
-- gene_name: gpsA
+- gene_category: Lipid metabolism
+  gene_name: gpsA
   locus_tag: EZ55_00463
   organism_strain: Alteromonas macleodii EZ55
   product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: EZ55_00507
   organism_strain: Alteromonas macleodii EZ55
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: fadB
+- gene_category: Lipid metabolism
+  gene_name: fadB
   locus_tag: EZ55_00586
   organism_strain: Alteromonas macleodii EZ55
   product: fatty acid oxidation complex subunit alpha FadB
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: EZ55_00701
   organism_strain: Alteromonas macleodii EZ55
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: yliI
+- gene_category: Carbohydrate metabolism
+  gene_name: yliI
   locus_tag: EZ55_00745
   organism_strain: Alteromonas macleodii EZ55
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: EZ55_00760
   organism_strain: Alteromonas macleodii EZ55
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: EZ55_00774
   organism_strain: Alteromonas macleodii EZ55
   product: hydroxymethylglutaryl-CoA reductase
-- gene_name: leuB
+- gene_category: Energy production
+  gene_name: leuB
   locus_tag: EZ55_00955
   organism_strain: Alteromonas macleodii EZ55
   product: 3-isopropylmalate dehydrogenase
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: EZ55_00990
   organism_strain: Alteromonas macleodii EZ55
   product: isocitrate dehydrogenase
-- gene_name: ispC
+- gene_category: Lipid metabolism
+  gene_name: ispC
   locus_tag: EZ55_01018
   organism_strain: Alteromonas macleodii EZ55
   product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
-- gene_name: pedE
+- gene_category: Carbohydrate metabolism
+  gene_name: pedE
   locus_tag: EZ55_01186
   organism_strain: Alteromonas macleodii EZ55
   product: methanol/ethanol family PQQ-dependent dehydrogenase
-- gene_name: panE
+- gene_category: Coenzyme metabolism
+  gene_name: panE
   locus_tag: EZ55_01204
   organism_strain: Alteromonas macleodii EZ55
   product: ketopantoate reductase family protein
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: EZ55_01235
   organism_strain: Alteromonas macleodii EZ55
   product: SDR family oxidoreductase
-- gene_name: fadJ
+- gene_category: Lipid metabolism
+  gene_name: fadJ
   locus_tag: EZ55_01279
   organism_strain: Alteromonas macleodii EZ55
   product: fatty acid oxidation complex subunit alpha FadJ
-- gene_name: null
+- gene_category: Coenzyme metabolism
+  gene_name: null
   locus_tag: EZ55_01354
   organism_strain: Alteromonas macleodii EZ55
   product: 2-dehydropantoate 2-reductase
-- gene_name: dkgB
+- gene_category: Unknown
+  gene_name: dkgB
   locus_tag: EZ55_01457
   organism_strain: Alteromonas macleodii EZ55
   product: 2,5-didehydrogluconate reductase DkgB
-- gene_name: bdhA
+- gene_category: Lipid metabolism
+  gene_name: bdhA
   locus_tag: EZ55_01469
   organism_strain: Alteromonas macleodii EZ55
   product: 3-hydroxybutyrate dehydrogenase
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: EZ55_01517
   organism_strain: Alteromonas macleodii EZ55
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: ahr
+- gene_category: Unknown
+  gene_name: ahr
   locus_tag: EZ55_01532
   organism_strain: Alteromonas macleodii EZ55
   product: NADPH-dependent aldehyde reductase Ahr
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: EZ55_01755
   organism_strain: Alteromonas macleodii EZ55
   product: 3-oxoacyl-ACP reductase FabG
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: EZ55_01770
   organism_strain: Alteromonas macleodii EZ55
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: fadN
+- gene_category: Lipid metabolism
+  gene_name: fadN
   locus_tag: EZ55_01772
   organism_strain: Alteromonas macleodii EZ55
   product: 3-hydroxyacyl-CoA dehydrogenase NAD-binding domain-containing protein
-- gene_name: mtlD
+- gene_category: Carbohydrate metabolism
+  gene_name: mtlD
   locus_tag: EZ55_01781
   organism_strain: Alteromonas macleodii EZ55
   product: mannitol dehydrogenase family protein
-- gene_name: ydiJ
+- gene_category: Energy production
+  gene_name: ydiJ
   locus_tag: EZ55_01786
   organism_strain: Alteromonas macleodii EZ55
   product: D-2-hydroxyglutarate dehydrogenase YdiJ
-- gene_name: icd
+- gene_category: Energy production
+  gene_name: icd
   locus_tag: EZ55_01878
   organism_strain: Alteromonas macleodii EZ55
   product: NADP-dependent isocitrate dehydrogenase
-- gene_name: ldhA
+- gene_category: Energy production
+  gene_name: ldhA
   locus_tag: EZ55_02027
   organism_strain: Alteromonas macleodii EZ55
   product: 2-hydroxyacid dehydrogenase
-- gene_name: garR
+- gene_category: Lipid metabolism
+  gene_name: garR
   locus_tag: EZ55_02029
   organism_strain: Alteromonas macleodii EZ55
   product: NAD(P)-dependent oxidoreductase
-- gene_name: SO2179
+- gene_category: Coenzyme metabolism
+  gene_name: SO2179
   locus_tag: EZ55_02037
   organism_strain: Alteromonas macleodii EZ55
   product: 6-carboxytetrahydropterin synthase
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: EZ55_02056
   organism_strain: Alteromonas macleodii EZ55
   product: zinc-dependent alcohol dehydrogenase family protein
-- gene_name: lvr
+- gene_category: Lipid metabolism
+  gene_name: lvr
   locus_tag: EZ55_02279
   organism_strain: Alteromonas macleodii EZ55
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: gndA
+- gene_category: Carbohydrate metabolism
+  gene_name: gndA
   locus_tag: EZ55_02400
   organism_strain: Alteromonas macleodii EZ55
   product: NADP-dependent phosphogluconate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: EZ55_02410
   organism_strain: Alteromonas macleodii EZ55
   product: glucose-6-phosphate dehydrogenase
-- gene_name: kduD
+- gene_category: Lipid metabolism
+  gene_name: kduD
   locus_tag: EZ55_02428
   organism_strain: Alteromonas macleodii EZ55
   product: 2-dehydro-3-deoxy-D-gluconate 5-dehydrogenase KduD
-- gene_name: uxuB
+- gene_category: Carbohydrate metabolism
+  gene_name: uxuB
   locus_tag: EZ55_02436
   organism_strain: Alteromonas macleodii EZ55
   product: mannitol dehydrogenase family protein
-- gene_name: yqhD
+- gene_category: Energy production
+  gene_name: yqhD
   locus_tag: EZ55_02455
   organism_strain: Alteromonas macleodii EZ55
   product: iron-containing alcohol dehydrogenase
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: EZ55_02499
   organism_strain: Alteromonas macleodii EZ55
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: pdxB
+- gene_category: Coenzyme metabolism
+  gene_name: pdxB
   locus_tag: EZ55_02521
   organism_strain: Alteromonas macleodii EZ55
   product: 4-phosphoerythronate dehydrogenase
-- gene_name: betA
+- gene_category: Amino acid metabolism
+  gene_name: betA
   locus_tag: EZ55_02560
   organism_strain: Alteromonas macleodii EZ55
   product: GMC family oxidoreductase
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: EZ55_02604
   organism_strain: Alteromonas macleodii EZ55
   product: histidinol dehydrogenase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: EZ55_02674
   organism_strain: Alteromonas macleodii EZ55
   product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
     reductase RibD
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: EZ55_02752
   organism_strain: Alteromonas macleodii EZ55
   product: IMP dehydrogenase
-- gene_name: betA
+- gene_category: Amino acid metabolism
+  gene_name: betA
   locus_tag: EZ55_02877
   organism_strain: Alteromonas macleodii EZ55
   product: choline dehydrogenase
-- gene_name: yliI
+- gene_category: Carbohydrate metabolism
+  gene_name: yliI
   locus_tag: EZ55_02960
   organism_strain: Alteromonas macleodii EZ55
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: EZ55_03003
   organism_strain: Alteromonas macleodii EZ55
   product: phosphoglycerate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: EZ55_03118
   organism_strain: Alteromonas macleodii EZ55
   product: bifunctional aspartate kinase/homoserine dehydrogenase I
-- gene_name: frmA
+- gene_category: Energy production
+  gene_name: frmA
   locus_tag: EZ55_03120
   organism_strain: Alteromonas macleodii EZ55
   product: S-(hydroxymethyl)glutathione dehydrogenase/class III alcohol dehydrogenase
-- gene_name: ghrA
+- gene_category: Amino acid metabolism
+  gene_name: ghrA
   locus_tag: EZ55_03199
   organism_strain: Alteromonas macleodii EZ55
   product: D-2-hydroxyacid dehydrogenase
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: EZ55_03273
   organism_strain: Alteromonas macleodii EZ55
   product: 3-hydroxyacyl-CoA dehydrogenase NAD-binding domain-containing protein
-- gene_name: gfo
+- gene_category: Unknown
+  gene_name: gfo
   locus_tag: EZ55_03286
   organism_strain: Alteromonas macleodii EZ55
   product: Gfo/Idh/MocA family protein
-- gene_name: pedH
+- gene_category: Carbohydrate metabolism
+  gene_name: pedH
   locus_tag: EZ55_03315
   organism_strain: Alteromonas macleodii EZ55
   product: PQQ-dependent methanol/ethanol family dehydrogenase
-- gene_name: mmsB
+- gene_category: Lipid metabolism
+  gene_name: mmsB
   locus_tag: EZ55_03340
   organism_strain: Alteromonas macleodii EZ55
   product: 3-hydroxyisobutyrate dehydrogenase
-- gene_name: lldD
+- gene_category: Energy production
+  gene_name: lldD
   locus_tag: EZ55_03347
   organism_strain: Alteromonas macleodii EZ55
   product: FMN-dependent L-lactate dehydrogenase LldD
-- gene_name: dld
+- gene_category: Energy production
+  gene_name: dld
   locus_tag: EZ55_03348
   organism_strain: Alteromonas macleodii EZ55
   product: D-lactate dehydrogenase
-- gene_name: rutE
+- gene_category: Energy production
+  gene_name: rutE
   locus_tag: EZ55_03455
   organism_strain: Alteromonas macleodii EZ55
   product: malonic semialdehyde reductase
-- gene_name: mdh
+- gene_category: Energy production
+  gene_name: mdh
   locus_tag: EZ55_03483
   organism_strain: Alteromonas macleodii EZ55
   product: malate dehydrogenase
-- gene_name: tas
+- gene_category: Energy production
+  gene_name: tas
   locus_tag: EZ55_03510
   organism_strain: Alteromonas macleodii EZ55
   product: aldo/keto reductase
-- gene_name: ugd
+- gene_category: Cell wall and membrane
+  gene_name: ugd
   locus_tag: EZ55_03549
   organism_strain: Alteromonas macleodii EZ55
   product: nucleotide sugar dehydrogenase
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: EZ55_03552
   organism_strain: Alteromonas macleodii EZ55
   product: dTDP-4-dehydrorhamnose reductase
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: EZ55_03643
   organism_strain: Alteromonas macleodii EZ55
   product: hydroxymethylglutaryl-CoA reductase
-- gene_name: maeB
+- gene_category: Energy production
+  gene_name: maeB
   locus_tag: EZ55_03660
   organism_strain: Alteromonas macleodii EZ55
   product: malic enzyme-like NAD(P)-binding protein
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: EZ55_03715
   organism_strain: Alteromonas macleodii EZ55
   product: alpha-hydroxy acid oxidase
-- gene_name: ytbE
+- gene_category: Unknown
+  gene_name: ytbE
   locus_tag: EZ55_03822
   organism_strain: Alteromonas macleodii EZ55
   product: aldo/keto reductase
-- gene_name: ydgJ
+- gene_category: Unknown
+  gene_name: ydgJ
   locus_tag: EZ55_03894
   organism_strain: Alteromonas macleodii EZ55
   product: Gfo/Idh/MocA family oxidoreductase
-- gene_name: yhdN
+- gene_category: Energy production
+  gene_name: yhdN
   locus_tag: EZ55_04021
   organism_strain: Alteromonas macleodii EZ55
   product: aldo/keto reductase
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: EZ55_04065
   organism_strain: Alteromonas macleodii EZ55
   product: ketol-acid reductoisomerase
-- gene_name: hprA
+- gene_category: Energy production
+  gene_name: hprA
   locus_tag: EZ55_04074
   organism_strain: Alteromonas macleodii EZ55
   product: D-2-hydroxyacid dehydrogenase
-- gene_name: areB
+- gene_category: Energy production
+  gene_name: areB
   locus_tag: EZ55_04286
   organism_strain: Alteromonas macleodii EZ55
   product: NAD(P)-dependent alcohol dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: MIT1002_00029
   organism_strain: Alteromonas macleodii MIT1002
   product: shikimate dehydrogenase
-- gene_name: tdh
+- gene_category: Energy production
+  gene_name: tdh
   locus_tag: MIT1002_00064
   organism_strain: Alteromonas macleodii MIT1002
   product: L-threonine 3-dehydrogenase
-- gene_name: glpD
+- gene_category: Energy production
+  gene_name: glpD
   locus_tag: MIT1002_00200
   organism_strain: Alteromonas macleodii MIT1002
   product: glycerol-3-phosphate dehydrogenase
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: MIT1002_00369
   organism_strain: Alteromonas macleodii MIT1002
   product: gluconate 2-dehydrogenase subunit 3 family protein
-- gene_name: eutG
+- gene_category: Energy production
+  gene_name: eutG
   locus_tag: MIT1002_00371
   organism_strain: Alteromonas macleodii MIT1002
   product: iron-containing alcohol dehydrogenase
-- gene_name: maeA
+- gene_category: Energy production
+  gene_name: maeA
   locus_tag: MIT1002_00455
   organism_strain: Alteromonas macleodii MIT1002
   product: NAD-dependent malic enzyme
-- gene_name: gpsA
+- gene_category: Lipid metabolism
+  gene_name: gpsA
   locus_tag: MIT1002_00485
   organism_strain: Alteromonas macleodii MIT1002
   product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: MIT1002_00526
   organism_strain: Alteromonas macleodii MIT1002
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: fadB
+- gene_category: Lipid metabolism
+  gene_name: fadB
   locus_tag: MIT1002_00575
   organism_strain: Alteromonas macleodii MIT1002
   product: fatty acid oxidation complex subunit alpha FadB
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: MIT1002_00636
   organism_strain: Alteromonas macleodii MIT1002
   product: zinc-dependent alcohol dehydrogenase family protein
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: MIT1002_00723
   organism_strain: Alteromonas macleodii MIT1002
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: yliI
+- gene_category: Carbohydrate metabolism
+  gene_name: yliI
   locus_tag: MIT1002_00767
   organism_strain: Alteromonas macleodii MIT1002
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: MIT1002_00782
   organism_strain: Alteromonas macleodii MIT1002
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: MIT1002_00796
   organism_strain: Alteromonas macleodii MIT1002
   product: hydroxymethylglutaryl-CoA reductase
-- gene_name: leuB
+- gene_category: Energy production
+  gene_name: leuB
   locus_tag: MIT1002_00948
   organism_strain: Alteromonas macleodii MIT1002
   product: 3-isopropylmalate dehydrogenase
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: MIT1002_00983
   organism_strain: Alteromonas macleodii MIT1002
   product: isocitrate dehydrogenase
-- gene_name: ispC
+- gene_category: Lipid metabolism
+  gene_name: ispC
   locus_tag: MIT1002_01010
   organism_strain: Alteromonas macleodii MIT1002
   product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
-- gene_name: pedE
+- gene_category: Carbohydrate metabolism
+  gene_name: pedE
   locus_tag: MIT1002_01197
   organism_strain: Alteromonas macleodii MIT1002
   product: methanol/ethanol family PQQ-dependent dehydrogenase
-- gene_name: panE
+- gene_category: Coenzyme metabolism
+  gene_name: panE
   locus_tag: MIT1002_01217
   organism_strain: Alteromonas macleodii MIT1002
   product: ketopantoate reductase family protein
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: MIT1002_01246
   organism_strain: Alteromonas macleodii MIT1002
   product: SDR family oxidoreductase
-- gene_name: fadJ
+- gene_category: Lipid metabolism
+  gene_name: fadJ
   locus_tag: MIT1002_01287
   organism_strain: Alteromonas macleodii MIT1002
   product: fatty acid oxidation complex subunit alpha FadJ
-- gene_name: null
+- gene_category: Coenzyme metabolism
+  gene_name: null
   locus_tag: MIT1002_01348
   organism_strain: Alteromonas macleodii MIT1002
   product: 2-dehydropantoate 2-reductase
-- gene_name: dkgB
+- gene_category: Unknown
+  gene_name: dkgB
   locus_tag: MIT1002_01436
   organism_strain: Alteromonas macleodii MIT1002
   product: 2,5-didehydrogluconate reductase DkgB
-- gene_name: bdhA
+- gene_category: Lipid metabolism
+  gene_name: bdhA
   locus_tag: MIT1002_01448
   organism_strain: Alteromonas macleodii MIT1002
   product: 3-hydroxybutyrate dehydrogenase
-- gene_name: ahr
+- gene_category: Unknown
+  gene_name: ahr
   locus_tag: MIT1002_01507
   organism_strain: Alteromonas macleodii MIT1002
   product: NADPH-dependent aldehyde reductase Ahr
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: MIT1002_01733
   organism_strain: Alteromonas macleodii MIT1002
   product: 3-oxoacyl-ACP reductase FabG
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: MIT1002_01748
   organism_strain: Alteromonas macleodii MIT1002
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: fadN
+- gene_category: Lipid metabolism
+  gene_name: fadN
   locus_tag: MIT1002_01750
   organism_strain: Alteromonas macleodii MIT1002
   product: 3-hydroxyacyl-CoA dehydrogenase NAD-binding domain-containing protein
-- gene_name: icd
+- gene_category: Energy production
+  gene_name: icd
   locus_tag: MIT1002_01830
   organism_strain: Alteromonas macleodii MIT1002
   product: NADP-dependent isocitrate dehydrogenase
-- gene_name: ldhA
+- gene_category: Energy production
+  gene_name: ldhA
   locus_tag: MIT1002_01974
   organism_strain: Alteromonas macleodii MIT1002
   product: 2-hydroxyacid dehydrogenase
-- gene_name: garR
+- gene_category: Lipid metabolism
+  gene_name: garR
   locus_tag: MIT1002_01976
   organism_strain: Alteromonas macleodii MIT1002
   product: NAD(P)-dependent oxidoreductase
-- gene_name: SO2179
+- gene_category: Coenzyme metabolism
+  gene_name: SO2179
   locus_tag: MIT1002_01984
   organism_strain: Alteromonas macleodii MIT1002
   product: 6-carboxytetrahydropterin synthase
-- gene_name: lvr
+- gene_category: Lipid metabolism
+  gene_name: lvr
   locus_tag: MIT1002_02275
   organism_strain: Alteromonas macleodii MIT1002
   product: SDR family NAD(P)-dependent oxidoreductase
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: MIT1002_02335
   organism_strain: Alteromonas macleodii MIT1002
   product: zinc-dependent alcohol dehydrogenase family protein
-- gene_name: gndA
+- gene_category: Carbohydrate metabolism
+  gene_name: gndA
   locus_tag: MIT1002_02397
   organism_strain: Alteromonas macleodii MIT1002
   product: NADP-dependent phosphogluconate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: MIT1002_02407
   organism_strain: Alteromonas macleodii MIT1002
   product: glucose-6-phosphate dehydrogenase
-- gene_name: kduD
+- gene_category: Lipid metabolism
+  gene_name: kduD
   locus_tag: MIT1002_02424
   organism_strain: Alteromonas macleodii MIT1002
   product: 2-dehydro-3-deoxy-D-gluconate 5-dehydrogenase KduD
-- gene_name: uxuB
+- gene_category: Carbohydrate metabolism
+  gene_name: uxuB
   locus_tag: MIT1002_02432
   organism_strain: Alteromonas macleodii MIT1002
   product: mannitol dehydrogenase family protein
-- gene_name: yqhD
+- gene_category: Energy production
+  gene_name: yqhD
   locus_tag: MIT1002_02460
   organism_strain: Alteromonas macleodii MIT1002
   product: iron-containing alcohol dehydrogenase
-- gene_name: pdxB
+- gene_category: Coenzyme metabolism
+  gene_name: pdxB
   locus_tag: MIT1002_02532
   organism_strain: Alteromonas macleodii MIT1002
   product: 4-phosphoerythronate dehydrogenase
-- gene_name: betA
+- gene_category: Amino acid metabolism
+  gene_name: betA
   locus_tag: MIT1002_02569
   organism_strain: Alteromonas macleodii MIT1002
   product: GMC family oxidoreductase
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: MIT1002_02633
   organism_strain: Alteromonas macleodii MIT1002
   product: histidinol dehydrogenase
-- gene_name: dld
+- gene_category: Energy production
+  gene_name: dld
   locus_tag: MIT1002_02672
   organism_strain: Alteromonas macleodii MIT1002
   product: D-lactate dehydrogenase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: MIT1002_02700
   organism_strain: Alteromonas macleodii MIT1002
   product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
     reductase RibD
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: MIT1002_02779
   organism_strain: Alteromonas macleodii MIT1002
   product: IMP dehydrogenase
-- gene_name: betA
+- gene_category: Amino acid metabolism
+  gene_name: betA
   locus_tag: MIT1002_02909
   organism_strain: Alteromonas macleodii MIT1002
   product: choline dehydrogenase
-- gene_name: yliI
+- gene_category: Carbohydrate metabolism
+  gene_name: yliI
   locus_tag: MIT1002_02966
   organism_strain: Alteromonas macleodii MIT1002
   product: PQQ-dependent sugar dehydrogenase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: MIT1002_02993
   organism_strain: Alteromonas macleodii MIT1002
   product: phosphoglycerate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: MIT1002_03086
   organism_strain: Alteromonas macleodii MIT1002
   product: bifunctional aspartate kinase/homoserine dehydrogenase I
-- gene_name: frmA
+- gene_category: Energy production
+  gene_name: frmA
   locus_tag: MIT1002_03089
   organism_strain: Alteromonas macleodii MIT1002
   product: S-(hydroxymethyl)glutathione dehydrogenase/class III alcohol dehydrogenase
-- gene_name: ghrA
+- gene_category: Amino acid metabolism
+  gene_name: ghrA
   locus_tag: MIT1002_03160
   organism_strain: Alteromonas macleodii MIT1002
   product: D-2-hydroxyacid dehydrogenase
-- gene_name: gfo
+- gene_category: Unknown
+  gene_name: gfo
   locus_tag: MIT1002_03250
   organism_strain: Alteromonas macleodii MIT1002
   product: Gfo/Idh/MocA family protein
-- gene_name: pedH
+- gene_category: Carbohydrate metabolism
+  gene_name: pedH
   locus_tag: MIT1002_03279
   organism_strain: Alteromonas macleodii MIT1002
   product: PQQ-dependent methanol/ethanol family dehydrogenase
-- gene_name: lldD
+- gene_category: Energy production
+  gene_name: lldD
   locus_tag: MIT1002_03297
   organism_strain: Alteromonas macleodii MIT1002
   product: alpha-hydroxy acid oxidase
-- gene_name: kduD
+- gene_category: Lipid metabolism
+  gene_name: kduD
   locus_tag: MIT1002_03304
   organism_strain: Alteromonas macleodii MIT1002
   product: 2-dehydro-3-deoxy-D-gluconate 5-dehydrogenase KduD
-- gene_name: mmsB
+- gene_category: Lipid metabolism
+  gene_name: mmsB
   locus_tag: MIT1002_03327
   organism_strain: Alteromonas macleodii MIT1002
   product: 3-hydroxyisobutyrate dehydrogenase
-- gene_name: lldD
+- gene_category: Energy production
+  gene_name: lldD
   locus_tag: MIT1002_03330
   organism_strain: Alteromonas macleodii MIT1002
   product: FMN-dependent L-lactate dehydrogenase LldD
-- gene_name: dld
+- gene_category: Energy production
+  gene_name: dld
   locus_tag: MIT1002_03331
   organism_strain: Alteromonas macleodii MIT1002
   product: D-lactate dehydrogenase
-- gene_name: rutE
+- gene_category: Energy production
+  gene_name: rutE
   locus_tag: MIT1002_03464
   organism_strain: Alteromonas macleodii MIT1002
   product: malonic semialdehyde reductase
-- gene_name: mdh
+- gene_category: Energy production
+  gene_name: mdh
   locus_tag: MIT1002_03492
   organism_strain: Alteromonas macleodii MIT1002
   product: malate dehydrogenase
-- gene_name: tas
+- gene_category: Energy production
+  gene_name: tas
   locus_tag: MIT1002_03519
   organism_strain: Alteromonas macleodii MIT1002
   product: aldo/keto reductase
-- gene_name: ugd
+- gene_category: Cell wall and membrane
+  gene_name: ugd
   locus_tag: MIT1002_03556
   organism_strain: Alteromonas macleodii MIT1002
   product: nucleotide sugar dehydrogenase
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: MIT1002_03558
   organism_strain: Alteromonas macleodii MIT1002
   product: dTDP-4-dehydrorhamnose reductase
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: MIT1002_03651
   organism_strain: Alteromonas macleodii MIT1002
   product: hydroxymethylglutaryl-CoA reductase
-- gene_name: maeB
+- gene_category: Energy production
+  gene_name: maeB
   locus_tag: MIT1002_03668
   organism_strain: Alteromonas macleodii MIT1002
   product: malic enzyme-like NAD(P)-binding protein
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: MIT1002_03723
   organism_strain: Alteromonas macleodii MIT1002
   product: alpha-hydroxy acid oxidase
-- gene_name: ytbE
+- gene_category: Unknown
+  gene_name: ytbE
   locus_tag: MIT1002_03829
   organism_strain: Alteromonas macleodii MIT1002
   product: aldo/keto reductase
-- gene_name: ydgJ
+- gene_category: Unknown
+  gene_name: ydgJ
   locus_tag: MIT1002_03898
   organism_strain: Alteromonas macleodii MIT1002
   product: Gfo/Idh/MocA family oxidoreductase
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: MIT1002_04045
   organism_strain: Alteromonas macleodii MIT1002
   product: ketol-acid reductoisomerase
-- gene_name: hprA
+- gene_category: Energy production
+  gene_name: hprA
   locus_tag: MIT1002_04054
   organism_strain: Alteromonas macleodii MIT1002
   product: D-2-hydroxyacid dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: NATL1_00271
   organism_strain: Prochlorococcus NATL1A
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: NATL1_01071
   organism_strain: Prochlorococcus NATL1A
   product: short-chain dehydrogenase/reductase (SDR) superfamily
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: NATL1_01771
   organism_strain: Prochlorococcus NATL1A
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: NATL1_04431
   organism_strain: Prochlorococcus NATL1A
   product: ribosome-associated GTPase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: NATL1_04721
   organism_strain: Prochlorococcus NATL1A
   product: malate:quinone oxidoreductase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: NATL1_05081
   organism_strain: Prochlorococcus NATL1A
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: null
+- gene_category: Stress response and adaptation
+  gene_name: null
   locus_tag: NATL1_05911
   organism_strain: Prochlorococcus NATL1A
   product: beta-ketoacyl-(acyl-carrier-protein) reductase protein family
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: NATL1_06381
   organism_strain: Prochlorococcus NATL1A
   product: short chain dehydrogenase family protein
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: NATL1_06831
   organism_strain: Prochlorococcus NATL1A
   product: UDP-glucose 6-dehydrogenase
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: NATL1_08081
   organism_strain: Prochlorococcus NATL1A
   product: 6-phosphogluconate dehydrogenase
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: NATL1_08261
   organism_strain: Prochlorococcus NATL1A
   product: 3-isopropylmalate dehydrogenase
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: NATL1_08561
   organism_strain: Prochlorococcus NATL1A
   product: dTDP-4-dehydrorhamnose reductase
-- gene_name: wecC
+- gene_category: Carbohydrate metabolism
+  gene_name: wecC
   locus_tag: NATL1_08641
   organism_strain: Prochlorococcus NATL1A
   product: nucleotide sugar dehydrogenase family protein
-- gene_name: mmsB
+- gene_category: Lipid metabolism
+  gene_name: mmsB
   locus_tag: NATL1_08981
   organism_strain: Prochlorococcus NATL1A
   product: NAD binding domain of 6-phosphogluconate dehydrogenase family protein
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: NATL1_11771
   organism_strain: Prochlorococcus NATL1A
   product: putative lysine decarboxylase family protein
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: NATL1_14931
   organism_strain: Prochlorococcus NATL1A
   product: glycerol dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: NATL1_15091
   organism_strain: Prochlorococcus NATL1A
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: NATL1_15241
   organism_strain: Prochlorococcus NATL1A
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: NATL1_15361
   organism_strain: Prochlorococcus NATL1A
   product: homoserine dehydrogenase
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: NATL1_15911
   organism_strain: Prochlorococcus NATL1A
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: NATL1_16841
   organism_strain: Prochlorococcus NATL1A
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: NATL1_17231
   organism_strain: Prochlorococcus NATL1A
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: NATL1_17361
   organism_strain: Prochlorococcus NATL1A
   product: ketol-acid reductoisomerase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: NATL1_17821
   organism_strain: Prochlorococcus NATL1A
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: NATL1_18891
   organism_strain: Prochlorococcus NATL1A
   product: histidinol dehydrogenase
-- gene_name: tas
+- gene_category: Coenzyme metabolism
+  gene_name: tas
   locus_tag: NATL1_20371
   organism_strain: Prochlorococcus NATL1A
   product: pyridoxine 4-dehydrogenase
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: NATL1_20451
   organism_strain: Prochlorococcus NATL1A
   product: isocitrate dehydrogenase
-- gene_name: lldD
+- gene_category: Amino acid metabolism
+  gene_name: lldD
   locus_tag: NATL1_20471
   organism_strain: Prochlorococcus NATL1A
   product: FMN-dependent L-lactate dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: NATL1_21871
   organism_strain: Prochlorococcus NATL1A
   product: shikimate 5-dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: P9301_00271
   organism_strain: Prochlorococcus MIT9301
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: tas
+- gene_category: Coenzyme metabolism
+  gene_name: tas
   locus_tag: P9301_00601
   organism_strain: Prochlorococcus MIT9301
   product: pyridoxine 4-dehydrogenase
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: P9301_01211
   organism_strain: Prochlorococcus MIT9301
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: P9301_04111
   organism_strain: Prochlorococcus MIT9301
   product: ribosome-associated GTPase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: P9301_04391
   organism_strain: Prochlorococcus MIT9301
   product: malate:quinone oxidoreductase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: P9301_04781
   organism_strain: Prochlorococcus MIT9301
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: null
+- gene_category: Stress response and adaptation
+  gene_name: null
   locus_tag: P9301_05611
   organism_strain: Prochlorococcus MIT9301
   product: beta-ketoacyl-(acyl-carrier-protein) reductase protein family
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: P9301_06081
   organism_strain: Prochlorococcus MIT9301
   product: short chain dehydrogenase family protein
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: P9301_07551
   organism_strain: Prochlorococcus MIT9301
   product: short-chain dehydrogenase/reductase (SDR) superfamily
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: P9301_08301
   organism_strain: Prochlorococcus MIT9301
   product: 6-phosphogluconate dehydrogenase
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: P9301_08471
   organism_strain: Prochlorococcus MIT9301
   product: 3-isopropylmalate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: P9301_11571
   organism_strain: Prochlorococcus MIT9301
   product: homoserine dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: P9301_11681
   organism_strain: Prochlorococcus MIT9301
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: P9301_11811
   organism_strain: Prochlorococcus MIT9301
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: P9301_11941
   organism_strain: Prochlorococcus MIT9301
   product: glycerol dehydrogenase
-- gene_name: ptxD
+- gene_category: Stress response and adaptation
+  gene_name: ptxD
   locus_tag: P9301_12531
   organism_strain: Prochlorococcus MIT9301
   product: phosphonate dehydrogenase
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: P9301_13311
   organism_strain: Prochlorococcus MIT9301
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: P9301_13981
   organism_strain: Prochlorococcus MIT9301
   product: UDP-glucose 6-dehydrogenase
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: P9301_14261
   organism_strain: Prochlorococcus MIT9301
   product: NAD dependent epimerase/dehydratase family protein
-- gene_name: wcaG
+- gene_category: Central intermediary metabolism
+  gene_name: wcaG
   locus_tag: P9301_14451
   organism_strain: Prochlorococcus MIT9301
   product: GDP-L-fucose synthase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: P9301_14501
   organism_strain: Prochlorococcus MIT9301
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: P9301_14891
   organism_strain: Prochlorococcus MIT9301
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: P9301_15011
   organism_strain: Prochlorococcus MIT9301
   product: ketol-acid reductoisomerase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: P9301_15401
   organism_strain: Prochlorococcus MIT9301
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: P9301_16791
   organism_strain: Prochlorococcus MIT9301
   product: histidinol dehydrogenase
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: P9301_17881
   organism_strain: Prochlorococcus MIT9301
   product: isocitrate dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: P9301_18961
   organism_strain: Prochlorococcus MIT9301
   product: shikimate 5-dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: PMM0028
   organism_strain: Prochlorococcus MED4
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: tas
+- gene_category: Coenzyme metabolism
+  gene_name: tas
   locus_tag: PMM0052
   organism_strain: Prochlorococcus MED4
   product: pyridoxine 4-dehydrogenase
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: PMM0105
   organism_strain: Prochlorococcus MED4
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: PMM0391
   organism_strain: Prochlorococcus MED4
   product: ribosome-associated GTPase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: PMM0419
   organism_strain: Prochlorococcus MED4
   product: malate:quinone oxidoreductase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: PMM0453
   organism_strain: Prochlorococcus MED4
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: null
+- gene_category: Stress response and adaptation
+  gene_name: null
   locus_tag: PMM0535
   organism_strain: Prochlorococcus MED4
   product: beta-ketoacyl-(acyl-carrier-protein) reductase protein family
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: PMM0582
   organism_strain: Prochlorococcus MED4
   product: short chain dehydrogenase family protein
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: PMM0770
   organism_strain: Prochlorococcus MED4
   product: 6-phosphogluconate dehydrogenase
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: PMM0786
   organism_strain: Prochlorococcus MED4
   product: 3-isopropylmalate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: PMM1051
   organism_strain: Prochlorococcus MED4
   product: homoserine dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: PMM1062
   organism_strain: Prochlorococcus MED4
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: PMM1074
   organism_strain: Prochlorococcus MED4
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: PMM1087
   organism_strain: Prochlorococcus MED4
   product: glycerol dehydrogenase
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: PMM1142
   organism_strain: Prochlorococcus MED4
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: PMM1202
   organism_strain: Prochlorococcus MED4
   product: NAD dependent epimerase/dehydratase family protein
-- gene_name: wcaG
+- gene_category: Central intermediary metabolism
+  gene_name: wcaG
   locus_tag: PMM1207
   organism_strain: Prochlorococcus MED4
   product: GDP-L-fucose synthase
-- gene_name: lhgO
+- gene_category: Energy production
+  gene_name: lhgO
   locus_tag: PMM1215
   organism_strain: Prochlorococcus MED4
   product: FAD/NAD-binding oxidoreductase
-- gene_name: null
+- gene_category: Cell wall and membrane
+  gene_name: null
   locus_tag: PMM1219
   organism_strain: Prochlorococcus MED4
   product: polysaccharide biosynthesis family protein
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: PMM1233
   organism_strain: Prochlorococcus MED4
   product: dTDP-4-dehydrorhamnose reductase protein family
-- gene_name: frmA
+- gene_category: Regulatory functions
+  gene_name: frmA
   locus_tag: PMM1234
   organism_strain: Prochlorococcus MED4
   product: alcohol dehydrogenase protein superfamily, zinc-type
-- gene_name: rfbB
+- gene_category: Cell wall and membrane
+  gene_name: rfbB
   locus_tag: PMM1257
   organism_strain: Prochlorococcus MED4
   product: possible dTDP-glucose 4,6-dehydratase
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: PMM1261
   organism_strain: Prochlorococcus MED4
   product: UDP-glucose 6-dehydrogenase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: PMM1265
   organism_strain: Prochlorococcus MED4
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: PMM1303
   organism_strain: Prochlorococcus MED4
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: PMM1315
   organism_strain: Prochlorococcus MED4
   product: ketol-acid reductoisomerase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: PMM1354
   organism_strain: Prochlorococcus MED4
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: PMM1377
   organism_strain: Prochlorococcus MED4
   product: NADP-binding domain-containing protein
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: PMM1488
   organism_strain: Prochlorococcus MED4
   product: histidinol dehydrogenase
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: PMM1596
   organism_strain: Prochlorococcus MED4
   product: isocitrate dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: PMM1705
   organism_strain: Prochlorococcus MED4
   product: shikimate 5-dehydrogenase
-- gene_name: PMN2A_RS03030
+- gene_category: Carbohydrate metabolism
+  gene_name: PMN2A_RS03030
   locus_tag: PMN2A_0018
   organism_strain: Prochlorococcus NATL2A
   product: short chain dehydrogenase family protein
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: PMN2A_0062
   organism_strain: Prochlorococcus NATL2A
   product: UDP-glucose 6-dehydrogenase
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: PMN2A_0176
   organism_strain: Prochlorococcus NATL2A
   product: 6-phosphogluconate dehydrogenase
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: PMN2A_0194
   organism_strain: Prochlorococcus NATL2A
   product: 3-isopropylmalate dehydrogenase
-- gene_name: PMN2A_RS04095
+- gene_category: Lipid metabolism
+  gene_name: PMN2A_RS04095
   locus_tag: PMN2A_0231
   organism_strain: Prochlorococcus NATL2A
   product: NAD binding domain of 6-phosphogluconate dehydrogenase family protein
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: PMN2A_0661
   organism_strain: Prochlorococcus NATL2A
   product: glycerol dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: PMN2A_0676
   organism_strain: Prochlorococcus NATL2A
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: PMN2A_0690
   organism_strain: Prochlorococcus NATL2A
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: PMN2A_0702
   organism_strain: Prochlorococcus NATL2A
   product: homoserine dehydrogenase
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: PMN2A_0751
   organism_strain: Prochlorococcus NATL2A
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: PMN2A_0831
   organism_strain: Prochlorococcus NATL2A
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: PMN2A_0869
   organism_strain: Prochlorococcus NATL2A
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: PMN2A_0881
   organism_strain: Prochlorococcus NATL2A
   product: ketol-acid reductoisomerase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: PMN2A_0926
   organism_strain: Prochlorococcus NATL2A
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: PMN2A_1019
   organism_strain: Prochlorococcus NATL2A
   product: histidinol dehydrogenase
-- gene_name: PMN2A_RS09075
+- gene_category: Coenzyme metabolism
+  gene_name: PMN2A_RS09075
   locus_tag: PMN2A_1162
   organism_strain: Prochlorococcus NATL2A
   product: pyridoxine 4-dehydrogenase
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: PMN2A_1170
   organism_strain: Prochlorococcus NATL2A
   product: isocitrate dehydrogenase
-- gene_name: lldD
+- gene_category: Amino acid metabolism
+  gene_name: lldD
   locus_tag: PMN2A_1172
   organism_strain: Prochlorococcus NATL2A
   product: FMN-dependent L-lactate dehydrogenase
-- gene_name: PMN2A_RS09445
+- gene_category: Cell wall and membrane
+  gene_name: PMN2A_RS09445
   locus_tag: PMN2A_1234
   organism_strain: Prochlorococcus NATL2A
   product: hypothetical protein
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: PMN2A_1239
   organism_strain: Prochlorococcus NATL2A
   product: dTDP-4-dehydrorhamnose reductase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: PMN2A_1314
   organism_strain: Prochlorococcus NATL2A
   product: shikimate 5-dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: PMN2A_1355
   organism_strain: Prochlorococcus NATL2A
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: PMN2A_1474
   organism_strain: Prochlorococcus NATL2A
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: PMN2A_1726
   organism_strain: Prochlorococcus NATL2A
   product: ribosome-associated GTPase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: PMN2A_1753
   organism_strain: Prochlorococcus NATL2A
   product: malate:quinone oxidoreductase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: PMN2A_1785
   organism_strain: Prochlorococcus NATL2A
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: PMN2A_RS02795
+- gene_category: Stress response and adaptation
+  gene_name: PMN2A_RS02795
   locus_tag: PMN2A_1866
   organism_strain: Prochlorococcus NATL2A
   product: beta-ketoacyl-(acyl-carrier-protein) reductase protein family
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: PMT0033
   organism_strain: Prochlorococcus MIT9313
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: PMT0114
   organism_strain: Prochlorococcus MIT9313
   product: dTDP-4-dehydrorhamnose reductase
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: PMT0165
   organism_strain: Prochlorococcus MIT9313
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: PMT0203
   organism_strain: Prochlorococcus MIT9313
   product: ribosome-associated GTPase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: PMT0255
   organism_strain: Prochlorococcus MIT9313
   product: malate:quinone oxidoreductase
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: PMT0313
   organism_strain: Prochlorococcus MIT9313
   product: ketol-acid reductoisomerase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: PMT0327
   organism_strain: Prochlorococcus MIT9313
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: PMT0375
   organism_strain: Prochlorococcus MIT9313
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: PMT0446
   organism_strain: Prochlorococcus MIT9313
   product: short chain dehydrogenase family protein
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: PMT0531
   organism_strain: Prochlorococcus MIT9313
   product: 3-isopropylmalate dehydrogenase
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: PMT0565
   organism_strain: Prochlorococcus MIT9313
   product: 6-phosphogluconate dehydrogenase
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: PMT1062
   organism_strain: Prochlorococcus MIT9313
   product: glycerol dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: PMT1102
   organism_strain: Prochlorococcus MIT9313
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: PMT1126
   organism_strain: Prochlorococcus MIT9313
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: PMT1143
   organism_strain: Prochlorococcus MIT9313
   product: homoserine dehydrogenase
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: PMT1161
   organism_strain: Prochlorococcus MIT9313
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: glcD1
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD1
   locus_tag: PMT1295
   organism_strain: Prochlorococcus MIT9313
   product: glycolate oxidase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: PMT1333
   organism_strain: Prochlorococcus MIT9313
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: PMT1431
   organism_strain: Prochlorococcus MIT9313
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: PMT1510
   organism_strain: Prochlorococcus MIT9313
   product: histidinol dehydrogenase
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: PMT1904
   organism_strain: Prochlorococcus MIT9313
   product: UDP-glucose 6-dehydrogenase
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: PMT1935
   organism_strain: Prochlorococcus MIT9313
   product: isocitrate dehydrogenase
-- gene_name: glcE
+- gene_category: Carbohydrate metabolism
+  gene_name: glcE
   locus_tag: PMT1939
   organism_strain: Prochlorococcus MIT9313
   product: glycolate oxidase subunit GlcE
-- gene_name: null
+- gene_category: Cellular processes
+  gene_name: null
   locus_tag: PMT2035
   organism_strain: Prochlorococcus MIT9313
   product: putative decaprenylphosphoryl-beta-D-ribose oxidase
-- gene_name: mmsB
+- gene_category: Lipid metabolism
+  gene_name: mmsB
   locus_tag: PMT2105
   organism_strain: Prochlorococcus MIT9313
   product: NAD binding domain of 6-phosphogluconate dehydrogenase family protein
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: PMT2257
   organism_strain: Prochlorococcus MIT9313
   product: shikimate 5-dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: PMT9312_0028
   organism_strain: Prochlorococcus MIT9312
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: tas
+- gene_category: Coenzyme metabolism
+  gene_name: tas
   locus_tag: PMT9312_0053
   organism_strain: Prochlorococcus MIT9312
   product: pyridoxine 4-dehydrogenase
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: PMT9312_0109
   organism_strain: Prochlorococcus MIT9312
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: PMT9312_0387
   organism_strain: Prochlorococcus MIT9312
   product: ribosome-associated GTPase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: PMT9312_0415
   organism_strain: Prochlorococcus MIT9312
   product: malate:quinone oxidoreductase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: PMT9312_0453
   organism_strain: Prochlorococcus MIT9312
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: null
+- gene_category: Stress response and adaptation
+  gene_name: null
   locus_tag: PMT9312_0535
   organism_strain: Prochlorococcus MIT9312
   product: beta-ketoacyl-(acyl-carrier-protein) reductase protein family
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: PMT9312_0582
   organism_strain: Prochlorococcus MIT9312
   product: short chain dehydrogenase family protein
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: PMT9312_0778
   organism_strain: Prochlorococcus MIT9312
   product: 6-phosphogluconate dehydrogenase
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: PMT9312_0794
   organism_strain: Prochlorococcus MIT9312
   product: 3-isopropylmalate dehydrogenase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: PMT9312_1062
   organism_strain: Prochlorococcus MIT9312
   product: homoserine dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: PMT9312_1073
   organism_strain: Prochlorococcus MIT9312
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: PMT9312_1085
   organism_strain: Prochlorococcus MIT9312
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: PMT9312_1098
   organism_strain: Prochlorococcus MIT9312
   product: glycerol dehydrogenase
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: PMT9312_1238
   organism_strain: Prochlorococcus MIT9312
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: PMT9312_1299
   organism_strain: Prochlorococcus MIT9312
   product: nucleotide sugar dehydrogenase family protein
-- gene_name: null
+- gene_category: Transport
+  gene_name: null
   locus_tag: PMT9312_1300
   organism_strain: Prochlorococcus MIT9312
   product: Predicted oxidoreductase
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: PMT9312_1312
   organism_strain: Prochlorococcus MIT9312
   product: UDP-glucose 6-dehydrogenase
-- gene_name: wcaG
+- gene_category: Central intermediary metabolism
+  gene_name: wcaG
   locus_tag: PMT9312_1315
   organism_strain: Prochlorococcus MIT9312
   product: GDP-L-fucose synthase
-- gene_name: null
+- gene_category: Translation
+  gene_name: null
   locus_tag: PMT9312_1328
   organism_strain: Prochlorococcus MIT9312
   product: phosphotransferase
-- gene_name: null
+- gene_category: Lipid metabolism
+  gene_name: null
   locus_tag: PMT9312_1350
   organism_strain: Prochlorococcus MIT9312
   product: 2-deoxy-D-gluconate 3-dehydrogenase
-- gene_name: null
+- gene_category: Transport
+  gene_name: null
   locus_tag: PMT9312_1351
   organism_strain: Prochlorococcus MIT9312
   product: blr5975 domain protein
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: PMT9312_1359
   organism_strain: Prochlorococcus MIT9312
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: PMT9312_1399
   organism_strain: Prochlorococcus MIT9312
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: PMT9312_1412
   organism_strain: Prochlorococcus MIT9312
   product: ketol-acid reductoisomerase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: PMT9312_1452
   organism_strain: Prochlorococcus MIT9312
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: PMT9312_1581
   organism_strain: Prochlorococcus MIT9312
   product: histidinol dehydrogenase
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: PMT9312_1688
   organism_strain: Prochlorococcus MIT9312
   product: isocitrate dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: PMT9312_1798
   organism_strain: Prochlorococcus MIT9312
   product: shikimate 5-dehydrogenase
-- gene_name: glcF
+- gene_category: Carbohydrate metabolism
+  gene_name: glcF
   locus_tag: PMT_1937
   organism_strain: Prochlorococcus MIT9313
   product: glycolate oxidase iron-sulfur subunit
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: SYNW0035
   organism_strain: Synechococcus WH8102
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: glcE
+- gene_category: Carbohydrate metabolism
+  gene_name: glcE
   locus_tag: SYNW0161
   organism_strain: Synechococcus WH8102
   product: glycolate oxidase subunit GlcE
-- gene_name: glcF
+- gene_category: Carbohydrate metabolism
+  gene_name: glcF
   locus_tag: SYNW0163
   organism_strain: Synechococcus WH8102
   product: glycolate oxidase iron-sulfur subunit
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: SYNW0166
   organism_strain: Synechococcus WH8102
   product: isocitrate dehydrogenase
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: SYNW0199
   organism_strain: Synechococcus WH8102
   product: UDP-glucose 6-dehydrogenase
-- gene_name: wcaG
+- gene_category: Central intermediary metabolism
+  gene_name: wcaG
   locus_tag: SYNW0423
   organism_strain: Synechococcus WH8102
   product: GDP-L-fucose synthase
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: SYNW0533
   organism_strain: Synechococcus WH8102
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: SYNW0610
   organism_strain: Synechococcus WH8102
   product: histidinol dehydrogenase
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: SYNW0625
   organism_strain: Synechococcus WH8102
   product: NADP-dependent oxidoreductase
-- gene_name: rfbD
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
   locus_tag: SYNW0647
   organism_strain: Synechococcus WH8102
   product: dTDP-4-dehydrorhamnose reductase
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: SYNW0657
   organism_strain: Synechococcus WH8102
   product: ribosome-associated GTPase
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: SYNW0698
   organism_strain: Synechococcus WH8102
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: SYNW0711
   organism_strain: Synechococcus WH8102
   product: homoserine dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: SYNW0725
   organism_strain: Synechococcus WH8102
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: SYNW0750
   organism_strain: Synechococcus WH8102
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: SYNW0784
   organism_strain: Synechococcus WH8102
   product: 3-isopropylmalate dehydrogenase
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: SYNW0939
   organism_strain: Synechococcus WH8102
   product: glycerol dehydrogenase
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: SYNW1119
   organism_strain: Synechococcus WH8102
   product: 6-phosphogluconate dehydrogenase
-- gene_name: null
+- gene_category: Carbohydrate metabolism
+  gene_name: null
   locus_tag: SYNW1496
   organism_strain: Synechococcus WH8102
   product: short chain dehydrogenase family protein
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: SYNW1590
   organism_strain: Synechococcus WH8102
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: SYNW1637
   organism_strain: Synechococcus WH8102
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: SYNW1650
   organism_strain: Synechococcus WH8102
   product: ketol-acid reductoisomerase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: SYNW1686
   organism_strain: Synechococcus WH8102
   product: malate:quinone oxidoreductase
-- gene_name: glcD1
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD1
   locus_tag: SYNW1808
   organism_strain: Synechococcus WH8102
   product: glycolate oxidase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: SYNW1852
   organism_strain: Synechococcus WH8102
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: SYNW1867
   organism_strain: Synechococcus WH8102
   product: aldo/keto reductase family protein
-- gene_name: glpA
+- gene_category: Lipid metabolism
+  gene_name: glpA
   locus_tag: SYNW1954
   organism_strain: Synechococcus WH8102
   product: FAD-dependent glycerol-3-phosphate dehydrogenase
-- gene_name: tas
+- gene_category: Coenzyme metabolism
+  gene_name: tas
   locus_tag: SYNW2031
   organism_strain: Synechococcus WH8102
   product: pyridoxine 4-dehydrogenase
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: SYNW2200
   organism_strain: Synechococcus WH8102
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: mmsB
+- gene_category: Lipid metabolism
+  gene_name: mmsB
   locus_tag: SYNW2331
   organism_strain: Synechococcus WH8102
   product: NAD binding domain of 6-phosphogluconate dehydrogenase family protein
-- gene_name: mmsB
+- gene_category: Amino acid metabolism
+  gene_name: mmsB
   locus_tag: SYNW2430
   organism_strain: Synechococcus WH8102
   product: 3-hydroxyisobutyrate dehydrogenase
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: SYNW2509
   organism_strain: Synechococcus WH8102
   product: shikimate 5-dehydrogenase
-- gene_name: pdxA
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: sync_0034
   organism_strain: Synechococcus CC9311
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
-- gene_name: wcaG-1
+- gene_category: Carbohydrate metabolism
+  gene_name: wcaG-1
   locus_tag: sync_0035
   organism_strain: Synechococcus CC9311
   product: uncharacterized conserved NADP-binding domain-containing protein
-- gene_name: wcaG
+- gene_category: Central intermediary metabolism
+  gene_name: wcaG
   locus_tag: sync_0145
   organism_strain: Synechococcus CC9311
   product: GDP-L-fucose synthase
-- gene_name: glcE
+- gene_category: Carbohydrate metabolism
+  gene_name: glcE
   locus_tag: sync_0210
   organism_strain: Synechococcus CC9311
   product: glycolate oxidase subunit GlcE
-- gene_name: glcF
+- gene_category: Carbohydrate metabolism
+  gene_name: glcF
   locus_tag: sync_0213
   organism_strain: Synechococcus CC9311
   product: glycolate oxidase iron-sulfur subunit
-- gene_name: icd
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
   locus_tag: sync_0214
   organism_strain: Synechococcus CC9311
   product: isocitrate dehydrogenase
-- gene_name: ugd
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
   locus_tag: sync_0233
   organism_strain: Synechococcus CC9311
   product: UDP-glucose 6-dehydrogenase
-- gene_name: tas
+- gene_category: Coenzyme metabolism
+  gene_name: tas
   locus_tag: sync_0479
   organism_strain: Synechococcus CC9311
   product: pyridoxine 4-dehydrogenase
-- gene_name: glpA
+- gene_category: Lipid metabolism
+  gene_name: glpA
   locus_tag: sync_0568
   organism_strain: Synechococcus CC9311
   product: FAD-dependent glycerol-3-phosphate dehydrogenase
-- gene_name: engA
+- gene_category: Translation
+  gene_name: engA
   locus_tag: sync_0596
   organism_strain: Synechococcus CC9311
   product: ribosome-associated GTPase
-- gene_name: mqoA
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
   locus_tag: sync_0648
   organism_strain: Synechococcus CC9311
   product: malate:quinone oxidoreductase
-- gene_name: gldA
+- gene_category: Cellular processes
+  gene_name: gldA
   locus_tag: sync_0649
   organism_strain: Synechococcus CC9311
   product: glycerol dehydrogenase, NAD, bacterial-like
-- gene_name: ilvC
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
   locus_tag: sync_0725
   organism_strain: Synechococcus CC9311
   product: ketol-acid reductoisomerase
-- gene_name: glcD2
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
   locus_tag: sync_0741
   organism_strain: Synechococcus CC9311
   product: alternative glycolate dehydrogenase GlcD2
-- gene_name: ribD
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
   locus_tag: sync_0821
   organism_strain: Synechococcus CC9311
   product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
     reductase
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: sync_0822
   organism_strain: Synechococcus CC9311
   product: aldo/keto reductase family protein
-- gene_name: null
+- gene_category: Stress response and adaptation
+  gene_name: null
   locus_tag: sync_0860
   organism_strain: Synechococcus CC9311
   product: short chain dehydrogenase family protein
-- gene_name: dxr
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
   locus_tag: sync_0920
   organism_strain: Synechococcus CC9311
   product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
-- gene_name: thrA
+- gene_category: Amino acid metabolism
+  gene_name: thrA
   locus_tag: sync_0941
   organism_strain: Synechococcus CC9311
   product: homoserine dehydrogenase
-- gene_name: guaB
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
   locus_tag: sync_0971
   organism_strain: Synechococcus CC9311
   product: inositol-5-monophosphate dehydrogenase
-- gene_name: zwf
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
   locus_tag: sync_1002
   organism_strain: Synechococcus CC9311
   product: glucose-6-phosphate 1-dehydrogenase
-- gene_name: gldA
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: sync_1026
   organism_strain: Synechococcus CC9311
   product: glycerol dehydrogenase
-- gene_name: null
+- gene_category: Unknown
+  gene_name: null
   locus_tag: sync_1244
   organism_strain: Synechococcus CC9311
   product: short-chain dehydrogenase/reductase family protein
-- gene_name: adhC
+- gene_category: Stress response and adaptation
+  gene_name: adhC
   locus_tag: sync_1463
   organism_strain: Synechococcus CC9311
   product: S-(hydroxymethyl)glutathione dehydrogenase/class III alcohol dehydrogenase
-- gene_name: gnd
+- gene_category: Stress response and adaptation
+  gene_name: gnd
   locus_tag: sync_1688
   organism_strain: Synechococcus CC9311
   product: 6-phosphogluconate dehydrogenase
-- gene_name: leuB
+- gene_category: Amino acid metabolism
+  gene_name: leuB
   locus_tag: sync_1712
   organism_strain: Synechococcus CC9311
   product: 3-isopropylmalate dehydrogenase
-- gene_name: gdh
+- gene_category: Carbohydrate metabolism
+  gene_name: gdh
   locus_tag: sync_1918
   organism_strain: Synechococcus CC9311
   product: glucose 1-dehydrogenase
-- gene_name: glcD1
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD1
   locus_tag: sync_2057
   organism_strain: Synechococcus CC9311
   product: glycolate oxidase
-- gene_name: fabG
+- gene_category: Lipid metabolism
+  gene_name: fabG
   locus_tag: sync_2137
   organism_strain: Synechococcus CC9311
   product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
-- gene_name: serA
+- gene_category: Amino acid metabolism
+  gene_name: serA
   locus_tag: sync_2256
   organism_strain: Synechococcus CC9311
   product: D-3-phosphoglycerate dehydrogenase (PGDH)
-- gene_name: hisD
+- gene_category: Amino acid metabolism
+  gene_name: hisD
   locus_tag: sync_2362
   organism_strain: Synechococcus CC9311
   product: histidinol dehydrogenase
-- gene_name: fabG-2
+- gene_category: Stress response and adaptation
+  gene_name: fabG-2
   locus_tag: sync_2382
   organism_strain: Synechococcus CC9311
   product: short chain dehydrogenase family protein
-- gene_name: ribD2
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
   locus_tag: sync_2555
   organism_strain: Synechococcus CC9311
   product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
-- gene_name: null
+- gene_category: Energy production
+  gene_name: null
   locus_tag: sync_2669
   organism_strain: Synechococcus CC9311
   product: iron-containing alcohol dehydrogenase family protein
-- gene_name: mmsB
+- gene_category: Lipid metabolism
+  gene_name: mmsB
   locus_tag: sync_2712
   organism_strain: Synechococcus CC9311
   product: NAD binding domain of 6-phosphogluconate dehydrogenase family protein
-- gene_name: aroE
+- gene_category: Amino acid metabolism
+  gene_name: aroE
   locus_tag: sync_2924
   organism_strain: Synechococcus CC9311
   product: shikimate 5-dehydrogenase
