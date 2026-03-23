@@ -600,61 +600,65 @@ def register_tools(mcp: FastMCP):
             logger.warning("run_cypher unexpected error: %s", e)
             return f"Error in run_cypher: {e}"
 
-    @mcp.tool()
-    def search_ontology(
+    # --- search_ontology ---
+
+    class SearchOntologyResult(BaseModel):
+        id: str = Field(description="Term ID (e.g. 'go:0006260')")
+        name: str = Field(description="Term name (e.g. 'DNA replication')")
+        score: float = Field(description="Fulltext relevance score (e.g. 5.23)")
+
+    class SearchOntologyResponse(BaseModel):
+        total_entries: int = Field(description="Total terms in this ontology (e.g. 847)")
+        total_matching: int = Field(description="Terms matching the search (e.g. 31)")
+        score_max: float = Field(description="Highest relevance score (e.g. 5.23)")
+        score_median: float = Field(description="Median relevance score (e.g. 2.1)")
+        returned: int = Field(description="Results in this response (0 when summary=true)")
+        truncated: bool = Field(description="True if total_matching > returned")
+        results: list[SearchOntologyResult] = Field(
+            default_factory=list, description="One row per matching term",
+        )
+
+    @mcp.tool(
+        tags={"ontology"},
+        annotations={"readOnlyHint": True},
+    )
+    async def search_ontology(
         ctx: Context,
-        search_text: str,
-        ontology: str,
-        limit: int = 25,
-    ) -> str:
+        search_text: Annotated[str, Field(
+            description="Search query (Lucene syntax). "
+            "E.g. 'replication', 'oxido*', 'transport AND membrane'.",
+        )],
+        ontology: Annotated[str, Field(
+            description="Ontology to search: 'go_bp', 'go_mf', 'go_cc', "
+            "'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam'.",
+        )],
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> SearchOntologyResponse:
         """Browse ontology terms by text search (fuzzy, Lucene syntax).
 
-        Use this to discover ontology term IDs, then pass them to
-        genes_by_ontology to find genes.
-
-        Supports Lucene query syntax: fuzzy matching (~), wildcards (*),
-        exact phrases ("..."), boolean operators (AND, OR).
-
-        Args:
-            search_text: Search query against term names. Examples:
-                "DNA replication" — phrase match
-                "replicat~" — fuzzy match
-                "oxido*" — wildcard
-                "transport AND membrane" — boolean
-            ontology: Which ontology to search. One of:
-                "go_bp" (biological process), "go_mf" (molecular function),
-                "go_cc" (cellular component), "kegg", "ec",
-                "cog_category" (COG functional categories),
-                "cyanorak_role" (Cyanorak functional roles),
-                "tigr_role" (TIGR functional roles),
-                "pfam" (Pfam protein domains and clans).
-                For KEGG, searches across all levels — level is encoded in
-                the returned ID prefix:
-                  kegg.category:    (e.g. "Metabolism")
-                  kegg.subcategory: (e.g. "Carbohydrate metabolism")
-                  kegg.pathway:     (e.g. "Glycolysis")
-                  kegg.orthology:   (e.g. "K00001 alcohol dehydrogenase")
-            limit: Max results (default 25).
+        Returns term IDs for use with genes_by_ontology. Supports fuzzy (~),
+        wildcards (*), exact phrases ("..."), boolean (AND, OR).
         """
-        logger.info("search_ontology search_text=%s ontology=%s limit=%d",
-                    search_text, ontology, limit)
+        await ctx.info(f"search_ontology search_text={search_text!r} ontology={ontology}")
         try:
             conn = _conn(ctx)
-            results = api.search_ontology(search_text, ontology, conn=conn)
-            results = results[:limit]
-            if not results:
-                return json.dumps({
-                    "results": [], "total": 0, "query": search_text,
-                })
-            return json.dumps({
-                "results": results, "total": len(results), "query": search_text,
-            }, indent=2, default=str)
+            data = api.search_ontology(
+                search_text, ontology, summary=summary,
+                limit=limit, conn=conn,
+            )
+            results = [SearchOntologyResult(**r) for r in data["results"]]
+            return SearchOntologyResponse(**{**data, "results": results})
         except ValueError as e:
-            logger.warning("search_ontology error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"search_ontology error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("search_ontology unexpected error: %s", e)
-            return f"Error in search_ontology: {e}"
+            await ctx.error(f"search_ontology unexpected error: {e}")
+            raise ToolError(f"Error in search_ontology: {e}")
 
     @mcp.tool()
     def genes_by_ontology(

@@ -1,0 +1,45 @@
+# Human-authored content for search_ontology about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Search GO biological processes
+    call: search_ontology(search_text="replication", ontology="go_bp")
+    response: |
+      {
+        "total_entries": 2448,
+        "total_matching": 31,
+        "score_max": 2.48,
+        "score_median": 1.78,
+        "returned": 5,
+        "truncated": true,
+        "results": [
+          {"id": "go:0006260", "name": "DNA replication", "score": 2.48},
+          {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 2.41},
+          ...
+        ]
+      }
+
+  - title: Summary only (how many terms match?)
+    call: search_ontology(search_text="transport", ontology="go_bp", summary=True)
+
+  - title: From search to gene discovery
+    steps: |
+      Step 1: search_ontology(search_text="replication", ontology="go_bp")
+              → collect term IDs from results (e.g. "go:0006260")
+
+      Step 2: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
+              → find genes annotated to these terms (with hierarchy expansion)
+
+      Step 3: gene_overview(locus_tags=["PMM0845", ...])
+              → check data availability for discovered genes
+
+chaining:
+  - "search_ontology → genes_by_ontology"
+  - "search_ontology → genes_by_ontology → gene_overview"
+
+mistakes:
+  - "search_ontology finds term IDs — use genes_by_ontology to find genes annotated to those terms"
+  - "This tool searches term names only — it does not traverse the ontology hierarchy"
+  - wrong: "search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene"
+    right: "resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups"

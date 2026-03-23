@@ -203,15 +203,23 @@ class TestListOrganismsContract:
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
 class TestSearchOntologyContract:
-    def test_returns_list_of_dicts(self, conn):
+    def test_returns_dict_envelope(self, conn):
         result = api.search_ontology("DNA replication", "go_bp", conn=conn)
-        assert isinstance(result, list)
-        assert len(result) >= 1
+        assert isinstance(result, dict)
+        assert "total_entries" in result
+        assert "total_matching" in result
+        assert "score_max" in result
+        assert "score_median" in result
+        assert "returned" in result
+        assert "truncated" in result
+        assert "results" in result
+        assert result["total_matching"] >= 1
 
     def test_result_keys(self, conn):
         result = api.search_ontology("DNA replication", "go_bp", conn=conn)
         expected_keys = {"id", "name", "score"}
-        assert set(result[0].keys()) == expected_keys
+        assert len(result["results"]) >= 1
+        assert set(result["results"][0].keys()) == expected_keys
 
 
 # ---------------------------------------------------------------------------

@@ -842,14 +842,67 @@ def build_list_experiments_summary(
     return cypher, params
 
 
-def build_search_ontology(
+def build_search_ontology_summary(
     *, ontology: str, search_text: str,
 ) -> tuple[str, dict]:
+    """Build summary Cypher for search_ontology.
+
+    RETURN keys: total_entries, total_matching, score_max, score_median.
+    """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
+
+    if parent_index:
+        cypher = (
+            "CALL {\n"
+            f"  CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
+            "  YIELD node AS t, score\n"
+            "  RETURN score\n"
+            "  UNION ALL\n"
+            f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
+            "  YIELD node AS t, score\n"
+            "  RETURN score\n"
+            "}\n"
+            "WITH count(score) AS total_matching,\n"
+            "     max(score) AS score_max,\n"
+            "     percentileDisc(score, 0.5) AS score_median\n"
+            "CALL { MATCH (all_t:Pfam) RETURN count(all_t) AS pfam_count }\n"
+            "CALL { MATCH (all_c:PfamClan) RETURN count(all_c) AS clan_count }\n"
+            "RETURN pfam_count + clan_count AS total_entries,\n"
+            "       total_matching, score_max, score_median"
+        )
+    else:
+        label = cfg["label"]
+        cypher = (
+            f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
+            "YIELD node AS t, score\n"
+            "WITH count(t) AS total_matching,\n"
+            "     max(score) AS score_max,\n"
+            "     percentileDisc(score, 0.5) AS score_median\n"
+            f"CALL {{ MATCH (all_t:{label}) RETURN count(all_t) AS total_entries }}\n"
+            "RETURN total_entries, total_matching, score_max, score_median"
+        )
+    return cypher, {"search_text": search_text}
+
+
+def build_search_ontology(
+    *, ontology: str, search_text: str,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build Cypher for search_ontology.
+
+    RETURN keys: id, name, score.
+    """
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    cfg = ONTOLOGY_CONFIG[ontology]
+    index_name = cfg["fulltext_index"]
+    parent_index = cfg.get("parent_fulltext_index")
+
+    limit_clause = "\nLIMIT $limit" if limit is not None else ""
 
     if parent_index:
         # UNION search across both indexes (e.g. Pfam domain + clan)
@@ -864,16 +917,19 @@ def build_search_ontology(
             "  RETURN t.id AS id, t.name AS name, score\n"
             "}\n"
             "RETURN id, name, score\n"
-            "ORDER BY score DESC"
+            "ORDER BY score DESC" + limit_clause
         )
     else:
         cypher = (
             f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "YIELD node AS t, score\n"
             "RETURN t.id AS id, t.name AS name, score\n"
-            "ORDER BY score DESC"
+            "ORDER BY score DESC" + limit_clause
         )
-    return cypher, {"search_text": search_text}
+    params: dict = {"search_text": search_text}
+    if limit is not None:
+        params["limit"] = limit
+    return cypher, params
 
 
 def build_genes_by_ontology(

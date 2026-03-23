@@ -863,100 +863,118 @@ class TestRunCypherWrapper:
 # search_ontology
 # ---------------------------------------------------------------------------
 class TestSearchOntologyWrapper:
-    def test_returns_json_with_id_name_score(self, tool_fns, mock_ctx):
-        rows = [
+    _SAMPLE_API_RETURN = {
+        "total_entries": 847,
+        "total_matching": 2,
+        "score_max": 5.0,
+        "score_median": 3.2,
+        "returned": 2,
+        "truncated": False,
+        "results": [
             {"id": "go:0006260", "name": "DNA replication", "score": 5.0},
             {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 3.2},
-        ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="replication", ontology="go_bp"))
-        assert result["total"] == 2
-        assert result["query"] == "replication"
-        for r in result["results"]:
-            assert "id" in r
-            assert "name" in r
-            assert "score" in r
+        ],
+    }
 
-    def test_kegg_same_columns(self, tool_fns, mock_ctx):
-        rows = [{"id": "kegg.pathway:ko00010", "name": "Glycolysis", "score": 4.0}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="glycolysis", ontology="kegg"))
-        assert set(result["results"][0].keys()) == {"id", "name", "score"}
+    @pytest.mark.asyncio
+    async def test_returns_dict_envelope(self, tool_fns, mock_ctx):
+        """Response has total_entries, total_matching, score_max, score_median, returned, truncated, results."""
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp",
+            )
+        assert result.total_entries == 847
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert result.truncated is False
+        assert result.score_max == 5.0
+        assert result.score_median == 3.2
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.id == "go:0006260"
+        assert r.name == "DNA replication"
+        assert r.score == 5.0
 
-    def test_empty_results(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="nonexistent", ontology="go_bp"))
-        assert result["results"] == []
-        assert result["total"] == 0
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        """When api returns no matches."""
+        empty_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 0,
+            "score_max": 0.0,
+            "score_median": 0.0,
+            "returned": 0,
+            "truncated": False,
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=empty_return,
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="nonexistent", ontology="go_bp",
+            )
+        assert result.total_matching == 0
+        assert result.returned == 0
+        assert result.results == []
 
-    def test_lucene_fallback_on_error(self, tool_fns, mock_ctx):
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            Neo4jClientError("Lucene parse error"),
-            [{"id": "go:0006260", "name": "DNA replication", "score": 1.0}],
-        ]
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="bad [query", ontology="go_bp"))
-        assert result["total"] == 1
-        assert conn.execute_query.call_count == 2
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """All params passed through to api."""
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["search_ontology"](
+                mock_ctx,
+                search_text="replication",
+                ontology="go_bp",
+                summary=True,
+                limit=10,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.args[0] == "replication"
+        assert call_kwargs.args[1] == "go_bp"
+        assert call_kwargs.kwargs["summary"] is True
+        assert call_kwargs.kwargs["limit"] == 10
 
-    def test_double_failure_returns_error_string(self, tool_fns, mock_ctx):
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            Neo4jClientError("parse error"),
-            Neo4jClientError("still broken"),
-        ]
-        result = tool_fns["search_ontology"](mock_ctx, search_text="bad [query", ontology="go_bp")
-        assert "Error in search_ontology" in result
-        assert "still broken" in result
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """returned/truncated from api are preserved when total_matching > returned."""
+        truncated_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 50,
+            "returned": 2,
+            "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value=truncated_return,
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp",
+            )
+        assert result.total_matching == 50
+        assert result.returned == 2
+        assert result.truncated is True
 
-    def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
-        """Limit parameter caps results at the MCP level."""
-        rows = [{"id": f"go:{i:07d}", "name": f"term_{i}", "score": 1.0} for i in range(10)]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="test", ontology="go_bp", limit=5))
-        assert len(result["results"]) == 5
+    @pytest.mark.asyncio
+    async def test_invalid_ontology_raises_toolerror(self, tool_fns, mock_ctx):
+        """ValueError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
 
-    def test_go_mf_ontology_accepted(self, tool_fns, mock_ctx):
-        """go_mf ontology is accepted without error."""
-        rows = [{"id": "go:0003677", "name": "DNA binding", "score": 4.0}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="binding", ontology="go_mf"))
-        assert result["total"] == 1
-
-    def test_go_cc_ontology_accepted(self, tool_fns, mock_ctx):
-        """go_cc ontology is accepted without error."""
-        rows = [{"id": "go:0016020", "name": "membrane", "score": 3.5}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="membrane", ontology="go_cc"))
-        assert result["total"] == 1
-
-    def test_cog_category_ontology_accepted(self, tool_fns, mock_ctx):
-        """cog_category ontology is accepted without error."""
-        rows = [{"id": "cog:C", "name": "Energy production and conversion", "score": 4.0}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="energy", ontology="cog_category"))
-        assert result["total"] == 1
-
-    def test_cyanorak_role_ontology_accepted(self, tool_fns, mock_ctx):
-        """cyanorak_role ontology is accepted without error."""
-        rows = [{"id": "cyanorak_role:F", "name": "DNA metabolism", "score": 3.5}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="DNA", ontology="cyanorak_role"))
-        assert result["total"] == 1
-
-    def test_tigr_role_ontology_accepted(self, tool_fns, mock_ctx):
-        """tigr_role ontology is accepted without error."""
-        rows = [{"id": "tigr_role:120", "name": "Energy metabolism", "score": 3.0}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="metabolism", ontology="tigr_role"))
-        assert result["total"] == 1
-
-    def test_pfam_ontology_accepted(self, tool_fns, mock_ctx):
-        """pfam ontology is accepted without error."""
-        rows = [{"id": "pfam:PF00712", "name": "DNA polymerase", "score": 5.0}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_ontology"](mock_ctx, search_text="polymerase", ontology="pfam"))
-        assert result["total"] == 1
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            side_effect=ValueError("Invalid ontology 'bad'"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["search_ontology"](
+                    mock_ctx, search_text="test", ontology="bad",
+                )
 
 
 # ---------------------------------------------------------------------------
@@ -1302,15 +1320,18 @@ class TestErrorHandling:
         result = tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
         assert "Error in run_cypher" in result
 
-    def test_search_ontology_value_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_search_ontology_value_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
+
         with patch(
             "multiomics_explorer.api.functions.search_ontology",
             side_effect=ValueError("Invalid ontology 'bad'"),
         ):
-            result = tool_fns["search_ontology"](
-                mock_ctx, search_text="test", ontology="bad",
-            )
-        assert result == "Error: Invalid ontology 'bad'"
+            with pytest.raises(ToolError):
+                await tool_fns["search_ontology"](
+                    mock_ctx, search_text="test", ontology="bad",
+                )
 
     def test_genes_by_ontology_generic_error(self, tool_fns, mock_ctx):
         with patch(

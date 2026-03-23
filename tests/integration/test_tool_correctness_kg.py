@@ -25,6 +25,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_gene,
     build_genes_by_function,
     build_search_ontology,
+    build_search_ontology_summary,
 )
 from tests.fixtures.gene_data import (
     GENES,
@@ -558,6 +559,43 @@ class TestSearchOntologyCorrectnessKG:
         for r in results:
             assert "id" in r
             assert "name" in r
+
+    def test_limit_parameter(self, conn):
+        """Limit parameter caps number of returned rows."""
+        cypher, params = build_search_ontology(ontology="go_bp", search_text="replication", limit=3)
+        results = conn.execute_query(cypher, **params)
+        assert len(results) <= 3
+
+
+# ---------------------------------------------------------------------------
+# TestSearchOntologySummaryCorrectnessKG
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestSearchOntologySummaryCorrectnessKG:
+    """Validate search_ontology_summary queries against live Neo4j."""
+
+    def test_go_bp_summary_keys(self, conn):
+        """Summary query returns expected keys."""
+        cypher, params = build_search_ontology_summary(ontology="go_bp", search_text="replication")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) == 1
+        row = results[0]
+        assert "total_entries" in row
+        assert "total_matching" in row
+        assert "score_max" in row
+        assert "score_median" in row
+        assert row["total_entries"] > 0
+        assert row["total_matching"] > 0
+
+    def test_pfam_summary(self, conn):
+        """Pfam summary uses UNION and returns totals."""
+        cypher, params = build_search_ontology_summary(ontology="pfam", search_text="polymerase")
+        results = conn.execute_query(cypher, **params)
+        assert len(results) == 1
+        row = results[0]
+        assert row["total_entries"] > 0
+        assert row["total_matching"] > 0
 
 
 # ---------------------------------------------------------------------------

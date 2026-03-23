@@ -24,6 +24,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments_summary,
     build_resolve_gene,
     build_search_ontology,
+    build_search_ontology_summary,
 )
 
 
@@ -618,19 +619,9 @@ class TestBuildSearchOntology:
         cypher, params = build_search_ontology(ontology="go_bp", search_text="replication")
         assert params["search_text"] == "replication"
         assert "$search_text" in cypher
-        # search_text should NOT be interpolated into cypher
         assert "replication" not in cypher
 
-    def test_go_mf_uses_correct_index(self):
-        cypher, _ = build_search_ontology(ontology="go_mf", search_text="binding")
-        assert "'molecularFunctionFullText'" in cypher
-
-    def test_go_cc_uses_correct_index(self):
-        cypher, _ = build_search_ontology(ontology="go_cc", search_text="membrane")
-        assert "'cellularComponentFullText'" in cypher
-
     def test_pfam_union_query(self):
-        """Pfam search generates UNION query across both pfam and pfamClan indexes."""
         cypher, _ = build_search_ontology(ontology="pfam", search_text="polymerase")
         assert "CALL {" in cypher
         assert "UNION ALL" in cypher
@@ -638,11 +629,62 @@ class TestBuildSearchOntology:
         assert "'pfamClanFullText'" in cypher
 
     def test_non_pfam_no_union(self):
-        """Non-pfam ontologies do not generate UNION queries."""
         for ontology in ["go_bp", "go_mf", "go_cc", "ec", "kegg",
                          "cog_category", "cyanorak_role", "tigr_role"]:
             cypher, _ = build_search_ontology(ontology=ontology, search_text="test")
-            assert "UNION ALL" not in cypher, f"{ontology} should not have UNION"
+            assert "UNION ALL" not in cypher
+
+    def test_limit_clause(self):
+        cypher, params = build_search_ontology(ontology="go_bp", search_text="test", limit=10)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        cypher, params = build_search_ontology(ontology="go_bp", search_text="test")
+        assert "LIMIT" not in cypher
+        assert "limit" not in params
+
+    def test_order_by_score_desc(self):
+        cypher, _ = build_search_ontology(ontology="go_bp", search_text="test")
+        assert "ORDER BY score DESC" in cypher
+
+
+class TestBuildSearchOntologySummary:
+    def test_returns_summary_keys(self):
+        cypher, _ = build_search_ontology_summary(ontology="go_bp", search_text="test")
+        assert "total_entries" in cypher
+        assert "total_matching" in cypher
+        assert "score_max" in cypher
+        assert "score_median" in cypher
+
+    @pytest.mark.parametrize("ontology,expected_index", [
+        ("go_bp", "biologicalProcessFullText"),
+        ("kegg", "keggFullText"),
+        ("pfam", "pfamFullText"),
+    ])
+    def test_correct_fulltext_index(self, ontology, expected_index):
+        cypher, _ = build_search_ontology_summary(ontology=ontology, search_text="test")
+        assert f"'{expected_index}'" in cypher
+
+    def test_pfam_union_query(self):
+        cypher, _ = build_search_ontology_summary(ontology="pfam", search_text="test")
+        assert "UNION ALL" in cypher
+        assert "pfam_count" in cypher
+        assert "clan_count" in cypher
+
+    def test_label_count_for_total_entries(self):
+        cypher, _ = build_search_ontology_summary(ontology="go_bp", search_text="test")
+        assert "BiologicalProcess" in cypher
+        assert "total_entries" in cypher
+
+    def test_invalid_ontology_raises_valueerror(self):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_search_ontology_summary(ontology="invalid", search_text="test")
+
+    def test_search_text_passed_as_parameter(self):
+        cypher, params = build_search_ontology_summary(ontology="go_bp", search_text="replication")
+        assert params["search_text"] == "replication"
+        assert "$search_text" in cypher
 
 
 class TestBuildGenesByOntology:

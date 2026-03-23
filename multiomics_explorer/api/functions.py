@@ -37,6 +37,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments_summary,
     build_resolve_gene,
     build_search_ontology,
+    build_search_ontology_summary,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -672,29 +673,74 @@ def list_experiments(
 def search_ontology(
     search_text: str,
     ontology: str,
+    summary: bool = False,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
+) -> dict:
     """Browse ontology terms by text search.
 
-    Returns list of dicts with keys: id, name, score.
-
-    Raises ValueError if ontology is invalid (raised by query builder).
+    Returns dict with keys: total_entries, total_matching, score_max,
+    score_median, returned, truncated, results.
+    Per result: id, name, score.
     """
+    if not search_text or not search_text.strip():
+        raise ValueError("search_text must not be empty.")
+    if summary:
+        limit = 0
+
     conn = _default_conn(conn)
-    cypher, params = build_search_ontology(
-        ontology=ontology, search_text=search_text,
-    )
+    effective_text = search_text
+
+    # Summary query — always runs
     try:
-        results = conn.execute_query(cypher, **params)
+        sum_cypher, sum_params = build_search_ontology_summary(
+            ontology=ontology, search_text=effective_text,
+        )
+        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
     except Neo4jClientError:
         logger.debug("search_ontology: Lucene parse error, retrying with escaped query")
-        escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-        cypher, params = build_search_ontology(
-            ontology=ontology, search_text=escaped,
+        effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+        sum_cypher, sum_params = build_search_ontology_summary(
+            ontology=ontology, search_text=effective_text,
         )
-        results = conn.execute_query(cypher, **params)
-    return results
+        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_entries": raw_summary["total_entries"],
+        "total_matching": total_matching,
+        "score_max": raw_summary["score_max"] or 0.0,
+        "score_median": raw_summary["score_median"] or 0.0,
+    }
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    try:
+        det_cypher, det_params = build_search_ontology(
+            ontology=ontology, search_text=effective_text, limit=limit,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+    except Neo4jClientError:
+        if effective_text == search_text:
+            logger.debug("search_ontology detail: Lucene parse error, retrying")
+            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            det_cypher, det_params = build_search_ontology(
+                ontology=ontology, search_text=effective_text, limit=limit,
+            )
+            results = conn.execute_query(det_cypher, **det_params)
+        else:
+            raise
+
+    envelope["returned"] = len(results)
+    envelope["truncated"] = total_matching > len(results)
+    envelope["results"] = results
+    return envelope
 
 
 def genes_by_ontology(

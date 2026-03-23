@@ -615,27 +615,91 @@ class TestListOrganisms:
 # search_ontology
 # ---------------------------------------------------------------------------
 class TestSearchOntology:
-    def test_returns_list(self, mock_conn):
-        mock_conn.execute_query.return_value = [
+    def _summary_result(self, total_entries=847, total_matching=5):
+        """Helper: mock summary query result."""
+        return [{
+            "total_entries": total_entries,
+            "total_matching": total_matching,
+            "score_max": 5.23,
+            "score_median": 2.1,
+        }]
+
+    def _detail_rows(self):
+        """Helper: mock detail query result rows."""
+        return [
             {"id": "GO:0006260", "name": "DNA replication", "score": 5.0},
         ]
+
+    def test_returns_dict(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
         result = api.search_ontology("DNA replication", "go_bp", conn=mock_conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
+        assert isinstance(result, dict)
+        assert "total_entries" in result
+        assert "total_matching" in result
+        assert "score_max" in result
+        assert "score_median" in result
+        assert "returned" in result
+        assert "truncated" in result
+        assert "results" in result
+        assert result["total_matching"] == 5
+        assert result["returned"] == 1
+        assert mock_conn.execute_query.call_count == 2
+
+    def test_summary_sets_limit_zero(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=5),
+        ]
+        result = api.search_ontology("test", "go_bp", summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_passes_params(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.search_ontology("test", "go_bp", limit=10, conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 2
+
+    def test_creates_conn_when_none(self, monkeypatch):
+        mock = MagicMock()
+        mock.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        monkeypatch.setattr("multiomics_explorer.api.functions._default_conn", lambda c: mock)
+        result = api.search_ontology("test", "go_bp")
+        assert isinstance(result, dict)
 
     def test_invalid_ontology_raises(self, mock_conn):
         with pytest.raises(ValueError, match="Invalid ontology"):
             api.search_ontology("test", "invalid", conn=mock_conn)
 
+    def test_empty_search_text_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="search_text must not be empty"):
+            api.search_ontology("", "go_bp", conn=mock_conn)
+        with pytest.raises(ValueError, match="search_text must not be empty"):
+            api.search_ontology("   ", "go_bp", conn=mock_conn)
+
     def test_lucene_retry(self, mock_conn):
         from neo4j.exceptions import ClientError as Neo4jClientError
         mock_conn.execute_query.side_effect = [
             Neo4jClientError("bad"),
-            [{"id": "GO:0006260", "name": "DNA replication", "score": 1.0}],
+            self._summary_result(),
+            self._detail_rows(),
         ]
         result = api.search_ontology("bad+query", "go_bp", conn=mock_conn)
-        assert mock_conn.execute_query.call_count == 2
-        assert len(result) == 1
+        assert mock_conn.execute_query.call_count == 3
+        assert result["returned"] == 1
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import search_ontology as fn
+        assert callable(fn)
 
 
 # ---------------------------------------------------------------------------
