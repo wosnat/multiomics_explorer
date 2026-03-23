@@ -243,11 +243,13 @@ Run alongside or after each layer. Each layer has its own test class:
 - Integration: add/update in `tests/integration/test_mcp_tools.py`
 - Regression: add/update cases in `tests/evals/cases.yaml`,
   add builder to `TOOL_BUILDERS` in `tests/regression/test_regression.py`
-- Generate baselines: `pytest tests/regression/ --force-regen -m kg`
+- **Regenerate baselines** (required for renames or column changes):
+  `pytest tests/regression/ --force-regen -m kg`
+- Verify baselines match: `pytest tests/regression/ -m kg`
 - → **Gate:** all tests pass:
   ```bash
   pytest tests/unit/ -v
-  pytest -m kg -v
+  pytest tests/integration/ -v
   pytest tests/regression/ -m kg
   ```
 
@@ -269,8 +271,10 @@ When renaming affects multiple layers:
 | Builder function | queries_lib.py, api/functions.py imports, test imports, TOOL_BUILDERS |
 | API function | api/functions.py, `__init__.py` (both), tools.py import, all tests |
 | MCP tool | tools.py, EXPECTED_TOOLS in test_tool_wrappers.py, cases.yaml |
+| MCP tool name | **Other tools' docstrings** that reference this tool by name (e.g. resolve_gene docstring says "use get_homologs") |
 | RETURN column | Builder Cypher, fixture projection helpers (`as_*_result`), all test assertions |
 | Parameter name | Builder, API, MCP wrapper, all test call sites |
+| Regression baselines | `tests/regression/test_regression/` golden files — must regenerate with `--force-regen` |
 
 Use grep to find all references before renaming:
 ```bash

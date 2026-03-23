@@ -54,6 +54,7 @@
 - [ ] `{Name}Result` fields have `Field(description=...)` with examples on all fields?
 - [ ] Return type annotation is the response model (→ auto outputSchema)?
 - [ ] No field computation — api/ dict → `Response(**data)`?
+- [ ] Does NOT mutate `data` dict in-place (construct models into new vars, not `data["field"] = ...`)?
 - [ ] Default `limit` is small (e.g. 5) — not 50 or 100?
 - [ ] Empty results return model with `results=[]` (not ToolError)?
 
@@ -81,6 +82,8 @@
 - [ ] Default values consistent across layers?
 - [ ] About content example calls use correct param names for other
       tools referenced in chaining examples?
+- [ ] For renames: other tools' docstrings that reference the old name
+      updated? (grep for old name across all `.py` files)
 
 ## Tools with rich summary fields
 
@@ -114,6 +117,7 @@
 - [ ] Eval cases in `cases.yaml`?
 - [ ] Integration tests if tool touches new data?
 - [ ] Contract tests (`test_api_contract.py`) updated if return shape changed?
+- [ ] Regression baselines regenerated if columns/tool renamed? (`--force-regen`)
 - [ ] Tests for every optional parameter?
 - [ ] Tests for validation errors?
 - [ ] Tests for empty results?

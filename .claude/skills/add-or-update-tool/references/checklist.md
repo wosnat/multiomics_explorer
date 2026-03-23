@@ -247,8 +247,9 @@ async def {name}(
         data = api.{name}(
             required_param, optional_param=optional_param,
             summary=summary, verbose=verbose, limit=limit, conn=conn)
-        data["results"] = [{Name}Result(**r) for r in data["results"]]
-        return {Name}Response(**data)
+        # Build models without mutating data dict (shared refs break tests)
+        results = [{Name}Result(**r) for r in data["results"]]
+        return {Name}Response(**{**data, "results": results})
     except ValueError as e:
         await ctx.warning(f"{name} error: {e}")
         raise ToolError(str(e))
@@ -259,7 +260,9 @@ async def {name}(
 
 **Note:** api/ assembles the complete response dict (summary fields,
 `returned`, `truncated`, `not_found`). MCP just validates via
-`Response(**data)`. No field computation in MCP.
+`Response(**data)`. No field computation in MCP. Do NOT mutate `data`
+in-place (`data["field"] = ...`) — the dict may be shared across
+test invocations when mocked. Build models into new variables.
 
 ## Template: cases.yaml entry
 
