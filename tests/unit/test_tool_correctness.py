@@ -20,8 +20,8 @@ from tests.fixtures.gene_data import (
     GENES_WITH_EC,
     GENES_WITH_GENE_NAME,
     GENES_WITHOUT_GENE_NAME,
+    as_genes_by_function_result,
     as_resolve_gene_result,
-    as_search_genes_result,
     genes_by_organism,
 )
 
@@ -190,66 +190,103 @@ class TestResolveGeneCorrectness:
 
 
 # ---------------------------------------------------------------------------
-# TestSearchGenesCorrectness
+# TestGenesByFunctionCorrectness
 # ---------------------------------------------------------------------------
-class TestSearchGenesCorrectness:
-    """Verify search_genes returns correct data for realistic mock responses."""
+class TestGenesByFunctionCorrectness:
+    """Verify genes_by_function returns correct data for realistic mock responses."""
 
-    def test_fulltext_results_with_scores(self, tool_fns, mock_ctx):
-        """Results from multiple organisms are returned with total count."""
+    def _make_api_return(self, results, total_matching=None):
+        """Helper: build api return dict from result rows."""
+        if total_matching is None:
+            total_matching = len(results)
+        return {
+            "total_entries": 100,
+            "total_matching": total_matching,
+            "by_organism": [{"organism": "Prochlorococcus MED4", "count": len(results)}],
+            "by_category": [{"category": "DNA replication", "count": len(results)}],
+            "score_max": results[0]["score"] if results else 0.0,
+            "score_median": results[0]["score"] if results else 0.0,
+            "returned": len(results),
+            "truncated": total_matching > len(results),
+            "results": results,
+        }
+
+    @pytest.mark.asyncio
+    async def test_fulltext_results_with_scores(self, tool_fns, mock_ctx):
+        """Results from multiple organisms are returned with Pydantic envelope."""
         rows = [
-            as_search_genes_result(GENES_BY_LOCUS["PMM0001"], score=5.2),
-            as_search_genes_result(GENES_BY_LOCUS["PMT9312_0001"], score=4.8),
-            as_search_genes_result(GENES_BY_LOCUS["SYNW0305"], score=2.1),
+            as_genes_by_function_result(GENES_BY_LOCUS["PMM0001"], score=5.2),
+            as_genes_by_function_result(GENES_BY_LOCUS["PMT9312_0001"], score=4.8),
+            as_genes_by_function_result(GENES_BY_LOCUS["SYNW0305"], score=2.1),
         ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
+        api_return = self._make_api_return(rows)
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_function"](
+                mock_ctx, search_text="DNA polymerase",
+            )
 
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, search_text="DNA polymerase")
-        )
-
-        assert result["total"] == 3
-        assert result["query"] == "DNA polymerase"
-        # Results preserve order (sorted by score from Neo4j)
-        loci = [r["locus_tag"] for r in result["results"]]
+        assert result.total_matching == 3
+        assert result.returned == 3
+        loci = [r.locus_tag for r in result.results]
         assert loci == ["PMM0001", "PMT9312_0001", "SYNW0305"]
 
-    def test_organism_filter_wh8102(self, tool_fns, mock_ctx):
-        """Organism filter passes through and only WH8102 genes returned."""
-        wh8102_row = as_search_genes_result(GENES_BY_LOCUS["SYNW0305"], score=3.0)
-        _conn_from(mock_ctx).execute_query.return_value = [wh8102_row]
+    @pytest.mark.asyncio
+    async def test_organism_filter_forwarded(self, tool_fns, mock_ctx):
+        """Organism filter passes through to the api function."""
+        rows = [as_genes_by_function_result(GENES_BY_LOCUS["SYNW0305"], score=3.0)]
+        api_return = self._make_api_return(rows)
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value=api_return,
+        ) as mock_api:
+            await tool_fns["genes_by_function"](
+                mock_ctx, search_text="metallopeptidase", organism="WH8102",
+            )
 
-        tool_fns["search_genes"](mock_ctx, search_text="metallopeptidase", organism="WH8102")
+        assert mock_api.call_args.kwargs["organism"] == "WH8102"
 
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["organism"] == "WH8102"
+    @pytest.mark.asyncio
+    async def test_quality_filter_forwarded(self, tool_fns, mock_ctx):
+        """min_quality=2 is passed through to the api function."""
+        rows = [as_genes_by_function_result(GENES_BY_LOCUS["PMM0001"], score=5.0)]
+        api_return = self._make_api_return(rows)
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value=api_return,
+        ) as mock_api:
+            await tool_fns["genes_by_function"](
+                mock_ctx, search_text="polymerase", min_quality=2,
+            )
 
-    def test_quality_filter_passed(self, tool_fns, mock_ctx):
-        """min_quality=2 is passed through to query builder."""
-        rows = [
-            as_search_genes_result(GENES_BY_LOCUS["PMM0001"], score=5.0),
-        ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
+        assert mock_api.call_args.kwargs["min_quality"] == 2
 
-        tool_fns["search_genes"](mock_ctx, search_text="polymerase", min_quality=2)
+    @pytest.mark.asyncio
+    async def test_result_envelope_shape(self, tool_fns, mock_ctx):
+        """Result envelope contains all expected fields."""
+        rows = [as_genes_by_function_result(GENES_BY_LOCUS["PMN2A_0044"], score=4.0)]
+        api_return = self._make_api_return(rows)
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_function"](
+                mock_ctx, search_text="naphthoate synthase",
+            )
 
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["min_quality"] == 2
-
-    def test_search_genes_result_envelope(self, tool_fns, mock_ctx):
-        """Result envelope contains query, total, and results keys."""
-        rows = [as_search_genes_result(GENES_BY_LOCUS["PMN2A_0044"], score=4.0)]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, search_text="naphthoate synthase")
-        )
-
-        assert "results" in result
-        assert "total" in result
-        assert "query" in result
-        assert result["total"] == 1
-        assert result["results"][0]["locus_tag"] == "PMN2A_0044"
+        assert hasattr(result, "total_entries")
+        assert hasattr(result, "total_matching")
+        assert hasattr(result, "by_organism")
+        assert hasattr(result, "by_category")
+        assert hasattr(result, "score_max")
+        assert hasattr(result, "score_median")
+        assert hasattr(result, "returned")
+        assert hasattr(result, "truncated")
+        assert hasattr(result, "results")
+        assert result.total_matching == 1
+        assert result.results[0].locus_tag == "PMN2A_0044"
 
 
 # ---------------------------------------------------------------------------

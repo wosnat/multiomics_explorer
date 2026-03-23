@@ -11,6 +11,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_homologs_summary,
     build_gene_ontology_terms,
     build_gene_overview,
+    build_genes_by_function,
+    build_genes_by_function_summary,
     build_genes_by_ontology,
     build_get_gene_details,
     build_list_gene_categories,
@@ -20,7 +22,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments,
     build_list_experiments_summary,
     build_resolve_gene,
-    build_search_genes,
     build_search_ontology,
 )
 
@@ -72,50 +73,115 @@ class TestBuildResolveGene:
         assert "ANY(id IN g.all_identifiers WHERE toLower(id) = toLower($identifier))" in cypher
 
 
-class TestBuildSearchGenes:
-    def test_basic(self):
-        cypher, params = build_search_genes(search_text="DNA repair")
+class TestBuildGenesByFunction:
+    def test_no_filters(self):
+        cypher, params = build_genes_by_function(search_text="DNA repair")
         assert "fulltext" in cypher.lower() or "geneFullText" in cypher
         assert params["search_text"] == "DNA repair"
+        assert params["organism"] is None
+        assert params["category"] is None
+        assert params["min_quality"] == 0
 
-    def test_min_quality(self):
-        _, params = build_search_genes(search_text="x", min_quality=2)
-        assert params["min_quality"] == 2
-
-    def test_organism_case_insensitive(self):
+    def test_organism_filter(self):
         """Organism filter uses toLower for case-insensitive matching."""
-        cypher, params = build_search_genes(search_text="x", organism="prochlorococcus")
+        cypher, params = build_genes_by_function(search_text="x", organism="prochlorococcus")
         assert params["organism"] == "prochlorococcus"
         assert "toLower($organism)" in cypher
 
-    def test_organism_multi_word(self):
-        """Multi-word organism uses ALL/split for word matching."""
-        cypher, _ = build_search_genes(search_text="x", organism="Alteromonas EZ55")
-        assert "ALL(word IN split(" in cypher
-
-    def test_gene_summary_in_return(self):
-        """RETURN clause includes gene_summary."""
-        cypher, _ = build_search_genes(search_text="x")
-        assert "gene_summary" in cypher
-
-    def test_no_removed_properties(self):
-        """RETURN clause should not reference removed gene properties."""
-        cypher, _ = build_search_genes(search_text="x")
-        assert "cluster_number" not in cypher
-        assert "alteromonadaceae_og" not in cypher
-
-    def test_category_param_when_provided(self):
+    def test_category_filter(self):
         """When category is provided, it is passed as $category parameter."""
-        cypher, params = build_search_genes(search_text="x", category="Photosynthesis")
+        cypher, params = build_genes_by_function(search_text="x", category="Photosynthesis")
         assert params["category"] == "Photosynthesis"
         assert "gene_category" in cypher
         assert "$category" in cypher
 
-    def test_category_is_null_when_none(self):
-        """When category is None, $category IS NULL allows all rows through."""
-        cypher, params = build_search_genes(search_text="x", category=None)
+    def test_min_quality_filter(self):
+        _, params = build_genes_by_function(search_text="x", min_quality=2)
+        assert params["min_quality"] == 2
+
+    def test_combined_filters(self):
+        """All three filters (organism, category, min_quality) in WHERE."""
+        cypher, params = build_genes_by_function(
+            search_text="x", organism="MED4", category="Photosynthesis", min_quality=2,
+        )
+        assert "toLower($organism)" in cypher
+        assert "$category" in cypher
+        assert "$min_quality" in cypher
+        assert params["organism"] == "MED4"
+        assert params["category"] == "Photosynthesis"
+        assert params["min_quality"] == 2
+
+    def test_returns_expected_columns(self):
+        """RETURN clause includes all compact columns."""
+        cypher, _ = build_genes_by_function(search_text="x")
+        for col in ["locus_tag", "gene_name", "product", "organism_strain",
+                     "gene_category", "annotation_quality", "score"]:
+            assert col in cypher
+
+    def test_order_by(self):
+        """ORDER BY score DESC, g.locus_tag."""
+        cypher, _ = build_genes_by_function(search_text="x")
+        assert "ORDER BY score DESC, g.locus_tag" in cypher
+
+    def test_verbose_false(self):
+        """Compact mode excludes function_description and gene_summary."""
+        cypher, _ = build_genes_by_function(search_text="x", verbose=False)
+        assert "function_description" not in cypher
+        assert "gene_summary" not in cypher
+
+    def test_verbose_true(self):
+        """Verbose mode includes function_description and gene_summary."""
+        cypher, _ = build_genes_by_function(search_text="x", verbose=True)
+        assert "function_description" in cypher
+        assert "gene_summary" in cypher
+
+    def test_limit_clause(self):
+        """LIMIT is added when limit is provided."""
+        cypher, params = build_genes_by_function(search_text="x", limit=50)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 50
+
+    def test_limit_none(self):
+        """No LIMIT when limit is None."""
+        cypher, _ = build_genes_by_function(search_text="x", limit=None)
+        assert "LIMIT" not in cypher
+
+
+class TestBuildGenesByFunctionSummary:
+    def test_no_filters(self):
+        cypher, params = build_genes_by_function_summary(search_text="DNA repair")
+        assert "geneFullText" in cypher
+        assert params["search_text"] == "DNA repair"
+        assert params["organism"] is None
         assert params["category"] is None
-        assert "$category IS NULL" in cypher
+
+    def test_with_filters(self):
+        """Filters are applied to the summary query."""
+        cypher, params = build_genes_by_function_summary(
+            search_text="x", organism="MED4", category="Photosynthesis", min_quality=2,
+        )
+        assert "toLower($organism)" in cypher
+        assert params["organism"] == "MED4"
+        assert params["category"] == "Photosynthesis"
+        assert params["min_quality"] == 2
+
+    def test_returns_total_entries_and_total_matching(self):
+        """RETURN clause includes both total_entries and total_matching."""
+        cypher, _ = build_genes_by_function_summary(search_text="x")
+        assert "total_entries" in cypher
+        assert "total_matching" in cypher
+
+    def test_returns_breakdowns(self):
+        """RETURN clause includes by_organism and by_category."""
+        cypher, _ = build_genes_by_function_summary(search_text="x")
+        assert "by_organism" in cypher
+        assert "by_category" in cypher
+
+    def test_returns_score_stats(self):
+        """RETURN clause includes score_max and score_median."""
+        cypher, _ = build_genes_by_function_summary(search_text="x")
+        assert "score_max" in cypher
+        assert "score_median" in cypher
 
 
 

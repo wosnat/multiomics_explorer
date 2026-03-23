@@ -113,7 +113,7 @@ resolve_gene → gene_ontology_terms
 - The organism filter uses partial matching — 'MED4' and 'Prochlorococcus MED4' both work
 
 ```mistake
-search_genes(search_text='PMM0001')  # wrong tool for ID lookup
+genes_by_function(search_text='PMM0001')  # wrong tool for ID lookup
 ```
 
 ```correction

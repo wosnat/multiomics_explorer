@@ -24,14 +24,14 @@ examples:
       Step 1: list_organisms()
               → discover available organisms and data coverage
 
-      Step 2: search_genes(search_text="photosystem", organism="MED4")
+      Step 2: genes_by_function(search_text="photosystem", organism="MED4")
               → search genes within a specific organism
 
       Step 3: list_publications(organism="MED4")
               → find publications studying that organism
 
 chaining:
-  - "list_organisms → search_genes"
+  - "list_organisms → genes_by_function"
   - "list_organisms → list_publications"
   - "list_organisms → resolve_gene"
   - "list_organisms → genes_by_ontology"

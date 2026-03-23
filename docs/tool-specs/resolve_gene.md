@@ -9,7 +9,7 @@ for gene-specific workflows — downstream tools require locus_tags.
 ## Out of Scope
 
 - Gene functional details — that's `gene_overview` or `get_gene_details`
-- Free-text search across annotations — that's `search_genes`
+- Free-text search across annotations — that's `genes_by_function`
 
 ## Status / Prerequisites
 
@@ -259,7 +259,7 @@ chaining:
 
 mistakes:
   - "Case-insensitive: 'pmm0001' and 'PMM0001' both work"
-  - wrong: "search_genes(search_text='PMM0001')  # wrong tool for ID lookup"
+  - wrong: "genes_by_function(search_text='PMM0001')  # wrong tool for ID lookup"
     right: "resolve_gene(identifier='PMM0001')  # exact identity resolution"
 ```
 

@@ -13,7 +13,7 @@ from multiomics_explorer.api.functions import (
     list_publications,
     resolve_gene,
     run_cypher,
-    search_genes,
+    genes_by_function,
     search_ontology,
 )
 
@@ -30,6 +30,6 @@ __all__ = [
     "list_publications",
     "resolve_gene",
     "run_cypher",
-    "search_genes",
+    "genes_by_function",
     "search_ontology",
 ]

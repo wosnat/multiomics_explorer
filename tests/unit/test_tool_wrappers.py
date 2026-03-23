@@ -47,7 +47,7 @@ def _conn_from(ctx):
 
 EXPECTED_TOOLS = [
     "get_schema", "list_filter_values", "list_organisms", "resolve_gene",
-    "search_genes", "gene_overview", "get_gene_details",
+    "genes_by_function", "gene_overview", "get_gene_details",
     "gene_homologs", "run_cypher",
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
     "list_publications",
@@ -348,130 +348,145 @@ class TestResolveGeneWrapper:
 
 
 # ---------------------------------------------------------------------------
-# search_genes
+# genes_by_function
 # ---------------------------------------------------------------------------
-class TestSearchGenesWrapper:
-    def test_empty_result_envelope(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="nonexistent"))
-        assert result["results"] == []
-        assert result["total"] == 0
-        assert result["query"] == "nonexistent"
+class TestGenesByFunctionWrapper:
+    _SAMPLE_API_RETURN = {
+        "total_entries": 100,
+        "total_matching": 5,
+        "by_organism": [{"organism": "Prochlorococcus MED4", "count": 3},
+                        {"organism": "Synechococcus WH8102", "count": 2}],
+        "by_category": [{"category": "DNA replication", "count": 3},
+                        {"category": "Photosynthesis", "count": 2}],
+        "score_max": 8.5,
+        "score_median": 4.2,
+        "returned": 2,
+        "truncated": True,
+        "results": [
+            {"locus_tag": "PMM0001", "gene_name": "dnaN",
+             "product": "DNA polymerase III subunit beta",
+             "organism_strain": "Prochlorococcus MED4",
+             "gene_category": "DNA replication",
+             "annotation_quality": 3, "score": 5.0},
+            {"locus_tag": "SYNW0305", "gene_name": "ftsH1",
+             "product": "ATP-dependent metalloprotease FtsH",
+             "organism_strain": "Synechococcus WH8102",
+             "gene_category": None,
+             "annotation_quality": 2, "score": 3.5},
+        ],
+    }
 
-    def test_result_envelope_with_hits(self, tool_fns, mock_ctx):
-        rows = [{"locus_tag": "PMM0001", "score": 1.5}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="photosystem"))
-        assert result["total"] == 1
-        assert result["query"] == "photosystem"
+    @pytest.mark.asyncio
+    async def test_returns_pydantic_envelope(self, tool_fns, mock_ctx):
+        """Response has total_entries, total_matching, by_organism, by_category, score_max, score_median, returned, truncated, results."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_function"](
+                mock_ctx, search_text="DNA polymerase",
+            )
+        assert result.total_entries == 100
+        assert result.total_matching == 5
+        assert result.returned == 2
+        assert result.truncated is True
+        assert result.score_max == 8.5
+        assert result.score_median == 4.2
+        assert len(result.by_organism) == 2
+        assert result.by_organism[0].organism == "Prochlorococcus MED4"
+        assert len(result.by_category) == 2
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.locus_tag == "PMM0001"
+        assert r.gene_name == "dnaN"
+        assert r.gene_category == "DNA replication"
 
-    def test_limit_capped_at_50(self, tool_fns, mock_ctx):
-        """limit is capped at 50 at the MCP level."""
-        rows = [{"locus_tag": f"PMM{i:04d}", "score": 1.0} for i in range(100)]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="x", limit=999))
-        assert len(result["results"]) <= 50
-
-    def test_double_failure_returns_error_string(self, tool_fns, mock_ctx):
-        """When both original and escaped queries fail, returns error string."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            Neo4jClientError("parse error"),
-            Neo4jClientError("still broken"),
-        ]
-        result = tool_fns["search_genes"](mock_ctx, search_text="bad [query")
-        assert "Error in search_genes" in result
-        assert "still broken" in result
-
-    def test_organism_filter_passed_through(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["search_genes"](mock_ctx, search_text="photosystem", organism="MED4")
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["organism"] == "MED4"
-
-    def test_min_quality_passed_through(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["search_genes"](mock_ctx, search_text="photosystem", min_quality=2)
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["min_quality"] == 2
-
-    def test_lucene_fallback_on_error(self, tool_fns, mock_ctx):
-        """When first query raises, should retry with escaped Lucene chars."""
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.side_effect = [
-            Neo4jClientError("Lucene parse error"),  # first call fails
-            [{"locus_tag": "PMM0001"}],  # retry succeeds
-        ]
-        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="DNA [repair"))
-        assert result["total"] == 1
-        assert conn.execute_query.call_count == 2
-
-    def test_category_passed_through(self, tool_fns, mock_ctx):
-        """category param is forwarded to the query builder."""
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["search_genes"](mock_ctx, search_text="x", category="Photosynthesis")
-        call_kwargs = _conn_from(mock_ctx).execute_query.call_args.kwargs
-        assert call_kwargs["category"] == "Photosynthesis"
-
-    def test_dedup_collapses_same_group(self, tool_fns, mock_ctx):
-        """Dedup groups rows with the same ortholog group, keeping the first as representative."""
-        search_rows = [
-            {"locus_tag": "PMM0044", "organism_strain": "Prochlorococcus MED4", "score": 5.0},
-            {"locus_tag": "PMT9312_0044", "organism_strain": "Prochlorococcus MIT9312", "score": 4.5},
-            {"locus_tag": "SYNW0044", "organism_strain": "Synechococcus WH8102", "score": 4.0},
-            {"locus_tag": "PMM0099", "organism_strain": "Prochlorococcus MED4", "score": 3.0},
-        ]
-        dedup_rows = [
-            {"locus_tag": "PMM0044", "dedup_group": "CK_00001234"},
-            {"locus_tag": "PMT9312_0044", "dedup_group": "CK_00001234"},
-            {"locus_tag": "SYNW0044", "dedup_group": "CK_00001234"},
-            {"locus_tag": "PMM0099", "dedup_group": "CK_00005678"},
-        ]
-        _conn_from(mock_ctx).execute_query.side_effect = [search_rows, dedup_rows]
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, search_text="naphthoate", deduplicate=True)
-        )
-        assert result["total"] == 2
-        rep = result["results"][0]
-        assert rep["locus_tag"] == "PMM0044"
-        assert rep["collapsed_count"] == 3
-        assert rep["group_organisms"] == {
-            "Prochlorococcus MED4": 1,
-            "Prochlorococcus MIT9312": 1,
-            "Synechococcus WH8102": 1,
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        """When api returns no matches."""
+        empty_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_entries": 50,
+            "total_matching": 0,
+            "by_organism": [],
+            "by_category": [],
+            "score_max": 0.0,
+            "score_median": 0.0,
+            "returned": 0,
+            "truncated": False,
+            "results": [],
         }
-        # Second group has only 1 member
-        assert result["results"][1]["collapsed_count"] == 1
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value=empty_return,
+        ):
+            result = await tool_fns["genes_by_function"](
+                mock_ctx, search_text="nonexistent",
+            )
+        assert result.total_matching == 0
+        assert result.returned == 0
+        assert result.results == []
 
-    def test_dedup_genes_without_group_appear_individually(self, tool_fns, mock_ctx):
-        """Genes without an ortholog group always appear individually even with dedup."""
-        search_rows = [
-            {"locus_tag": "PMM0044", "organism_strain": "Prochlorococcus MED4", "score": 5.0},
-            {"locus_tag": "PMT9312_0044", "organism_strain": "Prochlorococcus MIT9312", "score": 4.5},
-            {"locus_tag": "ALT_NOCL", "organism_strain": "Alteromonas macleodii MIT1002", "score": 3.0},
-        ]
-        dedup_rows = [
-            {"locus_tag": "PMM0044", "dedup_group": "CK_00001234"},
-            {"locus_tag": "PMT9312_0044", "dedup_group": "CK_00001234"},
-            # ALT_NOCL has no ortholog group — not in dedup_rows
-        ]
-        _conn_from(mock_ctx).execute_query.side_effect = [search_rows, dedup_rows]
-        result = json.loads(
-            tool_fns["search_genes"](mock_ctx, search_text="test", deduplicate=True)
-        )
-        assert result["total"] == 2
-        loci = [r["locus_tag"] for r in result["results"]]
-        assert "ALT_NOCL" in loci
-        # Gene without group should not have collapsed_count
-        nocl = [r for r in result["results"] if r["locus_tag"] == "ALT_NOCL"][0]
-        assert "collapsed_count" not in nocl
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """All params passed through to api."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["genes_by_function"](
+                mock_ctx,
+                search_text="photosystem",
+                organism="MED4",
+                category="Photosynthesis",
+                min_quality=2,
+                summary=True,
+                verbose=True,
+                limit=10,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.args[0] == "photosystem"
+        assert call_kwargs.kwargs["organism"] == "MED4"
+        assert call_kwargs.kwargs["category"] == "Photosynthesis"
+        assert call_kwargs.kwargs["min_quality"] == 2
+        assert call_kwargs.kwargs["summary"] is True
+        assert call_kwargs.kwargs["verbose"] is True
+        assert call_kwargs.kwargs["limit"] == 10
 
-    def test_limit_boundary_one(self, tool_fns, mock_ctx):
-        """limit=1 returns at most 1 result."""
-        rows = [{"locus_tag": "PMM0001", "score": 5.0}, {"locus_tag": "PMM0002", "score": 3.0}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["search_genes"](mock_ctx, search_text="x", limit=1))
-        assert len(result["results"]) == 1
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """returned/truncated from api are preserved when total_matching > returned."""
+        truncated_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 50,
+            "returned": 5,
+            "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value=truncated_return,
+        ):
+            result = await tool_fns["genes_by_function"](
+                mock_ctx, search_text="photosystem",
+            )
+        assert result.total_matching == 50
+        assert result.returned == 5
+        assert result.truncated is True
+
+    @pytest.mark.asyncio
+    async def test_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """Exception from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            side_effect=Exception("something broke"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["genes_by_function"](
+                    mock_ctx, search_text="test",
+                )
 
 
 # ---------------------------------------------------------------------------
@@ -1125,21 +1140,25 @@ class TestErrorHandling:
             with pytest.raises(ToolError, match="Error in resolve_gene"):
                 await tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
 
-    def test_search_genes_value_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_genes_by_function_value_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
-            "multiomics_explorer.api.functions.search_genes",
+            "multiomics_explorer.api.functions.genes_by_function",
             side_effect=ValueError("bad input"),
         ):
-            result = tool_fns["search_genes"](mock_ctx, search_text="test")
-        assert result == "Error: bad input"
+            with pytest.raises(ToolError):
+                await tool_fns["genes_by_function"](mock_ctx, search_text="test")
 
-    def test_search_genes_generic_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_genes_by_function_generic_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
-            "multiomics_explorer.api.functions.search_genes",
+            "multiomics_explorer.api.functions.genes_by_function",
             side_effect=RuntimeError("timeout"),
         ):
-            result = tool_fns["search_genes"](mock_ctx, search_text="test")
-        assert "Error in search_genes" in result
+            with pytest.raises(ToolError, match="Error in genes_by_function"):
+                await tool_fns["genes_by_function"](mock_ctx, search_text="test")
 
     def test_gene_overview_generic_error(self, tool_fns, mock_ctx):
         with patch(

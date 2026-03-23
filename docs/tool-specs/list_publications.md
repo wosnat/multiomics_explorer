@@ -62,7 +62,7 @@ async def list_publications(
 
     Returns publication metadata and experiment summaries. Use this as
     an entry point to discover what studies exist, then drill into
-    specific experiments with list_experiments or genes with search_genes.
+    specific experiments with list_experiments or genes with genes_by_function.
     """
 ```
 
@@ -214,7 +214,7 @@ if author:
 
 **Design notes:**
 - `search_text` uses `publicationFullText` index (Lucene syntax,
-  case-insensitive, fuzzy matching) — same pattern as `search_genes`
+  case-insensitive, fuzzy matching) — same pattern as `genes_by_function`
   and `search_ontology`
 - When `search_text` is provided, the query starts with a fulltext CALL
   and results are sorted by score first
@@ -293,7 +293,7 @@ The API function runs two queries: count (for `total`) then data
 (with LIMIT). The MCP wrapper adds `returned` and `truncated` from
 the API response.
 
-Lucene escape retry follows the same pattern as `search_genes` and
+Lucene escape retry follows the same pattern as `genes_by_function` and
 `search_ontology`.
 
 ---
@@ -341,7 +341,7 @@ async def list_publications(
 
     Returns publication metadata and experiment summaries. Use this as
     an entry point to discover what studies exist, then drill into
-    specific experiments with list_experiments or genes with search_genes.
+    specific experiments with list_experiments or genes with genes_by_function.
     """
     await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                    f"search_text={search_text} author={author}")
@@ -511,7 +511,7 @@ Using the about-content template (Option A: small result set, no modes):
 - **Response:** `{total_entries, total_matching, returned, truncated, results}`.
   Compact results by default; `verbose=True` adds abstract and description.
 - **Chaining:** `list_publications` → `list_experiments` (by DOI or
-  treatment_type) → `search_genes` or `query_expression` (by experiment).
+  treatment_type) → `genes_by_function` or `query_expression` (by experiment).
 - **Package import:** `from multiomics_explorer import list_publications` —
   returns `{total_entries, total_matching, results}` (no truncation wrapper).
 

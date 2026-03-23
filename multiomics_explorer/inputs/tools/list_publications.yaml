@@ -29,7 +29,7 @@ examples:
       Step 2: list_experiments(doi=result["doi"])
               → drill into experiments from a specific paper
 
-      Step 3: search_genes(search_text="photosystem", organism="MED4")
+      Step 3: genes_by_function(search_text="photosystem", organism="MED4")
               → find genes of interest
 
 verbose_fields:
@@ -38,6 +38,6 @@ verbose_fields:
 
 chaining:
   - "list_publications → list_experiments → query_expression"
-  - "list_publications → search_genes"
+  - "list_publications → genes_by_function"
 
 mistakes: []

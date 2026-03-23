@@ -18,6 +18,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
     build_gene_stub,
+    build_genes_by_function,
     build_genes_by_ontology,
     build_get_gene_details,
     build_gene_homologs,
@@ -27,7 +28,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_organisms,
     build_list_publications,
     build_resolve_gene,
-    build_search_genes,
     build_search_ontology,
 )
 
@@ -41,7 +41,7 @@ CASE_IDS = [c["id"] for c in CASES]
 
 TOOL_BUILDERS = {
     "resolve_gene": build_resolve_gene,
-    "search_genes": build_search_genes,
+    "genes_by_function": build_genes_by_function,
     "gene_overview": build_gene_overview,
     "get_gene_details": build_get_gene_details,
     "gene_homologs": build_gene_homologs,

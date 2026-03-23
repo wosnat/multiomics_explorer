@@ -21,6 +21,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
     build_gene_stub,
+    build_genes_by_function,
     build_genes_by_ontology,
     build_get_gene_details,
     build_gene_homologs,
@@ -30,8 +31,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_organisms,
     build_list_publications,
     build_resolve_gene,
-    build_search_genes,
-    build_search_genes_dedup_groups,
     build_search_ontology,
 )
 
@@ -49,7 +48,7 @@ CASE_IDS = [c["id"] for c in CASES]
 
 TOOL_BUILDERS = {
     "resolve_gene": build_resolve_gene,
-    "search_genes": build_search_genes,
+    "genes_by_function": build_genes_by_function,
     "gene_overview": build_gene_overview,
     "get_gene_details": build_get_gene_details,
     "gene_homologs": build_gene_homologs,
@@ -79,10 +78,9 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         return conn.execute_query(cypher, **params_b)
 
     builder = TOOL_BUILDERS[tool]
-    deduplicate = params.get("deduplicate", False)
     limit = params.get("limit")
     # Strip tool-level params that aren't accepted by query builders
-    builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit")}
+    builder_params = {k: v for k, v in params.items() if k not in ("limit",)}
     cypher, query_params = builder(**builder_params)
     results = conn.execute_query(cypher, **query_params)
     # Apply limit at the test level (mirrors MCP layer behavior)
@@ -92,24 +90,6 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
     # get_gene_details returns g{.*} AS gene — unwrap for flat column checks
     if tool == "get_gene_details" and results and "gene" in results[0]:
         results = [r["gene"] for r in results if r.get("gene") is not None]
-
-    if deduplicate and tool == "search_genes":
-        locus_tags = [r["locus_tag"] for r in results]
-        dedup_cypher, dedup_params = build_search_genes_dedup_groups(
-            locus_tags=locus_tags,
-        )
-        dedup_rows = conn.execute_query(dedup_cypher, **dedup_params)
-        tag_to_group = {r["locus_tag"]: r["dedup_group"] for r in dedup_rows}
-        seen_groups: set[str] = set()
-        deduped = []
-        for row in results:
-            group = tag_to_group.get(row["locus_tag"])
-            if group:
-                if group in seen_groups:
-                    continue
-                seen_groups.add(group)
-            deduped.append(row)
-        results = deduped
 
     return results
 

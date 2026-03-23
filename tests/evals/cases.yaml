@@ -124,17 +124,17 @@
 
 # ── Full-text search ────────────────────────────────────
 
-- id: search_genes_photosystem
-  tool: search_genes
+- id: genes_by_function_photosystem
+  tool: genes_by_function
   desc: Full-text search for photosystem genes
   params:
     search_text: photosystem
   expect:
     min_rows: 1
-    columns: [locus_tag, product, gene_summary, score]
+    columns: [locus_tag, gene_name, product, organism_strain, gene_category, annotation_quality, score]
 
-- id: search_genes_with_organism
-  tool: search_genes
+- id: genes_by_function_with_organism
+  tool: genes_by_function
   desc: Full-text search narrowed by organism
   params:
     search_text: "DNA repair"
@@ -317,10 +317,10 @@
     row0:
       locus_tag: PMM0001
 
-# ── Search genes corner cases ────────────────────────────────
+# ── Genes by function corner cases ────────────────────────────────
 
-- id: search_genes_synechococcus_filter
-  tool: search_genes
+- id: genes_by_function_synechococcus_filter
+  tool: genes_by_function
   desc: Full-text search with Synechococcus organism filter
   params:
     search_text: cell division
@@ -328,55 +328,32 @@
   expect:
     min_rows: 1
 
-- id: search_genes_naphthoate
-  tool: search_genes
+- id: genes_by_function_naphthoate
+  tool: genes_by_function
   desc: Specific enzyme search finds naphthoate synthase
   params:
     search_text: naphthoate
   expect:
     min_rows: 1
-    columns: [locus_tag, product, gene_summary, score]
+    columns: [locus_tag, gene_name, product, organism_strain, gene_category, annotation_quality, score]
 
-# ── Search genes: return columns ──────────────────────────────
+# ── Genes by function: return columns ──────────────────────────────
 
-- id: search_genes_with_cluster_id
-  tool: search_genes
+- id: genes_by_function_columns
+  tool: genes_by_function
   desc: Results include all expected columns
   params:
     search_text: naphthoate
     limit: 10
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, function_description,
-              gene_summary, organism_strain, annotation_quality,
-              score]
+    columns: [locus_tag, gene_name, product, organism_strain,
+              gene_category, annotation_quality, score]
 
-# ── Search genes: deduplication ────────────────────────────
+# ── Genes by function: category filter ──────────────────────────
 
-- id: search_genes_dedup_photosystem
-  tool: search_genes
-  desc: Dedup collapses photosystem orthologs into cluster representatives
-  params:
-    search_text: photosystem
-    deduplicate: true
-    limit: 20
-  expect:
-    min_rows: 1
-
-- id: search_genes_dedup_naphthoate
-  tool: search_genes
-  desc: Dedup naphthoate (dedup currently no-op without cluster_id)
-  params:
-    search_text: naphthoate
-    deduplicate: true
-    limit: 10
-  expect:
-    min_rows: 1
-
-# ── Search genes: category filter ──────────────────────────
-
-- id: search_genes_category_filter
-  tool: search_genes
+- id: genes_by_function_category_filter
+  tool: genes_by_function
   desc: Category filter restricts to Photosynthesis genes
   params:
     search_text: reaction centre
@@ -384,10 +361,10 @@
   expect:
     min_rows: 1
 
-# ── Search genes: cross-organism ───────────────────────────
+# ── Genes by function: cross-organism ───────────────────────────
 
-- id: search_genes_cross_organism_chaperone
-  tool: search_genes
+- id: genes_by_function_cross_organism_chaperone
+  tool: genes_by_function
   desc: "chaperone spans Pro + Syn + Alt in top results"
   params:
     search_text: chaperone
@@ -396,8 +373,8 @@
     min_rows: 5
     columns: [locus_tag, gene_name, product, organism_strain, score]
 
-- id: search_genes_cross_organism_superoxide
-  tool: search_genes
+- id: genes_by_function_cross_organism_superoxide
+  tool: genes_by_function
   desc: "superoxide dismutase spans Pro/Syn + Alt"
   params:
     search_text: superoxide dismutase
@@ -405,8 +382,8 @@
   expect:
     min_rows: 3
 
-- id: search_genes_alteromonas_only_catalase
-  tool: search_genes
+- id: genes_by_function_alteromonas_only_catalase
+  tool: genes_by_function
   desc: "catalase returns Alteromonas only (not in cyanobacteria)"
   params:
     search_text: catalase
@@ -414,18 +391,8 @@
   expect:
     min_rows: 5
 
-- id: search_genes_dedup_cross_organism_chaperone
-  tool: search_genes
-  desc: Dedup chaperone collapses orthologs but keeps both Pro + Alt representatives
-  params:
-    search_text: chaperone
-    deduplicate: true
-    limit: 10
-  expect:
-    min_rows: 2
-
-- id: search_genes_min_quality
-  tool: search_genes
+- id: genes_by_function_min_quality
+  tool: genes_by_function
   desc: min_quality=2 filters out hypothetical proteins
   params:
     search_text: polymerase
@@ -434,8 +401,8 @@
   expect:
     min_rows: 1
 
-- id: search_genes_lucene_fuzzy
-  tool: search_genes
+- id: genes_by_function_lucene_fuzzy
+  tool: genes_by_function
   desc: Lucene fuzzy syntax (~) works in gene search
   params:
     search_text: "replicat~"

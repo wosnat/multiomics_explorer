@@ -22,6 +22,8 @@ from multiomics_explorer.kg.constants import (
 from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
+    build_genes_by_function,
+    build_genes_by_function_summary,
     build_genes_by_ontology,
     build_get_gene_details,
     build_gene_homologs,
@@ -33,8 +35,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments,
     build_list_experiments_summary,
     build_resolve_gene,
-    build_search_genes,
-    build_search_genes_dedup_groups,
     build_search_ontology,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
@@ -115,81 +115,96 @@ def resolve_gene(
     }
 
 
-def search_genes(
+def genes_by_function(
     search_text: str,
     organism: str | None = None,
     category: str | None = None,
     min_quality: int = 0,
-    deduplicate: bool = False,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
-    """Free-text search across gene functional annotations.
+) -> dict:
+    """Search genes by functional annotation text.
 
-    Returns list of dicts with keys: locus_tag, gene_name, product,
-    function_description, gene_summary, organism_strain,
-    annotation_quality, score.
-
-    When deduplicate=True, representatives also have collapsed_count
-    and group_organisms keys.
+    Returns dict with keys: total_entries, total_matching,
+    by_organism, by_category, score_max, score_median,
+    returned, truncated, results.
+    Per result: locus_tag, gene_name, product, organism_strain,
+    gene_category, annotation_quality, score.
+    Verbose adds: function_description, gene_summary.
     """
+    if summary:
+        limit = 0
+
     conn = _default_conn(conn)
-    cypher, params = build_search_genes(
+    filter_kwargs = dict(
         search_text=search_text, organism=organism,
         category=category, min_quality=min_quality,
     )
-    try:
-        results = conn.execute_query(cypher, **params)
-    except Neo4jClientError:
-        logger.debug("search_genes: Lucene parse error, retrying with escaped query")
-        escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-        cypher, params = build_search_genes(
-            search_text=escaped, organism=organism,
-            category=category, min_quality=min_quality,
+
+    def _run_summary(st=search_text):
+        kw = {**filter_kwargs, "search_text": st}
+        cypher, params = build_genes_by_function_summary(**kw)
+        return conn.execute_query(cypher, **params)[0]
+
+    def _run_detail(st=search_text):
+        kw = {**filter_kwargs, "search_text": st}
+        cypher, params = build_genes_by_function(
+            **kw, verbose=verbose, limit=limit,
         )
-        results = conn.execute_query(cypher, **params)
+        return conn.execute_query(cypher, **params)
 
-    if deduplicate:
-        logger.debug("search_genes: deduplicating %d results by orthogroup", len(results))
-        results = _deduplicate_by_orthogroup(results, conn)
+    # Always run summary query
+    try:
+        raw_summary = _run_summary()
+    except Neo4jClientError:
+        logger.debug("genes_by_function: Lucene parse error, retrying with escaped query")
+        escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+        raw_summary = _run_summary(st=escaped)
+        filter_kwargs["search_text"] = escaped
 
-    return results
+    # Rename APOC {item, count} to domain keys, sort desc
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
 
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_entries": raw_summary["total_entries"],
+        "total_matching": total_matching,
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism"),
+        "by_category": _rename_freq(raw_summary["by_category"], "category"),
+        "score_max": raw_summary["score_max"] or 0.0,
+        "score_median": raw_summary["score_median"] or 0.0,
+    }
 
-def _deduplicate_by_orthogroup(
-    results: list[dict], conn: GraphConnection,
-) -> list[dict]:
-    """Collapse search results by ortholog group."""
-    locus_tags = [r["locus_tag"] for r in results]
-    dedup_cypher, dedup_params = build_search_genes_dedup_groups(
-        locus_tags=locus_tags,
-    )
-    dedup_rows = conn.execute_query(dedup_cypher, **dedup_params)
-    tag_to_group = {r["locus_tag"]: r["dedup_group"] for r in dedup_rows}
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
 
-    seen_groups: dict[str, list] = {}
-    deduped = []
-    for row in results:
-        group = tag_to_group.get(row["locus_tag"])
-        if group:
-            if group in seen_groups:
-                seen_groups[group].append(row)
-                continue
-            seen_groups[group] = [row]
-        deduped.append(row)
+    try:
+        results = _run_detail()
+    except Neo4jClientError:
+        if filter_kwargs["search_text"] == search_text:
+            # Not yet escaped (summary succeeded without retry)
+            logger.debug("genes_by_function detail: Lucene parse error, retrying")
+            escaped = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            results = _run_detail(st=escaped)
+        else:
+            raise
 
-    for row in deduped:
-        group = tag_to_group.get(row["locus_tag"])
-        if group:
-            members = seen_groups[group]
-            row["collapsed_count"] = len(members)
-            org_counts: dict[str, int] = {}
-            for r in members:
-                org = r.get("organism_strain", "Unknown")
-                org_counts[org] = org_counts.get(org, 0) + 1
-            row["group_organisms"] = org_counts
-
-    return deduped
+    envelope["returned"] = len(results)
+    envelope["truncated"] = total_matching > len(results)
+    envelope["results"] = results
+    return envelope
 
 
 def gene_overview(

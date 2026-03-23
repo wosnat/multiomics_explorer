@@ -6,7 +6,7 @@ List publications with expression data in the knowledge graph.
 
 Returns publication metadata and experiment summaries. Use this as
 an entry point to discover what studies exist, then drill into
-specific experiments with list_experiments or genes with search_genes.
+specific experiments with list_experiments or genes with genes_by_function.
 
 ## Parameters
 
@@ -97,7 +97,7 @@ Step 1: list_publications(organism="MED4")
 Step 2: list_experiments(doi=result["doi"])
         → drill into experiments from a specific paper
 
-Step 3: search_genes(search_text="photosystem", organism="MED4")
+Step 3: genes_by_function(search_text="photosystem", organism="MED4")
         → find genes of interest
 ```
 
@@ -105,7 +105,7 @@ Step 3: search_genes(search_text="photosystem", organism="MED4")
 
 ```
 list_publications → list_experiments → query_expression
-list_publications → search_genes
+list_publications → genes_by_function
 ```
 
 ## Package import equivalent

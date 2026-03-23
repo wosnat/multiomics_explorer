@@ -19,7 +19,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_publications,
     build_list_publications_summary,
     build_resolve_gene,
-    build_search_genes,
+    build_genes_by_function,
 )
 from multiomics_explorer.api import functions as api
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
@@ -44,25 +44,25 @@ class TestGetSchema:
 
 
 @pytest.mark.kg
-class TestSearchGenes:
+class TestGenesByFunction:
     def test_invalid_lucene_syntax_does_not_crash(self, conn):
         """Unbalanced brackets should trigger the Lucene escape fallback."""
         import re
 
         search_text = "DNA [repair"
-        cypher, params = build_search_genes(search_text=search_text)
+        cypher, params = build_genes_by_function(search_text=search_text)
         try:
             results = conn.execute_query(cypher, **params)
         except Exception:
             # Retry with escaped Lucene chars (mirrors tools.py fallback logic)
             escaped = re.sub(r'[+\-!(){}\[\]^"~*?:\\/]', r'\\\g<0>', search_text)
-            cypher, params = build_search_genes(search_text=escaped)
+            cypher, params = build_genes_by_function(search_text=escaped)
             results = conn.execute_query(cypher, **params)
         # Should not raise — may return 0 or more results
         assert isinstance(results, list)
 
     def test_basic_search_returns_results(self, conn):
-        cypher, params = build_search_genes(search_text="photosystem")
+        cypher, params = build_genes_by_function(search_text="photosystem")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         assert "locus_tag" in results[0]

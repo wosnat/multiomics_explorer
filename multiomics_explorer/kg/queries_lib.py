@@ -92,43 +92,117 @@ def build_resolve_gene(
     return cypher, {"identifier": identifier, "organism": organism}
 
 
-def build_search_genes(
-    *, search_text: str, organism: str | None = None,
+def _genes_by_function_filter_clause() -> str:
+    """Return the shared WHERE filter expression for genes_by_function builders."""
+    return (
+        "($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')"
+        " WHERE toLower(g.organism_strain) CONTAINS word))\n"
+        "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
+        "  AND ($category IS NULL OR g.gene_category = $category)"
+    )
+
+
+def _genes_by_function_params(
+    *,
+    search_text: str,
+    organism: str | None = None,
     category: str | None = None,
     min_quality: int = 0,
-) -> tuple[str, dict]:
-    cypher = (
-        "CALL db.index.fulltext.queryNodes('geneFullText', $search_text)\n"
-        "YIELD node AS g, score\n"
-        "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word))\n"
-        "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
-        "  AND ($category IS NULL OR g.gene_category = $category)\n"
-        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.product AS product, g.function_description AS function_description,\n"
-        "       g.gene_summary AS gene_summary,\n"
-        "       g.organism_strain AS organism_strain,\n"
-        "       g.annotation_quality AS annotation_quality,\n"
-        "       score\n"
-        "ORDER BY score DESC, g.locus_tag"
-    )
-    return cypher, {
+) -> dict:
+    return {
         "search_text": search_text, "organism": organism,
-        "category": category,
-        "min_quality": min_quality,
+        "category": category, "min_quality": min_quality,
     }
 
 
-def build_search_genes_dedup_groups(*, locus_tags: list[str]) -> tuple[str, dict]:
-    """Return the most specific OrthologGroup name for each gene (for dedup)."""
+def build_genes_by_function_summary(
+    *,
+    search_text: str,
+    organism: str | None = None,
+    category: str | None = None,
+    min_quality: int = 0,
+) -> tuple[str, dict]:
+    """Build summary Cypher for genes_by_function.
+
+    Uses conditional counting to compute total_entries (before filters)
+    and total_matching (after filters) in a single fulltext pass.
+
+    RETURN keys: total_entries, total_matching, by_organism, by_category,
+    score_max, score_median.
+    """
+    filt = _genes_by_function_filter_clause()
     cypher = (
-        "UNWIND $locus_tags AS lt\n"
-        "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
-        "WHERE og.specificity_rank < 3\n"
-        "WITH g.locus_tag AS locus_tag, og ORDER BY og.specificity_rank\n"
-        "WITH locus_tag, collect(og.name)[0] AS dedup_group\n"
-        "RETURN locus_tag, dedup_group"
+        "CALL db.index.fulltext.queryNodes('geneFullText', $search_text)\n"
+        "YIELD node AS g, score\n"
+        f"WITH g, score,\n"
+        f"     CASE WHEN {filt}\n"
+        "     THEN 1 ELSE 0 END AS matches\n"
+        "WITH count(g) AS total_entries,\n"
+        "     sum(matches) AS total_matching,\n"
+        "     max(CASE WHEN matches = 1 THEN score END) AS score_max,\n"
+        "     percentileDisc(\n"
+        "       CASE WHEN matches = 1 THEN score END, 0.5\n"
+        "     ) AS score_median,\n"
+        "     [x IN collect(\n"
+        "       CASE WHEN matches = 1 THEN g.organism_strain END\n"
+        "     ) WHERE x IS NOT NULL] AS organisms,\n"
+        "     [x IN collect(\n"
+        "       CASE WHEN matches = 1 THEN g.gene_category END\n"
+        "     ) WHERE x IS NOT NULL] AS categories\n"
+        "RETURN total_entries, total_matching, score_max, score_median,\n"
+        "       apoc.coll.frequencies(organisms) AS by_organism,\n"
+        "       apoc.coll.frequencies(categories) AS by_category"
     )
-    return cypher, {"locus_tags": locus_tags}
+    return cypher, _genes_by_function_params(
+        search_text=search_text, organism=organism,
+        category=category, min_quality=min_quality,
+    )
+
+
+def build_genes_by_function(
+    *,
+    search_text: str,
+    organism: str | None = None,
+    category: str | None = None,
+    min_quality: int = 0,
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build detail Cypher for genes_by_function.
+
+    RETURN keys (compact): locus_tag, gene_name, product,
+    organism_strain, gene_category, annotation_quality, score.
+    RETURN keys (verbose): adds function_description, gene_summary.
+    """
+    params = _genes_by_function_params(
+        search_text=search_text, organism=organism,
+        category=category, min_quality=min_quality,
+    )
+
+    verbose_cols = (
+        ",\n       g.function_description AS function_description"
+        ",\n       g.gene_summary AS gene_summary"
+        if verbose else ""
+    )
+
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    filt = _genes_by_function_filter_clause()
+    cypher = (
+        "CALL db.index.fulltext.queryNodes('geneFullText', $search_text)\n"
+        "YIELD node AS g, score\n"
+        f"WHERE {filt}\n"
+        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       g.product AS product, g.organism_strain AS organism_strain,\n"
+        "       g.gene_category AS gene_category,\n"
+        f"       g.annotation_quality AS annotation_quality, score{verbose_cols}\n"
+        f"ORDER BY score DESC, g.locus_tag{limit_clause}"
+    )
+    return cypher, params
 
 
 def build_gene_overview(

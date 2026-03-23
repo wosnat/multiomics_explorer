@@ -23,7 +23,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_gene_categories,
     build_list_organisms,
     build_resolve_gene,
-    build_search_genes,
+    build_genes_by_function,
     build_search_ontology,
 )
 from tests.fixtures.gene_data import (
@@ -133,12 +133,12 @@ class TestResolveGeneCorrectnessKG:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.kg
-class TestSearchGenesCorrectnessKG:
-    """Validate full-text search_genes returns scored results."""
+class TestGenesByFunctionCorrectnessKG:
+    """Validate full-text genes_by_function returns scored results."""
 
     def test_basic_search_has_scores(self, conn):
         """Full-text search for 'photosystem' should return results with scores."""
-        cypher, params = build_search_genes(search_text="photosystem")
+        cypher, params = build_genes_by_function(search_text="photosystem")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         for r in results:
@@ -147,7 +147,7 @@ class TestSearchGenesCorrectnessKG:
 
     def test_organism_filter(self, conn):
         """Organism filter should restrict full-text results."""
-        cypher, params = build_search_genes(search_text="DNA repair", organism="MED4")
+        cypher, params = build_genes_by_function(search_text="DNA repair", organism="MED4")
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         for r in results:
@@ -157,10 +157,10 @@ class TestSearchGenesCorrectnessKG:
 
     def test_quality_filter_reduces_results(self, conn):
         """Higher min_quality should return fewer or equal results than lower."""
-        cypher_low, params_low = build_search_genes(
+        cypher_low, params_low = build_genes_by_function(
             search_text="polymerase", min_quality=0,
         )
-        cypher_high, params_high = build_search_genes(
+        cypher_high, params_high = build_genes_by_function(
             search_text="polymerase", min_quality=2,
         )
         results_low = conn.execute_query(cypher_low, **params_low)
@@ -169,7 +169,7 @@ class TestSearchGenesCorrectnessKG:
 
     def test_category_filter(self, conn):
         """Category filter restricts results to genes in that category."""
-        cypher, params = build_search_genes(
+        cypher, params = build_genes_by_function(
             search_text="reaction centre", category="Photosynthesis",
         )
         results = conn.execute_query(cypher, **params)
@@ -177,7 +177,7 @@ class TestSearchGenesCorrectnessKG:
 
     def test_cross_organism_results(self, conn):
         """Search without organism filter returns genes from multiple organisms."""
-        cypher, params = build_search_genes(
+        cypher, params = build_genes_by_function(
             search_text="chaperone",
         )
         results = conn.execute_query(cypher, **params)

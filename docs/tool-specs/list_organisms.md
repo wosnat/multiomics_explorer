@@ -25,11 +25,11 @@ include species, taxonomy IDs, and data-availability signals.
 - **Discovery:** "What organisms are in this KG?" — first tool a
   researcher calls, orients all subsequent queries.
 - **Filter value lookup:** organism names returned here are used as
-  filter values in `search_genes`, `resolve_gene`, `genes_by_ontology`,
+  filter values in `genes_by_function`, `resolve_gene`, `genes_by_ontology`,
   `list_publications`, etc.
 - **Cross-referencing:** `ncbi_taxon_id` enables lookup in NCBI,
   UniProt, JGI, etc.
-- **Chaining:** `list_organisms` → pick organism → `search_genes(organism=...)`
+- **Chaining:** `list_organisms` → pick organism → `genes_by_function(organism=...)`
   or `list_publications(organism=...)`.
 
 ## KG dependencies
@@ -62,7 +62,7 @@ async def list_organisms(
     """List all organisms with sequenced genomes in the knowledge graph.
 
     Returns taxonomy, gene counts, and publication counts for each organism.
-    Use the returned organism names as filter values in search_genes,
+    Use the returned organism names as filter values in genes_by_function,
     resolve_gene, genes_by_ontology, list_publications, etc. The organism
     filter uses partial matching — "MED4", "Prochlorococcus MED4", and
     "Prochlorococcus" all work.
@@ -294,7 +294,7 @@ async def list_organisms(
     """List all organisms with sequenced genomes in the knowledge graph.
 
     Returns taxonomy, gene counts, and publication counts for each organism.
-    Use the returned organism names as filter values in search_genes,
+    Use the returned organism names as filter values in genes_by_function,
     resolve_gene, genes_by_ontology, list_publications, etc. The organism
     filter uses partial matching — "MED4", "Prochlorococcus MED4", and
     "Prochlorococcus" all work.
@@ -396,14 +396,14 @@ examples:
       Step 1: list_organisms()
               → discover available organisms and data coverage
 
-      Step 2: search_genes(search_text="photosystem", organism="MED4")
+      Step 2: genes_by_function(search_text="photosystem", organism="MED4")
               → search genes within a specific organism
 
       Step 3: list_publications(organism="MED4")
               → find publications studying that organism
 
 chaining:
-  - "list_organisms → search_genes"
+  - "list_organisms → genes_by_function"
   - "list_organisms → list_publications"
   - "list_organisms → resolve_gene"
   - "list_organisms → genes_by_ontology"

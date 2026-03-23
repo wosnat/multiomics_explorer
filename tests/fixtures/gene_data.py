@@ -1834,18 +1834,21 @@ def as_resolve_gene_result(gene):
     }
 
 
-# Helper: project to search_genes return shape
-def as_search_genes_result(gene, score=1.0):
-    return {
+# Helper: project to genes_by_function return shape
+def as_genes_by_function_result(gene, score=1.0, verbose=False):
+    row = {
         "locus_tag": gene["locus_tag"],
         "gene_name": gene.get("gene_name"),
         "product": gene.get("product"),
-        "function_description": gene.get("function_description"),
-        "gene_summary": gene.get("gene_summary"),
         "organism_strain": gene.get("organism_strain"),
+        "gene_category": gene.get("gene_category"),
         "annotation_quality": gene.get("annotation_quality"),
         "score": score,
     }
+    if verbose:
+        row["function_description"] = gene.get("function_description")
+        row["gene_summary"] = gene.get("gene_summary")
+    return row
 
 
 # Filter helpers

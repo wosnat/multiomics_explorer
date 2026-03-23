@@ -63,7 +63,7 @@ def register_tools(mcp: FastMCP):
         """List valid values for categorical filters used across tools.
 
         Returns:
-        - gene_categories: values for the category filter on search_genes
+        - gene_categories: values for the category filter on genes_by_function
           (e.g. "Photosynthesis", "Transport", "Stress response and adaptation")
         """
         logger.info("list_filter_values")
@@ -129,7 +129,7 @@ def register_tools(mcp: FastMCP):
         """List all organisms with sequenced genomes in the knowledge graph.
 
         Returns taxonomy, gene counts, and publication counts for each organism.
-        Use the returned organism names as filter values in search_genes,
+        Use the returned organism names as filter values in genes_by_function,
         resolve_gene, genes_by_ontology, list_publications, etc. The organism
         filter uses partial matching — "MED4", "Prochlorococcus MED4", and
         "Prochlorococcus" all work.
@@ -217,71 +217,122 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"resolve_gene unexpected error: {e}")
             raise ToolError(f"Error in resolve_gene: {e}")
 
-    @mcp.tool()
-    def search_genes(
-        ctx: Context,
-        search_text: str,
-        organism: str | None = None,
-        category: str | None = None,
-        min_quality: int = 0,
-        deduplicate: bool = False,
-        limit: int = 10,
-    ) -> str:
-        """Free-text search across gene functional annotations using full-text index.
-        Supports Lucene syntax: "DNA repair", nitrogen AND transport, iron*, dnaN~.
+    # --- genes_by_function ---
 
-        Args:
-            search_text: Free-text query (Lucene syntax supported).
-            organism: Optional organism filter (e.g. "MED4", "Prochlorococcus MED4").
-                Use list_organisms to see all valid organisms.
-            category: Optional gene_category filter (e.g. "Photosynthesis", "Transport").
-                Use list_filter_values to see all valid categories. Invalid values
-                return empty results (no validation).
-            min_quality: Minimum annotation_quality (0-3).
-                0 = hypothetical, no function info;
-                1 = hypothetical but has function description;
-                2 = real product name;
-                3 = well-annotated (product + GO/KEGG/EC/Pfam).
-                Use 2 to skip hypothetical proteins.
-            deduplicate: If True, collapse orthologs by ortholog group and return
-                one representative per group with collapsed_count and
-                group_organisms summary. Counts reflect hits within the result
-                set, not total group membership — use gene_homologs for full
-                ortholog inventory.
-            limit: Max results (default 10, max 50). When deduplicate=True, the
-                limit applies to the pre-dedup query, so fewer rows may be
-                returned after collapsing.
+    class FunctionOrganismBreakdown(BaseModel):
+        organism: str = Field(description="Organism strain (e.g. 'Prochlorococcus MED4')")
+        count: int = Field(description="Number of matching genes")
+
+    class FunctionCategoryBreakdown(BaseModel):
+        category: str = Field(description="Gene category (e.g. 'Photosynthesis')")
+        count: int = Field(description="Number of matching genes")
+
+    class GenesByFunctionResult(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
+        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
+        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta')")
+        organism_strain: str = Field(description="Organism strain (e.g. 'Prochlorococcus MED4')")
+        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Photosynthesis')")
+        annotation_quality: int = Field(description="Annotation quality 0-3 (3=best)")
+        score: float = Field(description="Fulltext relevance score")
+        # verbose only
+        function_description: str | None = Field(default=None, description="Functional description text")
+        gene_summary: str | None = Field(default=None, description="Combined gene annotation summary")
+
+    class GenesByFunctionResponse(BaseModel):
+        total_entries: int = Field(description="Total genes matching search text (before filters)")
+        total_matching: int = Field(description="Total genes matching search + all filters")
+        by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
+        by_category: list[FunctionCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
+        score_max: float = Field(description="Highest relevance score")
+        score_median: float = Field(description="Median relevance score")
+        returned: int = Field(description="Number of results returned")
+        truncated: bool = Field(description="True when total_matching > returned")
+        results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance")
+
+    @mcp.tool(
+        tags={"genes", "discovery"},
+        annotations={"readOnlyHint": True},
+    )
+    async def genes_by_function(
+        ctx: Context,
+        search_text: Annotated[str, Field(
+            description="Free-text query (Lucene syntax supported). "
+            "E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'.",
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter by organism (case-insensitive substring). "
+            "E.g. 'MED4', 'Prochlorococcus MED4'. "
+            "Use list_organisms to see valid values.",
+        )] = None,
+        category: Annotated[str | None, Field(
+            description="Filter by gene_category. "
+            "E.g. 'Photosynthesis', 'Transport'. "
+            "Use list_filter_values to see valid values.",
+        )] = None,
+        min_quality: Annotated[int, Field(
+            description="Minimum annotation_quality (0-3). "
+            "0=hypothetical, 1=has description, 2=named product, "
+            "3=well-annotated. Use 2 to skip hypothetical proteins.",
+            ge=0, le=3,
+        )] = 0,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include function_description and gene_summary.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> GenesByFunctionResponse:
+        """Search genes by functional annotation text.
+
+        Full-text search across gene names, products, and functional
+        descriptions. Supports Lucene syntax: quoted phrases, AND/OR,
+        wildcards (*), fuzzy (~). Results ranked by relevance score.
+
+        For ontology-based search, use genes_by_ontology.
+        For gene details, use gene_overview.
         """
-        logger.info("search_genes search_text=%s organism=%s category=%s deduplicate=%s limit=%d",
-                    search_text, organism, category, deduplicate, limit)
+        await ctx.info(f"genes_by_function search_text={search_text} organism={organism} "
+                       f"category={category} min_quality={min_quality}")
         try:
             conn = _conn(ctx)
-            limit = min(limit, 50)
-            results = api.search_genes(
+            data = api.genes_by_function(
                 search_text, organism=organism,
                 category=category, min_quality=min_quality,
-                deduplicate=deduplicate, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, conn=conn,
             )
-            results = results[:limit]
-            if not results:
-                return json.dumps({
-                    "results": [], "total": 0, "query": search_text,
-                })
-            return json.dumps({
-                "results": results, "total": len(results), "query": search_text,
-            }, indent=2, default=str)
+            by_organism = [FunctionOrganismBreakdown(**b) for b in data["by_organism"]]
+            by_category = [FunctionCategoryBreakdown(**b) for b in data["by_category"]]
+            results = [GenesByFunctionResult(**r) for r in data["results"]]
+            response = GenesByFunctionResponse(
+                total_entries=data["total_entries"],
+                total_matching=data["total_matching"],
+                by_organism=by_organism,
+                by_category=by_category,
+                score_max=data["score_max"],
+                score_median=data["score_median"],
+                returned=data["returned"],
+                truncated=data["truncated"],
+                results=results,
+            )
+            await ctx.info(f"Returning {response.returned} of {response.total_matching} "
+                           f"matching genes ({response.total_entries} before filters)")
+            return response
         except ValueError as e:
-            logger.warning("search_genes error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"genes_by_function error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("search_genes unexpected error: %s", e)
-            return f"Error in search_genes: {e}"
+            await ctx.error(f"genes_by_function unexpected error: {e}")
+            raise ToolError(f"Error in genes_by_function: {e}")
 
     @mcp.tool()
     def gene_overview(ctx: Context, gene_ids: list[str], limit: int = 50) -> str:
         """Get an overview of one or more genes: identity and data availability.
 
-        Use this after resolve_gene, search_genes, genes_by_ontology, or
+        Use this after resolve_gene, genes_by_function, genes_by_ontology, or
         gene_homologs to understand what each gene is and what follow-up data
         exists.
 
@@ -697,7 +748,7 @@ def register_tools(mcp: FastMCP):
 
         Returns publication metadata and experiment summaries. Use this as
         an entry point to discover what studies exist, then drill into
-        specific experiments with list_experiments or genes with search_genes.
+        specific experiments with list_experiments or genes with genes_by_function.
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"search_text={search_text} author={author}")

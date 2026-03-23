@@ -55,30 +55,31 @@ class TestResolveGeneContract:
 
 
 # ---------------------------------------------------------------------------
-# search_genes
+# genes_by_function
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
-class TestSearchGenesContract:
-    def test_returns_list_of_dicts(self, conn):
-        result = api.search_genes("DNA polymerase", conn=conn)
-        assert isinstance(result, list)
-        assert len(result) >= 1
+class TestGenesByFunctionContract:
+    def test_returns_dict(self, conn):
+        result = api.genes_by_function("DNA polymerase", conn=conn)
+        assert isinstance(result, dict)
+        assert result["total_matching"] >= 1
+        assert len(result["results"]) >= 1
+
+    def test_envelope_keys(self, conn):
+        result = api.genes_by_function("DNA polymerase", conn=conn)
+        expected_envelope = {
+            "total_entries", "total_matching", "by_organism", "by_category",
+            "score_max", "score_median", "returned", "truncated", "results",
+        }
+        assert set(result.keys()) == expected_envelope
 
     def test_result_keys(self, conn):
-        result = api.search_genes("DNA polymerase", conn=conn)
+        result = api.genes_by_function("DNA polymerase", conn=conn)
         expected_keys = {
-            "locus_tag", "gene_name", "product", "function_description",
-            "gene_summary", "organism_strain", "annotation_quality", "score",
+            "locus_tag", "gene_name", "product", "organism_strain",
+            "gene_category", "annotation_quality", "score",
         }
-        assert set(result[0].keys()) == expected_keys
-
-    def test_dedup_adds_keys(self, conn):
-        result = api.search_genes(
-            "DNA polymerase", deduplicate=True, conn=conn,
-        )
-        # At least one result should have collapsed_count
-        has_collapsed = any("collapsed_count" in r for r in result)
-        assert has_collapsed
+        assert set(result["results"][0].keys()) == expected_keys
 
 
 # ---------------------------------------------------------------------------

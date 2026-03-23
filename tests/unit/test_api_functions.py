@@ -21,6 +21,7 @@ class TestTopLevelImports:
             gene_homologs,
             gene_ontology_terms,
             gene_overview,
+            genes_by_function,
             genes_by_ontology,
             get_gene_details,
             get_schema,
@@ -28,12 +29,12 @@ class TestTopLevelImports:
             list_organisms,
             resolve_gene,
             run_cypher,
-            search_genes,
             search_ontology,
         )
         # Each should be the same object as in api.functions
         assert resolve_gene is api.resolve_gene
         assert gene_homologs is api.gene_homologs
+        assert genes_by_function is api.genes_by_function
 
     def test_query_expression_removed(self):
         """query_expression is no longer exported (schema migration B1)."""
@@ -139,81 +140,129 @@ class TestResolveGene:
 
 
 # ---------------------------------------------------------------------------
-# search_genes
+# genes_by_function
 # ---------------------------------------------------------------------------
-class TestSearchGenes:
-    def test_returns_list(self, mock_conn):
-        mock_conn.execute_query.return_value = [
+class TestGenesByFunction:
+    def _summary_result(self, total_entries=100, total_matching=5):
+        """Helper: mock summary query result."""
+        return [{
+            "total_entries": total_entries,
+            "total_matching": total_matching,
+            "score_max": 8.5,
+            "score_median": 4.2,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 3},
+                            {"item": "Synechococcus WH8102", "count": 2}],
+            "by_category": [{"item": "DNA replication", "count": 3},
+                            {"item": "Photosynthesis", "count": 2}],
+        }]
+
+    def _detail_rows(self):
+        """Helper: mock detail query result rows."""
+        return [
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
              "product": "DNA polymerase III subunit beta",
-             "function_description": None, "gene_summary": None,
-             "organism_strain": "Prochlorococcus marinus MED4",
+             "organism_strain": "Prochlorococcus MED4",
+             "gene_category": "DNA replication",
              "annotation_quality": 3, "score": 5.0},
         ]
-        result = api.search_genes("DNA polymerase", conn=mock_conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
 
-    def test_lucene_retry_on_error(self, mock_conn):
+    def test_returns_dict(self, mock_conn):
+        """Runs summary + detail queries, returns dict with envelope keys."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.genes_by_function("DNA polymerase", conn=mock_conn)
+        assert isinstance(result, dict)
+        assert "total_entries" in result
+        assert "total_matching" in result
+        assert "by_organism" in result
+        assert "by_category" in result
+        assert "score_max" in result
+        assert "score_median" in result
+        assert "returned" in result
+        assert "truncated" in result
+        assert "results" in result
+        assert result["total_matching"] == 5
+        assert result["returned"] == 1
+        assert len(result["results"]) == 1
+        assert result["results"][0]["locus_tag"] == "PMM0001"
+        assert mock_conn.execute_query.call_count == 2
+
+    def test_summary_true_skips_detail(self, mock_conn):
+        """summary=True returns results=[], returned=0."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=5),
+        ]
+        result = api.genes_by_function("DNA polymerase", summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        # Only summary query called
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_lucene_retry(self, mock_conn):
         """On Neo4jClientError, retries with escaped special chars."""
         from neo4j.exceptions import ClientError as Neo4jClientError
-        normal_results = [{"locus_tag": "PMM0001", "gene_name": "dnaN",
-                           "product": "p", "function_description": None,
-                           "gene_summary": None,
-                           "organism_strain": "MED4",
-                           "annotation_quality": 3, "score": 1.0}]
         mock_conn.execute_query.side_effect = [
             Neo4jClientError("bad query"),
-            normal_results,
+            self._summary_result(),  # retry summary succeeds (returns list, [0] extracted internally)
+            self._detail_rows(),
         ]
-        result = api.search_genes("bad+query", conn=mock_conn)
-        assert mock_conn.execute_query.call_count == 2
-        assert result == normal_results
+        result = api.genes_by_function("bad+query", conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 3
+        assert result["total_matching"] == 5
 
-    def test_dedup_collapses_orthologs(self, mock_conn):
-        """deduplicate=True collapses genes sharing an ortholog group."""
-        search_results = [
-            {"locus_tag": "PMM0001", "organism_strain": "MED4",
-             "gene_name": "dnaN", "product": "p",
-             "function_description": None, "gene_summary": None,
-             "annotation_quality": 3, "score": 5.0},
-            {"locus_tag": "sync_0001", "organism_strain": "WH8102",
-             "gene_name": "dnaN", "product": "p",
-             "function_description": None, "gene_summary": None,
-             "annotation_quality": 3, "score": 4.0},
+    def test_passes_params(self, mock_conn):
+        """Verify organism, category, min_quality forwarded to builder."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
         ]
-        dedup_rows = [
-            {"locus_tag": "PMM0001", "dedup_group": "CK_00000364"},
-            {"locus_tag": "sync_0001", "dedup_group": "CK_00000364"},
-        ]
-        mock_conn.execute_query.side_effect = [search_results, dedup_rows]
-        result = api.search_genes("DNA polymerase", deduplicate=True, conn=mock_conn)
-        assert len(result) == 1
-        assert result[0]["locus_tag"] == "PMM0001"
-        assert result[0]["collapsed_count"] == 2
-        assert "group_organisms" in result[0]
+        api.genes_by_function(
+            "test", organism="MED4", category="Photosynthesis",
+            min_quality=2, conn=mock_conn,
+        )
+        # Summary query (1st call) should have filter params
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        params = summary_call[1]
+        assert params.get("organism") == "MED4"
+        assert params.get("category") == "Photosynthesis"
+        assert params.get("min_quality") == 2
 
-    def test_dedup_preserves_ungrouped(self, mock_conn):
-        """Genes without ortholog groups are not collapsed."""
-        search_results = [
-            {"locus_tag": "PMM0001", "organism_strain": "MED4",
-             "gene_name": "dnaN", "product": "p",
-             "function_description": None, "gene_summary": None,
-             "annotation_quality": 3, "score": 5.0},
-            {"locus_tag": "PMM9999", "organism_strain": "MED4",
-             "gene_name": None, "product": "hypothetical",
-             "function_description": None, "gene_summary": None,
-             "annotation_quality": 0, "score": 1.0},
+    def test_creates_conn_when_none(self):
+        """Default conn used when None."""
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                [{  # summary
+                    "total_entries": 0, "total_matching": 0,
+                    "score_max": None, "score_median": None,
+                    "by_organism": [], "by_category": [],
+                }],
+            ]
+            result = api.genes_by_function("test", summary=True)
+        MockConn.assert_called_once()
+        assert result["total_matching"] == 0
+
+    def test_importable_from_package(self):
+        """from multiomics_explorer import genes_by_function works."""
+        from multiomics_explorer import genes_by_function
+        assert genes_by_function is api.genes_by_function
+
+    def test_zero_match(self, mock_conn):
+        """When summary returns total_matching=0, score_max=0.0, score_median=0.0."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 50, "total_matching": 0,
+              "score_max": None, "score_median": None,
+              "by_organism": [], "by_category": []}],
         ]
-        dedup_rows = [
-            {"locus_tag": "PMM0001", "dedup_group": "CK_00000364"},
-            # PMM9999 has no group
-        ]
-        mock_conn.execute_query.side_effect = [search_results, dedup_rows]
-        result = api.search_genes("test", deduplicate=True, conn=mock_conn)
-        assert len(result) == 2
-        assert result[0]["collapsed_count"] == 1
-        assert "collapsed_count" not in result[1]
+        result = api.genes_by_function("nonexistent", summary=True, conn=mock_conn)
+        assert result["total_matching"] == 0
+        assert result["score_max"] == 0.0
+        assert result["score_median"] == 0.0
 
 
 # ---------------------------------------------------------------------------
