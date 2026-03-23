@@ -226,7 +226,7 @@ class TestGeneOverviewCorrectnessKG:
 
     def test_single_gene_pro(self, conn):
         """PMM1428: verify annotation_types, expression counts, ortholog signals."""
-        cypher, params = build_gene_overview(gene_ids=["PMM1428"])
+        cypher, params = build_gene_overview(locus_tags=["PMM1428"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         r = results[0]
@@ -239,7 +239,7 @@ class TestGeneOverviewCorrectnessKG:
 
     def test_single_gene_alt(self, conn):
         """EZ55_00275: empty annotation_types, no expression, small ortholog group."""
-        cypher, params = build_gene_overview(gene_ids=["EZ55_00275"])
+        cypher, params = build_gene_overview(locus_tags=["EZ55_00275"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         r = results[0]
@@ -250,7 +250,7 @@ class TestGeneOverviewCorrectnessKG:
 
     def test_batch_mixed_organisms(self, conn):
         """[PMM1428, EZ55_00275]: returns 2 rows with correct organism_strain."""
-        cypher, params = build_gene_overview(gene_ids=["PMM1428", "EZ55_00275"])
+        cypher, params = build_gene_overview(locus_tags=["PMM1428", "EZ55_00275"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 2
         orgs = {r["organism_strain"] for r in results}
@@ -258,7 +258,7 @@ class TestGeneOverviewCorrectnessKG:
 
     def test_nonexistent_gene_excluded(self, conn):
         """[PMM1428, FAKE_GENE]: returns 1 row (only PMM1428)."""
-        cypher, params = build_gene_overview(gene_ids=["PMM1428", "FAKE_GENE"])
+        cypher, params = build_gene_overview(locus_tags=["PMM1428", "FAKE_GENE"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         assert results[0]["locus_tag"] == "PMM1428"

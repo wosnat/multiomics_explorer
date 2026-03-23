@@ -9,7 +9,6 @@ rows:
   expression_edge_count: 0
   gene_category: Unknown
   gene_name: null
-  gene_summary: 'hypothetical protein :: -'
   locus_tag: EZ55_00275
   organism_strain: Alteromonas macleodii EZ55
   product: hypothetical protein

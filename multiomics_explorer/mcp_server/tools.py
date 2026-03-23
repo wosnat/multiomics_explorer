@@ -328,41 +328,106 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"genes_by_function unexpected error: {e}")
             raise ToolError(f"Error in genes_by_function: {e}")
 
-    @mcp.tool()
-    def gene_overview(ctx: Context, gene_ids: list[str], limit: int = 50) -> str:
-        """Get an overview of one or more genes: identity and data availability.
+    # --- gene_overview ---
 
-        Use this after resolve_gene, genes_by_function, genes_by_ontology, or
-        gene_homologs to understand what each gene is and what follow-up data
-        exists.
+    class GeneOverviewResult(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
+        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
+        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta')")
+        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair')")
+        annotation_quality: int | None = Field(default=None, description="Annotation quality score 0-3 (e.g. 3)")
+        organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        annotation_types: list[str] = Field(default_factory=list, description="Ontology types with annotations (e.g. ['go_bp', 'ec', 'kegg'])")
+        expression_edge_count: int = Field(default=0, description="Number of expression data points (e.g. 36)")
+        significant_expression_count: int = Field(default=0, description="Significant DE observations (e.g. 5)")
+        closest_ortholog_group_size: int | None = Field(default=None, description="Size of tightest ortholog group (e.g. 9)")
+        closest_ortholog_genera: list[str] | None = Field(default=None, description="Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus'])")
+        # verbose-only
+        gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'dnaN :: DNA polymerase III subunit beta :: Alternative locus ID')")
+        function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Alternative locus ID')")
+        all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (e.g. ['CK_Pro_MED4_00845', 'Q7V1M0', 'WP_011132479.1'])")
 
-        Returns one row per gene with routing signals:
-        - annotation_types: which ontology types have annotations
-          → use gene_ontology_terms with the relevant type
-        - expression_edge_count + significant_expression_count: whether
-          expression data exists and how much is significant
-        - closest_ortholog_group_size + closest_ortholog_genera: whether
-          orthologs exist and in which genera
-          → use gene_homologs for full membership
+    class OverviewOrganismBreakdown(BaseModel):
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
+        count: int = Field(description="Genes from this organism (e.g. 3)")
 
-        Args:
-            gene_ids: List of gene locus_tags.
-                      Use resolve_gene to find locus_tags from other identifiers.
-            limit: Max genes to return (default 50).
+    class OverviewCategoryBreakdown(BaseModel):
+        category: str = Field(description="Gene category (e.g. 'Photosynthesis')")
+        count: int = Field(description="Genes in this category (e.g. 5)")
+
+    class OverviewAnnotationTypeBreakdown(BaseModel):
+        annotation_type: str = Field(description="Ontology type (e.g. 'go_bp', 'ec', 'kegg')")
+        count: int = Field(description="Genes with this annotation type (e.g. 12)")
+
+    class GeneOverviewResponse(BaseModel):
+        total_matching: int = Field(description="Genes found in KG from input locus_tags")
+        by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
+        by_category: list[OverviewCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
+        by_annotation_type: list[OverviewAnnotationTypeBreakdown] = Field(description="Gene counts per annotation type, sorted desc")
+        has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0)")
+        has_significant_expression: int = Field(description="Genes with significant DE observations")
+        has_orthologs: int = Field(description="Genes with ortholog group membership")
+        returned: int = Field(description="Results in this response (0 when summary=true)")
+        truncated: bool = Field(description="True if total_matching > returned")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
+        results: list[GeneOverviewResult] = Field(default_factory=list, description="One row per gene")
+
+    @mcp.tool(
+        tags={"genes"},
+        annotations={"readOnlyHint": True},
+    )
+    async def gene_overview(
+        ctx: Context,
+        locus_tags: Annotated[list[str], Field(
+            description="Gene locus tags to look up. "
+            "E.g. ['PMM0001', 'PMM0845'].",
+        )],
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include gene_summary, function_description, all_identifiers.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> GeneOverviewResponse:
+        """Get an overview of genes: identity and data availability signals.
+
+        Use after resolve_gene, genes_by_function, genes_by_ontology, or
+        gene_homologs to understand what each gene is and what follow-up
+        data exists.
         """
-        logger.info("gene_overview gene_ids=%s limit=%d", gene_ids, limit)
+        await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
             conn = _conn(ctx)
-            rows = api.gene_overview(gene_ids, conn=conn)
-            if not rows:
-                return "No genes found for the given locus_tags."
-            return _fmt(rows, limit=limit)
+            data = api.gene_overview(
+                locus_tags, summary=summary, verbose=verbose,
+                limit=limit, conn=conn,
+            )
+            by_organism = [OverviewOrganismBreakdown(**b) for b in data["by_organism"]]
+            by_category = [OverviewCategoryBreakdown(**b) for b in data["by_category"]]
+            by_annotation_type = [OverviewAnnotationTypeBreakdown(**b) for b in data["by_annotation_type"]]
+            results = [GeneOverviewResult(**r) for r in data["results"]]
+            return GeneOverviewResponse(
+                total_matching=data["total_matching"],
+                by_organism=by_organism,
+                by_category=by_category,
+                by_annotation_type=by_annotation_type,
+                has_expression=data["has_expression"],
+                has_significant_expression=data["has_significant_expression"],
+                has_orthologs=data["has_orthologs"],
+                returned=data["returned"],
+                truncated=data["truncated"],
+                not_found=data["not_found"],
+                results=results,
+            )
         except ValueError as e:
-            logger.warning("gene_overview error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"gene_overview error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("gene_overview unexpected error: %s", e)
-            return f"Error in gene_overview: {e}"
+            await ctx.error(f"gene_overview unexpected error: {e}")
+            raise ToolError(f"Error in gene_overview: {e}")
 
     @mcp.tool()
     def get_gene_details(ctx: Context, gene_id: str) -> str:

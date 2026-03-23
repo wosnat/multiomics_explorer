@@ -37,32 +37,28 @@ Field descriptions, about content):
 
 | Tool | Status |
 |---|---|
-| `list_organisms` | v2 complete |
-| `list_publications` | v2 complete |
-| `list_experiments` | v2 complete (has summary/detail modes) |
-| `resolve_gene` | v2 complete |
+| `list_organisms` | v3 complete |
+| `list_publications` | v3 complete |
+| `list_experiments` | v3 complete |
+| `resolve_gene` | v3 complete |
+| `gene_homologs` | v3 complete (was `get_homologs`) |
+| `genes_by_function` | v3 complete (was `search_genes`) |
+| `gene_overview` | v3 complete |
 
 **Tools in v1 pattern** (sync `def`, JSON string returns, `logger`,
 no Pydantic models):
 
 | Tool | Status |
 |---|---|
-| `get_schema` | v1 |
+| `get_schema` | v1 (to be renamed `kg_schema`) |
 | `list_filter_values` | v1 |
-| `search_genes` | v1 |
-| `gene_overview` | v1 |
 | `get_gene_details` | v1 (to be retired) |
-| `get_homologs` | v1 (to be renamed `gene_homologs`) |
 | `search_ontology` | v1 |
 | `genes_by_ontology` | v1 |
 | `gene_ontology_terms` | v1 |
 | `run_cypher` | v1 |
 
 **Tools not yet built:**
-
-| Tool | Notes |
-|---|---|
-| `genes_by_function` | Replaces `search_genes` (rename + redesign) |
 | `search_homolog_groups` | New — text search on OrthologGroup |
 | `genes_by_homolog_group` | New — group ID → member genes |
 | `differential_expression_by_gene` | Replaces removed `query_expression` |
@@ -159,31 +155,11 @@ Update the 4 tools already in v2 pattern to match v3 conventions.
 Small changes per tool — the bulk of the work (async, Pydantic,
 ToolError) is already done.
 
-#### H1: `list_experiments` — mode → summary bool
+#### H1: `list_experiments` — mode → summary bool ✅
 
-Currently uses `mode: Literal["summary", "detail"]`. Update to:
-- `summary: bool = False` parameter (both api/ and MCP)
-- api/ assembles complete response dict (move `returned`/`truncated`
-  computation from MCP to api/)
-- Default `limit=5` in MCP
+#### H2: `list_organisms`, `list_publications`, `resolve_gene` ✅
 
-**Gate:** All tests pass. Code review (code-review skill) passes.
-
-#### H2: `list_organisms`, `list_publications`, `resolve_gene`
-
-These don't have modes, but need:
-- api/ to return `returned`/`truncated` (currently computed in MCP)
-- Default `limit=5` in MCP (currently 50)
-- `resolve_gene`: batch tool → add `not_found` when
-  accepting lists (currently accepts single `identifier` — no
-  change needed now, but note for future if it gains batch input)
-
-**Gate per tool:** All tests pass. Code review passes.
-
-#### H3: Update dev skills + checklist templates
-
-Already done in this session. Verify skills match actual code
-after H1-H2 changes.
+#### H3: Update dev skills + checklist templates ✅
 
 ---
 
@@ -201,7 +177,7 @@ a code review (code-review skill) immediately after. Fix issues
 before moving to the next tool. Update skills if the review
 reveals gaps.
 
-#### D2: `get_homologs` → `gene_homologs` (rename + v3 upgrade)
+#### D2: `get_homologs` → `gene_homologs` (rename + v3 upgrade) ✅
 
 - Rename across all layers (cascading rename)
 - Upgrade to v3 pattern (async, Pydantic, summary bool, api/ owns
@@ -212,7 +188,7 @@ reveals gaps.
 
 **Gate:** All tests pass. Code review passes. Old name removed.
 
-#### D3: `search_genes` → `genes_by_function` (rename + v3 upgrade)
+#### D3: `search_genes` → `genes_by_function` (rename + v3 upgrade) ✅
 
 - Rename across all layers
 - Upgrade to v3 pattern
@@ -225,15 +201,15 @@ reveals gaps.
 
 Migrate each to v3 (order flexible). Code review after each tool.
 
-| Tool | Key changes |
-|---|---|
-| `gene_overview` | Batch tool: add `not_found`, `summary` bool, rich summary fields (annotation type breakdown) |
-| `search_ontology` | v3 upgrade, summary fields if large results |
-| `genes_by_ontology` | v3 upgrade, rich summary fields |
-| `gene_ontology_terms` | Batch tool: `locus_tags` list, `not_found` |
-| `get_schema` → `kg_schema` | Rename + v3 upgrade |
-| `list_filter_values` | v3 upgrade (simple, small result set) |
-| `run_cypher` | v3 upgrade (keep limit=25 default) |
+| Tool | Key changes | Status |
+|---|---|---|
+| `gene_overview` | Batch tool: `locus_tags`, `not_found`, `summary`/`verbose`/`limit`, rich summary fields (by_organism, by_category, by_annotation_type, has_expression/significant/orthologs). Verbose adds gene_summary, function_description, all_identifiers. | ✅ done 2026-03-23 |
+| `search_ontology` | v3 upgrade, summary fields if large results | |
+| `genes_by_ontology` | v3 upgrade, rich summary fields | |
+| `gene_ontology_terms` | Batch tool: `locus_tags` list, `not_found` | |
+| `get_schema` → `kg_schema` | Rename + v3 upgrade | |
+| `list_filter_values` | v3 upgrade (simple, small result set) | |
+| `run_cypher` | v3 upgrade (keep limit=25 default) | |
 
 **Gate per tool:** Tests pass. Code review passes.
 

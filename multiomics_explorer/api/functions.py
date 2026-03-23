@@ -22,6 +22,7 @@ from multiomics_explorer.kg.constants import (
 from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
+    build_gene_overview_summary,
     build_genes_by_function,
     build_genes_by_function_summary,
     build_genes_by_ontology,
@@ -208,21 +209,71 @@ def genes_by_function(
 
 
 def gene_overview(
-    gene_ids: list[str],
+    locus_tags: list[str],
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
-    """Get overview of one or more genes: identity + data availability.
+) -> dict:
+    """Get overview of genes: identity + data availability signals.
 
-    Returns list of dicts with keys: locus_tag, gene_name, product,
-    gene_summary, gene_category, annotation_quality, organism_strain,
-    annotation_types, expression_edge_count,
-    significant_expression_count, closest_ortholog_group_size,
-    closest_ortholog_genera.
+    Returns dict with keys: total_matching, by_organism, by_category,
+    by_annotation_type, has_expression, has_significant_expression,
+    has_orthologs, returned, truncated, not_found, results.
+    Per result: locus_tag, gene_name, product, gene_category,
+    annotation_quality, organism_strain, annotation_types,
+    expression_edge_count, significant_expression_count,
+    closest_ortholog_group_size, closest_ortholog_genera.
+    Verbose adds: gene_summary, function_description, all_identifiers.
     """
+    if summary:
+        limit = 0
+
     conn = _default_conn(conn)
-    cypher, params = build_gene_overview(gene_ids=gene_ids)
-    return conn.execute_query(cypher, **params)
+
+    # Summary query — always runs
+    sum_cypher, sum_params = build_gene_overview_summary(locus_tags=locus_tags)
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    # Rename APOC {item, count} to domain keys, sort desc
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_matching": total_matching,
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
+        "by_category": _rename_freq(raw_summary["by_category"], "category"),
+        "by_annotation_type": _rename_freq(
+            raw_summary["by_annotation_type"], "annotation_type",
+        ),
+        "has_expression": raw_summary["has_expression"],
+        "has_significant_expression": raw_summary["has_significant_expression"],
+        "has_orthologs": raw_summary["has_orthologs"],
+        "not_found": raw_summary["not_found"],
+    }
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    det_cypher, det_params = build_gene_overview(
+        locus_tags=locus_tags, verbose=verbose, limit=limit,
+    )
+    results = conn.execute_query(det_cypher, **det_params)
+
+    envelope["returned"] = len(results)
+    envelope["truncated"] = total_matching > len(results)
+    envelope["results"] = results
+    return envelope
 
 
 def get_gene_details(

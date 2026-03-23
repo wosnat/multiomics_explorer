@@ -62,10 +62,11 @@
   tool: gene_overview
   desc: Single Prochlorococcus gene overview with routing signals
   params:
-    gene_ids: ["PMM1428"]
+    locus_tags: ["PMM1428"]
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_summary, annotation_types,
+    columns: [locus_tag, gene_name, product, gene_category,
+              annotation_quality, organism_strain, annotation_types,
               expression_edge_count, significant_expression_count,
               closest_ortholog_group_size, closest_ortholog_genera]
 
@@ -73,7 +74,7 @@
   tool: gene_overview
   desc: Single Alteromonas gene overview
   params:
-    gene_ids: ["EZ55_00275"]
+    locus_tags: ["EZ55_00275"]
   expect:
     min_rows: 1
     columns: [locus_tag, organism_strain]
@@ -82,22 +83,22 @@
   tool: gene_overview
   desc: Batch overview for Pro + Alt genes
   params:
-    gene_ids: ["PMM1428", "EZ55_00275"]
+    locus_tags: ["PMM1428", "EZ55_00275"]
   expect:
     min_rows: 2
-    columns: [locus_tag, gene_summary, annotation_types]
+    columns: [locus_tag, annotation_types]
 
 - id: gene_overview_regression_pro
   tool: gene_overview
   desc: Gene overview regression baseline for Pro gene
   params:
-    gene_ids: ["PMM1428"]
+    locus_tags: ["PMM1428"]
 
 - id: gene_overview_regression_alt
   tool: gene_overview
   desc: Gene overview regression baseline for Alt gene
   params:
-    gene_ids: ["EZ55_00275"]
+    locus_tags: ["EZ55_00275"]
 
 # ── Gene details ─────────────────────────────────────────
 

@@ -205,25 +205,86 @@ def build_genes_by_function(
     return cypher, params
 
 
-def build_gene_overview(
-    *, gene_ids: list[str],
+def build_gene_overview_summary(
+    *,
+    locus_tags: list[str],
 ) -> tuple[str, dict]:
-    """Build query for gene overview: identity + data availability signals."""
+    """Build summary + not_found for gene_overview.
+
+    RETURN keys: total_matching, by_organism, by_category,
+    by_annotation_type, has_expression, has_significant_expression,
+    has_orthologs, not_found.
+    """
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
+        "WITH collect(lt) AS all_tags,\n"
+        "     collect(g) AS genes,\n"
+        "     collect(CASE WHEN g IS NULL THEN lt END) AS not_found_raw\n"
+        "WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found,\n"
+        "     [g IN genes WHERE g IS NOT NULL] AS found\n"
+        "WITH not_found, found,\n"
+        "     size(found) AS total_matching,\n"
+        "     [g IN found | g.organism_strain] AS orgs,\n"
+        "     [g IN found | g.gene_category] AS cats,\n"
+        "     apoc.coll.flatten([g IN found | g.annotation_types]) AS all_atypes\n"
+        "RETURN total_matching,\n"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(cats) AS by_category,\n"
+        "       apoc.coll.frequencies(all_atypes) AS by_annotation_type,\n"
+        "       size([g IN found WHERE g.expression_edge_count > 0]) AS has_expression,\n"
+        "       size([g IN found WHERE g.significant_expression_count > 0]) AS has_significant_expression,\n"
+        "       size([g IN found WHERE g.closest_ortholog_group_size > 0]) AS has_orthologs,\n"
+        "       not_found"
+    )
+    return cypher, {"locus_tags": locus_tags}
+
+
+def build_gene_overview(
+    *,
+    locus_tags: list[str],
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build detail Cypher for gene_overview.
+
+    RETURN keys (compact): locus_tag, gene_name, product, gene_category,
+    annotation_quality, organism_strain, annotation_types,
+    expression_edge_count, significant_expression_count,
+    closest_ortholog_group_size, closest_ortholog_genera.
+    RETURN keys (verbose): adds gene_summary, function_description,
+    all_identifiers.
+    """
+    params: dict = {"locus_tags": locus_tags}
+
+    verbose_cols = (
+        ",\n       g.gene_summary AS gene_summary"
+        ",\n       g.function_description AS function_description"
+        ",\n       g.all_identifiers AS all_identifiers"
+        if verbose else ""
+    )
+
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "MATCH (g:Gene {locus_tag: lt})\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.product AS product, g.gene_summary AS gene_summary,\n"
-        "       g.gene_category AS gene_category, g.annotation_quality AS annotation_quality,\n"
+        "       g.product AS product, g.gene_category AS gene_category,\n"
+        "       g.annotation_quality AS annotation_quality,\n"
         "       g.organism_strain AS organism_strain,\n"
         "       g.annotation_types AS annotation_types,\n"
         "       g.expression_edge_count AS expression_edge_count,\n"
         "       g.significant_expression_count AS significant_expression_count,\n"
         "       g.closest_ortholog_group_size AS closest_ortholog_group_size,\n"
-        "       g.closest_ortholog_genera AS closest_ortholog_genera\n"
-        "ORDER BY g.locus_tag"
+        f"       g.closest_ortholog_genera AS closest_ortholog_genera{verbose_cols}\n"
+        f"ORDER BY g.locus_tag{limit_clause}"
     )
-    return cypher, {"locus_tags": gene_ids}
+    return cypher, params
 
 
 def build_get_gene_details(*, gene_id: str) -> tuple[str, dict]:

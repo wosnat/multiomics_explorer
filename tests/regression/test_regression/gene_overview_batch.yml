@@ -9,7 +9,6 @@ rows:
   expression_edge_count: 0
   gene_category: Unknown
   gene_name: null
-  gene_summary: 'hypothetical protein :: -'
   locus_tag: EZ55_00275
   organism_strain: Alteromonas macleodii EZ55
   product: hypothetical protein
@@ -27,7 +26,6 @@ rows:
   expression_edge_count: 36
   gene_category: Unknown
   gene_name: null
-  gene_summary: 'EVE domain protein :: Alternative locus ID'
   locus_tag: PMM1428
   organism_strain: Prochlorococcus MED4
   product: EVE domain protein

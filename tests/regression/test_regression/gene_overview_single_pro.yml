@@ -14,7 +14,6 @@ rows:
   expression_edge_count: 36
   gene_category: Unknown
   gene_name: null
-  gene_summary: 'EVE domain protein :: Alternative locus ID'
   locus_tag: PMM1428
   organism_strain: Prochlorococcus MED4
   product: EVE domain protein

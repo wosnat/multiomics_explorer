@@ -490,33 +490,131 @@ class TestGenesByFunctionWrapper:
 
 
 # ---------------------------------------------------------------------------
-# get_gene_details
+# gene_overview
 # ---------------------------------------------------------------------------
 class TestGeneOverviewWrapper:
-    def test_not_found_empty_results(self, tool_fns, mock_ctx):
-        """Empty query result returns 'No genes found' message."""
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["gene_overview"](mock_ctx, gene_ids=["FAKE"])
-        assert "No genes found" in result
-
-    def test_returns_json_list(self, tool_fns, mock_ctx):
-        """Mock rows returned as JSON list."""
-        rows = [
+    _SAMPLE_API_RETURN = {
+        "total_matching": 2,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1},
+                        {"organism_name": "Alteromonas EZ55", "count": 1}],
+        "by_category": [{"category": "DNA replication", "count": 1},
+                        {"category": "Unknown", "count": 1}],
+        "by_annotation_type": [{"annotation_type": "go_bp", "count": 1}],
+        "has_expression": 1,
+        "has_significant_expression": 1,
+        "has_orthologs": 2,
+        "returned": 2,
+        "truncated": False,
+        "not_found": [],
+        "results": [
             {"locus_tag": "PMM1428", "gene_name": "test", "product": "test product",
-             "organism_strain": "Prochlorococcus MED4"},
-        ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428"]))
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert result[0]["locus_tag"] == "PMM1428"
+             "gene_category": "DNA replication", "annotation_quality": 3,
+             "organism_strain": "Prochlorococcus MED4",
+             "annotation_types": ["go_bp"], "expression_edge_count": 36,
+             "significant_expression_count": 5, "closest_ortholog_group_size": 9,
+             "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]},
+            {"locus_tag": "EZ55_00275", "gene_name": None, "product": "hypothetical",
+             "gene_category": "Unknown", "annotation_quality": 0,
+             "organism_strain": "Alteromonas EZ55",
+             "annotation_types": [], "expression_edge_count": 0,
+             "significant_expression_count": 0, "closest_ortholog_group_size": 1,
+             "closest_ortholog_genera": []},
+        ],
+    }
 
-    def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
-        """Verify limit caps the results returned by the MCP tool."""
-        rows = [{"locus_tag": f"PMM{i:04d}"} for i in range(5)]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_overview"](mock_ctx, gene_ids=["x"], limit=2))
-        assert len(result) == 2
+    @pytest.mark.asyncio
+    async def test_returns_pydantic_response(self, tool_fns, mock_ctx):
+        """Response is a Pydantic model with envelope fields."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM1428", "EZ55_00275"],
+            )
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert result.truncated is False
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.locus_tag == "PMM1428"
+        assert r.expression_edge_count == 36
+        assert len(result.by_organism) == 2
+        assert result.by_organism[0].organism_name == "Prochlorococcus MED4"
+        assert len(result.by_category) == 2
+        assert len(result.by_annotation_type) == 1
+        assert result.has_expression == 1
+        assert result.has_orthologs == 2
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        """When no genes found, not_found populated."""
+        empty_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 0,
+            "by_organism": [],
+            "by_category": [],
+            "by_annotation_type": [],
+            "has_expression": 0,
+            "has_significant_expression": 0,
+            "has_orthologs": 0,
+            "returned": 0,
+            "truncated": False,
+            "not_found": ["FAKE0001"],
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=empty_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["FAKE0001"],
+            )
+        assert result.total_matching == 0
+        assert result.returned == 0
+        assert result.results == []
+        assert result.not_found == ["FAKE0001"]
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """All params passed through to api."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_overview"](
+                mock_ctx,
+                locus_tags=["PMM1428", "EZ55_00275"],
+                summary=True,
+                verbose=True,
+                limit=10,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.args[0] == ["PMM1428", "EZ55_00275"]
+        assert call_kwargs.kwargs["summary"] is True
+        assert call_kwargs.kwargs["verbose"] is True
+        assert call_kwargs.kwargs["limit"] == 10
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """returned/truncated from api are preserved."""
+        truncated_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 10,
+            "returned": 2,
+            "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=truncated_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM1428"],
+            )
+        assert result.total_matching == 10
+        assert result.returned == 2
+        assert result.truncated is True
 
 
 class TestGetGeneDetailsWrapper:
@@ -1160,13 +1258,15 @@ class TestErrorHandling:
             with pytest.raises(ToolError, match="Error in genes_by_function"):
                 await tool_fns["genes_by_function"](mock_ctx, search_text="test")
 
-    def test_gene_overview_generic_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_gene_overview_generic_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
             "multiomics_explorer.api.functions.gene_overview",
             side_effect=RuntimeError("timeout"),
         ):
-            result = tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM0001"])
-        assert "Error in gene_overview" in result
+            with pytest.raises(ToolError, match="Error in gene_overview"):
+                await tool_fns["gene_overview"](mock_ctx, locus_tags=["PMM0001"])
 
     def test_get_gene_details_generic_error(self, tool_fns, mock_ctx):
         with patch(

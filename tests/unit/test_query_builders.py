@@ -11,6 +11,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_homologs_summary,
     build_gene_ontology_terms,
     build_gene_overview,
+    build_gene_overview_summary,
     build_genes_by_function,
     build_genes_by_function_summary,
     build_genes_by_ontology,
@@ -186,23 +187,75 @@ class TestBuildGenesByFunctionSummary:
 
 
 class TestBuildGeneOverview:
-    def test_gene_overview_query(self):
-        """UNWIND present, returns all 12 expected columns, $gene_ids in params."""
-        cypher, params = build_gene_overview(gene_ids=["PMM1428"])
+    def test_returns_expected_columns(self):
+        """UNWIND + MATCH, returns 11 compact columns, $locus_tags in params."""
+        cypher, params = build_gene_overview(locus_tags=["PMM1428"])
         assert "UNWIND" in cypher
+        assert "MATCH (g:Gene" in cypher
         assert params["locus_tags"] == ["PMM1428"]
-
-    def test_gene_overview_columns(self):
-        """Verify all column names in RETURN clause."""
-        cypher, _ = build_gene_overview(gene_ids=["PMM1428"])
         expected_columns = [
-            "locus_tag", "gene_name", "product", "gene_summary", "gene_category",
+            "locus_tag", "gene_name", "product", "gene_category",
             "annotation_quality", "organism_strain", "annotation_types",
             "expression_edge_count", "significant_expression_count",
             "closest_ortholog_group_size", "closest_ortholog_genera",
         ]
         for col in expected_columns:
             assert col in cypher, f"Missing column '{col}' in RETURN clause"
+
+    def test_verbose_false(self):
+        """Compact mode omits gene_summary, function_description, all_identifiers."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=False)
+        assert "gene_summary" not in cypher
+        assert "function_description" not in cypher
+        assert "all_identifiers" not in cypher
+
+    def test_verbose_true(self):
+        """Verbose mode includes gene_summary, function_description, all_identifiers."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=True)
+        assert "gene_summary" in cypher
+        assert "function_description" in cypher
+        assert "all_identifiers" in cypher
+
+    def test_limit_clause(self):
+        """limit=10 adds LIMIT $limit to Cypher."""
+        cypher, params = build_gene_overview(locus_tags=["PMM1428"], limit=10)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        """limit=None omits LIMIT clause."""
+        cypher, params = build_gene_overview(locus_tags=["PMM1428"], limit=None)
+        assert "LIMIT" not in cypher
+        assert "limit" not in params
+
+    def test_order_by(self):
+        """Results ordered by locus_tag."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"])
+        assert "ORDER BY g.locus_tag" in cypher
+
+
+class TestBuildGeneOverviewSummary:
+    def test_returns_summary_keys(self):
+        """Summary query uses OPTIONAL MATCH, frequencies, flatten."""
+        cypher, params = build_gene_overview_summary(locus_tags=["PMM1428"])
+        assert "OPTIONAL MATCH" in cypher
+        assert "apoc.coll.frequencies" in cypher
+        assert "apoc.coll.flatten" in cypher
+        assert "total_matching" in cypher
+        assert "by_organism" in cypher
+        assert "by_category" in cypher
+        assert "by_annotation_type" in cypher
+        assert "has_expression" in cypher
+        assert "has_significant_expression" in cypher
+        assert "has_orthologs" in cypher
+        assert "not_found" in cypher
+        assert params["locus_tags"] == ["PMM1428"]
+
+    def test_not_found_logic(self):
+        """Summary query detects not_found via OPTIONAL MATCH + CASE WHEN g IS NULL."""
+        cypher, _ = build_gene_overview_summary(locus_tags=["PMM1428", "FAKE"])
+        assert "OPTIONAL MATCH" in cypher
+        assert "CASE WHEN g IS NULL" in cypher
 
 
 class TestBuildGetGeneDetails:

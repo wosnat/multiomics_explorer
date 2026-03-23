@@ -87,21 +87,33 @@ class TestGenesByFunctionContract:
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
 class TestGeneOverviewContract:
-    def test_returns_list_of_dicts(self, conn):
+    def test_returns_dict_envelope(self, conn):
         result = api.gene_overview([KNOWN_GENE], conn=conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
+        assert isinstance(result, dict)
+        assert "total_matching" in result
+        assert "by_organism" in result
+        assert "by_category" in result
+        assert "by_annotation_type" in result
+        assert "has_expression" in result
+        assert "has_significant_expression" in result
+        assert "has_orthologs" in result
+        assert "returned" in result
+        assert "truncated" in result
+        assert "not_found" in result
+        assert "results" in result
+        assert result["total_matching"] >= 1
+        assert len(result["results"]) >= 1
 
     def test_result_keys(self, conn):
         result = api.gene_overview([KNOWN_GENE], conn=conn)
         expected_keys = {
-            "locus_tag", "gene_name", "product", "gene_summary",
+            "locus_tag", "gene_name", "product",
             "gene_category", "annotation_quality", "organism_strain",
             "annotation_types", "expression_edge_count",
             "significant_expression_count", "closest_ortholog_group_size",
             "closest_ortholog_genera",
         }
-        assert set(result[0].keys()) == expected_keys
+        assert set(result["results"][0].keys()) == expected_keys
 
 
 # ---------------------------------------------------------------------------

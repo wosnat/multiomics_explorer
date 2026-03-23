@@ -269,27 +269,120 @@ class TestGenesByFunction:
 # gene_overview
 # ---------------------------------------------------------------------------
 class TestGeneOverview:
-    def test_returns_list(self, mock_conn):
-        mock_conn.execute_query.return_value = [
+    def _summary_result(self, total=1, not_found=None):
+        """Helper: mock summary query result."""
+        return [{
+            "total_matching": total,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [{"item": "DNA replication", "count": 1}],
+            "by_annotation_type": [{"item": "go_bp", "count": 1}],
+            "has_expression": 1,
+            "has_significant_expression": 1,
+            "has_orthologs": 1,
+            "not_found": not_found or [],
+        }]
+
+    def _detail_rows(self):
+        """Helper: mock detail query result rows."""
+        return [
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
              "product": "DNA polymerase III subunit beta",
-             "gene_summary": None, "gene_category": "DNA replication",
+             "gene_category": "DNA replication",
              "annotation_quality": 3,
-             "organism_strain": "Prochlorococcus marinus MED4",
+             "organism_strain": "Prochlorococcus MED4",
              "annotation_types": ["go_bp", "ec", "kegg"],
              "expression_edge_count": 10,
              "significant_expression_count": 5,
              "closest_ortholog_group_size": 20,
-             "closest_ortholog_genera": "Prochlorococcus,Synechococcus"},
+             "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]},
+        ]
+
+    def test_returns_dict(self, mock_conn):
+        """Runs summary + detail queries, returns dict with envelope keys."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
         ]
         result = api.gene_overview(["PMM0001"], conn=mock_conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
+        assert isinstance(result, dict)
+        assert "total_matching" in result
+        assert "by_organism" in result
+        assert "by_category" in result
+        assert "by_annotation_type" in result
+        assert "has_expression" in result
+        assert "has_significant_expression" in result
+        assert "has_orthologs" in result
+        assert "returned" in result
+        assert "truncated" in result
+        assert "not_found" in result
+        assert "results" in result
+        assert result["total_matching"] == 1
+        assert result["returned"] == 1
+        assert len(result["results"]) == 1
+        assert result["results"][0]["locus_tag"] == "PMM0001"
+        assert mock_conn.execute_query.call_count == 2
 
-    def test_empty_gene_ids(self, mock_conn):
-        mock_conn.execute_query.return_value = []
-        result = api.gene_overview([], conn=mock_conn)
-        assert result == []
+    def test_summary_sets_limit_zero(self, mock_conn):
+        """summary=True returns results=[], returned=0, only summary query called."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total=1),
+        ]
+        result = api.gene_overview(["PMM0001"], summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_passes_params(self, mock_conn):
+        """Verify locus_tags, verbose, limit forwarded to builders."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.gene_overview(
+            ["PMM0001"], verbose=True, limit=10, conn=mock_conn,
+        )
+        # Summary query (1st call) should have locus_tags
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        assert summary_call[1].get("locus_tags") == ["PMM0001"]
+        # Detail query (2nd call) should have locus_tags and limit
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("locus_tags") == ["PMM0001"]
+        assert detail_call[1].get("limit") == 10
+
+    def test_creates_conn_when_none(self):
+        """Default conn used when None."""
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                [{  # summary
+                    "total_matching": 0,
+                    "by_organism": [], "by_category": [],
+                    "by_annotation_type": [],
+                    "has_expression": 0,
+                    "has_significant_expression": 0,
+                    "has_orthologs": 0,
+                    "not_found": ["FAKE"],
+                }],
+            ]
+            result = api.gene_overview(["FAKE"], summary=True)
+        MockConn.assert_called_once()
+        assert result["total_matching"] == 0
+
+    def test_not_found_populated(self, mock_conn):
+        """Not-found locus_tags appear in not_found list."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total=0, not_found=["FAKE0001"]),
+        ]
+        result = api.gene_overview(["FAKE0001"], summary=True, conn=mock_conn)
+        assert result["not_found"] == ["FAKE0001"]
+
+    def test_importable_from_package(self):
+        """from multiomics_explorer import gene_overview works."""
+        from multiomics_explorer import gene_overview
+        assert gene_overview is api.gene_overview
 
 
 # ---------------------------------------------------------------------------

@@ -354,76 +354,91 @@ class TestGetGeneDetailsCorrectness:
 class TestGeneOverviewCorrectness:
     """Verify gene_overview returns correct data for realistic mock responses."""
 
-    def test_single_gene_overview(self, tool_fns, mock_ctx):
-        """Mock single gene row with all 12 columns, verify JSON output structure."""
-        row = {
-            "locus_tag": "PMM1428",
-            "gene_name": "test",
-            "product": "test product",
-            "gene_summary": "A test summary",
-            "gene_category": "Photosynthesis",
-            "annotation_quality": 3,
-            "organism_strain": "Prochlorococcus MED4",
-            "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"],
-            "expression_edge_count": 36,
-            "significant_expression_count": 5,
-            "closest_ortholog_group_size": 9,
-            "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
-        }
-        _conn_from(mock_ctx).execute_query.return_value = [row]
+    _SAMPLE_API_RETURN = {
+        "total_matching": 1,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+        "by_category": [{"category": "Photosynthesis", "count": 1}],
+        "by_annotation_type": [{"annotation_type": "go_mf", "count": 1},
+                               {"annotation_type": "pfam", "count": 1}],
+        "has_expression": 1,
+        "has_significant_expression": 1,
+        "has_orthologs": 1,
+        "returned": 1,
+        "truncated": False,
+        "not_found": [],
+        "results": [
+            {"locus_tag": "PMM1428", "gene_name": "test", "product": "test product",
+             "gene_category": "Photosynthesis", "annotation_quality": 3,
+             "organism_strain": "Prochlorococcus MED4",
+             "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"],
+             "expression_edge_count": 36, "significant_expression_count": 5,
+             "closest_ortholog_group_size": 9,
+             "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]},
+        ],
+    }
 
-        result = json.loads(tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428"]))
+    @pytest.mark.asyncio
+    async def test_single_gene_overview(self, tool_fns, mock_ctx):
+        """Mock single gene row with all 11 compact columns, verify Pydantic response."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_overview"](mock_ctx, locus_tags=["PMM1428"])
 
-        assert len(result) == 1
-        r = result[0]
-        assert r["locus_tag"] == "PMM1428"
-        assert r["expression_edge_count"] == 36
-        assert r["annotation_types"] == ["go_mf", "pfam", "cog_category", "tigr_role"]
+        assert result.total_matching == 1
+        assert len(result.results) == 1
+        r = result.results[0]
+        assert r.locus_tag == "PMM1428"
+        assert r.expression_edge_count == 36
+        assert r.annotation_types == ["go_mf", "pfam", "cog_category", "tigr_role"]
 
-    def test_batch_overview(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_batch_overview(self, tool_fns, mock_ctx):
         """Mock multiple gene rows, verify all returned."""
-        rows = [
-            {"locus_tag": "PMM1428", "gene_name": "a", "product": "p1",
-             "gene_summary": None, "gene_category": None,
-             "annotation_quality": 3, "organism_strain": "Prochlorococcus MED4",
-             "annotation_types": ["go_mf"], "expression_edge_count": 36,
-             "significant_expression_count": 5, "closest_ortholog_group_size": 9,
-             "closest_ortholog_genera": ["Prochlorococcus"]},
-            {"locus_tag": "EZ55_00275", "gene_name": None, "product": "p2",
-             "gene_summary": None, "gene_category": None,
-             "annotation_quality": 0, "organism_strain": "Alteromonas EZ55",
-             "annotation_types": [], "expression_edge_count": 0,
-             "significant_expression_count": 0, "closest_ortholog_group_size": 1,
-             "closest_ortholog_genera": []},
-        ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
+        batch_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 2,
+            "returned": 2,
+            "results": [
+                {"locus_tag": "PMM1428", "gene_name": "a", "product": "p1",
+                 "gene_category": None, "annotation_quality": 3,
+                 "organism_strain": "Prochlorococcus MED4",
+                 "annotation_types": ["go_mf"], "expression_edge_count": 36,
+                 "significant_expression_count": 5, "closest_ortholog_group_size": 9,
+                 "closest_ortholog_genera": ["Prochlorococcus"]},
+                {"locus_tag": "EZ55_00275", "gene_name": None, "product": "p2",
+                 "gene_category": None, "annotation_quality": 0,
+                 "organism_strain": "Alteromonas EZ55",
+                 "annotation_types": [], "expression_edge_count": 0,
+                 "significant_expression_count": 0, "closest_ortholog_group_size": 1,
+                 "closest_ortholog_genera": []},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=batch_return,
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM1428", "EZ55_00275"],
+            )
 
-        result = json.loads(
-            tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428", "EZ55_00275"])
-        )
-
-        assert len(result) == 2
-        loci = {r["locus_tag"] for r in result}
+        assert result.total_matching == 2
+        assert len(result.results) == 2
+        loci = {r.locus_tag for r in result.results}
         assert loci == {"PMM1428", "EZ55_00275"}
 
-    def test_annotation_types_preserved(self, tool_fns, mock_ctx):
-        """List field preserved in JSON output."""
-        row = {
-            "locus_tag": "PMM1428",
-            "gene_name": "a", "product": "p",
-            "gene_summary": None, "gene_category": None,
-            "annotation_quality": 3, "organism_strain": "Prochlorococcus MED4",
-            "annotation_types": ["go_mf", "pfam", "cog_category"],
-            "expression_edge_count": 36, "significant_expression_count": 5,
-            "closest_ortholog_group_size": 9,
-            "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
-        }
-        _conn_from(mock_ctx).execute_query.return_value = [row]
+    @pytest.mark.asyncio
+    async def test_annotation_types_preserved(self, tool_fns, mock_ctx):
+        """List field preserved in Pydantic response."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_overview"](mock_ctx, locus_tags=["PMM1428"])
 
-        result = json.loads(tool_fns["gene_overview"](mock_ctx, gene_ids=["PMM1428"]))
-
-        assert isinstance(result[0]["annotation_types"], list)
-        assert "go_mf" in result[0]["annotation_types"]
+        assert isinstance(result.results[0].annotation_types, list)
+        assert "go_mf" in result.results[0].annotation_types
 
 
 

@@ -63,7 +63,7 @@ async def gene_overview(
         description="When true, return only summary fields (results=[]).",
     )] = False,
     verbose: Annotated[bool, Field(
-        description="Include gene_summary in results rows.",
+        description="Include gene_summary, function_description, all_identifiers.",
     )] = False,
     limit: Annotated[int, Field(
         description="Max results.", ge=1,
@@ -77,16 +77,16 @@ async def gene_overview(
     """
 ```
 
-**Return envelope:** `total_matching, by_organism, by_category, returned, truncated, not_found, results`
+**Return envelope:** `total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, returned, truncated, not_found, results`
 
-**Per-result columns (compact — 10):**
+**Per-result columns (compact — 11):**
 `locus_tag`, `gene_name`, `product`, `gene_category`,
 `annotation_quality`, `organism_strain`, `annotation_types`,
 `expression_edge_count`, `significant_expression_count`,
 `closest_ortholog_group_size`, `closest_ortholog_genera`
 
-**Verbose adds (1):**
-`gene_summary`
+**Verbose adds (3):**
+`gene_summary`, `function_description`, `all_identifiers`
 
 ## Result-size controls
 
@@ -99,6 +99,10 @@ Batch input can be large → summary + limit pattern.
 | `total_matching` | int | Genes found in KG from input locus_tags |
 | `by_organism` | list | Gene counts per organism, sorted desc |
 | `by_category` | list | Gene counts per gene_category, sorted desc |
+| `by_annotation_type` | list | Gene counts per annotation type (e.g. go_bp, ec, kegg), sorted desc (→ gene_ontology_terms) |
+| `has_expression` | int | Genes with expression_edge_count > 0 (→ differential_expression_by_gene) |
+| `has_significant_expression` | int | Genes with significant_expression_count > 0 |
+| `has_orthologs` | int | Genes with closest_ortholog_group_size > 0 (→ gene_homologs) |
 
 ### Batch handling
 
@@ -117,7 +121,7 @@ No `no_groups` equivalent needed — every gene in the KG has an overview.
   annotation_quality, organism_strain, annotation_types,
   expression_edge_count, significant_expression_count,
   closest_ortholog_group_size, closest_ortholog_genera
-- Verbose adds: gene_summary
+- Verbose adds: gene_summary, function_description, all_identifiers
 
 ## Special handling
 
@@ -135,16 +139,17 @@ No `no_groups` equivalent needed — every gene in the KG has an overview.
 |------|-------|------|------|
 | 1 | Query builder | `kg/queries_lib.py` | `build_gene_overview()` (update) + `build_gene_overview_summary()` (new) |
 | 2 | API function | `api/functions.py` | `gene_overview()` (rewrite: `list[dict]` → `dict` envelope) |
-| 3 | MCP wrapper | `mcp_server/tools.py` | Rewrite: `async def`, Pydantic models, `ToolError` |
-| 4 | Unit tests | `tests/unit/test_query_builders.py` | Replace `TestBuildGeneOverview` |
-| 5 | Unit tests | `tests/unit/test_api_functions.py` | Replace `TestGeneOverview` |
-| 6 | Unit tests | `tests/unit/test_tool_wrappers.py` | Replace `TestGeneOverviewWrapper` |
-| 7 | Integration | `tests/integration/test_mcp_tools.py` | Update response shape |
-| 8 | Regression | `tests/regression/test_regression.py` | Update `TOOL_BUILDERS` |
-| 9 | Eval cases | `tests/evals/cases.yaml` | Update params + shape |
-| 10 | About content | `multiomics_explorer/inputs/tools/gene_overview.yaml` | Input YAML → build → verify |
-| 11 | Docs | `CLAUDE.md` | Update tool description |
-| 12 | Code review | — | Run code-review skill (full checklist) |
+| 3 | Exports | `api/__init__.py`, `multiomics_explorer/__init__.py` | Verify existing exports (no change expected) |
+| 4 | MCP wrapper | `mcp_server/tools.py` | Rewrite: `async def`, Pydantic models, `ToolError` |
+| 5 | Unit tests | `tests/unit/test_query_builders.py` | Replace `TestBuildGeneOverview` |
+| 6 | Unit tests | `tests/unit/test_api_functions.py` | Replace `TestGeneOverview` |
+| 7 | Unit tests | `tests/unit/test_tool_wrappers.py` | Replace `TestGeneOverviewWrapper` |
+| 8 | Integration | `tests/integration/test_mcp_tools.py` | Update response shape |
+| 9 | Regression | `tests/regression/test_regression.py` | Update `TOOL_BUILDERS` |
+| 10 | Eval cases | `tests/evals/cases.yaml` | Update params + shape |
+| 11 | About content | `multiomics_explorer/inputs/tools/gene_overview.yaml` | Input YAML → build → verify |
+| 12 | Docs | `CLAUDE.md` | Update tool description |
+| 13 | Code review | — | Run code-review skill (full checklist) |
 
 ---
 
@@ -161,7 +166,9 @@ def build_gene_overview_summary(
 ) -> tuple[str, dict]:
     """Build summary + not_found for gene_overview.
 
-    RETURN keys: total_matching, by_organism, by_category, not_found.
+    RETURN keys: total_matching, by_organism, by_category,
+    by_annotation_type, has_expression, has_significant_expression,
+    has_orthologs, not_found.
     """
 ```
 
@@ -177,10 +184,15 @@ WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found,
 WITH not_found, found,
      size(found) AS total_matching,
      [g IN found | g.organism_strain] AS orgs,
-     [g IN found | g.gene_category] AS cats
+     [g IN found | g.gene_category] AS cats,
+     apoc.coll.flatten([g IN found | g.annotation_types]) AS all_atypes
 RETURN total_matching,
        apoc.coll.frequencies(orgs) AS by_organism,
        apoc.coll.frequencies(cats) AS by_category,
+       apoc.coll.frequencies(all_atypes) AS by_annotation_type,
+       size([g IN found WHERE g.expression_edge_count > 0]) AS has_expression,
+       size([g IN found WHERE g.significant_expression_count > 0]) AS has_significant_expression,
+       size([g IN found WHERE g.closest_ortholog_group_size > 0]) AS has_orthologs,
        not_found
 ```
 
@@ -199,7 +211,8 @@ def build_gene_overview(
     annotation_quality, organism_strain, annotation_types,
     expression_edge_count, significant_expression_count,
     closest_ortholog_group_size, closest_ortholog_genera.
-    RETURN keys (verbose): adds gene_summary.
+    RETURN keys (verbose): adds gene_summary, function_description,
+    all_identifiers.
     """
 ```
 
@@ -216,7 +229,9 @@ RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,
        g.significant_expression_count AS significant_expression_count,
        g.closest_ortholog_group_size AS closest_ortholog_group_size,
        g.closest_ortholog_genera AS closest_ortholog_genera
-       [, g.gene_summary AS gene_summary]  -- verbose only
+       [, g.gene_summary AS gene_summary,               -- verbose only
+          g.function_description AS function_description,
+          g.all_identifiers AS all_identifiers]
 ORDER BY g.locus_tag
 [LIMIT $limit]  -- when limit is not None
 ```
@@ -225,6 +240,9 @@ ORDER BY g.locus_tag
 - Param renamed from `gene_ids` to `locus_tags` (v3 convention)
 - `gene_summary` moved to verbose-only — it's a concatenated text field
   that adds bulk without aiding routing decisions
+- `function_description` in verbose — consistent with `genes_by_function`
+- `all_identifiers` in verbose — cross-references (UniProt, CyanorakID,
+  RefSeq) replace the main use case of `get_gene_details`
 - Summary builder uses OPTIONAL MATCH to detect not_found tags
 
 ---
@@ -245,12 +263,13 @@ def gene_overview(
     """Get overview of genes: identity + data availability signals.
 
     Returns dict with keys: total_matching, by_organism, by_category,
-    returned, truncated, not_found, results.
+    by_annotation_type, has_expression, has_significant_expression,
+    has_orthologs, returned, truncated, not_found, results.
     Per result: locus_tag, gene_name, product, gene_category,
     annotation_quality, organism_strain, annotation_types,
     expression_edge_count, significant_expression_count,
     closest_ortholog_group_size, closest_ortholog_genera.
-    Verbose adds: gene_summary.
+    Verbose adds: gene_summary, function_description, all_identifiers.
     """
 ```
 
@@ -286,6 +305,8 @@ class GeneOverviewResult(BaseModel):
     closest_ortholog_genera: list[str] | None = Field(default=None, description="Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus'])")
     # verbose-only
     gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'dnaN :: DNA polymerase III subunit beta :: Alternative locus ID')")
+    function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Alternative locus ID')")
+    all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (e.g. ['CK_Pro_MED4_00845', 'Q7V1M0', 'WP_011132479.1'])")
 
 class OverviewOrganismBreakdown(BaseModel):
     organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
@@ -295,10 +316,18 @@ class OverviewCategoryBreakdown(BaseModel):
     category: str = Field(description="Gene category (e.g. 'Photosynthesis')")
     count: int = Field(description="Genes in this category (e.g. 5)")
 
+class OverviewAnnotationTypeBreakdown(BaseModel):
+    annotation_type: str = Field(description="Ontology type (e.g. 'go_bp', 'ec', 'kegg')")
+    count: int = Field(description="Genes with this annotation type (e.g. 12)")
+
 class GeneOverviewResponse(BaseModel):
     total_matching: int = Field(description="Genes found in KG from input locus_tags")
     by_organism: list[OverviewOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
     by_category: list[OverviewCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
+    by_annotation_type: list[OverviewAnnotationTypeBreakdown] = Field(description="Gene counts per annotation type, sorted desc")
+    has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0)")
+    has_significant_expression: int = Field(description="Genes with significant DE observations")
+    has_orthologs: int = Field(description="Genes with ortholog group membership")
     returned: int = Field(description="Results in this response (0 when summary=true)")
     truncated: bool = Field(description="True if total_matching > returned")
     not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
@@ -309,8 +338,66 @@ Breakdown models follow the per-tool prefix convention
 (`FunctionOrganismBreakdown`, `HomologOrganismBreakdown`, etc.) —
 no shared models between tools.
 
-Thin wrapper: `GeneOverviewResponse(**data)` with standard error
-handling (ValueError → ToolError, Exception → ToolError with prefix).
+### Wrapper
+
+```python
+@mcp.tool(
+    tags={"genes"},
+    annotations={"readOnlyHint": True},
+)
+async def gene_overview(
+    ctx: Context,
+    locus_tags: Annotated[list[str], Field(
+        description="Gene locus tags to look up. "
+        "E.g. ['PMM0001', 'PMM0845'].",
+    )],
+    summary: Annotated[bool, Field(
+        description="When true, return only summary fields (results=[]).",
+    )] = False,
+    verbose: Annotated[bool, Field(
+        description="Include gene_summary, function_description, all_identifiers.",
+    )] = False,
+    limit: Annotated[int, Field(
+        description="Max results.", ge=1,
+    )] = 5,
+) -> GeneOverviewResponse:
+    """Get an overview of genes: identity and data availability signals.
+
+    Use after resolve_gene, genes_by_function, genes_by_ontology, or
+    gene_homologs to understand what each gene is and what follow-up
+    data exists.
+    """
+    await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
+    try:
+        conn = _conn(ctx)
+        data = api.gene_overview(
+            locus_tags, summary=summary, verbose=verbose,
+            limit=limit, conn=conn,
+        )
+        by_organism = [OverviewOrganismBreakdown(**b) for b in data["by_organism"]]
+        by_category = [OverviewCategoryBreakdown(**b) for b in data["by_category"]]
+        by_annotation_type = [OverviewAnnotationTypeBreakdown(**b) for b in data["by_annotation_type"]]
+        results = [GeneOverviewResult(**r) for r in data["results"]]
+        return GeneOverviewResponse(
+            total_matching=data["total_matching"],
+            by_organism=by_organism,
+            by_category=by_category,
+            by_annotation_type=by_annotation_type,
+            has_expression=data["has_expression"],
+            has_significant_expression=data["has_significant_expression"],
+            has_orthologs=data["has_orthologs"],
+            returned=data["returned"],
+            truncated=data["truncated"],
+            not_found=data["not_found"],
+            results=results,
+        )
+    except ValueError as e:
+        await ctx.warning(f"gene_overview error: {e}")
+        raise ToolError(str(e))
+    except Exception as e:
+        await ctx.error(f"gene_overview unexpected error: {e}")
+        raise ToolError(f"Error in gene_overview: {e}")
+```
 
 ---
 
@@ -362,20 +449,148 @@ class TestGeneOverviewWrapper:
 
 Update `EXPECTED_TOOLS` (tool name unchanged).
 
-### Integration + regression
+### Integration (`test_mcp_tools.py`)
 
-- Update `test_mcp_tools.py`: response shape changed (dict envelope)
-- Update `cases.yaml`: use `locus_tags` param, expect dict envelope
-- Update `TOOL_BUILDERS` in `test_regression.py` and `test_eval.py`
-- Regenerate regression baselines: `pytest tests/regression/ --force-regen -m kg`
+Against live KG:
+- Batch query returns expected fields in dict envelope
+- Not-found gene returns `not_found` populated
+- Each result has expected compact columns
+
+### Regression (`test_regression.py`)
+
+Update `TOOL_BUILDERS` (builder signature changed: `gene_ids` → `locus_tags`):
+```python
+"gene_overview": build_gene_overview,
+```
+
+### Eval cases (`cases.yaml`)
+
+```yaml
+- id: gene_overview_single_pro
+  tool: gene_overview
+  desc: Single Prochlorococcus gene overview with routing signals
+  params:
+    locus_tags: ["PMM1428"]
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, product, gene_category,
+              annotation_quality, organism_strain, annotation_types,
+              expression_edge_count, significant_expression_count,
+              closest_ortholog_group_size, closest_ortholog_genera]
+
+- id: gene_overview_single_alt
+  tool: gene_overview
+  desc: Single Alteromonas gene overview
+  params:
+    locus_tags: ["EZ55_00275"]
+  expect:
+    min_rows: 1
+    columns: [locus_tag, organism_strain]
+
+- id: gene_overview_batch
+  tool: gene_overview
+  desc: Batch overview for Pro + Alt genes
+  params:
+    locus_tags: ["PMM1428", "EZ55_00275"]
+  expect:
+    min_rows: 2
+    columns: [locus_tag, gene_summary, annotation_types]
+
+- id: gene_overview_regression_pro
+  tool: gene_overview
+  desc: Gene overview regression baseline for Pro gene
+  params:
+    locus_tags: ["PMM1428"]
+
+- id: gene_overview_regression_alt
+  tool: gene_overview
+  desc: Gene overview regression baseline for Alt gene
+  params:
+    locus_tags: ["EZ55_00275"]
+```
+
+Regenerate regression baselines: `pytest tests/regression/ --force-regen -m kg`
 
 ---
 
 ## About Content
 
-- Create `inputs/tools/gene_overview.yaml`
-- Run `build_about_content.py gene_overview`
-- Verify: `test_about_content.py` + `test_about_examples.py`
+### Input YAML
+
+**File:** `multiomics_explorer/inputs/tools/gene_overview.yaml`
+
+```yaml
+examples:
+  - title: Overview of a single gene
+    call: gene_overview(locus_tags=["PMM1428"])
+    response: |
+      {
+        "total_matching": 1,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+        "by_category": [{"category": "Unknown", "count": 1}],
+        "by_annotation_type": [{"annotation_type": "go_mf", "count": 1}, {"annotation_type": "pfam", "count": 1}, ...],
+        "has_expression": 1, "has_significant_expression": 1, "has_orthologs": 1,
+        "returned": 1, "truncated": false, "not_found": [],
+        "results": [
+          {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein",
+           "gene_category": "Unknown", "annotation_quality": 3,
+           "organism_strain": "Prochlorococcus MED4",
+           "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"],
+           "expression_edge_count": 36, "significant_expression_count": 5,
+           "closest_ortholog_group_size": 9,
+           "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]}
+        ]
+      }
+
+  - title: Batch overview with mixed organisms
+    call: gene_overview(locus_tags=["PMM1428", "EZ55_00275"])
+
+  - title: Summary only (counts and breakdowns)
+    call: gene_overview(locus_tags=["PMM0845", "PMM1428", "EZ55_00275"], summary=True)
+
+  - title: From discovery to overview to details
+    steps: |
+      Step 1: genes_by_function(search_text="photosystem")
+              → collect locus_tags from results
+
+      Step 2: gene_overview(locus_tags=["PMM0845", ...])
+              → check which genes have expression data, ontology, orthologs
+
+      Step 3: gene_ontology_terms(locus_tags=["PMM0845"])
+              → drill into annotations for genes with rich annotation_types
+
+verbose_fields:
+  - gene_summary
+  - function_description
+  - all_identifiers
+
+chaining:
+  - "resolve_gene → gene_overview"
+  - "genes_by_function → gene_overview"
+  - "gene_overview → gene_ontology_terms"
+  - "gene_overview → gene_homologs"
+  - "gene_overview → differential_expression_by_gene"
+
+mistakes:
+  - "annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms"
+  - "expression_edge_count > 0 means expression data exists — use differential_expression_by_gene to explore it"
+  - "closest_ortholog_genera shows cross-genus reach — use gene_homologs for full group membership"
+  - wrong: "gene_overview(locus_tags=['PMM0845'], verbose=True)  # just to see the gene"
+    right: "gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary text"
+```
+
+### Build
+
+```bash
+uv run python scripts/build_about_content.py gene_overview
+```
+
+### Verify
+
+```bash
+pytest tests/unit/test_about_content.py -v
+pytest tests/integration/test_about_examples.py -v
+```
 
 ---
 
