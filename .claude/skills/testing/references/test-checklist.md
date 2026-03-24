@@ -297,6 +297,9 @@ Current names: `get_schema`, `search_genes`, `get_gene_details`,
 
 - Verifies API function return types and key presence against live KG
 - Check `result` is `dict`, has `results` key, has `total_matching`/`returned`/`truncated`
+- **Must update when the return shape of any API function changes** — the contract test
+  captures the pre-change shape and will fail silently if not updated. Always grep for
+  `TestRunCypherContract` / `Test{Name}Contract` when touching api/functions.py return values.
 
 ---
 

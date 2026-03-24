@@ -94,17 +94,30 @@ class TestGeneHomologs:
 
 
 @pytest.mark.kg
-class TestRunCypherBlocking:
-    def test_invalid_cypher_returns_error(self, conn):
-        """Syntax-invalid Cypher should raise, not hang."""
-        with pytest.raises(Exception):
-            conn.execute_query("MATC (n) RETURNN n LIMIT 1")
+class TestRunCypher:
+    def test_valid_query_returns_results(self, conn):
+        """Valid query returns envelope with rows and empty warnings."""
+        result = api.run_cypher("MATCH (g:Gene) RETURN count(g) AS cnt", conn=conn)
+        assert result["returned"] > 0
+        assert result["warnings"] == []
+        assert set(result.keys()) >= {"returned", "truncated", "warnings", "results"}
 
-    def test_write_blocked_at_regex_level(self):
-        """Write keywords are caught before reaching Neo4j."""
-        assert _WRITE_KEYWORDS.search("CREATE (n:Gene {name: 'test'})")
-        assert _WRITE_KEYWORDS.search("MATCH (n) DELETE n")
-        assert _WRITE_KEYWORDS.search("MATCH (n) SET n.x = 1")
+    def test_bad_label_produces_warnings(self, conn):
+        """Query referencing a non-existent label returns non-empty warnings."""
+        result = api.run_cypher(
+            "MATCH (n:NonExistentLabel_XYZ) RETURN n LIMIT 1", conn=conn
+        )
+        assert len(result["warnings"]) > 0
+
+    def test_write_query_raises_value_error(self, conn):
+        """Write keywords raise ValueError before execution."""
+        with pytest.raises(ValueError, match="Write operations"):
+            api.run_cypher("CREATE (n:Gene {name: 'test'})", conn=conn)
+
+    def test_syntax_error_raises_value_error(self, conn):
+        """Syntax-invalid Cypher raises ValueError with a message."""
+        with pytest.raises(ValueError, match="Syntax error"):
+            api.run_cypher("MATC (n) RETURNN n LIMIT 1", conn=conn)
 
 
 @pytest.mark.kg

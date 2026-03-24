@@ -151,7 +151,7 @@ Do not trust Cypher by reading alone — run it. For each builder:
 - [ ] Eval cases in `cases.yaml`?
 - [ ] Integration tests if tool touches new data?
 - [ ] KG correctness tests (`test_tool_correctness_kg.py`) updated if builder signature changed?
-- [ ] Contract tests (`test_api_contract.py`) updated if return shape changed?
+- [ ] Contract tests (`test_api_contract.py`) updated if return shape changed? (`grep Test.*Contract` — easy to miss)
 - [ ] Regression baselines regenerated if columns/tool renamed? (`--force-regen`)
 - [ ] Tests for every optional parameter?
 - [ ] Tests for validation errors?

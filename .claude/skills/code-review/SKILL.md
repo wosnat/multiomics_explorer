@@ -24,12 +24,15 @@ checklist.
 4. **Verify test coverage** — does every changed layer have
    corresponding test updates?
 
-5. **Run tests** — verify everything passes:
+5. **Run tests** — unit tests always; integration tests when Neo4j is available:
    ```bash
-   pytest tests/unit/ -v                        # unit tests (no Neo4j)
-   pytest tests/integration/ -v                  # contract, about-examples, KG tests
-   pytest tests/regression/ -m kg                # regression golden files
+   pytest tests/unit/ -v                        # always run
+   pytest tests/integration/ -m kg -v           # run if Neo4j available
+   pytest tests/regression/ -m kg               # run if golden files may be affected
    ```
+   **Do not report a passing review based on unit tests alone** when api/ return shapes
+   or about content changed — `test_api_contract.py` and `test_about_examples.py` only
+   run with a live KG and will not appear in the unit suite.
 
 ## Quick checks
 
@@ -41,3 +44,4 @@ Before diving into the full checklist, verify these common issues:
 - [ ] No f-string interpolation of user input in Cypher?
 - [ ] `ORDER BY` in every query for deterministic results?
 - [ ] About content (MCP resource) updated if tool behavior changed?
+- [ ] `pytest tests/unit/test_about_content.py` passes (expected-keys match Pydantic models)?

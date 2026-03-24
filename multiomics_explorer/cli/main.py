@@ -157,10 +157,11 @@ def schema_validate(
 @app.command()
 def cypher(
     query: str = typer.Argument(help="Cypher query to execute"),
-    limit: int = typer.Option(25, help="Max rows to display"),
+    limit: int = typer.Option(25, help="Max rows to display (injected automatically if absent)"),
     json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
 ):
     """Execute a Cypher query directly against the knowledge graph."""
+    from multiomics_explorer.api.functions import run_cypher
     from multiomics_explorer.kg.connection import GraphConnection
 
     with GraphConnection() as conn:
@@ -168,38 +169,37 @@ def cypher(
             console.print("[red]Cannot connect to Neo4j. Is it running?[/red]")
             raise typer.Exit(1)
 
-        # Block write operations (read-only tool)
-        from multiomics_explorer.api.functions import _WRITE_KEYWORDS
-        if _WRITE_KEYWORDS.search(query):
-            console.print("[red]Error: write operations are not allowed. This tool is read-only.[/red]")
-            raise typer.Exit(1)
-
         try:
-            results = conn.execute_query(query)
+            result = run_cypher(query, limit=limit, conn=conn)
+        except ValueError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            raise typer.Exit(1)
         except Exception as e:
             console.print(f"[red]Query error: {e}[/red]")
             raise typer.Exit(1)
+
+        for warning in result["warnings"]:
+            console.print(f"[yellow]Warning: {warning}[/yellow]")
+
+        results = result["results"]
 
         if not results:
             console.print("[yellow]No results.[/yellow]")
             return
 
         if json_output:
-            console.print(json.dumps(results[:limit], indent=2, default=str))
+            console.print(json.dumps(results, indent=2, default=str))
         else:
-            # Build a rich table from the results
             table = Table(show_lines=True)
             keys = list(results[0].keys())
             for k in keys:
                 table.add_column(k)
-
-            for row in results[:limit]:
+            for row in results:
                 table.add_row(*[str(row.get(k, "")) for k in keys])
-
             console.print(table)
 
-        if len(results) > limit:
-            console.print(f"[dim]Showing {limit} of {len(results)} results[/dim]")
+        if result["truncated"]:
+            console.print(f"[dim]Showing {result['returned']} rows (may be more — increase --limit)[/dim]")
 
 
 @app.command()

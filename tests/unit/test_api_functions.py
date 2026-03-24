@@ -980,29 +980,210 @@ class TestGeneOntologyTerms:
 # ---------------------------------------------------------------------------
 # run_cypher
 # ---------------------------------------------------------------------------
-class TestRunCypher:
-    def test_returns_list(self, mock_conn):
-        mock_conn.execute_query.return_value = [{"count": 42}]
-        result = api.run_cypher("MATCH (g:Gene) RETURN count(g) AS count", conn=mock_conn)
-        assert isinstance(result, list)
-        assert result[0]["count"] == 42
 
-    def test_write_keyword_raises(self, mock_conn):
+MOD = "multiomics_explorer.api.functions"
+
+
+def _valid_validators(sv_cls, schv_cls, pv_cls):
+    """Configure CyVer validator mocks for an error-free query."""
+    sv_cls.return_value.validate.return_value = (True, [])
+    schv_cls.return_value.validate.return_value = (1.0, [])
+    pv_cls.return_value.validate.return_value = (1.0, [])
+
+
+class TestRunCypher:
+    def test_returns_standard_envelope(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"count": 42}]
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            result = api.run_cypher("MATCH (g:Gene) RETURN count(g) AS count", conn=mock_conn)
+        assert set(result.keys()) == {"returned", "truncated", "warnings", "results"}
+        assert result["returned"] == 1
+        assert result["results"][0]["count"] == 42
+
+    def test_write_blocked_raises_value_error(self, mock_conn):
         with pytest.raises(ValueError, match="Write operations"):
             api.run_cypher("CREATE (n:Test)", conn=mock_conn)
 
-    def test_merge_blocked(self, mock_conn):
+    def test_foreach_blocked(self, mock_conn):
         with pytest.raises(ValueError, match="Write operations"):
-            api.run_cypher("MERGE (n:Test {id: 1})", conn=mock_conn)
+            api.run_cypher("FOREACH (x IN [1] | CREATE (:Node))", conn=mock_conn)
 
-    def test_delete_blocked(self, mock_conn):
+    def test_load_csv_blocked(self, mock_conn):
         with pytest.raises(ValueError, match="Write operations"):
-            api.run_cypher("MATCH (n) DELETE n", conn=mock_conn)
+            api.run_cypher("LOAD CSV FROM 'file:///data.csv' AS row RETURN row", conn=mock_conn)
 
-    def test_read_query_passes(self, mock_conn):
+    def test_call_procedure_blocked(self, mock_conn):
+        with pytest.raises(ValueError, match="Write operations"):
+            api.run_cypher("CALL apoc.create.node(['Gene'], {name: 'x'})", conn=mock_conn)
+
+    def test_syntax_error_raises_value_error(self, mock_conn):
+        with patch(f"{MOD}.SyntaxValidator") as sv:
+            sv.return_value.validate.return_value = (False, [{"description": "Invalid input 'MATC'"}])
+            with pytest.raises(ValueError, match="Syntax error"):
+                api.run_cypher("MATC (n) RETURNN n", conn=mock_conn)
+
+    def test_syntax_error_message_propagated(self, mock_conn):
+        with patch(f"{MOD}.SyntaxValidator") as sv:
+            sv.return_value.validate.return_value = (False, [{"description": "Invalid input near line 1, col 5"}])
+            with pytest.raises(ValueError, match="line 1, col 5"):
+                api.run_cypher("MATC (n) RETURNN n", conn=mock_conn)
+
+    def test_schema_warnings_in_response(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"n": 1}]
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            sv.return_value.validate.return_value = (True, [])
+            schv.return_value.validate.return_value = (
+                0.5,
+                [{"code": "UnknownLabelWarning", "description": "Label Foo not in database"}],
+            )
+            pv.return_value.validate.return_value = (1.0, [])
+            result = api.run_cypher("MATCH (n:Foo) RETURN n", conn=mock_conn)
+        assert result["warnings"] == ["Label Foo not in database"]
+
+    def test_property_warnings_in_response(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"n": 1}]
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            sv.return_value.validate.return_value = (True, [])
+            schv.return_value.validate.return_value = (1.0, [])
+            pv.return_value.validate.return_value = (
+                0.5,
+                [{"description": "Property bad_prop not found on Gene"}],
+            )
+            result = api.run_cypher("MATCH (n:Gene) RETURN n.bad_prop", conn=mock_conn)
+        assert result["warnings"] == ["Property bad_prop not found on Gene"]
+
+    def test_no_warnings_when_valid(self, mock_conn):
         mock_conn.execute_query.return_value = []
-        result = api.run_cypher("MATCH (n) RETURN n LIMIT 10", conn=mock_conn)
-        assert result == []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            result = api.run_cypher("MATCH (n:Gene) RETURN n LIMIT 5", conn=mock_conn)
+        assert result["warnings"] == []
+
+    def test_duplicate_warnings_deduplicated(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        msg = "Label Foo not in database"
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            sv.return_value.validate.return_value = (True, [])
+            schv.return_value.validate.return_value = (0.5, [{"description": msg}])
+            pv.return_value.validate.return_value = (0.5, [{"description": msg}])
+            result = api.run_cypher("MATCH (n:Foo) RETURN n", conn=mock_conn)
+        assert result["warnings"] == [msg]
+
+    def test_validators_use_conn_driver(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            api.run_cypher("MATCH (n) RETURN n LIMIT 1", conn=mock_conn)
+        sv.assert_called_once_with(mock_conn.driver)
+        schv.assert_called_once_with(mock_conn.driver)
+        pv.assert_called_once_with(mock_conn.driver)
+
+    def test_limit_injected_when_absent(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            api.run_cypher("MATCH (n) RETURN n", limit=10, conn=mock_conn)
+        called_query = mock_conn.execute_query.call_args[0][0]
+        assert "LIMIT 10" in called_query
+
+    def test_limit_not_duplicated_when_present(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            api.run_cypher("MATCH (n) RETURN n LIMIT 5", limit=10, conn=mock_conn)
+        called_query = mock_conn.execute_query.call_args[0][0]
+        assert called_query.count("LIMIT") == 1
+
+    def test_limit_none_skips_injection(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            result = api.run_cypher("MATCH (n) RETURN n", limit=None, conn=mock_conn)
+        called_query = mock_conn.execute_query.call_args[0][0]
+        assert "LIMIT" not in called_query
+        assert result["truncated"] is False
+
+    def test_semicolon_stripped(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            api.run_cypher("MATCH (n) RETURN n;", limit=10, conn=mock_conn)
+        called_query = mock_conn.execute_query.call_args[0][0]
+        assert ";" not in called_query
+        assert "LIMIT" in called_query
+
+    def test_truncated_when_returned_equals_limit(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"n": i} for i in range(5)]
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            result = api.run_cypher("MATCH (n) RETURN n", limit=5, conn=mock_conn)
+        assert result["truncated"] is True
+
+    def test_not_truncated_when_returned_lt_limit(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"n": 1}, {"n": 2}]
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            result = api.run_cypher("MATCH (n) RETURN n", limit=5, conn=mock_conn)
+        assert result["truncated"] is False
+
+    def test_truncated_false_when_limit_none(self, mock_conn):
+        mock_conn.execute_query.return_value = [{"n": i} for i in range(10)]
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            result = api.run_cypher("MATCH (n) RETURN n LIMIT 10", limit=None, conn=mock_conn)
+        assert result["truncated"] is False
+
+    def test_empty_results(self, mock_conn):
+        mock_conn.execute_query.return_value = []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            result = api.run_cypher("MATCH (n:Fake) RETURN n", conn=mock_conn)
+        assert result["returned"] == 0
+        assert result["truncated"] is False
+        assert result["results"] == []
+
+    def test_creates_conn_when_none(self):
+        with patch(f"{MOD}.GraphConnection") as gc_cls, \
+             patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            gc_cls.return_value.execute_query.return_value = []
+            _valid_validators(sv, schv, pv)
+            api.run_cypher("MATCH (n) RETURN n LIMIT 1")
+        gc_cls.assert_called_once()
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import run_cypher
+        assert run_cypher is api.run_cypher
 
 
 # ---------------------------------------------------------------------------

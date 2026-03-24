@@ -25,6 +25,21 @@ def build_{name}(
 - Organism filter pattern: `ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word)`
 - NULL-safe optional filters: `$param IS NULL OR ...`
 - For ontology queries, use `ONTOLOGY_CONFIG` dict
+- **NULL behaviour in aggregation (verified against live KG):**
+  - `collect(expr)` **silently drops NULLs** from scalar values. Never
+    use `collect(r.nullable_field)` to gather values that may be null —
+    they will vanish without error. Use GROUP BY instead so each NULL
+    forms its own group row, then `collect({key: val})` to build a map.
+  - `collect({key: null_val})` **preserves NULLs inside maps** — safe
+    for building nested result structs.
+  - `count(*)` counts all rows; `count(field)` excludes NULLs. Use
+    `count(*)` for row totals when any field may be null.
+  - `sum(CASE WHEN cond THEN 1 ELSE 0 END)` — use `ELSE 0` (explicit);
+    both `ELSE 0` and implicit `ELSE null` produce the same sum, but
+    `ELSE 0` is clearer.
+  - `percentileCont(CASE WHEN cond THEN val ELSE null END, p)` — nulls
+    from CASE are silently ignored by `percentileCont`, safe for
+    conditional medians (e.g. significant-only median |log2FC|).
 - **UNWIND + WITH DISTINCT scoping:** When queries use `UNWIND $list AS var`
   followed by `WITH DISTINCT`, all variables needed downstream must be
   carried through. E.g. `WITH DISTINCT descendant, tid` — not just
@@ -282,6 +297,19 @@ lc._cache_attr = response
 - Compute response fields (`returned`, `truncated`, `not_found`) — api/ owns that
 - Return error strings — use `ToolError` instead
 - Execute raw Cypher (except through `api.run_cypher`)
+
+### Documented exception: `run_cypher`
+
+`run_cypher` is an escape-hatch tool with dynamic query columns. It intentionally
+deviates from the standard envelope — deviations are spec'd in `docs/tool-specs/run_cypher.md`:
+
+| Convention | Standard | `run_cypher` | Reason |
+|---|---|---|---|
+| `total_matching` | Always present | Omitted | True total requires a separate COUNT query — impossible for arbitrary Cypher |
+| `{Name}Result` per-row model | Required | `list[dict]` | Columns are caller-defined; typed model is impossible |
+| `truncated` semantics | `total_matching > returned` | `returned == limit` | Follows from missing `total_matching` |
+| MCP default `limit` | 5 | 25 | Escape hatch — users need more context rows |
+| CyVer validation | Not applicable | SyntaxValidator (hard) + SchemaValidator + PropertiesValidator (soft warnings) | Validates before execution; warnings surfaced in response |
 
 ---
 

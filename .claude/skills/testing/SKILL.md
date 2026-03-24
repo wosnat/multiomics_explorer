@@ -18,8 +18,11 @@ and [regression guide](references/regression-guide.md) for golden-file tests.
 | `tests/unit/test_tool_wrappers.py` | MCP wrapper Pydantic models + ToolError | No |
 | `tests/unit/test_tool_correctness.py` | Fixture-based correctness (mocked) | No |
 | `tests/unit/test_write_blocking.py` | Write keyword regex | No |
+| `tests/unit/test_about_content.py` | About-file consistency with Pydantic schemas (expected-keys, param names) | No |
 | `tests/integration/test_tool_correctness_kg.py` | Fixture-based correctness (live KG) | Yes |
 | `tests/integration/test_mcp_tools.py` | MCP smoke tests | Yes |
+| `tests/integration/test_api_contract.py` | API return-type contracts (shape + keys) | Yes |
+| `tests/integration/test_about_examples.py` | About-content examples execute against KG | Yes |
 | `tests/regression/test_regression.py` | Golden-file comparison | Yes |
 
 ## Test commands
@@ -62,6 +65,12 @@ will fail otherwise.
 
 When adding a new query builder for regression tests, add it to the
 `TOOL_BUILDERS` dict in `tests/regression/test_regression.py`.
+
+## Important: API contract tests
+
+When changing the return shape of any `api/functions.py` function, update the
+corresponding `Test{Name}Contract` class in `tests/integration/test_api_contract.py`.
+These tests capture the pre-change shape and will silently fail otherwise.
 
 ## Important: KG char escaping
 

@@ -47,6 +47,9 @@ markers = [
     "eval: marks evaluation tests (slow, requires LLM API calls)",
     "slow: marks slow tests",
 ]
+filterwarnings = [
+    "ignore::DeprecationWarning:CyVer",
+]
 
 [tool.ruff]
 line-length = 100

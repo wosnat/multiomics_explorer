@@ -5,7 +5,8 @@
 List valid values for categorical filters used across tools.
 
 Returns valid values and counts for the requested filter type.
-Use the returned values as filter parameters in other tools.
+Use the returned values as filter parameters in `genes_by_function`
+(category filter).
 
 ## Parameters
 

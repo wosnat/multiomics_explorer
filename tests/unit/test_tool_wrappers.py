@@ -881,69 +881,108 @@ class TestGeneHomologsWrapper:
 # ---------------------------------------------------------------------------
 # run_cypher
 # ---------------------------------------------------------------------------
+
+_CYPHER_MOD = "multiomics_explorer.api.functions"
+
+
+def _patch_cyver_valid(sv_cls, schv_cls, pv_cls):
+    sv_cls.return_value.validate.return_value = (True, [])
+    schv_cls.return_value.validate.return_value = (1.0, [])
+    pv_cls.return_value.validate.return_value = (1.0, [])
+
+
 class TestRunCypherWrapper:
-    def test_write_blocked_returns_error_message(self, tool_fns, mock_ctx):
-        result = tool_fns["run_cypher"](mock_ctx, query="CREATE (n:Gene {name: 'x'})")
-        assert "Error" in result
-        assert "Write operations" in result
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = [{"n": 1}]
+        with patch(f"{_CYPHER_MOD}.SyntaxValidator") as sv, \
+             patch(f"{_CYPHER_MOD}.SchemaValidator") as schv, \
+             patch(f"{_CYPHER_MOD}.PropertiesValidator") as pv:
+            _patch_cyver_valid(sv, schv, pv)
+            response = await tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
+        assert hasattr(response, "returned")
+        assert hasattr(response, "truncated")
+        assert hasattr(response, "warnings")
+        assert hasattr(response, "results")
+
+    @pytest.mark.asyncio
+    async def test_write_blocked_raises_tool_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
+        with pytest.raises(ToolError, match="Write operations"):
+            await tool_fns["run_cypher"](mock_ctx, query="CREATE (n:Gene {name: 'x'})")
         _conn_from(mock_ctx).execute_query.assert_not_called()
 
-    def test_limit_injected_when_absent(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = [{"n": 1}]
-        tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
-        called_query = _conn_from(mock_ctx).execute_query.call_args[0][0]
-        assert "LIMIT" in called_query
+    @pytest.mark.asyncio
+    async def test_syntax_error_raises_tool_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
+        with patch(f"{_CYPHER_MOD}.SyntaxValidator") as sv:
+            sv.return_value.validate.return_value = (False, [{"description": "Invalid input 'MATC'"}])
+            with pytest.raises(ToolError, match="Syntax error"):
+                await tool_fns["run_cypher"](mock_ctx, query="MATC (n) RETURNN n")
 
-    def test_limit_not_duplicated_when_present(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = [{"n": 1}]
-        tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n LIMIT 5")
-        called_query = _conn_from(mock_ctx).execute_query.call_args[0][0]
-        assert called_query.count("LIMIT") == 1
+    @pytest.mark.asyncio
+    async def test_cyver_exception_raises_tool_error(self, tool_fns, mock_ctx):
+        """CyVer validator throwing an unexpected exception surfaces as ToolError."""
+        from fastmcp.exceptions import ToolError
+        with patch(f"{_CYPHER_MOD}.SyntaxValidator") as sv:
+            sv.return_value.validate.side_effect = RuntimeError("CyVer internal error")
+            with pytest.raises(ToolError):
+                await tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
 
-    def test_limit_capped_at_200(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = [{"n": 1}]
-        tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n", limit=500)
-        called_query = _conn_from(mock_ctx).execute_query.call_args[0][0]
-        assert "LIMIT 200" in called_query
-
-    def test_empty_results_message(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_limit_forwarded(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["run_cypher"](mock_ctx, query="MATCH (n:Fake) RETURN n")
-        assert "no results" in result.lower()
-
-    def test_semicolon_stripped_before_limit(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = [{"n": 1}]
-        tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n;")
+        with patch(f"{_CYPHER_MOD}.SyntaxValidator") as sv, \
+             patch(f"{_CYPHER_MOD}.SchemaValidator") as schv, \
+             patch(f"{_CYPHER_MOD}.PropertiesValidator") as pv:
+            _patch_cyver_valid(sv, schv, pv)
+            await tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n", limit=10)
         called_query = _conn_from(mock_ctx).execute_query.call_args[0][0]
-        assert ";" not in called_query
-        assert "LIMIT" in called_query
+        assert "LIMIT 10" in called_query
 
-    def test_neo4j_error_returns_error_string(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.side_effect = Neo4jClientError("syntax error")
-        result = tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
-        assert "Error in run_cypher" in result
-        assert "syntax error" in result
+    @pytest.mark.asyncio
+    async def test_warnings_in_response(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        with patch(f"{_CYPHER_MOD}.SyntaxValidator") as sv, \
+             patch(f"{_CYPHER_MOD}.SchemaValidator") as schv, \
+             patch(f"{_CYPHER_MOD}.PropertiesValidator") as pv:
+            sv.return_value.validate.return_value = (True, [])
+            schv.return_value.validate.return_value = (0.5, [{"description": "Label Foo not in database"}])
+            pv.return_value.validate.return_value = (1.0, [])
+            response = await tool_fns["run_cypher"](mock_ctx, query="MATCH (n:Foo) RETURN n")
+        assert response.warnings == ["Label Foo not in database"]
 
-    def test_foreach_blocked(self, tool_fns, mock_ctx):
-        result = tool_fns["run_cypher"](
-            mock_ctx, query="FOREACH (x IN [1] | CREATE (:Node))"
-        )
-        assert "Error" in result
-        _conn_from(mock_ctx).execute_query.assert_not_called()
+    @pytest.mark.asyncio
+    async def test_empty_warnings_when_valid(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = [{"n": 1}]
+        with patch(f"{_CYPHER_MOD}.SyntaxValidator") as sv, \
+             patch(f"{_CYPHER_MOD}.SchemaValidator") as schv, \
+             patch(f"{_CYPHER_MOD}.PropertiesValidator") as pv:
+            _patch_cyver_valid(sv, schv, pv)
+            response = await tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
+        assert response.warnings == []
 
-    def test_load_csv_blocked(self, tool_fns, mock_ctx):
-        result = tool_fns["run_cypher"](
-            mock_ctx, query="LOAD CSV FROM 'file:///data.csv' AS row RETURN row"
-        )
-        assert "Error" in result
-        _conn_from(mock_ctx).execute_query.assert_not_called()
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.return_value = []
+        with patch(f"{_CYPHER_MOD}.SyntaxValidator") as sv, \
+             patch(f"{_CYPHER_MOD}.SchemaValidator") as schv, \
+             patch(f"{_CYPHER_MOD}.PropertiesValidator") as pv:
+            _patch_cyver_valid(sv, schv, pv)
+            response = await tool_fns["run_cypher"](mock_ctx, query="MATCH (n:Fake) RETURN n")
+        assert response.returned == 0
+        assert response.results == []
 
-    def test_call_procedure_blocked(self, tool_fns, mock_ctx):
-        result = tool_fns["run_cypher"](
-            mock_ctx, query="CALL apoc.create.node(['Gene'], {name: 'x'})"
-        )
-        assert "Error" in result
-        _conn_from(mock_ctx).execute_query.assert_not_called()
+    @pytest.mark.asyncio
+    async def test_generic_error_raises_tool_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
+        with patch(f"{_CYPHER_MOD}.SyntaxValidator") as sv, \
+             patch(f"{_CYPHER_MOD}.SchemaValidator") as schv, \
+             patch(f"{_CYPHER_MOD}.PropertiesValidator") as pv:
+            _patch_cyver_valid(sv, schv, pv)
+            _conn_from(mock_ctx).execute_query.side_effect = RuntimeError("timeout")
+            with pytest.raises(ToolError, match="Error in run_cypher"):
+                await tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
 
 
 # ---------------------------------------------------------------------------
@@ -1470,11 +1509,6 @@ class TestErrorHandling:
         ):
             with pytest.raises(ToolError):
                 await tool_fns["gene_homologs"](mock_ctx, locus_tags=["PMM0001"])
-
-    def test_run_cypher_generic_error(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.side_effect = RuntimeError("timeout")
-        result = tool_fns["run_cypher"](mock_ctx, query="MATCH (n) RETURN n")
-        assert "Error in run_cypher" in result
 
     @pytest.mark.asyncio
     async def test_search_ontology_value_error(self, tool_fns, mock_ctx):

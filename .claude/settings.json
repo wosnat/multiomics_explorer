@@ -2,10 +2,23 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "permissions": {
+    "allow": [
+      "Edit(/.claude/skills/testing/**)",
+      "Edit(/.claude/skills/code-review/**)",
+      "Edit(/.claude/skills/layer-rules/**)",
+      "Edit(/.claude/skills/add-or-update-tool/**)"
+    ]
+  },
   "mcpServers": {
     "multiomics-kg": {
       "command": "uv",
-      "args": ["run", "--directory", "/home/osnat/github/multiomics_explorer", "multiomics-kg-mcp"]
+      "args": [
+        "run",
+        "--directory",
+        "/home/osnat/github/multiomics_explorer",
+        "multiomics-kg-mcp"
+      ]
     }
   }
 }

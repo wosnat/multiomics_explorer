@@ -12,6 +12,7 @@ So product/description strings in the KG may differ from raw annotation JSONs.
 
 import pytest
 
+from multiomics_explorer.api import functions as api
 from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
@@ -898,3 +899,52 @@ class TestGeneOntologyTermsCorrectnessKG:
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
         assert "organism_strain" in results[0]
+
+
+# ---------------------------------------------------------------------------
+# run_cypher
+# ---------------------------------------------------------------------------
+
+@pytest.mark.kg
+class TestRunCypherCorrectness:
+    def test_valid_query_no_warnings(self, conn):
+        """A well-formed query against real labels returns empty warnings."""
+        result = api.run_cypher(
+            "MATCH (g:Gene) RETURN count(g) AS cnt", conn=conn
+        )
+        assert result["warnings"] == []
+        assert result["returned"] > 0
+        assert "cnt" in result["results"][0]
+
+    def test_bad_label_populates_warnings(self, conn):
+        """A query referencing a non-existent label returns schema warnings."""
+        result = api.run_cypher(
+            "MATCH (n:NonExistentLabel_XYZ) RETURN n LIMIT 1", conn=conn
+        )
+        assert len(result["warnings"]) > 0
+        assert any("NonExistentLabel_XYZ" in w or "not" in w.lower() for w in result["warnings"])
+
+    def test_bad_property_populates_warnings(self, conn):
+        """PropertiesValidator fires when a valid label has a non-existent property."""
+        result = api.run_cypher(
+            "MATCH (g:Gene) RETURN g.nonexistent_prop_xyz AS val LIMIT 1", conn=conn
+        )
+        assert len(result["warnings"]) > 0
+
+    def test_truncated_true_when_limit_hit(self, conn):
+        """truncated=True when exactly limit rows are returned."""
+        result = api.run_cypher(
+            "MATCH (g:Gene) RETURN g.locus_tag AS tag", limit=1, conn=conn
+        )
+        assert result["returned"] == 1
+        assert result["truncated"] is True
+
+    def test_truncated_false_when_under_limit(self, conn):
+        """truncated=False when fewer rows than limit come back."""
+        # There is exactly 1 Gene with locus_tag PMM0001, so limit=10 won't be hit.
+        result = api.run_cypher(
+            "MATCH (g:Gene) WHERE g.locus_tag = 'PMM0001' RETURN g.locus_tag AS tag",
+            limit=10, conn=conn,
+        )
+        assert result["returned"] == 1
+        assert result["truncated"] is False

@@ -12,6 +12,8 @@ import logging
 import re
 import statistics
 
+from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
+
 from neo4j.exceptions import ClientError as Neo4jClientError
 
 from multiomics_explorer.kg.connection import GraphConnection
@@ -47,6 +49,9 @@ from multiomics_explorer.kg.queries_lib import (
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
 logger = logging.getLogger(__name__)
+
+# Suppress EXPLAIN notification noise emitted by CyVer validators.
+logging.getLogger("neo4j").setLevel(logging.ERROR)
 
 
 def _default_conn(conn: GraphConnection | None) -> GraphConnection:
@@ -961,20 +966,54 @@ def gene_ontology_terms(
 
 def run_cypher(
     query: str,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
+) -> dict:
     """Execute a raw Cypher query (read-only).
 
     Write operations are blocked via keyword detection.
+    Syntax is validated via CyVer before execution; schema and property
+    warnings are included in the returned dict.
 
-    Returns list of dicts (raw query results).
+    Returns dict with keys: returned, truncated, warnings, results.
 
-    Raises ValueError if the query contains write keywords.
+    Raises ValueError if the query contains write keywords or has a syntax error.
+
+    Note: SyntaxValidator returns False for parameterized queries ($param) due to
+    a ParameterNotProvided notification — not a real syntax error. run_cypher users
+    should write literal values, so this is not an issue in practice.
     """
-    if _WRITE_KEYWORDS.search(query):
-        raise ValueError(
-            "Write operations are not allowed. This interface is read-only."
-        )
     conn = _default_conn(conn)
-    return conn.execute_query(query)
+
+    # 1. Write blocking
+    if _WRITE_KEYWORDS.search(query):
+        raise ValueError("Write operations are not allowed. This interface is read-only.")
+
+    # 2. Syntax validation (hard block)
+    valid, meta = SyntaxValidator(conn.driver).validate(query)
+    if not valid:
+        msg = meta[0]["description"] if meta else "Syntax error"
+        raise ValueError(f"Syntax error: {msg}")
+
+    # 3–4. Schema + property warnings (soft); deduplicate preserving order
+    raw_warnings: list[str] = []
+    _, schema_meta = SchemaValidator(conn.driver).validate(query)
+    raw_warnings.extend(m["description"] for m in schema_meta)
+    _, prop_meta = PropertiesValidator(conn.driver).validate(query)
+    raw_warnings.extend(m["description"] for m in prop_meta)
+    warnings = list(dict.fromkeys(raw_warnings))
+
+    # 5. Limit injection + semicolon strip (only when limit provided)
+    if limit is not None and not re.search(r"\bLIMIT\b", query, re.IGNORECASE):
+        query = query.rstrip().rstrip(";")
+        query += f"\nLIMIT {limit}"
+
+    # 6. Execute
+    results = conn.execute_query(query)
+    return {
+        "returned": len(results),
+        "truncated": len(results) == limit if limit is not None else False,
+        "warnings": warnings,
+        "results": results,
+    }

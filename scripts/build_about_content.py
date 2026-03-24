@@ -121,7 +121,8 @@ def extract_response_fields(schema: dict) -> tuple[list[dict], list[dict]]:
     props = output.get("properties", {})
     for name, prop in props.items():
         if name == "results":
-            # Extract per-result fields from $ref
+            # Extract per-result fields from $ref (typed model).
+            # For untyped list[dict], ref is absent — results still exists.
             ref = prop.get("items", {}).get("$ref", "")
             if ref:
                 def_name = ref.split("/")[-1]
@@ -185,6 +186,7 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
 
     # Response format (auto-generated)
     envelope, result_fields = extract_response_fields(schema)
+    has_results = bool(result_fields) or "results" in schema.get("output_schema", {}).get("properties", {})
     lines.append("## Response format")
     lines.append("")
 
@@ -192,7 +194,7 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append("### Envelope")
         lines.append("")
         lines.append("```expected-keys")
-        suffix = ", results" if result_fields else ""
+        suffix = ", results" if has_results else ""
         lines.append(", ".join(f["name"] for f in envelope) + suffix)
         lines.append("```")
         lines.append("")
@@ -318,7 +320,7 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append(f'result = {tool_name}()')
     # API returns a subset of the MCP envelope (no returned/truncated wrapper)
     api_keys = [f["name"] for f in envelope if f["name"] not in ("returned", "truncated")]
-    if result_fields:
+    if has_results:
         api_keys.append("results")
     envelope_keys = ", ".join(api_keys)
     lines.append(f'# returns dict with keys: {envelope_keys}')

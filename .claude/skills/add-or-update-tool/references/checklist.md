@@ -16,6 +16,7 @@
 | UT | `tests/unit/test_tool_wrappers.py` | `class Test{Name}Wrapper` + update `EXPECTED_TOOLS` |
 | IT | `tests/integration/test_mcp_tools.py` | Smoke test against live KG |
 | IT | `tests/integration/test_tool_correctness_kg.py` | Update `TestBuild{Name}CorrectnessKG` if exists |
+| IT | `tests/integration/test_api_contract.py` | Add/update `Test{Name}Contract` — **update whenever return shape changes** |
 | RG | `tests/evals/cases.yaml` | Eval cases |
 | RG | `tests/evals/test_eval.py` | Add to `TOOL_BUILDERS` |
 | RG | `tests/regression/test_regression.py` | Add to `TOOL_BUILDERS` |
@@ -382,6 +383,7 @@ Pattern: `gene_ontology_terms` (9 ontologies × batch genes).
 - Forgetting to add builder to `TOOL_BUILDERS` in `test_regression.py` AND `test_eval.py` (both have their own dict)
 - Forgetting to update `CLAUDE.md` tool table
 - Forgetting to update `test_tool_correctness_kg.py` when builder signature changes
+- Forgetting to update `test_api_contract.py` when api/ return shape changes — it captures the pre-change shape and will fail silently if skipped
 - Every query MUST have `ORDER BY` — if no natural sort key, sort alphabetically by primary identifier. Non-deterministic results break regression tests.
 - String filters must be case-insensitive — use `toLower()` on both sides
 - Fulltext search tools must return `score` in RETURN columns and ORDER BY score DESC. Summary needs `score_max`/`score_median`.

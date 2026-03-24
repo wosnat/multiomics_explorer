@@ -324,13 +324,14 @@ class TestGeneOntologyTermsContract:
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
 class TestRunCypherContract:
-    def test_returns_list_of_dicts(self, conn):
+    def test_returns_envelope(self, conn):
         result = api.run_cypher(
             "MATCH (g:Gene) RETURN count(g) AS count", conn=conn,
         )
-        assert isinstance(result, list)
-        assert len(result) == 1
-        assert "count" in result[0]
+        assert isinstance(result, dict)
+        assert set(result.keys()) >= {"returned", "truncated", "warnings", "results"}
+        assert result["returned"] == 1
+        assert "count" in result["results"][0]
 
     def test_write_blocked(self, conn):
         with pytest.raises(ValueError, match="Write operations"):

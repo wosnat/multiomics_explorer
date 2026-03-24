@@ -50,6 +50,7 @@ async def run_cypher(
     limit: Annotated[int, Field(
         description="Max results (default 25, max 200).",
         ge=1,
+        le=200,
     )] = 25,
 ) -> RunCypherResponse:
     """Execute a raw Cypher query against the knowledge graph (read-only).
@@ -65,6 +66,15 @@ async def run_cypher(
 `truncated` is a heuristic: `True` when `returned == limit` (may be more rows).
 `warnings` are non-blocking schema/property issues from CyVer (e.g. unknown
 label, unknown property key). Syntax errors raise `ToolError` before execution.
+
+**Intentional deviations from v3 conventions:**
+
+| Convention | v3 standard | run_cypher | Reason |
+|---|---|---|---|
+| `total_matching` in envelope | Always present | Omitted | Raw query — true total requires a separate COUNT query not possible for arbitrary Cypher |
+| `{Name}Result` per-row model | Required | `list[dict]` | Columns are dynamic (caller-defined query); typed model is impossible |
+| MCP default `limit` | 5 | 25 | Escape hatch — users need more context rows; established convention (transition plan: "keep limit=25 default") |
+| `truncated` semantics | `total_matching > returned` | `returned == limit` | Follows from missing `total_matching` |
 
 ---
 
@@ -84,11 +94,9 @@ the complete response dict is assembled. CyVer needs `conn.driver` (neo4j
 `Driver` object), available as `GraphConnection.driver`.
 
 **Driver notification noise:** CyVer uses `EXPLAIN` internally. The neo4j
-driver logs EXPLAIN notifications via the `neo4j` logger. Suppress in tests:
-```python
-import logging
-logging.getLogger("neo4j").setLevel(logging.ERROR)
-```
+driver logs EXPLAIN notifications via the `neo4j` logger. Suppressed at
+module level in `functions.py` (see API Function section) — no additional
+action needed in tests or callers.
 
 **`SyntaxValidator` false negative:** Parameterized queries (`$param`) return
 `False` from `SyntaxValidator` — `ParameterNotProvided` is a notification, not
@@ -99,16 +107,16 @@ values. Document in docstring.
 
 ## Result-size controls
 
-### Option A: Small result set (no modes needed)
-
 No `summary` or `verbose`. Result count controlled entirely by `limit`.
 
 **Sort key:** Caller-defined (raw query, no imposed ORDER BY).
 
-**Default limit:** 25. Max 200 (capped in api/).
+**Default limit:** 25 (MCP default). No default in api/ (`None`). Max 200
+enforced by `le=200` in MCP `Field` — no capping in api/.
 
-**`truncated` heuristic:** `returned == limit` — may be more rows if exactly
-`limit` results came back. Cannot know true total without a COUNT query.
+**`truncated` heuristic:** `returned == limit` when limit is not None — may be
+more rows if exactly `limit` results came back. `False` when `limit=None`.
+Cannot know true total without a COUNT query.
 
 ---
 
@@ -116,18 +124,21 @@ No `summary` or `verbose`. Result count controlled entirely by `limit`.
 
 | Step | Layer | File | What |
 |------|-------|------|------|
-| 1 | API function | `api/functions.py` | Update `run_cypher()` — add limit param, move limit-injection + semicolon stripping from MCP, add CyVer validation, return dict |
+| 1 | API function | `api/functions.py` | Update `run_cypher()` — add `limit: int | None = None` (no capping), move limit-injection + semicolon stripping from MCP, add CyVer validation, return dict |
 | 2 | MCP wrapper | `mcp_server/tools.py` | Pydantic models, async, ToolError, remove limit logic |
-| 3 | Unit tests | `tests/unit/test_api_functions.py` | `TestRunCypher` — new envelope, CyVer mocked |
-| 4 | Unit tests | `tests/unit/test_tool_wrappers.py` | Rewrite `TestRunCypherWrapper` — async, Pydantic |
-| 5 | Unit tests | `tests/unit/test_write_blocking.py` | No changes — `_WRITE_KEYWORDS` unchanged |
-| 6 | Integration | `tests/integration/test_mcp_tools.py` | Update smoke test for new response shape |
-| 7 | About content | `multiomics_explorer/inputs/tools/run_cypher.yaml` | Create input YAML |
-| 8 | About content | `multiomics_explorer/skills/.../tools/run_cypher.md` | Build |
-| 9 | Docs | `CLAUDE.md` | Update row (add CyVer mention) |
+| 3 | Exports | `api/__init__.py`, `multiomics_explorer/__init__.py` | N/A — `run_cypher` already exported |
+| 4 | Unit tests | `tests/unit/test_api_functions.py` | `TestRunCypher` — new envelope, CyVer mocked |
+| 5 | Unit tests | `tests/unit/test_tool_wrappers.py` | Rewrite `TestRunCypherWrapper` — async, Pydantic |
+| 6 | Unit tests | `tests/unit/test_write_blocking.py` | No changes — `_WRITE_KEYWORDS` unchanged |
+| 7 | Integration | `tests/integration/test_mcp_tools.py` | Update smoke test + add warnings/error cases (see Tests section) |
+| 8 | Integration | `tests/integration/test_tool_correctness_kg.py` | Add `TestRunCypherCorrectness`: valid query → no warnings; bad-label query → warnings populated |
+| 9 | Regression | `tests/regression/test_regression.py` | N/A — query is caller-supplied, no fixed builder to snapshot |
+| 10 | Eval cases | `tests/evals/cases.yaml` | N/A — dynamic query, no fixed expected columns |
+| 11 | About content | `multiomics_explorer/inputs/tools/run_cypher.yaml` | Create skeleton then fill: `uv run python scripts/build_about_content.py --skeleton run_cypher` |
+| 12 | About content | `multiomics_explorer/skills/.../tools/run_cypher.md` | Build: `uv run python scripts/build_about_content.py run_cypher` |
+| 13 | Docs | `CLAUDE.md` | Update row (add CyVer mention) |
 
 No query builder needed — raw pass-through.
-No eval cases / regression fixtures — query is caller-supplied.
 
 ---
 
@@ -140,13 +151,13 @@ No eval cases / regression fixtures — query is caller-supplied.
 from CyVer import SyntaxValidator, SchemaValidator, PropertiesValidator
 
 # Module-level: suppress neo4j driver EXPLAIN notification noise from CyVer
-import logging as _logging
-_logging.getLogger("neo4j").setLevel(_logging.ERROR)
+# (uses existing `logging` import at top of functions.py)
+logging.getLogger("neo4j").setLevel(logging.ERROR)
 
 
 def run_cypher(
     query: str,
-    limit: int = 25,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -161,7 +172,6 @@ def run_cypher(
     Raises ValueError if the query contains write keywords or has a syntax error.
     """
     conn = _default_conn(conn)
-    limit = min(limit, 200)
 
     # 1. Write blocking
     if _WRITE_KEYWORDS.search(query):
@@ -181,8 +191,8 @@ def run_cypher(
     raw_warnings.extend(m["description"] for m in prop_meta)
     warnings = list(dict.fromkeys(raw_warnings))
 
-    # 5. Limit injection + semicolon strip
-    if not re.search(r"\bLIMIT\b", query, re.IGNORECASE):
+    # 5. Limit injection + semicolon strip (only when limit provided)
+    if limit is not None and not re.search(r"\bLIMIT\b", query, re.IGNORECASE):
         query = query.rstrip().rstrip(";")
         query += f"\nLIMIT {limit}"
 
@@ -190,19 +200,20 @@ def run_cypher(
     results = conn.execute_query(query)
     return {
         "returned": len(results),
-        "truncated": len(results) == limit,
+        "truncated": len(results) == limit if limit is not None else False,
         "warnings": warnings,
         "results": results,
     }
 ```
 
 **Notes:**
-- `limit` param added (was only in MCP layer before).
+- `limit: int | None = None` in api/ (v3 convention). No capping in api/ —
+  MCP enforces `le=200` via `Field` constraint before passing to api/.
+- When `limit=None`, LIMIT injection is skipped (query runs as-is or with
+  its own LIMIT). `truncated` is `False` in this case.
 - Limit injection + semicolon stripping moved from MCP to here.
-- CyVer imported at module level (top of `functions.py` with other imports).
-- `logging.getLogger("neo4j")` set at module level — one-time side effect,
-  not repeated on every call. Affects all neo4j logging in the process;
-  acceptable since CyVer EXPLAIN noise is otherwise unavoidable.
+- CyVer imported at module level; `logging.getLogger("neo4j")` uses the existing
+  `logging` import already at the top of `functions.py` — no new import needed.
 - `dict.fromkeys()` deduplicates warnings while preserving insertion order —
   SchemaValidator and PropertiesValidator can both flag the same unknown label.
 - CyVer validators are stateless and cheap to construct per call.
@@ -243,6 +254,7 @@ async def run_cypher(
     limit: Annotated[int, Field(
         description="Max results (default 25, max 200).",
         ge=1,
+        le=200,
     )] = 25,
 ) -> RunCypherResponse:
     """Execute a raw Cypher query against the knowledge graph (read-only).
@@ -273,7 +285,7 @@ Key changes from v1:
 - `async def` with `await ctx.info/warning/error()`
 - Pydantic `RunCypherResponse` (not JSON string return)
 - `ToolError` instead of returning error strings
-- Remove `logger` calls, remove limit logic (moved to api/)
+- Remove `logger` calls, remove limit injection + semicolon logic (moved to api/)
 - `warnings` field surfaces CyVer schema/property issues
 - Syntax errors → `ToolError` before any execution
 
@@ -301,12 +313,14 @@ class TestRunCypher:
     test_validators_use_conn_driver       — validators instantiated with conn.driver, not conn
     test_limit_injected_when_absent       — LIMIT added to query
     test_limit_not_duplicated_when_present — existing LIMIT preserved
-    test_limit_capped_at_200              — limit=500 → LIMIT 200 in query
+    test_limit_none_skips_injection       — limit=None → no LIMIT injected, truncated=False
     test_semicolon_stripped               — trailing ; removed before LIMIT
     test_truncated_when_returned_equals_limit
     test_not_truncated_when_returned_lt_limit
+    test_truncated_false_when_limit_none  — limit=None → truncated=False regardless of row count
     test_empty_results                    — returned=0, truncated=False
     test_creates_conn_when_none
+    test_importable_from_package          — `from multiomics_explorer import run_cypher`
 ```
 
 **Note on write blocking coverage:** `test_write_blocking.py` tests `_WRITE_KEYWORDS`
@@ -316,7 +330,7 @@ verify the regex is wired through the function — not redundant.
 Mock pattern — patch where imported (`multiomics_explorer.api.functions`),
 not the source module (`CyVer`):
 ```python
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 MOD = "multiomics_explorer.api.functions"
 
@@ -375,16 +389,16 @@ Update smoke test:
 
 ```yaml
 examples:
-  - title: Count genes per organism
-    call: run_cypher(query="MATCH (g:Gene) RETURN g.ncbi_taxon_id AS taxon, count(g) AS gene_count ORDER BY gene_count DESC")
+  - title: Count genes per organism strain
+    call: run_cypher(query="MATCH (g:Gene) RETURN g.organism_strain AS strain, count(g) AS gene_count ORDER BY gene_count DESC")
     response: |
       {
-        "returned": 25,
+        "returned": 12,
         "truncated": false,
         "warnings": [],
         "results": [
-          {"taxon": "1219", "gene_count": 1921},
-          {"taxon": "324", "gene_count": 1470}
+          {"strain": "Alteromonas macleodii EZ55", "gene_count": 4136},
+          {"strain": "Alteromonas macleodii HOT1A3", "gene_count": 4031}
         ]
       }
 
@@ -411,13 +425,20 @@ mistakes:
   - "Warnings are non-blocking — the query still executes. Check warnings before trusting empty results."
   - wrong: "run_cypher(query='MATCH (g:Gene) WHERE g.locus_tag = $tag RETURN g', params={'tag': 'PMM0001'})"
     right: "run_cypher(query=\"MATCH (g:Gene) WHERE g.locus_tag = 'PMM0001' RETURN g\")"
-  - "No LIMIT in query? One is added automatically at the default (25). Pass limit= to increase."
+  - "No LIMIT in query? One is added automatically at the MCP default (25). Pass limit= to increase or add LIMIT directly in your query."
 ```
 
 ### Build
 
 ```bash
 uv run python scripts/build_about_content.py run_cypher
+```
+
+### Verify
+
+```bash
+pytest tests/unit/test_about_content.py -v          # consistency with tool schema
+pytest tests/integration/test_about_examples.py -v  # examples execute against KG
 ```
 
 ---

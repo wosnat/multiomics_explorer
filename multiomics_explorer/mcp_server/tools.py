@@ -599,37 +599,59 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"gene_homologs unexpected error: {e}")
             raise ToolError(f"Error in gene_homologs: {e}")
 
-    @mcp.tool()
-    def run_cypher(ctx: Context, query: str, limit: int = 25) -> str:
+    class RunCypherResponse(BaseModel):
+        returned: int = Field(description="Number of rows returned (e.g. 12)")
+        truncated: bool = Field(
+            description="True when returned == limit (more rows may exist)"
+        )
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Schema or property warnings from CyVer (non-blocking). "
+            "Empty list means query is fully valid against the current KG schema.",
+        )
+        results: list[dict] = Field(
+            default_factory=list,
+            description="Raw query results, one dict per row",
+        )
+
+    @mcp.tool(
+        tags={"raw", "escape-hatch"},
+        annotations={"readOnlyHint": True},
+    )
+    async def run_cypher(
+        ctx: Context,
+        query: Annotated[str, Field(
+            description="Cypher query string. Write operations are blocked. "
+            "A LIMIT clause is added automatically if absent.",
+        )],
+        limit: Annotated[int, Field(
+            description="Max results (default 25, max 200).",
+            ge=1,
+            le=200,
+        )] = 25,
+    ) -> RunCypherResponse:
         """Execute a raw Cypher query against the knowledge graph (read-only).
 
-        Use this as an escape hatch when the other tools don't cover your query.
-        Write operations are blocked (regex keyword filter + read-only transaction).
-
-        Args:
-            query: Cypher query string. A LIMIT clause will be added if not present.
-            limit: Max results (default 25, max 200).
+        Use this as an escape hatch when other tools don't cover your query.
+        Write operations are blocked. Queries are validated for syntax and schema
+        correctness before execution — warnings are returned in the response.
         """
-        logger.info("run_cypher limit=%d", limit)
+        await ctx.info(f"run_cypher limit={limit}")
         try:
-            limit = min(limit, 200)
-
-            # Add LIMIT if not present
-            if not re.search(r"\bLIMIT\b", query, re.IGNORECASE):
-                query = query.rstrip().rstrip(";")
-                query += f"\nLIMIT {limit}"
-
             conn = _conn(ctx)
-            results = api.run_cypher(query, conn=conn)
-            if not results:
-                return "Query returned no results."
-            return _fmt(results, limit=limit)
+            data = api.run_cypher(query, limit=limit, conn=conn)
+            response = RunCypherResponse(**data)
+            await ctx.info(
+                f"Returning {response.returned} rows"
+                + (f" ({len(response.warnings)} warnings)" if response.warnings else "")
+            )
+            return response
         except ValueError as e:
-            logger.warning("run_cypher error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"run_cypher error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("run_cypher unexpected error: %s", e)
-            return f"Error in run_cypher: {e}"
+            await ctx.error(f"run_cypher unexpected error: {e}")
+            raise ToolError(f"Error in run_cypher: {e}")
 
     # --- search_ontology ---
 
