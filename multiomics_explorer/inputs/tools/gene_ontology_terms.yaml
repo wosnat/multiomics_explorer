@@ -1,0 +1,52 @@
+# Human-authored content for gene_ontology_terms about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: GO biological process terms for a gene
+    call: gene_ontology_terms(locus_tags=["PMM0001"], ontology="go_bp")
+    response: |
+      {
+        "total_matching": 2, "total_genes": 1, "total_terms": 2,
+        "by_ontology": [{"ontology_type": "go_bp", "term_count": 2, "gene_count": 1}],
+        "by_term": [
+          {"term_id": "go:0006260", "term_name": "DNA replication", "ontology_type": "go_bp", "count": 1},
+          {"term_id": "go:0006271", "term_name": "DNA strand elongation involved in DNA replication", "ontology_type": "go_bp", "count": 1}
+        ],
+        "terms_per_gene_min": 2, "terms_per_gene_max": 2, "terms_per_gene_median": 2.0,
+        "returned": 2, "truncated": false, "not_found": [], "no_terms": [],
+        "results": [
+          {"locus_tag": "PMM0001", "term_id": "go:0006260", "term_name": "DNA replication"},
+          {"locus_tag": "PMM0001", "term_id": "go:0006271", "term_name": "DNA strand elongation involved in DNA replication"}
+        ]
+      }
+
+  - title: All ontology annotations for a gene
+    call: gene_ontology_terms(locus_tags=["PMM0001"])
+
+  - title: Batch annotations with summary only
+    call: gene_ontology_terms(locus_tags=["PMM0001", "PMM0845", "EZ55_00275"], summary=True)
+
+  - title: From overview to ontology details
+    steps: |
+      Step 1: gene_overview(locus_tags=["PMM0001"])
+              → check annotation_types: ["go_bp", "go_mf", "kegg", "ec", ...]
+
+      Step 2: gene_ontology_terms(locus_tags=["PMM0001"], ontology="go_bp")
+              → get actual GO BP terms
+
+      Step 3: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
+              → find other genes with same term
+
+verbose_fields:
+  - organism_strain
+
+chaining:
+  - "gene_overview → gene_ontology_terms (check annotation_types first)"
+  - "gene_ontology_terms → genes_by_ontology (reverse: term → other genes)"
+  - "resolve_gene → gene_ontology_terms"
+
+mistakes:
+  - "ontology=None returns ALL ontology types — use ontology filter when you only need one type"
+  - "returns only leaf (most specific) terms — ancestor terms like 'metabolic process' are excluded because they are implied by the more specific child terms"
+  - "to check if a gene is connected to a broad term (e.g. 'DNA repair'), use genes_by_ontology which expands down the hierarchy — gene_ontology_terms only returns the leaf annotations"
