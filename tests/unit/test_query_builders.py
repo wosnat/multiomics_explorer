@@ -200,7 +200,7 @@ class TestBuildGeneOverview:
         expected_columns = [
             "locus_tag", "gene_name", "product", "gene_category",
             "annotation_quality", "organism_strain", "annotation_types",
-            "expression_edge_count", "significant_expression_count",
+            "expression_edge_count", "significant_up_count", "significant_down_count",
             "closest_ortholog_group_size", "closest_ortholog_genera",
         ]
         for col in expected_columns:

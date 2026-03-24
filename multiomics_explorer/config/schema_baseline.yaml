@@ -24,7 +24,8 @@ nodes:
       preferred_id: string
       product: string
       protein_id: string
-      significant_expression_count: int
+      significant_down_count: int
+      significant_up_count: int
       start: int
       strand: string
   BiologicalProcess:
@@ -106,7 +107,8 @@ nodes:
       preferred_id: string
       product: string
       protein_id: string
-      significant_expression_count: int
+      significant_down_count: int
+      significant_up_count: int
       start: int
       strand: string
   GeneOntology:

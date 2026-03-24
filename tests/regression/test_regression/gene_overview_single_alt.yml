@@ -12,4 +12,5 @@ rows:
   locus_tag: EZ55_00275
   organism_strain: Alteromonas macleodii EZ55
   product: hypothetical protein
-  significant_expression_count: 0
+  significant_down_count: 0
+  significant_up_count: 0

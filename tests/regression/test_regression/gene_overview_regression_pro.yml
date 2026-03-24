@@ -17,4 +17,5 @@ rows:
   locus_tag: PMM1428
   organism_strain: Prochlorococcus MED4
   product: EVE domain protein
-  significant_expression_count: 5
+  significant_down_count: 1
+  significant_up_count: 4

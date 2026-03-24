@@ -370,7 +370,8 @@ def register_tools(mcp: FastMCP):
         organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
         annotation_types: list[str] = Field(default_factory=list, description="Ontology types with annotations (e.g. ['go_bp', 'ec', 'kegg'])")
         expression_edge_count: int = Field(default=0, description="Number of expression data points (e.g. 36)")
-        significant_expression_count: int = Field(default=0, description="Significant DE observations (e.g. 5)")
+        significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations (e.g. 3)")
+        significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations (e.g. 2)")
         closest_ortholog_group_size: int | None = Field(default=None, description="Size of tightest ortholog group (e.g. 9)")
         closest_ortholog_genera: list[str] | None = Field(default=None, description="Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus'])")
         # verbose-only

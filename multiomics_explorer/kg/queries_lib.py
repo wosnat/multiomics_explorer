@@ -233,7 +233,7 @@ def build_gene_overview_summary(
         "       apoc.coll.frequencies(cats) AS by_category,\n"
         "       apoc.coll.frequencies(all_atypes) AS by_annotation_type,\n"
         "       size([g IN found WHERE g.expression_edge_count > 0]) AS has_expression,\n"
-        "       size([g IN found WHERE g.significant_expression_count > 0]) AS has_significant_expression,\n"
+        "       size([g IN found WHERE (g.significant_up_count + g.significant_down_count) > 0]) AS has_significant_expression,\n"
         "       size([g IN found WHERE g.closest_ortholog_group_size > 0]) AS has_orthologs,\n"
         "       not_found"
     )
@@ -250,7 +250,7 @@ def build_gene_overview(
 
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
     annotation_quality, organism_strain, annotation_types,
-    expression_edge_count, significant_expression_count,
+    expression_edge_count, significant_up_count, significant_down_count,
     closest_ortholog_group_size, closest_ortholog_genera.
     RETURN keys (verbose): adds gene_summary, function_description,
     all_identifiers.
@@ -279,7 +279,8 @@ def build_gene_overview(
         "       g.organism_strain AS organism_strain,\n"
         "       g.annotation_types AS annotation_types,\n"
         "       g.expression_edge_count AS expression_edge_count,\n"
-        "       g.significant_expression_count AS significant_expression_count,\n"
+        "       g.significant_up_count AS significant_up_count,\n"
+        "       g.significant_down_count AS significant_down_count,\n"
         "       g.closest_ortholog_group_size AS closest_ortholog_group_size,\n"
         f"       g.closest_ortholog_genera AS closest_ortholog_genera{verbose_cols}\n"
         f"ORDER BY g.locus_tag{limit_clause}"

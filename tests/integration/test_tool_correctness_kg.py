@@ -235,7 +235,7 @@ class TestGeneOverviewCorrectnessKG:
         assert r["locus_tag"] == "PMM1428"
         assert set(r["annotation_types"]) >= {"go_mf", "pfam", "cog_category", "tigr_role"}
         assert r["expression_edge_count"] == 36
-        assert r["significant_expression_count"] == 5
+        assert r["significant_up_count"] + r["significant_down_count"] == 5
         assert r["closest_ortholog_group_size"] == 9
         assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
 

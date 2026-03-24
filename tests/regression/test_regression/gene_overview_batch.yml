@@ -12,7 +12,8 @@ rows:
   locus_tag: EZ55_00275
   organism_strain: Alteromonas macleodii EZ55
   product: hypothetical protein
-  significant_expression_count: 0
+  significant_down_count: 0
+  significant_up_count: 0
 - annotation_quality: 3
   annotation_types:
   - cog_category
@@ -29,4 +30,5 @@ rows:
   locus_tag: PMM1428
   organism_strain: Prochlorococcus MED4
   product: EVE domain protein
-  significant_expression_count: 5
+  significant_down_count: 1
+  significant_up_count: 4

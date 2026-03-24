@@ -1,105 +1,44 @@
-# KG change spec: expression_call on Changes_expression_of edges
+# KG change spec: expression_status on Changes_expression_of edges
 
 ## Summary
 
-Add `expression_call` as a precomputed property on `Changes_expression_of` edges.
-Derived from existing `r.significant` + `r.expression_direction` at KG build time.
+Add `expression_status` as a derived property on `Changes_expression_of` edges.
+Split all precomputed significant counts into directional `significant_up_count` /
+`significant_down_count` on Experiment and Gene nodes.
 
-## Motivation
+**Status: implemented in KG repo — rebuild in progress (2026-03-24).**
 
-The `differential_expression_by_gene` tool needs a single enum field to:
-- Filter rows (`WHERE r.expression_call <> "not_significant"`)
-- Aggregate call breakdowns (`apoc.coll.frequencies(collect(r.expression_call))`)
+See `multiomics_biocypher_kg/docs/kg-changes/expression-status.md` for the authoritative spec.
 
-Without this, every aggregation requires two conditional sums and every filter
-requires two predicates. Having it precomputed also makes the intent clearer.
+## New Edge Property
 
-## Current state
-
-All `Changes_expression_of` edges have:
-- `significant`: string — `"significant"` or `"not_significant"`
-- `expression_direction`: string — `"up"` or `"down"`
-
-188,501 total edges; 42,687 significant (22,645 up / 20,042 down).
-
-## Required changes
-
-### New nodes
-
-None.
-
-### New edges
-
-None.
-
-### Property changes
-
-| Node/Edge | Property | Change | Notes |
+| Edge | Property | Type | Values |
 |---|---|---|---|
-| `Changes_expression_of` (all 188,501 edges) | `expression_call` | Add new property | Derived: see derivation rule below |
+| `Changes_expression_of` | `expression_status` | str | `"significant_up"`, `"significant_down"`, `"not_significant"` |
 
-### Derivation rule
+Derived from `significant` + `expression_direction` at build time. Source properties retained.
 
-```
-expression_call =
-  "significant_up"   when r.significant = "significant" AND r.expression_direction = "up"
-  "significant_down" when r.significant = "significant" AND r.expression_direction = "down"
-  "not_significant"  when r.significant = "not_significant"
-```
+## Property Renames — Experiment Nodes
 
-The `expression_direction` field is still present and not removed — it may be
-useful for other queries. `expression_call` is purely additive.
+| Before | After |
+|---|---|
+| `significant_count` | `significant_up_count` + `significant_down_count` |
+| `time_point_significants` | `time_point_significant_up` + `time_point_significant_down` (parallel arrays) |
 
-### Implementation (post-import computation)
+## Property Renames — Gene Nodes
 
-```cypher
-MATCH ()-[r:Changes_expression_of]->()
-SET r.expression_call = CASE
-  WHEN r.significant = "significant" AND r.expression_direction = "up"   THEN "significant_up"
-  WHEN r.significant = "significant" AND r.expression_direction = "down" THEN "significant_down"
-  ELSE "not_significant"
-END
-```
+| Before | After |
+|---|---|
+| `significant_expression_count` | `significant_up_count` + `significant_down_count` |
 
-### New indexes
+## MCP Code Impact (fix after rebuild)
 
-None required — `expression_call` is always used alongside other filters
-(locus_tags, experiment_ids) that already use indexes.
-
-## Verification queries
-
-```cypher
--- 1. All edges have expression_call populated
-MATCH ()-[r:Changes_expression_of]->()
-WHERE r.expression_call IS NULL
-RETURN count(r)
--- Expected: 0
-
--- 2. Total significant matches existing significant count
-MATCH ()-[r:Changes_expression_of]->()
-WHERE r.expression_call IN ["significant_up", "significant_down"]
-RETURN count(r)
--- Expected: 42,687 (matches existing r.significant = "significant" count)
-
--- 3. Counts match existing fields
-MATCH ()-[r:Changes_expression_of]->()
-RETURN
-  count(CASE WHEN r.expression_call = "significant_up"   THEN 1 END) AS new_up,
-  count(CASE WHEN r.expression_call = "significant_down" THEN 1 END) AS new_down,
-  count(CASE WHEN r.significant = "significant" AND r.expression_direction = "up"   THEN 1 END) AS old_up,
-  count(CASE WHEN r.significant = "significant" AND r.expression_direction = "down" THEN 1 END) AS old_down
--- Expected: new_up = old_up, new_down = old_down
-
--- 4. No unexpected values
-MATCH ()-[r:Changes_expression_of]->()
-WHERE r.expression_call NOT IN ["significant_up", "significant_down", "not_significant"]
-RETURN count(r)
--- Expected: 0
-```
-
-## Status
-
-- [x] Spec reviewed with user
-- [ ] Changes implemented in KG repo
-- [ ] KG rebuilt
-- [ ] Verification queries pass
+| File | Location | Old reference | New reference |
+|---|---|---|---|
+| `kg/queries_lib.py` | `build_list_experiments_summary` (line ~701) | `significant_count` | `significant_up_count`, `significant_down_count` |
+| `kg/queries_lib.py` | `build_list_experiments` (line ~745) | `e.significant_count`, `e.time_point_significants` | `e.significant_up_count`, `e.significant_down_count`, `e.time_point_significant_up`, `e.time_point_significant_down` |
+| `api/functions.py` | `list_experiments` (line ~563, ~667) | `significant_count`, `time_point_significants` | updated names |
+| `mcp_server/tools.py` | `ListExperimentsResult` (line ~1032) | `significant_count` | `significant_up_count`, `significant_down_count` |
+| `kg/queries_lib.py` | `build_gene_overview` (line ~236, ~282) | `significant_expression_count` | `significant_up_count`, `significant_down_count` |
+| `api/functions.py` | `gene_overview` (line ~237) | `significant_expression_count` | updated |
+| `mcp_server/tools.py` | `GeneOverviewResult` (line ~373) | `significant_expression_count` | `significant_up_count`, `significant_down_count` |

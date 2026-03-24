@@ -292,7 +292,7 @@ class TestGeneOverview:
              "organism_strain": "Prochlorococcus MED4",
              "annotation_types": ["go_bp", "ec", "kegg"],
              "expression_edge_count": 10,
-             "significant_expression_count": 5,
+             "significant_up_count": 3, "significant_down_count": 2,
              "closest_ortholog_group_size": 20,
              "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]},
         ]

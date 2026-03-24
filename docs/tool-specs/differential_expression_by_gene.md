@@ -21,13 +21,13 @@ homology.
 ## Status / Prerequisites
 
 - [x] KG explored (2026-03-24)
-- [x] KG spec: `docs/kg-specs/kg-spec-expression-call.md` — `expression_call` property on edges
+- [x] KG spec: `docs/kg-specs/kg-spec-expression-call.md` — `expression_status` on edges + directional counts on Experiment/Gene nodes
 - [x] Scope reviewed with user
-- [ ] KG rebuilt with `expression_call` on edges
-- [ ] Ready for Phase 2 (build)
+- [x] KG rebuilt (2026-03-24) — `r.expression_status` verified on all 188,501 edges
+- [x] Ready for Phase 2 (build)
 
-**Workflow note:** One KG change required: add `expression_call` precomputed
-property to `Changes_expression_of` edges. KG spec → KG rebuild → then build.
+**Workflow note:** KG rebuild in progress. Once complete, verify `r.expression_status`
+is populated on edges, then proceed to Phase 2 (build).
 
 ## Use cases
 
@@ -47,7 +47,7 @@ property to `Changes_expression_of` edges. KG spec → KG rebuild → then build
 ## KG dependencies
 
 Existing properties verified in live KG (2026-03-24). One new property
-needed: `expression_call` — see `docs/kg-specs/kg-spec-expression-call.md`.
+needed: `expression_status` — see `docs/kg-specs/kg-spec-expression-call.md`.
 
 ### Edge properties (`Changes_expression_of`)
 
@@ -55,9 +55,9 @@ needed: `expression_call` — see `docs/kg-specs/kg-spec-expression-call.md`.
 |---|---|---|
 | `log2_fold_change` | `log2fc` | float |
 | `adjusted_p_value` | `padj` | float |
-| `expression_direction` | — | Used at KG build time to compute `expression_call` |
-| `significant` | — | Used at KG build time to compute `expression_call` |
-| `expression_call` | `expression_call` | **New** — precomputed enum: `"significant_up"`, `"significant_down"`, `"not_significant"` |
+| `expression_direction` | — | Used at KG build time to compute `expression_status` |
+| `significant` | — | Used at KG build time to compute `expression_status` |
+| `expression_status` | `expression_status` | **New** — precomputed enum: `"significant_up"`, `"significant_down"`, `"not_significant"` |
 | `rank_by_effect` | `rank` | rank by \|log2FC\| within experiment × timepoint; 1 = strongest |
 | `time_point` | `timepoint` | label string (e.g. "20h", "day 31") |
 | `time_point_hours` | `timepoint_hours` | float, nullable |
@@ -138,7 +138,7 @@ async def differential_expression_by_gene(
     At least one of locus_tags or experiment_ids is strongly recommended.
     Without any filter, results cover the full KG (188K rows).
 
-    The `expression_call` field uses the publication-specific threshold from
+    The `expression_status` field uses the publication-specific threshold from
     each experiment's original paper (not a uniform padj<0.05 cutoff). A row
     with padj=0.03 may still be `"not_significant"` if the paper used a stricter
     threshold or required a minimum fold-change.
@@ -148,14 +148,14 @@ async def differential_expression_by_gene(
     """
 ```
 
-**Return envelope:** `organism_strain, matching_genes, total_rows, rows_by_call,
+**Return envelope:** `organism_strain, matching_genes, total_rows, rows_by_status,
 median_abs_log2fc, max_abs_log2fc, experiment_count, top_categories, experiments,
 returned, truncated, not_found, no_expression, results`
 
 **Per-result columns (compact — 11):**
 `locus_tag`, `gene_name`,
 `experiment_id`, `condition_type`, `timepoint`, `timepoint_hours`, `timepoint_order`,
-`log2fc`, `padj`, `rank`, `expression_call`
+`log2fc`, `padj`, `rank`, `expression_status`
 
 **Verbose adds (6):**
 `product`, `experiment_name`, `treatment`,
@@ -172,9 +172,9 @@ series.
 **Naming convention:**
 - `_rows` suffix → gene × experiment × timepoint rows
 - `_genes` suffix → distinct genes
-- `rows_by_call` → dict keyed by `expression_call` values, counting rows
+- `rows_by_status` → dict keyed by `expression_status` values, counting rows
 
-### `expression_call` enum (on KG edge + result rows)
+### `expression_status` enum (on KG edge + result rows)
 
 | Value | Meaning |
 |---|---|
@@ -182,11 +182,11 @@ series.
 | `"significant_down"` | Significant and downregulated (per publication threshold) |
 | `"not_significant"` | Not significant; direction readable from `log2fc` sign |
 
-Stored as `r.expression_call` on `Changes_expression_of` edges (KG schema change —
+Stored as `r.expression_status` on `Changes_expression_of` edges (KG schema change —
 see `docs/kg-specs/kg-spec-expression-call.md`). Derived from existing `r.significant`
 + `r.expression_direction` at KG build time.
 
-### `rows_by_call` dict
+### `rows_by_status` dict
 
 `{"significant_up": N, "significant_down": N, "not_significant": N}` — appears at
 global level, per-experiment, and per-timepoint. Always all three keys present.
@@ -198,7 +198,7 @@ global level, per-experiment, and per-timepoint. Always all three keys present.
 | `organism_strain` | str | The single organism all inputs belong to |
 | `matching_genes` | int | Distinct genes present in results (after filters) |
 | `total_rows` | int | Total gene × experiment × timepoint rows matching all filters |
-| `rows_by_call` | dict | `{"significant_up": N, "significant_down": N, "not_significant": N}` |
+| `rows_by_status` | dict | `{"significant_up": N, "significant_down": N, "not_significant": N}` |
 | `median_abs_log2fc` | float \| null | Median \|log2FC\| for significant rows only; null if none |
 | `max_abs_log2fc` | float \| null | Max \|log2FC\| for significant rows only; null if none |
 | `experiment_count` | int | Number of experiments in results (after filters) |
@@ -214,7 +214,7 @@ global level, per-experiment, and per-timepoint. Always all three keys present.
 | `experiment_name` | str | Human-readable name from `e.name` |
 | `omics_type` | str | |
 | `matching_genes` | int | Distinct genes in this experiment (after all active filters) |
-| `rows_by_call` | dict | `{"significant_up": N, "significant_down": N, "not_significant": N}` |
+| `rows_by_status` | dict | `{"significant_up": N, "significant_down": N, "not_significant": N}` |
 | `timepoints` | list \| null | Per-timepoint breakdown (see below). Null when `is_time_course=false`. |
 
 ### `timepoints` entry (nested in `experiments`)
@@ -225,7 +225,7 @@ global level, per-experiment, and per-timepoint. Always all three keys present.
 | `timepoint_hours` | float \| null | Numeric hours. Null for non-numeric timepoints (e.g. "days 60+89"). No sentinel — genuine null. |
 | `timepoint_order` | int | Sort key. Always populated. |
 | `matching_genes` | int | Distinct genes at this timepoint |
-| `rows_by_call` | dict | `{"significant_up": N, "significant_down": N, "not_significant": N}` |
+| `rows_by_status` | dict | `{"significant_up": N, "significant_down": N, "not_significant": N}` |
 
 ### Batch handling
 
@@ -282,12 +282,12 @@ All summary queries always run. Detail query skipped when `limit=0` / `summary=T
 All queries share the same WHERE clause (same filter parameters).
 
 **Summary query 1 — global stats:**
-Returns `total_rows`, `rows_by_call`, `median_abs_log2fc`, `max_abs_log2fc`.
+Returns `total_rows`, `rows_by_status`, `median_abs_log2fc`, `max_abs_log2fc`.
 
-`rows_by_call` uses `apoc.coll.frequencies(collect(r.expression_call))` —
+`rows_by_status` uses `apoc.coll.frequencies(collect(r.expression_status))` —
 single aggregation over the precomputed enum; always all three keys present.
 
-Uses `percentileCont(CASE WHEN r.expression_call <> "not_significant" THEN abs(r.log2_fold_change) ELSE null END, 0.5)` — nulls from CASE are silently ignored by `percentileCont`, confirmed against live KG.
+Uses `percentileCont(CASE WHEN r.expression_status <> "not_significant" THEN abs(r.log2_fold_change) ELSE null END, 0.5)` — nulls from CASE are silently ignored by `percentileCont`, confirmed against live KG.
 
 **Summary query 2 — per-experiment with nested timepoints:**
 Returns `experiments` list (flat — single organism enforced, no organism
@@ -304,34 +304,32 @@ Returns `top_categories`, `not_found`, `no_expression`.
 
 `top_categories` uses two counts per category:
 - `total_genes`: `count(DISTINCT g.locus_tag)` — all input genes in that category
-- `significant_genes`: `count(DISTINCT CASE WHEN r.significant = "significant" THEN g.locus_tag END)`
+- `significant_genes`: `count(DISTINCT CASE WHEN r.expression_status <> "not_significant" THEN g.locus_tag END)`
 Both count distinct genes, not rows. Sorted by `significant_genes DESC`, top 5.
 
-Organism mismatch for `warnings`: collect `DISTINCT g.organism_strain` from
-matched genes and `DISTINCT e.organism_strain` from matched experiments, then
-check disjointness client-side (two small sets).
+`experiment_count` is computed in api/ as `len(experiments)` from query 2 — not a separate query field.
 
 **Detail query:**
 Returns result rows. Skipped when `limit=0`.
 
-### Significant-only filtering and `expression_call`
+### Significant-only filtering and `expression_status`
 
-`r.expression_call` is a precomputed property on `Changes_expression_of` edges
+`r.expression_status` is a precomputed property on `Changes_expression_of` edges
 (see `docs/kg-specs/kg-spec-expression-call.md`). Three values:
 `"significant_up"`, `"significant_down"`, `"not_significant"`.
 
-Result rows carry `expression_call` directly from the edge. For non-significant
+Result rows carry `expression_status` directly from the edge. For non-significant
 rows, direction is still readable from `log2fc` sign.
 
-`significant_only=True` → `WHERE r.expression_call <> "not_significant"` in all queries.
+`significant_only=True` → `WHERE r.expression_status <> "not_significant"` in all queries.
 
-`direction="up"` → `WHERE r.expression_call = "significant_up"` (implies significant).
-`direction="down"` → `WHERE r.expression_call = "significant_down"` (implies significant).
+`direction="up"` → `WHERE r.expression_status = "significant_up"` (implies significant).
+`direction="down"` → `WHERE r.expression_status = "significant_down"` (implies significant).
 Both direction values imply significance — non-significant rows are excluded when
 direction is set, regardless of `significant_only`.
 
-`rows_by_call` uses `apoc.coll.frequencies(collect(r.expression_call))` — single
-aggregation instead of two conditional sums. Safe: `expression_call` is never null.
+`rows_by_status` uses `apoc.coll.frequencies(collect(r.expression_status))` — single
+aggregation instead of two conditional sums. Safe: `expression_status` is never null.
 
 ### Time course vs single-timepoint
 
@@ -370,14 +368,14 @@ def build_differential_expression_by_gene_summary_global(
 ) -> tuple[str, dict]:
     """Global aggregate stats for differential_expression_by_gene.
 
-    RETURN keys: total_rows, rows_by_call, median_abs_log2fc, max_abs_log2fc.
-    rows_by_call = {"significant_up": N, "significant_down": N, "not_significant": N}
+    RETURN keys: total_rows, rows_by_status, median_abs_log2fc, max_abs_log2fc.
+    rows_by_status = {"significant_up": N, "significant_down": N, "not_significant": N}
     """
 ```
 
-Uses `apoc.coll.frequencies(collect(r.expression_call))` for `rows_by_call` —
-`expression_call` is never null, so `collect()` is safe here.
-Uses `percentileCont(CASE WHEN r.expression_call <> "not_significant" THEN
+Uses `apoc.coll.frequencies(collect(r.expression_status))` for `rows_by_status` —
+`expression_status` is never null, so `collect()` is safe here.
+Uses `percentileCont(CASE WHEN r.expression_status <> "not_significant" THEN
 abs(r.log2_fold_change) ELSE null END, 0.5)` — nulls from CASE are
 silently ignored by `percentileCont`, confirmed against live KG.
 Uses `count(*)` (not `count(r.time_point)`) for `total_rows` — field-level
@@ -397,7 +395,7 @@ def build_differential_expression_by_gene_summary_by_experiment(
 
     RETURN keys: organism_strain, matching_genes, experiment_count, experiments.
     experiments is a list of dicts, each with nested timepoints list.
-    rows_by_call = {"significant_up": N, "significant_down": N, "not_significant": N}
+    rows_by_status = {"significant_up": N, "significant_down": N, "not_significant": N}
     at both experiment and timepoint level.
     api/ strips timepoints key for non-time-course experiments.
     """
@@ -410,22 +408,22 @@ Two-pass aggregation — verified against live KG:
 // (keeping g would make each group (g, e, tp), giving 3×5=15 entries instead of 5)
 WITH e, r.time_point AS tp, r.time_point_order AS tpo, r.time_point_hours AS tph,
   collect(DISTINCT g.locus_tag) AS tp_genes,
-  collect(r.expression_call) AS tp_calls  // raw list — frequencies computed below
+  collect(r.expression_status) AS tp_calls  // raw list — frequencies computed below
 
 // Pass 2: roll up to experiment level
-// rows_by_call: flatten all per-timepoint call lists then compute frequencies
+// rows_by_status: flatten all per-timepoint call lists then compute frequencies
 WITH e,
   size(apoc.coll.toSet(apoc.coll.flatten(collect(tp_genes)))) AS matching_genes,
-  apoc.coll.frequencies(apoc.coll.flatten(collect(tp_calls))) AS rows_by_call,
+  apoc.coll.frequencies(apoc.coll.flatten(collect(tp_calls))) AS rows_by_status,
   collect({timepoint: tp, timepoint_hours: tph, timepoint_order: tpo,
            matching_genes: size(tp_genes),
-           rows_by_call: apoc.coll.frequencies(tp_calls)}) AS timepoints
+           rows_by_status: apoc.coll.frequencies(tp_calls)}) AS timepoints
 
 // Pass 3: collect experiments (organism already validated as single value)
 WITH collect({experiment_id: e.id, experiment_name: e.name, omics_type: e.omics_type,
               is_time_course: e.is_time_course,
               matching_genes: matching_genes,
-              rows_by_call: rows_by_call,
+              rows_by_status: rows_by_status,
               timepoints: timepoints}) AS experiments,
      e.organism_strain AS organism_strain  // same value for all rows — safe to use
 RETURN organism_strain, experiments
@@ -441,11 +439,7 @@ Do NOT use `sum(tp_gene_count)` — that would give rows × timepoints, not dist
   timepoint forms its own group row, then collect the map.
 - `collect({timepoint: tp, ...})` with `tp = null` **preserves the
   null** inside the map — safe for nested structures.
-- Use `count(*)` not `count(r.time_point)` for `gene_count` — field-level
-  count excludes NULLs and would undercount.
-- `sum(CASE WHEN r.significant = "significant" THEN 1 ELSE 0 END)` —
-  use `ELSE 0` (explicit) for clarity; both `ELSE 0` and implicit
-  `ELSE null` produce the same sum result, confirmed.
+- `r.expression_status` is never null — `collect(r.expression_status)` is safe.
 
 Returns `is_time_course` per experiment so api/ can decide whether to
 populate or omit `timepoints` — matching `list_experiments` pattern
@@ -461,11 +455,9 @@ def build_differential_expression_by_gene_summary_diagnostics(
     direction: str | None = None,
     significant_only: bool = False,
 ) -> tuple[str, dict]:
-    """Organism breakdowns, top categories, batch diagnostics, warnings.
+    """Top categories + batch diagnostics for differential_expression_by_gene.
 
-    RETURN keys: by_organism, top_categories, not_found, no_expression.
-    Gene organisms and experiment organisms also returned for warning
-    detection in api/.
+    RETURN keys: top_categories, not_found, no_expression.
     """
 ```
 
@@ -474,11 +466,8 @@ not rows, to avoid inflation from genes appearing in many experiments.
 Confirmed against live KG.
 
 `not_found` / `no_expression` only computed when `locus_tags` is provided,
-using UNWIND + OPTIONAL MATCH pattern.
-
-Organism mismatch (`warnings`) is detected in api/ by comparing the two
-organism sets returned by this query — two small `list[str]` values, cheap
-to compare client-side.
+using UNWIND + OPTIONAL MATCH pattern. Both are empty lists when only
+`experiment_ids` is provided.
 
 ### `build_differential_expression_by_gene`
 
@@ -496,7 +485,7 @@ def build_differential_expression_by_gene(
 
     RETURN keys (compact): locus_tag, gene_name, organism_strain,
     experiment_id, condition_type, timepoint, timepoint_hours, timepoint_order,
-    log2fc, padj, rank, expression_call.
+    log2fc, padj, rank, expression_status.
     RETURN keys (verbose): adds product, experiment_name, treatment,
     gene_category, omics_type, coculture_partner.
     """
@@ -511,7 +500,7 @@ Property mappings:
 - `r.log2_fold_change` → `log2fc`
 - `r.adjusted_p_value` → `padj`
 - `r.rank_by_effect` → `rank`
-- `r.expression_call` → `expression_call` (precomputed enum on edge)
+- `r.expression_status` → `expression_status` (precomputed enum on edge)
 - `r.time_point` → `timepoint`
 - `r.time_point_hours` → `timepoint_hours`
 
@@ -546,7 +535,7 @@ def differential_expression_by_gene(
 
     Returns:
         dict with keys: organism_strain, matching_genes, total_rows,
-        rows_by_call, median_abs_log2fc, max_abs_log2fc, experiment_count,
+        rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
         top_categories, experiments, returned, truncated, not_found,
         no_expression, results.
         experiments list is flat (single organism); each entry has nested timepoints.
@@ -554,6 +543,7 @@ def differential_expression_by_gene(
 ```
 
 - `summary=True` → `limit=0`
+- `limit=0` → `results=[]`, `returned=0`, `truncated = total_rows > 0` (signals rows exist but aren't returned)
 - Validate `direction` against `{"up", "down"}`
 - **Pre-query organism validation** (before any summary queries):
   - Resolve `DISTINCT g.organism_strain` for `locus_tags` (if provided)
@@ -563,8 +553,8 @@ def differential_expression_by_gene(
 - Always run summary queries → all summary fields
 - Skip detail when `limit=0`
 - Rename KG properties to output field names (`log2_fold_change` → `log2fc`, etc.)
-- Convert APOC `apoc.coll.frequencies` result `[{item, count}]` → `{item: count}` dict for `rows_by_call`
-- Sort `experiments` by `(rows_by_call["significant_up"] + rows_by_call["significant_down"]) DESC`
+- Convert APOC `apoc.coll.frequencies` result `[{item, count}]` → `{item: count}` dict for `rows_by_status`
+- Sort `experiments` by `(rows_by_status["significant_up"] + rows_by_status["significant_down"]) DESC`
 - Strip `timepoints` key (set to null) for experiments where `is_time_course = "false"`
 
 ---
@@ -573,14 +563,169 @@ def differential_expression_by_gene(
 
 **File:** `mcp_server/tools.py`
 
-Pydantic response models:
-- `ExpressionRow` — one result row (compact + optional verbose fields)
-- `ExpressionTimepoint` — per-timepoint entry (nested in experiment)
-- `ExpressionByExperiment` — per-experiment entry with nested `timepoints`
-- `DifferentialExpressionByGeneResponse` — full response envelope (includes top-level `organism_strain`, `experiments` list, summary fields)
+```python
+class ExpressionStatusBreakdown(BaseModel):
+    significant_up: int = Field(default=0, description="Rows with significant upregulation (e.g. 3)")
+    significant_down: int = Field(default=0, description="Rows with significant downregulation (e.g. 1)")
+    not_significant: int = Field(default=0, description="Rows not meeting significance threshold (e.g. 12)")
+
+class ExpressionTimepoint(BaseModel):
+    timepoint: str | None = Field(description="Timepoint label (e.g. 'day 18', 'days 60+89'). Null when edge has no label.")
+    timepoint_hours: float | None = Field(description="Hours numeric value (e.g. 432.0). Null for non-numeric labels like 'days 60+89'.")
+    timepoint_order: int = Field(description="Sort key for time course reconstruction (e.g. 1)")
+    matching_genes: int = Field(description="Distinct genes at this timepoint (e.g. 5)")
+    rows_by_status: ExpressionStatusBreakdown = Field(description="Row counts by expression_status at this timepoint")
+
+class ExpressionByExperiment(BaseModel):
+    experiment_id: str = Field(description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')")
+    experiment_name: str = Field(description="Human-readable name (e.g. 'HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)')")
+    omics_type: str = Field(description="Omics type (e.g. 'RNASEQ', 'PROTEOMICS')")
+    matching_genes: int = Field(description="Distinct genes with data in this experiment (e.g. 5)")
+    rows_by_status: ExpressionStatusBreakdown = Field(description="Row counts by expression_status across all timepoints")
+    timepoints: list[ExpressionTimepoint] | None = Field(default=None, description="Per-timepoint breakdown, sorted by timepoint_order. Null for non-time-course experiments.")
+
+class ExpressionTopCategory(BaseModel):
+    category: str = Field(description="Gene category (e.g. 'Signal transduction')")
+    total_genes: int = Field(description="All input genes in this category (e.g. 2)")
+    significant_genes: int = Field(description="Genes with at least one significant row (e.g. 2)")
+
+class ExpressionRow(BaseModel):
+    # Compact (always present)
+    locus_tag: str = Field(description="Gene locus tag (e.g. 'ACZ81_01830')")
+    gene_name: str | None = Field(description="Gene name (e.g. 'amtB'). Null if unannotated.")
+    experiment_id: str = Field(description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')")
+    condition_type: str = Field(description="Treatment type from experiment (e.g. 'nitrogen_stress')")
+    timepoint: str | None = Field(description="Timepoint label (e.g. 'days 60+89'). Null when edge has no label.")
+    timepoint_hours: float | None = Field(description="Numeric hours (e.g. 432.0). Null for non-numeric labels.")
+    timepoint_order: int = Field(description="Sort key for time course order (e.g. 3)")
+    log2fc: float = Field(description="Log2 fold change (e.g. 3.591). Positive = up.")
+    padj: float | None = Field(description="Adjusted p-value (e.g. 1.13e-12). Null if not computed.")
+    rank: int = Field(description="Rank by |log2FC| within experiment × timepoint; 1 = strongest (e.g. 77)")
+    expression_status: Literal["significant_up", "significant_down", "not_significant"] = Field(
+        description="Significance call using publication-specific threshold (e.g. 'significant_up')"
+    )
+    # Verbose (present when verbose=True)
+    product: str | None = Field(default=None, description="Gene product description (e.g. 'Ammonium transporter')")
+    experiment_name: str | None = Field(default=None, description="Human-readable experiment name")
+    treatment: str | None = Field(default=None, description="Treatment details (e.g. 'PRO99-lowN nutrient starvation')")
+    gene_category: str | None = Field(default=None, description="Gene functional category (e.g. 'Inorganic ion transport')")
+    omics_type: str | None = Field(default=None, description="Omics type (e.g. 'RNASEQ')")
+    coculture_partner: str | None = Field(default=None, description="Coculture partner organism, if applicable")
+
+class DifferentialExpressionByGeneResponse(BaseModel):
+    organism_strain: str = Field(description="Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')")
+    matching_genes: int = Field(description="Distinct genes in results after filters (e.g. 5)")
+    total_rows: int = Field(description="Total gene × experiment × timepoint rows matching filters (e.g. 15)")
+    rows_by_status: ExpressionStatusBreakdown = Field(description="Row counts by expression_status across all results")
+    median_abs_log2fc: float | None = Field(description="Median |log2FC| for significant rows only (e.g. 1.978). Null if no significant rows.")
+    max_abs_log2fc: float | None = Field(description="Max |log2FC| for significant rows only (e.g. 3.591). Null if no significant rows.")
+    experiment_count: int = Field(description="Number of experiments in results (e.g. 1)")
+    top_categories: list[ExpressionTopCategory] = Field(description="Top gene categories by significant gene count, max 5")
+    experiments: list[ExpressionByExperiment] = Field(description="Per-experiment summary with nested timepoint breakdown, sorted by significant row count desc")
+    not_found: list[str] = Field(default_factory=list, description="Input locus_tags not found in KG")
+    no_expression: list[str] = Field(default_factory=list, description="Locus tags in KG but with no expression data matching filters")
+    returned: int = Field(description="Rows in results (e.g. 5)")
+    truncated: bool = Field(description="True if total_rows > returned")
+    results: list[ExpressionRow] = Field(default_factory=list)
+```
 
 Thin wrapper: `Response(**data)` with standard error handling
 (ValueError → ToolError, Exception → ToolError with prefix).
+
+---
+
+## Implementation Order
+
+| Step | Layer | File | What |
+|------|-------|------|------|
+| 1 | Query builder | `kg/queries_lib.py` | `build_differential_expression_by_gene_summary_global()` |
+| 2 | Query builder | `kg/queries_lib.py` | `build_differential_expression_by_gene_summary_by_experiment()` |
+| 3 | Query builder | `kg/queries_lib.py` | `build_differential_expression_by_gene_summary_diagnostics()` |
+| 4 | Query builder | `kg/queries_lib.py` | `build_differential_expression_by_gene()` |
+| 5 | Pre-query | `kg/queries_lib.py` | `build_resolve_organism_for_locus_tags()` + `build_resolve_organism_for_experiments()` (lightweight organism validation queries) |
+| 6 | API function | `api/functions.py` | `differential_expression_by_gene()` |
+| 7 | Exports | `api/__init__.py`, `multiomics_explorer/__init__.py` | Add to imports + `__all__` |
+| 8 | MCP wrapper | `mcp_server/tools.py` | `@mcp.tool()` wrapper inside `register_tools()` |
+| 9 | Unit tests | `tests/unit/test_query_builders.py` | 4 builder test classes |
+| 10 | Unit tests | `tests/unit/test_api_functions.py` | `TestDifferentialExpressionByGene` |
+| 11 | Unit tests | `tests/unit/test_tool_wrappers.py` | `TestDifferentialExpressionByGeneWrapper` + update `EXPECTED_TOOLS` |
+| 12 | Integration | `tests/integration/test_mcp_tools.py` | Smoke test against live KG |
+| 13 | Integration | `tests/integration/test_api_contract.py` | `TestDifferentialExpressionByGeneContract` |
+| 14 | Regression | `tests/regression/test_regression.py` | Add to `TOOL_BUILDERS` |
+| 15 | Eval cases | `tests/evals/cases.yaml` + `tests/evals/test_eval.py` | Eval cases + add to `TOOL_BUILDERS` |
+| 16 | About content | `multiomics_explorer/inputs/tools/differential_expression_by_gene.yaml` | Input YAML |
+| 17 | Docs | `CLAUDE.md` | Add row to MCP Tools table |
+
+---
+
+## Example Response
+
+**Call:** `locus_tags=["ACZ81_01830","ACZ81_04825","ACZ81_15555","ACZ81_15560","ACZ81_13905"]`
+(amtB, glnD, glnL, glnG, glnE — HOT1A3 nitrogen regulators),
+`experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic"]`,
+`limit=5`. Verified against live KG (2026-03-24).
+
+```json
+{
+  "organism_strain": "Alteromonas macleodii HOT1A3",
+  "matching_genes": 5,
+  "total_rows": 15,
+  "rows_by_status": {"significant_up": 3, "significant_down": 0, "not_significant": 12},
+  "median_abs_log2fc": 1.978,
+  "max_abs_log2fc": 3.591,
+  "experiment_count": 1,
+  "top_categories": [
+    {"category": "Signal transduction",        "total_genes": 2, "significant_genes": 2},
+    {"category": "Inorganic ion transport",     "total_genes": 1, "significant_genes": 1},
+    {"category": "Post-translational modification", "total_genes": 1, "significant_genes": 0},
+    {"category": "Coenzyme metabolism",         "total_genes": 1, "significant_genes": 0}
+  ],
+  "experiments": [
+    {
+      "experiment_id": "10.1101/2025.11.24.690089_..._axenic",
+      "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+      "omics_type": "RNASEQ",
+      "matching_genes": 5,
+      "rows_by_status": {"significant_up": 3, "significant_down": 0, "not_significant": 12},
+      "timepoints": [
+        {"timepoint": "day 18",     "timepoint_hours": 432.0, "timepoint_order": 1,
+         "matching_genes": 5, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 5}},
+        {"timepoint": "day 31",     "timepoint_hours": 744.0, "timepoint_order": 2,
+         "matching_genes": 5, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 5}},
+        {"timepoint": "days 60+89", "timepoint_hours": null,  "timepoint_order": 3,
+         "matching_genes": 5, "rows_by_status": {"significant_up": 3, "significant_down": 0, "not_significant": 2}}
+      ]
+    }
+  ],
+  "not_found": [],
+  "no_expression": [],
+  "returned": 5,
+  "truncated": true,
+  "results": [
+    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "condition_type": "nitrogen_stress",
+     "timepoint": "days 60+89", "timepoint_hours": null,  "timepoint_order": 3,
+     "log2fc":  3.591, "padj": 1.13e-12, "rank":  77,  "expression_status": "significant_up"},
+    {"locus_tag": "ACZ81_15555", "gene_name": "glnL", "experiment_id": "...", "condition_type": "nitrogen_stress",
+     "timepoint": "days 60+89", "timepoint_hours": null,  "timepoint_order": 3,
+     "log2fc":  1.978, "padj": 2.31e-6,  "rank": 410,  "expression_status": "significant_up"},
+    {"locus_tag": "ACZ81_15560", "gene_name": "glnG", "experiment_id": "...", "condition_type": "nitrogen_stress",
+     "timepoint": "days 60+89", "timepoint_hours": null,  "timepoint_order": 3,
+     "log2fc":  1.745, "padj": 2.11e-5,  "rank": 544,  "expression_status": "significant_up"},
+    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "condition_type": "nitrogen_stress",
+     "timepoint": "day 18",     "timepoint_hours": 432.0, "timepoint_order": 1,
+     "log2fc":  0.856, "padj": 0.259,    "rank": 1104, "expression_status": "not_significant"},
+    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "condition_type": "nitrogen_stress",
+     "timepoint": "day 31",     "timepoint_hours": 744.0, "timepoint_order": 2,
+     "log2fc":  0.556, "padj": 0.510,    "rank": 1716, "expression_status": "not_significant"}
+  ]
+}
+```
+
+**Notes on this example:**
+- Response is **late-stage** — no significant expression at day 18 or day 31, all 3 significant events at days 60+89. Visible immediately from `timepoints[].rows_by_status`.
+- `glnE` (ACZ81_13905) has padj=0.035 but `expression_status="not_significant"` — the paper uses a stricter threshold than padj<0.05.
+- `rows_by_status` from `apoc.coll.frequencies` omits zero-count keys; api/ fills in `"significant_down": 0`.
+- Timepoints from `collect()` are unordered — api/ sorts by `timepoint_order`.
 
 ---
 
@@ -595,9 +740,11 @@ Thin wrapper: `Response(**data)` with standard error handling
 | API | `test_api_functions.py` | `TestDifferentialExpressionByGene` |
 | MCP wrapper | `test_tool_wrappers.py` | `TestDifferentialExpressionByGeneWrapper` + update EXPECTED_TOOLS |
 | Integration | `test_mcp_tools.py` | New class |
-| Contract | `test_api_contract.py` | Update |
-| Regression | `test_regression.py` | Add to TOOL_BUILDERS |
-| Evals | `cases.yaml` | New cases |
+| Integration | `test_tool_correctness_kg.py` | `TestDifferentialExpressionByGeneCorrectnessKG` |
+| Contract | `test_api_contract.py` | `TestDifferentialExpressionByGeneContract` |
+| Regression | `tests/regression/test_regression.py` | Add to `TOOL_BUILDERS` |
+| Evals | `tests/evals/cases.yaml` | New cases |
+| Evals | `tests/evals/test_eval.py` | Add to `TOOL_BUILDERS` |
 
 **Key test scenarios:**
 
@@ -615,7 +762,7 @@ Thin wrapper: `Response(**data)` with standard error handling
 - Both `locus_tags` and `experiment_ids` provided → intersection
 
 **Summary field consistency:** `total_rows` must equal the number of edges
-that would be returned without `limit`. `rows_by_call` values must sum to
+that would be returned without `limit`. `rows_by_status` values must sum to
 `total_rows`. `matching_genes` must equal `len({r["locus_tag"] for r in results})`
 when `limit=None`.
 
