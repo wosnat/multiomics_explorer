@@ -67,6 +67,13 @@ taxonomy hierarchies, or other fields not needed for routing. The builder
 adds/removes RETURN columns based on this flag. Orthogonal to summary —
 `verbose` controls which columns, `limit` controls which rows.
 
+**Compact vs verbose field placement:** Short categorical fields
+(`gene_category`, `annotation_quality`, `term_type`) go in compact —
+they're lightweight and useful for routing/filtering decisions. Heavy
+text blobs (`gene_summary`, `function_description`, `abstract`) go in
+verbose. Match sibling tools for consistency (e.g. `genes_by_ontology`
+matches `genes_by_function`).
+
 **`limit`** (int | None): Caps `results` length. Default None in api/
 (all rows), small default in MCP (e.g. 5) so the LLM gets summary
 fields + a few example rows in one call.
@@ -192,6 +199,9 @@ input YAML, then served via MCP resource at `docs://tools/{name}`.
        call: tool_name(locus_tags=["PMM0001"])    # tool call to show
        response: |                                 # optional example response
          {"total_matching": 1, "results": [{"locus_tag": "PMM0001", ...}]}
+         # IMPORTANT: result objects inside "results" must be single-line.
+         # Multi-line objects cause test_about_examples key-extraction regex
+         # to match nested fields (e.g. "product") as top-level keys.
 
      - title: Multi-step chaining example
        steps: |                                    # use steps for chains

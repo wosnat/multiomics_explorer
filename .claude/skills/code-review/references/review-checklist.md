@@ -68,6 +68,8 @@
 - [ ] Common mistakes section if applicable?
 - [ ] `pytest tests/unit/test_about_content.py` passes (consistency)?
 - [ ] `pytest tests/integration/test_about_examples.py` passes (examples execute)?
+- [ ] `Literal`/enum params show valid values in Parameters table (not bare `string`)?
+- [ ] Example-response result objects on single lines (multi-line objects cause key-extraction regex to match nested fields as top-level)?
 
 ## Cross-layer consistency
 

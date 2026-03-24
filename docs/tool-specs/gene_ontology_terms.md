@@ -92,10 +92,13 @@ async def gene_ontology_terms(
     """
 ```
 
-**Return envelope:** `total_matching, by_ontology, returned, truncated, not_found, results`
+**Return envelope:** `total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, returned, truncated, not_found, no_terms, results`
 
 **Per-result columns (compact — 3):**
 `locus_tag`, `term_id`, `term_name`
+
+**All-ontology mode adds (1):**
+`ontology_type` — present when `ontology=None`, absent when filtering to one
 
 **Verbose adds (1):**
 `organism_strain`
@@ -109,13 +112,20 @@ Batch input can be large × multiple ontologies → summary + limit pattern.
 | Field | Type | Description |
 |---|---|---|
 | `total_matching` | int | Total gene × term rows matching filters |
-| `by_ontology` | list | Term counts per ontology type, sorted desc |
+| `total_genes` | int | Distinct genes with at least one term (= len(locus_tags) - len(not_found) - len(no_terms)) |
+| `total_terms` | int | Distinct terms across all input genes |
+| `by_ontology` | list | Per ontology type: term count + gene coverage, sorted by term_count desc (e.g. `[{"ontology_type": "go_bp", "term_count": 12, "gene_count": 8}, ...]`) |
+| `by_term` | list | Gene counts per term, sorted desc — shows which terms are shared across input genes (e.g. `[{"term_id": "go:0015979", "term_name": "photosynthesis", "count": 4}, ...]`) |
+| `terms_per_gene_min` | int | Fewest leaf terms on any gene with terms (excludes no_terms genes; ≥ 1) |
+| `terms_per_gene_max` | int | Most leaf terms on any gene with terms |
+| `terms_per_gene_median` | float | Median leaf terms per gene with terms — annotation density signal |
 
 ### Batch handling
 
 | Field | Type | Description |
 |---|---|---|
 | `not_found` | list[str] | Input locus_tags that don't exist in KG |
+| `no_terms` | list[str] | Input locus_tags that exist in KG but have no terms (for the queried ontology, or any ontology if ontology=None) |
 
 **Sort key:** `locus_tag ASC, term_id ASC`
 
@@ -124,6 +134,23 @@ Batch input can be large × multiple ontologies → summary + limit pattern.
 **Verbose:**
 - Compact: locus_tag, term_id, term_name
 - Verbose adds: organism_strain
+
+---
+
+## Special handling
+
+- **2-query pattern:** summary query always runs (OPTIONAL MATCH for
+  not_found/no_terms + aggregations), detail query skipped when `limit=0`
+- **Multi-ontology UNION:** when `ontology=None`, builder generates a
+  UNION ALL across all 9 ONTOLOGY_CONFIG entries. Single-ontology queries
+  use a simpler focused query.
+- **Conditional `ontology_type` column:** present in results when
+  `ontology=None` (all-ontology mode), absent when a specific ontology
+  is requested (redundant — caller already knows which ontology).
+- **No Lucene:** no fulltext search
+- **No caching:** result depends on input locus_tags
+- **Validation:** `locus_tags` must be non-empty; `ontology` (when given)
+  must be a valid ONTOLOGY_CONFIG key (ValueError otherwise)
 
 ---
 
@@ -190,6 +217,7 @@ genes. The two tools complement each other:
 | 7 | Unit tests | `tests/unit/test_tool_wrappers.py` | Replace `TestGeneOntologyTermsWrapper` |
 | 8 | Integration | `tests/integration/test_api_contract.py` | Update `TestGeneOntologyTermsContract` |
 | 9 | Regression | `tests/regression/test_regression.py` | Update `TOOL_BUILDERS` |
+| 9b | Evals | `tests/evals/test_eval.py` | Update `TOOL_BUILDERS` |
 | 10 | Eval cases | `tests/evals/cases.yaml` | Update params + shape |
 | 11 | About content | `multiomics_explorer/inputs/tools/gene_ontology_terms.yaml` | Input YAML → build → verify |
 | 12 | Docs | `CLAUDE.md` | Update tool description |
@@ -211,7 +239,9 @@ def build_gene_ontology_terms_summary(
 ) -> tuple[str, dict]:
     """Build summary + not_found for gene_ontology_terms.
 
-    RETURN keys: total_matching, by_ontology, not_found.
+    RETURN keys: total_matching, total_genes, total_terms,
+    by_ontology, by_term, terms_per_gene_min, terms_per_gene_max,
+    terms_per_gene_median, not_found, no_terms.
     """
 ```
 
@@ -229,7 +259,10 @@ WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found,
      [g IN genes WHERE g IS NOT NULL] AS found
 // For each found gene × ontology, count term matches
 // ... (per-ontology CALL blocks)
-RETURN total_matching, by_ontology, not_found
+RETURN total_matching, total_genes, total_terms,
+       by_ontology, by_term,
+       terms_per_gene_min, terms_per_gene_max, terms_per_gene_median,
+       not_found, no_terms
 ```
 
 Since each ontology uses a different relationship type and label, the builder
@@ -252,6 +285,7 @@ def build_gene_ontology_terms(
     """Build detail Cypher for gene_ontology_terms.
 
     RETURN keys (compact): locus_tag, term_id, term_name.
+    RETURN keys (all-ontology mode): adds ontology_type.
     RETURN keys (verbose): adds organism_strain.
     """
 ```
@@ -311,8 +345,10 @@ def gene_ontology_terms(
 ) -> dict:
     """Get ontology annotations for genes.
 
-    Returns dict with keys: total_matching, by_ontology,
-    returned, truncated, not_found, results.
+    Returns dict with keys: total_matching, total_genes, total_terms,
+    by_ontology, by_term, terms_per_gene_min, terms_per_gene_max,
+    terms_per_gene_median, returned, truncated, not_found, no_terms,
+    results.
     Per result: locus_tag, term_id, term_name.
     Verbose adds: organism_strain.
     All-ontology queries add: ontology_type.
@@ -323,7 +359,7 @@ def gene_ontology_terms(
 - **Breaking change:** param renamed from `gene_id` to `locus_tags` (list)
 - **Breaking change:** `ontology` now optional (None = all ontologies)
 - `summary=True` → `limit=0`
-- Always run summary query → total_matching, by_ontology, not_found
+- Always run summary query → all summary fields + not_found + no_terms
 - Skip detail when `limit=0`
 - Rename APOC `{item, count}` to domain keys via `_rename_freq()` helper
 
@@ -346,14 +382,27 @@ class OntologyTermRow(BaseModel):
 
 class OntologyTypeBreakdown(BaseModel):
     ontology_type: str = Field(description="Ontology type (e.g. 'go_bp', 'kegg')")
-    count: int = Field(description="Terms in this ontology (e.g. 5)")
+    term_count: int = Field(description="Total leaf terms in this ontology (e.g. 12)")
+    gene_count: int = Field(description="Input genes with at least one term in this ontology (e.g. 8)")
+
+class TermBreakdown(BaseModel):
+    term_id: str = Field(description="Ontology term ID (e.g. 'go:0015979')")
+    term_name: str = Field(description="Term name (e.g. 'photosynthesis')")
+    count: int = Field(description="Genes annotated to this term (e.g. 4)")
 
 class GeneOntologyTermsResponse(BaseModel):
     total_matching: int = Field(description="Total gene × term annotation rows")
-    by_ontology: list[OntologyTypeBreakdown] = Field(description="Term counts per ontology type, sorted desc")
+    total_genes: int = Field(description="Distinct genes with at least one term")
+    total_terms: int = Field(description="Distinct terms across all input genes")
+    by_ontology: list[OntologyTypeBreakdown] = Field(description="Per ontology type: term + gene counts, sorted by term_count desc")
+    by_term: list[TermBreakdown] = Field(description="Gene counts per term, sorted desc — shows shared terms across input genes")
+    terms_per_gene_min: int = Field(description="Fewest leaf terms on any gene with terms (e.g. 1)")
+    terms_per_gene_max: int = Field(description="Most leaf terms on any gene with terms (e.g. 15)")
+    terms_per_gene_median: float = Field(description="Median leaf terms per gene with terms (e.g. 6.0)")
     returned: int = Field(description="Results in this response (0 when summary=true)")
     truncated: bool = Field(description="True if total_matching > returned")
     not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
+    no_terms: list[str] = Field(default_factory=list, description="Input locus_tags in KG but with no terms for queried ontology")
     results: list[OntologyTermRow] = Field(default_factory=list, description="One row per gene × term")
 ```
 
@@ -400,15 +449,11 @@ async def gene_ontology_terms(
             locus_tags, ontology=ontology,
             summary=summary, verbose=verbose, limit=limit, conn=conn,
         )
-        by_ontology = [OntologyTypeBreakdown(**b) for b in data["by_ontology"]]
         results = [OntologyTermRow(**r) for r in data["results"]]
+        by_ontology = [OntologyTypeBreakdown(**b) for b in data["by_ontology"]]
+        by_term = [TermBreakdown(**b) for b in data["by_term"]]
         return GeneOntologyTermsResponse(
-            total_matching=data["total_matching"],
-            by_ontology=by_ontology,
-            returned=data["returned"],
-            truncated=data["truncated"],
-            not_found=data["not_found"],
-            results=results,
+            **{**data, "results": results, "by_ontology": by_ontology, "by_term": by_term},
         )
     except ValueError as e:
         await ctx.warning(f"gene_ontology_terms error: {e}")
@@ -551,9 +596,14 @@ examples:
     call: gene_ontology_terms(locus_tags=["PMM0001"], ontology="go_bp")
     response: |
       {
-        "total_matching": 2,
-        "by_ontology": [{"ontology_type": "go_bp", "count": 2}],
-        "returned": 2, "truncated": false, "not_found": [],
+        "total_matching": 2, "total_genes": 1, "total_terms": 2,
+        "by_ontology": [{"ontology_type": "go_bp", "term_count": 2, "gene_count": 1}],
+        "by_term": [
+          {"term_id": "go:0006260", "term_name": "DNA replication", "count": 1},
+          {"term_id": "go:0006271", "term_name": "DNA strand elongation involved in DNA replication", "count": 1}
+        ],
+        "terms_per_gene_min": 2, "terms_per_gene_max": 2, "terms_per_gene_median": 2.0,
+        "returned": 2, "truncated": false, "not_found": [], "no_terms": [],
         "results": [
           {"locus_tag": "PMM0001", "term_id": "go:0006260", "term_name": "DNA replication"},
           {"locus_tag": "PMM0001", "term_id": "go:0006271", "term_name": "DNA strand elongation involved in DNA replication"}

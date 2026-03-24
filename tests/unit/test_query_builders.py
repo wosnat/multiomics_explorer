@@ -811,6 +811,15 @@ class TestBuildGenesByOntology:
         assert "function_description" in cypher
         assert "matched_terms" in cypher
 
+    def test_verbose_tid_survives_with_distinct(self):
+        """UNWIND-based verbose query must carry tid through WITH DISTINCT."""
+        cypher, _ = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], verbose=True,
+        )
+        for line in cypher.split("\n"):
+            if "WITH DISTINCT" in line and "descendant" in line:
+                assert "tid" in line, f"tid dropped from scope: {line}"
+
     def test_limit_clause(self):
         cypher, params = build_genes_by_ontology(
             ontology="go_bp", term_ids=["go:0006260"], limit=10,
@@ -868,6 +877,30 @@ class TestBuildGenesByOntologySummary:
         )
         assert "Pfam" in cypher
         assert "PfamClan" in cypher
+
+    def test_tid_survives_with_distinct(self):
+        """UNWIND-based summary query must carry tid through WITH DISTINCT."""
+        cypher, _ = build_genes_by_ontology_summary(
+            ontology="go_bp", term_ids=["go:0006260"],
+        )
+        for line in cypher.split("\n"):
+            if "WITH DISTINCT" in line and "descendant" in line:
+                assert "tid" in line, f"tid dropped from scope: {line}"
+
+    @pytest.mark.parametrize("ontology", [
+        "go_bp", "go_mf", "go_cc", "kegg", "ec",
+        "cog_category", "cyanorak_role", "tigr_role", "pfam",
+    ])
+    def test_tid_survives_all_ontologies(self, ontology):
+        """tid scoping must work for all ontology types (hierarchy + flat)."""
+        cypher, _ = build_genes_by_ontology_summary(
+            ontology=ontology, term_ids=["test:001"],
+        )
+        for line in cypher.split("\n"):
+            if "WITH DISTINCT" in line and "descendant" in line:
+                assert "tid" in line, (
+                    f"{ontology}: tid dropped from scope: {line}"
+                )
 
 
 class TestBuildGeneOntologyTerms:

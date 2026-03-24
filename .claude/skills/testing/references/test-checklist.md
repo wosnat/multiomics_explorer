@@ -47,6 +47,26 @@ class TestBuildNewTool:
             build_new_tool(required_param="x", enum_param="bad_value")
 ```
 
+### UNWIND variable scoping
+
+For builders that use `UNWIND $list AS var` (summary builders, verbose
+detail builders), test that `var` survives `WITH DISTINCT` clauses.
+This catches a class of bug where WITH DISTINCT drops variables from
+scope — only detectable against a live DB without this test.
+
+```python
+def test_tid_survives_with_distinct(self):
+    """UNWIND-based query must carry tid through WITH DISTINCT."""
+    cypher, _ = build_tool_summary(ontology="go_bp", term_ids=["go:0006260"])
+    for line in cypher.split("\n"):
+        if "WITH DISTINCT" in line and "descendant" in line:
+            assert "tid" in line, f"tid dropped from scope: {line}"
+```
+
+Parametrize across all ontology types (hierarchy + flat) since flat
+ontologies use `WITH root AS descendant` which is especially prone
+to dropping variables.
+
 ### Assert patterns
 
 - `assert "keyword" in cypher` — check Cypher structure

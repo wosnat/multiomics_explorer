@@ -25,6 +25,12 @@ def build_{name}(
 - Organism filter pattern: `ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word)`
 - NULL-safe optional filters: `$param IS NULL OR ...`
 - For ontology queries, use `ONTOLOGY_CONFIG` dict
+- **UNWIND + WITH DISTINCT scoping:** When queries use `UNWIND $list AS var`
+  followed by `WITH DISTINCT`, all variables needed downstream must be
+  carried through. E.g. `WITH DISTINCT descendant, tid` — not just
+  `WITH DISTINCT descendant`, which drops `tid` from scope. This
+  applies to summary builders and verbose detail queries that track
+  per-input-ID associations.
 - **APOC is available.** Use throughout:
   - `apoc.coll.frequencies()` for per-dimension breakdowns in summary queries
   - `apoc.coll.max/min/sort` for distributions

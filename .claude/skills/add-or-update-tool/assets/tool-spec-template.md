@@ -173,6 +173,13 @@ Both builders share the same WHERE clause construction.
 
 **WHERE clause construction:** (show the conditions/params pattern)
 
+**Variable scoping check:** For UNWIND-based queries (summary builders,
+verbose detail builders), trace each variable through every WITH clause.
+Any `WITH DISTINCT` must carry forward all variables referenced
+downstream (e.g. `WITH DISTINCT descendant, tid` — not just
+`WITH DISTINCT descendant`). Flat ontologies (`WITH root AS descendant`)
+are especially prone to dropping variables.
+
 **Design notes:** (key decisions — sort order, precomputed vs aggregated, etc.)
 
 ---
