@@ -22,25 +22,19 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function,
 )
 from multiomics_explorer.api import functions as api
-from multiomics_explorer.kg.schema import load_schema_from_neo4j
 from multiomics_explorer.api.functions import _WRITE_KEYWORDS
 
 
 @pytest.mark.kg
-class TestGetSchema:
-    def test_returns_node_counts_and_relationships(self, conn):
-        schema = load_schema_from_neo4j(conn)
-        assert len(schema.nodes) > 0
-        assert len(schema.relationships) > 0
-        # At least Gene nodes should exist
-        assert "Gene" in schema.nodes
-        assert schema.nodes["Gene"].count > 0
+class TestKgSchema:
+    def test_returns_nodes_and_relationships(self, conn):
+        result = api.kg_schema(conn=conn)
+        assert "Gene" in result["nodes"]
+        assert len(result["relationships"]) > 0
 
-    def test_prompt_string_not_empty(self, conn):
-        schema = load_schema_from_neo4j(conn)
-        text = schema.to_prompt_string()
-        assert "Gene" in text
-        assert "## Graph Schema" in text
+    def test_gene_node_has_properties(self, conn):
+        result = api.kg_schema(conn=conn)
+        assert "properties" in result["nodes"]["Gene"]
 
 
 @pytest.mark.kg

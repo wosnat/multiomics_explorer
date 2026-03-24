@@ -192,7 +192,8 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append("### Envelope")
         lines.append("")
         lines.append("```expected-keys")
-        lines.append(", ".join(f["name"] for f in envelope) + ", results")
+        suffix = ", results" if result_fields else ""
+        lines.append(", ".join(f["name"] for f in envelope) + suffix)
         lines.append("```")
         lines.append("")
         for f in envelope:
@@ -317,7 +318,8 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         lines.append(f'result = {tool_name}()')
     # API returns a subset of the MCP envelope (no returned/truncated wrapper)
     api_keys = [f["name"] for f in envelope if f["name"] not in ("returned", "truncated")]
-    api_keys.append("results")
+    if result_fields:
+        api_keys.append("results")
     envelope_keys = ", ".join(api_keys)
     lines.append(f'# returns dict with keys: {envelope_keys}')
     lines.append("```")

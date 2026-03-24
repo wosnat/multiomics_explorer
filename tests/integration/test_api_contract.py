@@ -16,18 +16,18 @@ KNOWN_ORGANISM = "MED4"
 
 
 # ---------------------------------------------------------------------------
-# get_schema
+# kg_schema
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
-class TestGetSchemaContract:
+class TestKgSchemaContract:
     def test_returns_dict_with_nodes_and_relationships(self, conn):
-        result = api.get_schema(conn=conn)
+        result = api.kg_schema(conn=conn)
         assert isinstance(result, dict)
         assert "nodes" in result
         assert "relationships" in result
 
     def test_gene_node_present(self, conn):
-        result = api.get_schema(conn=conn)
+        result = api.kg_schema(conn=conn)
         assert "Gene" in result["nodes"]
         assert "properties" in result["nodes"]["Gene"]
 

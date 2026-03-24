@@ -40,23 +40,34 @@ def _group_by_organism(results: list[dict]) -> dict:
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
-    @mcp.tool()
-    def get_schema(ctx: Context) -> str:
-        """Get the knowledge graph schema: node types with counts, relationship types with
-        source/target labels, and property names. Use this first to understand what's queryable."""
-        logger.info("get_schema")
-        try:
-            from multiomics_explorer.kg.schema import load_schema_from_neo4j
+    class KgSchemaResponse(BaseModel):
+        nodes: dict[str, dict] = Field(
+            description="Node labels mapped to their property definitions. "
+                        "Each value is {'properties': {'prop_name': 'type_string', ...}}."
+        )
+        relationships: dict[str, dict] = Field(
+            description="Relationship types mapped to their definitions. "
+                        "Each value is {'source_labels': [...], 'target_labels': [...], "
+                        "'properties': {'prop_name': 'type_string', ...}}."
+        )
 
-            conn = _conn(ctx)
-            schema = load_schema_from_neo4j(conn)
-            return schema.to_prompt_string()
-        except ValueError as e:
-            logger.warning("get_schema error: %s", e)
-            return f"Error: {e}"
+    @mcp.tool(
+        tags={"utility", "schema"},
+        annotations={"readOnlyHint": True},
+    )
+    async def kg_schema(ctx: Context) -> KgSchemaResponse:
+        """Get the knowledge graph schema: node labels with property names/types,
+        and relationship types with source/target labels.
+
+        Use this before run_cypher to understand what labels and properties are queryable.
+        """
+        await ctx.info("kg_schema")
+        try:
+            data = api.kg_schema(conn=_conn(ctx))
+            return KgSchemaResponse(**data)
         except Exception as e:
-            logger.warning("get_schema unexpected error: %s", e)
-            return f"Error in get_schema: {e}"
+            await ctx.error(f"kg_schema unexpected error: {e}")
+            raise ToolError(f"Error in kg_schema: {e}")
 
     @mcp.tool()
     def list_filter_values(ctx: Context) -> str:

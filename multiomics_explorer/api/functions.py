@@ -65,7 +65,7 @@ _WRITE_KEYWORDS = re.compile(
 _LUCENE_SPECIAL = re.compile(r'[+\-!(){}\[\]^"~*?:\\/]')
 
 
-def get_schema(
+def kg_schema(
     *,
     conn: GraphConnection | None = None,
 ) -> dict:

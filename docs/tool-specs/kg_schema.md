@@ -59,14 +59,24 @@ async def kg_schema(
 
 ## Result-size controls
 
-### Option A: Small result set (no modes needed)
-
 Schema is always small (tens of node labels, tens of relationship types).
 No `summary`, `verbose`, `limit`, or `not_found`.
 
-**Sort key:** alphabetical on node/relationship name (already done in `to_dict()`)
+**Sort key:** alphabetical on node/relationship name (already enforced in `to_dict()`)
 
-**Verbose:** no
+---
+
+## Special notes
+
+- **No query builder** — `kg_schema` uses `kg/schema.py` introspection, not
+  `queries_lib.py`. No entry in `TOOL_BUILDERS` and no regression golden file.
+- **`to_prompt_string()` goes away** — the current wrapper calls
+  `schema.to_prompt_string()` directly, bypassing `api/`. After v3, the MCP
+  wrapper calls `api.kg_schema()` which calls `schema.to_dict()`. The formatted
+  string output is replaced by a structured `KgSchemaResponse`.
+- **Non-standard envelope** — `KgSchemaResponse` has `nodes` and `relationships`
+  instead of the usual `total_matching / returned / truncated / results` fields.
+  The schema is a single structured object, not a list of rows.
 
 ---
 
@@ -81,17 +91,20 @@ is unchanged. No new query builder needed.
 |---|---|
 | `kg/queries_lib.py` | No change — schema uses `kg/schema.py`, not queries_lib |
 | `api/functions.py` | Rename `get_schema` → `kg_schema` |
-| `api/__init__.py` | Update import + `__all__` |
-| `multiomics_explorer/__init__.py` | Update import + `__all__` |
-| `mcp_server/tools.py` | Rename + v3 pattern: `async def`, `ToolError`, Pydantic model, `@mcp.tool(tags=..., annotations=...)`, call `api.kg_schema()` instead of bypassing api/ |
-| `tests/unit/test_api_functions.py` | Rename class + references |
-| `tests/unit/test_tool_wrappers.py` | Rename class + references, update `EXPECTED_TOOLS`, update error test class, update response assertions |
-| `tests/integration/test_api_contract.py` | Rename class + call site |
-| `tests/evals/cases.yaml` | Add `kg_schema_all` case |
+| `api/__init__.py` | Update import + `__all__`: `get_schema` → `kg_schema` |
+| `multiomics_explorer/__init__.py` | Update import + `__all__`: `get_schema` → `kg_schema` |
+| `mcp_server/tools.py` | Rename + v3 pattern (see below) |
+| `tests/unit/test_api_functions.py` | Rename class + call sites |
+| `tests/unit/test_tool_wrappers.py` | Full rewrite of wrapper test class + error tests (see below) |
+| `tests/integration/test_api_contract.py` | Rename class + call sites |
+| `tests/integration/test_mcp_tools.py` | Add smoke test |
+| `tests/evals/cases.yaml` | No entry — eval framework checks `results` rows; `kg_schema` has no results list |
 | About content | New input YAML + build |
-| `CLAUDE.md` | Update tool table |
+| `CLAUDE.md` | Update tool table row |
 
-### Pydantic models
+---
+
+## Pydantic models
 
 ```python
 class KgSchemaResponse(BaseModel):
@@ -106,10 +119,11 @@ class KgSchemaResponse(BaseModel):
     )
 ```
 
-No `{Name}Result` per-row model — the schema is a single structured object,
-not a list of rows. `KgSchemaResponse` IS the envelope.
+No `{Name}Result` per-row model — `KgSchemaResponse` IS the envelope.
 
-### API function
+---
+
+## API Function
 
 ```python
 def kg_schema(
@@ -127,7 +141,11 @@ def kg_schema(
     return schema.to_dict()
 ```
 
-### MCP wrapper
+Rename only — logic unchanged.
+
+---
+
+## MCP Wrapper
 
 ```python
 async def kg_schema(ctx: Context) -> KgSchemaResponse:
@@ -136,7 +154,11 @@ async def kg_schema(ctx: Context) -> KgSchemaResponse:
     return KgSchemaResponse(**data)
 ```
 
-Errors propagate as `ToolError` — remove old try/except error-string returns.
+- `async def` (was `def`)
+- Calls `api.kg_schema()` — fixes the layer bypass (old wrapper called
+  `load_schema_from_neo4j` directly and called `schema.to_prompt_string()`)
+- Errors propagate naturally — remove the old `try/except` error-string returns;
+  `ToolError` is used if explicit error handling is needed
 
 ---
 
@@ -144,34 +166,65 @@ Errors propagate as `ToolError` — remove old try/except error-string returns.
 
 ### Unit: API function (`test_api_functions.py`)
 
-Rename `TestGetSchema` → `TestKgSchema`. Update all call sites from
-`api.get_schema` → `api.kg_schema`. Assertions unchanged.
+Rename `TestGetSchema` → `TestKgSchema`. Update all `api.get_schema` call
+sites to `api.kg_schema`. Assertions unchanged (returns dict with `nodes`
+and `relationships`).
 
 ### Unit: MCP wrapper (`test_tool_wrappers.py`)
 
-- Rename `TestGetSchemaWrapper` → `TestKgSchemaWrapper`
-- Update `EXPECTED_TOOLS`: replace `"get_schema"` with `"kg_schema"`
-- Rename error test methods in `TestErrorHandling`
-- Update `tool_fns["get_schema"]` → `tool_fns["kg_schema"]`
-- Update assertions: tool now returns a `KgSchemaResponse` (not a raw string).
-  `result.nodes` and `result.relationships` replace string checks.
-- Error tests: `ToolError` raised instead of error string returned.
+**`TestKgSchemaWrapper`** (rename from `TestGetSchemaWrapper`, full rewrite):
 
-### Integration (`test_api_contract.py`)
+```python
+class TestKgSchemaWrapper:
+    _SAMPLE_API_RETURN = {
+        "nodes": {"Gene": {"properties": {"locus_tag": "STRING"}}},
+        "relationships": {"Has_function": {"source_labels": ["Gene"], "target_labels": ["GOTerm"], "properties": {}}},
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_schema(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.kg_schema",
+                   return_value=self._SAMPLE_API_RETURN):
+            result = await tool_fns["kg_schema"](mock_ctx)
+        assert "Gene" in result.nodes
+        assert "Has_function" in result.relationships
+
+    @pytest.mark.asyncio
+    async def test_nodes_have_properties(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.kg_schema",
+                   return_value=self._SAMPLE_API_RETURN):
+            result = await tool_fns["kg_schema"](mock_ctx)
+        assert "properties" in result.nodes["Gene"]
+```
+
+**`EXPECTED_TOOLS`**: replace `"get_schema"` with `"kg_schema"`.
+
+**`TestErrorHandling`**: remove `test_get_schema_value_error` and
+`test_get_schema_generic_error` — the only real error is KG unavailability,
+which propagates naturally from `api.kg_schema()`. No replacement needed.
+
+### Integration: API contract (`test_api_contract.py`)
 
 Rename `TestGetSchemaContract` → `TestKgSchemaContract`.
 Update `api.get_schema` → `api.kg_schema`. Assertions unchanged.
 
-### Eval cases (`cases.yaml`)
+### Integration: smoke test (`test_mcp_tools.py`)
 
-```yaml
-- id: kg_schema_all
-  tool: kg_schema
-  desc: Schema always returns nodes and relationships
-  params: {}
-  expect:
-    columns: [nodes, relationships]
+Add:
+```python
+@pytest.mark.kg
+async def test_kg_schema(client):
+    result = await client.call_tool("kg_schema", {})
+    data = result[0].model_dump()
+    assert "Gene" in data["nodes"]
+    assert len(data["relationships"]) > 0
 ```
+
+### Regression / eval cases
+
+**Not applicable** — no query builder, so no `TOOL_BUILDERS` entry and no
+regression golden file. No eval case (eval framework checks `results` rows;
+`kg_schema` has no results list).
 
 ---
 
@@ -193,9 +246,11 @@ chaining:
 
 mistakes:
   - "Schema does not include node counts — use run_cypher for counts"
-  - wrong: "kg_schema() to get filter values for organism"
+  - wrong: "kg_schema() to discover valid filter values for organism"
     right: "list_filter_values() for categorical filter options; list_organisms() for organism details"
 ```
+
+Build: `uv run python scripts/build_about_content.py kg_schema`
 
 ---
 

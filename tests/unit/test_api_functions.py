@@ -24,7 +24,7 @@ class TestTopLevelImports:
             genes_by_function,
             genes_by_ontology,
             get_gene_details,
-            get_schema,
+            kg_schema,
             list_filter_values,
             list_organisms,
             resolve_gene,
@@ -49,9 +49,9 @@ def mock_conn():
 
 
 # ---------------------------------------------------------------------------
-# get_schema
+# kg_schema
 # ---------------------------------------------------------------------------
-class TestGetSchema:
+class TestKgSchema:
     def test_returns_dict(self, mock_conn):
         mock_schema = MagicMock()
         mock_schema.to_dict.return_value = {
@@ -62,7 +62,7 @@ class TestGetSchema:
             "multiomics_explorer.api.functions.load_schema_from_neo4j",
             return_value=mock_schema,
         ):
-            result = api.get_schema(conn=mock_conn)
+            result = api.kg_schema(conn=mock_conn)
         assert isinstance(result, dict)
         assert "nodes" in result
         assert "relationships" in result
@@ -77,7 +77,7 @@ class TestGetSchema:
         ) as mock_load, patch(
             "multiomics_explorer.api.functions.GraphConnection",
         ) as MockConn:
-            api.get_schema()
+            api.kg_schema()
         mock_load.assert_called_once_with(MockConn.return_value)
 
 

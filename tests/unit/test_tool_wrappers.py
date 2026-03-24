@@ -46,7 +46,7 @@ def _conn_from(ctx):
 
 
 EXPECTED_TOOLS = [
-    "get_schema", "list_filter_values", "list_organisms", "resolve_gene",
+    "kg_schema", "list_filter_values", "list_organisms", "resolve_gene",
     "genes_by_function", "gene_overview", "get_gene_details",
     "gene_homologs", "run_cypher",
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
@@ -67,21 +67,39 @@ class TestToolRegistration:
 
 
 # ---------------------------------------------------------------------------
-# get_schema
+# kg_schema
 # ---------------------------------------------------------------------------
-class TestGetSchemaWrapper:
-    def test_returns_prompt_string(self, tool_fns, mock_ctx):
-        """get_schema calls load_schema_from_neo4j and returns its prompt string."""
-        mock_schema = MagicMock()
-        mock_schema.to_prompt_string.return_value = "## Graph Schema\n- Gene (42)"
+class TestKgSchemaWrapper:
+    _SAMPLE_API_RETURN = {
+        "nodes": {"Gene": {"properties": {"locus_tag": "STRING"}}},
+        "relationships": {
+            "Has_function": {
+                "source_labels": ["Gene"],
+                "target_labels": ["GOTerm"],
+                "properties": {},
+            }
+        },
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_schema(self, tool_fns, mock_ctx):
         with patch(
-            "multiomics_explorer.kg.schema.load_schema_from_neo4j",
-            return_value=mock_schema,
+            "multiomics_explorer.api.functions.kg_schema",
+            return_value=self._SAMPLE_API_RETURN,
         ):
-            result = tool_fns["get_schema"](mock_ctx)
-        assert "Graph Schema" in result
-        assert "Gene" in result
-        mock_schema.to_prompt_string.assert_called_once()
+            result = await tool_fns["kg_schema"](mock_ctx)
+        assert "Gene" in result.nodes
+        assert "Has_function" in result.relationships
+
+    @pytest.mark.asyncio
+    async def test_nodes_have_properties(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.kg_schema",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["kg_schema"](mock_ctx)
+        assert "properties" in result.nodes["Gene"]
+        assert result.nodes["Gene"]["properties"]["locus_tag"] == "STRING"
 
 
 # ---------------------------------------------------------------------------
@@ -1284,23 +1302,6 @@ class TestGeneOntologyTermsWrapper:
 # ---------------------------------------------------------------------------
 class TestErrorHandling:
     """Every MCP tool must catch ValueError and Exception, returning an error string."""
-
-    def test_get_schema_value_error(self, tool_fns, mock_ctx):
-        with patch(
-            "multiomics_explorer.kg.schema.load_schema_from_neo4j",
-            side_effect=ValueError("bad schema"),
-        ):
-            result = tool_fns["get_schema"](mock_ctx)
-        assert result == "Error: bad schema"
-
-    def test_get_schema_generic_error(self, tool_fns, mock_ctx):
-        with patch(
-            "multiomics_explorer.kg.schema.load_schema_from_neo4j",
-            side_effect=RuntimeError("connection lost"),
-        ):
-            result = tool_fns["get_schema"](mock_ctx)
-        assert "Error in get_schema" in result
-        assert "connection lost" in result
 
     def test_list_filter_values_generic_error(self, tool_fns, mock_ctx):
         mock_ctx.request_context.lifespan_context._filter_values_cache = None

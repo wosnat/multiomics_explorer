@@ -6,7 +6,7 @@ from multiomics_explorer.api.functions import (
     genes_by_ontology,
     get_gene_details,
     gene_homologs,
-    get_schema,
+    kg_schema,
     list_filter_values,
     list_experiments,
     list_organisms,

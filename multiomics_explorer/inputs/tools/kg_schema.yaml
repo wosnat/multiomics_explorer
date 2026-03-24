@@ -1,0 +1,17 @@
+# Human-authored content for kg_schema about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Get the full schema
+    call: kg_schema()
+    response: |
+      {"nodes": {"Gene": {"properties": {"locus_tag": "STRING", "gene_name": "STRING", ...}}, "GOTerm": {"properties": {"id": "STRING", "name": "STRING", ...}}, ...}, "relationships": {"Has_function": {"source_labels": ["Gene"], "target_labels": ["GOTerm"], "properties": {}}, ...}}
+
+chaining:
+  - "kg_schema → run_cypher"
+
+mistakes:
+  - "Schema does not include node counts — use run_cypher for counts"
+  - wrong: "kg_schema() to discover valid organism or category filter values"
+    right: "list_filter_values() for categorical filter options; list_organisms() for organism details"
