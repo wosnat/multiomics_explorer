@@ -1086,31 +1086,130 @@ def build_genes_by_ontology(
     return cypher, params
 
 
-def build_gene_ontology_terms(
-    *, ontology: str, gene_id: str, leaf_only: bool = True,
+def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
+    """Return a WHERE NOT EXISTS clause for leaf filtering, or empty string.
+
+    Leaf filtering is meaningful only when genes can be annotated to both
+    a child and its ancestor within the same label. Skipped for:
+    - Flat ontologies (no hierarchy_rels): cog_category, tigr_role
+    - Cross-label hierarchies (parent_label present): pfam (Pfam→PfamClan)
+    - Level-restricted ontologies (gene_connects_to_level): kegg (ko only)
+    """
+    hierarchy_rels = cfg["hierarchy_rels"]
+    if not hierarchy_rels:
+        return ""
+    if cfg.get("parent_label"):
+        return ""
+    if cfg.get("gene_connects_to_level"):
+        return ""
+    gene_rel = cfg["gene_rel"]
+    label = cfg["label"]
+    hierarchy = "|".join(hierarchy_rels)
+    return (
+        "WHERE NOT EXISTS {\n"
+        f"  MATCH (g)-[:{gene_rel}]->(child:{label})\n"
+        f"        -[:{hierarchy}]->(t)\n"
+        "}\n"
+    )
+
+
+def build_gene_ontology_terms_summary(
+    *,
+    locus_tags: list[str],
+    ontology: str,
 ) -> tuple[str, dict]:
+    """Build summary for gene_ontology_terms for ONE ontology.
+
+    Called once per ontology by api/ layer (which merges results
+    and adds not_found, no_terms, totals).
+
+    RETURN keys: gene_count, term_count, by_term, gene_term_counts.
+    gene_term_counts is [{locus_tag, term_count}] — has per-gene identity
+    so api/ can merge across ontologies for cross-ontology stats.
+    """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     cfg = ONTOLOGY_CONFIG[ontology]
-    label = cfg["label"]
     gene_rel = cfg["gene_rel"]
-    hierarchy_rels = cfg["hierarchy_rels"]
+    label = cfg["label"]
+    leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
 
-    if leaf_only and hierarchy_rels:
-        hierarchy = "|".join(hierarchy_rels)
-        cypher = (
-            f"MATCH (g:Gene {{locus_tag: $gene_id}})-[:{gene_rel}]->(t:{label})\n"
-            "WHERE NOT EXISTS {\n"
-            f"  MATCH (g)-[:{gene_rel}]->(child:{label})\n"
-            f"        -[:{hierarchy}]->(t)\n"
-            "}\n"
-            "RETURN t.id AS id, t.name AS name\n"
-            "ORDER BY t.name"
-        )
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        f"MATCH (g:Gene {{locus_tag: lt}})-[:{gene_rel}]->(t:{label})\n"
+        f"{leaf_filter}"
+        "WITH g.locus_tag AS lt, collect({id: t.id, name: t.name}) AS terms\n"
+        "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
+        "WITH genes,\n"
+        "     apoc.coll.flatten([g IN genes | g.terms]) AS all_terms,\n"
+        "     [g IN genes | {locus_tag: g.lt, term_count: g.cnt}] AS gene_term_counts\n"
+        "UNWIND all_terms AS t\n"
+        "WITH genes, gene_term_counts, t.id AS tid, t.name AS tname, count(*) AS cnt\n"
+        "WITH genes, gene_term_counts,\n"
+        "     collect({term_id: tid, term_name: tname, count: cnt}) AS by_term\n"
+        "RETURN size(genes) AS gene_count,\n"
+        "       size(apoc.coll.flatten([g IN genes | g.terms])) AS term_count,\n"
+        "       by_term,\n"
+        "       gene_term_counts"
+    )
+    return cypher, {"locus_tags": locus_tags}
+
+
+def build_gene_ontology_terms(
+    *,
+    locus_tags: list[str],
+    ontology: str,
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build detail Cypher for gene_ontology_terms for ONE ontology.
+
+    RETURN keys (compact): locus_tag, term_id, term_name.
+    RETURN keys (verbose): adds organism_strain.
+
+    Called by api/ — which adds ontology_type column and merges
+    across ontologies when ontology=None.
+    """
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    cfg = ONTOLOGY_CONFIG[ontology]
+    gene_rel = cfg["gene_rel"]
+    label = cfg["label"]
+    leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
+
+    params: dict = {"locus_tags": locus_tags}
+
+    verbose_cols = (
+        ",\n       g.organism_strain AS organism_strain"
+        if verbose else ""
+    )
+
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
     else:
-        cypher = (
-            f"MATCH (g:Gene {{locus_tag: $gene_id}})-[:{gene_rel}]->(t:{label})\n"
-            "RETURN t.id AS id, t.name AS name\n"
-            "ORDER BY t.name"
-        )
-    return cypher, {"gene_id": gene_id}
+        limit_clause = ""
+
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        f"MATCH (g:Gene {{locus_tag: lt}})-[:{gene_rel}]->(t:{label})\n"
+        f"{leaf_filter}"
+        "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
+        f"       t.name AS term_name{verbose_cols}\n"
+        f"ORDER BY g.locus_tag, t.id{limit_clause}"
+    )
+    return cypher, params
+
+
+def build_gene_existence_check() -> tuple[str, dict]:
+    """Build query to check which locus_tags exist in the KG.
+
+    RETURN keys: lt, found.
+    Pass locus_tags as parameter when executing.
+    """
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
+        "RETURN lt, g IS NOT NULL AS found"
+    )
+    return cypher, {}

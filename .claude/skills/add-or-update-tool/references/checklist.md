@@ -15,6 +15,7 @@
 | UT | `tests/unit/test_api_functions.py` | `class Test{Name}` |
 | UT | `tests/unit/test_tool_wrappers.py` | `class Test{Name}Wrapper` + update `EXPECTED_TOOLS` |
 | IT | `tests/integration/test_mcp_tools.py` | Smoke test against live KG |
+| IT | `tests/integration/test_tool_correctness_kg.py` | Update `TestBuild{Name}CorrectnessKG` if exists |
 | RG | `tests/evals/cases.yaml` | Eval cases |
 | RG | `tests/evals/test_eval.py` | Add to `TOOL_BUILDERS` |
 | RG | `tests/regression/test_regression.py` | Add to `TOOL_BUILDERS` |
@@ -354,17 +355,39 @@ treatment_type: Annotated[list[str] | None, Field(
 
 CONTAINS filters stay as single `str` — fuzzy match doesn't combine well.
 
+## Multi-query orchestration (api/ layer)
+
+When a tool spans multiple entity types or dimensions (e.g. ontology
+queries across 9 ontology types), the api/ layer orchestrates multiple
+builder calls:
+
+- **Builders are single-dimension** — one query per ontology type,
+  not a massive UNION ALL. Keeps Cypher simple and plan-efficient.
+- **Summary queries always run** — stats computed in Cypher, never
+  derived from detail rows. Avoids fetching all rows just to count.
+- **Detail queries only when limit != 0** — with limit pushed into
+  Cypher. For multi-dimension, each gets `limit` rows; Python merges
+  and takes final `limit` from the merged set.
+- **Summary builders must return per-entity identity** when stats
+  need to merge across dimensions (e.g. `gene_term_counts` with
+  `{locus_tag, term_count}` instead of anonymous count lists).
+  Without identity, you can't compute cross-dimension per-gene stats.
+
+Pattern: `gene_ontology_terms` (9 ontologies × batch genes).
+
 ## Common gotchas
 
 - Forgetting to add to `__init__.py` exports (both `api/` and package root)
 - Forgetting to update `EXPECTED_TOOLS` list in `test_tool_wrappers.py`
 - Forgetting to add builder to `TOOL_BUILDERS` in `test_regression.py` AND `test_eval.py` (both have their own dict)
 - Forgetting to update `CLAUDE.md` tool table
+- Forgetting to update `test_tool_correctness_kg.py` when builder signature changes
 - Every query MUST have `ORDER BY` — if no natural sort key, sort alphabetically by primary identifier. Non-deterministic results break regression tests.
 - String filters must be case-insensitive — use `toLower()` on both sides
 - Fulltext search tools must return `score` in RETURN columns and ORDER BY score DESC. Summary needs `score_max`/`score_median`.
 - Using f-strings for user input in Cypher instead of `$param` placeholders
 - Forgetting `_default_conn(conn)` call in API function
 - `summary=True` sets `truncated=True` — signals results exist but aren't shown
-- `apoc.coll.frequencies()` returns `{item, count}` — rename to domain keys in API layer
+- `apoc.coll.frequencies()` returns `{item, count}` — rename to domain keys in API layer. Cannot carry multiple fields per item — use UNWIND + count(*) + collect for breakdowns that need term_id + term_name + count.
 - List-type filter params need case normalization in Python before passing to Cypher
+- Summary builders that return anonymous lists (e.g. `[2, 3, 1]`) lose per-entity identity — return `[{locus_tag, count}]` instead when cross-dimension merging is needed

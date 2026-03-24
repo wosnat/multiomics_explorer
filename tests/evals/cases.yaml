@@ -732,39 +732,39 @@
   tool: gene_ontology_terms
   desc: argR leaf BP annotations (most specific)
   params:
-    gene_id: MIT1002_03493
+    locus_tags: ["MIT1002_03493"]
     ontology: go_bp
   expect:
     min_rows: 5
     max_rows: 20
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_bp_all
   tool: gene_ontology_terms
-  desc: argR all BP annotations (full hierarchy)
+  desc: argR BP annotations (verbose includes organism_strain)
   params:
-    gene_id: MIT1002_03493
+    locus_tags: ["MIT1002_03493"]
     ontology: go_bp
-    leaf_only: false
+    verbose: true
   expect:
-    min_rows: 50
-    columns: [id, name]
+    min_rows: 5
+    columns: [locus_tag, term_id, term_name, organism_strain]
 
 - id: gene_ontology_terms_kegg
   tool: gene_ontology_terms
   desc: Gene KEGG KO annotations
   params:
-    gene_id: MIT1002_03493
+    locus_tags: ["MIT1002_03493"]
     ontology: kegg
   expect:
     min_rows: 1
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_ec
   tool: gene_ontology_terms
   desc: Gene EC number annotations
   params:
-    gene_id: MIT1002_03493
+    locus_tags: ["MIT1002_03493"]
     ontology: ec
   expect:
     min_rows: 0
@@ -773,85 +773,83 @@
   tool: gene_ontology_terms
   desc: Gene molecular function annotations
   params:
-    gene_id: MIT1002_03493
+    locus_tags: ["MIT1002_03493"]
     ontology: go_mf
   expect:
     min_rows: 0
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_cc
   tool: gene_ontology_terms
   desc: Gene cellular component annotations
   params:
-    gene_id: MIT1002_03493
+    locus_tags: ["MIT1002_03493"]
     ontology: go_cc
   expect:
     min_rows: 0
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_ec_leaf
   tool: gene_ontology_terms
-  desc: EC leaf-only annotations verify NOT EXISTS clause for non-GO ontology
+  desc: EC annotations verify leaf filtering for non-GO ontology
   params:
-    gene_id: PMM0001
+    locus_tags: ["PMM0001"]
     ontology: ec
-    leaf_only: true
   expect:
     min_rows: 0
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_bp_limited
   tool: gene_ontology_terms
   desc: Limit parameter caps ontology term results
   params:
-    gene_id: MIT1002_03493
+    locus_tags: ["MIT1002_03493"]
     ontology: go_bp
-    leaf_only: false
     limit: 5
   expect:
     min_rows: 1
     max_rows: 5
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_different_gene
   tool: gene_ontology_terms
   desc: BP annotations for a Prochlorococcus gene (gene diversity)
   params:
-    gene_id: PMM0001
+    locus_tags: ["PMM0001"]
     ontology: go_bp
   expect:
     min_rows: 1
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_cog_category
   tool: gene_ontology_terms
   desc: COG category annotations for a gene
   params:
-    gene_id: PMM0001
+    locus_tags: ["PMM0001"]
     ontology: cog_category
   expect:
     min_rows: 1
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_cyanorak_role
   tool: gene_ontology_terms
   desc: Cyanorak role annotations for a Prochlorococcus gene
   params:
-    gene_id: PMM0001
+    locus_tags: ["PMM0001"]
     ontology: cyanorak_role
   expect:
     min_rows: 1
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 - id: gene_ontology_terms_tigr_role
   tool: gene_ontology_terms
   desc: TIGR role annotations for a gene
   params:
-    gene_id: PMM0001
+    locus_tags: ["PMM0001"]
     ontology: tigr_role
   expect:
     min_rows: 1
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 # ── Pfam ontology ──────────────────────────────────────────
 
@@ -890,10 +888,10 @@
   desc: Get Pfam domain annotations for a gene
   params:
     ontology: pfam
-    gene_id: PMM0001
+    locus_tags: ["PMM0001"]
   expect:
     min_rows: 0
-    columns: [id, name]
+    columns: [locus_tag, term_id, term_name]
 
 # ── Publications ──────────────────────────────────────────
 

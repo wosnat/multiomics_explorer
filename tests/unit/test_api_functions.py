@@ -793,25 +793,165 @@ class TestGenesByOntology:
 # gene_ontology_terms
 # ---------------------------------------------------------------------------
 class TestGeneOntologyTerms:
-    def test_returns_list(self, mock_conn):
-        mock_conn.execute_query.return_value = [
-            {"id": "GO:0006260", "name": "DNA replication"},
+    """Tests for gene_ontology_terms API function (multi-query orchestration)."""
+
+    def _exist_found(self, *locus_tags):
+        """Helper: existence check rows where all genes are found."""
+        return [{"lt": lt, "found": True} for lt in locus_tags]
+
+    def _exist_mixed(self, found, not_found):
+        """Helper: existence check rows with some found, some not."""
+        rows = [{"lt": lt, "found": True} for lt in found]
+        rows += [{"lt": lt, "found": False} for lt in not_found]
+        return rows
+
+    def _detail_rows(self, locus_tag="PMM0001"):
+        """Helper: sample detail query result rows."""
+        return [
+            {"locus_tag": locus_tag, "term_id": "go:0006260", "term_name": "DNA replication"},
+            {"locus_tag": locus_tag, "term_id": "go:0006351", "term_name": "DNA-templated transcription"},
         ]
-        result = api.gene_ontology_terms("PMM0001", "go_bp", conn=mock_conn)
-        assert isinstance(result, list)
-        assert len(result) == 1
+
+    def _summary_row(self, locus_tag="PMM0001"):
+        """Helper: sample summary query result row."""
+        return [{
+            "gene_count": 1,
+            "term_count": 2,
+            "by_term": [
+                {"term_id": "go:0006260", "term_name": "DNA replication", "count": 1},
+                {"term_id": "go:0006351", "term_name": "DNA-templated transcription", "count": 1},
+            ],
+            "gene_term_counts": [{"locus_tag": locus_tag, "term_count": 2}],
+        }]
+
+    def test_returns_dict(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),       # existence check
+            self._summary_row(),                 # go_bp summary
+            self._detail_rows(),                 # go_bp detail
+        ]
+        result = api.gene_ontology_terms(["PMM0001"], "go_bp", conn=mock_conn)
+        assert isinstance(result, dict)
+
+    def test_has_expected_keys(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        result = api.gene_ontology_terms(["PMM0001"], "go_bp", conn=mock_conn)
+        expected_keys = {
+            "total_matching", "total_genes", "total_terms",
+            "by_ontology", "by_term",
+            "terms_per_gene_min", "terms_per_gene_max", "terms_per_gene_median",
+            "returned", "truncated", "not_found", "no_terms", "results",
+        }
+        assert set(result.keys()) == expected_keys
+
+    def test_summary_sets_limit_zero(self, mock_conn):
+        """summary=True uses summary queries, returns empty results."""
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+        ]
+        result = api.gene_ontology_terms(
+            ["PMM0001"], "go_bp", summary=True, conn=mock_conn,
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert result["total_matching"] == 2
+
+    def test_empty_locus_tags_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="locus_tags must not be empty"):
+            api.gene_ontology_terms([], "go_bp", conn=mock_conn)
 
     def test_invalid_ontology_raises(self, mock_conn):
         with pytest.raises(ValueError, match="Invalid ontology"):
-            api.gene_ontology_terms("PMM0001", "invalid", conn=mock_conn)
+            api.gene_ontology_terms(["PMM0001"], "invalid", conn=mock_conn)
 
-    def test_leaf_only_default_true(self, mock_conn):
-        """Default leaf_only=True is passed through to query builder."""
-        mock_conn.execute_query.return_value = []
-        api.gene_ontology_terms("PMM0001", "go_bp", conn=mock_conn)
-        cypher_arg = mock_conn.execute_query.call_args[0][0]
-        # leaf_only=True produces a WHERE NOT EXISTS clause
-        assert "NOT EXISTS" in cypher_arg
+    def test_creates_conn_when_none(self):
+        """Default conn used when None."""
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                self._exist_found("PMM0001"),
+                self._summary_row(),
+                self._detail_rows(),
+            ]
+            result = api.gene_ontology_terms(["PMM0001"], "go_bp")
+        MockConn.assert_called_once()
+        assert isinstance(result, dict)
+
+    def test_not_found_populated(self, mock_conn):
+        """Gene not in graph appears in not_found list."""
+        mock_conn.execute_query.side_effect = [
+            self._exist_mixed(found=["PMM0001"], not_found=["FAKE999"]),
+            self._summary_row("PMM0001"),
+            self._detail_rows("PMM0001"),
+        ]
+        result = api.gene_ontology_terms(
+            ["PMM0001", "FAKE999"], "go_bp", conn=mock_conn,
+        )
+        assert "FAKE999" in result["not_found"]
+        assert result["total_genes"] == 1
+
+    def test_no_terms_populated(self, mock_conn):
+        """Gene exists but has no terms for the ontology."""
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            [],  # summary query returns nothing
+            [],  # detail query returns nothing
+        ]
+        result = api.gene_ontology_terms(["PMM0001"], "go_bp", conn=mock_conn)
+        assert "PMM0001" in result["no_terms"]
+        assert result["total_matching"] == 0
+        assert result["total_genes"] == 0
+
+    def test_limit_caps_results(self, mock_conn):
+        """limit=2 with 5 total returns 2 results, truncated=True."""
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            # summary says 5 total
+            [{
+                "gene_count": 1, "term_count": 5,
+                "by_term": [{"term_id": f"go:{i:07d}", "term_name": f"t{i}", "count": 1} for i in range(5)],
+                "gene_term_counts": [{"locus_tag": "PMM0001", "term_count": 5}],
+            }],
+            # detail query (with limit=2 pushed in) returns 2 rows
+            [
+                {"locus_tag": "PMM0001", "term_id": "go:0000000", "term_name": "t0"},
+                {"locus_tag": "PMM0001", "term_id": "go:0000001", "term_name": "t1"},
+            ],
+        ]
+        result = api.gene_ontology_terms(
+            ["PMM0001"], "go_bp", limit=2, conn=mock_conn,
+        )
+        assert result["returned"] == 2
+        assert result["truncated"] is True
+        assert result["total_matching"] == 5
+        assert len(result["results"]) == 2
+
+    def test_ontology_none_queries_all(self, mock_conn):
+        """ontology=None queries all ONTOLOGY_CONFIG keys."""
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        n = len(ONTOLOGY_CONFIG)
+
+        # existence + n summaries (all empty) + n details (all empty)
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+        ] + [[] for _ in range(n)] + [[] for _ in range(n)]
+
+        result = api.gene_ontology_terms(["PMM0001"], conn=mock_conn)
+        # 1 existence + n summary + n detail = 1 + 2n
+        assert mock_conn.execute_query.call_count == 1 + 2 * n
+
+    def test_importable_from_package(self):
+        """from multiomics_explorer import gene_ontology_terms works."""
+        from multiomics_explorer import gene_ontology_terms
+        assert gene_ontology_terms is api.gene_ontology_terms
 
 
 # ---------------------------------------------------------------------------

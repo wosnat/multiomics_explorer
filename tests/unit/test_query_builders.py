@@ -7,9 +7,11 @@ import pytest
 
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
+    build_gene_existence_check,
     build_gene_homologs,
     build_gene_homologs_summary,
     build_gene_ontology_terms,
+    build_gene_ontology_terms_summary,
     build_gene_overview,
     build_gene_overview_summary,
     build_genes_by_function,
@@ -904,89 +906,133 @@ class TestBuildGenesByOntologySummary:
 
 
 class TestBuildGeneOntologyTerms:
-    @pytest.mark.parametrize("ontology,expected_label,expected_rel", [
-        ("go_bp", "BiologicalProcess", "Gene_involved_in_biological_process"),
-        ("go_mf", "MolecularFunction", "Gene_enables_molecular_function"),
-        ("go_cc", "CellularComponent", "Gene_located_in_cellular_component"),
-        ("ec", "EcNumber", "Gene_catalyzes_ec_number"),
-        ("kegg", "KeggTerm", "Gene_has_kegg_ko"),
-        ("cog_category", "CogFunctionalCategory", "Gene_in_cog_category"),
-        ("cyanorak_role", "CyanorakRole", "Gene_has_cyanorak_role"),
-        ("tigr_role", "TigrRole", "Gene_has_tigr_role"),
-        ("pfam", "Pfam", "Gene_has_pfam"),
-    ])
-    def test_correct_label_and_rel(self, ontology, expected_label, expected_rel):
-        cypher, _ = build_gene_ontology_terms(ontology=ontology, gene_id="PMM0001")
-        assert expected_label in cypher
-        assert expected_rel in cypher
-
-    def test_leaf_only_adds_not_exists(self):
+    def test_single_ontology_returns_expected_columns(self):
+        """go_bp returns locus_tag, term_id, term_name in RETURN."""
         cypher, _ = build_gene_ontology_terms(
-            ontology="go_bp", gene_id="PMM0001", leaf_only=True,
+            locus_tags=["PMM0001"], ontology="go_bp",
+        )
+        assert "locus_tag" in cypher
+        assert "term_id" in cypher
+        assert "term_name" in cypher
+
+    def test_leaf_filter_hierarchical(self):
+        """go_bp has hierarchy_rels, so NOT EXISTS clause is present."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp",
         )
         assert "NOT EXISTS" in cypher
-        # Hierarchy edges should be in the NOT EXISTS subquery
         assert "Biological_process_is_a_biological_process" in cypher
         assert "Biological_process_part_of_biological_process" in cypher
 
-    def test_leaf_only_false_no_not_exists(self):
+    def test_leaf_filter_flat_ontology(self):
+        """cog_category is flat (no hierarchy_rels), so NO NOT EXISTS clause."""
         cypher, _ = build_gene_ontology_terms(
-            ontology="go_bp", gene_id="PMM0001", leaf_only=False,
-        )
-        assert "NOT EXISTS" not in cypher
-
-    def test_returns_id_name_columns(self):
-        for ontology in ["go_bp", "go_mf", "go_cc", "ec", "kegg"]:
-            cypher, _ = build_gene_ontology_terms(ontology=ontology, gene_id="x")
-            assert "t.id AS id" in cypher
-            assert "t.name AS name" in cypher
-
-    def test_invalid_ontology_raises_valueerror(self):
-        with pytest.raises(ValueError, match="Invalid ontology"):
-            build_gene_ontology_terms(ontology="bad", gene_id="x")
-
-    def test_go_mf_correct_label_and_rel(self):
-        cypher, _ = build_gene_ontology_terms(ontology="go_mf", gene_id="PMM0001")
-        assert "MolecularFunction" in cypher
-        assert "Gene_enables_molecular_function" in cypher
-
-    def test_go_cc_correct_label_and_rel(self):
-        cypher, _ = build_gene_ontology_terms(ontology="go_cc", gene_id="PMM0001")
-        assert "CellularComponent" in cypher
-        assert "Gene_located_in_cellular_component" in cypher
-
-    def test_leaf_only_ec(self):
-        """leaf_only=True works for EC (only is_a hierarchy)."""
-        cypher, _ = build_gene_ontology_terms(
-            ontology="ec", gene_id="PMM0001", leaf_only=True,
-        )
-        assert "NOT EXISTS" in cypher
-        assert "Ec_number_is_a_ec_number" in cypher
-
-    def test_leaf_only_kegg(self):
-        """leaf_only=True works for KEGG."""
-        cypher, _ = build_gene_ontology_terms(
-            ontology="kegg", gene_id="PMM0001", leaf_only=True,
-        )
-        assert "NOT EXISTS" in cypher
-        assert "Kegg_term_is_a_kegg_term" in cypher
-
-    def test_leaf_only_flat_ontology_returns_all(self):
-        """Flat ontologies (empty hierarchy_rels) ignore leaf_only — all terms are leaves."""
-        cypher, _ = build_gene_ontology_terms(
-            ontology="cog_category", gene_id="PMM0001", leaf_only=True,
+            locus_tags=["PMM0001"], ontology="cog_category",
         )
         assert "NOT EXISTS" not in cypher
         assert "CogFunctionalCategory" in cypher
-        assert "Gene_in_cog_category" in cypher
 
-    def test_cyanorak_role_leaf_only(self):
-        """CyanorakRole has hierarchy, so leaf_only=True uses NOT EXISTS."""
+    def test_leaf_filter_pfam(self):
+        """pfam has cross-label hierarchy (parent_label), so NO NOT EXISTS."""
         cypher, _ = build_gene_ontology_terms(
-            ontology="cyanorak_role", gene_id="PMM0001", leaf_only=True,
+            locus_tags=["PMM0001"], ontology="pfam",
         )
-        assert "NOT EXISTS" in cypher
-        assert "Cyanorak_role_is_a_cyanorak_role" in cypher
+        assert "NOT EXISTS" not in cypher
+        assert "Pfam" in cypher
+
+    def test_leaf_filter_kegg(self):
+        """kegg has gene_connects_to_level, so NO NOT EXISTS."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="kegg",
+        )
+        assert "NOT EXISTS" not in cypher
+        assert "KeggTerm" in cypher
+
+    def test_verbose_false(self):
+        """Compact mode does not include organism_strain in RETURN."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", verbose=False,
+        )
+        assert "organism_strain" not in cypher
+
+    def test_verbose_true(self):
+        """Verbose mode includes organism_strain in RETURN."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", verbose=True,
+        )
+        assert "organism_strain" in cypher
+
+    def test_limit_clause(self):
+        """LIMIT is added when limit is provided."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", limit=10,
+        )
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        """No LIMIT when limit is None."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", limit=None,
+        )
+        assert "LIMIT" not in cypher
+
+    def test_order_by(self):
+        """Results are ordered by locus_tag then term id."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp",
+        )
+        assert "ORDER BY g.locus_tag, t.id" in cypher
+
+    def test_invalid_ontology_raises(self):
+        """Invalid ontology raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_gene_ontology_terms(locus_tags=["x"], ontology="bad")
+
+    def test_params_include_locus_tags(self):
+        """params dict has locus_tags key."""
+        _, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001", "PMM0002"], ontology="go_bp",
+        )
+        assert params["locus_tags"] == ["PMM0001", "PMM0002"]
+
+
+class TestBuildGeneOntologyTermsSummary:
+    def test_returns_cypher_and_params(self):
+        """Basic call returns cypher and params."""
+        cypher, params = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="go_bp",
+        )
+        assert "gene_count" in cypher
+        assert "term_count" in cypher
+        assert "by_term" in cypher
+        assert "gene_term_counts" in cypher
+
+    def test_params_include_locus_tags(self):
+        """params dict has locus_tags key."""
+        _, params = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001", "PMM0002"], ontology="go_bp",
+        )
+        assert params["locus_tags"] == ["PMM0001", "PMM0002"]
+
+    def test_invalid_ontology_raises(self):
+        """Invalid ontology raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_gene_ontology_terms_summary(locus_tags=["x"], ontology="bad")
+
+
+class TestBuildGeneExistenceCheck:
+    def test_returns_cypher(self):
+        """Cypher uses OPTIONAL MATCH pattern."""
+        cypher, _ = build_gene_existence_check()
+        assert "OPTIONAL MATCH" in cypher
+        assert "lt" in cypher
+        assert "found" in cypher
+
+    def test_empty_params(self):
+        """params dict is empty (locus_tags passed at execute time)."""
+        _, params = build_gene_existence_check()
+        assert params == {}
 
 
 # ---------------------------------------------------------------------------

@@ -1,161 +1,51 @@
 case_id: gene_ontology_terms_bp_all
-row_count: 79
+row_count: 12
 rows:
-- id: go:0006082
-  name: organic acid metabolic process
-- id: go:0006139
-  name: nucleobase-containing compound metabolic process
-- id: go:0006259
-  name: DNA metabolic process
-- id: go:0006310
-  name: DNA recombination
-- id: go:0006355
-  name: regulation of DNA-templated transcription
-- id: go:0006520
-  name: amino acid metabolic process
-- id: go:0006521
-  name: regulation of amino acid metabolic process
-- id: go:0006525
-  name: arginine metabolic process
-- id: go:0008150
-  name: biological_process
-- id: go:0008152
-  name: metabolic process
-- id: go:0009889
-  name: regulation of biosynthetic process
-- id: go:0009890
-  name: negative regulation of biosynthetic process
-- id: go:0009891
-  name: positive regulation of biosynthetic process
-- id: go:0009892
-  name: negative regulation of metabolic process
-- id: go:0009893
-  name: positive regulation of metabolic process
-- id: go:0009894
-  name: regulation of catabolic process
-- id: go:0009987
-  name: cellular process
-- id: go:0010468
-  name: regulation of gene expression
-- id: go:0010556
-  name: regulation of macromolecule biosynthetic process
-- id: go:0010557
-  name: positive regulation of macromolecule biosynthetic process
-- id: go:0010558
-  name: negative regulation of macromolecule biosynthetic process
-- id: go:0010565
-  name: regulation of ketone metabolic process
-- id: go:0010604
-  name: positive regulation of macromolecule metabolic process
-- id: go:0010605
-  name: negative regulation of macromolecule metabolic process
-- id: go:0010628
-  name: positive regulation of gene expression
-- id: go:0010629
-  name: negative regulation of gene expression
-- id: go:0016043
-  name: cellular component organization
-- id: go:0019219
-  name: regulation of nucleobase-containing compound metabolic process
-- id: go:0019222
-  name: regulation of metabolic process
-- id: go:0019752
-  name: carboxylic acid metabolic process
-- id: go:0022607
-  name: cellular component assembly
-- id: go:0031333
-  name: negative regulation of protein-containing complex assembly
-- id: go:0031334
-  name: positive regulation of protein-containing complex assembly
-- id: go:0033238
-  name: regulation of amine metabolic process
-- id: go:0033241
-  name: regulation of amine catabolic process
-- id: go:0034214
-  name: protein hexamerization
-- id: go:0042150
-  name: plasmid recombination
-- id: go:0043170
-  name: macromolecule metabolic process
-- id: go:0043254
-  name: regulation of protein-containing complex assembly
-- id: go:0043436
-  name: oxoacid metabolic process
-- id: go:0043933
-  name: protein-containing complex organization
-- id: go:0044085
-  name: cellular component biogenesis
-- id: go:0044087
-  name: regulation of cellular component biogenesis
-- id: go:0044089
-  name: positive regulation of cellular component biogenesis
-- id: go:0044238
-  name: primary metabolic process
-- id: go:0044281
-  name: small molecule metabolic process
-- id: go:0045892
-  name: negative regulation of DNA-templated transcription
-- id: go:0045893
-  name: positive regulation of DNA-templated transcription
-- id: go:0045934
-  name: negative regulation of nucleobase-containing compound metabolic process
-- id: go:0048518
-  name: positive regulation of biological process
-- id: go:0048519
-  name: negative regulation of biological process
-- id: go:0048522
-  name: positive regulation of cellular process
-- id: go:0048523
-  name: negative regulation of cellular process
-- id: go:0050789
-  name: regulation of biological process
-- id: go:0050794
-  name: regulation of cellular process
-- id: go:0051128
-  name: regulation of cellular component organization
-- id: go:0051129
-  name: negative regulation of cellular component organization
-- id: go:0051130
-  name: positive regulation of cellular component organization
-- id: go:0051252
-  name: regulation of RNA metabolic process
-- id: go:0051253
-  name: negative regulation of RNA metabolic process
-- id: go:0051254
-  name: positive regulation of RNA metabolic process
-- id: go:0051259
-  name: protein complex oligomerization
-- id: go:0060255
-  name: regulation of macromolecule metabolic process
-- id: go:0062012
-  name: regulation of small molecule metabolic process
-- id: go:0065003
-  name: protein-containing complex assembly
-- id: go:0065007
-  name: biological regulation
-- id: go:0071840
-  name: cellular component organization or biogenesis
-- id: go:0080090
-  name: regulation of primary metabolic process
-- id: go:0090304
-  name: nucleic acid metabolic process
-- id: go:1900079
-  name: regulation of arginine biosynthetic process
-- id: go:1900081
-  name: regulation of arginine catabolic process
-- id: go:1901605
-  name: alpha-amino acid metabolic process
-- id: go:1902679
-  name: negative regulation of RNA biosynthetic process
-- id: go:1902680
-  name: positive regulation of RNA biosynthetic process
-- id: go:2000142
-  name: regulation of DNA-templated transcription initiation
-- id: go:2000143
-  name: negative regulation of DNA-templated transcription initiation
-- id: go:2000144
-  name: positive regulation of DNA-templated transcription initiation
-- id: go:2000282
-  name: regulation of amino acid biosynthetic process
-- id: go:2001141
-  name: regulation of RNA biosynthetic process
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:0006525
+  term_name: arginine metabolic process
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:0010565
+  term_name: regulation of ketone metabolic process
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:0010628
+  term_name: positive regulation of gene expression
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:0010629
+  term_name: negative regulation of gene expression
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:0031333
+  term_name: negative regulation of protein-containing complex assembly
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:0031334
+  term_name: positive regulation of protein-containing complex assembly
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:0034214
+  term_name: protein hexamerization
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:0042150
+  term_name: plasmid recombination
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:1900079
+  term_name: regulation of arginine biosynthetic process
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:1900081
+  term_name: regulation of arginine catabolic process
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:2000143
+  term_name: negative regulation of DNA-templated transcription initiation
+- locus_tag: MIT1002_03493
+  organism_strain: Alteromonas macleodii MIT1002
+  term_id: go:2000144
+  term_name: positive regulation of DNA-templated transcription initiation

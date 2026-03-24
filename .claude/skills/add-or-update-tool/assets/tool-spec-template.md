@@ -107,7 +107,12 @@ a tool mode parameter.
 ## Special handling
 
 - Caching: yes/no, what to cache
-- Multi-query orchestration: does the API function make multiple builder calls?
+- Multi-query orchestration: does the API function make multiple builder
+  calls? If spanning multiple entity types (e.g. 9 ontology types),
+  builders should be single-dimension; api/ loops and merges. Summary
+  builders must return per-entity identity (not anonymous count lists)
+  when cross-dimension merging is needed. See `gene_ontology_terms` as
+  the reference pattern.
 - Lucene retry: does this tool use fulltext search?
 - Grouping: group results by organism or other dimension?
 
@@ -125,6 +130,7 @@ a tool mode parameter.
 | 6 | Unit tests | `tests/unit/test_api_functions.py` | `Test{Name}` |
 | 7 | Unit tests | `tests/unit/test_tool_wrappers.py` | `Test{Name}Wrapper` + update `EXPECTED_TOOLS` |
 | 8 | Integration | `tests/integration/test_mcp_tools.py` | Smoke test against live KG |
+| 8b | Integration | `tests/integration/test_tool_correctness_kg.py` | Update if class exists for this tool |
 | 9 | Regression | `tests/regression/test_regression.py` | Add to `TOOL_BUILDERS` |
 | 10 | Eval cases | `tests/evals/cases.yaml` | Regression + correctness cases |
 | 11 | About content | `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md` | Per-tool about text |
@@ -169,7 +175,8 @@ def build_{name}_summary(
 
 Both builders share the same WHERE clause construction.
 
-**Cypher:** (show the actual queries)
+**Cypher:** (show the actual queries — mark as "verified against live KG"
+after testing)
 
 **WHERE clause construction:** (show the conditions/params pattern)
 
@@ -179,6 +186,17 @@ Any `WITH DISTINCT` must carry forward all variables referenced
 downstream (e.g. `WITH DISTINCT descendant, tid` — not just
 `WITH DISTINCT descendant`). Flat ontologies (`WITH root AS descendant`)
 are especially prone to dropping variables.
+
+**KG verification (do during spec, not after build):**
+- Run detail query with representative inputs → check columns and values
+- Run summary query → compare total_matching against detail row count
+  (must match or document why they differ)
+- If query uses filtering (NOT EXISTS, level, hierarchy), run with and
+  without → confirm filter actually reduces results
+- For multi-dimension tools, confirm summary returns per-entity identity
+  for cross-dimension merging (not anonymous count lists)
+- Test edge cases: gene with no results, nonexistent gene, batch with
+  mixed found/not-found
 
 **Design notes:** (key decisions — sort order, precomputed vs aggregated, etc.)
 

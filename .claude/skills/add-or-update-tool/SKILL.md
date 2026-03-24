@@ -94,17 +94,47 @@ YAML.
   this may reveal new needs
 - → **Review:** present updated findings to user. Repeat steps 1–2.
 
+### Step 3: Draft and verify Cypher
+
+Before writing the spec, draft the actual Cypher queries and verify
+them against the live KG. This catches design problems before build.
+
+- **Detail query:** Run with representative inputs. Verify columns,
+  row counts, sort order, and values are correct.
+- **Summary query:** Run and compare `total_matching` against detail
+  row count. They must match — if they don't, the summary query has
+  a bug. Fix before writing the spec.
+- **Filters:** If the query uses NOT EXISTS, level restrictions, or
+  hierarchy expansion, run with and without. Confirm the filter
+  actually changes results. If it doesn't, it's a no-op — document
+  why or remove it.
+- **Edge cases:** Test with a gene/entity that has no results. Test
+  with a nonexistent input. Test batch with mixed found/not-found.
+- **Multi-dimension tools:** If the tool spans multiple entity types
+  (e.g. 9 ontology types), decide the orchestration pattern now:
+  single-dimension builders with api/ loop, or multi-dimension UNION.
+  Verify summary builders return per-entity identity for cross-
+  dimension merging (e.g. `{locus_tag, count}` not `[count]`).
+
+Mark verified queries in the spec as "verified against live KG".
+Unverified Cypher in specs leads to rework during build.
+
+- → **Review:** present query results to user if non-obvious.
+
 ### Output: implementation plan
 
-Once scope and KG schema are stable, write the implementation plan at
-**`docs/tool-specs/{tool-name}.md`** using
+Once scope, KG schema, and Cypher are stable, write the implementation
+plan at **`docs/tool-specs/{tool-name}.md`** using
 [template](assets/tool-spec-template.md). Document:
 - Purpose, use cases, tool chains
 - Result-size controls: summary, verbose, limit — or "none needed"
 - Return field names (use standard names from layer-rules)
+- Verified Cypher queries (detail + summary)
 - Any special handling (caching, multi-query orchestration, etc.)
 - → **Gate:** user approves implementation plan before proceeding
-  to build.
+  to build. **Spec is frozen after approval** — adding fields,
+  removing parameters, or changing the query architecture during
+  build requires re-approval. Design iteration belongs in Phase 1.
 
 ## Phase 2: Build (gated steps)
 

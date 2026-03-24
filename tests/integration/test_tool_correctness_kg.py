@@ -772,116 +772,91 @@ class TestGenesByOntologyCorrectnessKG:
 class TestGeneOntologyTermsCorrectnessKG:
     """Validate gene_ontology_terms queries against live Neo4j."""
 
-    def test_bp_leaf_only_argr(self, conn):
+    def test_bp_leaf_argr(self, conn):
         """argR (MIT1002_03493) leaf BP terms should be around 12."""
         cypher, params = build_gene_ontology_terms(
-            ontology="go_bp", gene_id="MIT1002_03493", leaf_only=True,
+            locus_tags=["MIT1002_03493"], ontology="go_bp",
         )
         results = conn.execute_query(cypher, **params)
         assert 5 <= len(results) <= 20, (
             f"Expected 5-20 leaf BP terms for argR, got {len(results)}"
         )
         for r in results:
-            assert "id" in r
-            assert "name" in r
-
-    def test_bp_all_argr(self, conn):
-        """argR (MIT1002_03493) all BP terms should be many more than leaf-only."""
-        cypher, params = build_gene_ontology_terms(
-            ontology="go_bp", gene_id="MIT1002_03493", leaf_only=False,
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 50, (
-            f"Expected >= 50 total BP terms for argR, got {len(results)}"
-        )
+            assert "locus_tag" in r
+            assert "term_id" in r
+            assert "term_name" in r
 
     def test_ec_annotations(self, conn):
-        """Gene with EC annotations returns EC numbers with id and name."""
+        """Gene with EC annotations returns EC numbers."""
         cypher, params = build_gene_ontology_terms(
-            ontology="ec", gene_id="MIT1002_03493",
+            locus_tags=["MIT1002_03493"], ontology="ec",
         )
         results = conn.execute_query(cypher, **params)
-        # argR may or may not have EC; just check column structure if results exist
         for r in results:
-            assert "id" in r
-            assert "name" in r
+            assert "locus_tag" in r
+            assert "term_id" in r
+            assert "term_name" in r
 
     def test_kegg_annotations(self, conn):
-        """Gene with KEGG KOs returns terms with id and name."""
+        """Gene with KEGG KOs returns terms."""
         cypher, params = build_gene_ontology_terms(
-            ontology="kegg", gene_id="MIT1002_03493",
+            locus_tags=["MIT1002_03493"], ontology="kegg",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1, "argR should have at least 1 KEGG KO"
         for r in results:
-            assert "id" in r
-            assert "name" in r
+            assert "term_id" in r
 
     def test_no_annotations_empty_result(self, conn):
         """Gene with no annotations for given ontology returns empty."""
-        # Use a gene unlikely to have GO:CC annotations
         cypher, params = build_gene_ontology_terms(
-            ontology="go_cc", gene_id="PMT9312_0342",
+            locus_tags=["PMT9312_0342"], ontology="go_cc",
         )
         results = conn.execute_query(cypher, **params)
-        # Just verify it returns a list (may be empty or not)
         assert isinstance(results, list)
-
-    def test_all_results_returned_without_limit(self, conn):
-        """Without limit in builder, all annotations are returned."""
-        cypher, params = build_gene_ontology_terms(
-            ontology="go_bp", gene_id="MIT1002_03493",
-            leaf_only=False,
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 50, (
-            f"Expected many results without limit, got {len(results)}"
-        )
 
     def test_mf_annotations(self, conn):
         """Gene with GO:MF annotations returns molecular function terms."""
         cypher, params = build_gene_ontology_terms(
-            ontology="go_mf", gene_id="MIT1002_03493",
+            locus_tags=["MIT1002_03493"], ontology="go_mf",
         )
         results = conn.execute_query(cypher, **params)
-        # Just check structure — may or may not have MF annotations
         for r in results:
-            assert "id" in r
-            assert "name" in r
+            assert "term_id" in r
+            assert "term_name" in r
 
     def test_cc_annotations(self, conn):
         """Gene with GO:CC annotations returns cellular component terms."""
         cypher, params = build_gene_ontology_terms(
-            ontology="go_cc", gene_id="MIT1002_03493",
+            locus_tags=["MIT1002_03493"], ontology="go_cc",
         )
         results = conn.execute_query(cypher, **params)
         for r in results:
-            assert "id" in r
-            assert "name" in r
+            assert "term_id" in r
 
     def test_different_gene_bp(self, conn):
         """Different gene (PMM0001/dnaN) has GO:BP annotations."""
         cypher, params = build_gene_ontology_terms(
-            ontology="go_bp", gene_id="PMM0001",
+            locus_tags=["PMM0001"], ontology="go_bp",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1, "PMM0001 (dnaN) should have GO:BP annotations"
 
     def test_cog_category_annotations(self, conn):
-        """PMM0001 should have COG category annotations."""
+        """PMM0001 should have COG category annotations (flat ontology)."""
         cypher, params = build_gene_ontology_terms(
-            ontology="cog_category", gene_id="PMM0001",
+            locus_tags=["PMM0001"], ontology="cog_category",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
         for r in results:
-            assert "id" in r
-            assert "name" in r
+            assert "term_id" in r
+            assert "term_name" in r
 
     def test_cyanorak_role_annotations(self, conn):
         """PMM0001 should have CyanoRAK role annotations."""
         cypher, params = build_gene_ontology_terms(
-            ontology="cyanorak_role", gene_id="PMM0001",
+            locus_tags=["PMM0001"], ontology="cyanorak_role",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
@@ -889,7 +864,7 @@ class TestGeneOntologyTermsCorrectnessKG:
     def test_tigr_role_annotations(self, conn):
         """PMM0001 should have TIGR role annotations."""
         cypher, params = build_gene_ontology_terms(
-            ontology="tigr_role", gene_id="PMM0001",
+            locus_tags=["PMM0001"], ontology="tigr_role",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
@@ -897,23 +872,29 @@ class TestGeneOntologyTermsCorrectnessKG:
     def test_pfam_annotations(self, conn):
         """PMM0001 should have Pfam domain annotations."""
         cypher, params = build_gene_ontology_terms(
-            ontology="pfam", gene_id="PMM0001",
+            locus_tags=["PMM0001"], ontology="pfam",
         )
         results = conn.execute_query(cypher, **params)
-        # May or may not have Pfam annotations
         assert isinstance(results, list)
         for r in results:
-            assert "id" in r
-            assert "name" in r
+            assert "term_id" in r
+            assert "term_name" in r
 
-    def test_cyanorak_role_leaf_only(self, conn):
-        """CyanoRAK role with leaf_only=True returns fewer or equal terms than all."""
-        cypher_leaf, params_leaf = build_gene_ontology_terms(
-            ontology="cyanorak_role", gene_id="PMM0001", leaf_only=True,
+    def test_batch_multiple_genes(self, conn):
+        """Batch query returns results for multiple genes."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001", "MIT1002_03493"], ontology="go_bp",
         )
-        cypher_all, params_all = build_gene_ontology_terms(
-            ontology="cyanorak_role", gene_id="PMM0001", leaf_only=False,
+        results = conn.execute_query(cypher, **params)
+        locus_tags_found = {r["locus_tag"] for r in results}
+        assert "PMM0001" in locus_tags_found
+        assert "MIT1002_03493" in locus_tags_found
+
+    def test_verbose_includes_organism(self, conn):
+        """verbose=True adds organism_strain to results."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", verbose=True,
         )
-        leaf_results = conn.execute_query(cypher_leaf, **params_leaf)
-        all_results = conn.execute_query(cypher_all, **params_all)
-        assert len(leaf_results) <= len(all_results)
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+        assert "organism_strain" in results[0]

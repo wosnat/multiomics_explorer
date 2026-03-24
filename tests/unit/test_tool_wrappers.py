@@ -1110,106 +1110,173 @@ class TestGenesByOntologyWrapper:
 # gene_ontology_terms
 # ---------------------------------------------------------------------------
 class TestGeneOntologyTermsWrapper:
-    def test_returns_json_with_id_name(self, tool_fns, mock_ctx):
-        rows = [
-            {"id": "go:0006260", "name": "DNA replication"},
-            {"id": "go:0006261", "name": "DNA-templated DNA replication"},
-        ]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="go_bp",
-        ))
-        assert result["total"] == 2
-        for r in result["results"]:
-            assert "id" in r
-            assert "name" in r
+    _SAMPLE_API_RETURN = {
+        "total_matching": 2,
+        "total_genes": 1,
+        "total_terms": 2,
+        "by_ontology": [{"ontology_type": "go_bp", "term_count": 2, "gene_count": 1}],
+        "by_term": [{"term_id": "go:0006260", "term_name": "DNA replication",
+                     "ontology_type": "go_bp", "count": 1}],
+        "terms_per_gene_min": 2,
+        "terms_per_gene_max": 2,
+        "terms_per_gene_median": 2.0,
+        "returned": 2,
+        "truncated": False,
+        "not_found": [],
+        "no_terms": [],
+        "results": [
+            {"locus_tag": "PMM0001", "term_id": "go:0006260",
+             "term_name": "DNA replication"},
+            {"locus_tag": "PMM0001", "term_id": "go:0006271",
+             "term_name": "DNA strand elongation"},
+        ],
+    }
 
-    def test_empty_results(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="FAKE", ontology="go_bp",
-        ))
-        assert result["results"] == []
-        assert result["total"] == 0
+    @pytest.mark.asyncio
+    async def test_returns_pydantic_response(self, tool_fns, mock_ctx):
+        """Response is a GeneOntologyTermsResponse Pydantic model."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+        assert type(result).__name__ == "GeneOntologyTermsResponse"
 
-    def test_invalid_ontology_returns_error(self, tool_fns, mock_ctx):
-        result = tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="invalid",
-        )
-        assert "Error" in result
-        assert "Invalid ontology" in result
+    @pytest.mark.asyncio
+    async def test_has_expected_fields(self, tool_fns, mock_ctx):
+        """Response has total_matching, by_ontology, results, etc."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+        assert result.total_matching == 2
+        assert result.total_genes == 1
+        assert result.total_terms == 2
+        assert result.returned == 2
+        assert result.truncated is False
+        assert len(result.by_ontology) == 1
+        assert result.by_ontology[0].ontology_type == "go_bp"
+        assert result.by_ontology[0].term_count == 2
+        assert result.by_ontology[0].gene_count == 1
+        assert len(result.by_term) == 1
+        assert result.by_term[0].term_id == "go:0006260"
+        assert result.by_term[0].term_name == "DNA replication"
+        assert result.terms_per_gene_min == 2
+        assert result.terms_per_gene_max == 2
+        assert result.terms_per_gene_median == 2.0
+        assert result.not_found == []
+        assert result.no_terms == []
+        assert len(result.results) == 2
+        r = result.results[0]
+        assert r.locus_tag == "PMM0001"
+        assert r.term_id == "go:0006260"
+        assert r.term_name == "DNA replication"
 
-    def test_limit_applied_at_mcp_level(self, tool_fns, mock_ctx):
-        """Limit parameter caps results at the MCP level via post-query slicing."""
-        rows = [{"id": f"go:{i:07d}", "name": f"term_{i}"} for i in range(20)]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="go_bp", limit=10,
-        ))
-        assert result["total"] == 10
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """All params passed through to api."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
+        ) as mock_api:
+            await tool_fns["gene_ontology_terms"](
+                mock_ctx,
+                locus_tags=["PMM0001"],
+                ontology="go_bp",
+                summary=True,
+                verbose=True,
+                limit=10,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.args[0] == ["PMM0001"]
+        assert call_kwargs.kwargs["ontology"] == "go_bp"
+        assert call_kwargs.kwargs["summary"] is True
+        assert call_kwargs.kwargs["verbose"] is True
+        assert call_kwargs.kwargs["limit"] == 10
 
-    def test_go_mf_ontology_accepted(self, tool_fns, mock_ctx):
-        """go_mf ontology is accepted without error."""
-        rows = [{"id": "go:0003677", "name": "DNA binding"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="go_mf",
-        ))
-        assert result["total"] == 1
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        """When no genes found, not_found populated."""
+        empty_return = {
+            "total_matching": 0,
+            "total_genes": 0,
+            "total_terms": 0,
+            "by_ontology": [],
+            "by_term": [],
+            "terms_per_gene_min": 0,
+            "terms_per_gene_max": 0,
+            "terms_per_gene_median": 0.0,
+            "returned": 0,
+            "truncated": False,
+            "not_found": ["FAKE0001"],
+            "no_terms": [],
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value=empty_return,
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["FAKE0001"],
+            )
+        assert result.total_matching == 0
+        assert result.returned == 0
+        assert result.results == []
+        assert result.not_found == ["FAKE0001"]
 
-    def test_go_cc_ontology_accepted(self, tool_fns, mock_ctx):
-        """go_cc ontology is accepted without error."""
-        rows = [{"id": "go:0016020", "name": "membrane"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="go_cc",
-        ))
-        assert result["total"] == 1
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        """returned < total_matching means truncated=True."""
+        truncated_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 50,
+            "returned": 2,
+            "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value=truncated_return,
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+        assert result.total_matching == 50
+        assert result.returned == 2
+        assert result.truncated is True
 
-    def test_cog_category_ontology_accepted(self, tool_fns, mock_ctx):
-        """cog_category ontology is accepted without error."""
-        rows = [{"id": "cog:C", "name": "Energy production and conversion"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="cog_category",
-        ))
-        assert result["total"] == 1
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
 
-    def test_cyanorak_role_ontology_accepted(self, tool_fns, mock_ctx):
-        """cyanorak_role ontology is accepted without error."""
-        rows = [{"id": "cyanorak_role:F", "name": "DNA metabolism"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="cyanorak_role",
-        ))
-        assert result["total"] == 1
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            side_effect=ValueError("Invalid ontology 'bad'"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["gene_ontology_terms"](
+                    mock_ctx, locus_tags=["PMM0001"], ontology="go_bp",
+                )
 
-    def test_tigr_role_ontology_accepted(self, tool_fns, mock_ctx):
-        """tigr_role ontology is accepted without error."""
-        rows = [{"id": "tigr_role:120", "name": "Energy metabolism"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="tigr_role",
-        ))
-        assert result["total"] == 1
+    @pytest.mark.asyncio
+    async def test_generic_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """Generic Exception from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
 
-    def test_pfam_ontology_accepted(self, tool_fns, mock_ctx):
-        """pfam ontology is accepted without error."""
-        rows = [{"id": "pfam:PF00712", "name": "DNA polymerase"}]
-        _conn_from(mock_ctx).execute_query.return_value = rows
-        result = json.loads(tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="pfam",
-        ))
-        assert result["total"] == 1
-
-    def test_leaf_only_default_true(self, tool_fns, mock_ctx):
-        """leaf_only defaults to True (leaf_only filter in query)."""
-        _conn_from(mock_ctx).execute_query.return_value = []
-        tool_fns["gene_ontology_terms"](
-            mock_ctx, gene_id="PMM0001", ontology="go_bp",
-        )
-        called_cypher = _conn_from(mock_ctx).execute_query.call_args[0][0]
-        assert "NOT EXISTS" in called_cypher
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            side_effect=RuntimeError("timeout"),
+        ):
+            with pytest.raises(ToolError, match="Error in gene_ontology_terms"):
+                await tool_fns["gene_ontology_terms"](
+                    mock_ctx, locus_tags=["PMM0001"],
+                )
 
 
 # ---------------------------------------------------------------------------
@@ -1363,15 +1430,17 @@ class TestErrorHandling:
                     mock_ctx, term_ids=["go:0006260"], ontology="go_bp",
                 )
 
-    def test_gene_ontology_terms_generic_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_gene_ontology_terms_generic_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
             "multiomics_explorer.api.functions.gene_ontology_terms",
             side_effect=RuntimeError("timeout"),
         ):
-            result = tool_fns["gene_ontology_terms"](
-                mock_ctx, gene_id="PMM0001", ontology="go_bp",
-            )
-        assert "Error in gene_ontology_terms" in result
+            with pytest.raises(ToolError, match="Error in gene_ontology_terms"):
+                await tool_fns["gene_ontology_terms"](
+                    mock_ctx, locus_tags=["PMM0001"],
+                )
 
 
 # ---------------------------------------------------------------------------

@@ -763,48 +763,92 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"genes_by_ontology unexpected error: {e}")
             raise ToolError(f"Error in genes_by_ontology: {e}")
 
-    @mcp.tool()
-    def gene_ontology_terms(
+    class OntologyTermRow(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
+        term_id: str = Field(description="Ontology term ID (e.g. 'go:0006260')")
+        term_name: str = Field(description="Term name (e.g. 'DNA replication')")
+        ontology_type: str | None = Field(default=None, description="Ontology type when querying all (e.g. 'go_bp')")
+        # verbose-only
+        organism_strain: str | None = Field(default=None, description="Organism (e.g. 'Prochlorococcus MED4')")
+
+    class OntologyTypeBreakdown(BaseModel):
+        ontology_type: str = Field(description="Ontology type (e.g. 'go_bp', 'kegg')")
+        term_count: int = Field(description="Total leaf terms in this ontology (e.g. 12)")
+        gene_count: int = Field(description="Input genes with at least one term in this ontology (e.g. 8)")
+
+    class TermBreakdown(BaseModel):
+        term_id: str = Field(description="Ontology term ID (e.g. 'go:0015979')")
+        term_name: str = Field(description="Term name (e.g. 'photosynthesis')")
+        ontology_type: str = Field(description="Ontology type (e.g. 'go_bp')")
+        count: int = Field(description="Genes annotated to this term (e.g. 4)")
+
+    class GeneOntologyTermsResponse(BaseModel):
+        total_matching: int = Field(description="Total gene × term annotation rows")
+        total_genes: int = Field(description="Distinct genes with at least one term")
+        total_terms: int = Field(description="Distinct terms across all input genes")
+        by_ontology: list[OntologyTypeBreakdown] = Field(description="Per ontology type: term + gene counts, sorted by term_count desc")
+        by_term: list[TermBreakdown] = Field(description="Gene counts per term, sorted desc — shows shared terms across input genes")
+        terms_per_gene_min: int = Field(description="Fewest leaf terms on any gene with terms (e.g. 1)")
+        terms_per_gene_max: int = Field(description="Most leaf terms on any gene with terms (e.g. 15)")
+        terms_per_gene_median: float = Field(description="Median leaf terms per gene with terms (e.g. 6.0)")
+        returned: int = Field(description="Results in this response (0 when summary=true)")
+        truncated: bool = Field(description="True if total_matching > returned")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
+        no_terms: list[str] = Field(default_factory=list, description="Input locus_tags in KG but with no terms for queried ontology")
+        results: list[OntologyTermRow] = Field(default_factory=list, description="One row per gene × term")
+
+    @mcp.tool(
+        tags={"genes", "ontology"},
+        annotations={"readOnlyHint": True},
+    )
+    async def gene_ontology_terms(
         ctx: Context,
-        gene_id: str,
-        ontology: str,
-        leaf_only: bool = True,
-        limit: int = 50,
-    ) -> str:
-        """Get ontology annotations for a gene.
+        locus_tags: Annotated[list[str], Field(
+            description="Gene locus tags to look up. "
+            "E.g. ['PMM0001', 'PMM0845'].",
+        )],
+        ontology: Annotated[
+            Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
+                    "cog_category", "cyanorak_role", "tigr_role", "pfam"] | None,
+            Field(description="Filter to one ontology. None returns all."),
+        ] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include organism_strain per row.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> GeneOntologyTermsResponse:
+        """Get ontology annotations for genes. One row per gene × term.
 
-        Returns the ontology terms a gene is annotated to. By default returns
-        only the most specific (leaf) terms — those that are not ancestors of
-        other terms the gene is annotated to.
+        Returns the most specific (leaf) terms only — redundant ancestor terms
+        are excluded. Use ontology param to filter to one type, or omit for all.
 
-        Args:
-            gene_id: Gene locus_tag (e.g. "PMM0001").
-            ontology: Which ontology to return. One of:
-                "go_bp" (biological process), "go_mf" (molecular function),
-                "go_cc" (cellular component), "kegg", "ec",
-                "cog_category", "cyanorak_role", "tigr_role", "pfam".
-            leaf_only: If True (default), return only the most specific terms.
-                If False, return all annotations.
-            limit: Max results (default 50). Relevant mainly with
-                leaf_only=False, which can return many ancestor terms.
+        For the reverse direction (find genes annotated to a term, with hierarchy
+        expansion), use genes_by_ontology. Use search_ontology to find terms by text.
         """
-        logger.info("gene_ontology_terms gene_id=%s ontology=%s leaf_only=%s limit=%d",
-                    gene_id, ontology, leaf_only, limit)
+        await ctx.info(f"gene_ontology_terms locus_tags={locus_tags} ontology={ontology}")
         try:
             conn = _conn(ctx)
-            results = api.gene_ontology_terms(gene_id, ontology, leaf_only=leaf_only, conn=conn)
-            results = results[:limit]
-            if not results:
-                return json.dumps({"results": [], "total": 0})
-            return json.dumps({
-                "results": results, "total": len(results),
-            }, indent=2, default=str)
+            data = api.gene_ontology_terms(
+                locus_tags, ontology=ontology,
+                summary=summary, verbose=verbose, limit=limit, conn=conn,
+            )
+            results = [OntologyTermRow(**r) for r in data["results"]]
+            by_ontology = [OntologyTypeBreakdown(**b) for b in data["by_ontology"]]
+            by_term = [TermBreakdown(**b) for b in data["by_term"]]
+            return GeneOntologyTermsResponse(
+                **{**data, "results": results, "by_ontology": by_ontology, "by_term": by_term},
+            )
         except ValueError as e:
-            logger.warning("gene_ontology_terms error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"gene_ontology_terms error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("gene_ontology_terms unexpected error: %s", e)
-            return f"Error in gene_ontology_terms: {e}"
+            await ctx.error(f"gene_ontology_terms unexpected error: {e}")
+            raise ToolError(f"Error in gene_ontology_terms: {e}")
 
     class PublicationResult(BaseModel):
         doi: str

@@ -265,15 +265,53 @@ class TestGenesByOntologyContract:
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
 class TestGeneOntologyTermsContract:
-    def test_returns_list_of_dicts(self, conn):
-        result = api.gene_ontology_terms(KNOWN_GENE, "go_bp", conn=conn)
-        assert isinstance(result, list)
-        assert len(result) >= 1
+    def test_returns_dict_envelope(self, conn):
+        result = api.gene_ontology_terms(
+            locus_tags=[KNOWN_GENE], ontology="go_bp", conn=conn,
+        )
+        assert isinstance(result, dict)
+        expected_keys = {
+            "total_matching", "total_genes", "total_terms",
+            "by_ontology", "by_term",
+            "terms_per_gene_min", "terms_per_gene_max",
+            "terms_per_gene_median",
+            "returned", "truncated", "not_found", "no_terms",
+            "results",
+        }
+        assert expected_keys <= set(result.keys())
+        assert result["total_matching"] >= 1
 
-    def test_result_keys(self, conn):
-        result = api.gene_ontology_terms(KNOWN_GENE, "go_bp", conn=conn)
-        expected_keys = {"id", "name"}
-        assert set(result[0].keys()) == expected_keys
+    def test_results_have_expected_columns(self, conn):
+        result = api.gene_ontology_terms(
+            locus_tags=[KNOWN_GENE], ontology="go_bp", conn=conn,
+        )
+        assert len(result["results"]) >= 1
+        row = result["results"][0]
+        for col in ("locus_tag", "term_id", "term_name"):
+            assert col in row
+
+    def test_not_found(self, conn):
+        result = api.gene_ontology_terms(
+            locus_tags=[KNOWN_GENE, "FAKE_GENE_999"], ontology="go_bp",
+            conn=conn,
+        )
+        assert "FAKE_GENE_999" in result["not_found"]
+
+    def test_all_ontology(self, conn):
+        result = api.gene_ontology_terms(
+            locus_tags=[KNOWN_GENE], ontology=None, conn=conn,
+        )
+        assert isinstance(result, dict)
+        assert result["total_matching"] >= 1
+        row = result["results"][0]
+        assert "ontology_type" in row
+
+    def test_single_ontology_filter(self, conn):
+        result = api.gene_ontology_terms(
+            locus_tags=[KNOWN_GENE], ontology="go_bp", conn=conn,
+        )
+        assert isinstance(result, dict)
+        assert result["total_matching"] >= 1
 
 
 # ---------------------------------------------------------------------------

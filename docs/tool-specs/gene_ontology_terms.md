@@ -115,7 +115,7 @@ Batch input can be large × multiple ontologies → summary + limit pattern.
 | `total_genes` | int | Distinct genes with at least one term (= len(locus_tags) - len(not_found) - len(no_terms)) |
 | `total_terms` | int | Distinct terms across all input genes |
 | `by_ontology` | list | Per ontology type: term count + gene coverage, sorted by term_count desc (e.g. `[{"ontology_type": "go_bp", "term_count": 12, "gene_count": 8}, ...]`) |
-| `by_term` | list | Gene counts per term, sorted desc — shows which terms are shared across input genes (e.g. `[{"term_id": "go:0015979", "term_name": "photosynthesis", "count": 4}, ...]`) |
+| `by_term` | list | Gene counts per term, sorted desc — shows which terms are shared across input genes (e.g. `[{"term_id": "go:0015979", "term_name": "photosynthesis", "ontology_type": "go_bp", "count": 4}, ...]`) |
 | `terms_per_gene_min` | int | Fewest leaf terms on any gene with terms (excludes no_terms genes; ≥ 1) |
 | `terms_per_gene_max` | int | Most leaf terms on any gene with terms |
 | `terms_per_gene_median` | float | Median leaf terms per gene with terms — annotation density signal |
@@ -229,48 +229,90 @@ genes. The two tools complement each other:
 
 **File:** `kg/queries_lib.py`
 
+### Architecture: single-ontology vs all-ontology
+
+The builder generates **different Cypher** depending on whether `ontology`
+is specified or None:
+
+- **Single ontology** (`ontology="go_bp"`): one focused query using that
+  ontology's config from `ONTOLOGY_CONFIG`. Simple, efficient.
+- **All ontologies** (`ontology=None`): the **api/ layer orchestrates**
+  by calling the single-ontology builder in a loop across all
+  `ONTOLOGY_CONFIG` entries and merging results in Python. This avoids
+  a massive 9-branch UNION ALL in Cypher (which repeats UNWIND and gene
+  lookups 9 times) and keeps each query simple and plan-efficient.
+
+This is a **multi-query orchestration** pattern — the api/ layer runs
+up to 9 single-ontology queries (detail) + 9 single-ontology summary
+queries and merges. Not_found is computed once with a separate gene
+existence check.
+
 ### `build_gene_ontology_terms_summary`
 
 ```python
 def build_gene_ontology_terms_summary(
     *,
     locus_tags: list[str],
-    ontology: str | None = None,
+    ontology: str,
 ) -> tuple[str, dict]:
-    """Build summary + not_found for gene_ontology_terms.
+    """Build summary for gene_ontology_terms for ONE ontology.
 
-    RETURN keys: total_matching, total_genes, total_terms,
-    by_ontology, by_term, terms_per_gene_min, terms_per_gene_max,
-    terms_per_gene_median, not_found, no_terms.
+    RETURN keys: term_count, gene_count, by_term,
+    terms_per_gene (list of counts for distribution).
+
+    Called once per ontology by api/ layer (which merges results
+    and adds not_found, no_terms, totals).
     """
 ```
 
-When `ontology` is None, iterate all ONTOLOGY_CONFIG entries. When specified,
-use only that one. Each ontology contributes rows tagged with ontology type.
+Cypher (single ontology, e.g. go_bp — verified against live KG):
+```cypher
+UNWIND $locus_tags AS lt
+MATCH (g:Gene {locus_tag: lt})-[:Gene_involved_in_biological_process]->(t:BiologicalProcess)
+WHERE NOT EXISTS {
+  MATCH (g)-[:Gene_involved_in_biological_process]->(child:BiologicalProcess)
+        -[:Biological_process_is_a_biological_process|
+           Biological_process_part_of_biological_process]->(t)
+}
+WITH g.locus_tag AS lt, collect({id: t.id, name: t.name}) AS terms
+WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes
+WITH genes,
+     apoc.coll.flatten([g IN genes | g.terms]) AS all_terms,
+     [g IN genes | g.cnt] AS terms_per_gene
+UNWIND all_terms AS t
+WITH genes, terms_per_gene, t.id AS tid, t.name AS tname, count(*) AS cnt
+WITH genes, terms_per_gene,
+     collect({term_id: tid, term_name: tname, count: cnt}) AS by_term
+RETURN size(genes) AS gene_count,
+       size(apoc.coll.flatten([g IN genes | g.terms])) AS term_count,
+       by_term,
+       terms_per_gene
+```
 
-Cypher strategy — UNION across ontologies:
+Note: `apoc.coll.frequencies()` is NOT used here because it only returns
+`{item, count}` on a single field — we need both `term_id` and `term_name`
+in `by_term`. Instead, UNWIND + count(*) + collect gives the full breakdown.
+
+The api/ layer:
+- Calls this once per ontology (or once if `ontology` specified)
+- Merges `by_term` lists across ontologies
+- Computes `terms_per_gene_*` distribution from merged per-gene counts
+  (using Python `statistics.median`)
+- Computes `no_terms` = found locus_tags that appear in zero
+  single-ontology results
+
+### Gene existence check (not_found)
+
+Separate lightweight query, called once:
 ```cypher
 UNWIND $locus_tags AS lt
 OPTIONAL MATCH (g:Gene {locus_tag: lt})
-WITH collect(lt) AS all_tags,
-     collect(g) AS genes,
-     collect(CASE WHEN g IS NULL THEN lt END) AS not_found_raw
-WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found,
-     [g IN genes WHERE g IS NOT NULL] AS found
-// For each found gene × ontology, count term matches
-// ... (per-ontology CALL blocks)
-RETURN total_matching, total_genes, total_terms,
-       by_ontology, by_term,
-       terms_per_gene_min, terms_per_gene_max, terms_per_gene_median,
-       not_found, no_terms
+RETURN lt, g IS NOT NULL AS found
 ```
 
-Since each ontology uses a different relationship type and label, the builder
-generates per-ontology subqueries (CALL blocks) and aggregates counts.
-
-**Design decision:** Rather than one massive UNION query across all 9 ontologies,
-use APOC or multiple CALL subqueries. For single-ontology queries, generate
-a simple focused query (same pattern as current v1 but batched).
+Api/ partitions into: found (proceed with ontology queries), not_found
+(report in envelope). Consistent with gene_overview pattern but
+separated because the ontology queries use MATCH (not OPTIONAL MATCH).
 
 ### `build_gene_ontology_terms`
 
@@ -278,54 +320,75 @@ a simple focused query (same pattern as current v1 but batched).
 def build_gene_ontology_terms(
     *,
     locus_tags: list[str],
-    ontology: str | None = None,
+    ontology: str,
     verbose: bool = False,
     limit: int | None = None,
 ) -> tuple[str, dict]:
-    """Build detail Cypher for gene_ontology_terms.
+    """Build detail Cypher for gene_ontology_terms for ONE ontology.
 
     RETURN keys (compact): locus_tag, term_id, term_name.
-    RETURN keys (all-ontology mode): adds ontology_type.
     RETURN keys (verbose): adds organism_strain.
+
+    Called by api/ — which adds ontology_type column and merges
+    across ontologies when ontology=None.
     """
 ```
 
-When `ontology` is specified — single-ontology query (simpler):
+Cypher (single ontology, e.g. go_bp with leaf filter — verified against live KG):
 ```cypher
 UNWIND $locus_tags AS lt
 MATCH (g:Gene {locus_tag: lt})-[:Gene_involved_in_biological_process]->(t:BiologicalProcess)
-WHERE NOT EXISTS { ... }  -- leaf filter (always applied for hierarchical ontologies)
+WHERE NOT EXISTS {
+  MATCH (g)-[:Gene_involved_in_biological_process]->(child:BiologicalProcess)
+        -[:Biological_process_is_a_biological_process|
+           Biological_process_part_of_biological_process]->(t)
+}
 RETURN g.locus_tag AS locus_tag, t.id AS term_id, t.name AS term_name
        [, g.organism_strain AS organism_strain]  -- verbose
 ORDER BY g.locus_tag, t.id
 [LIMIT $limit]
 ```
 
-When `ontology` is None — UNION across all ontologies, each adding a literal
-`ontology_type` column:
+For flat/no-op ontologies (cog_category, tigr_role, kegg, pfam):
 ```cypher
-CALL {
-  UNWIND $locus_tags AS lt
-  MATCH (g:Gene {locus_tag: lt})-[:Gene_involved_in_biological_process]->(t:BiologicalProcess)
-  WHERE NOT EXISTS { ... }  -- leaf filter
-  RETURN g.locus_tag AS locus_tag, t.id AS term_id, t.name AS term_name,
-         'go_bp' AS ontology_type
-         [, g.organism_strain AS organism_strain]
-  UNION ALL
-  ...  -- repeat for each ontology
-}
-RETURN locus_tag, term_id, term_name, ontology_type
-       [, organism_strain]
-ORDER BY locus_tag, term_id
-[LIMIT $limit]
+UNWIND $locus_tags AS lt
+MATCH (g:Gene {locus_tag: lt})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)
+RETURN g.locus_tag AS locus_tag, t.id AS term_id, t.name AS term_name
+ORDER BY g.locus_tag, t.id
 ```
+
+### Leaf filtering per ontology
+
+| Ontology | Hierarchy rels | Leaf filter |
+|---|---|---|
+| go_bp | `is_a`, `part_of` | NOT EXISTS with both rels |
+| go_mf | `is_a`, `part_of` | NOT EXISTS with both rels |
+| go_cc | `is_a`, `part_of` | NOT EXISTS with both rels |
+| ec | `is_a` | NOT EXISTS with single rel |
+| kegg | `is_a` | No-op — genes only connect at `ko` level (`gene_connects_to_level`), so no ancestors to filter |
+| cog_category | (none) | No-op — flat ontology, no hierarchy |
+| cyanorak_role | `is_a` | NOT EXISTS with single rel |
+| tigr_role | (none) | No-op — flat ontology, no hierarchy |
+| pfam | `Pfam_in_pfam_clan` | No-op — hierarchy goes Pfam→PfamClan, but genes only connect to Pfam nodes (not clans), so no Pfam child can have a clan as ancestor via `Gene_has_pfam` |
+
+**Key insight:** Leaf filtering is only meaningful when a gene can be
+annotated to both a child AND its ancestor in the same label. For Pfam,
+genes connect to `Pfam` nodes only, and the hierarchy goes to `PfamClan`
+(different label) — so the NOT EXISTS pattern from GO/EC wouldn't match
+anything. For KEGG, genes connect only at `ko` level. Both are effectively
+no-op for leaf filtering.
+
+The builder reads `hierarchy_rels` from ONTOLOGY_CONFIG: if empty or if
+the hierarchy crosses labels (`parent_label` present), skip the NOT
+EXISTS clause.
 
 **Design notes:**
 - Column renamed from `id`/`name` → `term_id`/`term_name` (clearer in batch context)
-- `ontology_type` column added when querying all ontologies (absent when single)
-- Leaf filtering always applied — NOT EXISTS subquery excludes ancestor terms
-  (no-op for flat ontologies like cog_category that have no hierarchy)
+- `ontology_type` column added by api/ layer when merging across ontologies
+  (not in the Cypher — each query is single-ontology)
 - Verbose adds `organism_strain` — useful in batch when mixing organisms
+- Each builder call is single-ontology — api/ orchestrates the multi-ontology
+  case. This keeps Cypher simple and avoids 9x UNWIND repetition.
 
 ---
 
@@ -359,9 +422,35 @@ def gene_ontology_terms(
 - **Breaking change:** param renamed from `gene_id` to `locus_tags` (list)
 - **Breaking change:** `ontology` now optional (None = all ontologies)
 - `summary=True` → `limit=0`
-- Always run summary query → all summary fields + not_found + no_terms
-- Skip detail when `limit=0`
-- Rename APOC `{item, count}` to domain keys via `_rename_freq()` helper
+
+### Orchestration logic
+
+1. **Gene existence check** — one lightweight query to partition
+   `locus_tags` into `found` and `not_found`
+2. **Determine ontologies** — if `ontology` specified, just that one;
+   if None, all 9 from `ONTOLOGY_CONFIG`
+3. **Summary queries** — call `build_gene_ontology_terms_summary()` once
+   per ontology (only for found genes). Merge results:
+   - `by_ontology`: one entry per ontology with `term_count` + `gene_count`
+     (skip ontologies with zero terms)
+   - `by_term`: merge across ontologies, sort by count desc
+   - `terms_per_gene`: merge per-gene counts across ontologies, compute
+     min/max/median
+   - `no_terms`: found genes that appear in zero ontology results
+   - `total_matching`: sum of all term_count
+   - `total_genes`: found genes minus no_terms
+   - `total_terms`: count of distinct term_ids across all by_term entries
+4. **Detail queries** — skip when `limit=0`. Call
+   `build_gene_ontology_terms()` once per ontology (for found genes).
+   Merge results, add `ontology_type` column when multi-ontology,
+   sort by `locus_tag, term_id`, apply limit.
+
+**Performance:** For single-ontology queries, this is 2 Cypher calls
+(existence + summary, or existence + detail, or all three). For
+all-ontology queries, up to 1 + 9 + 9 = 19 calls in the worst case.
+Each call is simple and fast — the KG is local and queries hit indexes.
+If performance becomes an issue, can batch ontologies into fewer calls
+using CALL subqueries within Cypher.
 
 ---
 
@@ -388,6 +477,7 @@ class OntologyTypeBreakdown(BaseModel):
 class TermBreakdown(BaseModel):
     term_id: str = Field(description="Ontology term ID (e.g. 'go:0015979')")
     term_name: str = Field(description="Term name (e.g. 'photosynthesis')")
+    ontology_type: str = Field(description="Ontology type (e.g. 'go_bp')")
     count: int = Field(description="Genes annotated to this term (e.g. 4)")
 
 class GeneOntologyTermsResponse(BaseModel):
@@ -599,8 +689,8 @@ examples:
         "total_matching": 2, "total_genes": 1, "total_terms": 2,
         "by_ontology": [{"ontology_type": "go_bp", "term_count": 2, "gene_count": 1}],
         "by_term": [
-          {"term_id": "go:0006260", "term_name": "DNA replication", "count": 1},
-          {"term_id": "go:0006271", "term_name": "DNA strand elongation involved in DNA replication", "count": 1}
+          {"term_id": "go:0006260", "term_name": "DNA replication", "ontology_type": "go_bp", "count": 1},
+          {"term_id": "go:0006271", "term_name": "DNA strand elongation involved in DNA replication", "ontology_type": "go_bp", "count": 1}
         ],
         "terms_per_gene_min": 2, "terms_per_gene_max": 2, "terms_per_gene_median": 2.0,
         "returned": 2, "truncated": false, "not_found": [], "no_terms": [],

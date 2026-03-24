@@ -206,7 +206,7 @@ Migrate each to v3 (order flexible). Code review after each tool.
 | `gene_overview` | Batch tool: `locus_tags`, `not_found`, `summary`/`verbose`/`limit`, rich summary fields (by_organism, by_category, by_annotation_type, has_expression/significant/orthologs). Verbose adds gene_summary, function_description, all_identifiers. | ✅ done 2026-03-23 |
 | `search_ontology` | v3 upgrade: summary fields (total_entries, score_max/median), 2-query pattern, async, Pydantic. No verbose (all fields lightweight). No KG changes needed. | ✅ done 2026-03-23 |
 | `genes_by_ontology` | v3 upgrade: summary fields (total_matching, by_organism, by_category, by_term), 2-query pattern, async, Pydantic, Literal ontology. Verbose adds matched_terms, gene_summary, function_description. | ✅ done 2026-03-23 |
-| `gene_ontology_terms` | Batch tool: `locus_tags` list, `not_found` | |
+| `gene_ontology_terms` | Batch tool: `locus_tags` list, `not_found`, `no_terms`, optional ontology filter, leaf-only (always), rich summary (by_ontology, by_term, annotation density stats). `leaf_only` param removed. | ✅ done 2026-03-24 |
 | `get_schema` → `kg_schema` | Rename + v3 upgrade | |
 | `list_filter_values` | v3 upgrade (simple, small result set) | |
 | `run_cypher` | v3 upgrade (keep limit=25 default) | |

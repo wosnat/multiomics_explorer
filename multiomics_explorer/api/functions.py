@@ -10,6 +10,7 @@ Validation errors raise ValueError with specific messages.
 
 import logging
 import re
+import statistics
 
 from neo4j.exceptions import ClientError as Neo4jClientError
 
@@ -20,7 +21,10 @@ from multiomics_explorer.kg.constants import (
     VALID_TAXONOMIC_LEVELS,
 )
 from multiomics_explorer.kg.queries_lib import (
+    ONTOLOGY_CONFIG,
+    build_gene_existence_check,
     build_gene_ontology_terms,
+    build_gene_ontology_terms_summary,
     build_gene_overview,
     build_gene_overview_summary,
     build_genes_by_function,
@@ -810,23 +814,141 @@ def genes_by_ontology(
 
 
 def gene_ontology_terms(
-    gene_id: str,
-    ontology: str,
-    leaf_only: bool = True,
+    locus_tags: list[str],
+    ontology: str | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> list[dict]:
-    """Get ontology annotations for a gene.
+) -> dict:
+    """Get ontology annotations for genes. One row per gene × term.
 
-    Returns list of dicts with keys: id, name.
+    Returns dict with keys: total_matching, total_genes, total_terms,
+    by_ontology, by_term, terms_per_gene_min, terms_per_gene_max,
+    terms_per_gene_median, returned, truncated, not_found, no_terms,
+    results.
+    Per result: locus_tag, term_id, term_name.
+    Verbose adds: organism_strain.
+    All-ontology queries add: ontology_type.
 
-    Raises ValueError if ontology is invalid (raised by query builder).
+    Raises ValueError if ontology is invalid or locus_tags is empty.
     """
+    if not locus_tags:
+        raise ValueError("locus_tags must not be empty.")
+    if ontology is not None and ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. "
+            f"Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+    if summary:
+        limit = 0
+
     conn = _default_conn(conn)
-    cypher, params = build_gene_ontology_terms(
-        ontology=ontology, gene_id=gene_id, leaf_only=leaf_only,
-    )
-    return conn.execute_query(cypher, **params)
+
+    # Step 1: gene existence check
+    exist_cypher, _ = build_gene_existence_check()
+    exist_rows = conn.execute_query(exist_cypher, locus_tags=locus_tags)
+    not_found = [r["lt"] for r in exist_rows if not r["found"]]
+    found_tags = [r["lt"] for r in exist_rows if r["found"]]
+
+    # Determine which ontologies to query
+    ontologies = [ontology] if ontology else sorted(ONTOLOGY_CONFIG)
+
+    # Step 2: summary queries — always run (stats from Cypher)
+    by_ontology: list[dict] = []
+    all_by_term: list[dict] = []
+    gene_term_counts: dict[str, int] = {lt: 0 for lt in found_tags}
+
+    if found_tags:
+        for ont in ontologies:
+            sum_cypher, sum_params = build_gene_ontology_terms_summary(
+                locus_tags=found_tags, ontology=ont,
+            )
+            rows = conn.execute_query(sum_cypher, **sum_params)
+            if not rows or rows[0]["gene_count"] == 0:
+                continue
+            row = rows[0]
+            by_ontology.append({
+                "ontology_type": ont,
+                "term_count": row["term_count"],
+                "gene_count": row["gene_count"],
+            })
+            for bt in row["by_term"]:
+                all_by_term.append({
+                    "term_id": bt["term_id"],
+                    "term_name": bt["term_name"],
+                    "ontology_type": ont,
+                    "count": bt["count"],
+                })
+            for gtc in row["gene_term_counts"]:
+                gene_term_counts[gtc["locus_tag"]] = (
+                    gene_term_counts.get(gtc["locus_tag"], 0)
+                    + gtc["term_count"]
+                )
+
+    total_matching = sum(o["term_count"] for o in by_ontology)
+
+    # Step 3: detail queries — skip when limit=0 (summary only)
+    if limit == 0:
+        results: list[dict] = []
+    else:
+        all_detail_rows: list[dict] = []
+        if found_tags:
+            for ont in ontologies:
+                det_cypher, det_params = build_gene_ontology_terms(
+                    locus_tags=found_tags, ontology=ont,
+                    verbose=verbose, limit=limit,
+                )
+                rows = conn.execute_query(det_cypher, **det_params)
+                if ontology is None:
+                    for r in rows:
+                        r["ontology_type"] = ont
+                all_detail_rows.extend(rows)
+
+        all_detail_rows.sort(key=lambda r: (r["locus_tag"], r["term_id"]))
+        if limit is not None:
+            results = all_detail_rows[:limit]
+        else:
+            results = all_detail_rows
+
+    # Sort breakdowns
+    by_ontology.sort(key=lambda x: x["term_count"], reverse=True)
+    all_by_term.sort(key=lambda x: x["count"], reverse=True)
+
+    # Compute totals
+    no_terms = [lt for lt in found_tags if gene_term_counts.get(lt, 0) == 0]
+    genes_with_terms = [lt for lt in found_tags
+                        if gene_term_counts.get(lt, 0) > 0]
+    total_genes = len(genes_with_terms)
+    total_terms = len({bt["term_id"] for bt in all_by_term})
+
+    # Per-gene distribution (only genes with terms)
+    counts = [gene_term_counts[lt] for lt in genes_with_terms]
+    if counts:
+        terms_per_gene_min = min(counts)
+        terms_per_gene_max = max(counts)
+        terms_per_gene_median = statistics.median(counts)
+    else:
+        terms_per_gene_min = 0
+        terms_per_gene_max = 0
+        terms_per_gene_median = 0.0
+
+    return {
+        "total_matching": total_matching,
+        "total_genes": total_genes,
+        "total_terms": total_terms,
+        "by_ontology": by_ontology,
+        "by_term": all_by_term,
+        "terms_per_gene_min": terms_per_gene_min,
+        "terms_per_gene_max": terms_per_gene_max,
+        "terms_per_gene_median": terms_per_gene_median,
+        "returned": len(results),
+        "truncated": total_matching > len(results),
+        "not_found": not_found,
+        "no_terms": no_terms,
+        "results": results,
+    }
 
 
 def run_cypher(

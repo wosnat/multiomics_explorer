@@ -87,13 +87,45 @@
 - [ ] For renames: other tools' docstrings that reference the old name
       updated? (grep for old name across all `.py` files)
 
+## Cypher review (exercise against live KG)
+
+Do not trust Cypher by reading alone — run it. For each builder:
+
+- [ ] Run the generated Cypher against the KG with representative inputs.
+      Verify columns, row counts, and values match expectations.
+- [ ] **Summary vs detail correctness:** Do summary stats (total_matching,
+      breakdowns) match what you get from counting detail rows? Run both
+      and compare. Mismatches mean the summary query has a bug.
+- [ ] **Leaf/hierarchy filtering:** If the query filters (NOT EXISTS,
+      level restrictions), run with and without the filter. Verify the
+      filter actually reduces results. If counts are identical, the
+      filter may be a no-op — document why or remove it.
+- [ ] **Efficiency:** Run `EXPLAIN` or `PROFILE` on the query. Check for:
+      cartesian products, full node scans where index lookup is expected,
+      unnecessary UNWIND-then-collect patterns.
+- [ ] **Edge cases:** Test with a gene that has no results for the query.
+      Test with a nonexistent gene. Test batch with mixed found/not-found.
+- [ ] **Multi-dimension orchestration:** If the tool spans multiple
+      entity types (e.g. 9 ontologies), verify that summary builders
+      return per-entity identity for cross-dimension merging. Anonymous
+      count lists (e.g. `[2, 3, 1]`) lose identity and can't be merged.
+- [ ] **apoc.coll.frequencies limitation:** Only carries one field per
+      item (`{item, count}`). If breakdown needs multiple fields (e.g.
+      term_id + term_name), use UNWIND + count(*) + collect instead.
+- [ ] **Spec match:** Do the Cypher RETURN keys match exactly what the
+      spec says? Do the summary fields match the Pydantic model fields?
+      Mismatches between spec Cypher, actual builder, API docstring, and
+      Pydantic model are the most common source of bugs.
+
 ## Tools with rich summary fields
 
 - [ ] Unified response model — summary fields + results in same dict/type?
 - [ ] `summary=True` → `limit=0` → `results=[]`, `returned=0`, `truncated=(total_matching > 0)`?
 - [ ] Summary fields always populated (both when summary=True and False)?
-- [ ] 2-query pattern: summary query always runs, detail skipped when `limit=0`?
-- [ ] Summary query uses `apoc.coll.frequencies` for breakdowns?
+- [ ] Summary queries always run — stats from Cypher, not derived from
+      detail rows. Detail queries only run when `limit != 0`.
+- [ ] Summary query uses `apoc.coll.frequencies` for simple breakdowns,
+      UNWIND + count(*) for multi-field breakdowns?
 - [ ] API renames `{item, count}` to domain keys, sorts descending?
 - [ ] Fulltext tools include `score_max`/`score_median` in summary fields?
 
@@ -118,6 +150,7 @@
 - [ ] Builder in `TOOL_BUILDERS` dict?
 - [ ] Eval cases in `cases.yaml`?
 - [ ] Integration tests if tool touches new data?
+- [ ] KG correctness tests (`test_tool_correctness_kg.py`) updated if builder signature changed?
 - [ ] Contract tests (`test_api_contract.py`) updated if return shape changed?
 - [ ] Regression baselines regenerated if columns/tool renamed? (`--force-regen`)
 - [ ] Tests for every optional parameter?
