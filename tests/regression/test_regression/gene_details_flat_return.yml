@@ -86,6 +86,7 @@ rows:
   product: DNA polymerase III, beta subunit
   protein_family: Beta sliding clamp family
   protein_id: WP_011131639.1
-  significant_expression_count: 3
+  significant_down_count: 0
+  significant_up_count: 3
   start: 174
   strand: +

@@ -67,6 +67,7 @@ rows:
   product: cell division protein FtsH1
   protein_family: AAA ATPase family; Peptidase M41 family; AAA ATPase family
   protein_id: WP_011127179.1
-  significant_expression_count: 0
+  significant_down_count: 0
+  significant_up_count: 0
   start: 302742
   strand: +

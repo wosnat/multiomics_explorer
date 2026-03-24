@@ -58,7 +58,8 @@ total_entries, total_matching, returned, truncated, by_organism, by_treatment_ty
 | is_time_course | bool | Whether experiment has multiple time points |
 | time_points | list[TimePoint] \| None (optional) | Per-time-point gene counts. Omitted for non-time-course experiments. |
 | gene_count | int | Total genes with expression data (e.g. 1696) |
-| significant_count | int | Genes with significant differential expression (e.g. 423) |
+| significant_up_count | int | Genes with significant upregulation (e.g. 210) |
+| significant_down_count | int | Genes with significant downregulation (e.g. 213) |
 | score | float \| None (optional) | Lucene relevance score, present only when search_text is used (e.g. 2.45) |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -149,7 +150,7 @@ list_experiments → query_expression
 
 - Default is detail (summary=false) — use summary=true to see only breakdowns
 
-- gene_count is total genes with expression data, not total significant genes — use significant_count for that
+- gene_count is total genes with expression data, not total significant genes — use significant_up_count + significant_down_count for that
 
 - time_points is omitted for non-time-course experiments, not an empty list
 

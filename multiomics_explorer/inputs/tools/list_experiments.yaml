@@ -63,7 +63,7 @@ chaining:
 
 mistakes:
   - "Default is detail (summary=false) — use summary=true to see only breakdowns"
-  - "gene_count is total genes with expression data, not total significant genes — use significant_count for that"
+  - "gene_count is total genes with expression data, not total significant genes — use significant_up_count + significant_down_count for that"
   - "time_points is omitted for non-time-course experiments, not an empty list"
   - "When summary=true, verbose and limit have no effect"
   - wrong: "list_experiments(publication='Biller 2018')"

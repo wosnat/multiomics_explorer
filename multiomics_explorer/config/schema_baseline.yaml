@@ -83,8 +83,12 @@ nodes:
       omics_type: string
       organism_strain: string
       preferred_id: string
+      significant_down_count: int
+      significant_up_count: int
       statistical_test: string
       temperature: string
+      time_point_significant_down: list
+      time_point_significant_up: list
       treatment: string
       treatment_type: string
   Gene:
@@ -158,8 +162,12 @@ nodes:
       omics_type: string
       organism_strain: string
       preferred_id: string
+      significant_down_count: int
+      significant_up_count: int
       statistical_test: string
       temperature: string
+      time_point_significant_down: list
+      time_point_significant_up: list
       treatment: string
       treatment_type: string
   KeggTerm:

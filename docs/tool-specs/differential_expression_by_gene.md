@@ -70,16 +70,16 @@ single-timepoint experiments.
 ### Experiment node
 
 Used for: `name` (→ `experiment_name`), `treatment_type`, `treatment`, `organism_strain`,
-`omics_type`, `coculture_partner`, `gene_count`, `significant_count`,
-`time_point_count`, `time_point_hours`, `time_point_significants`.
+`omics_type`, `coculture_partner`, `gene_count`, `significant_up_count`, `significant_down_count`,
+`time_point_count`, `time_point_hours`, `time_point_significant_up`, `time_point_significant_down`.
 
 ### Gene node
 
 Used for: `locus_tag`, `organism_strain`, `gene_name`, `product`
 (from `function_description`), `gene_category`, `function_description`.
 
-Precomputed: `expression_edge_count`, `significant_expression_count` — available
-for verbose mode as context, but **not** used in summary (summary is computed
+Precomputed: `expression_edge_count`, `significant_up_count`, `significant_down_count` —
+available for verbose mode as context, but **not** used in summary (summary is computed
 from edges to respect the active filters).
 
 ### Scale
@@ -290,13 +290,11 @@ single aggregation over the precomputed enum; always all three keys present.
 Uses `percentileCont(CASE WHEN r.expression_status <> "not_significant" THEN abs(r.log2_fold_change) ELSE null END, 0.5)` — nulls from CASE are silently ignored by `percentileCont`, confirmed against live KG.
 
 **Summary query 2 — per-experiment with nested timepoints:**
-Returns `experiments` list (flat — single organism enforced, no organism
-grouping needed). Each experiment entry contains a nested `timepoints` list
-(or null for non-time-course, handled in api/). Also returns `organism_strain`,
-`matching_genes`, `experiment_count` from this query.
-Aggregates at (experiment × timepoint) level, then re-aggregates to experiment
-level using `collect()`. Single-timepoint experiments return `timepoints` with
-one entry (not empty — consistent structure).
+Returns `organism_strain` and `experiments` list. Each experiment entry
+contains a nested `timepoints` list (or null for non-time-course, handled in api/).
+`matching_genes` (global) comes from query 1; `experiment_count = len(experiments)`
+computed in api/. Single-timepoint experiments return `timepoints` with one entry
+(not empty — consistent structure).
 
 **Summary query 3 — categories + batch diagnostics:**
 Returns `top_categories`, `not_found`, `no_expression`.
@@ -353,8 +351,86 @@ Text search on experiments → use `list_experiments` upstream.
 
 **File:** `kg/queries_lib.py`
 
-Three summary builders, all sharing the same signature and WHERE clause logic.
-The api/ layer calls all three and merges results.
+Three summary builders + one detail builder, all sharing the same WHERE clause
+helper. The api/ layer calls all three summary builders and merges results.
+
+### `_differential_expression_where` (private helper)
+
+```python
+def _differential_expression_where(
+    *,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+) -> tuple[list[str], dict]:
+    """Build WHERE conditions + params shared by all de_by_gene builders.
+
+    direction takes precedence over significant_only (direction implies significance).
+    """
+    conditions: list[str] = []
+    params: dict = {}
+    if locus_tags:
+        conditions.append("g.locus_tag IN $locus_tags")
+        params["locus_tags"] = locus_tags
+    if experiment_ids:
+        conditions.append("e.id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+    if direction == "up":
+        conditions.append('r.expression_status = "significant_up"')
+    elif direction == "down":
+        conditions.append('r.expression_status = "significant_down"')
+    elif significant_only:
+        conditions.append('r.expression_status <> "not_significant"')
+    return conditions, params
+```
+
+All four builders call this helper. The `where_block` is constructed as:
+```python
+where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+```
+
+### Pre-query: organism validation
+
+Two lightweight builders used by api/ before any summary queries run.
+Not added to `TOOL_BUILDERS` in regression tests (not tools themselves).
+
+```python
+def build_resolve_organism_for_locus_tags(
+    *, locus_tags: list[str],
+) -> tuple[str, dict]:
+    """Resolve distinct organism_strain values for a list of locus_tags.
+
+    RETURN keys: organisms (list[str]).
+    Used for single-organism pre-validation in differential_expression_by_gene.
+    """
+```
+
+```cypher
+UNWIND $locus_tags AS lt
+MATCH (g:Gene {locus_tag: lt})
+RETURN collect(DISTINCT g.organism_strain) AS organisms
+```
+
+```python
+def build_resolve_organism_for_experiments(
+    *, experiment_ids: list[str],
+) -> tuple[str, dict]:
+    """Resolve distinct organism_strain values for a list of experiment IDs.
+
+    RETURN keys: organisms (list[str]).
+    Used for single-organism pre-validation in differential_expression_by_gene.
+    """
+```
+
+```cypher
+UNWIND $experiment_ids AS eid
+MATCH (e:Experiment {id: eid})
+RETURN collect(DISTINCT e.organism_strain) AS organisms
+```
+
+api/ calls one or both, checks `len(organisms) > 1` → ValueError, then checks
+disjointness if both are provided.
 
 ### `build_differential_expression_by_gene_summary_global`
 
@@ -368,18 +444,30 @@ def build_differential_expression_by_gene_summary_global(
 ) -> tuple[str, dict]:
     """Global aggregate stats for differential_expression_by_gene.
 
-    RETURN keys: total_rows, rows_by_status, median_abs_log2fc, max_abs_log2fc.
-    rows_by_status = {"significant_up": N, "significant_down": N, "not_significant": N}
+    RETURN keys: total_rows, matching_genes, rows_by_status,
+    median_abs_log2fc, max_abs_log2fc.
+    rows_by_status = apoc list [{item, count}] — api/ converts to dict.
     """
 ```
 
-Uses `apoc.coll.frequencies(collect(r.expression_status))` for `rows_by_status` —
-`expression_status` is never null, so `collect()` is safe here.
-Uses `percentileCont(CASE WHEN r.expression_status <> "not_significant" THEN
-abs(r.log2_fold_change) ELSE null END, 0.5)` — nulls from CASE are
-silently ignored by `percentileCont`, confirmed against live KG.
-Uses `count(*)` (not `count(r.time_point)`) for `total_rows` — field-level
-count excludes NULLs and would undercount experiments with no timepoint label.
+```cypher
+MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
+{where_block}
+RETURN count(*) AS total_rows,
+       count(DISTINCT g.locus_tag) AS matching_genes,
+       apoc.coll.frequencies(collect(r.expression_status)) AS rows_by_status,
+       percentileCont(
+           CASE WHEN r.expression_status <> "not_significant"
+                THEN abs(r.log2_fold_change) ELSE null END, 0.5
+       ) AS median_abs_log2fc,
+       max(CASE WHEN r.expression_status <> "not_significant"
+               THEN abs(r.log2_fold_change) END) AS max_abs_log2fc
+```
+
+- `count(*)` not `count(r.time_point)` — field-level count drops NULLs, would undercount.
+- `percentileCont(CASE ... ELSE null, 0.5)` — nulls silently ignored, confirmed on live KG.
+- `max(CASE ...)` — returns null when no significant rows; correct for `float | None`.
+- `rows_by_status` only includes non-zero keys from APOC — api/ fills missing keys with 0.
 
 ### `build_differential_expression_by_gene_summary_by_experiment`
 
@@ -393,45 +481,45 @@ def build_differential_expression_by_gene_summary_by_experiment(
 ) -> tuple[str, dict]:
     """Per-experiment breakdown with nested timepoints (single organism enforced).
 
-    RETURN keys: organism_strain, matching_genes, experiment_count, experiments.
-    experiments is a list of dicts, each with nested timepoints list.
-    rows_by_status = {"significant_up": N, "significant_down": N, "not_significant": N}
-    at both experiment and timepoint level.
-    api/ strips timepoints key for non-time-course experiments.
+    RETURN keys: organism_strain, experiments.
+    experiments: list of dicts, each with nested timepoints.
+    rows_by_status at both experiment and timepoint level (APOC list format).
+    is_time_course included per experiment so api/ can null-out timepoints.
+    matching_genes (global) and experiment_count come from api/ post-processing:
+      matching_genes = from global summary query
+      experiment_count = len(experiments)
     """
 ```
 
-Two-pass aggregation — verified against live KG:
+Full Cypher — verified against live KG:
 
 ```cypher
-// Pass 1: group by (experiment × timepoint) — g must NOT be in this WITH clause
-// (keeping g would make each group (g, e, tp), giving 3×5=15 entries instead of 5)
+MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
+{where_block}
+// Pass 1: group by (experiment × timepoint) — g must NOT be in this WITH
+// (including g gives groups of (g,e,tp), 3×5=15 entries instead of 5)
 WITH e, r.time_point AS tp, r.time_point_order AS tpo, r.time_point_hours AS tph,
-  collect(DISTINCT g.locus_tag) AS tp_genes,
-  collect(r.expression_status) AS tp_calls  // raw list — frequencies computed below
+     collect(DISTINCT g.locus_tag) AS tp_genes,
+     collect(r.expression_status) AS tp_calls
 
 // Pass 2: roll up to experiment level
 // rows_by_status: flatten all per-timepoint call lists then compute frequencies
 WITH e,
-  size(apoc.coll.toSet(apoc.coll.flatten(collect(tp_genes)))) AS matching_genes,
-  apoc.coll.frequencies(apoc.coll.flatten(collect(tp_calls))) AS rows_by_status,
-  collect({timepoint: tp, timepoint_hours: tph, timepoint_order: tpo,
-           matching_genes: size(tp_genes),
-           rows_by_status: apoc.coll.frequencies(tp_calls)}) AS timepoints
+     size(apoc.coll.toSet(apoc.coll.flatten(collect(tp_genes)))) AS matching_genes,
+     apoc.coll.frequencies(apoc.coll.flatten(collect(tp_calls))) AS rows_by_status,
+     collect({timepoint: tp, timepoint_hours: tph, timepoint_order: tpo,
+              matching_genes: size(tp_genes),
+              rows_by_status: apoc.coll.frequencies(tp_calls)}) AS timepoints
 
-// Pass 3: collect experiments (organism already validated as single value)
+// Pass 3: collect experiments — organism already validated as single value
 WITH collect({experiment_id: e.id, experiment_name: e.name, omics_type: e.omics_type,
               is_time_course: e.is_time_course,
               matching_genes: matching_genes,
               rows_by_status: rows_by_status,
               timepoints: timepoints}) AS experiments,
-     e.organism_strain AS organism_strain  // same value for all rows — safe to use
+     e.organism_strain AS organism_strain
 RETURN organism_strain, experiments
 ```
-
-`gene_count` at experiment level = `apoc.coll.toSet(apoc.coll.flatten(...))` on
-the per-timepoint gene lists — correctly deduplicates genes across timepoints.
-Do NOT use `sum(tp_gene_count)` — that would give rows × timepoints, not distinct genes.
 
 **Null handling (verified against live KG):**
 - `collect()` on a scalar **silently drops NULLs** — do NOT use
@@ -440,10 +528,11 @@ Do NOT use `sum(tp_gene_count)` — that would give rows × timepoints, not dist
 - `collect({timepoint: tp, ...})` with `tp = null` **preserves the
   null** inside the map — safe for nested structures.
 - `r.expression_status` is never null — `collect(r.expression_status)` is safe.
+- `apoc.coll.toSet(apoc.coll.flatten(collect(tp_genes)))` — correctly
+  deduplicates genes across timepoints. Do NOT use `sum(size(tp_genes))`.
 
-Returns `is_time_course` per experiment so api/ can decide whether to
-populate or omit `timepoints` — matching `list_experiments` pattern
-exactly: omit key for non-time-course, Pydantic model defaults to `null`.
+Returns `is_time_course` per experiment so api/ can set `timepoints=null`
+for non-time-course experiments (matching `list_experiments` pattern).
 
 ### `build_differential_expression_by_gene_summary_diagnostics`
 
@@ -458,16 +547,69 @@ def build_differential_expression_by_gene_summary_diagnostics(
     """Top categories + batch diagnostics for differential_expression_by_gene.
 
     RETURN keys: top_categories, not_found, no_expression.
+    not_found and no_expression are empty lists when locus_tags is None.
+    Constructs different Cypher depending on whether locus_tags is provided.
     """
 ```
 
-`top_categories` uses `count(DISTINCT g.locus_tag)` — counts unique genes
-not rows, to avoid inflation from genes appearing in many experiments.
-Confirmed against live KG.
+**When `locus_tags` is None** — simple MATCH, no batch diagnostics:
 
-`not_found` / `no_expression` only computed when `locus_tags` is provided,
-using UNWIND + OPTIONAL MATCH pattern. Both are empty lists when only
-`experiment_ids` is provided.
+```cypher
+MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
+{where_block}
+WITH g.gene_category AS category,
+     count(DISTINCT g.locus_tag) AS total_genes,
+     count(DISTINCT CASE WHEN r.expression_status <> "not_significant"
+                         THEN g.locus_tag END) AS significant_genes
+ORDER BY significant_genes DESC
+RETURN [] AS not_found, [] AS no_expression,
+       collect({category: category, total_genes: total_genes,
+                significant_genes: significant_genes})[0..5] AS top_categories
+```
+
+**When `locus_tags` is provided** — UNWIND for batch diagnostics; verified on live KG:
+
+```cypher
+// Pass 1: classify each input locus_tag
+// where_block_no_lt = same conditions but WITHOUT the g.locus_tag IN $locus_tags condition
+UNWIND $locus_tags AS lt
+OPTIONAL MATCH (g:Gene {locus_tag: lt})
+OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)
+{where_block_no_lt}
+WITH lt, g, count(*) AS edge_count
+
+WITH collect(CASE WHEN g IS NULL           THEN lt END) AS not_found_raw,
+     collect(CASE WHEN g IS NOT NULL AND edge_count = 0 THEN lt END) AS no_expr_raw,
+     collect(CASE WHEN g IS NOT NULL AND edge_count > 0 THEN g  END) AS matched_genes
+
+// Pass 2: top_categories over matched genes only
+UNWIND CASE WHEN size(matched_genes) > 0 THEN matched_genes ELSE [null] END AS g
+OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)
+{where_block_no_lt}
+WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found,
+     [x IN no_expr_raw  WHERE x IS NOT NULL] AS no_expression,
+     g.gene_category AS category,
+     count(DISTINCT g.locus_tag) AS total_genes,
+     count(DISTINCT CASE WHEN r.expression_status <> "not_significant"
+                         THEN g.locus_tag END) AS significant_genes
+ORDER BY significant_genes DESC
+RETURN not_found, no_expression,
+       collect({category: category, total_genes: total_genes,
+                significant_genes: significant_genes})[0..5] AS top_categories
+```
+
+`where_block_no_lt` = same `_differential_expression_where()` conditions but
+with `locus_tags=None` (experiment_ids + direction + significant_only only).
+The locus_tag filter is already applied via `UNWIND + OPTIONAL MATCH`.
+
+`collect(CASE WHEN g IS NULL THEN lt END)` — collect() drops NULLs, so
+this collects only the locus_tags where g was not found. The `WHERE x IS NOT NULL`
+in `[x IN ... WHERE x IS NOT NULL]` is defensive (belt-and-suspenders).
+
+`UNWIND CASE WHEN size(matched_genes) > 0 THEN matched_genes ELSE [null]` —
+when matched_genes is empty, UNWIND [null] gives g=null; OPTIONAL MATCH on
+null g produces no results; WITH aggregates over zero rows → empty collect().
+This is the established pattern (see `build_gene_homologs_summary`).
 
 ### `build_differential_expression_by_gene`
 
@@ -483,7 +625,7 @@ def build_differential_expression_by_gene(
 ) -> tuple[str, dict]:
     """Build detail Cypher for differential_expression_by_gene.
 
-    RETURN keys (compact): locus_tag, gene_name, organism_strain,
+    RETURN keys (compact — 11): locus_tag, gene_name,
     experiment_id, condition_type, timepoint, timepoint_hours, timepoint_order,
     log2fc, padj, rank, expression_status.
     RETURN keys (verbose): adds product, experiment_name, treatment,
@@ -492,19 +634,46 @@ def build_differential_expression_by_gene(
 ```
 
 Property mappings:
+- `g.locus_tag` → `locus_tag`
 - `g.gene_name` → `gene_name` (nullable)
 - `g.function_description` → `product` (verbose)
+- `e.id` → `experiment_id`
 - `e.name` → `experiment_name` (verbose)
 - `e.treatment_type` → `condition_type`
-- `e.treatment` → `treatment`
+- `e.treatment` → `treatment` (verbose)
+- `e.omics_type` → `omics_type` (verbose)
+- `e.coculture_partner` → `coculture_partner` (verbose)
 - `r.log2_fold_change` → `log2fc`
 - `r.adjusted_p_value` → `padj`
 - `r.rank_by_effect` → `rank`
-- `r.expression_status` → `expression_status` (precomputed enum on edge)
+- `r.expression_status` → `expression_status`
 - `r.time_point` → `timepoint`
 - `r.time_point_hours` → `timepoint_hours`
+- `r.time_point_order` → `timepoint_order`
 
-Sort: `ORDER BY ABS(r.log2_fold_change) DESC, g.locus_tag ASC, e.id ASC, r.time_point_order ASC`
+**Note:** `organism_strain` is NOT returned per row — it's in the top-level
+envelope (single organism enforced). Avoids repeating it across all rows.
+
+LIMIT: `LIMIT $limit` with `params["limit"] = limit` when `limit is not None`.
+
+```cypher
+MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
+{where_block}
+RETURN g.locus_tag AS locus_tag,
+       g.gene_name AS gene_name,
+       e.id AS experiment_id,
+       e.treatment_type AS condition_type,
+       r.time_point AS timepoint,
+       r.time_point_hours AS timepoint_hours,
+       r.time_point_order AS timepoint_order,
+       r.log2_fold_change AS log2fc,
+       r.adjusted_p_value AS padj,
+       r.rank_by_effect AS rank,
+       r.expression_status AS expression_status
+       {verbose_cols}
+ORDER BY ABS(r.log2_fold_change) DESC, g.locus_tag ASC, e.id ASC, r.time_point_order ASC
+{limit_clause}
+```
 
 ---
 

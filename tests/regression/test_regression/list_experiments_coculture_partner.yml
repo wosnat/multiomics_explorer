@@ -8,7 +8,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 62
+  significant_down_count: 3
+  significant_up_count: 59
   time_point_count: 1
   time_point_hours:
   - '264.0'
@@ -16,8 +17,10 @@ rows:
   - day 11
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '62'
+  time_point_significant_down:
+  - '3'
+  time_point_significant_up:
+  - '59'
   time_point_totals:
   - '1849'
   treatment_type: coculture
@@ -28,7 +31,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 296
+  significant_down_count: 272
+  significant_up_count: 24
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -36,8 +40,10 @@ rows:
   - 20h
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '296'
+  time_point_significant_down:
+  - '272'
+  time_point_significant_up:
+  - '24'
   time_point_totals:
   - '1714'
   treatment_type: coculture
@@ -48,7 +54,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 198
+  significant_down_count: 45
+  significant_up_count: 153
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -56,8 +63,10 @@ rows:
   - 20h
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '198'
+  time_point_significant_down:
+  - '45'
+  time_point_significant_up:
+  - '153'
   time_point_totals:
   - '2267'
   treatment_type: coculture
@@ -68,7 +77,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 99
+  significant_down_count: 3
+  significant_up_count: 96
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -76,8 +86,10 @@ rows:
   - 20h
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '99'
+  time_point_significant_down:
+  - '3'
+  time_point_significant_up:
+  - '96'
   time_point_totals:
   - '2268'
   treatment_type: coculture
@@ -88,7 +100,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus NATL2A
   publication_doi: 10.1038/ismej.2016.82
-  significant_count: 573
+  significant_down_count: 352
+  significant_up_count: 221
   time_point_count: 7
   time_point_hours:
   - '-12.0'
@@ -114,14 +127,22 @@ rows:
   - '5'
   - '6'
   - '7'
-  time_point_significants:
+  time_point_significant_down:
   - '0'
   - '0'
   - '0'
   - '12'
-  - '218'
-  - '258'
-  - '85'
+  - '122'
+  - '141'
+  - '77'
+  time_point_significant_up:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '117'
+  - '8'
+  - '96'
   time_point_totals:
   - '353'
   - '353'

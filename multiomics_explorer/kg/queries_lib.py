@@ -699,9 +699,9 @@ def build_list_experiments(
 
     RETURN keys (compact): experiment_id, publication_doi,
     organism_strain, treatment_type, coculture_partner, omics_type,
-    is_time_course, gene_count, significant_count, time_point_count,
-    time_point_labels, time_point_orders, time_point_hours,
-    time_point_totals, time_point_significants.
+    is_time_course, gene_count, significant_up_count, significant_down_count,
+    time_point_count, time_point_labels, time_point_orders, time_point_hours,
+    time_point_totals, time_point_significant_up, time_point_significant_down.
     RETURN keys (verbose): adds name, publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context.
@@ -743,13 +743,15 @@ def build_list_experiments(
         "       e.omics_type AS omics_type,\n"
         "       e.is_time_course AS is_time_course,\n"
         "       e.gene_count AS gene_count,\n"
-        "       e.significant_count AS significant_count,\n"
+        "       e.significant_up_count AS significant_up_count,\n"
+        "       e.significant_down_count AS significant_down_count,\n"
         "       e.time_point_count AS time_point_count,\n"
         "       e.time_point_labels AS time_point_labels,\n"
         "       e.time_point_orders AS time_point_orders,\n"
         "       e.time_point_hours AS time_point_hours,\n"
         "       e.time_point_totals AS time_point_totals,\n"
-        "       e.time_point_significants AS time_point_significants"
+        "       e.time_point_significant_up AS time_point_significant_up,\n"
+        "       e.time_point_significant_down AS time_point_significant_down"
     )
 
     if search_text:

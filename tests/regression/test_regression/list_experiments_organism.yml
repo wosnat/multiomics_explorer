@@ -8,7 +8,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 275
+  significant_down_count: 163
+  significant_up_count: 112
   time_point_count: 1
   time_point_hours:
   - '264.0'
@@ -16,8 +17,10 @@ rows:
   - day 11
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '275'
+  time_point_significant_down:
+  - '163'
+  time_point_significant_up:
+  - '112'
   time_point_totals:
   - '3950'
   treatment_type: coculture
@@ -28,7 +31,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 62
+  significant_down_count: 3
+  significant_up_count: 59
   time_point_count: 1
   time_point_hours:
   - '264.0'
@@ -36,8 +40,10 @@ rows:
   - day 11
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '62'
+  time_point_significant_down:
+  - '3'
+  time_point_significant_up:
+  - '59'
   time_point_totals:
   - '1849'
   treatment_type: coculture
@@ -48,7 +54,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1003
+  significant_down_count: 394
+  significant_up_count: 609
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -68,12 +75,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '219'
-  - '234'
-  - '248'
-  - '253'
-  - '49'
+  time_point_significant_down:
+  - '137'
+  - '14'
+  - '74'
+  - '77'
+  - '92'
+  time_point_significant_up:
+  - '111'
+  - '145'
+  - '157'
+  - '161'
+  - '35'
   time_point_totals:
   - '1424'
   - '1424'
@@ -88,7 +101,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1155
+  significant_down_count: 556
+  significant_up_count: 599
   time_point_count: 3
   time_point_hours:
   - '2136.0'
@@ -102,10 +116,14 @@ rows:
   - '1'
   - '2'
   - '3'
-  time_point_significants:
-  - '135'
-  - '499'
-  - '521'
+  time_point_significant_down:
+  - '204'
+  - '257'
+  - '95'
+  time_point_significant_up:
+  - '264'
+  - '295'
+  - '40'
   time_point_totals:
   - '1424'
   - '1424'
@@ -118,7 +136,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1387
+  significant_down_count: 834
+  significant_up_count: 553
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -138,12 +157,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '267'
-  - '285'
-  - '360'
-  - '391'
-  - '84'
+  time_point_significant_down:
+  - '159'
+  - '169'
+  - '226'
+  - '235'
+  - '45'
+  time_point_significant_up:
+  - '108'
+  - '116'
+  - '134'
+  - '156'
+  - '39'
   time_point_totals:
   - '1849'
   - '1849'
@@ -158,7 +183,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1242
+  significant_down_count: 640
+  significant_up_count: 602
   time_point_count: 2
   time_point_hours:
   - '-1.0'
@@ -169,9 +195,12 @@ rows:
   time_point_orders:
   - '1'
   - '2'
-  time_point_significants:
-  - '365'
-  - '877'
+  time_point_significant_down:
+  - '168'
+  - '472'
+  time_point_significant_up:
+  - '197'
+  - '405'
   time_point_totals:
   - '1849'
   - '1849'
@@ -183,7 +212,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.3389/fmicb.2022.1038136
-  significant_count: 27
+  significant_down_count: 14
+  significant_up_count: 13
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -191,8 +221,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '27'
+  time_point_significant_down:
+  - '14'
+  time_point_significant_up:
+  - '13'
   time_point_totals:
   - '27'
   treatment_type: salt_stress
@@ -203,7 +235,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2017.88
-  significant_count: 597
+  significant_down_count: 326
+  significant_up_count: 271
   time_point_count: 3
   time_point_hours:
   - '12.0'
@@ -217,10 +250,14 @@ rows:
   - '1'
   - '2'
   - '3'
-  time_point_significants:
-  - '101'
-  - '215'
-  - '281'
+  time_point_significant_down:
+  - '126'
+  - '166'
+  - '34'
+  time_point_significant_up:
+  - '115'
+  - '67'
+  - '89'
   time_point_totals:
   - '840'
   - '841'
@@ -233,7 +270,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 296
+  significant_down_count: 272
+  significant_up_count: 24
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -241,8 +279,10 @@ rows:
   - 20h
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '296'
+  time_point_significant_down:
+  - '272'
+  time_point_significant_up:
+  - '24'
   time_point_totals:
   - '1714'
   treatment_type: coculture
@@ -253,7 +293,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_count: 49
+  significant_down_count: 36
+  significant_up_count: 13
   time_point_count: 4
   time_point_hours:
   - '1.5'
@@ -270,11 +311,16 @@ rows:
   - '2'
   - '3'
   - '4'
-  time_point_significants:
+  time_point_significant_down:
+  - '0'
   - '1'
-  - '14'
-  - '3'
-  - '31'
+  - '26'
+  - '9'
+  time_point_significant_up:
+  - '1'
+  - '2'
+  - '5'
+  - '5'
   time_point_totals:
   - '1'
   - '14'
@@ -288,7 +334,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_count: 51
+  significant_down_count: 42
+  significant_up_count: 9
   time_point_count: 5
   time_point_hours:
   - '0.5'
@@ -308,12 +355,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '1'
-  - '10'
-  - '29'
-  - '3'
+  time_point_significant_down:
+  - '0'
+  - '2'
+  - '25'
+  - '7'
   - '8'
+  time_point_significant_up:
+  - '0'
+  - '1'
+  - '1'
+  - '3'
+  - '4'
   time_point_totals:
   - '1'
   - '10'
@@ -328,7 +381,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_count: 29
+  significant_down_count: 21
+  significant_up_count: 8
   time_point_count: 3
   time_point_hours:
   - '2.5'
@@ -342,10 +396,14 @@ rows:
   - '1'
   - '2'
   - '3'
-  time_point_significants:
-  - '16'
+  time_point_significant_down:
+  - '13'
+  - '2'
   - '6'
-  - '7'
+  time_point_significant_up:
+  - '1'
+  - '3'
+  - '4'
   time_point_totals:
   - '16'
   - '6'
@@ -358,7 +416,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
-  significant_count: 32
+  significant_down_count: 20
+  significant_up_count: 12
   time_point_count: 5
   time_point_hours:
   - '0.5'
@@ -378,12 +437,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '13'
-  - '3'
-  - '3'
-  - '5'
-  - '8'
+  time_point_significant_down:
+  - '1'
+  - '11'
+  - '2'
+  - '2'
+  - '4'
+  time_point_significant_up:
+  - '1'
+  - '1'
+  - '1'
+  - '2'
+  - '7'
   time_point_totals:
   - '13'
   - '3'
@@ -398,7 +463,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
-  significant_count: 166
+  significant_down_count: 45
+  significant_up_count: 121
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -406,8 +472,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '166'
+  time_point_significant_down:
+  - '45'
+  time_point_significant_up:
+  - '121'
   time_point_totals:
   - '166'
   treatment_type: carbon_stress
@@ -418,7 +486,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
-  significant_count: 4
+  significant_down_count: 0
+  significant_up_count: 4
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -426,7 +495,9 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
   - '4'
   time_point_totals:
   - '4'
@@ -438,7 +509,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
-  significant_count: 285
+  significant_down_count: 211
+  significant_up_count: 74
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -446,8 +518,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '285'
+  time_point_significant_down:
+  - '211'
+  time_point_significant_up:
+  - '74'
   time_point_totals:
   - '285'
   treatment_type: carbon_stress
@@ -458,7 +532,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
-  significant_count: 252
+  significant_down_count: 204
+  significant_up_count: 48
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -466,8 +541,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '252'
+  time_point_significant_down:
+  - '204'
+  time_point_significant_up:
+  - '48'
   time_point_totals:
   - '252'
   treatment_type: carbon_stress
@@ -478,7 +555,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
-  significant_count: 92
+  significant_down_count: 32
+  significant_up_count: 60
   time_point_count: 1
   time_point_hours:
   - '48.0'
@@ -486,8 +564,10 @@ rows:
   - 48h
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '92'
+  time_point_significant_down:
+  - '32'
+  time_point_significant_up:
+  - '60'
   time_point_totals:
   - '112'
   treatment_type: iron_stress
@@ -498,7 +578,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
-  significant_count: 125
+  significant_down_count: 35
+  significant_up_count: 90
   time_point_count: 2
   time_point_hours:
   - '12.0'
@@ -509,9 +590,12 @@ rows:
   time_point_orders:
   - '1'
   - '2'
-  time_point_significants:
-  - '52'
-  - '73'
+  time_point_significant_down:
+  - '13'
+  - '22'
+  time_point_significant_up:
+  - '39'
+  - '51'
   time_point_totals:
   - '112'
   - '112'
@@ -523,7 +607,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
-  significant_count: 106
+  significant_down_count: 66
+  significant_up_count: 40
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -531,8 +616,10 @@ rows:
   - 'R (rescue: 70h vs 48h)'
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '106'
+  time_point_significant_down:
+  - '66'
+  time_point_significant_up:
+  - '40'
   time_point_totals:
   - '112'
   treatment_type: iron_stress
@@ -543,7 +630,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/nature06130
-  significant_count: 117
+  significant_down_count: 0
+  significant_up_count: 117
   time_point_count: 8
   time_point_hours:
   - '1.0'
@@ -572,7 +660,16 @@ rows:
   - '6'
   - '7'
   - '8'
-  time_point_significants:
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  time_point_significant_up:
   - '12'
   - '15'
   - '16'
@@ -598,7 +695,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
-  significant_count: 104
+  significant_down_count: 40
+  significant_up_count: 64
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -606,8 +704,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '104'
+  time_point_significant_down:
+  - '40'
+  time_point_significant_up:
+  - '64'
   time_point_totals:
   - '198'
   treatment_type: light_stress
@@ -618,7 +718,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
-  significant_count: 9
+  significant_down_count: 7
+  significant_up_count: 2
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -626,8 +727,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '9'
+  time_point_significant_down:
+  - '7'
+  time_point_significant_up:
+  - '2'
   time_point_totals:
   - '198'
   treatment_type: light_stress
@@ -638,7 +741,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
-  significant_count: 2
+  significant_down_count: 1
+  significant_up_count: 1
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -646,8 +750,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '2'
+  time_point_significant_down:
+  - '1'
+  time_point_significant_up:
+  - '1'
   time_point_totals:
   - '198'
   treatment_type: light_stress
@@ -658,7 +764,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_count: 43
+  significant_down_count: 23
+  significant_up_count: 20
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -666,8 +773,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '43'
+  time_point_significant_down:
+  - '23'
+  time_point_significant_up:
+  - '20'
   time_point_totals:
   - '1696'
   treatment_type: nitrogen_stress
@@ -678,7 +787,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_count: 32
+  significant_down_count: 14
+  significant_up_count: 18
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -686,8 +796,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '32'
+  time_point_significant_down:
+  - '14'
+  time_point_significant_up:
+  - '18'
   time_point_totals:
   - '1696'
   treatment_type: nitrogen_stress
@@ -698,7 +810,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
-  significant_count: 174
+  significant_down_count: 59
+  significant_up_count: 115
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -706,8 +819,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '174'
+  time_point_significant_down:
+  - '59'
+  time_point_significant_up:
+  - '115'
   time_point_totals:
   - '198'
   treatment_type: light_stress
@@ -718,7 +833,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_count: 868
+  significant_down_count: 476
+  significant_up_count: 392
   time_point_count: 6
   time_point_hours:
   - '0.0'
@@ -741,13 +857,20 @@ rows:
   - '4'
   - '5'
   - '6'
-  time_point_significants:
-  - '13'
-  - '216'
-  - '236'
-  - '307'
+  time_point_significant_down:
+  - '0'
+  - '123'
+  - '141'
+  - '162'
+  - '42'
+  - '8'
+  time_point_significant_up:
+  - '113'
+  - '145'
+  - '48'
+  - '5'
   - '6'
-  - '90'
+  - '75'
   time_point_totals:
   - '1696'
   - '1696'
@@ -763,7 +886,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1073/pnas.0601301103
-  significant_count: 54
+  significant_down_count: 6
+  significant_up_count: 48
   time_point_count: 5
   time_point_hours:
   - '0.0'
@@ -783,11 +907,17 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '0'
+  - '2'
+  - '4'
+  time_point_significant_up:
+  - '0'
   - '0'
   - '11'
-  - '2'
-  - '34'
+  - '30'
   - '7'
   time_point_totals:
   - '34'
@@ -803,7 +933,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
-  significant_count: 25
+  significant_down_count: 3
+  significant_up_count: 22
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -811,8 +942,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '25'
+  time_point_significant_down:
+  - '3'
+  time_point_significant_up:
+  - '22'
   time_point_totals:
   - '198'
   treatment_type: light_stress
@@ -823,7 +956,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
-  significant_count: 72
+  significant_down_count: 3
+  significant_up_count: 69
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -831,8 +965,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '72'
+  time_point_significant_down:
+  - '3'
+  time_point_significant_up:
+  - '69'
   time_point_totals:
   - '198'
   treatment_type: light_stress

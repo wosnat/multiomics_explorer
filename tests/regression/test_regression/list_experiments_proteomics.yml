@@ -8,7 +8,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 2382
+  significant_down_count: 1003
+  significant_up_count: 1379
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -28,12 +29,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '150'
-  - '422'
-  - '586'
-  - '601'
-  - '623'
+  time_point_significant_down:
+  - '179'
+  - '264'
+  - '265'
+  - '268'
+  - '27'
+  time_point_significant_up:
+  - '123'
+  - '243'
+  - '321'
+  - '337'
+  - '355'
   time_point_totals:
   - '2226'
   - '2226'
@@ -48,7 +55,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1011
+  significant_down_count: 578
+  significant_up_count: 433
   time_point_count: 2
   time_point_hours:
   - '432.0'
@@ -59,9 +67,12 @@ rows:
   time_point_orders:
   - '1'
   - '2'
-  time_point_significants:
+  time_point_significant_down:
   - '0'
-  - '1011'
+  - '578'
+  time_point_significant_up:
+  - '0'
+  - '433'
   time_point_totals:
   - '2226'
   - '2226'
@@ -73,7 +84,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1003
+  significant_down_count: 394
+  significant_up_count: 609
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -93,12 +105,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '219'
-  - '234'
-  - '248'
-  - '253'
-  - '49'
+  time_point_significant_down:
+  - '137'
+  - '14'
+  - '74'
+  - '77'
+  - '92'
+  time_point_significant_up:
+  - '111'
+  - '145'
+  - '157'
+  - '161'
+  - '35'
   time_point_totals:
   - '1424'
   - '1424'
@@ -113,7 +131,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1155
+  significant_down_count: 556
+  significant_up_count: 599
   time_point_count: 3
   time_point_hours:
   - '2136.0'
@@ -127,10 +146,14 @@ rows:
   - '1'
   - '2'
   - '3'
-  time_point_significants:
-  - '135'
-  - '499'
-  - '521'
+  time_point_significant_down:
+  - '204'
+  - '257'
+  - '95'
+  time_point_significant_up:
+  - '264'
+  - '295'
+  - '40'
   time_point_totals:
   - '1424'
   - '1424'

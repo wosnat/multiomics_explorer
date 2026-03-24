@@ -1017,7 +1017,8 @@ def register_tools(mcp: FastMCP):
         order: int = Field(description="Sort order within experiment (e.g. 1, 2, 3)")
         hours: float | None = Field(default=None, description="Time in hours, null if unknown (e.g. 24.0)")
         total: int = Field(description="Total genes with expression data at this time point (e.g. 1696)")
-        significant: int = Field(description="Genes with significant differential expression (e.g. 423)")
+        significant_up: int = Field(description="Genes with significant up-regulation (e.g. 245)")
+        significant_down: int = Field(description="Genes with significant down-regulation (e.g. 178)")
 
     class ExperimentResult(BaseModel):
         # compact fields (always returned)
@@ -1030,7 +1031,8 @@ def register_tools(mcp: FastMCP):
         is_time_course: bool = Field(description="Whether experiment has multiple time points")
         time_points: list[TimePoint] | None = Field(default=None, description="Per-time-point gene counts. Omitted for non-time-course experiments.")
         gene_count: int = Field(description="Total genes with expression data (e.g. 1696)")
-        significant_count: int = Field(description="Genes with significant differential expression (e.g. 423)")
+        significant_up_count: int = Field(description="Genes with significant up-regulation (e.g. 245)")
+        significant_down_count: int = Field(description="Genes with significant down-regulation (e.g. 178)")
         score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
         # verbose-only fields
         name: str | None = Field(default=None, description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")

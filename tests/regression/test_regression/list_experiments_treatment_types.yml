@@ -8,7 +8,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 275
+  significant_down_count: 163
+  significant_up_count: 112
   time_point_count: 1
   time_point_hours:
   - '264.0'
@@ -16,8 +17,10 @@ rows:
   - day 11
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '275'
+  time_point_significant_down:
+  - '163'
+  time_point_significant_up:
+  - '112'
   time_point_totals:
   - '3950'
   treatment_type: coculture
@@ -28,7 +31,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 2382
+  significant_down_count: 1003
+  significant_up_count: 1379
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -48,12 +52,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '150'
-  - '422'
-  - '586'
-  - '601'
-  - '623'
+  time_point_significant_down:
+  - '179'
+  - '264'
+  - '265'
+  - '268'
+  - '27'
+  time_point_significant_up:
+  - '123'
+  - '243'
+  - '321'
+  - '337'
+  - '355'
   time_point_totals:
   - '2226'
   - '2226'
@@ -68,7 +78,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1011
+  significant_down_count: 578
+  significant_up_count: 433
   time_point_count: 2
   time_point_hours:
   - '432.0'
@@ -79,9 +90,12 @@ rows:
   time_point_orders:
   - '1'
   - '2'
-  time_point_significants:
+  time_point_significant_down:
   - '0'
-  - '1011'
+  - '578'
+  time_point_significant_up:
+  - '0'
+  - '433'
   time_point_totals:
   - '2226'
   - '2226'
@@ -93,7 +107,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 4124
+  significant_down_count: 2449
+  significant_up_count: 1675
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -113,12 +128,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '663'
-  - '853'
-  - '863'
-  - '871'
-  - '874'
+  time_point_significant_down:
+  - '329'
+  - '493'
+  - '528'
+  - '536'
+  - '563'
+  time_point_significant_up:
+  - '290'
+  - '327'
+  - '334'
+  - '346'
+  - '378'
   time_point_totals:
   - '3950'
   - '3950'
@@ -133,7 +154,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 2426
+  significant_down_count: 1648
+  significant_up_count: 778
   time_point_count: 3
   time_point_hours:
   - '-1.0'
@@ -147,10 +169,14 @@ rows:
   - '1'
   - '2'
   - '3'
-  time_point_significants:
-  - '1240'
-  - '517'
-  - '669'
+  time_point_significant_down:
+  - '366'
+  - '492'
+  - '790'
+  time_point_significant_up:
+  - '151'
+  - '177'
+  - '450'
   time_point_totals:
   - '3950'
   - '3950'
@@ -163,7 +189,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 62
+  significant_down_count: 3
+  significant_up_count: 59
   time_point_count: 1
   time_point_hours:
   - '264.0'
@@ -171,8 +198,10 @@ rows:
   - day 11
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '62'
+  time_point_significant_down:
+  - '3'
+  time_point_significant_up:
+  - '59'
   time_point_totals:
   - '1849'
   treatment_type: coculture
@@ -183,7 +212,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1003
+  significant_down_count: 394
+  significant_up_count: 609
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -203,12 +233,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '219'
-  - '234'
-  - '248'
-  - '253'
-  - '49'
+  time_point_significant_down:
+  - '137'
+  - '14'
+  - '74'
+  - '77'
+  - '92'
+  time_point_significant_up:
+  - '111'
+  - '145'
+  - '157'
+  - '161'
+  - '35'
   time_point_totals:
   - '1424'
   - '1424'
@@ -223,7 +259,8 @@ rows:
   omics_type: PROTEOMICS
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1155
+  significant_down_count: 556
+  significant_up_count: 599
   time_point_count: 3
   time_point_hours:
   - '2136.0'
@@ -237,10 +274,14 @@ rows:
   - '1'
   - '2'
   - '3'
-  time_point_significants:
-  - '135'
-  - '499'
-  - '521'
+  time_point_significant_down:
+  - '204'
+  - '257'
+  - '95'
+  time_point_significant_up:
+  - '264'
+  - '295'
+  - '40'
   time_point_totals:
   - '1424'
   - '1424'
@@ -253,7 +294,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1387
+  significant_down_count: 834
+  significant_up_count: 553
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -273,12 +315,18 @@ rows:
   - '3'
   - '4'
   - '5'
-  time_point_significants:
-  - '267'
-  - '285'
-  - '360'
-  - '391'
-  - '84'
+  time_point_significant_down:
+  - '159'
+  - '169'
+  - '226'
+  - '235'
+  - '45'
+  time_point_significant_up:
+  - '108'
+  - '116'
+  - '134'
+  - '156'
+  - '39'
   time_point_totals:
   - '1849'
   - '1849'
@@ -293,7 +341,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_count: 1242
+  significant_down_count: 640
+  significant_up_count: 602
   time_point_count: 2
   time_point_hours:
   - '-1.0'
@@ -304,9 +353,12 @@ rows:
   time_point_orders:
   - '1'
   - '2'
-  time_point_significants:
-  - '365'
-  - '877'
+  time_point_significant_down:
+  - '168'
+  - '472'
+  time_point_significant_up:
+  - '197'
+  - '405'
   time_point_totals:
   - '1849'
   - '1849'
@@ -318,7 +370,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii EZ55
   publication_doi: 10.1038/s43705-022-00197-2
-  significant_count: 419
+  significant_down_count: 111
+  significant_up_count: 308
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -326,8 +379,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '419'
+  time_point_significant_down:
+  - '111'
+  time_point_significant_up:
+  - '308'
   time_point_totals:
   - '419'
   treatment_type: coculture
@@ -338,7 +393,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii EZ55
   publication_doi: 10.1038/s43705-022-00197-2
-  significant_count: 188
+  significant_down_count: 84
+  significant_up_count: 104
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -346,8 +402,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '188'
+  time_point_significant_down:
+  - '84'
+  time_point_significant_up:
+  - '104'
   time_point_totals:
   - '188'
   treatment_type: coculture
@@ -358,7 +416,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii EZ55
   publication_doi: 10.1038/s43705-022-00197-2
-  significant_count: 293
+  significant_down_count: 176
+  significant_up_count: 117
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -366,8 +425,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '293'
+  time_point_significant_down:
+  - '176'
+  time_point_significant_up:
+  - '117'
   time_point_totals:
   - '293'
   treatment_type: coculture
@@ -378,7 +439,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii EZ55
   publication_doi: 10.1038/s43705-022-00197-2
-  significant_count: 83
+  significant_down_count: 52
+  significant_up_count: 31
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -386,8 +448,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '83'
+  time_point_significant_down:
+  - '52'
+  time_point_significant_up:
+  - '31'
   time_point_totals:
   - '83'
   treatment_type: coculture
@@ -398,7 +462,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii EZ55
   publication_doi: 10.1038/s43705-022-00197-2
-  significant_count: 136
+  significant_down_count: 110
+  significant_up_count: 26
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -406,8 +471,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '136'
+  time_point_significant_down:
+  - '110'
+  time_point_significant_up:
+  - '26'
   time_point_totals:
   - '136'
   treatment_type: coculture
@@ -418,7 +485,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii EZ55
   publication_doi: 10.1038/s43705-022-00197-2
-  significant_count: 58
+  significant_down_count: 31
+  significant_up_count: 27
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -426,8 +494,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '58'
+  time_point_significant_down:
+  - '31'
+  time_point_significant_up:
+  - '27'
   time_point_totals:
   - '58'
   treatment_type: coculture
@@ -438,7 +508,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2017.88
-  significant_count: 597
+  significant_down_count: 326
+  significant_up_count: 271
   time_point_count: 3
   time_point_hours:
   - '12.0'
@@ -452,10 +523,14 @@ rows:
   - '1'
   - '2'
   - '3'
-  time_point_significants:
-  - '101'
-  - '215'
-  - '281'
+  time_point_significant_down:
+  - '126'
+  - '166'
+  - '34'
+  time_point_significant_up:
+  - '115'
+  - '67'
+  - '89'
   time_point_totals:
   - '840'
   - '841'
@@ -468,12 +543,14 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 0
+  significant_down_count: 0
+  significant_up_count: 0
   time_point_count: 0
   time_point_hours: []
   time_point_labels: []
   time_point_orders: []
-  time_point_significants: []
+  time_point_significant_down: []
+  time_point_significant_up: []
   time_point_totals: []
   treatment_type: coculture
 - coculture_partner: Prochlorococcus MIT9313
@@ -483,12 +560,14 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 0
+  significant_down_count: 0
+  significant_up_count: 0
   time_point_count: 0
   time_point_hours: []
   time_point_labels: []
   time_point_orders: []
-  time_point_significants: []
+  time_point_significant_down: []
+  time_point_significant_up: []
   time_point_totals: []
   treatment_type: coculture
 - coculture_partner: Prochlorococcus NATL2A
@@ -498,7 +577,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii MIT1002
   publication_doi: 10.1038/ismej.2016.82
-  significant_count: 458
+  significant_down_count: 0
+  significant_up_count: 458
   time_point_count: 1
   time_point_hours:
   - '24.0'
@@ -506,7 +586,9 @@ rows:
   - 24h vs 12h
   time_point_orders:
   - '1'
-  time_point_significants:
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
   - '458'
   time_point_totals:
   - '740'
@@ -518,7 +600,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Alteromonas macleodii MIT1002
   publication_doi: 10.1038/ismej.2016.82
-  significant_count: 455
+  significant_down_count: 0
+  significant_up_count: 455
   time_point_count: 1
   time_point_hours:
   - '48.0'
@@ -526,7 +609,9 @@ rows:
   - 48h vs 12h
   time_point_orders:
   - '1'
-  time_point_significants:
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
   - '455'
   time_point_totals:
   - '740'
@@ -538,7 +623,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 296
+  significant_down_count: 272
+  significant_up_count: 24
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -546,8 +632,10 @@ rows:
   - 20h
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '296'
+  time_point_significant_down:
+  - '272'
+  time_point_significant_up:
+  - '24'
   time_point_totals:
   - '1714'
   treatment_type: coculture
@@ -558,7 +646,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 198
+  significant_down_count: 45
+  significant_up_count: 153
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -566,8 +655,10 @@ rows:
   - 20h
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '198'
+  time_point_significant_down:
+  - '45'
+  time_point_significant_up:
+  - '153'
   time_point_totals:
   - '2267'
   treatment_type: coculture
@@ -578,7 +669,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
-  significant_count: 99
+  significant_down_count: 3
+  significant_up_count: 96
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -586,8 +678,10 @@ rows:
   - 20h
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '99'
+  time_point_significant_down:
+  - '3'
+  time_point_significant_up:
+  - '96'
   time_point_totals:
   - '2268'
   treatment_type: coculture
@@ -598,7 +692,8 @@ rows:
   omics_type: RNASEQ
   organism_strain: Prochlorococcus NATL2A
   publication_doi: 10.1038/ismej.2016.82
-  significant_count: 573
+  significant_down_count: 352
+  significant_up_count: 221
   time_point_count: 7
   time_point_hours:
   - '-12.0'
@@ -624,14 +719,22 @@ rows:
   - '5'
   - '6'
   - '7'
-  time_point_significants:
+  time_point_significant_down:
   - '0'
   - '0'
   - '0'
   - '12'
-  - '218'
-  - '258'
-  - '85'
+  - '122'
+  - '141'
+  - '77'
+  time_point_significant_up:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '117'
+  - '8'
+  - '96'
   time_point_totals:
   - '353'
   - '353'
@@ -648,7 +751,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_count: 43
+  significant_down_count: 23
+  significant_up_count: 20
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -656,8 +760,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '43'
+  time_point_significant_down:
+  - '23'
+  time_point_significant_up:
+  - '20'
   time_point_totals:
   - '1696'
   treatment_type: nitrogen_stress
@@ -668,7 +774,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_count: 32
+  significant_down_count: 14
+  significant_up_count: 18
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -676,8 +783,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '32'
+  time_point_significant_down:
+  - '14'
+  time_point_significant_up:
+  - '18'
   time_point_totals:
   - '1696'
   treatment_type: nitrogen_stress
@@ -688,7 +797,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_count: 868
+  significant_down_count: 476
+  significant_up_count: 392
   time_point_count: 6
   time_point_hours:
   - '0.0'
@@ -711,13 +821,20 @@ rows:
   - '4'
   - '5'
   - '6'
-  time_point_significants:
-  - '13'
-  - '216'
-  - '236'
-  - '307'
+  time_point_significant_down:
+  - '0'
+  - '123'
+  - '141'
+  - '162'
+  - '42'
+  - '8'
+  time_point_significant_up:
+  - '113'
+  - '145'
+  - '48'
+  - '5'
   - '6'
-  - '90'
+  - '75'
   time_point_totals:
   - '1696'
   - '1696'
@@ -733,7 +850,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MIT9313
   publication_doi: 10.1038/msb4100087
-  significant_count: 20
+  significant_down_count: 8
+  significant_up_count: 12
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -741,8 +859,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '20'
+  time_point_significant_down:
+  - '8'
+  time_point_significant_up:
+  - '12'
   time_point_totals:
   - '2241'
   treatment_type: nitrogen_stress
@@ -753,7 +873,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MIT9313
   publication_doi: 10.1038/msb4100087
-  significant_count: 110
+  significant_down_count: 61
+  significant_up_count: 49
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -761,8 +882,10 @@ rows:
   - ''
   time_point_orders:
   - '1'
-  time_point_significants:
-  - '110'
+  time_point_significant_down:
+  - '61'
+  time_point_significant_up:
+  - '49'
   time_point_totals:
   - '2241'
   treatment_type: nitrogen_stress
@@ -773,7 +896,8 @@ rows:
   omics_type: MICROARRAY
   organism_strain: Prochlorococcus MIT9313
   publication_doi: 10.1038/msb4100087
-  significant_count: 909
+  significant_down_count: 604
+  significant_up_count: 305
   time_point_count: 6
   time_point_hours:
   - '0.0'
@@ -796,13 +920,20 @@ rows:
   - '4'
   - '5'
   - '6'
-  time_point_significants:
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '141'
+  - '339'
+  - '46'
+  - '78'
+  time_point_significant_up:
   - '0'
   - '1'
-  - '129'
-  - '246'
-  - '462'
-  - '71'
+  - '105'
+  - '123'
+  - '25'
+  - '51'
   time_point_totals:
   - '2241'
   - '2241'

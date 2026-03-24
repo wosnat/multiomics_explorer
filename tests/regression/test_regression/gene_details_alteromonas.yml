@@ -27,5 +27,6 @@ rows:
   preferred_id: ncbigene
   product: IS630 family transposase
   protein_id: WP_197047964.1
-  significant_expression_count: 0
+  significant_down_count: 0
+  significant_up_count: 0
   start: 39682

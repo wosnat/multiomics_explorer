@@ -560,7 +560,7 @@ def list_experiments(
     Per result: experiment_id, publication_doi, organism_strain,
     treatment_type, coculture_partner, omics_type, is_time_course (bool),
     time_points (list, omitted if not time-course), gene_count,
-    significant_count.
+    significant_up_count, significant_down_count.
     When verbose=True, also includes: name, publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context.
@@ -664,7 +664,8 @@ def list_experiments(
         tp_orders = r.pop("time_point_orders", [])
         tp_hours = r.pop("time_point_hours", [])
         tp_totals = r.pop("time_point_totals", [])
-        tp_sigs = r.pop("time_point_significants", [])
+        tp_sig_up = r.pop("time_point_significant_up", [])
+        tp_sig_down = r.pop("time_point_significant_down", [])
 
         if r["is_time_course"] and tp_count > 0:
             time_points = []
@@ -674,7 +675,8 @@ def list_experiments(
                     "order": tp_orders[i],
                     "hours": tp_hours[i] if tp_hours[i] != -1.0 else None,
                     "total": tp_totals[i],
-                    "significant": tp_sigs[i],
+                    "significant_up": tp_sig_up[i],
+                    "significant_down": tp_sig_down[i],
                 }
                 time_points.append(tp)
             r["time_points"] = time_points

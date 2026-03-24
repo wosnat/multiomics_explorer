@@ -1290,13 +1290,15 @@ class TestListExperiments:
             "omics_type": "RNASEQ",
             "is_time_course": "false",
             "gene_count": 1696,
-            "significant_count": 423,
+            "significant_up_count": 245,
+            "significant_down_count": 178,
             "time_point_count": 1,
             "time_point_labels": ["20h"],
             "time_point_orders": [1],
             "time_point_hours": [20.0],
             "time_point_totals": [1696],
-            "time_point_significants": [423],
+            "time_point_significant_up": [245],
+            "time_point_significant_down": [178],
         }
         row.update(overrides)
         return row
@@ -1311,7 +1313,8 @@ class TestListExperiments:
             time_point_orders=[1, 2, 3],
             time_point_hours=[2.0, 12.0, 24.0],
             time_point_totals=[353, 353, 353],
-            time_point_significants=[0, 85, 258],
+            time_point_significant_up=[0, 50, 150],
+            time_point_significant_down=[0, 35, 108],
         )
 
     def test_detail_returns_dict(self, mock_conn):
@@ -1395,7 +1398,8 @@ class TestListExperiments:
         assert tp["order"] == 1
         assert tp["hours"] == 2.0
         assert tp["total"] == 353
-        assert tp["significant"] == 0
+        assert tp["significant_up"] == 0
+        assert tp["significant_down"] == 0
 
     def test_time_points_omitted(self, mock_conn):
         """Non-time-course results have no time_points key."""
@@ -1416,7 +1420,8 @@ class TestListExperiments:
             time_point_orders=[1],
             time_point_hours=[-1.0],
             time_point_totals=[100],
-            time_point_significants=[10],
+            time_point_significant_up=[6],
+            time_point_significant_down=[4],
         )
         mock_conn.execute_query.side_effect = [
             self._summary_result(),

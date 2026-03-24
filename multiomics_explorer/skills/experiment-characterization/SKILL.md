@@ -67,18 +67,19 @@ Do not pick silently.
 expression profile without pulling full data into context.
 
 **Tools:** `list_experiments` (already have gene_count and
-significant_count from step 1)
+significant_up_count and significant_down_count from step 1)
 
 From step 1 results, note:
 - `gene_count` — total genes with expression data
-- `significant_count` — genes with significant DE
-- Ratio tells you how broad or targeted the response is
+- `significant_up_count` — genes with significant upregulation
+- `significant_down_count` — genes with significant downregulation
+- Ratio of total significant (up + down) to gene_count tells you how broad or targeted the response is
 
 If time-course: note `time_points` array — how many time points,
 gene counts per point.
 
 **Gate 2 — Response characterized:**
-- [ ] Total gene count and significant count recorded
+- [ ] Total gene count and significant up/down counts recorded
 - [ ] If time-course: time points enumerated
 - [ ] Proportion significant noted (broad vs targeted response)
 
@@ -116,11 +117,11 @@ print(f"Direction breakdown: {df['direction'].value_counts().to_dict()}")
 **Gate 3 — Data complete:**
 - [ ] Script ran successfully
 - [ ] Output CSV exists and is non-empty
-- [ ] Row count matches `significant_count` from step 2 (± small
+- [ ] Row count matches `significant_up_count + significant_down_count` from step 2 (± small
       tolerance for filtering differences)
 - [ ] Direction breakdown (up/down) is plausible
 
-If row count is far from `significant_count`, investigate before
+If row count is far from `significant_up_count + significant_down_count`, investigate before
 proceeding. Do not silently accept a mismatch.
 
 ---
@@ -258,7 +259,7 @@ it retroactively.
 ## Gene selection
 
 - Total genes with expression data: [gene_count]
-- Significant DE genes: [significant_count]
+- Significant DE genes: [significant_up_count + significant_down_count] ([significant_up_count] up, [significant_down_count] down)
 - Significance criteria: [padj threshold, fold-change cutoff if any]
 - Direction breakdown: [N up, N down]
 
@@ -287,7 +288,7 @@ it retroactively.
 |---|---|---|
 | 1. Scope | Experiment confirmed with researcher | Ask, don't guess |
 | 2. Response | Gene counts recorded | Re-query if missing |
-| 3. Data | CSV row count ≈ significant_count | Investigate mismatch |
+| 3. Data | CSV row count ≈ significant_up_count + significant_down_count | Investigate mismatch |
 | 4. Enrichment | BH correction applied, results saved | Fix stats before interpreting |
 | 5. Outputs | All files exist and non-empty | Re-run failed scripts |
 | 6. Docs | methods.md complete | Fill missing sections |

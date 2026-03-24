@@ -1240,9 +1240,11 @@ class TestBuildListExperiments:
         for col in [
             "experiment_id", "publication_doi", "organism_strain",
             "treatment_type", "coculture_partner", "omics_type",
-            "is_time_course", "gene_count", "significant_count",
+            "is_time_course", "gene_count", "significant_up_count",
+            "significant_down_count",
             "time_point_count", "time_point_labels", "time_point_orders",
-            "time_point_hours", "time_point_totals", "time_point_significants",
+            "time_point_hours", "time_point_totals",
+            "time_point_significant_up", "time_point_significant_down",
         ]:
             assert col in cypher
 

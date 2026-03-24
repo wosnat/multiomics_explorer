@@ -1686,7 +1686,8 @@ class TestListExperimentsWrapper:
         "omics_type": "RNASEQ",
         "is_time_course": False,
         "gene_count": 1696,
-        "significant_count": 423,
+        "significant_up_count": 245,
+        "significant_down_count": 178,
     }
 
     _SAMPLE_DETAIL = {
@@ -1861,8 +1862,8 @@ class TestListExperimentsWrapper:
             **self._SAMPLE_EXP,
             "is_time_course": True,
             "time_points": [
-                {"label": "2h", "order": 1, "hours": 2.0, "total": 353, "significant": 0},
-                {"label": "24h", "order": 2, "hours": 24.0, "total": 353, "significant": 258},
+                {"label": "2h", "order": 1, "hours": 2.0, "total": 353, "significant_up": 0, "significant_down": 0},
+                {"label": "24h", "order": 2, "hours": 24.0, "total": 353, "significant_up": 150, "significant_down": 108},
             ],
         }
         detail = {**self._SAMPLE_SUMMARY, "returned": 1, "truncated": False,
@@ -1877,7 +1878,7 @@ class TestListExperimentsWrapper:
         assert len(r.time_points) == 2
         assert r.time_points[0].label == "2h"
         assert r.time_points[0].hours == 2.0
-        assert r.time_points[1].significant == 258
+        assert r.time_points[1].significant_up + r.time_points[1].significant_down == 258
 
     @pytest.mark.asyncio
     async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
