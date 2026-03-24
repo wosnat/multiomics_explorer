@@ -548,24 +548,47 @@ class TestGeneHomologs:
 # list_filter_values
 # ---------------------------------------------------------------------------
 class TestListFilterValues:
-    def test_returns_dict_with_gene_categories(self, mock_conn):
-        categories = [{"category": "Photosynthesis", "gene_count": 100}]
-        mock_conn.execute_query.return_value = categories
+    def test_returns_standard_envelope(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"category": "Photosynthesis", "gene_count": 770},
+        ]
         result = api.list_filter_values(conn=mock_conn)
         assert isinstance(result, dict)
-        assert "gene_categories" in result
-        assert result["gene_categories"] == categories
+        for key in ("filter_type", "total_entries", "returned", "truncated", "results"):
+            assert key in result
 
-    def test_no_condition_types_key(self, mock_conn):
-        """condition_types removed in schema migration B1."""
+    def test_results_have_value_count_fields(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"category": "Photosynthesis", "gene_count": 770},
+        ]
+        result = api.list_filter_values(conn=mock_conn)
+        assert result["results"][0] == {"value": "Photosynthesis", "count": 770}
+
+    def test_gene_category_default(self, mock_conn):
         mock_conn.execute_query.return_value = []
         result = api.list_filter_values(conn=mock_conn)
-        assert "condition_types" not in result
+        assert result["filter_type"] == "gene_category"
+
+    def test_unknown_filter_type_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="Unknown filter_type"):
+            api.list_filter_values(filter_type="bogus", conn=mock_conn)
+
+    def test_truncated_always_false(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"category": "X", "gene_count": 1},
+        ]
+        result = api.list_filter_values(conn=mock_conn)
+        assert result["truncated"] is False
 
     def test_one_query_executed(self, mock_conn):
         mock_conn.execute_query.return_value = []
         api.list_filter_values(conn=mock_conn)
         assert mock_conn.execute_query.call_count == 1
+
+    def test_creates_conn_when_none(self, mock_conn):
+        with patch("multiomics_explorer.api.functions._default_conn", return_value=mock_conn):
+            api.list_filter_values()
+            assert mock_conn.execute_query.called
 
 
 # ---------------------------------------------------------------------------

@@ -17,6 +17,7 @@ import yaml
 
 from functools import partial
 
+from multiomics_explorer.api import functions as api
 from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
@@ -68,9 +69,10 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         return conn.execute_query(params["query"])
 
     if tool == "list_filter_values":
-        cat_cypher, cat_params = build_list_gene_categories()
-        categories = conn.execute_query(cat_cypher, **cat_params)
-        return categories
+        return api.list_filter_values(
+            filter_type=params.get("filter_type", "gene_category"),
+            conn=conn,
+        )["results"]
 
     if tool == "gene_homologs_with_members":
         # Legacy eval case — run detail query for batch locus_tags

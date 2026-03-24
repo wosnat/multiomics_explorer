@@ -53,16 +53,85 @@ total_entries, total_matching, by_organism, by_category, score_max, score_median
 | gene_category | string \| None (optional) | Functional category (e.g. 'Photosynthesis') |
 | annotation_quality | int | Annotation quality 0-3 (3=best) |
 | score | float | Fulltext relevance score |
+
+**Verbose-only fields** (included when `verbose=True`):
+
+| Field | Type | Description |
+|---|---|---|
 | function_description | string \| None (optional) | Functional description text |
 | gene_summary | string \| None (optional) | Combined gene annotation summary |
 
 ## Few-shot examples
 
-<!-- TODO: Add examples -->
+### Example 1: Search for photosynthesis genes
+
+```example-call
+genes_by_function(search_text="photosystem")
+```
+
+```example-response
+{"total_entries": 312, "total_matching": 312, "by_organism": [{"organism": "Prochlorococcus MED4", "count": 42}, ...], "by_category": [{"category": "Photosynthesis", "count": 280}, ...], "score_max": 8.4, "score_median": 5.1, "returned": 5, "truncated": true, "results": [{"locus_tag": "PMM0001", "gene_name": "psbA", "product": "Photosystem II D1 protein", "organism_strain": "Prochlorococcus MED4", "gene_category": "Photosynthesis", "annotation_quality": 3, "score": 8.4}]}
+```
+
+### Example 2: Search with organism filter and verbose output
+
+```example-call
+genes_by_function(search_text="nitrogen transport", organism="MED4", verbose=True)
+```
+
+### Example 3: Get counts only (no rows)
+
+```example-call
+genes_by_function(search_text="chaperone", summary=True)
+```
+
+```example-response
+{"total_entries": 87, "total_matching": 87, "by_organism": [{"organism": "Prochlorococcus MED4", "count": 18}, ...], "by_category": [{"category": "Protein folding and degradation", "count": 54}, ...], "score_max": 7.2, "score_median": 4.3, "returned": 0, "truncated": true, "results": []}
+```
+
+### Example 4: Chaining — find genes then inspect details
+
+```
+Step 1: genes_by_function(search_text="ferredoxin", summary=True)
+        → note total_matching and by_organism breakdown
+
+Step 2: genes_by_function(search_text="ferredoxin", organism="MIT9313", limit=20)
+        → collect locus_tags from results
+
+Step 3: gene_overview(locus_tags=["PMT0001", ...])
+        → get expression availability and annotation details
+```
 
 ## Chaining patterns
 
-<!-- TODO: Add chaining patterns -->
+```
+genes_by_function → gene_overview
+genes_by_function → gene_ontology_terms
+genes_by_function → genes_by_ontology (use term IDs from gene_ontology_terms)
+search_ontology → genes_by_ontology (ontology-first route, alternative to genes_by_function)
+```
+
+## Common mistakes
+
+```mistake
+genes_by_function(search_text='GO:0015977')
+```
+
+```correction
+genes_by_ontology(term_ids=['go:0015977']) for ontology term lookup; genes_by_function is for free-text search
+```
+
+```mistake
+len(result['results'])  # to count matches
+```
+
+```correction
+result['total_matching']  # results may be truncated
+```
+
+- Use summary=True to get organism/category breakdowns without fetching gene rows
+
+- Use min_quality=2 to skip hypothetical proteins and get better-annotated results
 
 ## Package import equivalent
 

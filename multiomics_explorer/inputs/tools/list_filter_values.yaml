@@ -1,0 +1,35 @@
+# Human-authored content for list_filter_values about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: List gene categories
+    call: list_filter_values(filter_type="gene_category")
+    response: |
+      {
+        "filter_type": "gene_category",
+        "total_entries": 26,
+        "returned": 26,
+        "truncated": false,
+        "results": [
+          {"value": "Unknown", "count": 12183},
+          {"value": "Coenzyme metabolism", "count": 2146},
+          {"value": "Stress response and adaptation", "count": 2073}
+        ]
+      }
+
+  - title: Find genes in a category
+    steps: |
+      Step 1: list_filter_values(filter_type="gene_category")
+              → extract value strings from results
+
+      Step 2: genes_by_function(search_text="photosystem", category="Photosynthesis")
+              → get photosynthesis genes matching "photosystem"
+
+chaining:
+  - "list_filter_values → genes_by_function(category=...)"
+
+mistakes:
+  - "count is summed across all organisms — a category with count=770 may cover genes in 10+ organisms"
+  - wrong: "list_filter_values(category='Photosynthesis')  # no such param"
+    right: "list_filter_values(filter_type='gene_category')  # then pass value to genes_by_function"

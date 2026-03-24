@@ -106,48 +106,117 @@ class TestKgSchemaWrapper:
 # list_filter_values
 # ---------------------------------------------------------------------------
 class TestListFilterValuesWrapper:
-    def test_returns_gene_categories_json(self, tool_fns, mock_ctx):
-        """list_filter_values returns gene_categories in JSON response."""
-        categories = [
-            {"category": "Photosynthesis", "gene_count": 100},
-            {"category": "Transport", "gene_count": 50},
-        ]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.return_value = categories
-        mock_ctx.request_context.lifespan_context._filter_values_cache = None
-        result = json.loads(tool_fns["list_filter_values"](mock_ctx))
-        assert "gene_categories" in result
-        assert len(result["gene_categories"]) == 2
+    _SAMPLE_API_RETURN = {
+        "filter_type": "gene_category",
+        "total_entries": 2,
+        "returned": 2,
+        "truncated": False,
+        "results": [
+            {"value": "Photosynthesis", "count": 770},
+            {"value": "Transport", "count": 500},
+        ],
+    }
 
-    def test_no_condition_types(self, tool_fns, mock_ctx):
-        """condition_types removed in schema migration B1."""
-        categories = [{"category": "Photosynthesis", "gene_count": 100}]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.return_value = categories
-        mock_ctx.request_context.lifespan_context._filter_values_cache = None
-        result = json.loads(tool_fns["list_filter_values"](mock_ctx))
-        assert "condition_types" not in result
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, mock_ctx):
+        """Response has filter_type, total_entries, returned, truncated, results."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_filter_values"](mock_ctx)
+        assert result.filter_type == "gene_category"
+        assert result.total_entries == 2
+        assert result.returned == 2
+        assert result.truncated is False
+        assert len(result.results) == 2
 
-    def test_gene_categories_keys(self, tool_fns, mock_ctx):
-        """Each gene_categories entry has 'category' and 'gene_count' keys."""
-        categories = [{"category": "Photosynthesis", "gene_count": 100}]
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.return_value = categories
-        mock_ctx.request_context.lifespan_context._filter_values_cache = None
-        result = json.loads(tool_fns["list_filter_values"](mock_ctx))
-        entry = result["gene_categories"][0]
-        assert "category" in entry
-        assert "gene_count" in entry
+    @pytest.mark.asyncio
+    async def test_result_fields(self, tool_fns, mock_ctx):
+        """Each result has value and count fields."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_filter_values"](mock_ctx)
+        entry = result.results[0]
+        assert hasattr(entry, "value")
+        assert hasattr(entry, "count")
+        assert entry.value == "Photosynthesis"
+        assert entry.count == 770
 
-    def test_caching(self, tool_fns, mock_ctx):
-        """Second call returns cached value without hitting Neo4j again."""
-        cached_response = json.dumps({
-            "gene_categories": [{"category": "Cached", "gene_count": 1}],
-        })
-        mock_ctx.request_context.lifespan_context._filter_values_cache = cached_response
-        result = tool_fns["list_filter_values"](mock_ctx)
-        assert result == cached_response
-        _conn_from(mock_ctx).execute_query.assert_not_called()
+    @pytest.mark.asyncio
+    async def test_filter_type_forwarded(self, tool_fns, mock_ctx):
+        """filter_type param is passed through to api.list_filter_values."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value={**self._SAMPLE_API_RETURN, "filter_type": "gene_category"},
+        ) as mock_fn:
+            await tool_fns["list_filter_values"](mock_ctx, filter_type="gene_category")
+        mock_fn.assert_called_once()
+        assert mock_fn.call_args.kwargs.get("filter_type") == "gene_category" or \
+               mock_fn.call_args.args[0] == "gene_category"
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        """total_entries=0, results=[]."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value={
+                "filter_type": "gene_category",
+                "total_entries": 0,
+                "returned": 0,
+                "truncated": False,
+                "results": [],
+            },
+        ):
+            result = await tool_fns["list_filter_values"](mock_ctx)
+        assert result.total_entries == 0
+        assert result.results == []
+
+    @pytest.mark.asyncio
+    async def test_truncated_always_false(self, tool_fns, mock_ctx):
+        """truncated is always False."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_filter_values"](mock_ctx)
+        assert result.truncated is False
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from api raises ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            side_effect=ValueError("Unknown filter_type: 'bogus'"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["list_filter_values"](mock_ctx, filter_type="gene_category")
+
+    @pytest.mark.asyncio
+    async def test_generic_error(self, tool_fns, mock_ctx):
+        """Unexpected exception raises ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            side_effect=RuntimeError("unexpected"),
+        ):
+            with pytest.raises(ToolError, match="Error in list_filter_values"):
+                await tool_fns["list_filter_values"](mock_ctx)
+
+    @pytest.mark.asyncio
+    async def test_no_caching(self, tool_fns, mock_ctx):
+        """api.list_filter_values is called on every invocation (no caching)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_fn:
+            await tool_fns["list_filter_values"](mock_ctx)
+        assert mock_fn.call_count == 1
 
 
 # ---------------------------------------------------------------------------
@@ -1303,14 +1372,15 @@ class TestGeneOntologyTermsWrapper:
 class TestErrorHandling:
     """Every MCP tool must catch ValueError and Exception, returning an error string."""
 
-    def test_list_filter_values_generic_error(self, tool_fns, mock_ctx):
-        mock_ctx.request_context.lifespan_context._filter_values_cache = None
+    @pytest.mark.asyncio
+    async def test_list_filter_values_generic_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
             "multiomics_explorer.api.functions.list_filter_values",
             side_effect=RuntimeError("connection lost"),
         ):
-            result = tool_fns["list_filter_values"](mock_ctx)
-        assert "Error in list_filter_values" in result
+            with pytest.raises(ToolError, match="Error in list_filter_values"):
+                await tool_fns["list_filter_values"](mock_ctx)
 
     @pytest.mark.asyncio
     async def test_list_organisms_generic_error(self, tool_fns, mock_ctx):

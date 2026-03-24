@@ -366,3 +366,21 @@ class TestListExperiments:
         assert summary["total_matching"] == detail["total_matching"]
         assert summary["total_matching"] == len(detail["results"])
 
+
+@pytest.mark.kg
+class TestListFilterValues:
+    def test_returns_envelope_keys(self, conn):
+        result = api.list_filter_values(conn=conn)
+        for key in ("filter_type", "total_entries", "returned", "truncated", "results"):
+            assert key in result
+
+    def test_filter_type_is_gene_category(self, conn):
+        result = api.list_filter_values(conn=conn)
+        assert result["filter_type"] == "gene_category"
+
+    def test_results_have_value_and_count(self, conn):
+        result = api.list_filter_values(conn=conn)
+        assert len(result["results"]) >= 1
+        assert "value" in result["results"][0]
+        assert "count" in result["results"][0]
+

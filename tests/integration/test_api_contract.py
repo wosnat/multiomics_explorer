@@ -167,13 +167,18 @@ class TestListFilterValuesContract:
     def test_returns_dict_with_keys(self, conn):
         result = api.list_filter_values(conn=conn)
         assert isinstance(result, dict)
-        assert "gene_categories" in result
+        for key in ("filter_type", "total_entries", "returned", "truncated", "results"):
+            assert key in result
 
-    def test_gene_categories_keys(self, conn):
+    def test_filter_type_in_result(self, conn):
         result = api.list_filter_values(conn=conn)
-        if result["gene_categories"]:
-            assert "category" in result["gene_categories"][0]
-            assert "gene_count" in result["gene_categories"][0]
+        assert result["filter_type"] == "gene_category"
+
+    def test_results_have_value_count_keys(self, conn):
+        result = api.list_filter_values(conn=conn)
+        if result["results"]:
+            assert "value" in result["results"][0]
+            assert "count" in result["results"][0]
 
 
 # ---------------------------------------------------------------------------

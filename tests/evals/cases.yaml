@@ -162,6 +162,7 @@
   desc: Returns gene categories (snapshot-stable, few changes expected)
   params: {}
   expect:
+    columns: [value, count]
 
 - id: list_filter_values_categories
   tool: raw_cypher

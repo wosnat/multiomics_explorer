@@ -69,32 +69,52 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"kg_schema unexpected error: {e}")
             raise ToolError(f"Error in kg_schema: {e}")
 
-    @mcp.tool()
-    def list_filter_values(ctx: Context) -> str:
+    class FilterValueResult(BaseModel):
+        value: str = Field(
+            description="Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown')"
+        )
+        count: int = Field(
+            description="Number of genes/items with this value (e.g. 770)"
+        )
+
+    class ListFilterValuesResponse(BaseModel):
+        filter_type: str = Field(description="The filter type returned (e.g. 'gene_category')")
+        total_entries: int = Field(description="Total distinct values for this filter (e.g. 26)")
+        returned: int = Field(description="Number of results returned (e.g. 26)")
+        truncated: bool = Field(description="True if total_entries > returned")
+        results: list[FilterValueResult] = Field(default_factory=list)
+
+    @mcp.tool(
+        tags={"filters", "discovery"},
+        annotations={"readOnlyHint": True},
+    )
+    async def list_filter_values(
+        ctx: Context,
+        filter_type: Annotated[Literal["gene_category"], Field(
+            description="Which filter's valid values to return. "
+            "'gene_category': values for the category filter in genes_by_function.",
+        )] = "gene_category",
+    ) -> ListFilterValuesResponse:
         """List valid values for categorical filters used across tools.
 
-        Returns:
-        - gene_categories: values for the category filter on genes_by_function
-          (e.g. "Photosynthesis", "Transport", "Stress response and adaptation")
+        Returns valid values and counts for the requested filter type.
+        Use the returned values as filter parameters in `genes_by_function`
+        (category filter).
         """
-        logger.info("list_filter_values")
+        await ctx.info(f"list_filter_values filter_type={filter_type}")
         try:
-            lc = ctx.request_context.lifespan_context
-            cached = getattr(lc, "_filter_values_cache", None)
-            if cached is not None:
-                return cached
-
             conn = _conn(ctx)
-            result = api.list_filter_values(conn=conn)
-            response = json.dumps(result, indent=2, default=str)
-            lc._filter_values_cache = response
+            data = api.list_filter_values(filter_type=filter_type, conn=conn)
+            results = [FilterValueResult(**r) for r in data["results"]]
+            response = ListFilterValuesResponse(**{**data, "results": results})
+            await ctx.info(f"Returning {response.total_entries} values for {filter_type}")
             return response
         except ValueError as e:
-            logger.warning("list_filter_values error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"list_filter_values error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("list_filter_values unexpected error: %s", e)
-            return f"Error in list_filter_values: {e}"
+            await ctx.error(f"list_filter_values unexpected error: {e}")
+            raise ToolError(f"Error in list_filter_values: {e}")
 
     class OrganismResult(BaseModel):
         organism_name: str = Field(description="Display name (e.g. 'Prochlorococcus MED4'). Use for organism filters in other tools.")

@@ -394,22 +394,30 @@ def gene_homologs(
 
 
 def list_filter_values(
+    filter_type: str = "gene_category",
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """List valid values for categorical filters.
+    """List valid values for a categorical filter.
 
-    Returns dict with keys:
-      gene_categories: list[dict] with category, gene_count
+    Returns dict with keys: filter_type, total_entries, returned, truncated, results.
+    Per result: value, count.
     """
     conn = _default_conn(conn)
-
-    logger.debug("list_filter_values: fetching gene categories")
-    cat_cypher, cat_params = build_list_gene_categories()
-    categories = conn.execute_query(cat_cypher, **cat_params)
-
+    if filter_type == "gene_category":
+        cypher, params = build_list_gene_categories()
+    else:
+        raise ValueError(f"Unknown filter_type: {filter_type!r}")
+    rows = conn.execute_query(cypher, **params)
+    # Normalise to generic {value, count} shape
+    results = [{"value": r["category"], "count": r["gene_count"]} for r in rows]
+    total = len(results)
     return {
-        "gene_categories": categories,
+        "filter_type": filter_type,
+        "total_entries": total,
+        "returned": total,
+        "truncated": False,
+        "results": results,
     }
 
 
