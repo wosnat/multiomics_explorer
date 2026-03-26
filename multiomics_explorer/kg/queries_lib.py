@@ -384,9 +384,10 @@ def build_gene_homologs(
     """Build detail Cypher for gene_homologs.
 
     RETURN keys (compact): locus_tag, organism_strain, group_id,
-    consensus_gene_name, consensus_product, taxonomic_level, source.
-    RETURN keys (verbose): adds specificity_rank, member_count,
-    organism_count, genera, has_cross_genus_members.
+    consensus_gene_name, consensus_product, taxonomic_level, source,
+    specificity_rank.
+    RETURN keys (verbose): adds member_count, organism_count, genera,
+    has_cross_genus_members, description, functional_description.
     """
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
@@ -397,11 +398,12 @@ def build_gene_homologs(
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
     verbose_cols = (
-        ",\n       og.specificity_rank AS specificity_rank"
         ",\n       og.member_count AS member_count"
         ",\n       og.organism_count AS organism_count"
         ",\n       og.genera AS genera"
         ",\n       og.has_cross_genus_members AS has_cross_genus_members"
+        ",\n       og.description AS description"
+        ",\n       og.functional_description AS functional_description"
         if verbose else ""
     )
 
@@ -416,10 +418,11 @@ def build_gene_homologs(
         "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
         f"{where_block}"
         "RETURN g.locus_tag AS locus_tag, g.organism_strain AS organism_strain,\n"
-        "       og.name AS group_id,\n"
+        "       og.id AS group_id,\n"
         "       og.consensus_gene_name AS consensus_gene_name,\n"
         "       og.consensus_product AS consensus_product,\n"
-        f"       og.taxonomic_level AS taxonomic_level, og.source AS source{verbose_cols}\n"
+        "       og.taxonomic_level AS taxonomic_level, og.source AS source,\n"
+        f"       og.specificity_rank AS specificity_rank{verbose_cols}\n"
         f"ORDER BY g.locus_tag, og.specificity_rank, og.source{limit_clause}"
     )
     return cypher, params
@@ -1667,5 +1670,83 @@ def build_search_homolog_groups(
         "       og.member_count AS member_count, og.organism_count AS organism_count,\n"
         f"       score{verbose_cols}\n"
         f"ORDER BY score DESC, og.specificity_rank, og.source{limit_clause}"
+    )
+    return cypher, params
+
+
+def build_genes_by_homolog_group_summary(
+    *,
+    group_ids: list[str],
+    organism: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for genes_by_homolog_group.
+
+    RETURN keys: total_matching, total_genes, by_organism, by_category,
+    by_group, not_found.
+    """
+    params: dict = {"group_ids": group_ids, "organism": organism}
+
+    cypher = (
+        "UNWIND $group_ids AS gid\n"
+        "OPTIONAL MATCH (og:OrthologGroup {id: gid})\n"
+        "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og)\n"
+        "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
+        "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+        "WITH gid, og, g\n"
+        "WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS not_found_raw,\n"
+        "     collect(CASE WHEN g IS NOT NULL THEN\n"
+        "       {lt: g.locus_tag, org: g.organism_strain,\n"
+        "        cat: coalesce(g.gene_category, 'Unknown'), gid: gid} END) AS rows\n"
+        "WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found, rows\n"
+        "WITH not_found,\n"
+        "     size(rows) AS total_matching,\n"
+        "     size(apoc.coll.toSet([r IN rows | r.lt])) AS total_genes,\n"
+        "     apoc.coll.frequencies([r IN rows | r.org]) AS by_organism,\n"
+        "     apoc.coll.frequencies([r IN rows | r.cat]) AS by_category,\n"
+        "     apoc.coll.frequencies([r IN rows | r.gid]) AS by_group\n"
+        "RETURN total_matching, total_genes, not_found, by_organism, by_category, by_group"
+    )
+    return cypher, params
+
+
+def build_genes_by_homolog_group(
+    *,
+    group_ids: list[str],
+    organism: str | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build detail Cypher for genes_by_homolog_group.
+
+    RETURN keys (compact): locus_tag, gene_name, product,
+    organism_strain, gene_category, group_id.
+    RETURN keys (verbose): adds gene_summary, function_description,
+    consensus_product, source.
+    """
+    params: dict = {"group_ids": group_ids, "organism": organism}
+
+    verbose_cols = (
+        ",\n       g.gene_summary AS gene_summary"
+        ",\n       g.function_description AS function_description"
+        ",\n       og.consensus_product AS consensus_product"
+        ",\n       og.source AS source"
+        if verbose else ""
+    )
+
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "UNWIND $group_ids AS gid\n"
+        "MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup {id: gid})\n"
+        "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
+        "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       g.product AS product, g.organism_strain AS organism_strain,\n"
+        f"       g.gene_category AS gene_category, og.id AS group_id{verbose_cols}\n"
+        f"ORDER BY og.id, g.organism_strain, g.locus_tag{limit_clause}"
     )
     return cypher, params

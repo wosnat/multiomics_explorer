@@ -45,6 +45,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_gene,
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
+    build_genes_by_homolog_group,
+    build_genes_by_homolog_group_summary,
     build_search_ontology,
     build_search_ontology_summary,
     build_differential_expression_by_gene,
@@ -331,9 +333,10 @@ def gene_homologs(
     Returns dict with keys: total_matching, by_organism, by_source,
     returned, truncated, not_found, no_groups, results.
     Per result (compact): locus_tag, organism_strain, group_id,
-    consensus_gene_name, consensus_product, taxonomic_level, source.
-    Per result (verbose): adds specificity_rank, member_count,
-    organism_count, genera, has_cross_genus_members.
+    consensus_gene_name, consensus_product, taxonomic_level, source,
+    specificity_rank.
+    Per result (verbose): adds member_count, organism_count, genera,
+    has_cross_genus_members, description, functional_description.
 
     summary=True is sugar for limit=0: results=[], summary fields only.
     not_found: input locus_tags not in KG.
@@ -896,6 +899,78 @@ def search_homolog_groups(
             results = conn.execute_query(det_cypher, **det_params)
         else:
             raise
+
+    envelope["returned"] = len(results)
+    envelope["truncated"] = total_matching > len(results)
+    envelope["results"] = results
+    return envelope
+
+
+def genes_by_homolog_group(
+    group_ids: list[str],
+    organism: str | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Find member genes of ortholog groups.
+
+    Returns dict with keys: total_matching, total_genes, by_organism,
+    by_category, by_group, not_found, returned, truncated, results.
+    Per result (compact): locus_tag, gene_name, product,
+    organism_strain, gene_category, group_id.
+    Per result (verbose): adds gene_summary, function_description,
+    consensus_product, source.
+
+    summary=True: results=[], summary fields only.
+
+    Raises:
+        ValueError: if group_ids is empty.
+    """
+    if not group_ids:
+        raise ValueError("group_ids must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # Summary query — always runs
+    sum_cypher, sum_params = build_genes_by_homolog_group_summary(
+        group_ids=group_ids, organism=organism,
+    )
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_matching": total_matching,
+        "total_genes": raw_summary["total_genes"],
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism"),
+        "by_category": _rename_freq(raw_summary["by_category"], "category"),
+        "by_group": _rename_freq(raw_summary["by_group"], "group_id"),
+        "not_found": raw_summary["not_found"],
+    }
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    det_cypher, det_params = build_genes_by_homolog_group(
+        group_ids=group_ids, organism=organism,
+        verbose=verbose, limit=limit,
+    )
+    results = conn.execute_query(det_cypher, **det_params)
 
     envelope["returned"] = len(results)
     envelope["truncated"] = total_matching > len(results)

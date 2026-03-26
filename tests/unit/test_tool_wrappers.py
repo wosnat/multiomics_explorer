@@ -49,7 +49,7 @@ EXPECTED_TOOLS = [
     "kg_schema", "list_filter_values", "list_organisms", "resolve_gene",
     "genes_by_function", "gene_overview", "get_gene_details",
     "gene_homologs", "run_cypher",
-    "search_ontology", "search_homolog_groups",
+    "search_ontology", "search_homolog_groups", "genes_by_homolog_group",
     "genes_by_ontology", "gene_ontology_terms",
     "list_publications",
     "list_experiments",
@@ -745,13 +745,15 @@ class TestGeneHomologsWrapper:
         "no_groups": [],
         "results": [
             {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
-             "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+             "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
-             "taxonomic_level": "curated", "source": "cyanorak"},
+             "taxonomic_level": "curated", "source": "cyanorak",
+             "specificity_rank": 0},
             {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102",
-             "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+             "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
-             "taxonomic_level": "curated", "source": "cyanorak"},
+             "taxonomic_level": "curated", "source": "cyanorak",
+             "specificity_rank": 0},
         ],
     }
 
@@ -771,7 +773,7 @@ class TestGeneHomologsWrapper:
         assert len(result.results) == 2
         r = result.results[0]
         assert r.locus_tag == "PMM0001"
-        assert r.group_id == "CK_00000364"
+        assert r.group_id == "cyanorak:CK_00000364"
         assert r.consensus_gene_name == "dnaN"
         assert r.source == "cyanorak"
 
@@ -2265,4 +2267,126 @@ class TestSearchHomologGroupsWrapper:
             with pytest.raises(ToolError):
                 await tool_fns["search_homolog_groups"](
                     mock_ctx, search_text="test", source="bad",
+                )
+
+
+# ---------------------------------------------------------------------------
+# genes_by_homolog_group
+# ---------------------------------------------------------------------------
+class TestGenesByHomologGroupWrapper:
+    """Tests for genes_by_homolog_group MCP wrapper."""
+
+    _SAMPLE_API_RETURN = {
+        "total_matching": 9,
+        "total_genes": 9,
+        "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1},
+                        {"organism": "Prochlorococcus AS9601", "count": 1}],
+        "by_category": [{"category": "Photosynthesis", "count": 9}],
+        "by_group": [{"group_id": "cyanorak:CK_00000570", "count": 9}],
+        "not_found": [],
+        "returned": 2,
+        "truncated": True,
+        "results": [
+            {"locus_tag": "A9601_03391", "gene_name": "psbB",
+             "product": "photosystem II chlorophyll-binding protein CP47",
+             "organism_strain": "Prochlorococcus AS9601",
+             "gene_category": "Photosynthesis",
+             "group_id": "cyanorak:CK_00000570"},
+            {"locus_tag": "PMM0315", "gene_name": "psbB",
+             "product": "photosystem II chlorophyll-binding protein CP47",
+             "organism_strain": "Prochlorococcus MED4",
+             "gene_category": "Photosynthesis",
+             "group_id": "cyanorak:CK_00000570"},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["cyanorak:CK_00000570"],
+            )
+        assert result.total_matching == 9
+        assert result.total_genes == 9
+        assert result.returned == 2
+        assert result.truncated is True
+        assert len(result.results) == 2
+        assert len(result.by_organism) == 2
+        assert len(result.by_group) == 1
+        assert result.not_found == []
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        empty_return = {
+            "total_matching": 0,
+            "total_genes": 0,
+            "by_organism": [],
+            "by_category": [],
+            "by_group": [],
+            "not_found": ["FAKE_GROUP"],
+            "returned": 0,
+            "truncated": False,
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value=empty_return,
+        ):
+            result = await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["FAKE_GROUP"],
+            )
+        assert result.total_matching == 0
+        assert result.returned == 0
+        assert result.results == []
+        assert result.not_found == ["FAKE_GROUP"]
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["cyanorak:CK_1"],
+                organism="MED4", summary=True, verbose=True, limit=10,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.args[0] == ["cyanorak:CK_1"]
+        assert call_kwargs.kwargs["organism"] == "MED4"
+        assert call_kwargs.kwargs["summary"] is True
+        assert call_kwargs.kwargs["verbose"] is True
+        assert call_kwargs.kwargs["limit"] == 10
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        truncated_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 33, "returned": 5, "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value=truncated_return,
+        ):
+            result = await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["cyanorak:CK_00000570"],
+            )
+        assert result.truncated is True
+        assert result.total_matching == 33
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            side_effect=ValueError("group_ids must not be empty."),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["genes_by_homolog_group"](
+                    mock_ctx, group_ids=[],
                 )

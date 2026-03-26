@@ -1,0 +1,48 @@
+# Human-authored content for genes_by_homolog_group about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Find members of an ortholog group
+    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
+    response: |
+      {"total_matching": 9, "total_genes": 9, "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1}], "by_category": [{"category": "Photosynthesis", "count": 9}], "by_group": [{"group_id": "cyanorak:CK_00000570", "count": 9}], "not_found": [], "returned": 5, "truncated": true, "results": [{"locus_tag": "A9601_03391", "gene_name": "psbB", "product": "photosystem II chlorophyll-binding protein CP47", "organism_strain": "Prochlorococcus AS9601", "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}]}
+
+  - title: Filter to one organism
+    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"], organism="MED4")
+
+  - title: Compare membership across groups
+    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], summary=True)
+    response: |
+      {"total_matching": 22, "total_genes": 13, "by_group": [{"group_id": "eggnog:COG0592@2", "count": 13}, {"group_id": "cyanorak:CK_00000570", "count": 9}], "returned": 0, "truncated": true, "results": []}
+
+  - title: From text search to member genes
+    steps: |
+      Step 1: search_homolog_groups(search_text="photosystem II")
+              → collect group_ids from results (e.g. "cyanorak:CK_00000570")
+
+      Step 2: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
+              → find member genes per organism
+
+      Step 3: gene_overview(locus_tags=["PMM0315", ...])
+              → check data availability for discovered genes
+
+verbose_fields:
+  - gene_summary
+  - function_description
+  - consensus_product
+  - source
+
+chaining:
+  - "search_homolog_groups → genes_by_homolog_group"
+  - "genes_by_homolog_group → gene_overview"
+  - "genes_by_homolog_group → differential_expression_by_gene"
+  - "gene_homologs → genes_by_homolog_group"
+
+mistakes:
+  - "group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570', not 'CK_00000570')"
+  - "A gene in multiple input groups appears once per group — rows are gene × group, not distinct genes. Use total_genes for the deduplicated count."
+  - wrong: "genes_by_homolog_group(group_ids=['photosystem'])  # passing text, not IDs"
+    right: "search_homolog_groups(search_text='photosystem')  # search first, then use IDs"
+  - wrong: "len(results)  # actual count"
+    right: "response['total_matching']  # use total, not len"

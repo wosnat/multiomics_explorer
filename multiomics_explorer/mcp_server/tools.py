@@ -494,17 +494,19 @@ def register_tools(mcp: FastMCP):
     class GeneHomologResult(BaseModel):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
-        group_id: str = Field(description="Ortholog group identifier (e.g. 'CK_00000364', 'COG0592@2')")
+        group_id: str = Field(description="Prefixed ortholog group ID for chaining to genes_by_homolog_group (e.g. 'cyanorak:CK_00000364', 'eggnog:COG0592@2')")
         consensus_gene_name: str | None = Field(default=None, description="Consensus gene name across group members (e.g. 'dnaN'). Often null.")
         consensus_product: str | None = Field(default=None, description="Consensus product across group members (e.g. 'DNA polymerase III, beta subunit')")
         taxonomic_level: str = Field(description="Taxonomic scope (e.g. 'curated', 'Prochloraceae', 'Bacteria')")
         source: str = Field(description="Source database (e.g. 'cyanorak', 'eggnog')")
+        specificity_rank: int = Field(description="Group breadth: 0=curated, 1=family, 2=order, 3=domain (e.g. 0)")
         # verbose-only
-        specificity_rank: int | None = Field(default=None, description="Group breadth: 0=curated, 1=family, 2=order, 3=domain (e.g. 0)")
         member_count: int | None = Field(default=None, description="Total genes in group (e.g. 9)")
         organism_count: int | None = Field(default=None, description="Distinct organisms in group (e.g. 9)")
         genera: list[str] | None = Field(default=None, description="Genera represented (e.g. ['Prochlorococcus', 'Synechococcus'])")
         has_cross_genus_members: str | None = Field(default=None, description="'cross_genus' or 'single_genus'")
+        description: str | None = Field(default=None, description="Group description text")
+        functional_description: str | None = Field(default=None, description="Functional annotation text")
 
     class HomologOrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
@@ -550,8 +552,9 @@ def register_tools(mcp: FastMCP):
             description="When true, return only summary fields (results=[]).",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include group metadata: specificity_rank, member_count, "
-            "organism_count, genera, has_cross_genus_members.",
+            description="Include group metadata: member_count, "
+            "organism_count, genera, has_cross_genus_members, "
+            "description, functional_description.",
         )] = False,
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
@@ -1727,3 +1730,128 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"search_homolog_groups unexpected error: {e}")
             raise ToolError(f"Error in search_homolog_groups: {e}")
+
+    # -----------------------------------------------------------------
+    # genes_by_homolog_group
+    # -----------------------------------------------------------------
+
+    class GenesByHomologGroupResult(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0315')")
+        gene_name: str | None = Field(default=None,
+            description="Gene name (e.g. 'psbB')")
+        product: str | None = Field(default=None,
+            description="Gene product (e.g. 'photosystem II chlorophyll-binding protein CP47')")
+        organism_strain: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MED4')")
+        gene_category: str | None = Field(default=None,
+            description="Functional category (e.g. 'Photosynthesis')")
+        group_id: str = Field(
+            description="Ortholog group ID (e.g. 'cyanorak:CK_00000570')")
+        # verbose only
+        gene_summary: str | None = Field(default=None,
+            description="Concatenated summary text")
+        function_description: str | None = Field(default=None,
+            description="Curated functional description")
+        consensus_product: str | None = Field(default=None,
+            description="Group consensus product (e.g. 'photosystem II chlorophyll-binding protein CP47')")
+        source: str | None = Field(default=None,
+            description="OG source (e.g. 'cyanorak')")
+
+    class HomologGroupOrganismBreakdown(BaseModel):
+        organism: str = Field(
+            description="Organism strain (e.g. 'Prochlorococcus MED4')")
+        count: int = Field(description="Member genes from this organism")
+
+    class HomologGroupCategoryBreakdown(BaseModel):
+        category: str = Field(
+            description="Gene category (e.g. 'Photosynthesis')")
+        count: int = Field(description="Member genes in this category")
+
+    class HomologGroupGroupBreakdown(BaseModel):
+        group_id: str = Field(
+            description="Ortholog group ID (e.g. 'cyanorak:CK_00000570')")
+        count: int = Field(description="Member genes in this group")
+
+    class GenesByHomologGroupResponse(BaseModel):
+        total_matching: int = Field(
+            description="Gene×group rows matching filters (e.g. 33)")
+        total_genes: int = Field(
+            description="Distinct genes (a gene in 2 input groups counted once, e.g. 30)")
+        by_organism: list[HomologGroupOrganismBreakdown] = Field(
+            description="Member counts per organism, sorted by count desc")
+        by_category: list[HomologGroupCategoryBreakdown] = Field(
+            description="Member counts per gene category, sorted by count desc")
+        by_group: list[HomologGroupGroupBreakdown] = Field(
+            description="Member counts per input group, sorted by count desc")
+        not_found: list[str] = Field(default_factory=list,
+            description="Input group_ids not found in KG")
+        returned: int = Field(description="Results in this response")
+        truncated: bool = Field(
+            description="True if total_matching > returned")
+        results: list[GenesByHomologGroupResult] = Field(
+            default_factory=list, description="One row per gene × group")
+
+    @mcp.tool(
+        tags={"genes", "homology"},
+        annotations={"readOnlyHint": True},
+    )
+    async def genes_by_homolog_group(
+        ctx: Context,
+        group_ids: Annotated[list[str], Field(
+            description="Ortholog group IDs (from search_homolog_groups or "
+            "gene_homologs). E.g. ['cyanorak:CK_00000570'].",
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter by organism (case-insensitive substring). "
+            "E.g. 'MED4', 'Alteromonas'. "
+            "Use list_organisms to see valid values.",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include gene_summary, function_description, "
+            "consensus_product, source in results.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> GenesByHomologGroupResponse:
+        """Find member genes of ortholog groups.
+
+        Takes group IDs from search_homolog_groups or gene_homologs and
+        returns member genes per organism. One row per gene × group.
+
+        For group discovery by text, use search_homolog_groups first.
+        For gene → group direction, use gene_homologs.
+        """
+        await ctx.info(f"genes_by_homolog_group group_ids={group_ids} organism={organism}")
+        try:
+            conn = _conn(ctx)
+            data = api.genes_by_homolog_group(
+                group_ids, organism=organism,
+                summary=summary, verbose=verbose, limit=limit, conn=conn,
+            )
+            by_organism = [HomologGroupOrganismBreakdown(**b) for b in data["by_organism"]]
+            by_category = [HomologGroupCategoryBreakdown(**b) for b in data["by_category"]]
+            by_group = [HomologGroupGroupBreakdown(**b) for b in data["by_group"]]
+            results = [GenesByHomologGroupResult(**r) for r in data["results"]]
+            response = GenesByHomologGroupResponse(
+                total_matching=data["total_matching"],
+                total_genes=data["total_genes"],
+                by_organism=by_organism,
+                by_category=by_category,
+                by_group=by_group,
+                not_found=data["not_found"],
+                returned=data["returned"],
+                truncated=data["truncated"],
+                results=results,
+            )
+            await ctx.info(f"Returning {response.returned} of {response.total_matching} gene×group rows")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"genes_by_homolog_group error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"genes_by_homolog_group unexpected error: {e}")
+            raise ToolError(f"Error in genes_by_homolog_group: {e}")

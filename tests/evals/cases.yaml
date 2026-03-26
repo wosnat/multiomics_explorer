@@ -121,7 +121,7 @@
   expect:
     min_rows: 1
     columns: [locus_tag, organism_strain, group_id, consensus_gene_name,
-              consensus_product, taxonomic_level, source]
+              consensus_product, taxonomic_level, source, specificity_rank]
 
 # ── Full-text search ────────────────────────────────────
 
@@ -442,7 +442,7 @@
   expect:
     min_rows: 2
     columns: [locus_tag, organism_strain, group_id, consensus_gene_name,
-              consensus_product, taxonomic_level, source]
+              consensus_product, taxonomic_level, source, specificity_rank]
 
 - id: homologs_source_filter_cyanorak
   tool: gene_homologs
@@ -1042,6 +1042,39 @@
   expect:
     min_rows: 1
     columns: [group_id, group_name, consensus_gene_name, consensus_product, source, taxonomic_level, specificity_rank, member_count, organism_count, score, description, functional_description, genera, has_cross_genus_members]
+
+# ---------------------------------------------------------------------------
+# genes_by_homolog_group
+# ---------------------------------------------------------------------------
+
+- id: genes_by_homolog_group_basic
+  tool: genes_by_homolog_group
+  desc: Single group to member genes
+  params:
+    group_ids: ["cyanorak:CK_00000570"]
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, product, organism_strain, gene_category, group_id]
+
+- id: genes_by_homolog_group_organism_filter
+  tool: genes_by_homolog_group
+  desc: Group members filtered by organism
+  params:
+    group_ids: ["cyanorak:CK_00000570"]
+    organism: "MED4"
+  expect:
+    min_rows: 1
+    columns: [locus_tag, organism_strain, group_id]
+
+- id: genes_by_homolog_group_verbose
+  tool: genes_by_homolog_group
+  desc: Verbose mode includes gene_summary and group context
+  params:
+    group_ids: ["cyanorak:CK_00000570"]
+    verbose: true
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, product, organism_strain, gene_category, group_id, gene_summary, function_description, consensus_product, source]
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene

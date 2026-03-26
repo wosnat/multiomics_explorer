@@ -428,13 +428,15 @@ class TestGeneHomologs:
         """Helper: mock detail query result rows."""
         return [
             {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
-             "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+             "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
-             "taxonomic_level": "curated", "source": "cyanorak"},
+             "taxonomic_level": "curated", "source": "cyanorak",
+             "specificity_rank": 0},
             {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102",
-             "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+             "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
-             "taxonomic_level": "curated", "source": "cyanorak"},
+             "taxonomic_level": "curated", "source": "cyanorak",
+             "specificity_rank": 0},
         ]
 
     def test_returns_dict(self, mock_conn):
@@ -1939,3 +1941,75 @@ class TestSearchHomologGroups:
     def test_importable_from_package(self):
         from multiomics_explorer import search_homolog_groups
         assert search_homolog_groups is api.search_homolog_groups
+
+
+class TestGenesByHomologGroup:
+    """Tests for genes_by_homolog_group API function."""
+
+    def test_returns_dict(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 9, "total_genes": 9,
+              "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
+              "by_category": [{"item": "Photosynthesis", "count": 9}],
+              "by_group": [{"item": "cyanorak:CK_00000570", "count": 9}],
+              "not_found": []}],
+            [{"locus_tag": "PMM0315", "gene_name": "psbB",
+              "product": "photosystem II", "organism_strain": "Prochlorococcus MED4",
+              "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}],
+        ]
+        result = api.genes_by_homolog_group(["cyanorak:CK_00000570"], conn=mock_conn)
+        assert isinstance(result, dict)
+        assert result["total_matching"] == 9
+        assert result["total_genes"] == 9
+        assert len(result["by_organism"]) == 1
+        assert result["by_organism"][0]["organism"] == "Prochlorococcus MED4"
+        assert len(result["by_group"]) == 1
+        assert result["by_group"][0]["group_id"] == "cyanorak:CK_00000570"
+        assert result["not_found"] == []
+        assert result["returned"] == 1
+        assert len(result["results"]) == 1
+
+    def test_summary_mode(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 9, "total_genes": 9,
+              "by_organism": [], "by_category": [],
+              "by_group": [{"item": "cyanorak:CK_00000570", "count": 9}],
+              "not_found": []}],
+        ]
+        result = api.genes_by_homolog_group(
+            ["cyanorak:CK_00000570"], summary=True, conn=mock_conn)
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert result["results"] == []
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_not_found(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 0, "total_genes": 0,
+              "by_organism": [], "by_category": [], "by_group": [],
+              "not_found": ["FAKE_GROUP"]}],
+        ]
+        result = api.genes_by_homolog_group(
+            ["FAKE_GROUP"], summary=True, conn=mock_conn)
+        assert result["not_found"] == ["FAKE_GROUP"]
+        assert result["total_matching"] == 0
+
+    def test_validates_empty_group_ids(self, mock_conn):
+        with pytest.raises(ValueError, match="group_ids must not be empty"):
+            api.genes_by_homolog_group([], conn=mock_conn)
+
+    def test_passes_params(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 0, "total_genes": 0,
+              "by_organism": [], "by_category": [], "by_group": [],
+              "not_found": []}],
+        ]
+        api.genes_by_homolog_group(
+            ["cyanorak:CK_1"], organism="MED4", summary=True, conn=mock_conn)
+        call_args = mock_conn.execute_query.call_args
+        cypher = call_args[0][0]
+        assert "$organism" in cypher
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import genes_by_homolog_group
+        assert genes_by_homolog_group is api.genes_by_homolog_group

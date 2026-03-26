@@ -24,6 +24,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_overview,
     build_gene_stub,
     build_genes_by_function,
+    build_genes_by_homolog_group,
+    build_genes_by_homolog_group_summary,
     build_genes_by_ontology,
     build_get_gene_details,
     build_gene_homologs,
@@ -66,6 +68,8 @@ TOOL_BUILDERS = {
     "differential_expression_by_gene": build_differential_expression_by_gene,
     "search_homolog_groups": build_search_homolog_groups,
     "search_homolog_groups_summary": build_search_homolog_groups_summary,
+    "genes_by_homolog_group": build_genes_by_homolog_group,
+    "genes_by_homolog_group_summary": build_genes_by_homolog_group_summary,
 }
 
 

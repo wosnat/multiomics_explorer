@@ -3,15 +3,17 @@ row_count: 2
 rows:
 - consensus_gene_name: null
   consensus_product: IS630 family transposase
-  group_id: 1S2QS@1236
+  group_id: eggnog:1S2QS@1236
   locus_tag: ALT831_RS00180
   organism_strain: Alteromonas macleodii MIT1002
   source: eggnog
+  specificity_rank: 2
   taxonomic_level: Gammaproteobacteria
 - consensus_gene_name: null
   consensus_product: IS630 family transposase
-  group_id: COG3415@2
+  group_id: eggnog:COG3415@2
   locus_tag: ALT831_RS00180
   organism_strain: Alteromonas macleodii MIT1002
   source: eggnog
+  specificity_rank: 3
   taxonomic_level: Bacteria

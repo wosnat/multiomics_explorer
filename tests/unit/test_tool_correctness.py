@@ -458,13 +458,15 @@ class TestGeneHomologsCorrectness:
 
     _SAMPLE_RESULTS = [
         {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
-         "group_id": "CK_00000364", "consensus_gene_name": "dnaN",
+         "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
          "consensus_product": "DNA polymerase III, beta subunit",
-         "taxonomic_level": "curated", "source": "cyanorak"},
+         "taxonomic_level": "curated", "source": "cyanorak",
+         "specificity_rank": 0},
         {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
-         "group_id": "COG0592@2", "consensus_gene_name": "dnaN",
+         "group_id": "eggnog:COG0592@2", "consensus_gene_name": "dnaN",
          "consensus_product": "DNA polymerase III, beta subunit",
-         "taxonomic_level": "Bacteria", "source": "eggnog"},
+         "taxonomic_level": "Bacteria", "source": "eggnog",
+         "specificity_rank": 3},
     ]
 
     @pytest.mark.asyncio
@@ -483,7 +485,7 @@ class TestGeneHomologsCorrectness:
         assert len(result.results) == 2
         r = result.results[0]
         assert r.locus_tag == "PMM0001"
-        assert r.group_id == "CK_00000364"
+        assert r.group_id == "cyanorak:CK_00000364"
         assert r.source == "cyanorak"
         assert r.consensus_product == "DNA polymerase III, beta subunit"
 
@@ -492,9 +494,10 @@ class TestGeneHomologsCorrectness:
         """Batch query returns rows for multiple genes."""
         batch_results = self._SAMPLE_RESULTS + [
             {"locus_tag": "PMM0845", "organism_strain": "Prochlorococcus MED4",
-             "group_id": "CK_00000853", "consensus_gene_name": "ndhV",
+             "group_id": "cyanorak:CK_00000853", "consensus_gene_name": "ndhV",
              "consensus_product": "NADH dehydrogenase subunit NdhV",
-             "taxonomic_level": "curated", "source": "cyanorak"},
+             "taxonomic_level": "curated", "source": "cyanorak",
+             "specificity_rank": 0},
         ]
         with patch(
             "multiomics_explorer.api.functions.gene_homologs",

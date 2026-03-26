@@ -35,9 +35,10 @@ with optional member expansion.
 ## KG dependencies
 
 - `Gene` nodes: `locus_tag`, `organism_strain`
-- `OrthologGroup` nodes: `name`, `source`, `taxonomic_level`,
+- `OrthologGroup` nodes: `id`, `source`, `taxonomic_level`,
   `specificity_rank`, `consensus_gene_name`, `consensus_product`,
-  `member_count`, `organism_count`, `genera`, `has_cross_genus_members`
+  `member_count`, `organism_count`, `genera`, `has_cross_genus_members`,
+  `description`, `functional_description`
 - `Gene_in_ortholog_group` edges
 
 All properties verified present in live KG (2026-03-23).
@@ -72,8 +73,9 @@ async def gene_homologs(
         description="When true, return only summary fields (results=[]).",
     )] = False,
     verbose: Annotated[bool, Field(
-        description="Include group metadata: specificity_rank, member_count, "
-        "organism_count, genera, has_cross_genus_members.",
+        description="Include group metadata: member_count, "
+        "organism_count, genera, has_cross_genus_members, "
+        "description, functional_description.",
     )] = False,
     limit: Annotated[int, Field(
         description="Max results.", ge=1,
@@ -92,13 +94,13 @@ async def gene_homologs(
 
 **Return envelope:** `total_matching, by_organism, by_source, returned, truncated, not_found, no_groups, results`
 
-**Per-result columns (compact — 7):**
+**Per-result columns (compact — 8):**
 `locus_tag`, `organism_strain`, `group_id`, `consensus_gene_name`,
-`consensus_product`, `taxonomic_level`, `source`
+`consensus_product`, `taxonomic_level`, `source`, `specificity_rank`
 
-**Verbose adds (5):**
-`specificity_rank`, `member_count`, `organism_count`, `genera`,
-`has_cross_genus_members`
+**Verbose adds (6):**
+`member_count`, `organism_count`, `genera`,
+`has_cross_genus_members`, `description`, `functional_description`
 
 ## Result-size controls
 
@@ -129,9 +131,9 @@ membership.
 
 **Verbose:**
 - Compact: locus_tag, organism_strain, group_id, consensus_gene_name,
-  consensus_product, taxonomic_level, source
-- Verbose adds: specificity_rank, member_count, organism_count, genera,
-  has_cross_genus_members
+  consensus_product, taxonomic_level, source, specificity_rank
+- Verbose adds: member_count, organism_count, genera,
+  has_cross_genus_members, description, functional_description
 
 ## Special handling
 
@@ -186,9 +188,10 @@ def build_gene_homologs(
     """Build detail Cypher for gene_homologs.
 
     RETURN keys (compact): locus_tag, organism_strain, group_id,
-    consensus_gene_name, consensus_product, taxonomic_level, source.
-    RETURN keys (verbose): adds specificity_rank, member_count,
-    organism_count, genera, has_cross_genus_members.
+    consensus_gene_name, consensus_product, taxonomic_level, source,
+    specificity_rank.
+    RETURN keys (verbose): adds member_count, organism_count, genera,
+    has_cross_genus_members, description, functional_description.
     """
 ```
 

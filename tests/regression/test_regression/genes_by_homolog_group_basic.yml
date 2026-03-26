@@ -1,0 +1,57 @@
+case_id: genes_by_homolog_group_basic
+row_count: 9
+rows:
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: A9601_03391
+  organism_strain: Prochlorococcus AS9601
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: NATL1_04051
+  organism_strain: Prochlorococcus NATL1A
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: P9301_03401
+  organism_strain: Prochlorococcus MIT9301
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: PMM0315
+  organism_strain: Prochlorococcus MED4
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: PMN2A_1692
+  organism_strain: Prochlorococcus NATL2A
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: PMT1665
+  organism_strain: Prochlorococcus MIT9313
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: PMT9312_0321
+  organism_strain: Prochlorococcus MIT9312
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: SYNW1982
+  organism_strain: Synechococcus WH8102
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: sync_0534
+  organism_strain: Synechococcus CC9311
+  product: photosystem II chlorophyll-binding protein CP47

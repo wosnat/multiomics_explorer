@@ -3,15 +3,17 @@ row_count: 2
 rows:
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
-  group_id: 1MKTR@1212
+  group_id: eggnog:1MKTR@1212
   locus_tag: PMM0001
   organism_strain: Prochlorococcus MED4
   source: eggnog
+  specificity_rank: 1
   taxonomic_level: Prochloraceae
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
-  group_id: COG0592@2
+  group_id: eggnog:COG0592@2
   locus_tag: PMM0001
   organism_strain: Prochlorococcus MED4
   source: eggnog
+  specificity_rank: 3
   taxonomic_level: Bacteria

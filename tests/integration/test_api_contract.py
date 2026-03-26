@@ -149,7 +149,7 @@ class TestGeneHomologsContract:
         expected_keys = {
             "locus_tag", "organism_strain", "group_id",
             "consensus_gene_name", "consensus_product",
-            "taxonomic_level", "source",
+            "taxonomic_level", "source", "specificity_rank",
         }
         assert set(result["results"][0].keys()) == expected_keys
 

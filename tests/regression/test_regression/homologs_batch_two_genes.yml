@@ -3,43 +3,49 @@ row_count: 6
 rows:
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
-  group_id: CK_00000364
+  group_id: cyanorak:CK_00000364
   locus_tag: PMM0001
   organism_strain: Prochlorococcus MED4
   source: cyanorak
+  specificity_rank: 0
   taxonomic_level: curated
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
-  group_id: 1MKTR@1212
+  group_id: eggnog:1MKTR@1212
   locus_tag: PMM0001
   organism_strain: Prochlorococcus MED4
   source: eggnog
+  specificity_rank: 1
   taxonomic_level: Prochloraceae
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
-  group_id: COG0592@2
+  group_id: eggnog:COG0592@2
   locus_tag: PMM0001
   organism_strain: Prochlorococcus MED4
   source: eggnog
+  specificity_rank: 3
   taxonomic_level: Bacteria
 - consensus_gene_name: ndhV
   consensus_product: NADH dehydrogenase subunit NdhV
-  group_id: CK_00000853
+  group_id: cyanorak:CK_00000853
   locus_tag: PMM0845
   organism_strain: Prochlorococcus MED4
   source: cyanorak
+  specificity_rank: 0
   taxonomic_level: curated
 - consensus_gene_name: ndhV
   consensus_product: NADH dehydrogenase subunit NdhV
-  group_id: 1MMP8@1212
+  group_id: eggnog:1MMP8@1212
   locus_tag: PMM0845
   organism_strain: Prochlorococcus MED4
   source: eggnog
+  specificity_rank: 1
   taxonomic_level: Prochloraceae
 - consensus_gene_name: ndhV
   consensus_product: NADH dehydrogenase subunit NdhV
-  group_id: 31HP9@2
+  group_id: eggnog:31HP9@2
   locus_tag: PMM0845
   organism_strain: Prochlorococcus MED4
   source: eggnog
+  specificity_rank: 3
   taxonomic_level: Bacteria

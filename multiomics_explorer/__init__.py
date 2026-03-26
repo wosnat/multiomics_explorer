@@ -3,6 +3,7 @@
 from multiomics_explorer.api.functions import (
     gene_ontology_terms,
     gene_overview,
+    genes_by_homolog_group,
     genes_by_ontology,
     get_gene_details,
     gene_homologs,
@@ -22,6 +23,7 @@ from multiomics_explorer.api.functions import (
 __all__ = [
     "gene_ontology_terms",
     "gene_overview",
+    "genes_by_homolog_group",
     "genes_by_ontology",
     "get_gene_details",
     "gene_homologs",

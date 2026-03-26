@@ -28,6 +28,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_gene,
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
+    build_genes_by_homolog_group,
+    build_genes_by_homolog_group_summary,
     build_search_ontology,
     build_search_ontology_summary,
     build_differential_expression_by_gene,
@@ -317,12 +319,12 @@ class TestBuildGeneHomologs:
         assert params["locus_tags"] == ["PMM0845"]
 
     def test_returns_compact_columns(self):
-        """Compact mode (verbose=False) returns 7 columns."""
+        """Compact mode (verbose=False) returns 8 columns."""
         cypher, _ = build_gene_homologs(locus_tags=["PMM0845"])
         for col in [
             "locus_tag", "organism_strain", "group_id",
             "consensus_gene_name", "consensus_product",
-            "taxonomic_level", "source",
+            "taxonomic_level", "source", "specificity_rank",
         ]:
             assert col in cypher
 
@@ -366,23 +368,34 @@ class TestBuildGeneHomologs:
         assert params == {"locus_tags": ["x"]}
 
     def test_verbose_false_no_extra_columns(self):
-        """Compact mode excludes specificity_rank, member_count, genera columns."""
+        """Compact mode excludes verbose-only columns."""
         cypher, _ = build_gene_homologs(locus_tags=["x"], verbose=False)
-        assert "specificity_rank" not in cypher.split("RETURN")[1].split("ORDER BY")[0] or \
-               "AS specificity_rank" not in cypher
         assert "member_count" not in cypher
         assert "organism_count" not in cypher
         assert "genera" not in cypher
         assert "has_cross_genus_members" not in cypher
+        assert "description" not in cypher
+        assert "functional_description" not in cypher
 
     def test_verbose_true_includes_extra_columns(self):
-        """Verbose mode adds specificity_rank, member_count, organism_count, genera, has_cross_genus_members."""
+        """Verbose mode adds member_count, organism_count, genera, has_cross_genus_members, description, functional_description."""
         cypher, _ = build_gene_homologs(locus_tags=["x"], verbose=True)
-        assert "og.specificity_rank AS specificity_rank" in cypher
         assert "og.member_count AS member_count" in cypher
         assert "og.organism_count AS organism_count" in cypher
         assert "og.genera AS genera" in cypher
         assert "og.has_cross_genus_members AS has_cross_genus_members" in cypher
+        assert "og.description AS description" in cypher
+        assert "og.functional_description AS functional_description" in cypher
+
+    def test_specificity_rank_always_in_compact(self):
+        """specificity_rank is returned in compact mode (not verbose-only)."""
+        cypher, _ = build_gene_homologs(locus_tags=["x"], verbose=False)
+        assert "og.specificity_rank AS specificity_rank" in cypher
+
+    def test_group_id_uses_og_id(self):
+        """group_id maps to og.id (prefixed), not og.name."""
+        cypher, _ = build_gene_homologs(locus_tags=["x"])
+        assert "og.id AS group_id" in cypher
 
     def test_limit_clause(self):
         """LIMIT is added when limit is provided."""
@@ -1744,3 +1757,93 @@ class TestBuildSearchHomologGroupsSummary:
         # Same filter params (detail has extra verbose/limit keys)
         assert sum_params["source"] == det_params["source"]
         assert sum_params["max_rank"] == det_params["max_rank"]
+
+
+class TestBuildGenesByHomologGroup:
+    """Tests for build_genes_by_homolog_group."""
+
+    def test_single_group_id(self):
+        cypher, params = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_00000570"])
+        assert "Gene_in_ortholog_group" in cypher
+        assert "$group_ids" in cypher
+        assert params["group_ids"] == ["cyanorak:CK_00000570"]
+
+    def test_multiple_group_ids(self):
+        cypher, params = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"])
+        assert len(params["group_ids"]) == 2
+
+    def test_organism_filter_clause(self):
+        cypher, params = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"], organism="MED4")
+        assert "$organism IS NULL" in cypher
+        assert params["organism"] == "MED4"
+
+    def test_no_organism_filter(self):
+        cypher, params = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"])
+        assert params["organism"] is None
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"])
+        for col in ["locus_tag", "gene_name", "product",
+                     "organism_strain", "gene_category", "group_id"]:
+            assert f"AS {col}" in cypher
+
+    def test_verbose_columns(self):
+        cypher, _ = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"], verbose=True)
+        for col in ["gene_summary", "function_description",
+                     "consensus_product", "source"]:
+            assert f"AS {col}" in cypher
+
+    def test_verbose_false_excludes_columns(self):
+        cypher, _ = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"], verbose=False)
+        assert "AS gene_summary" not in cypher
+        assert "AS function_description" not in cypher
+
+    def test_order_by(self):
+        cypher, _ = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"])
+        assert "ORDER BY" in cypher
+
+    def test_limit_clause(self):
+        cypher, params = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"], limit=10)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        cypher, params = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"])
+        assert "LIMIT" not in cypher
+        assert "limit" not in params
+
+
+class TestBuildGenesByHomologGroupSummary:
+    """Tests for build_genes_by_homolog_group_summary."""
+
+    def test_returns_summary_keys(self):
+        cypher, params = build_genes_by_homolog_group_summary(
+            group_ids=["cyanorak:CK_1"])
+        assert "total_matching" in cypher
+        assert "total_genes" in cypher
+        assert "not_found" in cypher
+        assert "by_organism" in cypher
+        assert "by_category" in cypher
+        assert "by_group" in cypher
+
+    def test_organism_filter(self):
+        cypher, params = build_genes_by_homolog_group_summary(
+            group_ids=["cyanorak:CK_1"], organism="MED4")
+        assert "$organism IS NULL" in cypher
+        assert params["organism"] == "MED4"
+
+    def test_not_found_detection(self):
+        cypher, _ = build_genes_by_homolog_group_summary(
+            group_ids=["cyanorak:CK_1"])
+        assert "OPTIONAL MATCH" in cypher
+        assert "not_found" in cypher

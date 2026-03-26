@@ -3,22 +3,25 @@ row_count: 3
 rows:
 - consensus_gene_name: ftsH1
   consensus_product: cell division protein FtsH1
-  group_id: CK_00008085
+  group_id: cyanorak:CK_00008085
   locus_tag: SYNW0305
   organism_strain: Synechococcus WH8102
   source: cyanorak
+  specificity_rank: 0
   taxonomic_level: curated
 - consensus_gene_name: ftsH1
   consensus_product: cell division protein FtsH1
-  group_id: 1GYE1@1129
+  group_id: eggnog:1GYE1@1129
   locus_tag: SYNW0305
   organism_strain: Synechococcus WH8102
   source: eggnog
+  specificity_rank: 1
   taxonomic_level: Synechococcus
 - consensus_gene_name: ftsH1
   consensus_product: cell division protein FtsH1
-  group_id: COG0465@2
+  group_id: eggnog:COG0465@2
   locus_tag: SYNW0305
   organism_strain: Synechococcus WH8102
   source: eggnog
+  specificity_rank: 3
   taxonomic_level: Bacteria

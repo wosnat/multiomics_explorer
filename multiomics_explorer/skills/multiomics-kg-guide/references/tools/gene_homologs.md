@@ -20,7 +20,7 @@ For text search on group names, use search_homolog_groups.
 | taxonomic_level | string \| None | None | Filter by taxonomic level. E.g. 'curated', 'Prochloraceae', 'Bacteria'. |
 | max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |
 | summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include group metadata: specificity_rank, member_count, organism_count, genera, has_cross_genus_members. |
+| verbose | bool | False | Include group metadata: member_count, organism_count, genera, has_cross_genus_members, description, functional_description. |
 | limit | int | 5 | Max results. |
 
 ## Response format
@@ -45,21 +45,23 @@ total_matching, by_organism, by_source, returned, truncated, not_found, no_group
 |---|---|---|
 | locus_tag | string | Gene locus tag (e.g. 'PMM0001') |
 | organism_strain | string | Organism (e.g. 'Prochlorococcus MED4') |
-| group_id | string | Ortholog group identifier (e.g. 'CK_00000364', 'COG0592@2') |
+| group_id | string | Prefixed ortholog group ID for chaining to genes_by_homolog_group (e.g. 'cyanorak:CK_00000364', 'eggnog:COG0592@2') |
 | consensus_gene_name | string \| None (optional) | Consensus gene name across group members (e.g. 'dnaN'). Often null. |
 | consensus_product | string \| None (optional) | Consensus product across group members (e.g. 'DNA polymerase III, beta subunit') |
 | taxonomic_level | string | Taxonomic scope (e.g. 'curated', 'Prochloraceae', 'Bacteria') |
 | source | string | Source database (e.g. 'cyanorak', 'eggnog') |
+| specificity_rank | int | Group breadth: 0=curated, 1=family, 2=order, 3=domain (e.g. 0) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
-| specificity_rank | int \| None (optional) | Group breadth: 0=curated, 1=family, 2=order, 3=domain (e.g. 0) |
 | member_count | int \| None (optional) | Total genes in group (e.g. 9) |
 | organism_count | int \| None (optional) | Distinct organisms in group (e.g. 9) |
 | genera | list[string] \| None (optional) | Genera represented (e.g. ['Prochlorococcus', 'Synechococcus']) |
 | has_cross_genus_members | string \| None (optional) | 'cross_genus' or 'single_genus' |
+| description | string \| None (optional) | Group description text |
+| functional_description | string \| None (optional) | Functional annotation text |
 
 ## Few-shot examples
 
@@ -76,8 +78,8 @@ gene_homologs(locus_tags=["PMM0001"])
   "by_source": [{"source": "eggnog", "count": 2}, {"source": "cyanorak", "count": 1}],
   "returned": 3, "truncated": false, "not_found": [], "no_groups": [],
   "results": [
-    {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4", "group_id": "CK_00000364", "consensus_gene_name": "dnaN", "consensus_product": "DNA polymerase III, beta subunit", "taxonomic_level": "curated", "source": "cyanorak"},
-    {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4", "group_id": "1MKTR@1212", ...},
+    {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4", "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN", "consensus_product": "DNA polymerase III, beta subunit", "taxonomic_level": "curated", "source": "cyanorak", "specificity_rank": 0},
+    {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4", "group_id": "eggnog:1MKTR@1212", ...},
     ...
   ]
 }
@@ -110,7 +112,7 @@ Step 1: resolve_gene(identifier="dnaN")
 Step 2: gene_homologs(locus_tags=["PMM0001", "PMT9312_0001", ...])
         → see which ortholog groups each gene belongs to
 
-Step 3: genes_by_homolog_group(group_ids=["CK_00000364"])
+Step 3: genes_by_homolog_group(group_ids=["cyanorak:CK_00000364"])
         → get all member genes in a group
 ```
 
