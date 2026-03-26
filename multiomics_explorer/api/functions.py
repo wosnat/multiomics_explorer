@@ -43,6 +43,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments,
     build_list_experiments_summary,
     build_resolve_gene,
+    build_search_homolog_groups,
+    build_search_homolog_groups_summary,
     build_search_ontology,
     build_search_ontology_summary,
     build_differential_expression_by_gene,
@@ -198,8 +200,8 @@ def genes_by_function(
         "total_matching": total_matching,
         "by_organism": _rename_freq(raw_summary["by_organism"], "organism"),
         "by_category": _rename_freq(raw_summary["by_category"], "category"),
-        "score_max": raw_summary["score_max"] or 0.0,
-        "score_median": raw_summary["score_median"] or 0.0,
+        "score_max": raw_summary["score_max"],
+        "score_median": raw_summary["score_median"],
     }
 
     # Detail query — skip when limit=0
@@ -755,8 +757,8 @@ def search_ontology(
     envelope = {
         "total_entries": raw_summary["total_entries"],
         "total_matching": total_matching,
-        "score_max": raw_summary["score_max"] or 0.0,
-        "score_median": raw_summary["score_median"] or 0.0,
+        "score_max": raw_summary["score_max"],
+        "score_median": raw_summary["score_median"],
     }
 
     # Detail query — skip when limit=0
@@ -778,6 +780,119 @@ def search_ontology(
             det_cypher, det_params = build_search_ontology(
                 ontology=ontology, search_text=effective_text, limit=limit,
             )
+            results = conn.execute_query(det_cypher, **det_params)
+        else:
+            raise
+
+    envelope["returned"] = len(results)
+    envelope["truncated"] = total_matching > len(results)
+    envelope["results"] = results
+    return envelope
+
+
+def search_homolog_groups(
+    search_text: str,
+    source: str | None = None,
+    taxonomic_level: str | None = None,
+    max_specificity_rank: int | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Search ortholog groups by text (Lucene fulltext).
+
+    Returns dict with keys: total_entries, total_matching, by_source,
+    by_level, score_max, score_median, returned, truncated, results.
+    Per result (compact): group_id, group_name, consensus_gene_name,
+    consensus_product, source, taxonomic_level, specificity_rank,
+    member_count, organism_count, score.
+    Per result (verbose): adds description, functional_description,
+    genera, has_cross_genus_members.
+
+    summary=True: results=[], summary fields only.
+    """
+    if not search_text or not search_text.strip():
+        raise ValueError("search_text must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # Validate enum params
+    if source is not None and source not in VALID_OG_SOURCES:
+        raise ValueError(
+            f"Invalid source '{source}'. Valid: {sorted(VALID_OG_SOURCES)}"
+        )
+    if taxonomic_level is not None and taxonomic_level not in VALID_TAXONOMIC_LEVELS:
+        raise ValueError(
+            f"Invalid taxonomic_level '{taxonomic_level}'. "
+            f"Valid: {sorted(VALID_TAXONOMIC_LEVELS)}"
+        )
+    if max_specificity_rank is not None and not (
+        0 <= max_specificity_rank <= MAX_SPECIFICITY_RANK
+    ):
+        raise ValueError(
+            f"Invalid max_specificity_rank {max_specificity_rank}. "
+            f"Valid: 0-{MAX_SPECIFICITY_RANK}."
+        )
+
+    filter_kwargs = dict(
+        source=source, taxonomic_level=taxonomic_level,
+        max_specificity_rank=max_specificity_rank,
+    )
+
+    effective_text = search_text
+
+    # Summary query — always runs
+    try:
+        sum_cypher, sum_params = build_search_homolog_groups_summary(
+            search_text=effective_text, **filter_kwargs)
+        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+    except Neo4jClientError:
+        logger.debug("search_homolog_groups: Lucene parse error, retrying with escaped query")
+        effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+        sum_cypher, sum_params = build_search_homolog_groups_summary(
+            search_text=effective_text, **filter_kwargs)
+        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_entries": raw_summary["total_entries"],
+        "total_matching": total_matching,
+        "by_source": _rename_freq(raw_summary["by_source"], "source"),
+        "by_level": _rename_freq(raw_summary["by_level"], "taxonomic_level"),
+        "score_max": raw_summary["score_max"],
+        "score_median": raw_summary["score_median"],
+    }
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    try:
+        det_cypher, det_params = build_search_homolog_groups(
+            search_text=effective_text, **filter_kwargs,
+            verbose=verbose, limit=limit)
+        results = conn.execute_query(det_cypher, **det_params)
+    except Neo4jClientError:
+        if effective_text == search_text:
+            logger.debug("search_homolog_groups detail: Lucene parse error, retrying")
+            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            det_cypher, det_params = build_search_homolog_groups(
+                search_text=effective_text, **filter_kwargs,
+                verbose=verbose, limit=limit)
             results = conn.execute_query(det_cypher, **det_params)
         else:
             raise

@@ -253,7 +253,7 @@ class TestGenesByFunction:
         assert genes_by_function is api.genes_by_function
 
     def test_zero_match(self, mock_conn):
-        """When summary returns total_matching=0, score_max=0.0, score_median=0.0."""
+        """When summary returns total_matching=0, score_max=None, score_median=None."""
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 50, "total_matching": 0,
               "score_max": None, "score_median": None,
@@ -261,8 +261,8 @@ class TestGenesByFunction:
         ]
         result = api.genes_by_function("nonexistent", summary=True, conn=mock_conn)
         assert result["total_matching"] == 0
-        assert result["score_max"] == 0.0
-        assert result["score_median"] == 0.0
+        assert result["score_max"] is None
+        assert result["score_median"] is None
 
 
 # ---------------------------------------------------------------------------
@@ -1859,3 +1859,83 @@ class TestDifferentialExpressionByGene:
         """from multiomics_explorer import differential_expression_by_gene works."""
         from multiomics_explorer import differential_expression_by_gene
         assert differential_expression_by_gene is api.differential_expression_by_gene
+
+
+class TestSearchHomologGroups:
+    """Tests for search_homolog_groups API function."""
+
+    def test_returns_dict(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21122, "total_matching": 5,
+              "score_max": 3.5, "score_median": 2.0,
+              "by_source": [{"item": "cyanorak", "count": 3}],
+              "by_level": [{"item": "curated", "count": 3}]}],
+            [{"group_id": "cyanorak:CK_1", "group_name": "CK_1",
+              "consensus_gene_name": "psbB", "consensus_product": "photosystem II",
+              "source": "cyanorak", "taxonomic_level": "curated",
+              "specificity_rank": 0, "member_count": 9, "organism_count": 9,
+              "score": 3.5}],
+        ]
+        result = api.search_homolog_groups("photosynthesis", conn=mock_conn)
+        assert isinstance(result, dict)
+        assert result["total_entries"] == 21122
+        assert result["total_matching"] == 5
+        assert result["score_max"] == 3.5
+        assert len(result["by_source"]) == 1
+        assert result["by_source"][0]["source"] == "cyanorak"
+        assert result["returned"] == 1
+        assert len(result["results"]) == 1
+
+    def test_summary_mode(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21122, "total_matching": 884,
+              "score_max": 6.1, "score_median": 1.0,
+              "by_source": [], "by_level": []}],
+        ]
+        result = api.search_homolog_groups("photosynthesis", summary=True, conn=mock_conn)
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert result["results"] == []
+        # Only 1 query call (summary only, detail skipped)
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_zero_match(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21122, "total_matching": 0,
+              "score_max": None, "score_median": None,
+              "by_source": [], "by_level": []}],
+        ]
+        result = api.search_homolog_groups("xyznonexistent", summary=True, conn=mock_conn)
+        assert result["total_matching"] == 0
+        assert result["score_max"] is None
+        assert result["score_median"] is None
+
+    def test_validates_source(self, mock_conn):
+        with pytest.raises(ValueError, match="Invalid source"):
+            api.search_homolog_groups("test", source="invalid", conn=mock_conn)
+
+    def test_validates_taxonomic_level(self, mock_conn):
+        with pytest.raises(ValueError, match="Invalid taxonomic_level"):
+            api.search_homolog_groups("test", taxonomic_level="invalid", conn=mock_conn)
+
+    def test_validates_empty_search_text(self, mock_conn):
+        with pytest.raises(ValueError, match="search_text"):
+            api.search_homolog_groups("", conn=mock_conn)
+
+    def test_passes_filters(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21122, "total_matching": 0,
+              "score_max": None, "score_median": None,
+              "by_source": [], "by_level": []}],
+        ]
+        api.search_homolog_groups(
+            "test", source="cyanorak", taxonomic_level="curated",
+            max_specificity_rank=0, summary=True, conn=mock_conn)
+        # Verify builder was called with filters
+        call_args = mock_conn.execute_query.call_args
+        cypher = call_args[0][0]
+        assert "og.source" in cypher
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import search_homolog_groups
+        assert search_homolog_groups is api.search_homolog_groups

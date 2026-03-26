@@ -49,7 +49,8 @@ EXPECTED_TOOLS = [
     "kg_schema", "list_filter_values", "list_organisms", "resolve_gene",
     "genes_by_function", "gene_overview", "get_gene_details",
     "gene_homologs", "run_cypher",
-    "search_ontology", "genes_by_ontology", "gene_ontology_terms",
+    "search_ontology", "search_homolog_groups",
+    "genes_by_ontology", "gene_ontology_terms",
     "list_publications",
     "list_experiments",
     "differential_expression_by_gene",
@@ -498,8 +499,8 @@ class TestGenesByFunctionWrapper:
             "total_matching": 0,
             "by_organism": [],
             "by_category": [],
-            "score_max": 0.0,
-            "score_median": 0.0,
+            "score_max": None,
+            "score_median": None,
             "returned": 0,
             "truncated": False,
             "results": [],
@@ -1031,8 +1032,8 @@ class TestSearchOntologyWrapper:
         empty_return = {
             **self._SAMPLE_API_RETURN,
             "total_matching": 0,
-            "score_max": 0.0,
-            "score_median": 0.0,
+            "score_max": None,
+            "score_median": None,
             "returned": 0,
             "truncated": False,
             "results": [],
@@ -2141,4 +2142,127 @@ class TestDifferentialExpressionByGeneWrapper:
             with pytest.raises(ToolError, match="Error in differential_expression"):
                 await tool_fns["differential_expression_by_gene"](
                     mock_ctx, organism="MED4",
+                )
+
+
+# ---------------------------------------------------------------------------
+# search_homolog_groups
+# ---------------------------------------------------------------------------
+class TestSearchHomologGroupsWrapper:
+    """Tests for search_homolog_groups MCP wrapper."""
+
+    _SAMPLE_API_RETURN = {
+        "total_entries": 21122,
+        "total_matching": 884,
+        "by_source": [{"source": "eggnog", "count": 647}, {"source": "cyanorak", "count": 237}],
+        "by_level": [{"taxonomic_level": "Bacteria", "count": 218}, {"taxonomic_level": "curated", "count": 237}],
+        "score_max": 6.128,
+        "score_median": 1.057,
+        "returned": 2,
+        "truncated": True,
+        "results": [
+            {"group_id": "eggnog:30SSF@2", "group_name": "30SSF@2",
+             "consensus_gene_name": "psbJ", "consensus_product": "photosystem II reaction center protein PsbJ",
+             "source": "eggnog", "taxonomic_level": "Bacteria",
+             "specificity_rank": 3, "member_count": 13, "organism_count": 13,
+             "score": 6.128},
+            {"group_id": "cyanorak:CK_00000570", "group_name": "CK_00000570",
+             "consensus_gene_name": "psbB", "consensus_product": "photosystem II chlorophyll-binding protein CP47",
+             "source": "cyanorak", "taxonomic_level": "curated",
+             "specificity_rank": 0, "member_count": 9, "organism_count": 9,
+             "score": 5.5},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="photosynthesis",
+            )
+        assert result.total_entries == 21122
+        assert result.total_matching == 884
+        assert result.returned == 2
+        assert result.truncated is True
+        assert len(result.results) == 2
+        assert len(result.by_source) == 2
+        assert len(result.by_level) == 2
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        empty_return = {
+            "total_entries": 21122,
+            "total_matching": 0,
+            "by_source": [],
+            "by_level": [],
+            "score_max": None,
+            "score_median": None,
+            "returned": 0,
+            "truncated": False,
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value=empty_return,
+        ):
+            result = await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="xyznonexistent",
+            )
+        assert result.total_matching == 0
+        assert result.returned == 0
+        assert result.results == []
+        assert result.score_max is None
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="kinase", source="cyanorak",
+                taxonomic_level="curated", max_specificity_rank=0,
+                summary=True, verbose=True, limit=10,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args
+        assert call_kwargs.args[0] == "kinase"
+        assert call_kwargs.kwargs["source"] == "cyanorak"
+        assert call_kwargs.kwargs["taxonomic_level"] == "curated"
+        assert call_kwargs.kwargs["max_specificity_rank"] == 0
+        assert call_kwargs.kwargs["summary"] is True
+        assert call_kwargs.kwargs["verbose"] is True
+        assert call_kwargs.kwargs["limit"] == 10
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, mock_ctx):
+        truncated_return = {
+            **self._SAMPLE_API_RETURN,
+            "total_matching": 884, "returned": 5, "truncated": True,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value=truncated_return,
+        ):
+            result = await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="photosynthesis",
+            )
+        assert result.truncated is True
+        assert result.total_matching == 884
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            side_effect=ValueError("Invalid source 'bad'"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["search_homolog_groups"](
+                    mock_ctx, search_text="test", source="bad",
                 )

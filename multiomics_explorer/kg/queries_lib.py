@@ -1577,3 +1577,95 @@ def build_differential_expression_by_gene(
         f"{limit_clause}"
     )
     return cypher, params
+
+
+def build_search_homolog_groups_summary(
+    *,
+    search_text: str,
+    source: str | None = None,
+    taxonomic_level: str | None = None,
+    max_specificity_rank: int | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for search_homolog_groups.
+
+    RETURN keys: total_entries, total_matching, score_max, score_median,
+    by_source, by_level.
+    """
+    conditions, params = _gene_homologs_og_where(
+        source=source, taxonomic_level=taxonomic_level,
+        max_specificity_rank=max_specificity_rank,
+    )
+    params["search_text"] = search_text
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    cypher = (
+        "CALL db.index.fulltext.queryNodes('orthologGroupFullText', $search_text)\n"
+        "YIELD node AS og, score\n"
+        f"{where_block}"
+        "WITH collect(og.source) AS sources,\n"
+        "     collect(og.taxonomic_level) AS levels,\n"
+        "     count(og) AS total_matching,\n"
+        "     max(score) AS score_max,\n"
+        "     percentileDisc(score, 0.5) AS score_median\n"
+        "CALL { MATCH (all_og:OrthologGroup) RETURN count(all_og) AS total_entries }\n"
+        "RETURN total_entries, total_matching, score_max, score_median,\n"
+        "       apoc.coll.frequencies(sources) AS by_source,\n"
+        "       apoc.coll.frequencies(levels) AS by_level"
+    )
+    return cypher, params
+
+
+def build_search_homolog_groups(
+    *,
+    search_text: str,
+    source: str | None = None,
+    taxonomic_level: str | None = None,
+    max_specificity_rank: int | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build Cypher for search_homolog_groups.
+
+    RETURN keys (compact): group_id, group_name, consensus_gene_name,
+    consensus_product, source, taxonomic_level, specificity_rank,
+    member_count, organism_count, score.
+    RETURN keys (verbose): adds description, functional_description,
+    genera, has_cross_genus_members.
+    """
+    conditions, params = _gene_homologs_og_where(
+        source=source, taxonomic_level=taxonomic_level,
+        max_specificity_rank=max_specificity_rank,
+    )
+    params["search_text"] = search_text
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    verbose_cols = (
+        ",\n       og.description AS description"
+        ",\n       og.functional_description AS functional_description"
+        ",\n       og.genera AS genera"
+        ",\n       og.has_cross_genus_members AS has_cross_genus_members"
+        if verbose else ""
+    )
+
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "CALL db.index.fulltext.queryNodes('orthologGroupFullText', $search_text)\n"
+        "YIELD node AS og, score\n"
+        f"{where_block}"
+        "RETURN og.id AS group_id, og.name AS group_name,\n"
+        "       og.consensus_gene_name AS consensus_gene_name,\n"
+        "       og.consensus_product AS consensus_product,\n"
+        "       og.source AS source, og.taxonomic_level AS taxonomic_level,\n"
+        "       og.specificity_rank AS specificity_rank,\n"
+        "       og.member_count AS member_count, og.organism_count AS organism_count,\n"
+        f"       score{verbose_cols}\n"
+        f"ORDER BY score DESC, og.specificity_rank, og.source{limit_clause}"
+    )
+    return cypher, params

@@ -26,6 +26,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments,
     build_list_experiments_summary,
     build_resolve_gene,
+    build_search_homolog_groups,
+    build_search_homolog_groups_summary,
     build_search_ontology,
     build_search_ontology_summary,
     build_differential_expression_by_gene,
@@ -1645,3 +1647,100 @@ class TestBuildDifferentialExpressionByGene:
         assert "product" in cypher
 
 
+class TestBuildSearchHomologGroups:
+    """Tests for build_search_homolog_groups."""
+
+    def test_no_filters(self):
+        cypher, params = build_search_homolog_groups(search_text="photosynthesis")
+        assert "orthologGroupFullText" in cypher
+        assert "$search_text" in cypher
+        assert params["search_text"] == "photosynthesis"
+        assert "WHERE" not in cypher
+
+    def test_source_filter(self):
+        cypher, params = build_search_homolog_groups(
+            search_text="kinase", source="cyanorak")
+        assert "og.source = $source" in cypher
+        assert params["source"] == "cyanorak"
+
+    def test_taxonomic_level_filter(self):
+        cypher, params = build_search_homolog_groups(
+            search_text="kinase", taxonomic_level="curated")
+        assert "og.taxonomic_level = $level" in cypher
+        assert params["level"] == "curated"
+
+    def test_max_specificity_rank_filter(self):
+        cypher, params = build_search_homolog_groups(
+            search_text="kinase", max_specificity_rank=1)
+        assert "og.specificity_rank <= $max_rank" in cypher
+        assert params["max_rank"] == 1
+
+    def test_combined_filters(self):
+        cypher, params = build_search_homolog_groups(
+            search_text="kinase", source="cyanorak", max_specificity_rank=0)
+        assert "og.source = $source" in cypher
+        assert "og.specificity_rank <= $max_rank" in cypher
+        assert "AND" in cypher
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_search_homolog_groups(search_text="test")
+        for col in ["group_id", "group_name", "consensus_gene_name",
+                     "consensus_product", "source", "taxonomic_level",
+                     "specificity_rank", "member_count", "organism_count"]:
+            assert f"AS {col}" in cypher
+        # score is returned directly from YIELD, not aliased
+        assert "score" in cypher
+
+    def test_verbose_columns(self):
+        cypher, _ = build_search_homolog_groups(search_text="test", verbose=True)
+        for col in ["description", "functional_description", "genera",
+                     "has_cross_genus_members"]:
+            assert f"AS {col}" in cypher
+
+    def test_verbose_false_excludes_columns(self):
+        cypher, _ = build_search_homolog_groups(search_text="test", verbose=False)
+        assert "AS description" not in cypher
+        assert "AS functional_description" not in cypher
+
+    def test_order_by(self):
+        cypher, _ = build_search_homolog_groups(search_text="test")
+        assert "ORDER BY score DESC" in cypher
+
+    def test_limit_clause(self):
+        cypher, params = build_search_homolog_groups(search_text="test", limit=10)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        cypher, params = build_search_homolog_groups(search_text="test")
+        assert "LIMIT" not in cypher
+        assert "limit" not in params
+
+
+class TestBuildSearchHomologGroupsSummary:
+    """Tests for build_search_homolog_groups_summary."""
+
+    def test_no_filters(self):
+        cypher, params = build_search_homolog_groups_summary(search_text="test")
+        assert "orthologGroupFullText" in cypher
+        assert "total_matching" in cypher
+        assert "score_max" in cypher
+        assert "score_median" in cypher
+        assert "by_source" in cypher
+        assert "by_level" in cypher
+        assert "total_entries" in cypher
+
+    def test_with_source_filter(self):
+        cypher, params = build_search_homolog_groups_summary(
+            search_text="test", source="cyanorak")
+        assert "og.source = $source" in cypher
+
+    def test_shares_where_clause(self):
+        """Summary and detail should produce the same WHERE for same filters."""
+        _, sum_params = build_search_homolog_groups_summary(
+            search_text="test", source="cyanorak", max_specificity_rank=1)
+        _, det_params = build_search_homolog_groups(
+            search_text="test", source="cyanorak", max_specificity_rank=1)
+        # Same filter params (detail has extra verbose/limit keys)
+        assert sum_params["source"] == det_params["source"]
+        assert sum_params["max_rank"] == det_params["max_rank"]

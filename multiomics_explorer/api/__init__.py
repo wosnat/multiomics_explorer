@@ -14,6 +14,7 @@ from multiomics_explorer.api.functions import (
     resolve_gene,
     run_cypher,
     genes_by_function,
+    search_homolog_groups,
     search_ontology,
     differential_expression_by_gene,
 )
@@ -32,6 +33,7 @@ __all__ = [
     "resolve_gene",
     "run_cypher",
     "genes_by_function",
+    "search_homolog_groups",
     "search_ontology",
     "differential_expression_by_gene",
 ]

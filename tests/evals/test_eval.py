@@ -33,6 +33,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_organisms,
     build_list_publications,
     build_resolve_gene,
+    build_search_homolog_groups,
+    build_search_homolog_groups_summary,
     build_search_ontology,
 )
 
@@ -62,6 +64,8 @@ TOOL_BUILDERS = {
     "list_experiments": build_list_experiments,
     "list_experiments_summary": build_list_experiments_summary,
     "differential_expression_by_gene": build_differential_expression_by_gene,
+    "search_homolog_groups": build_search_homolog_groups,
+    "search_homolog_groups_summary": build_search_homolog_groups_summary,
 }
 
 

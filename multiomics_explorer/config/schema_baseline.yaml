@@ -28,6 +28,7 @@ nodes:
       significant_up_count: int
       start: int
       strand: string
+      transporter_classification: list
   BiologicalProcess:
     properties:
       id: string
@@ -65,8 +66,8 @@ nodes:
       preferred_id: string
   Entity:
     properties:
-      code: string
       id: string
+      level: string
       name: string
       preferred_id: string
   Experiment:
@@ -74,6 +75,7 @@ nodes:
       coculture_partner: string
       control: string
       experimental_context: string
+      gene_count: int
       id: string
       is_time_course: string
       light_condition: string
@@ -86,9 +88,16 @@ nodes:
       significant_down_count: int
       significant_up_count: int
       statistical_test: string
+      table_scope: string
+      table_scope_detail: string
       temperature: string
+      time_point_count: int
+      time_point_hours: list
+      time_point_labels: list
+      time_point_orders: list
       time_point_significant_down: list
       time_point_significant_up: list
+      time_point_totals: list
       treatment: string
       treatment_type: string
   Gene:
@@ -115,6 +124,7 @@ nodes:
       significant_up_count: int
       start: int
       strand: string
+      transporter_classification: list
   GeneOntology:
     properties:
       id: string
@@ -124,6 +134,8 @@ nodes:
     properties:
       consensus_gene_name: string
       consensus_product: string
+      description: string
+      functional_description: string
       genera: list
       has_cross_genus_members: string
       id: string
@@ -141,18 +153,22 @@ nodes:
       authors: list
       description: string
       doi: string
+      experiment_count: int
       id: string
       journal: string
-      organism: list
+      omics_types: list
+      organisms: list
       preferred_id: string
       publication_year: int
       study_type: string
       title: string
+      treatment_types: list
   InvestigativeProcess:
     properties:
       coculture_partner: string
       control: string
       experimental_context: string
+      gene_count: int
       id: string
       is_time_course: string
       light_condition: string
@@ -165,9 +181,16 @@ nodes:
       significant_down_count: int
       significant_up_count: int
       statistical_test: string
+      table_scope: string
+      table_scope_detail: string
       temperature: string
+      time_point_count: int
+      time_point_hours: list
+      time_point_labels: list
+      time_point_orders: list
       time_point_significant_down: list
       time_point_significant_up: list
+      time_point_totals: list
       treatment: string
       treatment_type: string
   KeggTerm:
@@ -183,28 +206,33 @@ nodes:
       preferred_id: string
   NamedThing:
     properties:
-      code: string
       id: string
+      level: string
       name: string
       preferred_id: string
   OrganismTaxon:
     properties:
       clade: string
+      experiment_count: int
       family: string
+      gene_count: int
       genus: string
       id: string
       kingdom: string
       lineage: string
       ncbi_taxon_id: int
+      omics_types: list
       order: string
       organism_name: string
       phylum: string
       preferred_id: string
       preferred_name: string
+      publication_count: int
       species: string
       strain_name: string
       superkingdom: string
       tax_class: string
+      treatment_types: list
   OrganismalEntity:
     properties:
       id: string
@@ -214,6 +242,8 @@ nodes:
     properties:
       consensus_gene_name: string
       consensus_product: string
+      description: string
+      functional_description: string
       genera: list
       has_cross_genus_members: string
       id: string
@@ -286,13 +316,16 @@ nodes:
       authors: list
       description: string
       doi: string
+      experiment_count: int
       id: string
       journal: string
-      organism: list
+      omics_types: list
+      organisms: list
       preferred_id: string
       publication_year: int
       study_type: string
       title: string
+      treatment_types: list
   Schema_info:
     properties:
       id: string
@@ -405,6 +438,7 @@ relationships:
     properties:
       adjusted_p_value: float
       expression_direction: string
+      expression_status: string
       id: string
       log2_fold_change: float
       rank_by_effect: int
@@ -648,6 +682,26 @@ relationships:
     - BiologicalProcessOrActivity
     - Entity
     - MolecularFunction
+    - NamedThing
+  Og_has_cyanorak_role:
+    properties:
+      id: string
+    source_labels:
+    - GroupingClass
+    - OrthologGroup
+    target_labels:
+    - CyanorakRole
+    - Entity
+    - NamedThing
+  Og_in_cog_category:
+    properties:
+      id: string
+    source_labels:
+    - GroupingClass
+    - OrthologGroup
+    target_labels:
+    - CogFunctionalCategory
+    - Entity
     - NamedThing
   Pfam_in_pfam_clan:
     properties:

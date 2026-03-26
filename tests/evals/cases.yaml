@@ -1010,6 +1010,43 @@
 # differential_expression_by_gene
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# search_homolog_groups
+# ---------------------------------------------------------------------------
+
+- id: search_homolog_groups_basic
+  tool: search_homolog_groups
+  desc: Text search returns matching ortholog groups
+  params:
+    search_text: photosynthesis
+  expect:
+    min_rows: 10
+    columns: [group_id, group_name, consensus_gene_name, consensus_product, source, taxonomic_level, specificity_rank, member_count, organism_count, score]
+
+- id: search_homolog_groups_source_filter
+  tool: search_homolog_groups
+  desc: Source filter narrows results to cyanorak only
+  params:
+    search_text: photosynthesis
+    source: cyanorak
+  expect:
+    min_rows: 5
+    columns: [group_id, group_name, consensus_gene_name, consensus_product, source, taxonomic_level, specificity_rank, member_count, organism_count, score]
+
+- id: search_homolog_groups_verbose
+  tool: search_homolog_groups
+  desc: Verbose mode includes description and functional_description
+  params:
+    search_text: nitrogen
+    verbose: true
+  expect:
+    min_rows: 1
+    columns: [group_id, group_name, consensus_gene_name, consensus_product, source, taxonomic_level, specificity_rank, member_count, organism_count, score, description, functional_description, genera, has_cross_genus_members]
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_gene
+# ---------------------------------------------------------------------------
+
 - id: de_by_gene_single_gene
   tool: differential_expression_by_gene
   desc: Single gene returns expression rows across experiments

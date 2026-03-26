@@ -1,0 +1,36 @@
+# Human-authored content for search_homolog_groups about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Search by function
+    call: search_homolog_groups(search_text="photosynthesis")
+    response: |
+      {"total_entries": 21122, "total_matching": 884, "by_source": [{"source": "eggnog", "count": 647}, {"source": "cyanorak", "count": 237}], "by_level": [{"taxonomic_level": "Bacteria", "count": 218}, {"taxonomic_level": "curated", "count": 237}], "score_max": 6.13, "score_median": 1.06, "returned": 5, "truncated": true, "results": [{"group_id": "eggnog:30SSF@2", "group_name": "30SSF@2", "consensus_gene_name": "psbJ", "consensus_product": "photosystem II reaction center protein PsbJ", "source": "eggnog", "taxonomic_level": "Bacteria", "specificity_rank": 3, "member_count": 13, "organism_count": 13, "score": 6.13}]}
+
+  - title: Filter to curated Cyanorak groups
+    call: search_homolog_groups(search_text="kinase", source="cyanorak", max_specificity_rank=0)
+
+  - title: Find groups then get member genes
+    steps: |
+      Step 1: search_homolog_groups(search_text="nitrogen regulatory")
+              → extract group_id values from results
+
+      Step 2: genes_by_homolog_group(group_ids=["cyanorak:CK_00000468"])
+              → see member genes per organism
+
+verbose_fields:
+  - description
+  - functional_description
+  - genera
+  - has_cross_genus_members
+
+chaining:
+  - "search_homolog_groups → genes_by_homolog_group → differential_expression_by_ortholog"
+  - "gene_homologs → inspect group → search_homolog_groups for similar"
+
+mistakes:
+  - "Searching by group ID (e.g. 'COG0592') will not work — group IDs are not in the fulltext index. Use the group_id from results directly."
+  - wrong: "len(results)  # actual result count"
+    right: "response['total_matching']  # use total, not len"
+  - "Hyphens in search text are Lucene operators — use spaces instead (e.g. 'beta glycosyltransferase' not 'beta-glycosyltransferase')"

@@ -275,8 +275,8 @@ def register_tools(mcp: FastMCP):
         total_matching: int = Field(description="Total genes matching search + all filters")
         by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
         by_category: list[FunctionCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
-        score_max: float = Field(description="Highest relevance score")
-        score_median: float = Field(description="Median relevance score")
+        score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches)")
+        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches)")
         returned: int = Field(description="Number of results returned")
         truncated: bool = Field(description="True when total_matching > returned")
         results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance")
@@ -664,8 +664,8 @@ def register_tools(mcp: FastMCP):
     class SearchOntologyResponse(BaseModel):
         total_entries: int = Field(description="Total terms in this ontology (e.g. 847)")
         total_matching: int = Field(description="Terms matching the search (e.g. 31)")
-        score_max: float = Field(description="Highest relevance score (e.g. 5.23)")
-        score_median: float = Field(description="Median relevance score (e.g. 2.1)")
+        score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches, e.g. 5.23)")
+        score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches, e.g. 2.1)")
         returned: int = Field(description="Results in this response (0 when summary=true)")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[SearchOntologyResult] = Field(
@@ -1604,3 +1604,126 @@ def register_tools(mcp: FastMCP):
             raise ToolError(
                 f"Error in differential_expression_by_gene: {e}"
             )
+
+    # ------------------------------------------------------------------
+    # search_homolog_groups
+    # ------------------------------------------------------------------
+
+    class SearchHomologGroupsResult(BaseModel):
+        group_id: str = Field(description="OG identifier (e.g. 'cyanorak:CK_00000570')")
+        group_name: str = Field(description="Raw OG name (e.g. 'CK_00000570')")
+        consensus_gene_name: str | None = Field(default=None,
+            description="Consensus gene name (e.g. 'psbB'). Often null.")
+        consensus_product: str = Field(
+            description="Consensus product (e.g. 'photosystem II chlorophyll-binding protein CP47')")
+        source: str = Field(description="Source database (e.g. 'cyanorak')")
+        taxonomic_level: str = Field(description="Taxonomic scope (e.g. 'curated')")
+        specificity_rank: int = Field(description="0=curated, 1=family, 2=order, 3=domain (e.g. 0)")
+        member_count: int = Field(description="Total genes in group (e.g. 9)")
+        organism_count: int = Field(description="Distinct organisms (e.g. 9)")
+        score: float = Field(description="Lucene relevance score (e.g. 5.23)")
+        # verbose-only
+        description: str | None = Field(default=None,
+            description="Functional narrative from eggNOG (e.g. 'photosynthesis')")
+        functional_description: str | None = Field(default=None,
+            description="Derived from member gene roles (e.g. 'Photosynthesis and respiration > Photosystem II')")
+        genera: list[str] | None = Field(default=None,
+            description="Genera represented (e.g. ['Prochlorococcus', 'Synechococcus'])")
+        has_cross_genus_members: str | None = Field(default=None,
+            description="'cross_genus' or 'single_genus'")
+
+    class SearchHomologGroupsSourceBreakdown(BaseModel):
+        source: str = Field(description="OG source (e.g. 'cyanorak')")
+        count: int = Field(description="Groups from this source (e.g. 237)")
+
+    class SearchHomologGroupsLevelBreakdown(BaseModel):
+        taxonomic_level: str = Field(description="Taxonomic level (e.g. 'curated')")
+        count: int = Field(description="Groups at this level (e.g. 237)")
+
+    class SearchHomologGroupsResponse(BaseModel):
+        total_entries: int = Field(description="Total OrthologGroup nodes in KG (e.g. 21122)")
+        total_matching: int = Field(description="Groups matching search + filters (e.g. 884)")
+        by_source: list[SearchHomologGroupsSourceBreakdown] = Field(
+            description="Groups per source, sorted by count desc")
+        by_level: list[SearchHomologGroupsLevelBreakdown] = Field(
+            description="Groups per taxonomic level, sorted by count desc")
+        score_max: float | None = Field(default=None,
+            description="Highest Lucene score (null if 0 matches, e.g. 6.13)")
+        score_median: float | None = Field(default=None,
+            description="Median Lucene score (null if 0 matches, e.g. 1.06)")
+        returned: int = Field(description="Results in this response (0 when summary=true)")
+        truncated: bool = Field(description="True if total_matching > returned")
+        results: list[SearchHomologGroupsResult] = Field(
+            default_factory=list, description="One row per matching ortholog group")
+
+    @mcp.tool(
+        tags={"homology", "search"},
+        annotations={"readOnlyHint": True},
+    )
+    async def search_homolog_groups(
+        ctx: Context,
+        search_text: Annotated[str, Field(
+            description="Search query (Lucene syntax). Searches consensus_product, "
+            "consensus_gene_name, description, functional_description.",
+        )],
+        source: Annotated[str | None, Field(
+            description="Filter by OG source: 'cyanorak' or 'eggnog'.",
+        )] = None,
+        taxonomic_level: Annotated[str | None, Field(
+            description="Filter by taxonomic level. "
+            "E.g. 'curated', 'Prochloraceae', 'Bacteria'.",
+        )] = None,
+        max_specificity_rank: Annotated[int | None, Field(
+            description="Cap group breadth. 0=curated only, 1=+family, "
+            "2=+order, 3=+domain (all).",
+            ge=0, le=3,
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include description, functional_description, genera, "
+            "has_cross_genus_members in results.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> SearchHomologGroupsResponse:
+        """Search ortholog groups by text (Lucene). Returns group IDs for
+        use with genes_by_homolog_group.
+
+        Searches across consensus_product, consensus_gene_name, description,
+        and functional_description fields.
+        """
+        await ctx.info(f"search_homolog_groups search_text={search_text!r} "
+                       f"source={source} limit={limit}")
+        try:
+            conn = _conn(ctx)
+            data = api.search_homolog_groups(
+                search_text, source=source,
+                taxonomic_level=taxonomic_level,
+                max_specificity_rank=max_specificity_rank,
+                summary=summary, verbose=verbose, limit=limit, conn=conn,
+            )
+            by_source = [SearchHomologGroupsSourceBreakdown(**b) for b in data["by_source"]]
+            by_level = [SearchHomologGroupsLevelBreakdown(**b) for b in data["by_level"]]
+            results = [SearchHomologGroupsResult(**r) for r in data["results"]]
+            response = SearchHomologGroupsResponse(
+                total_entries=data["total_entries"],
+                total_matching=data["total_matching"],
+                by_source=by_source,
+                by_level=by_level,
+                score_max=data["score_max"],
+                score_median=data["score_median"],
+                returned=data["returned"],
+                truncated=data["truncated"],
+                results=results,
+            )
+            await ctx.info(f"Returning {response.returned} of {response.total_matching} groups")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"search_homolog_groups error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"search_homolog_groups unexpected error: {e}")
+            raise ToolError(f"Error in search_homolog_groups: {e}")
