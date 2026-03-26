@@ -1504,6 +1504,9 @@ class TestDifferentialExpressionByGene:
             "rows_by_treatment_type": [
                 {"item": "nitrogen_stress", "count": 15},
             ],
+            "by_table_scope": [
+                {"item": "all_detected_genes", "count": 15},
+            ],
             "median_abs_log2fc": 1.978,
             "max_abs_log2fc": 3.591,
         }]
@@ -1520,6 +1523,8 @@ class TestDifferentialExpressionByGene:
                     "omics_type": "RNASEQ",
                     "coculture_partner": None,
                     "is_time_course": "true",
+                    "table_scope": "all_detected_genes",
+                    "table_scope_detail": None,
                     "matching_genes": 5,
                     "rows_by_status": [
                         {"item": "significant_up", "count": 3},
@@ -1594,8 +1599,8 @@ class TestDifferentialExpressionByGene:
         for key in [
             "organism_strain", "matching_genes", "total_rows",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
-            "experiment_count", "rows_by_treatment_type", "top_categories",
-            "experiments", "not_found", "no_expression",
+            "experiment_count", "rows_by_treatment_type", "by_table_scope",
+            "top_categories", "experiments", "not_found", "no_expression",
             "returned", "truncated", "results",
         ]:
             assert key in result
@@ -1695,6 +1700,8 @@ class TestDifferentialExpressionByGene:
                     "omics_type": "RNASEQ",
                     "coculture_partner": None,
                     "is_time_course": "false",
+                    "table_scope": "all_detected_genes",
+                    "table_scope_detail": None,
                     "matching_genes": 1,
                     "rows_by_status": [
                         {"item": "significant_up", "count": 1},
@@ -1708,6 +1715,8 @@ class TestDifferentialExpressionByGene:
                     "omics_type": "RNASEQ",
                     "coculture_partner": None,
                     "is_time_course": "false",
+                    "table_scope": "significant_only",
+                    "table_scope_detail": None,
                     "matching_genes": 1,
                     "rows_by_status": [
                         {"item": "significant_up", "count": 10},
@@ -1743,6 +1752,8 @@ class TestDifferentialExpressionByGene:
                     "omics_type": "RNASEQ",
                     "coculture_partner": None,
                     "is_time_course": "false",
+                    "table_scope": "all_detected_genes",
+                    "table_scope_detail": None,
                     "matching_genes": 1,
                     "rows_by_status": [
                         {"item": "not_significant", "count": 5},

@@ -1247,6 +1247,17 @@ def register_tools(mcp: FastMCP):
         is_time_course: str = Field(
             description="'true' or 'false'",
         )
+        table_scope: str = Field(
+            description="What genes the source DE table contains."
+            " Values: all_detected_genes, significant_any_timepoint,"
+            " significant_only, top_n, filtered_subset."
+            " Critical for interpreting missing genes.",
+        )
+        table_scope_detail: str | None = Field(
+            default=None,
+            description="Free-text clarification of table_scope"
+            " (e.g. 'Top 50% of genes by expression level').",
+        )
         matching_genes: int = Field(
             description="Distinct genes with data in this experiment (e.g. 5)",
         )
@@ -1341,6 +1352,16 @@ def register_tools(mcp: FastMCP):
             default=None,
             description="Coculture partner organism, if applicable",
         )
+        table_scope: str | None = Field(
+            default=None,
+            description="What genes the source DE table contains"
+            " (e.g. 'all_detected_genes'). Verbose only.",
+        )
+        table_scope_detail: str | None = Field(
+            default=None,
+            description="Free-text clarification of table_scope."
+            " Verbose only.",
+        )
 
     class DifferentialExpressionByGeneResponse(BaseModel):
         organism_strain: str = Field(
@@ -1371,6 +1392,11 @@ def register_tools(mcp: FastMCP):
         rows_by_treatment_type: dict[str, int] = Field(
             description="Row counts by treatment type"
             " (e.g. {'nitrogen_stress': 15})",
+        )
+        by_table_scope: dict[str, int] = Field(
+            description="Row counts by experiment table_scope"
+            " (e.g. {'all_detected_genes': 100, 'significant_only': 50})."
+            " Shows data completeness across experiments.",
         )
         top_categories: list[ExpressionTopCategory] = Field(
             description="Top gene categories by significant gene count,"
@@ -1522,6 +1548,7 @@ def register_tools(mcp: FastMCP):
                 max_abs_log2fc=data["max_abs_log2fc"],
                 experiment_count=data["experiment_count"],
                 rows_by_treatment_type=data["rows_by_treatment_type"],
+                by_table_scope=data["by_table_scope"],
                 top_categories=top_cat_models,
                 experiments=exp_models,
                 not_found=data["not_found"],

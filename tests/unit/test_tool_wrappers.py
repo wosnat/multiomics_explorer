@@ -1910,6 +1910,7 @@ class TestDifferentialExpressionByGeneWrapper:
         "max_abs_log2fc": 3.591,
         "experiment_count": 1,
         "rows_by_treatment_type": {"nitrogen_stress": 15},
+        "by_table_scope": {"all_detected_genes": 15},
         "top_categories": [
             {"category": "Signal transduction",
              "total_genes": 2, "significant_genes": 2},
@@ -1922,6 +1923,8 @@ class TestDifferentialExpressionByGeneWrapper:
                 "omics_type": "RNASEQ",
                 "coculture_partner": None,
                 "is_time_course": "true",
+                "table_scope": "all_detected_genes",
+                "table_scope_detail": None,
                 "matching_genes": 5,
                 "rows_by_status": {
                     "significant_up": 3,

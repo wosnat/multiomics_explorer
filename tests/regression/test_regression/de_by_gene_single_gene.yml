@@ -73,7 +73,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.89
   padj: 0.54
-  rank: 471
+  rank: 467
   timepoint: 12h
   timepoint_hours: 12.0
   timepoint_order: 2
@@ -84,7 +84,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.87
   padj: 0.49
-  rank: 494
+  rank: 493
   timepoint: 24h
   timepoint_hours: 24.0
   timepoint_order: 3

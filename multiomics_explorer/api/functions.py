@@ -1162,8 +1162,8 @@ def differential_expression_by_gene(
     Returns:
         dict with keys: organism_strain, matching_genes, total_rows,
         rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
-        rows_by_treatment_type, top_categories, experiments, returned,
-        truncated, not_found, no_expression, results.
+        rows_by_treatment_type, by_table_scope, top_categories, experiments,
+        returned, truncated, not_found, no_expression, results.
     """
     conn = _default_conn(conn)
 
@@ -1207,6 +1207,9 @@ def differential_expression_by_gene(
     rows_by_status = _apoc_freq_to_dict(global_raw["rows_by_status"])
     rows_by_treatment_type = _apoc_freq_to_treatment_dict(
         global_raw["rows_by_treatment_type"]
+    )
+    by_table_scope = _apoc_freq_to_treatment_dict(
+        global_raw["by_table_scope"]
     )
 
     # --- Summary query 2: per-experiment with nested timepoints ---
@@ -1280,6 +1283,7 @@ def differential_expression_by_gene(
         "max_abs_log2fc": global_raw["max_abs_log2fc"],
         "experiment_count": len(experiments),
         "rows_by_treatment_type": rows_by_treatment_type,
+        "by_table_scope": by_table_scope,
         "top_categories": top_categories,
         "experiments": experiments,
         "not_found": not_found,

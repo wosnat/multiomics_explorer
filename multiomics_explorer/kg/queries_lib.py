@@ -1328,9 +1328,10 @@ def build_differential_expression_by_gene_summary_global(
     """Global aggregate stats for differential_expression_by_gene.
 
     RETURN keys: total_rows, matching_genes, rows_by_status,
-    rows_by_treatment_type, median_abs_log2fc, max_abs_log2fc.
+    rows_by_treatment_type, by_table_scope, median_abs_log2fc, max_abs_log2fc.
     rows_by_status = apoc list [{item, count}] — api/ converts to dict.
     rows_by_treatment_type = apoc list [{item, count}] — api/ converts to dict.
+    by_table_scope = apoc list [{item, count}] — api/ converts to dict.
     """
     conditions, params = _differential_expression_where(
         organism=organism, locus_tags=locus_tags,
@@ -1346,6 +1347,7 @@ def build_differential_expression_by_gene_summary_global(
         "       count(DISTINCT g.locus_tag) AS matching_genes,\n"
         "       apoc.coll.frequencies(collect(r.expression_status)) AS rows_by_status,\n"
         "       apoc.coll.frequencies(collect(e.treatment_type)) AS rows_by_treatment_type,\n"
+        "       apoc.coll.frequencies(collect(e.table_scope)) AS by_table_scope,\n"
         "       percentileCont(\n"
         '           CASE WHEN r.expression_status <> "not_significant"\n'
         "                THEN abs(r.log2_fold_change) ELSE null END, 0.5\n"
@@ -1400,6 +1402,8 @@ def build_differential_expression_by_gene_summary_by_experiment(
         " omics_type: e.omics_type,\n"
         "              coculture_partner: e.coculture_partner,\n"
         "              is_time_course: e.is_time_course,\n"
+        "              table_scope: e.table_scope,\n"
+        "              table_scope_detail: e.table_scope_detail,\n"
         "              matching_genes: matching_genes,\n"
         "              rows_by_status: rows_by_status,\n"
         "              timepoints: timepoints}) AS experiments,\n"
@@ -1513,7 +1517,8 @@ def build_differential_expression_by_gene(
     experiment_id, treatment_type, timepoint, timepoint_hours, timepoint_order,
     log2fc, padj, rank, expression_status.
     RETURN keys (verbose): adds product, experiment_name, treatment,
-    gene_category, omics_type, coculture_partner.
+    gene_category, omics_type, coculture_partner, table_scope,
+    table_scope_detail.
     """
     conditions, params = _differential_expression_where(
         organism=organism, locus_tags=locus_tags,
@@ -1529,6 +1534,8 @@ def build_differential_expression_by_gene(
         ",\n       g.gene_category AS gene_category"
         ",\n       e.omics_type AS omics_type"
         ",\n       e.coculture_partner AS coculture_partner"
+        ",\n       e.table_scope AS table_scope"
+        ",\n       e.table_scope_detail AS table_scope_detail"
         if verbose else ""
     )
 

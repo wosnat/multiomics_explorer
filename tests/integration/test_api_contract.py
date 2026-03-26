@@ -351,8 +351,8 @@ class TestDifferentialExpressionByGeneContract:
         expected_keys = {
             "organism_strain", "matching_genes", "total_rows",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
-            "experiment_count", "rows_by_treatment_type", "top_categories",
-            "experiments", "not_found", "no_expression",
+            "experiment_count", "rows_by_treatment_type", "by_table_scope",
+            "top_categories", "experiments", "not_found", "no_expression",
             "returned", "truncated", "results",
         }
         assert set(result.keys()) == expected_keys
