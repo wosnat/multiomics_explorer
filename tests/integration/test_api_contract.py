@@ -336,3 +336,64 @@ class TestRunCypherContract:
     def test_write_blocked(self, conn):
         with pytest.raises(ValueError, match="Write operations"):
             api.run_cypher("CREATE (n:Test)", conn=conn)
+
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_gene
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestDifferentialExpressionByGeneContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.differential_expression_by_gene(
+            organism=KNOWN_ORGANISM, summary=True, conn=conn,
+        )
+        assert isinstance(result, dict)
+        expected_keys = {
+            "organism_strain", "matching_genes", "total_rows",
+            "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
+            "experiment_count", "rows_by_treatment_type", "top_categories",
+            "experiments", "not_found", "no_expression",
+            "returned", "truncated", "results",
+        }
+        assert set(result.keys()) == expected_keys
+
+    def test_rows_by_status_keys(self, conn):
+        result = api.differential_expression_by_gene(
+            organism=KNOWN_ORGANISM, summary=True, conn=conn,
+        )
+        rbs = result["rows_by_status"]
+        assert set(rbs.keys()) == {"significant_up", "significant_down", "not_significant"}
+        assert sum(rbs.values()) == result["total_rows"]
+
+    def test_result_row_keys(self, conn):
+        result = api.differential_expression_by_gene(
+            locus_tags=[KNOWN_GENE], limit=1, conn=conn,
+        )
+        assert result["returned"] >= 1
+        row = result["results"][0]
+        expected_compact = {
+            "locus_tag", "gene_name", "experiment_id", "treatment_type",
+            "timepoint", "timepoint_hours", "timepoint_order",
+            "log2fc", "padj", "rank", "expression_status",
+        }
+        assert expected_compact <= set(row.keys())
+
+    def test_verbose_adds_columns(self, conn):
+        result = api.differential_expression_by_gene(
+            locus_tags=[KNOWN_GENE], verbose=True, limit=1, conn=conn,
+        )
+        row = result["results"][0]
+        for col in ("product", "experiment_name", "treatment",
+                     "gene_category", "omics_type"):
+            assert col in row
+
+    def test_experiment_summary_shape(self, conn):
+        result = api.differential_expression_by_gene(
+            organism=KNOWN_ORGANISM, summary=True, conn=conn,
+        )
+        assert result["experiment_count"] == len(result["experiments"])
+        if result["experiments"]:
+            exp = result["experiments"][0]
+            assert "experiment_id" in exp
+            assert "rows_by_status" in exp
+            assert "matching_genes" in exp

@@ -50,6 +50,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `search_ontology` | Browse ontology terms by text search (GO, KEGG, EC, COG, Cyanorak, TIGR, Pfam). Summary fields: total_entries, score stats. Returns term IDs for use with `genes_by_ontology`. |
 | `genes_by_ontology` | Find genes annotated to ontology term IDs, with hierarchy expansion. Summary fields (by_organism, by_category, by_term). Verbose adds matched_terms, gene_summary, function_description. |
 | `gene_ontology_terms` | Reverse lookup: get ontology annotations for genes (batch). Always returns leaf (most specific) terms. Optional ontology filter (None = all). Rich summary fields (by_ontology with gene coverage, by_term, annotation density stats). |
+| `differential_expression_by_gene` | Gene-centric differential expression. One row per gene × experiment × timepoint. Summary stats always returned; detail rows sorted by |log2FC|. Filters: organism, locus_tags, experiment_ids, direction, significant_only. Single organism enforced. |
 | `run_cypher` | Raw Cypher escape hatch (read-only). Write operations blocked; syntax and schema validated via CyVer before execution. Returns `{returned, truncated, warnings, results}`. |
 
 ### Claude Code Configuration

@@ -400,3 +400,49 @@ class TestListFilterValues:
         assert "value" in result["results"][0]
         assert "count" in result["results"][0]
 
+
+@pytest.mark.kg
+class TestDifferentialExpressionByGene:
+    def test_organism_summary(self, conn):
+        """Organism-only summary returns counts without rows."""
+        result = api.differential_expression_by_gene(
+            organism="MED4", summary=True, conn=conn,
+        )
+        assert "MED4" in result["organism_strain"]
+        assert result["total_rows"] > 0
+        assert result["results"] == []
+        assert result["truncated"] is True
+
+    def test_locus_tags_with_limit(self, conn):
+        """Locus tags return detail rows sorted by |log2fc|."""
+        result = api.differential_expression_by_gene(
+            locus_tags=["PMM0001"], limit=5, conn=conn,
+        )
+        assert result["returned"] <= 5
+        assert result["matching_genes"] >= 1
+        for row in result["results"]:
+            assert row["locus_tag"] == "PMM0001"
+            assert "log2fc" in row
+            assert "expression_status" in row
+
+    def test_significant_only(self, conn):
+        """significant_only filters to significant rows."""
+        result = api.differential_expression_by_gene(
+            organism="MED4", significant_only=True, limit=5, conn=conn,
+        )
+        for row in result["results"]:
+            assert row["expression_status"] in ("significant_up", "significant_down")
+
+    def test_no_filters_raises(self, conn):
+        """All three None raises ValueError."""
+        with pytest.raises(ValueError, match="at least one"):
+            api.differential_expression_by_gene(conn=conn)
+
+    def test_summary_consistency(self, conn):
+        """Summary total_rows matches detail row count (small dataset)."""
+        kwargs = dict(locus_tags=["PMM0001"], conn=conn)
+        summary = api.differential_expression_by_gene(**kwargs, summary=True)
+        detail = api.differential_expression_by_gene(**kwargs, limit=500)
+        assert summary["total_rows"] == detail["total_rows"]
+        assert summary["total_rows"] == len(detail["results"])
+

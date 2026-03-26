@@ -2,9 +2,11 @@
 
 ## Purpose
 
-Given gene locus tags and/or experiment IDs, return differential expression
-results for those genes across experiments. One row per gene × experiment ×
-timepoint (long form, all context inlined — no separate metadata tables).
+Given an organism, gene locus tags, and/or experiment IDs, return differential
+expression results. One row per gene × experiment × timepoint (long form, all
+context inlined — no separate metadata tables).
+
+At least one of `organism`, `locus_tags`, or `experiment_ids` is required.
 
 Phase 3 — Expression. Gene-centric. Same organism at a time.
 
@@ -26,11 +28,15 @@ homology.
 - [x] KG rebuilt (2026-03-24) — `r.expression_status` verified on all 188,501 edges
 - [x] Ready for Phase 2 (build)
 
-**Workflow note:** KG rebuild in progress. Once complete, verify `r.expression_status`
-is populated on edges, then proceed to Phase 2 (build).
+**Workflow note:** KG rebuild complete. Verified: `r.expression_status` on all
+188,501 edges (19,783 significant_up / 22,904 significant_down / 145,814 not_significant).
 
 ## Use cases
 
+- **Organism overview** — "What's the expression landscape for MED4?" →
+  `organism="MED4"`, `summary=True` — 47K edges summarised without row data
+- **Organism top responders** — "Strongest responders in MED4" →
+  `organism="MED4"`, `significant_only=True`, `limit=20`
 - **Gene profile across conditions** — "Show expression of psbA across all
   experiments" → `locus_tags=["PMM0001"]`, no experiment filter
 - **Batch gene × experiment** — "Expression of [PMM0001, PMM0845] in iron
@@ -40,14 +46,14 @@ is populated on edges, then proceed to Phase 2 (build).
 - **Time course profile** — "Expression of [genes] across all time points in
   experiment Y" → `experiment_ids=[Y]`, default limit, look at timepoint fields
 - **Filter by direction** — "Upregulated genes in coculture" →
-  `direction="up"`, `significant_only=True`
+  `direction="up"` (implies significant — no need for `significant_only=True`)
 - **Chained with Phase 2** — `genes_by_function` → locus_tags →
   `differential_expression_by_gene`
 
 ## KG dependencies
 
-Existing properties verified in live KG (2026-03-24). One new property
-needed: `expression_status` — see `docs/kg-specs/kg-spec-expression-call.md`.
+All properties present in live KG (2026-03-24). `expression_status` added
+in KG rebuild 2026-03-24 — see `docs/kg-specs/kg-spec-expression-call.md`.
 
 ### Edge properties (`Changes_expression_of`)
 
@@ -99,6 +105,12 @@ from edges to respect the active filters).
 )
 async def differential_expression_by_gene(
     ctx: Context,
+    organism: Annotated[str | None, Field(
+        description="Organism name or partial match (e.g. 'MED4', "
+                    "'Prochlorococcus MED4'). Fuzzy word-based matching "
+                    "(same as list_experiments). "
+                    "Get valid names from list_organisms.",
+    )] = None,
     locus_tags: Annotated[list[str] | None, Field(
         description="Gene locus tags. E.g. ['PMM0001', 'PMM0845']. "
                     "Get these from resolve_gene / gene_overview.",
@@ -130,13 +142,15 @@ async def differential_expression_by_gene(
     (strongest effects first). Default limit=5 gives a quick overview.
     Set summary=True for counts only, or increase limit for more rows.
 
-    All inputs must refer to the same organism. If locus_tags span multiple
-    organisms, or experiment_ids span multiple organisms, or locus_tag organisms
-    don't match experiment organisms, a ValueError is raised. Call once per
-    organism.
+    At least one of organism, locus_tags, or experiment_ids is required.
+    All inputs must refer to the same organism — call once per organism.
 
-    At least one of locus_tags or experiment_ids is strongly recommended.
-    Without any filter, results cover the full KG (188K rows).
+    When organism is the only filter, it scopes to that organism's full
+    expression data (e.g. MED4 = 47K edges). Combine with summary=True or
+    significant_only=True + limit for manageable results.
+
+    When locus_tags and/or experiment_ids are also provided, organism acts as
+    validation (must match the organism inferred from those IDs).
 
     The `expression_status` field uses the publication-specific threshold from
     each experiment's original paper (not a uniform padj<0.05 cutoff). A row
@@ -148,13 +162,37 @@ async def differential_expression_by_gene(
     """
 ```
 
+### Parameter interactions: `organism`, `locus_tags`, `experiment_ids`
+
+At least one required. `ValueError` raised when none provided.
+
+| organism | locus_tags | experiment_ids | Behavior |
+|---|---|---|---|
+| None | None | None | **Reject** — `ValueError("at least one of organism, locus_tags, or experiment_ids is required")` |
+| None | `[lts]` | None | All experiments for those genes. Organism inferred from genes. |
+| None | None | `[eids]` | All genes in those experiments. Organism inferred from experiments. |
+| None | `[lts]` | `[eids]` | Intersection — those genes in those experiments. Organism inferred + cross-validated. |
+| `"org"` | None | None | All expression for that organism. Fuzzy match resolves to full `organism_strain`. |
+| `"org"` | `[lts]` | None | Organism validates gene organism. Functionally same as `(None, lts, None)` after validation. |
+| `"org"` | None | `[eids]` | Organism validates experiment organism. Functionally same as `(None, None, eids)` after validation. |
+| `"org"` | `[lts]` | `[eids]` | Organism validates both. Functionally same as `(None, lts, eids)` after validation. |
+
+**Organism fuzzy matching** — same word-based CONTAINS as `list_experiments`:
+`"MED4"` matches `"Prochlorococcus MED4"`, `"HOT1A3"` matches
+`"Alteromonas macleodii HOT1A3"`. Uses `e.organism_strain` (verified:
+`g.organism_strain == e.organism_strain` for all 188,501 edges).
+
+**Scale by organism (significant-only):**
+MED4 = 8,460 rows, HOT1A3 = 12,168, MIT1002 = 7,296, NATL2A = 5,754,
+MIT9313 = 6,640, others < 1K. All manageable with `summary=True` or `limit`.
+
 **Return envelope:** `organism_strain, matching_genes, total_rows, rows_by_status,
 median_abs_log2fc, max_abs_log2fc, experiment_count, top_categories, experiments,
 returned, truncated, not_found, no_expression, results`
 
 **Per-result columns (compact — 11):**
 `locus_tag`, `gene_name`,
-`experiment_id`, `condition_type`, `timepoint`, `timepoint_hours`, `timepoint_order`,
+`experiment_id`, `treatment_type`, `timepoint`, `timepoint_hours`, `timepoint_order`,
 `log2fc`, `padj`, `rank`, `expression_status`
 
 **Verbose adds (6):**
@@ -189,7 +227,8 @@ see `docs/kg-specs/kg-spec-expression-call.md`). Derived from existing `r.signif
 ### `rows_by_status` dict
 
 `{"significant_up": N, "significant_down": N, "not_significant": N}` — appears at
-global level, per-experiment, and per-timepoint. Always all three keys present.
+global level, per-experiment, and per-timepoint. api/ fills missing zero-count keys
+(`apoc.coll.frequencies` omits keys with count=0; all three keys always present in output).
 
 ### Always present (organism-level — single organism enforced)
 
@@ -202,7 +241,8 @@ global level, per-experiment, and per-timepoint. Always all three keys present.
 | `median_abs_log2fc` | float \| null | Median \|log2FC\| for significant rows only; null if none |
 | `max_abs_log2fc` | float \| null | Max \|log2FC\| for significant rows only; null if none |
 | `experiment_count` | int | Number of experiments in results (after filters) |
-| `top_categories` | list | Top gene categories by distinct significantly-expressed genes, max 5. `[{"category": str, "total_genes": int, "significant_genes": int}]`. `total_genes` = all input genes in that category; `significant_genes` = those with at least one significant row. |
+| `rows_by_treatment_type` | dict | `{"nitrogen_stress": N, "coculture": N, ...}` — row counts by treatment type |
+| `top_categories` | list | Top gene categories by distinct significantly-expressed genes, max 5. `[{"category": str, "total_genes": int, "significant_genes": int}]`. `total_genes` = distinct matched genes in that category (= input genes when `locus_tags` provided; = all matched genes otherwise); `significant_genes` = those with at least one significant row. |
 | `returned` | int | Rows in `results` |
 | `truncated` | bool | True if `total_rows > returned` |
 
@@ -212,7 +252,10 @@ global level, per-experiment, and per-timepoint. Always all three keys present.
 |---|---|---|
 | `experiment_id` | str | |
 | `experiment_name` | str | Human-readable name from `e.name` |
+| `treatment_type` | str | Treatment category (e.g. "nitrogen_stress", "coculture") |
 | `omics_type` | str | |
+| `coculture_partner` | str \| null | Coculture partner organism, if applicable |
+| `is_time_course` | str | `"true"` / `"false"` — from Experiment node |
 | `matching_genes` | int | Distinct genes in this experiment (after all active filters) |
 | `rows_by_status` | dict | `{"significant_up": N, "significant_down": N, "not_significant": N}` |
 | `timepoints` | list \| null | Per-timepoint breakdown (see below). Null when `is_time_course=false`. |
@@ -241,19 +284,32 @@ the given experiment filters exclude all their data. Distinguishing from `not_fo
 **`not_found` / `no_expression` only populated when `locus_tags` is provided.**
 When querying by `experiment_ids` only, these fields are empty lists.
 
-### Single-organism validation (raises ValueError)
+### Input validation (raises ValueError)
 
-Enforced in api/ before any KG queries run, using a lightweight pre-query
-that resolves organism_strain for all input IDs:
+Enforced in api/ before any KG queries run.
+
+**Require at least one filter:**
 
 | Case | Error message |
 |---|---|
+| All three None | `"at least one of organism, locus_tags, or experiment_ids is required"` |
+
+**Single-organism enforcement** — lightweight pre-queries resolve
+`DISTINCT organism_strain` for each input set:
+
+| Case | Error message |
+|---|---|
+| `organism` fuzzy match resolves to 0 organisms | `"no organism matching 'xyz' found"` |
+| `organism` fuzzy match resolves to >1 organisms | `"organism 'pro' matches multiple organisms: MED4, MIT9313, ... — be more specific"` |
 | `locus_tags` from multiple organisms | `"locus_tags span multiple organisms: MED4, MIT9313 — call once per organism"` |
 | `experiment_ids` from multiple organisms | `"experiment_ids span multiple organisms: MED4, HOT1A3 — call once per organism"` |
 | `locus_tags` organism ≠ `experiment_ids` organism | `"locus_tags are MED4 genes but experiment_ids cover HOT1A3 — organisms must match"` |
+| `organism` ≠ inferred organism from locus_tags/experiment_ids | `"organism 'MED4' does not match locus_tags organism 'MIT9313'"` |
 
 Pre-query resolves `DISTINCT g.organism_strain` for locus_tags and
-`DISTINCT e.organism_strain` for experiment_ids. Cheap (index lookup).
+`DISTINCT e.organism_strain` for experiment_ids. For `organism` alone,
+the fuzzy match is applied in the WHERE clause and the resulting
+`DISTINCT e.organism_strain` is checked. Cheap (index lookups).
 `organism_strain` in the response is set from the validated single value.
 
 ---
@@ -263,12 +319,14 @@ Pre-query resolves `DISTINCT g.organism_strain` for locus_tags and
 | Scenario | Recommended call |
 |---|---|
 | Quick overview (what's available?) | `summary=True` — no rows, just counts |
-| Strongest responders in an experiment | `significant_only=True`, `limit=20` |
-| Full profile for 1–3 genes | `locus_tags=[...]`, `limit=0` (all rows) |
+| Organism-wide landscape | `organism="MED4"`, `summary=True` |
+| Organism top responders | `organism="MED4"`, `significant_only=True`, `limit=20` |
+| Strongest responders in an experiment | `experiment_ids=[...]`, `significant_only=True`, `limit=20` |
+| Full profile for 1–3 genes | `locus_tags=[...]`, `limit=None` in api/ (all rows); set large limit in MCP |
 | Batch annotation of gene list | `significant_only=True`, `summary=True` first |
 
-`limit=0` in the MCP tool returns all matching rows — use with `significant_only=True`
-or after checking `total_matching` via summary.
+`limit=None` in api/ returns all matching rows. MCP `limit` has `ge=1` — use a
+large value (e.g. 200) when you need many rows via MCP.
 
 **Default limit:** 5 (MCP), None (api/).
 
@@ -282,7 +340,7 @@ All summary queries always run. Detail query skipped when `limit=0` / `summary=T
 All queries share the same WHERE clause (same filter parameters).
 
 **Summary query 1 — global stats:**
-Returns `total_rows`, `rows_by_status`, `median_abs_log2fc`, `max_abs_log2fc`.
+Returns `total_rows`, `matching_genes`, `rows_by_status`, `median_abs_log2fc`, `max_abs_log2fc`.
 
 `rows_by_status` uses `apoc.coll.frequencies(collect(r.expression_status))` —
 single aggregation over the precomputed enum; always all three keys present.
@@ -345,6 +403,32 @@ Filtering is by exact match on IDs and enum values only.
 Text search on gene names → use `genes_by_function` upstream.
 Text search on experiments → use `list_experiments` upstream.
 
+### Common mistakes
+
+**1. Treating truncated results as complete.**
+The `limit` controls total result rows (gene × experiment × timepoint). When `truncated=true`,
+the result set is a partial slice sorted by `|log2FC| DESC` — it may contain only a subset of
+timepoints for a gene, only some experiments, or only the strongest-responding genes. Do not
+interpret the absence of a row as "no change" when the output is truncated. Always check
+`truncated` before drawing conclusions about presence/absence. Use `summary=True` for reliable
+counts, or increase `limit` to get the full picture.
+
+**2. Assuming `no_expression` means "not differentially expressed".**
+A gene in `no_expression` has zero `Changes_expression_of` edges matching the active filters.
+This does **not** mean the gene was measured and found unchanged. Possible reasons:
+
+- **Publication-level filtering:** Some publications report all genes assayed (full genome),
+  others report only a subset (e.g. top 50 by effect size, or only significant hits). A gene
+  absent from a subset-reporting publication was likely measured but filtered out by the
+  authors before data was deposited — it may or may not be differentially expressed.
+- **Not sequenced:** The gene's organism was not included in the experiment.
+- **Filter mismatch:** The gene has expression data, but not in the experiments matching
+  the current `experiment_ids` / `organism` filters.
+
+The KG build pipeline tracks publication reporting scope (full vs filtered), but this
+metadata is not yet exposed through the expression tool. For now, treat `no_expression`
+as "no data available" rather than "no change observed".
+
 ---
 
 ## Query Builders
@@ -359,6 +443,7 @@ helper. The api/ layer calls all three summary builders and merges results.
 ```python
 def _differential_expression_where(
     *,
+    organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -367,9 +452,16 @@ def _differential_expression_where(
     """Build WHERE conditions + params shared by all de_by_gene builders.
 
     direction takes precedence over significant_only (direction implies significance).
+    organism uses fuzzy word-based matching (same as list_experiments).
     """
     conditions: list[str] = []
     params: dict = {}
+    if organism:
+        conditions.append(
+            "ALL(word IN split(toLower($organism), ' ')"
+            " WHERE toLower(e.organism_strain) CONTAINS word)"
+        )
+        params["organism"] = organism
     if locus_tags:
         conditions.append("g.locus_tag IN $locus_tags")
         params["locus_tags"] = locus_tags
@@ -392,8 +484,27 @@ where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
 ### Pre-query: organism validation
 
-Two lightweight builders used by api/ before any summary queries run.
+Three lightweight builders used by api/ before any summary queries run.
 Not added to `TOOL_BUILDERS` in regression tests (not tools themselves).
+
+```python
+def build_resolve_organism_for_organism(
+    *, organism: str,
+) -> tuple[str, dict]:
+    """Resolve distinct organism_strain values for a fuzzy organism name.
+
+    RETURN keys: organisms (list[str]).
+    Uses the same word-based CONTAINS matching as list_experiments.
+    Used for single-organism pre-validation in differential_expression_by_gene.
+    """
+```
+
+```cypher
+MATCH (e:Experiment)-[:Changes_expression_of]->()
+WHERE ALL(word IN split(toLower($organism), ' ')
+      WHERE toLower(e.organism_strain) CONTAINS word)
+RETURN collect(DISTINCT e.organism_strain) AS organisms
+```
 
 ```python
 def build_resolve_organism_for_locus_tags(
@@ -429,14 +540,16 @@ MATCH (e:Experiment {id: eid})
 RETURN collect(DISTINCT e.organism_strain) AS organisms
 ```
 
-api/ calls one or both, checks `len(organisms) > 1` → ValueError, then checks
-disjointness if both are provided.
+api/ calls one, two, or all three depending on which inputs are provided.
+Checks `len(organisms) > 1` → ValueError, then checks cross-set consistency
+if multiple inputs are provided.
 
 ### `build_differential_expression_by_gene_summary_global`
 
 ```python
 def build_differential_expression_by_gene_summary_global(
     *,
+    organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -445,8 +558,9 @@ def build_differential_expression_by_gene_summary_global(
     """Global aggregate stats for differential_expression_by_gene.
 
     RETURN keys: total_rows, matching_genes, rows_by_status,
-    median_abs_log2fc, max_abs_log2fc.
+    rows_by_treatment_type, median_abs_log2fc, max_abs_log2fc.
     rows_by_status = apoc list [{item, count}] — api/ converts to dict.
+    rows_by_treatment_type = apoc list [{item, count}] — api/ converts to dict.
     """
 ```
 
@@ -456,6 +570,7 @@ MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
 RETURN count(*) AS total_rows,
        count(DISTINCT g.locus_tag) AS matching_genes,
        apoc.coll.frequencies(collect(r.expression_status)) AS rows_by_status,
+       apoc.coll.frequencies(collect(e.treatment_type)) AS rows_by_treatment_type,
        percentileCont(
            CASE WHEN r.expression_status <> "not_significant"
                 THEN abs(r.log2_fold_change) ELSE null END, 0.5
@@ -474,6 +589,7 @@ RETURN count(*) AS total_rows,
 ```python
 def build_differential_expression_by_gene_summary_by_experiment(
     *,
+    organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -512,7 +628,9 @@ WITH e,
               rows_by_status: apoc.coll.frequencies(tp_calls)}) AS timepoints
 
 // Pass 3: collect experiments — organism already validated as single value
-WITH collect({experiment_id: e.id, experiment_name: e.name, omics_type: e.omics_type,
+WITH collect({experiment_id: e.id, experiment_name: e.name,
+              treatment_type: e.treatment_type, omics_type: e.omics_type,
+              coculture_partner: e.coculture_partner,
               is_time_course: e.is_time_course,
               matching_genes: matching_genes,
               rows_by_status: rows_by_status,
@@ -539,6 +657,7 @@ for non-time-course experiments (matching `list_experiments` pattern).
 ```python
 def build_differential_expression_by_gene_summary_diagnostics(
     *,
+    organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -576,7 +695,7 @@ UNWIND $locus_tags AS lt
 OPTIONAL MATCH (g:Gene {locus_tag: lt})
 OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)
 {where_block_no_lt}
-WITH lt, g, count(*) AS edge_count
+WITH lt, g, count(r) AS edge_count
 
 WITH collect(CASE WHEN g IS NULL           THEN lt END) AS not_found_raw,
      collect(CASE WHEN g IS NOT NULL AND edge_count = 0 THEN lt END) AS no_expr_raw,
@@ -599,7 +718,7 @@ RETURN not_found, no_expression,
 ```
 
 `where_block_no_lt` = same `_differential_expression_where()` conditions but
-with `locus_tags=None` (experiment_ids + direction + significant_only only).
+with `locus_tags=None` (organism + experiment_ids + direction + significant_only).
 The locus_tag filter is already applied via `UNWIND + OPTIONAL MATCH`.
 
 `collect(CASE WHEN g IS NULL THEN lt END)` — collect() drops NULLs, so
@@ -616,6 +735,7 @@ This is the established pattern (see `build_gene_homologs_summary`).
 ```python
 def build_differential_expression_by_gene(
     *,
+    organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -626,7 +746,7 @@ def build_differential_expression_by_gene(
     """Build detail Cypher for differential_expression_by_gene.
 
     RETURN keys (compact — 11): locus_tag, gene_name,
-    experiment_id, condition_type, timepoint, timepoint_hours, timepoint_order,
+    experiment_id, treatment_type, timepoint, timepoint_hours, timepoint_order,
     log2fc, padj, rank, expression_status.
     RETURN keys (verbose): adds product, experiment_name, treatment,
     gene_category, omics_type, coculture_partner.
@@ -639,7 +759,7 @@ Property mappings:
 - `g.function_description` → `product` (verbose)
 - `e.id` → `experiment_id`
 - `e.name` → `experiment_name` (verbose)
-- `e.treatment_type` → `condition_type`
+- `e.treatment_type` → `treatment_type`
 - `e.treatment` → `treatment` (verbose)
 - `e.omics_type` → `omics_type` (verbose)
 - `e.coculture_partner` → `coculture_partner` (verbose)
@@ -662,7 +782,7 @@ MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
 RETURN g.locus_tag AS locus_tag,
        g.gene_name AS gene_name,
        e.id AS experiment_id,
-       e.treatment_type AS condition_type,
+       e.treatment_type AS treatment_type,
        r.time_point AS timepoint,
        r.time_point_hours AS timepoint_hours,
        r.time_point_order AS timepoint_order,
@@ -675,6 +795,212 @@ ORDER BY ABS(r.log2_fold_change) DESC, g.locus_tag ASC, e.id ASC, r.time_point_o
 {limit_clause}
 ```
 
+### Cypher review notes and sticky points
+
+Review of query builders (this spec) and `post-import.cypher` (KG build repo).
+Findings verified against live KG (2026-03-25).
+
+#### KG invariants (verified)
+
+These hold for all 188,501 edges. Queries that depend on them should have
+integration tests that assert them, so a KG rebuild that breaks an invariant
+is caught immediately.
+
+| Invariant | Verified | Depends on |
+|---|---|---|
+| `g.organism_strain == e.organism_strain` for every `Changes_expression_of` edge | 0 mismatches | KG build pipeline — edges only connect experiments to genes of the same organism |
+| `r.expression_status` is never null | all 188,501 edges have a value | `post-import.cypher` CASE expression covers all combinations |
+| Coculture experiments: edges only point to the experiment's own organism, never the partner | confirmed — `gene_orgs` always single-element | KG build — DE analysis is per-organism even in coculture |
+| Non-time-course experiments have at most 1 distinct `r.time_point` per experiment | 0 experiments with >1 | KG build — single-TP experiments get one time_point label (or null) |
+| 2 HOT1A3 experiments have `gene_count = 0` (no expression edges) | `10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_...` and `..._mit9313_hot1a3_...` | KG build — Alteromonas-side DE not computed for these coculture experiments |
+
+**Test guideline:** Add an integration test class `TestExpressionKGInvariants` that
+asserts each invariant with a Cypher query. Run with `pytest -m kg`. If any fails
+after a KG rebuild, the expression tool's assumptions are broken.
+
+```python
+# Example invariant tests (integration, requires live KG)
+def test_organism_match_on_all_edges(conn):
+    """g.organism_strain must equal e.organism_strain for every expression edge."""
+    result = conn.execute(
+        "MATCH (e:Experiment)-[:Changes_expression_of]->(g:Gene) "
+        "WHERE e.organism_strain <> g.organism_strain RETURN count(*) AS n"
+    )
+    assert result[0]["n"] == 0
+
+def test_expression_status_never_null(conn):
+    """expression_status must be set on every edge (post-import.cypher)."""
+    result = conn.execute(
+        "MATCH ()-[r:Changes_expression_of]->() "
+        "WHERE r.expression_status IS NULL RETURN count(*) AS n"
+    )
+    assert result[0]["n"] == 0
+
+def test_non_tc_single_timepoint(conn):
+    """Non-time-course experiments must have at most 1 distinct timepoint."""
+    result = conn.execute(
+        "MATCH (e:Experiment)-[r:Changes_expression_of]->() "
+        "WHERE e.is_time_course = 'false' "
+        "WITH e.id AS eid, collect(DISTINCT r.time_point) AS tps "
+        "WHERE size(tps) > 1 RETURN count(*) AS n"
+    )
+    assert result[0]["n"] == 0
+```
+
+#### `post-import.cypher` — `rank_by_effect`
+
+```cypher
+MATCH (e)-[r:Changes_expression_of]->(g:Gene)
+WITH r.time_point_order AS tp, r, abs(r.log2_fold_change) AS abs_fc
+ORDER BY tp, abs_fc DESC
+WITH tp, collect(r) AS edges
+UNWIND range(0, size(edges)-1) AS i
+SET (edges[i]).rank_by_effect = i + 1
+```
+
+**Tied |log2FC| values get arbitrary rank ordering** — no tiebreaker beyond
+`abs_fc DESC`. For two genes with identical |log2FC|, their relative rank is
+non-deterministic across KG rebuilds. This is acceptable for the ranking use
+case but means rank-based assertions in tests must allow for ties.
+
+**Potential improvement:** add `g.locus_tag ASC` as tiebreaker for deterministic
+ranks across rebuilds:
+```cypher
+ORDER BY tp, abs_fc DESC, g.locus_tag ASC
+```
+
+**Test guideline:** Integration tests that assert specific `rank` values should
+either (a) pick genes with unique |log2FC| in their experiment×timepoint, or
+(b) assert rank is within the expected tied range rather than an exact value.
+
+#### `summary_by_experiment` — GROUP BY fragility
+
+The final WITH:
+```cypher
+WITH collect({...}) AS experiments,
+     e.organism_strain AS organism_strain
+```
+uses `e.organism_strain` as an implicit GROUP BY key. With single-organism
+enforcement, this produces exactly one row. If pre-validation ever fails to
+run (bug in api/), this would silently split experiments into per-organism
+groups and only return the last one.
+
+**Test guideline:** Integration test should call with known multi-organism inputs
+(bypassing api/ validation) at the query-builder level and verify the query
+returns multiple `organism_strain` groups — confirming the grouping behavior
+is understood, not that it's "safe".
+
+```python
+# Unit test: builder produces valid Cypher for multi-organism case
+def test_by_experiment_groups_by_organism(conn):
+    """Without api/ validation, query groups by organism_strain."""
+    cypher, params = build_differential_expression_by_gene_summary_by_experiment(
+        organism=None, locus_tags=None, experiment_ids=None,
+    )
+    # Run against KG — should return multiple rows (one per organism)
+    results = conn.execute(cypher, params)
+    orgs = [r["organism_strain"] for r in results]
+    assert len(orgs) > 1, "expected multiple organism groups without filters"
+```
+
+#### `summary_diagnostics` — `no_expression` respects active filters
+
+When `locus_tags` + `experiment_ids` are both provided, `no_expression` means
+"gene exists but has no expression in *those specific experiments*" (not globally).
+This is because `where_block_no_lt` includes the `experiment_ids` condition.
+
+A gene could have expression data globally but appear in `no_expression` when
+filtered to experiments it wasn't profiled in. This is correct behavior.
+
+**Test guideline:** Test with a gene that has expression in experiment A but not
+experiment B. Call with `locus_tags=[gene]`, `experiment_ids=[B]` → gene should
+appear in `no_expression`. Call with `experiment_ids=[A]` → gene should NOT be
+in `no_expression`.
+
+```python
+# Integration test: no_expression is filter-aware
+def test_no_expression_respects_experiment_filter(conn):
+    """Gene with expression in exp A but not exp B → no_expression when filtered to B."""
+    # PMM0001 has expression in MED4 experiments but not in MIT9313 experiments
+    # Pick a MED4 gene and a non-MED4 experiment
+    cypher_a, params_a = build_differential_expression_by_gene_summary_diagnostics(
+        locus_tags=["PMM0001"],
+        experiment_ids=["<med4_experiment_id>"],  # experiment where PMM0001 IS profiled
+    )
+    result_a = conn.execute(cypher_a, params_a)
+    assert "PMM0001" not in result_a[0]["no_expression"]
+
+    # Now filter to an experiment where PMM0001 is NOT profiled
+    # (would need a real experiment ID from a different organism — but single-organism
+    # validation would block this in api/. Test at builder level only.)
+```
+
+#### `summary_global` — `percentileCont` with all-null input
+
+When `significant_only=True` and no matching significant rows exist (e.g. an
+experiment where everything is non-significant), the CASE expression produces
+all nulls → `percentileCont` receives an empty set → returns null. This is the
+correct behavior (`median_abs_log2fc: null`).
+
+Similarly, `max(CASE ...)` returns null with no significant rows.
+
+**Test guideline:** Test with `significant_only=True` on an experiment/gene
+combination with zero significant rows → verify `median_abs_log2fc` and
+`max_abs_log2fc` are both null (not 0, not error).
+
+#### `summary_diagnostics` — `count(*)` with OPTIONAL MATCH returning no edges
+
+When a gene exists but has no expression edges (or none matching filters),
+`OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)` produces
+`e=null, r=null`. Then `count(*)` returns 1 (counts the null row), not 0.
+This means `edge_count = 1` for a gene with no edges, which would
+misclassify it as having expression.
+
+**This is a bug in the spec.** Fix: use `count(r)` instead of `count(*)`.
+`count(r)` returns 0 when `r IS NULL` (OPTIONAL MATCH found nothing).
+
+```cypher
+// WRONG:
+WITH lt, g, count(*) AS edge_count  -- returns 1 even when r is null
+
+// CORRECT:
+WITH lt, g, count(r) AS edge_count  -- returns 0 when no edges match
+```
+
+**Test guideline:** Test with a gene that exists in the KG but has zero
+expression edges. Verify it appears in `no_expression`, not in
+`matched_genes`.
+
+```python
+# Integration test: gene with no expression edges
+def test_gene_with_no_expression_classified_correctly(conn):
+    """Gene in KG but with no expression data → no_expression, not matched."""
+    # MIT1002_02071 has expression_edge_count = 0 (verified on live KG)
+    cypher, params = build_differential_expression_by_gene_summary_diagnostics(
+        organism="MIT1002",
+        locus_tags=["MIT1002_02071"],
+    )
+    result = conn.execute(cypher, params)
+    assert "MIT1002_02071" in result[0]["no_expression"]
+    # top_categories should be empty (no matched genes)
+    cats = result[0]["top_categories"]
+    assert all(c["total_genes"] == 0 for c in cats) or len(cats) == 0
+```
+
+#### `_differential_expression_where` — organism fuzzy match on `e.organism_strain`
+
+The organism filter uses `e.organism_strain` (not `g.organism_strain`). Since
+`g.organism_strain == e.organism_strain` for all edges (invariant above), this
+is equivalent. However, the choice of `e.organism_strain` is deliberate: the
+MATCH pattern is `(e:Experiment)-[r]->(g:Gene)`, and filtering on `e` allows
+Neo4j to use the `experiment_organism_idx` index for the initial node scan.
+
+**Test guideline:** Verify the organism fuzzy match resolves correctly:
+- `"MED4"` → matches `Prochlorococcus MED4` only
+- `"Alteromonas"` → matches all 3 Alteromonas strains (pre-validation rejects as multi-organism)
+- `"Prochlorococcus MED4"` → exact match (all words match)
+- `"ZZZZZ"` → no match
+
 ---
 
 ## API Function
@@ -683,6 +1009,7 @@ ORDER BY ABS(r.log2_fold_change) DESC, g.locus_tag ASC, e.id ASC, r.time_point_o
 
 ```python
 def differential_expression_by_gene(
+    organism: str | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -699,8 +1026,9 @@ def differential_expression_by_gene(
     one row per gene × experiment × timepoint, all context inlined.
 
     Raises:
-        ValueError: if locus_tags or experiment_ids span multiple organisms,
-            or if their organisms don't match each other.
+        ValueError: if no filter provided (organism/locus_tags/experiment_ids
+            all None), if inputs span multiple organisms, if organisms don't
+            match each other, or if organism fuzzy match is ambiguous.
 
     Returns:
         dict with keys: organism_strain, matching_genes, total_rows,
@@ -714,15 +1042,19 @@ def differential_expression_by_gene(
 - `summary=True` → `limit=0`
 - `limit=0` → `results=[]`, `returned=0`, `truncated = total_rows > 0` (signals rows exist but aren't returned)
 - Validate `direction` against `{"up", "down"}`
+- Validate at least one of `{organism, locus_tags, experiment_ids}` is provided
 - **Pre-query organism validation** (before any summary queries):
+  - If `organism` provided: resolve via fuzzy match against `DISTINCT e.organism_strain`
+    (same word-based CONTAINS as list_experiments). Raise if 0 or >1 matches.
   - Resolve `DISTINCT g.organism_strain` for `locus_tags` (if provided)
   - Resolve `DISTINCT e.organism_strain` for `experiment_ids` (if provided)
-  - Raise `ValueError` if either set has > 1 organism, or if sets are disjoint
+  - Raise `ValueError` if any set has >1 organism, or if sets are disjoint
+  - When `organism` is combined with locus_tags/experiment_ids, validate they agree
   - Set `organism_strain` in response from the validated single value
 - Always run summary queries → all summary fields
 - Skip detail when `limit=0`
 - Rename KG properties to output field names (`log2_fold_change` → `log2fc`, etc.)
-- Convert APOC `apoc.coll.frequencies` result `[{item, count}]` → `{item: count}` dict for `rows_by_status`
+- Convert APOC `apoc.coll.frequencies` result `[{item, count}]` → `{item: count}` dict for `rows_by_status`; fill missing keys (`significant_up`, `significant_down`, `not_significant`) with 0
 - Sort `experiments` by `(rows_by_status["significant_up"] + rows_by_status["significant_down"]) DESC`
 - Strip `timepoints` key (set to null) for experiments where `is_time_course = "false"`
 
@@ -748,7 +1080,10 @@ class ExpressionTimepoint(BaseModel):
 class ExpressionByExperiment(BaseModel):
     experiment_id: str = Field(description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')")
     experiment_name: str = Field(description="Human-readable name (e.g. 'HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)')")
+    treatment_type: str = Field(description="Treatment category (e.g. 'nitrogen_stress', 'coculture')")
     omics_type: str = Field(description="Omics type (e.g. 'RNASEQ', 'PROTEOMICS')")
+    coculture_partner: str | None = Field(default=None, description="Coculture partner organism, if applicable")
+    is_time_course: str = Field(description="'true' or 'false'")
     matching_genes: int = Field(description="Distinct genes with data in this experiment (e.g. 5)")
     rows_by_status: ExpressionStatusBreakdown = Field(description="Row counts by expression_status across all timepoints")
     timepoints: list[ExpressionTimepoint] | None = Field(default=None, description="Per-timepoint breakdown, sorted by timepoint_order. Null for non-time-course experiments.")
@@ -763,7 +1098,7 @@ class ExpressionRow(BaseModel):
     locus_tag: str = Field(description="Gene locus tag (e.g. 'ACZ81_01830')")
     gene_name: str | None = Field(description="Gene name (e.g. 'amtB'). Null if unannotated.")
     experiment_id: str = Field(description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')")
-    condition_type: str = Field(description="Treatment type from experiment (e.g. 'nitrogen_stress')")
+    treatment_type: str = Field(description="Treatment type from experiment (e.g. 'nitrogen_stress')")
     timepoint: str | None = Field(description="Timepoint label (e.g. 'days 60+89'). Null when edge has no label.")
     timepoint_hours: float | None = Field(description="Numeric hours (e.g. 432.0). Null for non-numeric labels.")
     timepoint_order: int = Field(description="Sort key for time course order (e.g. 3)")
@@ -789,6 +1124,7 @@ class DifferentialExpressionByGeneResponse(BaseModel):
     median_abs_log2fc: float | None = Field(description="Median |log2FC| for significant rows only (e.g. 1.978). Null if no significant rows.")
     max_abs_log2fc: float | None = Field(description="Max |log2FC| for significant rows only (e.g. 3.591). Null if no significant rows.")
     experiment_count: int = Field(description="Number of experiments in results (e.g. 1)")
+    rows_by_treatment_type: dict[str, int] = Field(description="Row counts by treatment type (e.g. {'nitrogen_stress': 15})")
     top_categories: list[ExpressionTopCategory] = Field(description="Top gene categories by significant gene count, max 5")
     experiments: list[ExpressionByExperiment] = Field(description="Per-experiment summary with nested timepoint breakdown, sorted by significant row count desc")
     not_found: list[str] = Field(default_factory=list, description="Input locus_tags not found in KG")
@@ -811,7 +1147,7 @@ Thin wrapper: `Response(**data)` with standard error handling
 | 2 | Query builder | `kg/queries_lib.py` | `build_differential_expression_by_gene_summary_by_experiment()` |
 | 3 | Query builder | `kg/queries_lib.py` | `build_differential_expression_by_gene_summary_diagnostics()` |
 | 4 | Query builder | `kg/queries_lib.py` | `build_differential_expression_by_gene()` |
-| 5 | Pre-query | `kg/queries_lib.py` | `build_resolve_organism_for_locus_tags()` + `build_resolve_organism_for_experiments()` (lightweight organism validation queries) |
+| 5 | Pre-query | `kg/queries_lib.py` | `build_resolve_organism_for_organism()` + `build_resolve_organism_for_locus_tags()` + `build_resolve_organism_for_experiments()` (lightweight organism validation queries) |
 | 6 | API function | `api/functions.py` | `differential_expression_by_gene()` |
 | 7 | Exports | `api/__init__.py`, `multiomics_explorer/__init__.py` | Add to imports + `__all__` |
 | 8 | MCP wrapper | `mcp_server/tools.py` | `@mcp.tool()` wrapper inside `register_tools()` |
@@ -843,6 +1179,7 @@ Thin wrapper: `Response(**data)` with standard error handling
   "median_abs_log2fc": 1.978,
   "max_abs_log2fc": 3.591,
   "experiment_count": 1,
+  "rows_by_treatment_type": {"nutrient_starvation": 15},
   "top_categories": [
     {"category": "Signal transduction",        "total_genes": 2, "significant_genes": 2},
     {"category": "Inorganic ion transport",     "total_genes": 1, "significant_genes": 1},
@@ -853,7 +1190,10 @@ Thin wrapper: `Response(**data)` with standard error handling
     {
       "experiment_id": "10.1101/2025.11.24.690089_..._axenic",
       "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+      "treatment_type": "nutrient_starvation",
       "omics_type": "RNASEQ",
+      "coculture_partner": null,
+      "is_time_course": "true",
       "matching_genes": 5,
       "rows_by_status": {"significant_up": 3, "significant_down": 0, "not_significant": 12},
       "timepoints": [
@@ -871,19 +1211,19 @@ Thin wrapper: `Response(**data)` with standard error handling
   "returned": 5,
   "truncated": true,
   "results": [
-    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "condition_type": "nitrogen_stress",
+    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation",
      "timepoint": "days 60+89", "timepoint_hours": null,  "timepoint_order": 3,
      "log2fc":  3.591, "padj": 1.13e-12, "rank":  77,  "expression_status": "significant_up"},
-    {"locus_tag": "ACZ81_15555", "gene_name": "glnL", "experiment_id": "...", "condition_type": "nitrogen_stress",
+    {"locus_tag": "ACZ81_15555", "gene_name": "glnL", "experiment_id": "...", "treatment_type": "nutrient_starvation",
      "timepoint": "days 60+89", "timepoint_hours": null,  "timepoint_order": 3,
      "log2fc":  1.978, "padj": 2.31e-6,  "rank": 410,  "expression_status": "significant_up"},
-    {"locus_tag": "ACZ81_15560", "gene_name": "glnG", "experiment_id": "...", "condition_type": "nitrogen_stress",
+    {"locus_tag": "ACZ81_15560", "gene_name": "glnG", "experiment_id": "...", "treatment_type": "nutrient_starvation",
      "timepoint": "days 60+89", "timepoint_hours": null,  "timepoint_order": 3,
      "log2fc":  1.745, "padj": 2.11e-5,  "rank": 544,  "expression_status": "significant_up"},
-    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "condition_type": "nitrogen_stress",
+    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation",
      "timepoint": "day 18",     "timepoint_hours": 432.0, "timepoint_order": 1,
      "log2fc":  0.856, "padj": 0.259,    "rank": 1104, "expression_status": "not_significant"},
-    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "condition_type": "nitrogen_stress",
+    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation",
      "timepoint": "day 31",     "timepoint_hours": 744.0, "timepoint_order": 2,
      "log2fc":  0.556, "padj": 0.510,    "rank": 1716, "expression_status": "not_significant"}
   ]
@@ -902,6 +1242,7 @@ Thin wrapper: `Response(**data)` with standard error handling
 
 | Layer | File | Test class |
 |---|---|---|
+| Pre-query builders | `test_query_builders.py` | `TestBuildResolveOrganismForOrganism`, `TestBuildResolveOrganismForLocusTags`, `TestBuildResolveOrganismForExperiments` |
 | Query builder (global summary) | `test_query_builders.py` | `TestBuildDifferentialExpressionByGeneSummaryGlobal` |
 | Query builder (by_experiment summary) | `test_query_builders.py` | `TestBuildDifferentialExpressionByGeneSummaryByExperiment` |
 | Query builder (diagnostics summary) | `test_query_builders.py` | `TestBuildDifferentialExpressionByGeneSummaryDiagnostics` |
@@ -917,6 +1258,15 @@ Thin wrapper: `Response(**data)` with standard error handling
 
 **Key test scenarios:**
 
+- `organism` only → all expression for that organism
+- `organism` only, `summary=True` → summary without rows
+- `organism` only, `significant_only=True`, `limit=20` → top responders
+- `organism` fuzzy match ("MED4") → resolves to full name
+- `organism` ambiguous ("Prochlorococcus") → ValueError (matches multiple)
+- `organism` no match ("ZZZZZ") → ValueError
+- `organism` + `locus_tags` match → organism validates, same as locus_tags alone
+- `organism` + `locus_tags` mismatch → ValueError
+- No filters (all three None) → ValueError
 - Single gene, no experiment filter → multiple experiments returned
 - Single experiment, no gene filter, `significant_only=True` → top DE genes
 - `summary=True` → `results=[]`, summary fields populated
@@ -933,7 +1283,7 @@ Thin wrapper: `Response(**data)` with standard error handling
 **Summary field consistency:** `total_rows` must equal the number of edges
 that would be returned without `limit`. `rows_by_status` values must sum to
 `total_rows`. `matching_genes` must equal `len({r["locus_tag"] for r in results})`
-when `limit=None`.
+when `total_rows == returned` (no truncation).
 
 ---
 
@@ -953,3 +1303,165 @@ when `limit=None`.
 ## Code Review
 
 Run code-review skill (full checklist) as final step.
+
+---
+
+## Resolved: Cross-tool output consistency
+
+**Decision: Align now.** Refactor `list_experiments` and `gene_overview` to use the
+same output patterns as `differential_expression_by_gene` before shipping. Pre-release,
+no external consumers — only cost is test/fixture updates.
+
+**Unified patterns adopted across all three tools:**
+- **`rows_by_status` dict** instead of separate `significant_up_count` / `significant_down_count` fields
+- **Nested timepoint objects** instead of parallel arrays
+- **`gene_count`** remains as-is in `list_experiments` (precomputed, different semantics from
+  `matching_genes` in the expression tool — not a consistency issue)
+
+### Side-by-side output examples
+
+Scenario: HOT1A3 nitrogen starvation experiment with 3 timepoints (day 18, day 31, days 60+89),
+queried for 5 nitrogen-related genes (amtB, glnD, glnL, glnG, glnE).
+
+#### `list_experiments` — experiment discovery (one result row per experiment)
+
+```json
+{
+  "total_matching": 1,
+  "results": [
+    {
+      "experiment_id": "10.1101/2025.11.24.690089_..._axenic",
+      "publication_doi": "10.1101/2025.11.24.690089",
+      "organism_strain": "Alteromonas macleodii HOT1A3",
+      "treatment_type": "nutrient_starvation",
+      "omics_type": "RNASEQ",
+      "is_time_course": "true",
+      "gene_count": 2814,
+      "rows_by_status": {"significant_up": 412, "significant_down": 389, "not_significant": 7630},
+      "timepoints": [
+        {"timepoint": "day 18",     "timepoint_order": 1, "timepoint_hours": 432.0,
+         "gene_count": 2814, "rows_by_status": {"significant_up": 98,  "significant_down": 112, "not_significant": 2604}},
+        {"timepoint": "day 31",     "timepoint_order": 2, "timepoint_hours": 744.0,
+         "gene_count": 2814, "rows_by_status": {"significant_up": 134, "significant_down": 156, "not_significant": 2524}},
+        {"timepoint": "days 60+89", "timepoint_order": 3, "timepoint_hours": null,
+         "gene_count": 2814, "rows_by_status": {"significant_up": 180, "significant_down": 121, "not_significant": 2513}}
+      ]
+    }
+  ]
+}
+```
+
+#### `gene_overview` — gene routing (one result row per gene, expression as availability signal)
+
+```json
+{
+  "total_matching": 5,
+  "results": [
+    {
+      "locus_tag": "ACZ81_01830",
+      "gene_name": "amtB",
+      "product": "ammonium transporter",
+      "gene_category": "Inorganic ion transport",
+      "organism_strain": "Alteromonas macleodii HOT1A3",
+      "expression_edge_count": 3,
+      "rows_by_status": {"significant_up": 1, "significant_down": 0, "not_significant": 2}
+    },
+    {
+      "locus_tag": "ACZ81_15555",
+      "gene_name": "glnL",
+      "product": "nitrogen regulation protein NR(II)",
+      "gene_category": "Signal transduction",
+      "organism_strain": "Alteromonas macleodii HOT1A3",
+      "expression_edge_count": 3,
+      "rows_by_status": {"significant_up": 1, "significant_down": 0, "not_significant": 2}
+    }
+  ]
+}
+```
+
+#### `differential_expression_by_gene` — expression analysis (one result row per gene x timepoint)
+
+```json
+{
+  "organism_strain": "Alteromonas macleodii HOT1A3",
+  "matching_genes": 5,
+  "total_rows": 15,
+  "rows_by_status": {"significant_up": 3, "significant_down": 0, "not_significant": 12},
+  "rows_by_treatment_type": {"nutrient_starvation": 15},
+  "experiments": [
+    {
+      "experiment_id": "10.1101/2025.11.24.690089_..._axenic",
+      "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+      "treatment_type": "nutrient_starvation",
+      "omics_type": "RNASEQ",
+      "coculture_partner": null,
+      "is_time_course": "true",
+      "matching_genes": 5,
+      "rows_by_status": {"significant_up": 3, "significant_down": 0, "not_significant": 12},
+      "timepoints": [
+        {"timepoint": "day 18",     "timepoint_hours": 432.0, "timepoint_order": 1,
+         "matching_genes": 5, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 5}},
+        {"timepoint": "day 31",     "timepoint_hours": 744.0, "timepoint_order": 2,
+         "matching_genes": 5, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 5}},
+        {"timepoint": "days 60+89", "timepoint_hours": null,  "timepoint_order": 3,
+         "matching_genes": 5, "rows_by_status": {"significant_up": 3, "significant_down": 0, "not_significant": 2}}
+      ]
+    }
+  ],
+  "results": [
+    {"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation",
+     "timepoint": "days 60+89", "log2fc": 3.591, "padj": 1.13e-12, "rank": 77, "expression_status": "significant_up"},
+    {"locus_tag": "ACZ81_15555", "gene_name": "glnL", "experiment_id": "...", "treatment_type": "nutrient_starvation",
+     "timepoint": "days 60+89", "log2fc": 1.978, "padj": 2.31e-6,  "rank": 410, "expression_status": "significant_up"}
+  ]
+}
+```
+
+#### Comparison: same data, different zoom level
+
+| Aspect | `list_experiments` | `gene_overview` | `differential_expression_by_gene` |
+|---|---|---|---|
+| **Question answered** | "What experiments exist?" | "What data is available for these genes?" | "How do these genes respond?" |
+| **Row granularity** | 1 row per experiment | 1 row per gene | 1 row per gene x timepoint |
+| **Gene counts** | `gene_count` (all genes in experiment) | `expression_edge_count` (edges per gene) | `matching_genes` (genes matching filters) |
+| **Significance** | `rows_by_status` dict | `rows_by_status` dict | `rows_by_status` dict |
+| **Treatment type** | On each result row | N/A | On each result row + `rows_by_treatment_type` summary |
+| **Coculture partner** | On each result row | N/A | In experiment summary; on rows in verbose |
+| **Timepoints** | Nested `timepoints[]` objects | Not shown (wrong zoom level) | Nested `timepoints[]` objects |
+| **Expression values** | Not shown (wrong zoom level) | Not shown (availability only) | `log2fc`, `padj`, `rank`, `expression_status` |
+
+### Refactoring scope for alignment
+
+**`list_experiments`** (changes from current):
+- `significant_up_count` + `significant_down_count` → `rows_by_status: {significant_up, significant_down, not_significant}` (experiment level)
+- Parallel arrays → nested `timepoints[]` objects with unified field names:
+  - `time_point_labels[i]` → `timepoints[i].timepoint`
+  - `time_point_orders[i]` → `timepoints[i].timepoint_order`
+  - `time_point_hours[i]` → `timepoints[i].timepoint_hours`
+  - `time_point_totals[i]` → `timepoints[i].gene_count`
+  - `time_point_significant_up[i]` + `time_point_significant_down[i]` → `timepoints[i].rows_by_status`
+- `time_point_count` → dropped (redundant: `len(timepoints)`)
+- Naming: `timepoints` (no underscore) — matches expression tool
+
+**`gene_overview`** (changes from current):
+- `significant_up_count` + `significant_down_count` → `rows_by_status: {significant_up, significant_down, not_significant}`
+- Keep `expression_edge_count` (total edges, useful as availability signal)
+- `not_significant` count derived: `expression_edge_count - significant_up - significant_down` (precomputed on Gene node)
+
+**Note:** `is_time_course` stays as string `"true"/"false"` across all tools (KG stores it that way).
+Converting to proper bool is a possible future improvement but not part of this alignment.
+
+## Open Questions
+
+### Experiment reporting scope (`reporting_scope` on Experiment node)
+
+Some publications report all genes assayed (full genome), others report only a subset
+(top N, significant-only, or other author-defined filter). This is tracked per-experiment
+in the KG build pipeline but not yet exposed on the Experiment node.
+
+Adding a `reporting_scope` property (e.g. `"full"` / `"filtered"`) to the Experiment node
+would let the expression tool disambiguate `no_expression`: "not measured / filtered out by
+authors" vs "measured and not differentially expressed". Currently `no_expression` conflates
+these — see Common mistakes §2.
+
+**Depends on:** KG schema change + rebuild. Design the enum values when ready to implement.

@@ -15,6 +15,7 @@ import pytest
 import yaml
 
 from multiomics_explorer.kg.queries_lib import (
+    build_differential_expression_by_gene,
     build_gene_ontology_terms,
     build_gene_overview,
     build_gene_stub,
@@ -74,6 +75,7 @@ TOOL_BUILDERS = {
     "list_publications": build_list_publications,
     "list_experiments": build_list_experiments,
     "list_experiments_summary": build_list_experiments_summary,
+    "differential_expression_by_gene": build_differential_expression_by_gene,
 }
 
 

@@ -1476,3 +1476,349 @@ class TestListExperiments:
         """from multiomics_explorer import list_experiments works."""
         from multiomics_explorer import list_experiments
         assert list_experiments is api.list_experiments
+
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_gene
+# ---------------------------------------------------------------------------
+
+
+class TestDifferentialExpressionByGene:
+    """Unit tests for differential_expression_by_gene API function."""
+
+    def _organism_result(self, orgs=None):
+        """Mock organism pre-validation result."""
+        if orgs is None:
+            orgs = ["Prochlorococcus MED4"]
+        return [{"organisms": orgs}]
+
+    def _global_summary(self, total_rows=15, matching_genes=5):
+        """Mock global summary query result."""
+        return [{
+            "total_rows": total_rows,
+            "matching_genes": matching_genes,
+            "rows_by_status": [
+                {"item": "significant_up", "count": 3},
+                {"item": "not_significant", "count": 12},
+            ],
+            "rows_by_treatment_type": [
+                {"item": "nitrogen_stress", "count": 15},
+            ],
+            "median_abs_log2fc": 1.978,
+            "max_abs_log2fc": 3.591,
+        }]
+
+    def _experiment_summary(self):
+        """Mock per-experiment summary result."""
+        return [{
+            "organism_strain": "Prochlorococcus MED4",
+            "experiments": [
+                {
+                    "experiment_id": "exp1",
+                    "experiment_name": "Test experiment",
+                    "treatment_type": "nitrogen_stress",
+                    "omics_type": "RNASEQ",
+                    "coculture_partner": None,
+                    "is_time_course": "true",
+                    "matching_genes": 5,
+                    "rows_by_status": [
+                        {"item": "significant_up", "count": 3},
+                        {"item": "not_significant", "count": 12},
+                    ],
+                    "timepoints": [
+                        {
+                            "timepoint": "day 18",
+                            "timepoint_hours": 432.0,
+                            "timepoint_order": 1,
+                            "matching_genes": 5,
+                            "rows_by_status": [
+                                {"item": "not_significant", "count": 5},
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }]
+
+    def _diagnostics_summary(self):
+        """Mock diagnostics summary result."""
+        return [{
+            "top_categories": [
+                {"category": "Signal transduction",
+                 "total_genes": 2, "significant_genes": 2},
+            ],
+            "not_found": [],
+            "no_expression": [],
+        }]
+
+    def _detail_rows(self):
+        """Mock detail query result rows."""
+        return [
+            {
+                "locus_tag": "PMM0001", "gene_name": "dnaN",
+                "experiment_id": "exp1", "treatment_type": "nitrogen_stress",
+                "timepoint": "day 18", "timepoint_hours": 432.0,
+                "timepoint_order": 1,
+                "log2fc": 3.591, "padj": 1.13e-12, "rank": 77,
+                "expression_status": "significant_up",
+            },
+        ]
+
+    def _mock_side_effect_organism_only(self):
+        """Side effect for organism-only call (1 pre-query + 3 summary + 1 detail)."""
+        return [
+            self._organism_result(),           # organism pre-query
+            self._global_summary(),            # summary global
+            self._experiment_summary(),        # summary by_experiment
+            self._diagnostics_summary(),       # summary diagnostics
+            self._detail_rows(),               # detail
+        ]
+
+    def _mock_side_effect_locus_tags(self):
+        """Side effect for locus_tags call (1 pre-query + 3 summary + 1 detail)."""
+        return [
+            self._organism_result(),           # locus_tags pre-query
+            self._global_summary(),
+            self._experiment_summary(),
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+
+    def test_returns_dict_with_envelope(self, mock_conn):
+        """Runs pre-query + 3 summaries + detail, returns correct dict."""
+        mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=mock_conn
+        )
+        assert isinstance(result, dict)
+        for key in [
+            "organism_strain", "matching_genes", "total_rows",
+            "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
+            "experiment_count", "rows_by_treatment_type", "top_categories",
+            "experiments", "not_found", "no_expression",
+            "returned", "truncated", "results",
+        ]:
+            assert key in result
+        assert result["organism_strain"] == "Prochlorococcus MED4"
+        assert result["total_rows"] == 15
+        assert result["matching_genes"] == 5
+        assert result["returned"] == 1
+        assert len(result["results"]) == 1
+
+    def test_rows_by_status_filled(self, mock_conn):
+        """APOC frequencies transformed; missing keys filled with 0."""
+        mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=mock_conn
+        )
+        rbs = result["rows_by_status"]
+        assert rbs["significant_up"] == 3
+        assert rbs["significant_down"] == 0  # filled
+        assert rbs["not_significant"] == 12
+
+    def test_summary_true_skips_detail(self, mock_conn):
+        """summary=True returns results=[], returned=0."""
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(),
+            self._experiment_summary(),
+            self._diagnostics_summary(),
+            # No detail query call
+        ]
+        result = api.differential_expression_by_gene(
+            organism="MED4", summary=True, conn=mock_conn
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True  # total_rows=15 > 0
+        assert mock_conn.execute_query.call_count == 4  # no detail call
+
+    def test_no_filters_raises(self, mock_conn):
+        """All three None raises ValueError."""
+        with pytest.raises(ValueError, match="at least one"):
+            api.differential_expression_by_gene(conn=mock_conn)
+
+    def test_invalid_direction_raises(self, mock_conn):
+        """Invalid direction raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid direction"):
+            api.differential_expression_by_gene(
+                organism="MED4", direction="sideways", conn=mock_conn
+            )
+
+    def test_multi_organism_locus_tags_raises(self, mock_conn):
+        """Locus tags from multiple organisms raises ValueError."""
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(["Prochlorococcus MED4", "MIT9313"]),
+        ]
+        with pytest.raises(ValueError, match="locus_tags span multiple"):
+            api.differential_expression_by_gene(
+                locus_tags=["PMM0001", "MIT9313_0001"], conn=mock_conn
+            )
+
+    def test_organism_no_match_raises(self, mock_conn):
+        """No organism match raises ValueError."""
+        mock_conn.execute_query.side_effect = [
+            self._organism_result([]),
+        ]
+        with pytest.raises(ValueError, match="no organism matching"):
+            api.differential_expression_by_gene(
+                organism="ZZZZZ", conn=mock_conn
+            )
+
+    def test_organism_ambiguous_raises(self, mock_conn):
+        """Ambiguous organism raises ValueError."""
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(["Prochlorococcus MED4", "MIT9313"]),
+        ]
+        with pytest.raises(ValueError, match="matches multiple"):
+            api.differential_expression_by_gene(
+                organism="Prochlorococcus", conn=mock_conn
+            )
+
+    def test_truncated_true(self, mock_conn):
+        """truncated=True when total_rows > returned."""
+        mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=mock_conn
+        )
+        assert result["truncated"] is True  # 15 > 1
+
+    def test_experiments_sorted_by_significant(self, mock_conn):
+        """Experiments sorted by total significant rows DESC."""
+        exp_summary = [{
+            "organism_strain": "Prochlorococcus MED4",
+            "experiments": [
+                {
+                    "experiment_id": "low_sig",
+                    "experiment_name": "Low",
+                    "treatment_type": "x",
+                    "omics_type": "RNASEQ",
+                    "coculture_partner": None,
+                    "is_time_course": "false",
+                    "matching_genes": 1,
+                    "rows_by_status": [
+                        {"item": "significant_up", "count": 1},
+                    ],
+                    "timepoints": [],
+                },
+                {
+                    "experiment_id": "high_sig",
+                    "experiment_name": "High",
+                    "treatment_type": "y",
+                    "omics_type": "RNASEQ",
+                    "coculture_partner": None,
+                    "is_time_course": "false",
+                    "matching_genes": 1,
+                    "rows_by_status": [
+                        {"item": "significant_up", "count": 10},
+                        {"item": "significant_down", "count": 5},
+                    ],
+                    "timepoints": [],
+                },
+            ],
+        }]
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(),
+            exp_summary,
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=mock_conn
+        )
+        # high_sig (15 significant) should come before low_sig (1)
+        assert result["experiments"][0]["experiment_id"] == "high_sig"
+        assert result["experiments"][1]["experiment_id"] == "low_sig"
+
+    def test_non_time_course_timepoints_null(self, mock_conn):
+        """Non-time-course experiments have timepoints=None."""
+        exp_summary = [{
+            "organism_strain": "Prochlorococcus MED4",
+            "experiments": [
+                {
+                    "experiment_id": "single_tp",
+                    "experiment_name": "Single",
+                    "treatment_type": "x",
+                    "omics_type": "RNASEQ",
+                    "coculture_partner": None,
+                    "is_time_course": "false",
+                    "matching_genes": 1,
+                    "rows_by_status": [
+                        {"item": "not_significant", "count": 5},
+                    ],
+                    "timepoints": [
+                        {
+                            "timepoint": "t0",
+                            "timepoint_hours": 0.0,
+                            "timepoint_order": 1,
+                            "matching_genes": 1,
+                            "rows_by_status": [
+                                {"item": "not_significant", "count": 5},
+                            ],
+                        },
+                    ],
+                },
+            ],
+        }]
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),
+            self._global_summary(total_rows=5, matching_genes=1),
+            exp_summary,
+            self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=mock_conn
+        )
+        assert result["experiments"][0]["timepoints"] is None
+
+    def test_not_found_and_no_expression(self, mock_conn):
+        """Batch diagnostics returns not_found and no_expression."""
+        mock_conn.execute_query.side_effect = [
+            self._organism_result(),           # locus_tags pre-query
+            self._global_summary(),
+            self._experiment_summary(),
+            [{
+                "top_categories": [],
+                "not_found": ["FAKE_GENE"],
+                "no_expression": ["PMM9999"],
+            }],
+            self._detail_rows(),
+        ]
+        result = api.differential_expression_by_gene(
+            locus_tags=["PMM0001", "FAKE_GENE", "PMM9999"], conn=mock_conn
+        )
+        assert result["not_found"] == ["FAKE_GENE"]
+        assert result["no_expression"] == ["PMM9999"]
+
+    def test_experiment_count(self, mock_conn):
+        """experiment_count = len(experiments)."""
+        mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=mock_conn
+        )
+        assert result["experiment_count"] == len(result["experiments"])
+
+    def test_creates_conn_when_none(self):
+        """Default conn used when None."""
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                self._organism_result(),
+                self._global_summary(total_rows=0, matching_genes=0),
+                [{"organism_strain": "Prochlorococcus MED4", "experiments": []}],
+                self._diagnostics_summary(),
+            ]
+            result = api.differential_expression_by_gene(
+                organism="MED4", summary=True,
+            )
+        MockConn.assert_called_once()
+        assert result["total_rows"] == 0
+
+    def test_importable_from_package(self):
+        """from multiomics_explorer import differential_expression_by_gene works."""
+        from multiomics_explorer import differential_expression_by_gene
+        assert differential_expression_by_gene is api.differential_expression_by_gene

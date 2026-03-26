@@ -45,6 +45,13 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_gene,
     build_search_ontology,
     build_search_ontology_summary,
+    build_differential_expression_by_gene,
+    build_differential_expression_by_gene_summary_global,
+    build_differential_expression_by_gene_summary_by_experiment,
+    build_differential_expression_by_gene_summary_diagnostics,
+    build_resolve_organism_for_organism,
+    build_resolve_organism_for_locus_tags,
+    build_resolve_organism_for_experiments,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -1019,3 +1026,266 @@ def run_cypher(
         "warnings": warnings,
         "results": results,
     }
+
+
+# ---------------------------------------------------------------------------
+# Expression: differential_expression_by_gene
+# ---------------------------------------------------------------------------
+
+_EXPRESSION_STATUS_KEYS = ("significant_up", "significant_down", "not_significant")
+_VALID_DIRECTIONS = {"up", "down"}
+
+
+def _apoc_freq_to_dict(freq_list: list[dict]) -> dict[str, int]:
+    """Convert apoc.coll.frequencies [{item, count}] to {item: count} dict.
+
+    Fills missing expression_status keys with 0.
+    """
+    d = {f["item"]: f["count"] for f in freq_list}
+    for key in _EXPRESSION_STATUS_KEYS:
+        d.setdefault(key, 0)
+    return d
+
+
+def _apoc_freq_to_treatment_dict(freq_list: list[dict]) -> dict[str, int]:
+    """Convert apoc.coll.frequencies [{item, count}] to {item: count} dict.
+
+    For treatment_type — no default keys needed.
+    """
+    return {f["item"]: f["count"] for f in freq_list}
+
+
+def _validate_organism_inputs(
+    organism: str | None,
+    locus_tags: list[str] | None,
+    experiment_ids: list[str] | None,
+    conn: "GraphConnection",
+) -> str:
+    """Pre-validate that all inputs refer to a single organism.
+
+    Returns the resolved organism_strain string.
+    Raises ValueError on validation failure.
+    """
+    resolved: dict[str, list[str]] = {}
+
+    if organism:
+        cypher, params = build_resolve_organism_for_organism(organism=organism)
+        orgs = conn.execute_query(cypher, **params)[0]["organisms"]
+        if len(orgs) == 0:
+            raise ValueError(f"no organism matching '{organism}' found")
+        if len(orgs) > 1:
+            names = ", ".join(sorted(orgs))
+            raise ValueError(
+                f"organism '{organism}' matches multiple organisms: {names}"
+                " — be more specific"
+            )
+        resolved["organism"] = orgs
+
+    if locus_tags:
+        cypher, params = build_resolve_organism_for_locus_tags(
+            locus_tags=locus_tags
+        )
+        orgs = conn.execute_query(cypher, **params)[0]["organisms"]
+        if len(orgs) > 1:
+            names = ", ".join(sorted(orgs))
+            raise ValueError(
+                f"locus_tags span multiple organisms: {names}"
+                " — call once per organism"
+            )
+        if orgs:
+            resolved["locus_tags"] = orgs
+
+    if experiment_ids:
+        cypher, params = build_resolve_organism_for_experiments(
+            experiment_ids=experiment_ids
+        )
+        orgs = conn.execute_query(cypher, **params)[0]["organisms"]
+        if len(orgs) > 1:
+            names = ", ".join(sorted(orgs))
+            raise ValueError(
+                f"experiment_ids span multiple organisms: {names}"
+                " — call once per organism"
+            )
+        if orgs:
+            resolved["experiment_ids"] = orgs
+
+    # Cross-validate: all resolved sets must agree
+    all_orgs = list(resolved.values())
+    if not all_orgs:
+        # No organism resolved from any input — shouldn't happen if at least
+        # one input is provided, but handle gracefully
+        raise ValueError(
+            "at least one of organism, locus_tags, or experiment_ids is required"
+        )
+
+    first = all_orgs[0][0]
+    for source, orgs in resolved.items():
+        if orgs[0] != first:
+            # Find which sources disagree
+            if "organism" in resolved and source != "organism":
+                raise ValueError(
+                    f"organism '{organism}' does not match"
+                    f" {source} organism '{orgs[0]}'"
+                )
+            if source == "experiment_ids" and "locus_tags" in resolved:
+                raise ValueError(
+                    f"locus_tags are {resolved['locus_tags'][0]} genes"
+                    f" but experiment_ids cover {orgs[0]}"
+                    " — organisms must match"
+                )
+
+    return first
+
+
+def differential_expression_by_gene(
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Query gene-centric differential expression data.
+
+    Returns dict with summary fields + results list. Results are long form:
+    one row per gene x experiment x timepoint, all context inlined.
+
+    Raises:
+        ValueError: if no filter provided, if inputs span multiple organisms,
+            if organisms don't match each other, or if organism fuzzy match
+            is ambiguous.
+
+    Returns:
+        dict with keys: organism_strain, matching_genes, total_rows,
+        rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
+        rows_by_treatment_type, top_categories, experiments, returned,
+        truncated, not_found, no_expression, results.
+    """
+    conn = _default_conn(conn)
+
+    # Validate direction
+    if direction is not None and direction not in _VALID_DIRECTIONS:
+        raise ValueError(
+            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS)}"
+        )
+
+    # Require at least one filter
+    if organism is None and locus_tags is None and experiment_ids is None:
+        raise ValueError(
+            "at least one of organism, locus_tags, or experiment_ids is required"
+        )
+
+    if summary:
+        limit = 0
+
+    # Common filter kwargs for all builders
+    filter_kwargs = dict(
+        organism=organism,
+        locus_tags=locus_tags,
+        experiment_ids=experiment_ids,
+        direction=direction,
+        significant_only=significant_only,
+    )
+
+    # Pre-validate single organism
+    organism_strain = _validate_organism_inputs(
+        organism, locus_tags, experiment_ids, conn
+    )
+
+    # --- Summary query 1: global stats ---
+    global_cypher, global_params = (
+        build_differential_expression_by_gene_summary_global(**filter_kwargs)
+    )
+    global_raw = conn.execute_query(global_cypher, **global_params)[0]
+
+    total_rows = global_raw["total_rows"]
+    matching_genes = global_raw["matching_genes"]
+    rows_by_status = _apoc_freq_to_dict(global_raw["rows_by_status"])
+    rows_by_treatment_type = _apoc_freq_to_treatment_dict(
+        global_raw["rows_by_treatment_type"]
+    )
+
+    # --- Summary query 2: per-experiment with nested timepoints ---
+    exp_cypher, exp_params = (
+        build_differential_expression_by_gene_summary_by_experiment(
+            **filter_kwargs
+        )
+    )
+    exp_raw = conn.execute_query(exp_cypher, **exp_params)
+
+    experiments: list[dict] = []
+    if exp_raw:
+        for exp in exp_raw[0]["experiments"]:
+            e = dict(exp)
+            e["rows_by_status"] = _apoc_freq_to_dict(e["rows_by_status"])
+
+            # Handle timepoints
+            if e.get("is_time_course") == "false":
+                e["timepoints"] = None
+            elif e.get("timepoints"):
+                tps = []
+                for tp in e["timepoints"]:
+                    tp_dict = dict(tp)
+                    tp_dict["rows_by_status"] = _apoc_freq_to_dict(
+                        tp_dict["rows_by_status"]
+                    )
+                    tps.append(tp_dict)
+                # Sort by timepoint_order
+                tps.sort(key=lambda t: t["timepoint_order"])
+                e["timepoints"] = tps
+
+            experiments.append(e)
+
+    # Sort experiments by total significant rows DESC
+    experiments.sort(
+        key=lambda e: (
+            e["rows_by_status"]["significant_up"]
+            + e["rows_by_status"]["significant_down"]
+        ),
+        reverse=True,
+    )
+
+    # --- Summary query 3: categories + batch diagnostics ---
+    diag_cypher, diag_params = (
+        build_differential_expression_by_gene_summary_diagnostics(
+            **filter_kwargs
+        )
+    )
+    diag_raw = conn.execute_query(diag_cypher, **diag_params)[0]
+
+    top_categories = diag_raw["top_categories"]
+    not_found = diag_raw["not_found"]
+    no_expression = diag_raw["no_expression"]
+
+    # --- Detail query (skip when limit=0) ---
+    if limit == 0:
+        results = []
+    else:
+        det_cypher, det_params = build_differential_expression_by_gene(
+            **filter_kwargs, verbose=verbose, limit=limit,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+
+    returned = len(results)
+    envelope = {
+        "organism_strain": organism_strain,
+        "matching_genes": matching_genes,
+        "total_rows": total_rows,
+        "rows_by_status": rows_by_status,
+        "median_abs_log2fc": global_raw["median_abs_log2fc"],
+        "max_abs_log2fc": global_raw["max_abs_log2fc"],
+        "experiment_count": len(experiments),
+        "rows_by_treatment_type": rows_by_treatment_type,
+        "top_categories": top_categories,
+        "experiments": experiments,
+        "not_found": not_found,
+        "no_expression": no_expression,
+        "returned": returned,
+        "truncated": total_rows > returned,
+        "results": results,
+    }
+    return envelope

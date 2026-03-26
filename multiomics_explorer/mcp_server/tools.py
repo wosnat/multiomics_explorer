@@ -1187,3 +1187,363 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"list_experiments unexpected error: {e}")
             raise ToolError(f"Error in list_experiments: {e}")
+
+    # ------------------------------------------------------------------
+    # Differential expression by gene
+    # ------------------------------------------------------------------
+
+    class ExpressionStatusBreakdown(BaseModel):
+        significant_up: int = Field(
+            default=0,
+            description="Rows with significant upregulation (e.g. 3)",
+        )
+        significant_down: int = Field(
+            default=0,
+            description="Rows with significant downregulation (e.g. 1)",
+        )
+        not_significant: int = Field(
+            default=0,
+            description="Rows not meeting significance threshold (e.g. 12)",
+        )
+
+    class ExpressionTimepoint(BaseModel):
+        timepoint: str | None = Field(
+            description="Timepoint label (e.g. 'day 18', 'days 60+89')."
+            " Null when edge has no label.",
+        )
+        timepoint_hours: float | None = Field(
+            description="Hours numeric value (e.g. 432.0)."
+            " Null for non-numeric labels like 'days 60+89'.",
+        )
+        timepoint_order: int = Field(
+            description="Sort key for time course reconstruction (e.g. 1)",
+        )
+        matching_genes: int = Field(
+            description="Distinct genes at this timepoint (e.g. 5)",
+        )
+        rows_by_status: ExpressionStatusBreakdown = Field(
+            description="Row counts by expression_status at this timepoint",
+        )
+
+    class ExpressionByExperiment(BaseModel):
+        experiment_id: str = Field(
+            description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')",
+        )
+        experiment_name: str = Field(
+            description="Human-readable name"
+            " (e.g. 'HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)')",
+        )
+        treatment_type: str = Field(
+            description="Treatment category"
+            " (e.g. 'nitrogen_stress', 'coculture')",
+        )
+        omics_type: str = Field(
+            description="Omics type (e.g. 'RNASEQ', 'PROTEOMICS')",
+        )
+        coculture_partner: str | None = Field(
+            default=None,
+            description="Coculture partner organism, if applicable",
+        )
+        is_time_course: str = Field(
+            description="'true' or 'false'",
+        )
+        matching_genes: int = Field(
+            description="Distinct genes with data in this experiment (e.g. 5)",
+        )
+        rows_by_status: ExpressionStatusBreakdown = Field(
+            description="Row counts by expression_status across all timepoints",
+        )
+        timepoints: list[ExpressionTimepoint] | None = Field(
+            default=None,
+            description="Per-timepoint breakdown, sorted by timepoint_order."
+            " Null for non-time-course experiments.",
+        )
+
+    class ExpressionTopCategory(BaseModel):
+        category: str = Field(
+            description="Gene category (e.g. 'Signal transduction')",
+        )
+        total_genes: int = Field(
+            description="All input genes in this category (e.g. 2)",
+        )
+        significant_genes: int = Field(
+            description="Genes with at least one significant row (e.g. 2)",
+        )
+
+    class ExpressionRow(BaseModel):
+        # Compact (always present)
+        locus_tag: str = Field(
+            description="Gene locus tag (e.g. 'ACZ81_01830')",
+        )
+        gene_name: str | None = Field(
+            description="Gene name (e.g. 'amtB'). Null if unannotated.",
+        )
+        experiment_id: str = Field(
+            description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')",
+        )
+        treatment_type: str = Field(
+            description="Treatment type from experiment"
+            " (e.g. 'nitrogen_stress')",
+        )
+        timepoint: str | None = Field(
+            description="Timepoint label (e.g. 'days 60+89')."
+            " Null when edge has no label.",
+        )
+        timepoint_hours: float | None = Field(
+            description="Numeric hours (e.g. 432.0)."
+            " Null for non-numeric labels.",
+        )
+        timepoint_order: int = Field(
+            description="Sort key for time course order (e.g. 3)",
+        )
+        log2fc: float = Field(
+            description="Log2 fold change (e.g. 3.591). Positive = up.",
+        )
+        padj: float | None = Field(
+            description="Adjusted p-value (e.g. 1.13e-12)."
+            " Null if not computed.",
+        )
+        rank: int = Field(
+            description="Rank by |log2FC| within experiment x timepoint;"
+            " 1 = strongest (e.g. 77)",
+        )
+        expression_status: Literal[
+            "significant_up", "significant_down", "not_significant"
+        ] = Field(
+            description="Significance call using publication-specific"
+            " threshold (e.g. 'significant_up')",
+        )
+        # Verbose (present when verbose=True)
+        product: str | None = Field(
+            default=None,
+            description="Gene product description"
+            " (e.g. 'Ammonium transporter')",
+        )
+        experiment_name: str | None = Field(
+            default=None,
+            description="Human-readable experiment name",
+        )
+        treatment: str | None = Field(
+            default=None,
+            description="Treatment details"
+            " (e.g. 'PRO99-lowN nutrient starvation')",
+        )
+        gene_category: str | None = Field(
+            default=None,
+            description="Gene functional category"
+            " (e.g. 'Inorganic ion transport')",
+        )
+        omics_type: str | None = Field(
+            default=None,
+            description="Omics type (e.g. 'RNASEQ')",
+        )
+        coculture_partner: str | None = Field(
+            default=None,
+            description="Coculture partner organism, if applicable",
+        )
+
+    class DifferentialExpressionByGeneResponse(BaseModel):
+        organism_strain: str = Field(
+            description="Single organism for all results"
+            " (e.g. 'Alteromonas macleodii HOT1A3')",
+        )
+        matching_genes: int = Field(
+            description="Distinct genes in results after filters (e.g. 5)",
+        )
+        total_rows: int = Field(
+            description="Total gene x experiment x timepoint rows"
+            " matching filters (e.g. 15)",
+        )
+        rows_by_status: ExpressionStatusBreakdown = Field(
+            description="Row counts by expression_status across all results",
+        )
+        median_abs_log2fc: float | None = Field(
+            description="Median |log2FC| for significant rows only"
+            " (e.g. 1.978). Null if no significant rows.",
+        )
+        max_abs_log2fc: float | None = Field(
+            description="Max |log2FC| for significant rows only"
+            " (e.g. 3.591). Null if no significant rows.",
+        )
+        experiment_count: int = Field(
+            description="Number of experiments in results (e.g. 1)",
+        )
+        rows_by_treatment_type: dict[str, int] = Field(
+            description="Row counts by treatment type"
+            " (e.g. {'nitrogen_stress': 15})",
+        )
+        top_categories: list[ExpressionTopCategory] = Field(
+            description="Top gene categories by significant gene count,"
+            " max 5",
+        )
+        experiments: list[ExpressionByExperiment] = Field(
+            description="Per-experiment summary with nested timepoint"
+            " breakdown, sorted by significant row count desc",
+        )
+        not_found: list[str] = Field(
+            default_factory=list,
+            description="Input locus_tags not found in KG",
+        )
+        no_expression: list[str] = Field(
+            default_factory=list,
+            description="Locus tags in KG but with no expression data"
+            " matching filters",
+        )
+        returned: int = Field(
+            description="Rows in results (e.g. 5)",
+        )
+        truncated: bool = Field(
+            description="True if total_rows > returned",
+        )
+        results: list[ExpressionRow] = Field(default_factory=list)
+
+    @mcp.tool(
+        tags={"expression", "genes"},
+        annotations={"readOnlyHint": True},
+    )
+    async def differential_expression_by_gene(
+        ctx: Context,
+        organism: Annotated[str | None, Field(
+            description="Organism name or partial match (e.g. 'MED4', "
+                        "'Prochlorococcus MED4'). Fuzzy word-based matching "
+                        "(same as list_experiments). "
+                        "Get valid names from list_organisms.",
+        )] = None,
+        locus_tags: Annotated[list[str] | None, Field(
+            description="Gene locus tags. E.g. ['PMM0001', 'PMM0845']. "
+                        "Get these from resolve_gene / gene_overview.",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Experiment IDs to restrict to. "
+                        "Get these from list_experiments.",
+        )] = None,
+        direction: Annotated[Literal["up", "down"] | None, Field(
+            description="Filter by expression direction.",
+        )] = None,
+        significant_only: Annotated[bool, Field(
+            description="If true, return only statistically significant"
+                        " results.",
+        )] = False,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields"
+                        " (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Add product, experiment_name, treatment, "
+                        "gene_category, omics_type, coculture_partner"
+                        " to each row.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> DifferentialExpressionByGeneResponse:
+        """Gene-centric differential expression. One row per gene x experiment x timepoint.
+
+        Returns summary statistics (always) + top results sorted by |log2FC|
+        (strongest effects first). Default limit=5 gives a quick overview.
+        Set summary=True for counts only, or increase limit for more rows.
+
+        At least one of organism, locus_tags, or experiment_ids is required.
+        All inputs must refer to the same organism — call once per organism.
+
+        When organism is the only filter, it scopes to that organism's full
+        expression data (e.g. MED4 = 47K edges). Combine with summary=True or
+        significant_only=True + limit for manageable results.
+
+        The expression_status field uses the publication-specific threshold from
+        each experiment's original paper (not a uniform padj<0.05 cutoff).
+
+        For cross-organism comparison via ortholog groups, use
+        differential_expression_by_ortholog.
+        """
+        await ctx.info(
+            f"differential_expression_by_gene"
+            f" organism={organism} locus_tags={locus_tags}"
+            f" limit={limit} summary={summary}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.differential_expression_by_gene(
+                organism=organism,
+                locus_tags=locus_tags,
+                experiment_ids=experiment_ids,
+                direction=direction,
+                significant_only=significant_only,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                conn=conn,
+            )
+
+            # Build nested Pydantic models
+            exp_models = []
+            for exp in data["experiments"]:
+                tp_models = None
+                if exp.get("timepoints") is not None:
+                    tp_models = [
+                        ExpressionTimepoint(
+                            **{
+                                **tp,
+                                "rows_by_status": ExpressionStatusBreakdown(
+                                    **tp["rows_by_status"]
+                                ),
+                            }
+                        )
+                        for tp in exp["timepoints"]
+                    ]
+                exp_models.append(
+                    ExpressionByExperiment(
+                        **{
+                            **{k: v for k, v in exp.items()
+                               if k != "timepoints" and k != "rows_by_status"},
+                            "rows_by_status": ExpressionStatusBreakdown(
+                                **exp["rows_by_status"]
+                            ),
+                            "timepoints": tp_models,
+                        }
+                    )
+                )
+
+            top_cat_models = [
+                ExpressionTopCategory(**c) for c in data["top_categories"]
+            ]
+            result_models = [
+                ExpressionRow(**r) for r in data["results"]
+            ]
+
+            response = DifferentialExpressionByGeneResponse(
+                organism_strain=data["organism_strain"],
+                matching_genes=data["matching_genes"],
+                total_rows=data["total_rows"],
+                rows_by_status=ExpressionStatusBreakdown(
+                    **data["rows_by_status"]
+                ),
+                median_abs_log2fc=data["median_abs_log2fc"],
+                max_abs_log2fc=data["max_abs_log2fc"],
+                experiment_count=data["experiment_count"],
+                rows_by_treatment_type=data["rows_by_treatment_type"],
+                top_categories=top_cat_models,
+                experiments=exp_models,
+                not_found=data["not_found"],
+                no_expression=data["no_expression"],
+                returned=data["returned"],
+                truncated=data["truncated"],
+                results=result_models,
+            )
+            await ctx.info(
+                f"Returning {response.returned} of {response.total_rows}"
+                f" rows ({response.experiment_count} experiments)"
+            )
+            return response
+        except ValueError as e:
+            await ctx.warning(
+                f"differential_expression_by_gene error: {e}"
+            )
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(
+                f"differential_expression_by_gene unexpected error: {e}"
+            )
+            raise ToolError(
+                f"Error in differential_expression_by_gene: {e}"
+            )

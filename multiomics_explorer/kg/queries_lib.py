@@ -1216,3 +1216,345 @@ def build_gene_existence_check() -> tuple[str, dict]:
         "RETURN lt, g IS NOT NULL AS found"
     )
     return cypher, {}
+
+
+# ---------------------------------------------------------------------------
+# Differential expression helpers
+# ---------------------------------------------------------------------------
+
+
+def _differential_expression_where(
+    *,
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+) -> tuple[list[str], dict]:
+    """Build WHERE conditions + params shared by all de_by_gene builders.
+
+    direction takes precedence over significant_only (direction implies
+    significance). organism uses fuzzy word-based matching (same as
+    list_experiments).
+    """
+    conditions: list[str] = []
+    params: dict = {}
+    if organism:
+        conditions.append(
+            "ALL(word IN split(toLower($organism), ' ')"
+            " WHERE toLower(e.organism_strain) CONTAINS word)"
+        )
+        params["organism"] = organism
+    if locus_tags:
+        conditions.append("g.locus_tag IN $locus_tags")
+        params["locus_tags"] = locus_tags
+    if experiment_ids:
+        conditions.append("e.id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+    if direction == "up":
+        conditions.append('r.expression_status = "significant_up"')
+    elif direction == "down":
+        conditions.append('r.expression_status = "significant_down"')
+    elif significant_only:
+        conditions.append('r.expression_status <> "not_significant"')
+    return conditions, params
+
+
+# ---------------------------------------------------------------------------
+# Organism pre-validation builders (differential expression)
+# ---------------------------------------------------------------------------
+
+
+def build_resolve_organism_for_organism(
+    *, organism: str,
+) -> tuple[str, dict]:
+    """Resolve distinct organism_strain values for a fuzzy organism name.
+
+    RETURN keys: organisms (list[str]).
+    Uses the same word-based CONTAINS matching as list_experiments.
+    """
+    cypher = (
+        "MATCH (e:Experiment)-[:Changes_expression_of]->()\n"
+        "WHERE ALL(word IN split(toLower($organism), ' ')"
+        " WHERE toLower(e.organism_strain) CONTAINS word)\n"
+        "RETURN collect(DISTINCT e.organism_strain) AS organisms"
+    )
+    return cypher, {"organism": organism}
+
+
+def build_resolve_organism_for_locus_tags(
+    *, locus_tags: list[str],
+) -> tuple[str, dict]:
+    """Resolve distinct organism_strain values for a list of locus_tags.
+
+    RETURN keys: organisms (list[str]).
+    """
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (g:Gene {locus_tag: lt})\n"
+        "RETURN collect(DISTINCT g.organism_strain) AS organisms"
+    )
+    return cypher, {"locus_tags": locus_tags}
+
+
+def build_resolve_organism_for_experiments(
+    *, experiment_ids: list[str],
+) -> tuple[str, dict]:
+    """Resolve distinct organism_strain values for a list of experiment IDs.
+
+    RETURN keys: organisms (list[str]).
+    """
+    cypher = (
+        "UNWIND $experiment_ids AS eid\n"
+        "MATCH (e:Experiment {id: eid})\n"
+        "RETURN collect(DISTINCT e.organism_strain) AS organisms"
+    )
+    return cypher, {"experiment_ids": experiment_ids}
+
+
+# ---------------------------------------------------------------------------
+# Differential expression summary builders
+# ---------------------------------------------------------------------------
+
+
+def build_differential_expression_by_gene_summary_global(
+    *,
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+) -> tuple[str, dict]:
+    """Global aggregate stats for differential_expression_by_gene.
+
+    RETURN keys: total_rows, matching_genes, rows_by_status,
+    rows_by_treatment_type, median_abs_log2fc, max_abs_log2fc.
+    rows_by_status = apoc list [{item, count}] — api/ converts to dict.
+    rows_by_treatment_type = apoc list [{item, count}] — api/ converts to dict.
+    """
+    conditions, params = _differential_expression_where(
+        organism=organism, locus_tags=locus_tags,
+        experiment_ids=experiment_ids, direction=direction,
+        significant_only=significant_only,
+    )
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    cypher = (
+        "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
+        f"{where_block}"
+        "RETURN count(*) AS total_rows,\n"
+        "       count(DISTINCT g.locus_tag) AS matching_genes,\n"
+        "       apoc.coll.frequencies(collect(r.expression_status)) AS rows_by_status,\n"
+        "       apoc.coll.frequencies(collect(e.treatment_type)) AS rows_by_treatment_type,\n"
+        "       percentileCont(\n"
+        '           CASE WHEN r.expression_status <> "not_significant"\n'
+        "                THEN abs(r.log2_fold_change) ELSE null END, 0.5\n"
+        "       ) AS median_abs_log2fc,\n"
+        '       max(CASE WHEN r.expression_status <> "not_significant"\n'
+        "               THEN abs(r.log2_fold_change) END) AS max_abs_log2fc"
+    )
+    return cypher, params
+
+
+def build_differential_expression_by_gene_summary_by_experiment(
+    *,
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+) -> tuple[str, dict]:
+    """Per-experiment breakdown with nested timepoints (single organism enforced).
+
+    RETURN keys: organism_strain, experiments.
+    experiments: list of dicts, each with nested timepoints.
+    rows_by_status at both experiment and timepoint level (APOC list format).
+    is_time_course included per experiment so api/ can null-out timepoints.
+    """
+    conditions, params = _differential_expression_where(
+        organism=organism, locus_tags=locus_tags,
+        experiment_ids=experiment_ids, direction=direction,
+        significant_only=significant_only,
+    )
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    cypher = (
+        "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
+        f"{where_block}"
+        "WITH e, r.time_point AS tp, r.time_point_order AS tpo,"
+        " r.time_point_hours AS tph,\n"
+        "     collect(DISTINCT g.locus_tag) AS tp_genes,\n"
+        "     collect(r.expression_status) AS tp_calls\n"
+        "WITH e,\n"
+        "     size(apoc.coll.toSet(apoc.coll.flatten(collect(tp_genes))))"
+        " AS matching_genes,\n"
+        "     apoc.coll.frequencies(apoc.coll.flatten(collect(tp_calls)))"
+        " AS rows_by_status,\n"
+        "     collect({timepoint: tp, timepoint_hours: tph,"
+        " timepoint_order: tpo,\n"
+        "              matching_genes: size(tp_genes),\n"
+        "              rows_by_status: apoc.coll.frequencies(tp_calls)})"
+        " AS timepoints\n"
+        "WITH collect({experiment_id: e.id, experiment_name: e.name,\n"
+        "              treatment_type: e.treatment_type,"
+        " omics_type: e.omics_type,\n"
+        "              coculture_partner: e.coculture_partner,\n"
+        "              is_time_course: e.is_time_course,\n"
+        "              matching_genes: matching_genes,\n"
+        "              rows_by_status: rows_by_status,\n"
+        "              timepoints: timepoints}) AS experiments,\n"
+        "     e.organism_strain AS organism_strain\n"
+        "RETURN organism_strain, experiments"
+    )
+    return cypher, params
+
+
+def build_differential_expression_by_gene_summary_diagnostics(
+    *,
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+) -> tuple[str, dict]:
+    """Top categories + batch diagnostics for differential_expression_by_gene.
+
+    RETURN keys: top_categories, not_found, no_expression.
+    not_found and no_expression are empty lists when locus_tags is None.
+    Constructs different Cypher depending on whether locus_tags is provided.
+    """
+    if locus_tags is None:
+        # Simple: no batch diagnostics needed
+        conditions, params = _differential_expression_where(
+            organism=organism, locus_tags=None,
+            experiment_ids=experiment_ids, direction=direction,
+            significant_only=significant_only,
+        )
+        where_block = (
+            "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+        )
+        cypher = (
+            "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
+            f"{where_block}"
+            "WITH g.gene_category AS category,\n"
+            "     count(DISTINCT g.locus_tag) AS total_genes,\n"
+            '     count(DISTINCT CASE WHEN r.expression_status <> "not_significant"\n'
+            "                         THEN g.locus_tag END) AS significant_genes\n"
+            "ORDER BY significant_genes DESC\n"
+            "RETURN [] AS not_found, [] AS no_expression,\n"
+            "       collect({category: category, total_genes: total_genes,\n"
+            "                significant_genes: significant_genes})[0..5]"
+            " AS top_categories"
+        )
+        return cypher, params
+
+    # Batch diagnostics: UNWIND locus_tags for not_found/no_expression
+    # Use where_block WITHOUT locus_tags condition (already applied via UNWIND)
+    conditions_no_lt, params = _differential_expression_where(
+        organism=organism, locus_tags=None,
+        experiment_ids=experiment_ids, direction=direction,
+        significant_only=significant_only,
+    )
+    params["locus_tags"] = locus_tags
+    where_block_no_lt = (
+        "\nWHERE " + " AND ".join(conditions_no_lt)
+        if conditions_no_lt else ""
+    )
+
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
+        "OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)"
+        f"{where_block_no_lt}\n"
+        "WITH lt, g, count(r) AS edge_count\n"
+        "WITH collect(CASE WHEN g IS NULL           THEN lt END)"
+        " AS not_found_raw,\n"
+        "     collect(CASE WHEN g IS NOT NULL AND edge_count = 0"
+        " THEN lt END) AS no_expr_raw,\n"
+        "     collect(CASE WHEN g IS NOT NULL AND edge_count > 0"
+        " THEN g  END) AS matched_genes\n"
+        "UNWIND CASE WHEN size(matched_genes) > 0"
+        " THEN matched_genes ELSE [null] END AS g\n"
+        "OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)"
+        f"{where_block_no_lt}\n"
+        "WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found,\n"
+        "     [x IN no_expr_raw  WHERE x IS NOT NULL] AS no_expression,\n"
+        "     g.gene_category AS category,\n"
+        "     count(DISTINCT g.locus_tag) AS total_genes,\n"
+        '     count(DISTINCT CASE WHEN r.expression_status <> "not_significant"\n'
+        "                         THEN g.locus_tag END) AS significant_genes\n"
+        "ORDER BY significant_genes DESC\n"
+        "RETURN not_found, no_expression,\n"
+        "       collect({category: category, total_genes: total_genes,\n"
+        "                significant_genes: significant_genes})[0..5]"
+        " AS top_categories"
+    )
+    return cypher, params
+
+
+# ---------------------------------------------------------------------------
+# Differential expression detail builder
+# ---------------------------------------------------------------------------
+
+
+def build_differential_expression_by_gene(
+    *,
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build detail Cypher for differential_expression_by_gene.
+
+    RETURN keys (compact — 11): locus_tag, gene_name,
+    experiment_id, treatment_type, timepoint, timepoint_hours, timepoint_order,
+    log2fc, padj, rank, expression_status.
+    RETURN keys (verbose): adds product, experiment_name, treatment,
+    gene_category, omics_type, coculture_partner.
+    """
+    conditions, params = _differential_expression_where(
+        organism=organism, locus_tags=locus_tags,
+        experiment_ids=experiment_ids, direction=direction,
+        significant_only=significant_only,
+    )
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    verbose_cols = (
+        ",\n       g.function_description AS product"
+        ",\n       e.name AS experiment_name"
+        ",\n       e.treatment AS treatment"
+        ",\n       g.gene_category AS gene_category"
+        ",\n       e.omics_type AS omics_type"
+        ",\n       e.coculture_partner AS coculture_partner"
+        if verbose else ""
+    )
+
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
+        f"{where_block}"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.gene_name AS gene_name,\n"
+        "       e.id AS experiment_id,\n"
+        "       e.treatment_type AS treatment_type,\n"
+        "       r.time_point AS timepoint,\n"
+        "       r.time_point_hours AS timepoint_hours,\n"
+        "       r.time_point_order AS timepoint_order,\n"
+        "       r.log2_fold_change AS log2fc,\n"
+        "       r.adjusted_p_value AS padj,\n"
+        "       r.rank_by_effect AS rank,\n"
+        "       r.expression_status AS expression_status"
+        f"{verbose_cols}\n"
+        "ORDER BY ABS(r.log2_fold_change) DESC, g.locus_tag ASC,"
+        " e.id ASC, r.time_point_order ASC"
+        f"{limit_clause}"
+    )
+    return cypher, params

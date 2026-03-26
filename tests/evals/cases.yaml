@@ -1005,3 +1005,52 @@
   expect:
     min_rows: 1
     columns: [total_matching, by_organism]
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_gene
+# ---------------------------------------------------------------------------
+
+- id: de_by_gene_single_gene
+  tool: differential_expression_by_gene
+  desc: Single gene returns expression rows across experiments
+  params:
+    locus_tags: ["PMM0001"]
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, experiment_id, treatment_type,
+              timepoint, timepoint_hours, timepoint_order,
+              log2fc, padj, rank, expression_status]
+    row0:
+      locus_tag: PMM0001
+
+- id: de_by_gene_significant_only
+  tool: differential_expression_by_gene
+  desc: Significant-only filter returns only significant rows
+  params:
+    locus_tags: ["PMM0001"]
+    significant_only: true
+  expect:
+    min_rows: 0
+
+- id: de_by_gene_direction_up
+  tool: differential_expression_by_gene
+  desc: Direction up returns only significant_up rows
+  params:
+    organism: "HOT1A3"
+    direction: "up"
+    limit: 5
+  expect:
+    min_rows: 1
+    columns: [locus_tag, expression_status]
+
+- id: de_by_gene_verbose
+  tool: differential_expression_by_gene
+  desc: Verbose adds product and experiment_name columns
+  params:
+    locus_tags: ["PMM0001"]
+    verbose: true
+    limit: 1
+  expect:
+    min_rows: 1
+    columns: [locus_tag, product, experiment_name, treatment,
+              gene_category, omics_type]

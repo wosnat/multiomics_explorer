@@ -1,0 +1,699 @@
+case_id: de_by_gene_verbose
+row_count: 28
+rows:
+- coculture_partner: Alteromonas macleodii HOT1A3
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
+    (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -2.8863
+  omics_type: RNASEQ
+  padj: 0.0311
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 581
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment: Coculture with Alteromonas HOT1A3
+  treatment_type: coculture
+- coculture_partner: null
+  experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
+  experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
+  expression_status: significant_up
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 2.23
+  omics_type: RNASEQ
+  padj: 0.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 75
+  timepoint: 3h
+  timepoint_hours: 3.0
+  timepoint_order: 1
+  treatment: N-depleted Pro99 medium
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  expression_status: significant_up
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 1.885
+  omics_type: RNASEQ
+  padj: 0.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 459
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 1.1985
+  omics_type: MICROARRAY
+  padj: 1.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 362
+  timepoint: 48h
+  timepoint_hours: 48.0
+  timepoint_order: 6
+  treatment: Nitrogen deprivation (MED4)
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  expression_status: significant_up
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 1.1005
+  omics_type: PROTEOMICS
+  padj: 0.0007
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 213
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 1.008
+  omics_type: MICROARRAY
+  padj: 1.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 462
+  timepoint: 12h
+  timepoint_hours: 12.0
+  timepoint_order: 4
+  treatment: Nitrogen deprivation (MED4)
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
+  experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.89
+  omics_type: RNASEQ
+  padj: 0.54
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 471
+  timepoint: 12h
+  timepoint_hours: 12.0
+  timepoint_order: 2
+  treatment: N-depleted Pro99 medium
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
+  experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.87
+  omics_type: RNASEQ
+  padj: 0.49
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 494
+  timepoint: 24h
+  timepoint_hours: 24.0
+  timepoint_order: 3
+  treatment: N-depleted Pro99 medium
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.8628
+  omics_type: MICROARRAY
+  padj: 1.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 467
+  timepoint: 24h
+  timepoint_hours: 24.0
+  timepoint_order: 5
+  treatment: Nitrogen deprivation (MED4)
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.7135
+  omics_type: PROTEOMICS
+  padj: 0.036
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 211
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 1
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: Alteromonas macleodii HOT1A3
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.7087
+  omics_type: RNASEQ
+  padj: 0.2466
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 248
+  timepoint: day 11
+  timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment: Coculture with Alteromonas HOT1A3
+  treatment_type: coculture
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.6293
+  omics_type: RNASEQ
+  padj: 0.0641
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 834
+  timepoint: days 60+89
+  timepoint_hours: null
+  timepoint_order: 2
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.6172
+  omics_type: PROTEOMICS
+  padj: 0.028
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 574
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.5893
+  omics_type: PROTEOMICS
+  padj: 0.0135
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 549
+  timepoint: days 60+89
+  timepoint_hours: null
+  timepoint_order: 5
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.5614
+  omics_type: PROTEOMICS
+  padj: 0.0484
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 570
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.5111
+  omics_type: MICROARRAY
+  padj: 1.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 722
+  timepoint: 6h
+  timepoint_hours: 6.0
+  timepoint_order: 3
+  treatment: Nitrogen deprivation (MED4)
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.3774
+  omics_type: PROTEOMICS
+  padj: 0.191
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 717
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
+    medium (MED4) (MICROARRAY)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.334
+  omics_type: MICROARRAY
+  padj: 1.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 694
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment: Growth on cyanate as sole N source (MED4)
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
+  experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
+    medium (MED4) (MICROARRAY)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.2121
+  omics_type: MICROARRAY
+  padj: 1.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 937
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment: Growth on urea as sole N source (MED4)
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.1577
+  omics_type: MICROARRAY
+  padj: 1.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1299
+  timepoint: 0h
+  timepoint_hours: 0.0
+  timepoint_order: 1
+  treatment: Nitrogen deprivation (MED4)
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.1564
+  omics_type: MICROARRAY
+  padj: 1.0
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1276
+  timepoint: 3h
+  timepoint_hours: 3.0
+  timepoint_order: 2
+  treatment: Nitrogen deprivation (MED4)
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.1452
+  omics_type: RNASEQ
+  padj: 0.7754
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1578
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.1271
+  omics_type: RNASEQ
+  padj: 0.8007
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1630
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.1087
+  omics_type: PROTEOMICS
+  padj: 0.6459
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1316
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.1035
+  omics_type: PROTEOMICS
+  padj: 0.665
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1323
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.0794
+  omics_type: RNASEQ
+  padj: 0.8653
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1670
+  timepoint: days 60+89
+  timepoint_hours: null
+  timepoint_order: 5
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.0714
+  omics_type: RNASEQ
+  padj: 0.9335
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1616
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 1
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.0161
+  omics_type: RNASEQ
+  padj: 0.9762
+  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
+    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
+    complex) which diffuses in an ATP-independent manner freely and bidirectionally
+    along dsDNA. Initially characterized for its ability to contact the catalytic
+    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
+    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
+    proofreading activity. The beta chain is required for initiation of replication
+    as well as for processivity of DNA replication
+  rank: 1823
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment: PRO99-lowN nutrient starvation
+  treatment_type: nitrogen_stress

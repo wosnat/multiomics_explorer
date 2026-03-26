@@ -52,6 +52,7 @@ EXPECTED_TOOLS = [
     "search_ontology", "genes_by_ontology", "gene_ontology_terms",
     "list_publications",
     "list_experiments",
+    "differential_expression_by_gene",
 ]
 
 
@@ -1890,3 +1891,189 @@ class TestListExperimentsWrapper:
         ):
             with pytest.raises(ToolError, match="bad param"):
                 await tool_fns["list_experiments"](mock_ctx)
+
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_gene
+# ---------------------------------------------------------------------------
+class TestDifferentialExpressionByGeneWrapper:
+    _SAMPLE_API_RETURN = {
+        "organism_strain": "Prochlorococcus MED4",
+        "matching_genes": 5,
+        "total_rows": 15,
+        "rows_by_status": {
+            "significant_up": 3,
+            "significant_down": 0,
+            "not_significant": 12,
+        },
+        "median_abs_log2fc": 1.978,
+        "max_abs_log2fc": 3.591,
+        "experiment_count": 1,
+        "rows_by_treatment_type": {"nitrogen_stress": 15},
+        "top_categories": [
+            {"category": "Signal transduction",
+             "total_genes": 2, "significant_genes": 2},
+        ],
+        "experiments": [
+            {
+                "experiment_id": "exp1",
+                "experiment_name": "Test experiment",
+                "treatment_type": "nitrogen_stress",
+                "omics_type": "RNASEQ",
+                "coculture_partner": None,
+                "is_time_course": "true",
+                "matching_genes": 5,
+                "rows_by_status": {
+                    "significant_up": 3,
+                    "significant_down": 0,
+                    "not_significant": 12,
+                },
+                "timepoints": [
+                    {
+                        "timepoint": "day 18",
+                        "timepoint_hours": 432.0,
+                        "timepoint_order": 1,
+                        "matching_genes": 5,
+                        "rows_by_status": {
+                            "significant_up": 0,
+                            "significant_down": 0,
+                            "not_significant": 5,
+                        },
+                    },
+                ],
+            },
+        ],
+        "not_found": [],
+        "no_expression": [],
+        "returned": 1,
+        "truncated": True,
+        "results": [
+            {
+                "locus_tag": "PMM0001",
+                "gene_name": "dnaN",
+                "experiment_id": "exp1",
+                "treatment_type": "nitrogen_stress",
+                "timepoint": "day 18",
+                "timepoint_hours": 432.0,
+                "timepoint_order": 1,
+                "log2fc": 3.591,
+                "padj": 1.13e-12,
+                "rank": 77,
+                "expression_status": "significant_up",
+            },
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, mock_ctx):
+        """API dict is converted to Pydantic response model."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        assert result.organism_strain == "Prochlorococcus MED4"
+        assert result.total_rows == 15
+        assert result.matching_genes == 5
+        assert result.returned == 1
+        assert result.truncated is True
+        assert len(result.results) == 1
+        assert result.results[0].locus_tag == "PMM0001"
+        assert result.results[0].expression_status == "significant_up"
+
+    @pytest.mark.asyncio
+    async def test_rows_by_status_model(self, tool_fns, mock_ctx):
+        """rows_by_status converted to ExpressionStatusBreakdown."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        rbs = result.rows_by_status
+        assert rbs.significant_up == 3
+        assert rbs.significant_down == 0
+        assert rbs.not_significant == 12
+
+    @pytest.mark.asyncio
+    async def test_experiments_with_timepoints(self, tool_fns, mock_ctx):
+        """Experiment with nested timepoints rendered correctly."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        exp = result.experiments[0]
+        assert exp.experiment_id == "exp1"
+        assert exp.is_time_course == "true"
+        assert exp.timepoints is not None
+        assert len(exp.timepoints) == 1
+        assert exp.timepoints[0].timepoint == "day 18"
+        assert exp.timepoints[0].matching_genes == 5
+
+    @pytest.mark.asyncio
+    async def test_non_time_course_null_timepoints(self, tool_fns, mock_ctx):
+        """Non-time-course experiment has timepoints=None."""
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "experiments": [
+                {
+                    **self._SAMPLE_API_RETURN["experiments"][0],
+                    "is_time_course": "false",
+                    "timepoints": None,
+                },
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=data,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        assert result.experiments[0].timepoints is None
+
+    @pytest.mark.asyncio
+    async def test_summary_true_empty_results(self, tool_fns, mock_ctx):
+        """summary=True returns results=[], returned=0."""
+        data = {**self._SAMPLE_API_RETURN, "results": [], "returned": 0}
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=data,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4", summary=True,
+            )
+        assert result.results == []
+        assert result.returned == 0
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            side_effect=ValueError("at least one"),
+        ):
+            with pytest.raises(ToolError, match="at least one"):
+                await tool_fns["differential_expression_by_gene"](
+                    mock_ctx, organism="ZZZZZ",
+                )
+
+    @pytest.mark.asyncio
+    async def test_generic_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """RuntimeError caught and converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            side_effect=RuntimeError("timeout"),
+        ):
+            with pytest.raises(ToolError, match="Error in differential_expression"):
+                await tool_fns["differential_expression_by_gene"](
+                    mock_ctx, organism="MED4",
+                )

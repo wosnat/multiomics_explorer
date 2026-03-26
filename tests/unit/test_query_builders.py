@@ -28,6 +28,13 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_gene,
     build_search_ontology,
     build_search_ontology_summary,
+    build_differential_expression_by_gene,
+    build_differential_expression_by_gene_summary_global,
+    build_differential_expression_by_gene_summary_by_experiment,
+    build_differential_expression_by_gene_summary_diagnostics,
+    build_resolve_organism_for_organism,
+    build_resolve_organism_for_locus_tags,
+    build_resolve_organism_for_experiments,
 )
 
 
@@ -1335,5 +1342,305 @@ class TestBuildListExperimentsSummary:
             "by_organism", "by_treatment_type", "by_omics_type", "by_publication",
         ]:
             assert key in cypher
+
+
+# ---------------------------------------------------------------------------
+# Organism pre-validation builders
+# ---------------------------------------------------------------------------
+
+
+class TestBuildResolveOrganismForOrganism:
+    def test_basic(self):
+        cypher, params = build_resolve_organism_for_organism(organism="MED4")
+        assert "Changes_expression_of" in cypher
+        assert "organisms" in cypher
+        assert params["organism"] == "MED4"
+
+    def test_fuzzy_match(self):
+        cypher, _ = build_resolve_organism_for_organism(organism="MED4")
+        assert "toLower($organism)" in cypher
+        assert "CONTAINS" in cypher
+
+
+class TestBuildResolveOrganismForLocusTags:
+    def test_basic(self):
+        cypher, params = build_resolve_organism_for_locus_tags(
+            locus_tags=["PMM0001"]
+        )
+        assert "Gene {locus_tag: lt}" in cypher
+        assert "organisms" in cypher
+        assert params["locus_tags"] == ["PMM0001"]
+
+
+class TestBuildResolveOrganismForExperiments:
+    def test_basic(self):
+        cypher, params = build_resolve_organism_for_experiments(
+            experiment_ids=["exp1"]
+        )
+        assert "Experiment {id: eid}" in cypher
+        assert "organisms" in cypher
+        assert params["experiment_ids"] == ["exp1"]
+
+
+# ---------------------------------------------------------------------------
+# Differential expression summary builders
+# ---------------------------------------------------------------------------
+
+
+class TestBuildDifferentialExpressionByGeneSummaryGlobal:
+    def test_no_filters(self):
+        cypher, params = (
+            build_differential_expression_by_gene_summary_global()
+        )
+        assert "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)" in cypher
+        assert "WHERE" not in cypher
+        assert params == {}
+
+    def test_organism_filter(self):
+        cypher, params = (
+            build_differential_expression_by_gene_summary_global(
+                organism="MED4"
+            )
+        )
+        assert "toLower($organism)" in cypher
+        assert params["organism"] == "MED4"
+
+    def test_locus_tags_filter(self):
+        cypher, params = (
+            build_differential_expression_by_gene_summary_global(
+                locus_tags=["PMM0001"]
+            )
+        )
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert params["locus_tags"] == ["PMM0001"]
+
+    def test_experiment_ids_filter(self):
+        cypher, params = (
+            build_differential_expression_by_gene_summary_global(
+                experiment_ids=["exp1"]
+            )
+        )
+        assert "e.id IN $experiment_ids" in cypher
+        assert params["experiment_ids"] == ["exp1"]
+
+    def test_direction_up(self):
+        cypher, _ = build_differential_expression_by_gene_summary_global(
+            direction="up"
+        )
+        assert 'r.expression_status = "significant_up"' in cypher
+
+    def test_direction_down(self):
+        cypher, _ = build_differential_expression_by_gene_summary_global(
+            direction="down"
+        )
+        assert 'r.expression_status = "significant_down"' in cypher
+
+    def test_significant_only(self):
+        cypher, _ = build_differential_expression_by_gene_summary_global(
+            significant_only=True
+        )
+        assert 'r.expression_status <> "not_significant"' in cypher
+
+    def test_direction_overrides_significant_only(self):
+        cypher, _ = build_differential_expression_by_gene_summary_global(
+            direction="up", significant_only=True
+        )
+        assert 'r.expression_status = "significant_up"' in cypher
+        # The <> "not_significant" appears in CASE expressions (for median/max),
+        # but should NOT appear in the WHERE clause when direction is set.
+        where_part = cypher.split("RETURN")[0]
+        assert 'r.expression_status <> "not_significant"' not in where_part
+
+    def test_returns_expected_keys(self):
+        cypher, _ = build_differential_expression_by_gene_summary_global()
+        for key in [
+            "total_rows", "matching_genes", "rows_by_status",
+            "rows_by_treatment_type", "median_abs_log2fc", "max_abs_log2fc",
+        ]:
+            assert key in cypher
+
+    def test_combined_filters(self):
+        cypher, params = (
+            build_differential_expression_by_gene_summary_global(
+                organism="MED4",
+                locus_tags=["PMM0001"],
+                experiment_ids=["exp1"],
+                significant_only=True,
+            )
+        )
+        assert "WHERE" in cypher
+        assert "AND" in cypher
+        assert params["organism"] == "MED4"
+        assert params["locus_tags"] == ["PMM0001"]
+        assert params["experiment_ids"] == ["exp1"]
+
+
+class TestBuildDifferentialExpressionByGeneSummaryByExperiment:
+    def test_no_filters(self):
+        cypher, params = (
+            build_differential_expression_by_gene_summary_by_experiment()
+        )
+        assert "Changes_expression_of" in cypher
+        assert "organism_strain" in cypher
+        assert "experiments" in cypher
+        assert params == {}
+
+    def test_returns_nested_timepoints(self):
+        cypher, _ = (
+            build_differential_expression_by_gene_summary_by_experiment()
+        )
+        assert "timepoint" in cypher
+        assert "timepoint_hours" in cypher
+        assert "timepoint_order" in cypher
+
+    def test_returns_experiment_metadata(self):
+        cypher, _ = (
+            build_differential_expression_by_gene_summary_by_experiment()
+        )
+        for key in [
+            "experiment_id", "experiment_name", "treatment_type",
+            "omics_type", "is_time_course",
+        ]:
+            assert key in cypher
+
+    def test_organism_filter(self):
+        cypher, params = (
+            build_differential_expression_by_gene_summary_by_experiment(
+                organism="HOT1A3"
+            )
+        )
+        assert "toLower($organism)" in cypher
+        assert params["organism"] == "HOT1A3"
+
+
+class TestBuildDifferentialExpressionByGeneSummaryDiagnostics:
+    def test_no_locus_tags(self):
+        """Without locus_tags, returns empty not_found/no_expression."""
+        cypher, params = (
+            build_differential_expression_by_gene_summary_diagnostics(
+                organism="MED4"
+            )
+        )
+        assert "[] AS not_found" in cypher
+        assert "[] AS no_expression" in cypher
+        assert "top_categories" in cypher
+        assert "UNWIND $locus_tags" not in cypher
+
+    def test_with_locus_tags(self):
+        """With locus_tags, uses UNWIND for batch diagnostics."""
+        cypher, params = (
+            build_differential_expression_by_gene_summary_diagnostics(
+                locus_tags=["PMM0001", "FAKE_TAG"]
+            )
+        )
+        assert "UNWIND $locus_tags AS lt" in cypher
+        assert "not_found" in cypher
+        assert "no_expression" in cypher
+        assert "top_categories" in cypher
+        assert params["locus_tags"] == ["PMM0001", "FAKE_TAG"]
+
+    def test_with_locus_tags_and_experiment_ids(self):
+        """Experiment filter is in where_block_no_lt."""
+        cypher, params = (
+            build_differential_expression_by_gene_summary_diagnostics(
+                locus_tags=["PMM0001"],
+                experiment_ids=["exp1"],
+            )
+        )
+        assert "e.id IN $experiment_ids" in cypher
+        assert params["experiment_ids"] == ["exp1"]
+        # locus_tags NOT in WHERE (applied via UNWIND)
+        assert "g.locus_tag IN $locus_tags" not in cypher
+
+    def test_top_categories_limited_to_5(self):
+        cypher, _ = (
+            build_differential_expression_by_gene_summary_diagnostics()
+        )
+        assert "[0..5]" in cypher
+
+    def test_uses_count_r_not_count_star(self):
+        """count(r) correctly handles OPTIONAL MATCH nulls."""
+        cypher, _ = (
+            build_differential_expression_by_gene_summary_diagnostics(
+                locus_tags=["PMM0001"]
+            )
+        )
+        assert "count(r)" in cypher
+        assert "count(*)" not in cypher
+
+
+# ---------------------------------------------------------------------------
+# Differential expression detail builder
+# ---------------------------------------------------------------------------
+
+
+class TestBuildDifferentialExpressionByGene:
+    def test_no_filters(self):
+        cypher, params = build_differential_expression_by_gene()
+        assert "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)" in cypher
+        assert "WHERE" not in cypher
+        assert params == {}
+
+    def test_returns_compact_columns(self):
+        cypher, _ = build_differential_expression_by_gene()
+        for col in [
+            "locus_tag", "gene_name", "experiment_id", "treatment_type",
+            "timepoint", "timepoint_hours", "timepoint_order",
+            "log2fc", "padj", "rank", "expression_status",
+        ]:
+            assert col in cypher
+
+    def test_verbose_false_no_extra_columns(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=False)
+        assert "product" not in cypher
+        assert "experiment_name" not in cypher
+        assert "gene_category" not in cypher
+
+    def test_verbose_true_adds_columns(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=True)
+        for col in [
+            "product", "experiment_name", "treatment",
+            "gene_category", "omics_type", "coculture_partner",
+        ]:
+            assert col in cypher
+
+    def test_limit(self):
+        cypher, params = build_differential_expression_by_gene(limit=10)
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+
+    def test_limit_none(self):
+        cypher, params = build_differential_expression_by_gene(limit=None)
+        assert "LIMIT" not in cypher
+        assert "limit" not in params
+
+    def test_order_by(self):
+        cypher, _ = build_differential_expression_by_gene()
+        assert "ORDER BY ABS(r.log2_fold_change) DESC" in cypher
+        assert "g.locus_tag ASC" in cypher
+
+    def test_organism_filter(self):
+        cypher, params = build_differential_expression_by_gene(
+            organism="MED4"
+        )
+        assert "toLower($organism)" in cypher
+        assert params["organism"] == "MED4"
+
+    def test_combined_filters(self):
+        cypher, params = build_differential_expression_by_gene(
+            organism="MED4",
+            locus_tags=["PMM0001"],
+            experiment_ids=["exp1"],
+            direction="up",
+            verbose=True,
+            limit=20,
+        )
+        assert "WHERE" in cypher
+        assert params["organism"] == "MED4"
+        assert params["locus_tags"] == ["PMM0001"]
+        assert params["experiment_ids"] == ["exp1"]
+        assert params["limit"] == 20
+        assert 'r.expression_status = "significant_up"' in cypher
+        assert "product" in cypher
 
 
