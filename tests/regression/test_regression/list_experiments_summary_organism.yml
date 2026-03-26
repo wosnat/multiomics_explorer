@@ -20,6 +20,11 @@ rows:
   - '{''count'': 4, ''item'': ''10.1371/journal.pone.0165375''}'
   - '{''count'': 6, ''item'': ''10.1101/2025.11.24.690089''}'
   - '{''count'': 6, ''item'': ''10.1128/JB.01097-06''}'
+  by_table_scope:
+  - '{''count'': 10, ''item'': ''all_detected_genes''}'
+  - '{''count'': 12, ''item'': ''filtered_subset''}'
+  - '{''count'': 3, ''item'': ''significant_any_timepoint''}'
+  - '{''count'': 6, ''item'': ''significant_only''}'
   by_treatment_type:
   - '{''count'': 1, ''item'': ''phosphorus_stress''}'
   - '{''count'': 1, ''item'': ''salt_stress''}'

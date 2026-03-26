@@ -1277,18 +1277,22 @@ class TestListExperiments:
             "by_treatment_type": [{"item": "coculture", "count": 16}],
             "by_omics_type": [{"item": "RNASEQ", "count": 48}],
             "by_publication": [{"item": "10.1038/ismej.2016.70", "count": 5}],
+            "by_table_scope": [{"item": "gene_level", "count": 40}],
         }]
 
     def _detail_row(self, **overrides):
         """Helper: mock detail query result row."""
         row = {
             "experiment_id": "test_exp_1",
+            "experiment_name": "Test Experiment 1",
             "publication_doi": "10.1234/test",
             "organism_strain": "Prochlorococcus MED4",
             "treatment_type": "coculture",
             "coculture_partner": "Alteromonas macleodii HOT1A3",
             "omics_type": "RNASEQ",
             "is_time_course": "false",
+            "table_scope": "gene_level",
+            "table_scope_detail": "gene_level_all",
             "gene_count": 1696,
             "significant_up_count": 245,
             "significant_down_count": 178,
@@ -1330,6 +1334,7 @@ class TestListExperiments:
         assert "total_matching" in result
         assert "by_organism" in result
         assert "by_treatment_type" in result
+        assert "by_table_scope" in result
         assert "results" in result
         assert len(result["results"]) == 1
 
@@ -1359,6 +1364,7 @@ class TestListExperiments:
             organism="MED4", treatment_type=["coculture"],
             omics_type=["RNASEQ"], publication_doi=["10.1234/test"],
             coculture_partner="Alteromonas", time_course_only=True,
+            table_scope=["gene_level"],
             verbose=True, limit=10, conn=mock_conn,
         )
         # Summary query has filter params
@@ -1367,7 +1373,7 @@ class TestListExperiments:
         assert "treatment_types" in summary_call[1]
         # Detail query has verbose + limit
         detail_call = mock_conn.execute_query.call_args_list[2]
-        assert "e.name AS name" in detail_call[0][0]
+        assert "e.name AS experiment_name" in detail_call[0][0]
         assert "LIMIT $limit" in detail_call[0][0]
 
     def test_is_time_course_cast(self, mock_conn):
@@ -1382,8 +1388,25 @@ class TestListExperiments:
         assert result["results"][0]["is_time_course"] is True
         assert result["results"][1]["is_time_course"] is False
 
-    def test_time_points_assembled(self, mock_conn):
-        """Parallel arrays assembled into time_points list of dicts for time-course."""
+    def test_genes_by_status_computed(self, mock_conn):
+        """genes_by_status dict computed from significant counts and gene_count."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._detail_row(
+                gene_count=1000,
+                significant_up_count=200,
+                significant_down_count=150,
+            )],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        gbs = result["results"][0]["genes_by_status"]
+        assert gbs["significant_up"] == 200
+        assert gbs["significant_down"] == 150
+        assert gbs["not_significant"] == 650  # 1000 - 200 - 150
+
+    def test_timepoints_assembled(self, mock_conn):
+        """Parallel arrays assembled into timepoints list of dicts for time-course."""
         mock_conn.execute_query.side_effect = [
             self._summary_result(),
             self._summary_result(),
@@ -1391,28 +1414,29 @@ class TestListExperiments:
         ]
         result = api.list_experiments(conn=mock_conn)
         row = result["results"][0]
-        assert "time_points" in row
-        assert len(row["time_points"]) == 3
-        tp = row["time_points"][0]
-        assert tp["label"] == "2h"
-        assert tp["order"] == 1
-        assert tp["hours"] == 2.0
-        assert tp["total"] == 353
-        assert tp["significant_up"] == 0
-        assert tp["significant_down"] == 0
+        assert "timepoints" in row
+        assert len(row["timepoints"]) == 3
+        tp = row["timepoints"][0]
+        assert tp["timepoint"] == "2h"
+        assert tp["timepoint_order"] == 1
+        assert tp["timepoint_hours"] == 2.0
+        assert tp["gene_count"] == 353
+        assert tp["genes_by_status"]["significant_up"] == 0
+        assert tp["genes_by_status"]["significant_down"] == 0
+        assert tp["genes_by_status"]["not_significant"] == 353
 
-    def test_time_points_omitted(self, mock_conn):
-        """Non-time-course results have no time_points key."""
+    def test_timepoints_omitted(self, mock_conn):
+        """Non-time-course results have no timepoints key."""
         mock_conn.execute_query.side_effect = [
             self._summary_result(),
             self._summary_result(),
             [self._detail_row(is_time_course="false")],
         ]
         result = api.list_experiments(conn=mock_conn)
-        assert "time_points" not in result["results"][0]
+        assert "timepoints" not in result["results"][0]
 
     def test_sentinel_conversion(self, mock_conn):
-        """Sentinel values converted: '' label -> None, -1.0 hours -> None."""
+        """Sentinel values converted: '' timepoint -> None, -1.0 hours -> None."""
         tc_row = self._detail_row(
             is_time_course="true",
             time_point_count=1,
@@ -1429,9 +1453,9 @@ class TestListExperiments:
             [tc_row],
         ]
         result = api.list_experiments(conn=mock_conn)
-        tp = result["results"][0]["time_points"][0]
-        assert tp["label"] is None
-        assert tp["hours"] is None
+        tp = result["results"][0]["timepoints"][0]
+        assert tp["timepoint"] is None
+        assert tp["timepoint_hours"] is None
 
     def test_limit_slices_results(self, mock_conn):
         """Limit passed to builder, total_matching from summary."""
@@ -1457,6 +1481,8 @@ class TestListExperiments:
         assert result["by_treatment_type"][0]["treatment_type"] == "coculture"
         assert result["by_omics_type"][0]["omics_type"] == "RNASEQ"
         assert result["by_publication"][0]["publication_doi"] == "10.1038/ismej.2016.70"
+        assert result["by_table_scope"][0]["table_scope"] == "gene_level"
+        assert result["by_table_scope"][0]["experiment_count"] == 40
 
     def test_creates_conn_when_none(self):
         """Default conn used when None."""

@@ -1012,30 +1012,35 @@ def register_tools(mcp: FastMCP):
 
     # --- list_experiments ---
 
+    class GeneStatusBreakdown(BaseModel):
+        significant_up: int = Field(default=0, description="Genes with significant upregulation (e.g. 245)")
+        significant_down: int = Field(default=0, description="Genes with significant downregulation (e.g. 178)")
+        not_significant: int = Field(default=0, description="Genes not meeting significance threshold (e.g. 1273)")
+
     class TimePoint(BaseModel):
-        label: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)')")
-        order: int = Field(description="Sort order within experiment (e.g. 1, 2, 3)")
-        hours: float | None = Field(default=None, description="Time in hours, null if unknown (e.g. 24.0)")
-        total: int = Field(description="Total genes with expression data at this time point (e.g. 1696)")
-        significant_up: int = Field(description="Genes with significant up-regulation (e.g. 245)")
-        significant_down: int = Field(description="Genes with significant down-regulation (e.g. 178)")
+        timepoint: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)')")
+        timepoint_order: int = Field(description="Sort order within experiment (e.g. 1, 2, 3)")
+        timepoint_hours: float | None = Field(default=None, description="Time in hours, null if unknown (e.g. 24.0)")
+        gene_count: int = Field(description="Total genes with expression data at this time point (e.g. 1696)")
+        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status at this time point")
 
     class ExperimentResult(BaseModel):
         # compact fields (always returned)
         experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq')")
+        experiment_name: str = Field(description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")
         publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
         organism_strain: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4')")
         treatment_type: str = Field(description="Treatment category (e.g. 'coculture', 'nitrogen_stress')")
         coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism (e.g. 'Alteromonas macleodii HOT1A3', 'Phage')")
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS')")
         is_time_course: bool = Field(description="Whether experiment has multiple time points")
-        time_points: list[TimePoint] | None = Field(default=None, description="Per-time-point gene counts. Omitted for non-time-course experiments.")
+        table_scope: str | None = Field(default=None, description="What genes the source DE table contains. Values: all_detected_genes, significant_any_timepoint, significant_only, top_n, filtered_subset. Critical for interpreting missing genes.")
+        table_scope_detail: str | None = Field(default=None, description="Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8')")
         gene_count: int = Field(description="Total genes with expression data (e.g. 1696)")
-        significant_up_count: int = Field(description="Genes with significant up-regulation (e.g. 245)")
-        significant_down_count: int = Field(description="Genes with significant down-regulation (e.g. 178)")
+        genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status")
+        timepoints: list[TimePoint] | None = Field(default=None, description="Per-timepoint gene counts. Omitted for non-time-course experiments.")
         score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
         # verbose-only fields
-        name: str | None = Field(default=None, description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")
         publication_title: str | None = Field(default=None, description="Publication title")
         treatment: str | None = Field(default=None, description="Treatment description (e.g. 'Coculture with Alteromonas HOT1A3')")
         control: str | None = Field(default=None, description="Control description (e.g. 'Pro99 medium growth conditions')")
@@ -1062,6 +1067,10 @@ def register_tools(mcp: FastMCP):
         publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
         experiment_count: int = Field(description="Number of experiments from this publication (e.g. 5)")
 
+    class TableScopeBreakdown(BaseModel):
+        table_scope: str = Field(description="Table scope value (e.g. 'all_detected_genes', 'significant_only')")
+        experiment_count: int = Field(description="Number of experiments with this scope (e.g. 22)")
+
     class ListExperimentsResponse(BaseModel):
         total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
         total_matching: int = Field(description="Experiments matching filters")
@@ -1071,6 +1080,7 @@ def register_tools(mcp: FastMCP):
         by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted by count descending")
         by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted by count descending")
         by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted by count descending")
+        by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted by count descending")
         time_course_count: int = Field(description="Number of time-course experiments in matching set")
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
@@ -1115,13 +1125,20 @@ def register_tools(mcp: FastMCP):
             description="If true, return only time-course experiments "
             "(multiple time points).",
         )] = False,
+        table_scope: Annotated[list[str] | None, Field(
+            description="Filter by table scope — what genes the source DE table "
+            "contains. Values: 'all_detected_genes', "
+            "'significant_any_timepoint', 'significant_only', 'top_n', "
+            "'filtered_subset'. E.g. ['all_detected_genes'] for fair "
+            "cross-experiment comparison.",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary breakdowns (by organism, "
-            "treatment type, omics type) with no individual experiments. "
-            "Use to orient before drilling into detail.",
+            "treatment type, omics type, table scope) with no individual "
+            "experiments. Use to orient before drilling into detail.",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include experiment name, publication title, "
+            description="Include publication title, "
             "treatment/control descriptions, and experimental conditions "
             "(light, medium, temperature, statistical test, context).",
         )] = False,
@@ -1131,9 +1148,14 @@ def register_tools(mcp: FastMCP):
     ) -> ListExperimentsResponse:
         """List differential expression experiments in the knowledge graph.
 
-        Returns summary breakdowns (by organism, treatment type, omics type) plus
-        individual experiments. Use summary=true to see only breakdowns, then
-        drill into detail with filters.
+        Returns summary breakdowns (by organism, treatment type, omics type,
+        table scope) plus individual experiments. Use summary=true to see only
+        breakdowns, then drill into detail with filters.
+
+        table_scope indicates what genes each experiment's source DE table
+        contains — critical for interpreting missing genes. Use
+        table_scope=['all_detected_genes'] to restrict to experiments that
+        report all assayed genes (fair for cross-experiment comparison).
         """
         await ctx.info(f"list_experiments summary={summary} organism={organism} "
                        f"treatment_type={treatment_type} search_text={search_text}")
@@ -1143,7 +1165,7 @@ def register_tools(mcp: FastMCP):
                 organism=organism, treatment_type=treatment_type,
                 omics_type=omics_type, publication_doi=publication_doi,
                 coculture_partner=coculture_partner, search_text=search_text,
-                time_course_only=time_course_only,
+                time_course_only=time_course_only, table_scope=table_scope,
                 summary=summary,
                 verbose=verbose, limit=limit, conn=conn,
             )
@@ -1153,15 +1175,22 @@ def register_tools(mcp: FastMCP):
             by_treatment_type = [TreatmentTypeBreakdown(**b) for b in result["by_treatment_type"]]
             by_omics_type = [OmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
             by_publication = [PublicationBreakdown(**b) for b in result["by_publication"]]
+            by_table_scope = [TableScopeBreakdown(**b) for b in result["by_table_scope"]]
 
             # Build result models (empty list when summary=True)
             experiments = []
             for r in result["results"]:
-                tp_data = r.get("time_points")
-                tp_list = [TimePoint(**tp) for tp in tp_data] if tp_data else None
+                tp_data = r.get("timepoints")
+                tp_list = (
+                    [TimePoint(genes_by_status=GeneStatusBreakdown(**tp.pop("genes_by_status")), **tp)
+                     for tp in tp_data]
+                    if tp_data else None
+                )
+                gbs = GeneStatusBreakdown(**r.pop("genes_by_status"))
                 experiments.append(ExperimentResult(
-                    **{k: v for k, v in r.items() if k != "time_points"},
-                    time_points=tp_list,
+                    **{k: v for k, v in r.items() if k != "timepoints"},
+                    genes_by_status=gbs,
+                    timepoints=tp_list,
                 ))
 
             response = ListExperimentsResponse(
@@ -1173,6 +1202,7 @@ def register_tools(mcp: FastMCP):
                 by_treatment_type=by_treatment_type,
                 by_omics_type=by_omics_type,
                 by_publication=by_publication,
+                by_table_scope=by_table_scope,
                 time_course_count=result["time_course_count"],
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),

@@ -549,6 +549,7 @@ def list_experiments(
     coculture_partner: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
+    table_scope: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -558,17 +559,18 @@ def list_experiments(
     """List experiments with gene count statistics.
 
     Always returns: total_entries, total_matching, by_organism,
-    by_treatment_type, by_omics_type, by_publication, time_course_count,
-    returned, truncated, results.
+    by_treatment_type, by_omics_type, by_publication, by_table_scope,
+    time_course_count, returned, truncated, results.
 
     summary=True is sugar for limit=0: results is empty list,
     returned=0, truncated=True.
     When summary=False (default): results populated with experiments.
-    Per result: experiment_id, publication_doi, organism_strain,
-    treatment_type, coculture_partner, omics_type, is_time_course (bool),
-    time_points (list, omitted if not time-course), gene_count,
-    significant_up_count, significant_down_count.
-    When verbose=True, also includes: name, publication_title, treatment,
+    Per result: experiment_id, experiment_name, publication_doi,
+    organism_strain, treatment_type, coculture_partner, omics_type,
+    is_time_course (bool), table_scope, table_scope_detail,
+    gene_count, genes_by_status (dict),
+    timepoints (list, omitted if not time-course).
+    When verbose=True, also includes: publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context.
     When search_text is provided, detail results include score.
@@ -581,7 +583,7 @@ def list_experiments(
         organism=organism, treatment_type=treatment_type,
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
-        time_course_only=time_course_only,
+        time_course_only=time_course_only, table_scope=table_scope,
     )
 
     def _run_summary(st=search_text):
@@ -629,6 +631,7 @@ def list_experiments(
         "by_treatment_type": _rename_freq(raw_summary["by_treatment_type"], "treatment_type"),
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
         "by_publication": _rename_freq(raw_summary["by_publication"], "publication_doi"),
+        "by_table_scope": _rename_freq(raw_summary["by_table_scope"], "table_scope"),
         "time_course_count": raw_summary["time_course_count"],
     }
 
@@ -665,7 +668,16 @@ def list_experiments(
         # Cast is_time_course string to bool
         r["is_time_course"] = r["is_time_course"] == "true"
 
-        # Assemble time_points from parallel arrays
+        # Consolidate gene status counts into dict
+        sig_up = r.pop("significant_up_count")
+        sig_down = r.pop("significant_down_count")
+        r["genes_by_status"] = {
+            "significant_up": sig_up,
+            "significant_down": sig_down,
+            "not_significant": r["gene_count"] - sig_up - sig_down,
+        }
+
+        # Assemble timepoints from parallel arrays
         tp_count = r.pop("time_point_count", 0)
         tp_labels = r.pop("time_point_labels", [])
         tp_orders = r.pop("time_point_orders", [])
@@ -675,19 +687,25 @@ def list_experiments(
         tp_sig_down = r.pop("time_point_significant_down", [])
 
         if r["is_time_course"] and tp_count > 0:
-            time_points = []
+            timepoints = []
             for i in range(tp_count):
+                tp_total = tp_totals[i]
+                tp_up = tp_sig_up[i]
+                tp_down = tp_sig_down[i]
                 tp = {
-                    "label": tp_labels[i] if tp_labels[i] != "" else None,
-                    "order": tp_orders[i],
-                    "hours": tp_hours[i] if tp_hours[i] != -1.0 else None,
-                    "total": tp_totals[i],
-                    "significant_up": tp_sig_up[i],
-                    "significant_down": tp_sig_down[i],
+                    "timepoint": tp_labels[i] if tp_labels[i] != "" else None,
+                    "timepoint_order": tp_orders[i],
+                    "timepoint_hours": tp_hours[i] if tp_hours[i] != -1.0 else None,
+                    "gene_count": tp_total,
+                    "genes_by_status": {
+                        "significant_up": tp_up,
+                        "significant_down": tp_down,
+                        "not_significant": tp_total - tp_up - tp_down,
+                    },
                 }
-                time_points.append(tp)
-            r["time_points"] = time_points
-        # Non-time-course: omit time_points key entirely
+                timepoints.append(tp)
+            r["timepoints"] = timepoints
+        # Non-time-course: omit timepoints key entirely
 
         processed.append(r)
 

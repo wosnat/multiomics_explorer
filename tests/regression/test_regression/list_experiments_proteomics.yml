@@ -3,6 +3,8 @@ row_count: 4
 rows:
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
+  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
   gene_count: 11130
   is_time_course: 'true'
   omics_type: PROTEOMICS
@@ -10,6 +12,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 1003
   significant_up_count: 1379
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -50,6 +54,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
+  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
   gene_count: 4452
   is_time_course: 'true'
   omics_type: PROTEOMICS
@@ -57,6 +63,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 578
   significant_up_count: 433
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 2
   time_point_hours:
   - '432.0'
@@ -79,6 +87,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
   gene_count: 7120
   is_time_course: 'true'
   omics_type: PROTEOMICS
@@ -86,6 +96,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 394
   significant_up_count: 609
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -126,6 +138,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
   gene_count: 4272
   is_time_course: 'true'
   omics_type: PROTEOMICS
@@ -133,6 +147,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 556
   significant_up_count: 599
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 3
   time_point_hours:
   - '2136.0'

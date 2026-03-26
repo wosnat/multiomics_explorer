@@ -635,6 +635,7 @@ def _list_experiments_where(
     coculture_partner: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
+    table_scope: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for experiment queries.
 
@@ -679,6 +680,10 @@ def _list_experiments_where(
     if time_course_only:
         conditions.append("e.is_time_course = 'true'")
 
+    if table_scope:
+        conditions.append("e.table_scope IN $table_scopes")
+        params["table_scopes"] = table_scope
+
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
     return where_block, params
 
@@ -692,17 +697,19 @@ def build_list_experiments(
     coculture_partner: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
+    table_scope: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
 ) -> tuple[str, dict]:
     """Build Cypher for listing experiments with precomputed gene count stats.
 
-    RETURN keys (compact): experiment_id, publication_doi,
+    RETURN keys (compact): experiment_id, experiment_name, publication_doi,
     organism_strain, treatment_type, coculture_partner, omics_type,
-    is_time_course, gene_count, significant_up_count, significant_down_count,
+    is_time_course, table_scope, table_scope_detail,
+    gene_count, significant_up_count, significant_down_count,
     time_point_count, time_point_labels, time_point_orders, time_point_hours,
     time_point_totals, time_point_significant_up, time_point_significant_down.
-    RETURN keys (verbose): adds name, publication_title, treatment,
+    RETURN keys (verbose): adds publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context.
     RETURN keys (search_text): adds score.
@@ -711,12 +718,11 @@ def build_list_experiments(
         organism=organism, treatment_type=treatment_type,
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
-        time_course_only=time_course_only,
+        time_course_only=time_course_only, table_scope=table_scope,
     )
 
     verbose_cols = (
-        ",\n       e.name AS name,"
-        "\n       p.title AS publication_title,"
+        ",\n       p.title AS publication_title,"
         "\n       e.treatment AS treatment,"
         "\n       e.control AS control,"
         "\n       e.light_condition AS light_condition,"
@@ -736,12 +742,15 @@ def build_list_experiments(
 
     return_cols = (
         "e.id AS experiment_id,\n"
+        "       e.name AS experiment_name,\n"
         "       p.doi AS publication_doi,\n"
         "       e.organism_strain AS organism_strain,\n"
         "       e.treatment_type AS treatment_type,\n"
         "       e.coculture_partner AS coculture_partner,\n"
         "       e.omics_type AS omics_type,\n"
         "       e.is_time_course AS is_time_course,\n"
+        "       e.table_scope AS table_scope,\n"
+        "       e.table_scope_detail AS table_scope_detail,\n"
         "       e.gene_count AS gene_count,\n"
         "       e.significant_up_count AS significant_up_count,\n"
         "       e.significant_down_count AS significant_down_count,\n"
@@ -786,21 +795,22 @@ def build_list_experiments_summary(
     coculture_partner: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
+    table_scope: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_experiments.
 
-    Returns breakdowns by organism, treatment type, omics type, and
-    publication using apoc.coll.frequencies.
+    Returns breakdowns by organism, treatment type, omics type,
+    publication, and table_scope using apoc.coll.frequencies.
 
     RETURN keys: total_matching, time_course_count, by_organism,
-    by_treatment_type, by_omics_type, by_publication.
+    by_treatment_type, by_omics_type, by_publication, by_table_scope.
     RETURN keys (search_text): adds score_max, score_median.
     """
     where_block, params = _list_experiments_where(
         organism=organism, treatment_type=treatment_type,
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
-        time_course_only=time_course_only,
+        time_course_only=time_course_only, table_scope=table_scope,
     )
 
     collect_cols = (
@@ -808,7 +818,8 @@ def build_list_experiments_summary(
         "     collect(e.treatment_type) AS tts,\n"
         "     collect(e.omics_type) AS omics,\n"
         "     collect(p.doi) AS dois,\n"
-        "     collect(e.is_time_course) AS tc"
+        "     collect(e.is_time_course) AS tc,\n"
+        "     collect(e.table_scope) AS scopes"
     )
 
     return_cols = (
@@ -817,7 +828,8 @@ def build_list_experiments_summary(
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
         "       apoc.coll.frequencies(tts) AS by_treatment_type,\n"
         "       apoc.coll.frequencies(omics) AS by_omics_type,\n"
-        "       apoc.coll.frequencies(dois) AS by_publication"
+        "       apoc.coll.frequencies(dois) AS by_publication,\n"
+        "       apoc.coll.frequencies(scopes) AS by_table_scope"
     )
 
     if search_text:

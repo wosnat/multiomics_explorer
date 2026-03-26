@@ -329,10 +329,10 @@ class TestListExperiments:
         """Each result has compact columns."""
         result = api.list_experiments(limit=5, conn=conn)
         for r in result["results"]:
-            for col in ["experiment_id", "publication_doi", "organism_strain",
+            for col in ["experiment_id", "experiment_name",
+                        "publication_doi", "organism_strain",
                         "treatment_type", "omics_type", "is_time_course",
-                        "gene_count", "significant_up_count",
-                        "significant_down_count"]:
+                        "table_scope", "gene_count", "genes_by_status"]:
                 assert col in r, f"Missing column: {col}"
 
     def test_detail_is_time_course_is_bool(self, conn):
@@ -342,35 +342,36 @@ class TestListExperiments:
             assert isinstance(r["is_time_course"], bool)
 
     def test_detail_gene_count_nonnegative(self, conn):
-        """gene_count and significant_up/down_count are >= 0."""
+        """gene_count and genes_by_status counts are >= 0."""
         result = api.list_experiments(conn=conn)
         for r in result["results"]:
             assert r["gene_count"] >= 0
-            assert r["significant_up_count"] >= 0
-            assert r["significant_down_count"] >= 0
+            gbs = r["genes_by_status"]
+            assert gbs["significant_up"] >= 0
+            assert gbs["significant_down"] >= 0
+            assert gbs["not_significant"] >= 0
 
-    def test_detail_time_course_has_time_points(self, conn):
-        """Time-course experiments have time_points with >1 entry."""
+    def test_detail_time_course_has_timepoints(self, conn):
+        """Time-course experiments have timepoints with >1 entry."""
         result = api.list_experiments(
             time_course_only=True, limit=5, conn=conn,
         )
         for r in result["results"]:
-            assert "time_points" in r
-            assert len(r["time_points"]) > 1
-            tp = r["time_points"][0]
-            assert "label" in tp
-            assert "order" in tp
-            assert "total" in tp
-            assert "significant_up" in tp
-            assert "significant_down" in tp
+            assert "timepoints" in r
+            assert len(r["timepoints"]) > 1
+            tp = r["timepoints"][0]
+            assert "timepoint" in tp
+            assert "timepoint_order" in tp
+            assert "gene_count" in tp
+            assert "genes_by_status" in tp
 
-    def test_detail_non_time_course_no_time_points(self, conn):
-        """Non-time-course experiments have no time_points key."""
+    def test_detail_non_time_course_no_timepoints(self, conn):
+        """Non-time-course experiments have no timepoints key."""
         result = api.list_experiments(conn=conn)
         non_tc = [r for r in result["results"] if not r["is_time_course"]]
         assert len(non_tc) > 0
         for r in non_tc:
-            assert "time_points" not in r
+            assert "timepoints" not in r
 
     # --- Consistency ---
 

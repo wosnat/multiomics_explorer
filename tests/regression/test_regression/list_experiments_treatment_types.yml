@@ -3,6 +3,7 @@ row_count: 31
 rows:
 - coculture_partner: Prochlorococcus MED4
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
+  experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
   gene_count: 3950
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -10,6 +11,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 163
   significant_up_count: 112
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '264.0'
@@ -26,6 +29,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
+  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
   gene_count: 11130
   is_time_course: 'true'
   omics_type: PROTEOMICS
@@ -33,6 +38,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 1003
   significant_up_count: 1379
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -73,6 +80,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
+  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
   gene_count: 4452
   is_time_course: 'true'
   omics_type: PROTEOMICS
@@ -80,6 +89,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 578
   significant_up_count: 433
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 2
   time_point_hours:
   - '432.0'
@@ -102,6 +113,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
+  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (RNASEQ)
   gene_count: 19750
   is_time_course: 'true'
   omics_type: RNASEQ
@@ -109,6 +122,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 2449
   significant_up_count: 1675
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -149,6 +164,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
+  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (RNASEQ)
   gene_count: 11850
   is_time_course: 'true'
   omics_type: RNASEQ
@@ -156,6 +173,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 1648
   significant_up_count: 778
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 3
   time_point_hours:
   - '-1.0'
@@ -184,6 +203,7 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   gene_count: 1849
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -191,6 +211,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 3
   significant_up_count: 59
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '264.0'
@@ -207,6 +229,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
   gene_count: 7120
   is_time_course: 'true'
   omics_type: PROTEOMICS
@@ -214,6 +238,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 394
   significant_up_count: 609
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -254,6 +280,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
   gene_count: 4272
   is_time_course: 'true'
   omics_type: PROTEOMICS
@@ -261,6 +289,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 556
   significant_up_count: 599
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 3
   time_point_hours:
   - '2136.0'
@@ -289,6 +319,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
   gene_count: 9245
   is_time_course: 'true'
   omics_type: RNASEQ
@@ -296,6 +328,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 834
   significant_up_count: 553
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 5
   time_point_hours:
   - '-1.0'
@@ -336,6 +370,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
   gene_count: 3698
   is_time_course: 'true'
   omics_type: RNASEQ
@@ -343,6 +379,8 @@ rows:
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 640
   significant_up_count: 602
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 2
   time_point_hours:
   - '-1.0'
@@ -365,6 +403,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: Prochlorococcus MIT9312
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 400 ppm pCO2 vs
+    Axenic at 400 ppm pCO2 (RNASEQ)
   gene_count: 419
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -372,6 +412,8 @@ rows:
   publication_doi: 10.1038/s43705-022-00197-2
   significant_down_count: 111
   significant_up_count: 308
+  table_scope: significant_only
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -388,6 +430,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Prochlorococcus MIT9312
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 800 ppm pCO2 vs
+    Axenic at 800 ppm pCO2 (RNASEQ)
   gene_count: 188
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -395,6 +439,8 @@ rows:
   publication_doi: 10.1038/s43705-022-00197-2
   significant_down_count: 84
   significant_up_count: 104
+  table_scope: significant_only
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -411,6 +457,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Synechococcus CC9311
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 400 ppm pCO2 vs Axenic
+    at 400 ppm pCO2 (RNASEQ)
   gene_count: 293
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -418,6 +466,8 @@ rows:
   publication_doi: 10.1038/s43705-022-00197-2
   significant_down_count: 176
   significant_up_count: 117
+  table_scope: significant_only
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -434,6 +484,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Synechococcus CC9311
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 800 ppm pCO2 vs Axenic
+    at 800 ppm pCO2 (RNASEQ)
   gene_count: 83
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -441,6 +493,8 @@ rows:
   publication_doi: 10.1038/s43705-022-00197-2
   significant_down_count: 52
   significant_up_count: 31
+  table_scope: significant_only
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -457,6 +511,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Synechococcus WH8102
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 400 ppm pCO2 vs Axenic
+    at 400 ppm pCO2 (RNASEQ)
   gene_count: 136
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -464,6 +520,8 @@ rows:
   publication_doi: 10.1038/s43705-022-00197-2
   significant_down_count: 110
   significant_up_count: 26
+  table_scope: significant_only
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -480,6 +538,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Synechococcus WH8102
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 800 ppm pCO2 vs Axenic
+    at 800 ppm pCO2 (RNASEQ)
   gene_count: 58
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -487,6 +547,8 @@ rows:
   publication_doi: 10.1038/s43705-022-00197-2
   significant_down_count: 31
   significant_up_count: 27
+  table_scope: significant_only
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -503,6 +565,7 @@ rows:
   treatment_type: coculture
 - coculture_partner: null
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
+  experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   gene_count: 2534
   is_time_course: 'true'
   omics_type: RNASEQ
@@ -510,6 +573,8 @@ rows:
   publication_doi: 10.1038/ismej.2017.88
   significant_down_count: 326
   significant_up_count: 271
+  table_scope: filtered_subset
+  table_scope_detail: Top 50% of genes by expression level
   time_point_count: 3
   time_point_hours:
   - '12.0'
@@ -538,6 +603,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: Prochlorococcus MIT9313
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
+    inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
   gene_count: 0
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -545,6 +612,8 @@ rows:
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 0
   significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 0
   time_point_hours: []
   time_point_labels: []
@@ -555,6 +624,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Prochlorococcus MIT9313
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
+    conditions (RNASEQ)
   gene_count: 0
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -562,6 +633,8 @@ rows:
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 0
   significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 0
   time_point_hours: []
   time_point_labels: []
@@ -572,6 +645,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Prochlorococcus NATL2A
   experiment_id: 10.1038/ismej.2016.82_coculture_24_hours_after_coculturing_mit1002_rnaseq
+  experiment_name: MIT1002 24 hours after co-culturing with Prochlorococcus NATL2A
+    vs Co-culture with Prochlorococcus NATL2A (RNASEQ)
   gene_count: 740
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -579,6 +654,8 @@ rows:
   publication_doi: 10.1038/ismej.2016.82
   significant_down_count: 0
   significant_up_count: 458
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '24.0'
@@ -595,6 +672,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Prochlorococcus NATL2A
   experiment_id: 10.1038/ismej.2016.82_coculture_48_hours_after_coculturing_mit1002_rnaseq
+  experiment_name: MIT1002 48 hours after co-culturing with Prochlorococcus NATL2A
+    vs Co-culture with Prochlorococcus NATL2A (RNASEQ)
   gene_count: 740
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -602,6 +681,8 @@ rows:
   publication_doi: 10.1038/ismej.2016.82
   significant_down_count: 0
   significant_up_count: 455
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '48.0'
@@ -618,6 +699,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
+    (RNASEQ)
   gene_count: 1714
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -625,6 +708,8 @@ rows:
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 272
   significant_up_count: 24
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -641,6 +726,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
+  experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
+    conditions (RNASEQ)
   gene_count: 2267
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -648,6 +735,8 @@ rows:
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 45
   significant_up_count: 153
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -664,6 +753,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
+  experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
+    conditions (RNASEQ)
   gene_count: 2268
   is_time_course: 'false'
   omics_type: RNASEQ
@@ -671,6 +762,8 @@ rows:
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 3
   significant_up_count: 96
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '20.0'
@@ -687,6 +780,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: Alteromonas macleodii MIT1002
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
+  experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
+    Prochlorococcus NATL2A (RNASEQ)
   gene_count: 2471
   is_time_course: 'true'
   omics_type: RNASEQ
@@ -694,6 +789,8 @@ rows:
   publication_doi: 10.1038/ismej.2016.82
   significant_down_count: 352
   significant_up_count: 221
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
   time_point_count: 7
   time_point_hours:
   - '-12.0'
@@ -746,6 +843,8 @@ rows:
   treatment_type: coculture
 - coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
+    medium (MED4) (MICROARRAY)
   gene_count: 1696
   is_time_course: 'false'
   omics_type: MICROARRAY
@@ -753,6 +852,8 @@ rows:
   publication_doi: 10.1038/msb4100087
   significant_down_count: 23
   significant_up_count: 20
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -769,6 +870,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
+  experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
+    medium (MED4) (MICROARRAY)
   gene_count: 1696
   is_time_course: 'false'
   omics_type: MICROARRAY
@@ -776,6 +879,8 @@ rows:
   publication_doi: 10.1038/msb4100087
   significant_down_count: 14
   significant_up_count: 18
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -792,6 +897,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
   gene_count: 10176
   is_time_course: 'true'
   omics_type: MICROARRAY
@@ -799,6 +906,8 @@ rows:
   publication_doi: 10.1038/msb4100087
   significant_down_count: 476
   significant_up_count: 392
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 6
   time_point_hours:
   - '0.0'
@@ -845,6 +954,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
+  experiment_name: MIT9313 Growth on nitrite as sole N source (MIT9313) vs N-replete
+    Pro99 medium (MIT9313) (MICROARRAY)
   gene_count: 2241
   is_time_course: 'false'
   omics_type: MICROARRAY
@@ -852,6 +963,8 @@ rows:
   publication_doi: 10.1038/msb4100087
   significant_down_count: 8
   significant_up_count: 12
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -868,6 +981,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
+  experiment_name: MIT9313 Growth on urea as sole N source (MIT9313) vs N-replete
+    Pro99 medium (MIT9313) (MICROARRAY)
   gene_count: 2241
   is_time_course: 'false'
   omics_type: MICROARRAY
@@ -875,6 +990,8 @@ rows:
   publication_doi: 10.1038/msb4100087
   significant_down_count: 61
   significant_up_count: 49
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 1
   time_point_hours:
   - '-1.0'
@@ -891,6 +1008,8 @@ rows:
   treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  experiment_name: MIT9313 Nitrogen deprivation (MIT9313) vs N-replete Pro99 medium
+    (MIT9313) (MICROARRAY)
   gene_count: 13446
   is_time_course: 'true'
   omics_type: MICROARRAY
@@ -898,6 +1017,8 @@ rows:
   publication_doi: 10.1038/msb4100087
   significant_down_count: 604
   significant_up_count: 305
+  table_scope: all_detected_genes
+  table_scope_detail: ''
   time_point_count: 6
   time_point_hours:
   - '0.0'

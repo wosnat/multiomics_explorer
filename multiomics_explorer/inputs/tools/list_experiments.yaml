@@ -10,6 +10,7 @@ examples:
        "by_organism": [{"organism_strain": "Prochlorococcus MED4", "experiment_count": 30}, ...],
        "by_treatment_type": [{"treatment_type": "coculture", "experiment_count": 16}, ...],
        "by_omics_type": [{"omics_type": "RNASEQ", "experiment_count": 48}, ...],
+       "by_table_scope": [{"table_scope": "all_detected_genes", "experiment_count": 40}, ...],
        "time_course_count": 29, "returned": 0, "truncated": true, "results": []}
 
   - title: Summary for MED4 only
@@ -44,7 +45,6 @@ examples:
               → get gene-level results
 
 verbose_fields:
-  - name
   - publication_title
   - treatment
   - control
@@ -63,8 +63,9 @@ chaining:
 
 mistakes:
   - "Default is detail (summary=false) — use summary=true to see only breakdowns"
-  - "gene_count is total genes with expression data, not total significant genes — use significant_up_count + significant_down_count for that"
-  - "time_points is omitted for non-time-course experiments, not an empty list"
+  - "gene_count is total genes with expression data, not total significant genes — use genes_by_status for the breakdown"
+  - "timepoints is omitted for non-time-course experiments, not an empty list"
   - "When summary=true, verbose and limit have no effect"
+  - "Check table_scope before interpreting missing genes — some experiments only include significant genes"
   - wrong: "list_experiments(publication='Biller 2018')"
     right: "list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])"

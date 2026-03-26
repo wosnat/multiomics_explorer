@@ -1245,9 +1245,11 @@ class TestBuildListExperiments:
         """RETURN clause has all expected compact columns."""
         cypher, _ = build_list_experiments()
         for col in [
-            "experiment_id", "publication_doi", "organism_strain",
-            "treatment_type", "coculture_partner", "omics_type",
-            "is_time_course", "gene_count", "significant_up_count",
+            "experiment_id", "experiment_name", "publication_doi",
+            "organism_strain", "treatment_type", "coculture_partner",
+            "omics_type", "is_time_course",
+            "table_scope", "table_scope_detail",
+            "gene_count", "significant_up_count",
             "significant_down_count",
             "time_point_count", "time_point_labels", "time_point_orders",
             "time_point_hours", "time_point_totals",
@@ -1258,15 +1260,13 @@ class TestBuildListExperiments:
     def test_verbose_false(self):
         """Compact mode does not include verbose columns."""
         cypher, _ = build_list_experiments(verbose=False)
-        assert "e.name AS name" not in cypher
         assert "publication_title" not in cypher
         assert "e.treatment AS treatment" not in cypher
         assert "light_condition" not in cypher
 
     def test_verbose_true(self):
-        """Verbose mode includes name, publication_title, treatment, etc."""
+        """Verbose mode includes publication_title, treatment, etc."""
         cypher, _ = build_list_experiments(verbose=True)
-        assert "e.name AS name" in cypher
         assert "p.title AS publication_title" in cypher
         assert "e.treatment AS treatment" in cypher
         assert "e.control AS control" in cypher
@@ -1339,7 +1339,8 @@ class TestBuildListExperimentsSummary:
         cypher, _ = build_list_experiments_summary()
         for key in [
             "total_matching", "time_course_count",
-            "by_organism", "by_treatment_type", "by_omics_type", "by_publication",
+            "by_organism", "by_treatment_type", "by_omics_type",
+            "by_publication", "by_table_scope",
         ]:
             assert key in cypher
 

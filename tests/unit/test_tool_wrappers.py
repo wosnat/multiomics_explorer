@@ -1670,6 +1670,7 @@ class TestListExperimentsWrapper:
         "by_treatment_type": [{"treatment_type": "coculture", "experiment_count": 16}],
         "by_omics_type": [{"omics_type": "RNASEQ", "experiment_count": 48}],
         "by_publication": [{"publication_doi": "10.1038/ismej.2016.70", "experiment_count": 5}],
+        "by_table_scope": [{"table_scope": "all_detected_genes", "experiment_count": 22}],
         "time_course_count": 29,
         "score_max": None,
         "score_median": None,
@@ -1680,23 +1681,27 @@ class TestListExperimentsWrapper:
 
     _SAMPLE_EXP = {
         "experiment_id": "test_exp_1",
+        "experiment_name": "MED4 Coculture with Alteromonas HOT1A3 (RNASEQ)",
         "publication_doi": "10.1234/test",
         "organism_strain": "Prochlorococcus MED4",
         "treatment_type": "coculture",
         "coculture_partner": "Alteromonas macleodii HOT1A3",
         "omics_type": "RNASEQ",
         "is_time_course": False,
+        "table_scope": "all_detected_genes",
+        "table_scope_detail": None,
         "gene_count": 1696,
-        "significant_up_count": 245,
-        "significant_down_count": 178,
+        "genes_by_status": {"significant_up": 245, "significant_down": 178, "not_significant": 1273},
     }
 
-    _SAMPLE_DETAIL = {
-        **_SAMPLE_SUMMARY,
-        "returned": 1,
-        "truncated": True,
-        "results": [_SAMPLE_EXP],
-    }
+    @classmethod
+    def _make_detail(cls, results=None):
+        """Return a fresh detail dict (wrapper mutates via .pop)."""
+        import copy
+        if results is None:
+            results = [copy.deepcopy(cls._SAMPLE_EXP)]
+        return {**cls._SAMPLE_SUMMARY, "returned": len(results),
+                "truncated": True, "results": results}
 
     @pytest.mark.asyncio
     async def test_summary_mode_empty_results(self, tool_fns, mock_ctx):
@@ -1719,7 +1724,7 @@ class TestListExperimentsWrapper:
         """Detail mode returns breakdowns + results."""
         with patch(
             "multiomics_explorer.api.functions.list_experiments",
-            return_value=self._SAMPLE_DETAIL,
+            return_value=self._make_detail(),
         ):
             result = await tool_fns["list_experiments"](mock_ctx)
         assert result.returned == 1
@@ -1733,7 +1738,7 @@ class TestListExperimentsWrapper:
         """No summary param defaults to detail (summary=False)."""
         with patch(
             "multiomics_explorer.api.functions.list_experiments",
-            return_value=self._SAMPLE_DETAIL,
+            return_value=self._make_detail(),
         ) as mock_api:
             await tool_fns["list_experiments"](mock_ctx)
         call_kwargs = mock_api.call_args[1]
@@ -1744,7 +1749,7 @@ class TestListExperimentsWrapper:
         """Breakdowns populated in both summary and detail."""
         for summary_val, api_result in [
             (True, self._SAMPLE_SUMMARY),
-            (False, self._SAMPLE_DETAIL),
+            (False, self._make_detail()),
         ]:
             with patch(
                 "multiomics_explorer.api.functions.list_experiments",
@@ -1755,6 +1760,7 @@ class TestListExperimentsWrapper:
             assert len(result.by_treatment_type) > 0
             assert len(result.by_omics_type) > 0
             assert len(result.by_publication) > 0
+            assert len(result.by_table_scope) > 0
 
     @pytest.mark.asyncio
     async def test_detail_empty_results(self, tool_fns, mock_ctx):
@@ -1762,7 +1768,8 @@ class TestListExperimentsWrapper:
         empty = {**self._SAMPLE_SUMMARY,
                  "total_matching": 0, "returned": 0, "truncated": False,
                  "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
-                 "by_publication": [], "time_course_count": 0, "results": []}
+                 "by_publication": [], "by_table_scope": [],
+                 "time_course_count": 0, "results": []}
         with patch(
             "multiomics_explorer.api.functions.list_experiments",
             return_value=empty,
@@ -1776,7 +1783,7 @@ class TestListExperimentsWrapper:
         """All params passed through to api."""
         with patch(
             "multiomics_explorer.api.functions.list_experiments",
-            return_value=self._SAMPLE_DETAIL,
+            return_value=self._make_detail(),
         ) as mock_api:
             await tool_fns["list_experiments"](
                 mock_ctx,
@@ -1787,6 +1794,7 @@ class TestListExperimentsWrapper:
                 coculture_partner="Alteromonas",
                 search_text="light",
                 time_course_only=True,
+                table_scope=["all_detected_genes"],
                 verbose=True,
                 limit=10,
             )
@@ -1798,6 +1806,7 @@ class TestListExperimentsWrapper:
         assert kw["coculture_partner"] == "Alteromonas"
         assert kw["search_text"] == "light"
         assert kw["time_course_only"] is True
+        assert kw["table_scope"] == ["all_detected_genes"]
         assert kw["summary"] is False
         assert kw["verbose"] is True
         assert kw["limit"] == 10
@@ -1807,7 +1816,7 @@ class TestListExperimentsWrapper:
         """returned == len(results), truncated reflects total_matching."""
         with patch(
             "multiomics_explorer.api.functions.list_experiments",
-            return_value=self._SAMPLE_DETAIL,
+            return_value=self._make_detail(),
         ):
             result = await tool_fns["list_experiments"](mock_ctx)
         assert result.returned == len(result.results)
@@ -1815,9 +1824,10 @@ class TestListExperimentsWrapper:
 
     @pytest.mark.asyncio
     async def test_detail_verbose_fields_present(self, tool_fns, mock_ctx):
-        """verbose=True includes name, treatment, etc. when present in api result."""
-        verbose_exp = {**self._SAMPLE_EXP,
-                       "name": "Test experiment", "publication_title": "Test paper",
+        """verbose=True includes publication_title, treatment, etc. when present in api result."""
+        import copy
+        verbose_exp = {**copy.deepcopy(self._SAMPLE_EXP),
+                       "publication_title": "Test paper",
                        "treatment": "Coculture", "control": "Axenic",
                        "light_condition": "continuous light"}
         detail = {**self._SAMPLE_SUMMARY, "returned": 1, "truncated": False,
@@ -1828,7 +1838,7 @@ class TestListExperimentsWrapper:
         ):
             result = await tool_fns["list_experiments"](mock_ctx, verbose=True)
         r = result.results[0]
-        assert r.name == "Test experiment"
+        assert r.experiment_name == "MED4 Coculture with Alteromonas HOT1A3 (RNASEQ)"
         assert r.publication_title == "Test paper"
         assert r.light_condition == "continuous light"
 
@@ -1837,11 +1847,10 @@ class TestListExperimentsWrapper:
         """verbose=False: verbose-only fields are None."""
         with patch(
             "multiomics_explorer.api.functions.list_experiments",
-            return_value=self._SAMPLE_DETAIL,
+            return_value=self._make_detail(),
         ):
             result = await tool_fns["list_experiments"](mock_ctx)
         r = result.results[0]
-        assert r.name is None
         assert r.publication_title is None
         assert r.light_condition is None
 
@@ -1857,14 +1866,17 @@ class TestListExperimentsWrapper:
         assert result.total_matching == 30
 
     @pytest.mark.asyncio
-    async def test_time_points_model(self, tool_fns, mock_ctx):
-        """time_points assembled into TimePoint models."""
+    async def test_timepoints_model(self, tool_fns, mock_ctx):
+        """timepoints assembled into TimePoint models."""
+        import copy
         tc_exp = {
-            **self._SAMPLE_EXP,
+            **copy.deepcopy(self._SAMPLE_EXP),
             "is_time_course": True,
-            "time_points": [
-                {"label": "2h", "order": 1, "hours": 2.0, "total": 353, "significant_up": 0, "significant_down": 0},
-                {"label": "24h", "order": 2, "hours": 24.0, "total": 353, "significant_up": 150, "significant_down": 108},
+            "timepoints": [
+                {"timepoint": "2h", "timepoint_order": 1, "timepoint_hours": 2.0,
+                 "gene_count": 353, "genes_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 353}},
+                {"timepoint": "24h", "timepoint_order": 2, "timepoint_hours": 24.0,
+                 "gene_count": 353, "genes_by_status": {"significant_up": 150, "significant_down": 108, "not_significant": 95}},
             ],
         }
         detail = {**self._SAMPLE_SUMMARY, "returned": 1, "truncated": False,
@@ -1876,10 +1888,60 @@ class TestListExperimentsWrapper:
             result = await tool_fns["list_experiments"](mock_ctx)
         r = result.results[0]
         assert r.is_time_course is True
-        assert len(r.time_points) == 2
-        assert r.time_points[0].label == "2h"
-        assert r.time_points[0].hours == 2.0
-        assert r.time_points[1].significant_up + r.time_points[1].significant_down == 258
+        assert len(r.timepoints) == 2
+        assert r.timepoints[0].timepoint == "2h"
+        assert r.timepoints[0].timepoint_hours == 2.0
+        assert r.timepoints[1].genes_by_status.significant_up == 150
+        assert r.timepoints[1].genes_by_status.significant_down == 108
+
+    @pytest.mark.asyncio
+    async def test_table_scope_filter_forwarded(self, tool_fns, mock_ctx):
+        """table_scope filter passed through to api."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._make_detail(),
+        ) as mock_api:
+            await tool_fns["list_experiments"](
+                mock_ctx, table_scope=["all_detected_genes", "significant_only"],
+            )
+        kw = mock_api.call_args[1]
+        assert kw["table_scope"] == ["all_detected_genes", "significant_only"]
+
+    @pytest.mark.asyncio
+    async def test_by_table_scope_in_response(self, tool_fns, mock_ctx):
+        """by_table_scope breakdown populated in response."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_SUMMARY,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert len(result.by_table_scope) == 1
+        assert result.by_table_scope[0].table_scope == "all_detected_genes"
+        assert result.by_table_scope[0].experiment_count == 22
+
+    @pytest.mark.asyncio
+    async def test_genes_by_status_in_experiment(self, tool_fns, mock_ctx):
+        """genes_by_status breakdown populated in experiment results."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._make_detail(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        r = result.results[0]
+        assert r.genes_by_status.significant_up == 245
+        assert r.genes_by_status.significant_down == 178
+        assert r.genes_by_status.not_significant == 1273
+
+    @pytest.mark.asyncio
+    async def test_experiment_name_always_present(self, tool_fns, mock_ctx):
+        """experiment_name is always present (compact field)."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._make_detail(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        r = result.results[0]
+        assert r.experiment_name == "MED4 Coculture with Alteromonas HOT1A3 (RNASEQ)"
 
     @pytest.mark.asyncio
     async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
