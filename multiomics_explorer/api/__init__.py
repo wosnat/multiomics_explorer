@@ -18,6 +18,7 @@ from multiomics_explorer.api.functions import (
     search_homolog_groups,
     search_ontology,
     differential_expression_by_gene,
+    differential_expression_by_ortholog,
 )
 
 __all__ = [
@@ -38,4 +39,5 @@ __all__ = [
     "search_homolog_groups",
     "search_ontology",
     "differential_expression_by_gene",
+    "differential_expression_by_ortholog",
 ]

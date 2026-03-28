@@ -67,6 +67,42 @@ Parametrize across all ontology types (hierarchy + flat) since flat
 ontologies use `WITH root AS descendant` which is especially prone
 to dropping variables.
 
+### Diagnostics builder tests
+
+For tools with diagnostic queries (not_found/not_matched validation):
+
+```python
+def test_combined_filters_no_double_where(self):
+    """Combined filters must not produce double WHERE in Cypher."""
+    result = build_tool_diagnostics(
+        ids=["id1"], organisms=["MED4"],
+        experiment_ids=["EXP001"], direction="up",
+    )
+    for cypher, _ in result:
+        parts = cypher.split("WHERE")
+        for i, part in enumerate(parts):
+            if i == 0:
+                continue
+            assert not part.strip().startswith("WHERE"), (
+                f"Double WHERE in query:\n{cypher}"
+            )
+
+def test_direction_forwarded(self):
+    """Expression filters must appear in diagnostic Cypher."""
+    result = build_tool_diagnostics(
+        ids=["id1"], organisms=["MED4"], direction="up",
+    )
+    cypher, _ = result[0]
+    assert 'r.expression_status = "significant_up"' in cypher
+```
+
+These catch two common bugs:
+- Appending conditions with `WHERE` instead of `AND` when a
+  WHERE clause already exists (Cypher syntax error only with
+  combined filters).
+- Omitting filter params from diagnostic builder calls, causing
+  not_matched to be evaluated against unfiltered data.
+
 ### Assert patterns
 
 - `assert "keyword" in cypher` — check Cypher structure

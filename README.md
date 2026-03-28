@@ -23,11 +23,7 @@ uv sync
 
 ### MCP Server (Claude Code integration)
 
-The MCP server exposes the KG to Claude Code with 14 specialized tools:
-`get_schema`, `resolve_gene`, `search_genes`, `get_gene_details`, `gene_overview`,
-`query_expression`, `compare_conditions`, `get_homologs`, `list_filter_values`,
-`list_organisms`, `search_ontology`, `genes_by_ontology`, `gene_ontology_terms`,
-`run_cypher`.
+The MCP server exposes the KG to Claude Code with specialized tools. See tool tracker below for the full list.
 
 To use with Claude Code, add to your `.claude/settings.json` (already configured in this repo):
 
@@ -43,6 +39,45 @@ To use with Claude Code, add to your `.claude/settings.json` (already configured
 ```
 
 Then start Claude Code in any project directory — the KG tools will be available automatically.
+
+## Tool Tracker
+
+### Done
+
+| Tool | Domain | Purpose |
+|---|---|---|
+| `kg_schema` | Schema | Graph schema: node labels, relationship types, properties |
+| `run_cypher` | Schema | Raw Cypher escape hatch (read-only, validated) |
+| `resolve_gene` | Gene | Resolve gene identifier to graph nodes (case-insensitive) |
+| `get_gene_details` | Gene | All Gene node properties |
+| `gene_overview` | Gene | Batch gene routing: identity + data availability signals |
+| `genes_by_function` | Gene | Free-text search across functional annotations (Lucene) |
+| `list_filter_values` | Gene | Valid values for categorical filters |
+| `list_organisms` | Organism | All organisms with taxonomy and counts |
+| `list_publications` | Publication | Publications with experiment summaries, filterable |
+| `list_experiments` | Experiment | Experiments with gene count stats, summary mode |
+| `search_ontology` | Ontology | Browse ontology terms by text (GO, KEGG, EC, COG, etc.) |
+| `genes_by_ontology` | Ontology | Term IDs → genes, with hierarchy expansion |
+| `gene_ontology_terms` | Ontology | Genes → ontology annotations (reverse lookup, batch) |
+| `gene_homologs` | Ortholog | Gene locus_tags → ortholog group memberships |
+| `search_homolog_groups` | Ortholog | Search ortholog groups by text (Lucene) |
+| `genes_by_homolog_group` | Ortholog | Group IDs → member genes per organism |
+| `differential_expression_by_gene` | Expression | Gene-centric DE: gene × experiment × timepoint |
+| `differential_expression_by_ortholog` | Expression | Cross-organism DE framed by ortholog groups |
+
+### Todo
+
+| Tool | Domain | Purpose | Notes |
+|---|---|---|---|
+| `homologs_by_ontology` | Ortholog × Ontology | Ortholog groups annotated to ontology terms — functional enrichment view for gene sets | Bridges OG↔ontology; enrichment-style analysis |
+| `ontology_subgraph` | Ontology | Navigate ontology hierarchies: expand to roots, list children, sub-categories | Uses is_a / part_of / regulates edges |
+
+### Needs Exploration
+
+| Idea | Domain | Notes |
+|---|---|---|
+| Genomic neighbors | Gene | Genes near gene X (operon/synteny). Needs: are start/end/strand populated consistently? |
+| Coculture exposure | Experiment | `Tests_coculture_with` edges. Could be a filter on `list_experiments` rather than a new tool |
 
 ### CLI
 

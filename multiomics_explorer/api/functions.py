@@ -57,6 +57,12 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_organism_for_organism,
     build_resolve_organism_for_locus_tags,
     build_resolve_organism_for_experiments,
+    build_differential_expression_by_ortholog_summary_global,
+    build_differential_expression_by_ortholog_top_groups,
+    build_differential_expression_by_ortholog_top_experiments,
+    build_differential_expression_by_ortholog_results,
+    build_differential_expression_by_ortholog_membership_counts,
+    build_differential_expression_by_ortholog_diagnostics,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -1524,6 +1530,181 @@ def differential_expression_by_gene(
         "no_expression": no_expression,
         "returned": returned,
         "truncated": total_rows > returned,
+        "results": results,
+    }
+    return envelope
+
+
+def differential_expression_by_ortholog(
+    group_ids: list[str],
+    organisms: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    direction: str | None = None,
+    significant_only: bool = False,
+    verbose: bool = False,
+    limit: int = 50,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Differential expression framed by ortholog groups.
+
+    Cross-organism by design. Results at group x experiment x timepoint
+    granularity showing how many group members respond (gene counts,
+    not individual genes).
+
+    Returns dict with keys: total_rows, matching_genes, matching_groups,
+    experiment_count, median_abs_log2fc, max_abs_log2fc,
+    by_organism, rows_by_status, rows_by_treatment_type, by_table_scope,
+    top_groups, top_experiments,
+    not_found_groups, not_matched_groups,
+    not_found_organisms, not_matched_organisms,
+    not_found_experiments, not_matched_experiments,
+    returned, truncated, results.
+    Per result (compact): group_id, consensus_gene_name, consensus_product,
+    experiment_id, treatment_type, organism_strain, coculture_partner,
+    timepoint, timepoint_hours, timepoint_order,
+    genes_with_expression, total_genes,
+    significant_up, significant_down, not_significant.
+    Per result (verbose): adds experiment_name, treatment, omics_type,
+    table_scope, table_scope_detail.
+
+    Raises:
+        ValueError: if group_ids is empty or direction is invalid.
+    """
+    if not group_ids:
+        raise ValueError("group_ids must not be empty.")
+
+    if direction is not None and direction not in _VALID_DIRECTIONS:
+        raise ValueError(
+            f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS)}"
+        )
+
+    conn = _default_conn(conn)
+
+    # Common filter kwargs for all builders
+    filter_kwargs = dict(
+        organisms=organisms,
+        experiment_ids=experiment_ids,
+        direction=direction,
+        significant_only=significant_only,
+    )
+
+    # --- Q1: summary_global (always) ---
+    global_cypher, global_params = (
+        build_differential_expression_by_ortholog_summary_global(
+            group_ids=group_ids, **filter_kwargs,
+        )
+    )
+    global_raw = conn.execute_query(global_cypher, **global_params)[0]
+
+    rows_by_status = _apoc_freq_to_dict(global_raw["rows_by_status"])
+    rows_by_treatment_type = _apoc_freq_to_treatment_dict(
+        global_raw["rows_by_treatment_type"]
+    )
+    by_table_scope = _apoc_freq_to_treatment_dict(
+        global_raw["by_table_scope"]
+    )
+
+    sig_log2fcs = global_raw.get("sig_log2fcs") or []
+    median_abs_log2fc = statistics.median(sig_log2fcs) if sig_log2fcs else None
+    max_abs_log2fc = max(sig_log2fcs) if sig_log2fcs else None
+
+    # --- Q2: top_groups (always) ---
+    tg_cypher, tg_params = build_differential_expression_by_ortholog_top_groups(
+        group_ids=group_ids, **filter_kwargs,
+    )
+    top_groups_raw = conn.execute_query(tg_cypher, **tg_params)
+
+    # --- Q3: top_experiments (always) ---
+    te_cypher, te_params = (
+        build_differential_expression_by_ortholog_top_experiments(
+            group_ids=group_ids, **filter_kwargs,
+        )
+    )
+    top_exp_raw = conn.execute_query(te_cypher, **te_params)
+
+    # --- Q4: results (always, with limit) ---
+    res_cypher, res_params = build_differential_expression_by_ortholog_results(
+        group_ids=group_ids, **filter_kwargs, verbose=verbose, limit=limit,
+    )
+    results = conn.execute_query(res_cypher, **res_params)
+
+    # --- Q5: membership_counts (always) ---
+    mc_cypher, mc_params = (
+        build_differential_expression_by_ortholog_membership_counts(
+            group_ids=group_ids, organisms=organisms,
+        )
+    )
+    mc_rows = conn.execute_query(mc_cypher, **mc_params)
+    mc_lookup = {
+        (r["group_id"], r["organism_strain"]): r["total_genes"]
+        for r in mc_rows
+    }
+    for r in results:
+        key = (r["group_id"], r["organism_strain"])
+        r["total_genes"] = mc_lookup.get(key, 0)
+
+    # --- Q6: diagnostics (conditional) ---
+    if organisms is not None or experiment_ids is not None:
+        diag_queries = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=group_ids, organisms=organisms,
+            experiment_ids=experiment_ids,
+            direction=direction, significant_only=significant_only,
+        )
+        not_found_organisms = []
+        not_matched_organisms = []
+        not_found_experiments = []
+        not_matched_experiments = []
+        if diag_queries:
+            for diag_cypher, diag_params in diag_queries:
+                diag_row = conn.execute_query(diag_cypher, **diag_params)[0]
+                if "not_found_organisms" in diag_row:
+                    not_found_organisms = diag_row["not_found_organisms"]
+                    not_matched_organisms = diag_row["not_matched_organisms"]
+                if "not_found_experiments" in diag_row:
+                    not_found_experiments = diag_row["not_found_experiments"]
+                    not_matched_experiments = diag_row["not_matched_experiments"]
+    else:
+        not_found_organisms = []
+        not_matched_organisms = []
+        not_found_experiments = []
+        not_matched_experiments = []
+
+    # Use same _rename_freq pattern as genes_by_homolog_group
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    by_organism = _rename_freq(global_raw["by_organism"], "organism")
+
+    envelope = {
+        "total_rows": global_raw["total_rows"],
+        "matching_genes": global_raw["matching_genes"],
+        "matching_groups": global_raw["matching_groups"],
+        "experiment_count": global_raw["experiment_count"],
+        "median_abs_log2fc": median_abs_log2fc,
+        "max_abs_log2fc": max_abs_log2fc,
+        "by_organism": by_organism,
+        "rows_by_status": rows_by_status,
+        "rows_by_treatment_type": rows_by_treatment_type,
+        "by_table_scope": by_table_scope,
+        "top_groups": (
+            top_groups_raw[0]["top_groups"] if top_groups_raw else []
+        ),
+        "top_experiments": (
+            top_exp_raw[0]["top_experiments"] if top_exp_raw else []
+        ),
+        "not_found_groups": global_raw["not_found_groups"],
+        "not_matched_groups": global_raw["not_matched_groups"],
+        "not_found_organisms": not_found_organisms,
+        "not_matched_organisms": not_matched_organisms,
+        "not_found_experiments": not_found_experiments,
+        "not_matched_experiments": not_matched_experiments,
+        "returned": len(results),
+        "truncated": len(results) >= limit,
         "results": results,
     }
     return envelope

@@ -37,6 +37,12 @@ from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene_summary_global,
     build_differential_expression_by_gene_summary_by_experiment,
     build_differential_expression_by_gene_summary_diagnostics,
+    build_differential_expression_by_ortholog_summary_global,
+    build_differential_expression_by_ortholog_top_groups,
+    build_differential_expression_by_ortholog_top_experiments,
+    build_differential_expression_by_ortholog_results,
+    build_differential_expression_by_ortholog_membership_counts,
+    build_differential_expression_by_ortholog_diagnostics,
     build_resolve_organism_for_organism,
     build_resolve_organism_for_locus_tags,
     build_resolve_organism_for_experiments,
@@ -1873,3 +1879,235 @@ class TestBuildGenesByHomologGroupDiagnostics:
             group_ids=["cyanorak:CK_1"], organisms=None)
         assert params["organisms"] is None
         assert "not_found_organisms" in cypher
+
+
+class TestBuildDifferentialExpressionByOrthologSummaryGlobal:
+    """Tests for build_differential_expression_by_ortholog_summary_global."""
+
+    def test_single_group(self):
+        cypher, params = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["cyanorak:CK_00000570"],
+        )
+        assert "$group_ids" in cypher
+        assert params["group_ids"] == ["cyanorak:CK_00000570"]
+
+    def test_multiple_groups(self):
+        cypher, params = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"],
+        )
+        assert len(params["group_ids"]) == 2
+
+    def test_organisms_filter(self):
+        cypher, params = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["cyanorak:CK_00000570"],
+            organisms=["MED4", "MIT9313"],
+        )
+        assert "$organisms" in cypher
+        assert params["organisms"] == ["MED4", "MIT9313"]
+
+    def test_experiment_ids_filter(self):
+        cypher, params = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["cyanorak:CK_00000570"],
+            experiment_ids=["EXP001"],
+        )
+        assert "$experiment_ids" in cypher
+        assert "e.id IN $experiment_ids" in cypher
+
+    def test_direction_filter(self):
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["cyanorak:CK_00000570"],
+            direction="up",
+        )
+        assert 'r.expression_status = "significant_up"' in cypher
+
+    def test_significant_only(self):
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["cyanorak:CK_00000570"],
+            significant_only=True,
+        )
+        assert 'r.expression_status <> "not_significant"' in cypher
+
+    def test_direction_takes_precedence(self):
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["g1"], direction="down", significant_only=True,
+        )
+        assert 'r.expression_status = "significant_down"' in cypher
+        # Direction takes precedence: significant_only's WHERE clause is NOT added
+        assert 'r.expression_status <> "not_significant"' not in cypher
+
+    def test_returns_expected_keys(self):
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["g1"],
+        )
+        for key in ["total_rows", "matching_genes", "matching_groups",
+                     "experiment_count", "by_organism", "rows_by_status",
+                     "rows_by_treatment_type", "by_table_scope",
+                     "sig_log2fcs", "not_found_groups", "not_matched_groups"]:
+            assert key in cypher, f"Missing RETURN key: {key}"
+
+
+class TestBuildDifferentialExpressionByOrthologTopGroups:
+    """Tests for build_differential_expression_by_ortholog_top_groups."""
+
+    def test_returns_top_groups(self):
+        cypher, params = build_differential_expression_by_ortholog_top_groups(
+            group_ids=["g1", "g2"],
+        )
+        assert "top_groups" in cypher
+        assert "LIMIT 5" in cypher
+        assert "ORDER BY significant_genes DESC" in cypher
+
+    def test_filters_applied(self):
+        cypher, params = build_differential_expression_by_ortholog_top_groups(
+            group_ids=["g1"], direction="up",
+        )
+        assert 'r.expression_status = "significant_up"' in cypher
+
+
+class TestBuildDifferentialExpressionByOrthologTopExperiments:
+    """Tests for build_differential_expression_by_ortholog_top_experiments."""
+
+    def test_returns_top_experiments(self):
+        cypher, params = build_differential_expression_by_ortholog_top_experiments(
+            group_ids=["g1"],
+        )
+        assert "top_experiments" in cypher
+        assert "LIMIT 5" in cypher
+
+    def test_filters_applied(self):
+        cypher, params = build_differential_expression_by_ortholog_top_experiments(
+            group_ids=["g1"], organisms=["MED4"],
+        )
+        assert "$organisms" in cypher
+
+
+class TestBuildDifferentialExpressionByOrthologResults:
+    """Tests for build_differential_expression_by_ortholog_results."""
+
+    def test_group_x_experiment_x_timepoint_rows(self):
+        cypher, params = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"],
+        )
+        for key in ["group_id", "consensus_gene_name", "consensus_product",
+                     "experiment_id", "treatment_type", "organism_strain",
+                     "coculture_partner", "timepoint", "timepoint_hours",
+                     "timepoint_order", "genes_with_expression",
+                     "significant_up", "significant_down", "not_significant"]:
+            assert key in cypher, f"Missing RETURN key: {key}"
+
+    def test_verbose_fields(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"], verbose=True,
+        )
+        for key in ["experiment_name", "treatment", "omics_type",
+                     "table_scope", "table_scope_detail"]:
+            assert key in cypher, f"Missing verbose key: {key}"
+
+    def test_verbose_false_excludes(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"], verbose=False,
+        )
+        assert "experiment_name" not in cypher
+
+    def test_limit(self):
+        cypher, params = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"], limit=10,
+        )
+        assert "$limit" in cypher
+        assert params["limit"] == 10
+
+    def test_order_by(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"],
+        )
+        assert "ORDER BY" in cypher
+
+
+class TestBuildDifferentialExpressionByOrthologMembershipCounts:
+    """Tests for build_differential_expression_by_ortholog_membership_counts."""
+
+    def test_returns_expected_keys(self):
+        cypher, params = build_differential_expression_by_ortholog_membership_counts(
+            group_ids=["g1"],
+        )
+        for key in ["group_id", "organism_strain", "total_genes"]:
+            assert key in cypher
+
+    def test_organism_filter(self):
+        cypher, params = build_differential_expression_by_ortholog_membership_counts(
+            group_ids=["g1"], organisms=["MED4"],
+        )
+        assert "$organisms" in cypher
+        assert params["organisms"] == ["MED4"]
+
+    def test_no_expression_edges(self):
+        """Membership counts should not reference expression edges."""
+        cypher, _ = build_differential_expression_by_ortholog_membership_counts(
+            group_ids=["g1"],
+        )
+        assert "Changes_expression_of" not in cypher
+        assert "Experiment" not in cypher
+
+
+class TestBuildDifferentialExpressionByOrthologDiagnostics:
+    """Tests for build_differential_expression_by_ortholog_diagnostics."""
+
+    def test_none_returns_none(self):
+        result = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"],
+        )
+        assert result is None
+
+    def test_organisms_returns_queries(self):
+        result = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"], organisms=["MED4"],
+        )
+        assert result is not None
+        assert isinstance(result, list)
+        assert len(result) >= 1
+
+    def test_experiment_ids_returns_queries(self):
+        result = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"], experiment_ids=["EXP001"],
+        )
+        assert result is not None
+        assert isinstance(result, list)
+
+    def test_combined_filters_no_double_where(self):
+        """Combined organisms + experiment_ids must not produce double WHERE."""
+        result = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"],
+            organisms=["MED4"],
+            experiment_ids=["EXP001"],
+            direction="up",
+        )
+        assert result is not None
+        for cypher, _ in result:
+            # Each WHERE keyword should be followed by conditions, not another WHERE
+            parts = cypher.split("WHERE")
+            for i, part in enumerate(parts):
+                if i == 0:
+                    continue
+                stripped = part.strip()
+                assert not stripped.startswith("WHERE"), (
+                    f"Double WHERE found in diagnostic query:\n{cypher}"
+                )
+
+    def test_direction_forwarded_to_diagnostics(self):
+        """Direction filter must appear in diagnostic Cypher."""
+        result = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"], organisms=["MED4"], direction="up",
+        )
+        assert result is not None
+        cypher, _ = result[0]
+        assert 'r.expression_status = "significant_up"' in cypher
+
+    def test_significant_only_forwarded_to_diagnostics(self):
+        """significant_only filter must appear in diagnostic Cypher."""
+        result = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"], experiment_ids=["EXP001"],
+            significant_only=True,
+        )
+        assert result is not None
+        cypher, _ = result[0]
+        assert 'r.expression_status <> "not_significant"' in cypher

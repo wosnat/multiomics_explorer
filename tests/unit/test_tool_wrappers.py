@@ -54,6 +54,7 @@ EXPECTED_TOOLS = [
     "list_publications",
     "list_experiments",
     "differential_expression_by_gene",
+    "differential_expression_by_ortholog",
 ]
 
 
@@ -2406,5 +2407,123 @@ class TestGenesByHomologGroupWrapper:
         ):
             with pytest.raises(ToolError):
                 await tool_fns["genes_by_homolog_group"](
+                    mock_ctx, group_ids=[],
+                )
+
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_ortholog
+# ---------------------------------------------------------------------------
+class TestDifferentialExpressionByOrthologWrapper:
+    """Tests for differential_expression_by_ortholog MCP wrapper."""
+
+    _SAMPLE_API_RETURN = {
+        "total_rows": 10,
+        "matching_genes": 3,
+        "matching_groups": 1,
+        "experiment_count": 2,
+        "median_abs_log2fc": 1.5,
+        "max_abs_log2fc": 3.0,
+        "by_organism": [{"organism": "MED4", "count": 10}],
+        "rows_by_status": {"significant_up": 5, "significant_down": 3,
+                           "not_significant": 2},
+        "rows_by_treatment_type": {"nitrogen_limitation": 10},
+        "by_table_scope": {"all_detected_genes": 10},
+        "top_groups": [{"group_id": "g1", "consensus_gene_name": "psbB",
+                        "consensus_product": "CP47",
+                        "significant_genes": 3, "total_genes": 5}],
+        "top_experiments": [{"experiment_id": "EXP001",
+                             "treatment_type": "nitrogen_limitation",
+                             "organism_strain": "MED4",
+                             "significant_genes": 3}],
+        "not_found_groups": [],
+        "not_matched_groups": [],
+        "not_found_organisms": [],
+        "not_matched_organisms": [],
+        "not_found_experiments": [],
+        "not_matched_experiments": [],
+        "returned": 1,
+        "truncated": False,
+        "results": [
+            {"group_id": "g1", "consensus_gene_name": "psbB",
+             "consensus_product": "CP47", "experiment_id": "EXP001",
+             "treatment_type": "nitrogen_limitation",
+             "organism_strain": "MED4", "coculture_partner": None,
+             "timepoint": "24h", "timepoint_hours": 24.0,
+             "timepoint_order": 3, "genes_with_expression": 3,
+             "total_genes": 5, "significant_up": 2,
+             "significant_down": 1, "not_significant": 0},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, mock_ctx):
+        """API dict is converted to Pydantic response model."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["differential_expression_by_ortholog"](
+                mock_ctx, group_ids=["g1"],
+            )
+        assert result.total_rows == 10
+        assert result.returned == 1
+        assert len(result.results) == 1
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["differential_expression_by_ortholog"](
+                mock_ctx, group_ids=["g1"],
+                organisms=["MED4"], direction="up",
+                significant_only=True, verbose=True, limit=10,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs
+        assert call_kwargs["group_ids"] == ["g1"]
+        assert call_kwargs["organisms"] == ["MED4"]
+        assert call_kwargs["direction"] == "up"
+        assert call_kwargs["significant_only"] is True
+        assert call_kwargs["verbose"] is True
+        assert call_kwargs["limit"] == 10
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        empty_return = {
+            "total_rows": 0, "matching_genes": 0, "matching_groups": 0,
+            "experiment_count": 0, "median_abs_log2fc": None,
+            "max_abs_log2fc": None, "results": [], "returned": 0,
+            "truncated": False,
+            "by_organism": [], "rows_by_status": {},
+            "rows_by_treatment_type": {}, "by_table_scope": {},
+            "top_groups": [], "top_experiments": [],
+            "not_found_groups": ["g1"], "not_matched_groups": [],
+            "not_found_organisms": [], "not_matched_organisms": [],
+            "not_found_experiments": [], "not_matched_experiments": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            return_value=empty_return,
+        ):
+            result = await tool_fns["differential_expression_by_ortholog"](
+                mock_ctx, group_ids=["g1"],
+            )
+        assert result.returned == 0
+        assert result.not_found_groups == ["g1"]
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from API is converted to ToolError."""
+        from fastmcp.exceptions import ToolError
+
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            side_effect=ValueError("group_ids must not be empty."),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["differential_expression_by_ortholog"](
                     mock_ctx, group_ids=[],
                 )

@@ -1878,3 +1878,318 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"genes_by_homolog_group unexpected error: {e}")
             raise ToolError(f"Error in genes_by_homolog_group: {e}")
+
+    # -----------------------------------------------------------------
+    # differential_expression_by_ortholog
+    # -----------------------------------------------------------------
+
+    class DifferentialExpressionByOrthologResult(BaseModel):
+        # --- always present ---
+        group_id: str = Field(
+            description="Ortholog group ID"
+            " (e.g. 'cyanorak:CK_00000570')",
+        )
+        consensus_gene_name: str | None = Field(
+            description="Short gene name (e.g. 'psbB')."
+            " Null for hypotheticals.",
+        )
+        consensus_product: str = Field(
+            description="Group product description"
+            " (e.g. 'photosystem II chlorophyll-binding protein CP47')",
+        )
+        experiment_id: str = Field(
+            description="Experiment ID",
+        )
+        treatment_type: str = Field(
+            description="Treatment category"
+            " (e.g. 'nitrogen_limitation')",
+        )
+        organism_strain: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MED4')",
+        )
+        coculture_partner: str | None = Field(
+            default=None,
+            description="Coculture partner organism, if applicable",
+        )
+        timepoint: str | None = Field(
+            description="Timepoint label (e.g. '24h')."
+            " Null when edge has no label.",
+        )
+        timepoint_hours: float | None = Field(
+            description="Numeric hours (e.g. 24.0)."
+            " Null for non-numeric labels.",
+        )
+        timepoint_order: int = Field(
+            description="Sort key for time course order (e.g. 3)",
+        )
+        genes_with_expression: int = Field(
+            description="Group members with expression at this timepoint",
+        )
+        total_genes: int = Field(
+            description="Total group members in this organism (computed)",
+        )
+        significant_up: int = Field(
+            description="Genes significantly upregulated",
+        )
+        significant_down: int = Field(
+            description="Genes significantly downregulated",
+        )
+        not_significant: int = Field(
+            description="Genes not meeting significance threshold",
+        )
+        # --- verbose only ---
+        experiment_name: str | None = Field(
+            default=None,
+            description="Human-readable experiment name. Verbose only.",
+        )
+        treatment: str | None = Field(
+            default=None,
+            description="Detailed treatment string. Verbose only.",
+        )
+        omics_type: str | None = Field(
+            default=None,
+            description="Omics type (e.g. 'RNASEQ'). Verbose only.",
+        )
+        table_scope: str | None = Field(
+            default=None,
+            description="What genes the DE table contains. Verbose only.",
+        )
+        table_scope_detail: str | None = Field(
+            default=None,
+            description="Free-text clarification of table_scope."
+            " Verbose only.",
+        )
+
+    class DifferentialExpressionByOrthologTopGroup(BaseModel):
+        group_id: str = Field(
+            description="Ortholog group ID",
+        )
+        consensus_gene_name: str | None = Field(
+            description="Short gene name",
+        )
+        consensus_product: str = Field(
+            description="Group product description",
+        )
+        significant_genes: int = Field(
+            description="Distinct significant genes in this group",
+        )
+        total_genes: int = Field(
+            description="Distinct genes with expression in this group",
+        )
+
+    class DifferentialExpressionByOrthologTopExperiment(BaseModel):
+        experiment_id: str = Field(
+            description="Experiment ID",
+        )
+        treatment_type: str = Field(
+            description="Treatment category",
+        )
+        organism_strain: str = Field(
+            description="Organism strain",
+        )
+        significant_genes: int = Field(
+            description="Distinct significant genes in this experiment"
+            " across groups",
+        )
+
+    class DifferentialExpressionByOrthologResponse(BaseModel):
+        total_rows: int = Field(
+            description="Gene x experiment x timepoint rows"
+            " matching all filters",
+        )
+        matching_genes: int = Field(
+            description="Distinct genes with expression",
+        )
+        matching_groups: int = Field(
+            description="Distinct groups with >=1 gene having expression",
+        )
+        experiment_count: int = Field(
+            description="Distinct experiments in results",
+        )
+        median_abs_log2fc: float | None = Field(
+            description="Median |log2FC| for significant rows."
+            " Null if none.",
+        )
+        max_abs_log2fc: float | None = Field(
+            description="Max |log2FC| for significant rows."
+            " Null if none.",
+        )
+        results: list[DifferentialExpressionByOrthologResult] = Field(
+            default_factory=list,
+        )
+        returned: int = Field(
+            description="Rows in results",
+        )
+        truncated: bool = Field(
+            description="True if more results exist than returned",
+        )
+        by_organism: list[dict] = Field(
+            description="[{organism, count}] — rows per organism,"
+            " sorted desc",
+        )
+        rows_by_status: dict = Field(
+            description="{significant_up, significant_down,"
+            " not_significant}",
+        )
+        rows_by_treatment_type: dict[str, int] = Field(
+            description="Row counts by treatment type",
+        )
+        by_table_scope: dict[str, int] = Field(
+            description="Row counts by experiment table_scope",
+        )
+        top_groups: list[DifferentialExpressionByOrthologTopGroup] = Field(
+            default_factory=list,
+            description="Top 5 groups by significant gene count",
+        )
+        top_experiments: list[DifferentialExpressionByOrthologTopExperiment] = Field(
+            default_factory=list,
+            description="Top 5 experiments by significant gene count",
+        )
+        not_found_groups: list[str] = Field(
+            default_factory=list,
+            description="Input group_ids not found in KG",
+        )
+        not_matched_groups: list[str] = Field(
+            default_factory=list,
+            description="Groups that exist but have 0 expression"
+            " matching filters",
+        )
+        not_found_organisms: list[str] = Field(
+            default_factory=list,
+            description="Organism filter values matching zero genes in KG",
+        )
+        not_matched_organisms: list[str] = Field(
+            default_factory=list,
+            description="Organisms in KG but with zero expression"
+            " in groups",
+        )
+        not_found_experiments: list[str] = Field(
+            default_factory=list,
+            description="Experiment IDs not found in KG",
+        )
+        not_matched_experiments: list[str] = Field(
+            default_factory=list,
+            description="Experiments that exist but have 0 expression"
+            " edges to group members",
+        )
+
+    @mcp.tool(
+        tags={"expression", "homology"},
+        annotations={"readOnlyHint": True},
+    )
+    async def differential_expression_by_ortholog(
+        ctx: Context,
+        group_ids: Annotated[list[str], Field(
+            description="Ortholog group IDs (from search_homolog_groups or "
+            "gene_homologs). E.g. ['cyanorak:CK_00000570'].",
+        )],
+        organisms: Annotated[list[str] | None, Field(
+            description="Filter by organisms (case-insensitive substring, "
+            "OR semantics). E.g. ['MED4', 'MIT9313']. "
+            "Use list_organisms to see valid values.",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Filter to these experiments. "
+            "Get IDs from list_experiments.",
+        )] = None,
+        direction: Annotated[Literal["up", "down"] | None, Field(
+            description="Filter by expression direction.",
+        )] = None,
+        significant_only: Annotated[bool, Field(
+            description="If true, return only statistically significant"
+            " rows.",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Add experiment_name, treatment, omics_type, "
+            "table_scope, table_scope_detail to each row.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max result rows.", ge=1, le=200,
+        )] = 5,
+    ) -> DifferentialExpressionByOrthologResponse:
+        """Differential expression framed by ortholog groups.
+
+        Cross-organism by design — results at group x experiment x timepoint
+        granularity showing how many group members respond. Gene counts,
+        not individual genes.
+
+        Three list filters — each reports not_found + not_matched:
+        - group_ids (required): ortholog groups
+        - organisms: restrict to specific organisms
+        - experiment_ids: restrict to specific experiments
+
+        For group discovery, use search_homolog_groups first.
+        For group membership without expression, use genes_by_homolog_group.
+        For per-gene expression, use differential_expression_by_gene.
+        """
+        await ctx.info(
+            f"differential_expression_by_ortholog"
+            f" group_ids={group_ids} limit={limit}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.differential_expression_by_ortholog(
+                group_ids=group_ids,
+                organisms=organisms,
+                experiment_ids=experiment_ids,
+                direction=direction,
+                significant_only=significant_only,
+                verbose=verbose,
+                limit=limit,
+                conn=conn,
+            )
+            # Build Pydantic models from dict results
+            top_groups = [
+                DifferentialExpressionByOrthologTopGroup(**g)
+                for g in data["top_groups"]
+            ]
+            top_experiments = [
+                DifferentialExpressionByOrthologTopExperiment(**e)
+                for e in data["top_experiments"]
+            ]
+            results = [
+                DifferentialExpressionByOrthologResult(**r)
+                for r in data["results"]
+            ]
+
+            response = DifferentialExpressionByOrthologResponse(
+                total_rows=data["total_rows"],
+                matching_genes=data["matching_genes"],
+                matching_groups=data["matching_groups"],
+                experiment_count=data["experiment_count"],
+                median_abs_log2fc=data["median_abs_log2fc"],
+                max_abs_log2fc=data["max_abs_log2fc"],
+                results=results,
+                returned=data["returned"],
+                truncated=data["truncated"],
+                by_organism=data["by_organism"],
+                rows_by_status=data["rows_by_status"],
+                rows_by_treatment_type=data["rows_by_treatment_type"],
+                by_table_scope=data["by_table_scope"],
+                top_groups=top_groups,
+                top_experiments=top_experiments,
+                not_found_groups=data["not_found_groups"],
+                not_matched_groups=data["not_matched_groups"],
+                not_found_organisms=data["not_found_organisms"],
+                not_matched_organisms=data["not_matched_organisms"],
+                not_found_experiments=data["not_found_experiments"],
+                not_matched_experiments=data["not_matched_experiments"],
+            )
+            await ctx.info(
+                f"Returning {response.returned} rows"
+                f" ({response.matching_groups} groups,"
+                f" {response.experiment_count} experiments)"
+            )
+            return response
+        except ValueError as e:
+            await ctx.warning(
+                f"differential_expression_by_ortholog error: {e}"
+            )
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(
+                f"differential_expression_by_ortholog unexpected error: {e}"
+            )
+            raise ToolError(
+                f"Error in differential_expression_by_ortholog: {e}"
+            )

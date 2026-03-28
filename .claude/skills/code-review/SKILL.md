@@ -45,3 +45,5 @@ Before diving into the full checklist, verify these common issues:
 - [ ] `ORDER BY` in every query for deterministic results?
 - [ ] About content (MCP resource) updated if tool behavior changed?
 - [ ] `pytest tests/unit/test_about_content.py` passes (expected-keys match Pydantic models)?
+- [ ] Diagnostic builder calls forward ALL filter params (direction, significant_only)?
+- [ ] Appended WHERE conditions use `AND` (not a second `WHERE`) when query already has a WHERE clause?

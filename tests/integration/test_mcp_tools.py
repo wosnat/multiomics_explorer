@@ -447,3 +447,127 @@ class TestDifferentialExpressionByGene:
         assert summary["total_rows"] == detail["total_rows"]
         assert summary["total_rows"] == len(detail["results"])
 
+
+@pytest.mark.kg
+class TestDifferentialExpressionByOrtholog:
+    KNOWN_GROUP = "cyanorak:CK_00000570"
+
+    def test_single_group(self, conn):
+        """Single group returns results with expected fields."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP], limit=10, conn=conn,
+        )
+        assert result["total_rows"] > 0
+        assert result["matching_genes"] >= 1
+        assert result["matching_groups"] == 1
+        assert result["returned"] >= 1
+        row = result["results"][0]
+        assert row["group_id"] == self.KNOWN_GROUP
+        for key in ("experiment_id", "treatment_type", "organism_strain",
+                     "timepoint_order", "genes_with_expression", "total_genes",
+                     "significant_up", "significant_down", "not_significant"):
+            assert key in row
+
+    def test_multiple_groups(self, conn):
+        """Multiple groups return results from all groups."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP, "cyanorak:CK_00000364"],
+            limit=200, conn=conn,
+        )
+        group_ids = {r["group_id"] for r in result["results"]}
+        assert len(group_ids) >= 2
+        assert result["matching_groups"] >= 2
+
+    def test_organisms_filter(self, conn):
+        """Organisms filter restricts by_organism and results."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP], organisms=["MED4"],
+            limit=50, conn=conn,
+        )
+        for row in result["results"]:
+            assert "MED4" in row["organism_strain"]
+        organisms = [b["organism"] for b in result["by_organism"]]
+        assert all("MED4" in o for o in organisms)
+
+    def test_significant_only(self, conn):
+        """significant_only filters to significant rows only."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP], significant_only=True,
+            limit=50, conn=conn,
+        )
+        for row in result["results"]:
+            # Each row should have at least one significant gene
+            assert row["significant_up"] + row["significant_down"] > 0
+        rbs = result["rows_by_status"]
+        assert rbs.get("not_significant", 0) == 0
+
+    def test_direction_up(self, conn):
+        """direction='up' only counts significant_up in rows_by_status."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP], direction="up",
+            limit=50, conn=conn,
+        )
+        rbs = result["rows_by_status"]
+        assert rbs.get("significant_down", 0) == 0
+        assert rbs.get("not_significant", 0) == 0
+
+    def test_verbose_adds_fields(self, conn):
+        """verbose=True adds experiment_name, treatment, omics_type."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP], verbose=True, limit=1, conn=conn,
+        )
+        if result["results"]:
+            row = result["results"][0]
+            for key in ("experiment_name", "treatment", "omics_type",
+                        "table_scope"):
+                assert key in row
+
+    def test_not_found_groups(self, conn):
+        """Fake group ID appears in not_found_groups."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=["FAKE_GROUP_ID"], conn=conn,
+        )
+        assert "FAKE_GROUP_ID" in result["not_found_groups"]
+        assert result["total_rows"] == 0
+        assert result["results"] == []
+
+    def test_genes_with_expression_le_total_genes(self, conn):
+        """genes_with_expression <= total_genes in every result row."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP], limit=50, conn=conn,
+        )
+        for row in result["results"]:
+            assert row["genes_with_expression"] <= row["total_genes"]
+
+    def test_empty_group_ids_raises(self, conn):
+        """Empty group_ids raises ValueError."""
+        with pytest.raises(ValueError, match="group_ids must not be empty"):
+            api.differential_expression_by_ortholog(group_ids=[], conn=conn)
+
+    def test_top_groups_and_experiments(self, conn):
+        """top_groups and top_experiments are populated."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP, "cyanorak:CK_00000364"],
+            limit=10, conn=conn,
+        )
+        assert len(result["top_groups"]) >= 1
+        assert len(result["top_experiments"]) >= 1
+        tg = result["top_groups"][0]
+        assert "group_id" in tg
+        assert "significant_genes" in tg
+        te = result["top_experiments"][0]
+        assert "experiment_id" in te
+        assert "significant_genes" in te
+
+    def test_diagnostics_with_combined_filters(self, conn):
+        """Diagnostics work with organisms + experiment_ids + direction."""
+        result = api.differential_expression_by_ortholog(
+            group_ids=[self.KNOWN_GROUP],
+            organisms=["FAKE_ORG", "MED4"],
+            experiment_ids=["FAKE_EXP"],
+            direction="up",
+            conn=conn,
+        )
+        assert "FAKE_ORG" in result["not_found_organisms"]
+        assert "FAKE_EXP" in result["not_found_experiments"]
+

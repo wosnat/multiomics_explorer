@@ -1124,3 +1124,39 @@
     min_rows: 1
     columns: [locus_tag, product, experiment_name, treatment,
               gene_category, omics_type]
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_ortholog
+# ---------------------------------------------------------------------------
+
+- id: differential_expression_by_ortholog_basic
+  tool: differential_expression_by_ortholog
+  desc: Single group expression across organisms
+  params:
+    group_ids: ["cyanorak:CK_00000570"]
+  expect:
+    min_rows: 1
+    columns: [group_id, consensus_product, experiment_id,
+              treatment_type, organism_strain, timepoint_order,
+              genes_with_expression, significant_up, significant_down,
+              not_significant]
+
+- id: differential_expression_by_ortholog_organism_filter
+  tool: differential_expression_by_ortholog
+  desc: Group expression for specific organisms
+  params:
+    group_ids: ["cyanorak:CK_00000570"]
+    organisms: ["MED4", "MIT9313"]
+  expect:
+    min_rows: 1
+    columns: [group_id, organism_strain, genes_with_expression]
+
+- id: differential_expression_by_ortholog_significant
+  tool: differential_expression_by_ortholog
+  desc: Only significant expression
+  params:
+    group_ids: ["cyanorak:CK_00000570"]
+    significant_only: true
+  expect:
+    min_rows: 1
+    columns: [group_id, significant_up, significant_down]

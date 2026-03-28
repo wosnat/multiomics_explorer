@@ -2021,3 +2021,99 @@ class TestGenesByHomologGroup:
     def test_importable_from_package(self):
         from multiomics_explorer import genes_by_homolog_group
         assert genes_by_homolog_group is api.genes_by_homolog_group
+
+
+class TestDifferentialExpressionByOrtholog:
+    """Tests for differential_expression_by_ortholog API function."""
+
+    def test_returns_dict(self, mock_conn):
+        # Mock all 5 query results
+        mock_conn.execute_query.side_effect = [
+            [{"total_rows": 10, "matching_genes": 3, "matching_groups": 1,
+              "experiment_count": 2, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "by_table_scope": [],
+              "sig_log2fcs": [1.5, 2.0], "not_found_groups": [],
+              "not_matched_groups": []}],  # Q1
+            [{"top_groups": []}],  # Q2
+            [{"top_experiments": []}],  # Q3
+            [],  # Q4 results
+            [],  # Q5 membership
+        ]
+        result = api.differential_expression_by_ortholog(
+            group_ids=["g1"], conn=mock_conn,
+        )
+        assert isinstance(result, dict)
+        assert "total_rows" in result
+        assert "results" in result
+        assert "returned" in result
+        assert "truncated" in result
+
+    def test_empty_group_ids_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="group_ids must not be empty"):
+            api.differential_expression_by_ortholog(group_ids=[], conn=mock_conn)
+
+    def test_invalid_direction_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="Invalid direction"):
+            api.differential_expression_by_ortholog(
+                group_ids=["g1"], direction="sideways", conn=mock_conn,
+            )
+
+    def test_median_max_computation(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_rows": 5, "matching_genes": 2, "matching_groups": 1,
+              "experiment_count": 1, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "by_table_scope": [],
+              "sig_log2fcs": [1.0, 2.0, 3.0], "not_found_groups": [],
+              "not_matched_groups": []}],
+            [{"top_groups": []}],
+            [{"top_experiments": []}],
+            [],
+            [],
+        ]
+        result = api.differential_expression_by_ortholog(
+            group_ids=["g1"], conn=mock_conn,
+        )
+        assert result["median_abs_log2fc"] == 2.0
+        assert result["max_abs_log2fc"] == 3.0
+
+    def test_empty_sig_log2fcs(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_rows": 0, "matching_genes": 0, "matching_groups": 0,
+              "experiment_count": 0, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "by_table_scope": [],
+              "sig_log2fcs": [], "not_found_groups": ["g1"],
+              "not_matched_groups": []}],
+            [{"top_groups": []}],
+            [{"top_experiments": []}],
+            [],
+            [],
+        ]
+        result = api.differential_expression_by_ortholog(
+            group_ids=["g1"], conn=mock_conn,
+        )
+        assert result["median_abs_log2fc"] is None
+        assert result["max_abs_log2fc"] is None
+
+    def test_total_genes_join(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_rows": 1, "matching_genes": 1, "matching_groups": 1,
+              "experiment_count": 1, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "by_table_scope": [],
+              "sig_log2fcs": [], "not_found_groups": [],
+              "not_matched_groups": []}],
+            [{"top_groups": []}],
+            [{"top_experiments": []}],
+            [{"group_id": "g1", "organism_strain": "MED4",
+              "genes_with_expression": 2, "significant_up": 1,
+              "significant_down": 0, "not_significant": 1}],  # Q4
+            [{"group_id": "g1", "organism_strain": "MED4",
+              "total_genes": 5}],  # Q5
+        ]
+        result = api.differential_expression_by_ortholog(
+            group_ids=["g1"], conn=mock_conn,
+        )
+        assert result["results"][0]["total_genes"] == 5
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import differential_expression_by_ortholog as fn
+        assert callable(fn)

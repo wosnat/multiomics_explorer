@@ -397,3 +397,104 @@ class TestDifferentialExpressionByGeneContract:
             assert "experiment_id" in exp
             assert "rows_by_status" in exp
             assert "matching_genes" in exp
+
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_ortholog
+# ---------------------------------------------------------------------------
+KNOWN_GROUP = "cyanorak:CK_00000570"
+
+
+@pytest.mark.kg
+class TestDifferentialExpressionByOrthologContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.differential_expression_by_ortholog(
+            group_ids=[KNOWN_GROUP], limit=5, conn=conn,
+        )
+        assert isinstance(result, dict)
+        expected_keys = {
+            "total_rows", "matching_genes", "matching_groups",
+            "experiment_count", "median_abs_log2fc", "max_abs_log2fc",
+            "results", "returned", "truncated",
+            "by_organism", "rows_by_status", "rows_by_treatment_type",
+            "by_table_scope", "top_groups", "top_experiments",
+            "not_found_groups", "not_matched_groups",
+            "not_found_organisms", "not_matched_organisms",
+            "not_found_experiments", "not_matched_experiments",
+        }
+        assert set(result.keys()) == expected_keys
+
+    def test_rows_by_status_keys(self, conn):
+        result = api.differential_expression_by_ortholog(
+            group_ids=[KNOWN_GROUP], limit=5, conn=conn,
+        )
+        rbs = result["rows_by_status"]
+        assert set(rbs.keys()) == {"significant_up", "significant_down", "not_significant"}
+        assert sum(rbs.values()) == result["total_rows"]
+
+    def test_result_row_keys_compact(self, conn):
+        result = api.differential_expression_by_ortholog(
+            group_ids=[KNOWN_GROUP], limit=1, conn=conn,
+        )
+        assert result["returned"] >= 1
+        row = result["results"][0]
+        expected_compact = {
+            "group_id", "consensus_gene_name", "consensus_product",
+            "experiment_id", "treatment_type", "organism_strain",
+            "coculture_partner", "timepoint", "timepoint_hours",
+            "timepoint_order", "genes_with_expression", "total_genes",
+            "significant_up", "significant_down", "not_significant",
+        }
+        assert expected_compact <= set(row.keys())
+
+    def test_verbose_adds_columns(self, conn):
+        result = api.differential_expression_by_ortholog(
+            group_ids=[KNOWN_GROUP], verbose=True, limit=1, conn=conn,
+        )
+        row = result["results"][0]
+        for col in ("experiment_name", "treatment", "omics_type",
+                     "table_scope", "table_scope_detail"):
+            assert col in row
+
+    def test_top_groups_shape(self, conn):
+        result = api.differential_expression_by_ortholog(
+            group_ids=[KNOWN_GROUP], limit=1, conn=conn,
+        )
+        assert isinstance(result["top_groups"], list)
+        if result["top_groups"]:
+            tg = result["top_groups"][0]
+            assert set(tg.keys()) == {
+                "group_id", "consensus_gene_name", "consensus_product",
+                "significant_genes", "total_genes",
+            }
+
+    def test_top_experiments_shape(self, conn):
+        result = api.differential_expression_by_ortholog(
+            group_ids=[KNOWN_GROUP], limit=1, conn=conn,
+        )
+        assert isinstance(result["top_experiments"], list)
+        if result["top_experiments"]:
+            te = result["top_experiments"][0]
+            assert set(te.keys()) == {
+                "experiment_id", "treatment_type", "organism_strain",
+                "significant_genes",
+            }
+
+    def test_by_organism_shape(self, conn):
+        result = api.differential_expression_by_ortholog(
+            group_ids=[KNOWN_GROUP], limit=1, conn=conn,
+        )
+        assert isinstance(result["by_organism"], list)
+        if result["by_organism"]:
+            bo = result["by_organism"][0]
+            assert "organism" in bo
+            assert "count" in bo
+
+    def test_diagnostic_fields_present(self, conn):
+        result = api.differential_expression_by_ortholog(
+            group_ids=[KNOWN_GROUP], conn=conn,
+        )
+        for field in ("not_found_groups", "not_matched_groups",
+                       "not_found_organisms", "not_matched_organisms",
+                       "not_found_experiments", "not_matched_experiments"):
+            assert isinstance(result[field], list)

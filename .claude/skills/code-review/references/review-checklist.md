@@ -32,6 +32,7 @@
 - [ ] Docstring lists return dict keys?
 - [ ] Added to `api/__init__.py` `__all__`?
 - [ ] Re-exported from `multiomics_explorer/__init__.py` `__all__`?
+- [ ] Diagnostic builder calls forward ALL active filter params (direction, significant_only, etc.)? Not_matched must be evaluated against the same filtered dataset the user sees — omitting filters gives false negatives.
 
 ## Layer 3: `mcp_server/tools.py`
 
@@ -116,6 +117,17 @@ Do not trust Cypher by reading alone — run it. For each builder:
       spec says? Do the summary fields match the Pydantic model fields?
       Mismatches between spec Cypher, actual builder, API docstring, and
       Pydantic model are the most common source of bugs.
+- [ ] **Diagnostics with combined filters:** Run diagnostic queries with
+      multiple filters active simultaneously (e.g. organisms + direction).
+      A common bug: conditions appended with `WHERE` instead of `AND`
+      when the query already has a WHERE clause from an earlier OPTIONAL
+      MATCH. This produces a Cypher syntax error that only surfaces
+      when multiple filters are combined.
+- [ ] **WHERE vs AND in chained OPTIONAL MATCH:** When a query has
+      `OPTIONAL MATCH ... WHERE cond1` and you append filter conditions,
+      the appended conditions must use `AND`, not a new `WHERE` keyword.
+      Cypher only allows one WHERE per clause. Verify by generating the
+      query with all optional filters active and inspecting the string.
 
 ## Tools with rich summary fields
 

@@ -1,0 +1,40 @@
+# Human-authored content for differential_expression_by_ortholog about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+verbose_fields:
+  - experiment_name
+  - treatment
+  - omics_type
+  - table_scope
+  - table_scope_detail
+
+examples:
+  - title: Expression across orthologs in a group
+    call: differential_expression_by_ortholog(group_ids=["cyanorak:CK_00000570"])
+
+  - title: Compare two groups in specific organisms
+    call: differential_expression_by_ortholog(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], organisms=["MED4", "MIT9313"])
+
+  - title: Full pipeline from text to expression
+    steps: |
+      Step 1: search_homolog_groups(search_text="photosystem II")
+              → collect group_ids
+
+      Step 2: differential_expression_by_ortholog(group_ids=[...],
+                organisms=["MED4", "MIT9313"])
+              → triage: which groups have expression?
+
+      Step 3 (if detail needed): use expression_by_ortholog script
+
+chaining:
+  - "search_homolog_groups → differential_expression_by_ortholog"
+  - "gene_homologs → differential_expression_by_ortholog"
+  - "genes_by_homolog_group (triage) → differential_expression_by_ortholog"
+  - "differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detail)"
+
+mistakes:
+  - "group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570')"
+  - "organisms is a list, not a string — use ['MED4'] not 'MED4'"
+  - "This tool does NOT enforce single organism — that is the point"
+  - "Results are group × experiment × timepoint (gene counts), not individual genes. Use the script for per-gene detail."
