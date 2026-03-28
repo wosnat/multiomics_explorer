@@ -2279,11 +2279,17 @@ class TestGenesByHomologGroupWrapper:
     _SAMPLE_API_RETURN = {
         "total_matching": 9,
         "total_genes": 9,
+        "total_categories": 1,
+        "genes_per_group_max": 9,
+        "genes_per_group_median": 9.0,
         "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1},
                         {"organism": "Prochlorococcus AS9601", "count": 1}],
-        "by_category": [{"category": "Photosynthesis", "count": 9}],
-        "by_group": [{"group_id": "cyanorak:CK_00000570", "count": 9}],
-        "not_found": [],
+        "top_categories": [{"category": "Photosynthesis", "count": 9}],
+        "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 9}],
+        "not_found_groups": [],
+        "not_matched_groups": [],
+        "not_found_organisms": [],
+        "not_matched_organisms": [],
         "returned": 2,
         "truncated": True,
         "results": [
@@ -2311,22 +2317,34 @@ class TestGenesByHomologGroupWrapper:
             )
         assert result.total_matching == 9
         assert result.total_genes == 9
+        assert result.total_categories == 1
+        assert result.genes_per_group_max == 9
+        assert result.genes_per_group_median == 9.0
         assert result.returned == 2
         assert result.truncated is True
         assert len(result.results) == 2
         assert len(result.by_organism) == 2
-        assert len(result.by_group) == 1
-        assert result.not_found == []
+        assert len(result.top_groups) == 1
+        assert result.not_found_groups == []
+        assert result.not_matched_groups == []
+        assert result.not_found_organisms == []
+        assert result.not_matched_organisms == []
 
     @pytest.mark.asyncio
     async def test_empty_results(self, tool_fns, mock_ctx):
         empty_return = {
             "total_matching": 0,
             "total_genes": 0,
+            "total_categories": 0,
+            "genes_per_group_max": 0,
+            "genes_per_group_median": 0,
             "by_organism": [],
-            "by_category": [],
-            "by_group": [],
-            "not_found": ["FAKE_GROUP"],
+            "top_categories": [],
+            "top_groups": [],
+            "not_found_groups": ["FAKE_GROUP"],
+            "not_matched_groups": [],
+            "not_found_organisms": [],
+            "not_matched_organisms": [],
             "returned": 0,
             "truncated": False,
             "results": [],
@@ -2341,7 +2359,7 @@ class TestGenesByHomologGroupWrapper:
         assert result.total_matching == 0
         assert result.returned == 0
         assert result.results == []
-        assert result.not_found == ["FAKE_GROUP"]
+        assert result.not_found_groups == ["FAKE_GROUP"]
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
@@ -2351,12 +2369,12 @@ class TestGenesByHomologGroupWrapper:
         ) as mock_api:
             await tool_fns["genes_by_homolog_group"](
                 mock_ctx, group_ids=["cyanorak:CK_1"],
-                organism="MED4", summary=True, verbose=True, limit=10,
+                organisms=["MED4"], summary=True, verbose=True, limit=10,
             )
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args
         assert call_kwargs.args[0] == ["cyanorak:CK_1"]
-        assert call_kwargs.kwargs["organism"] == "MED4"
+        assert call_kwargs.kwargs["organisms"] == ["MED4"]
         assert call_kwargs.kwargs["summary"] is True
         assert call_kwargs.kwargs["verbose"] is True
         assert call_kwargs.kwargs["limit"] == 10

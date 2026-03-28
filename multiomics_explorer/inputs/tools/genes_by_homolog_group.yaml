@@ -6,15 +6,15 @@ examples:
   - title: Find members of an ortholog group
     call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
     response: |
-      {"total_matching": 9, "total_genes": 9, "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1}], "by_category": [{"category": "Photosynthesis", "count": 9}], "by_group": [{"group_id": "cyanorak:CK_00000570", "count": 9}], "not_found": [], "returned": 5, "truncated": true, "results": [{"locus_tag": "A9601_03391", "gene_name": "psbB", "product": "photosystem II chlorophyll-binding protein CP47", "organism_strain": "Prochlorococcus AS9601", "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}]}
+      {"total_matching": 9, "total_genes": 9, "total_categories": 1, "genes_per_group_max": 9, "genes_per_group_median": 9.0, "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1}], "top_categories": [{"category": "Photosynthesis", "count": 9}], "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 9}], "not_found_groups": [], "not_matched_groups": [], "not_found_organisms": [], "not_matched_organisms": [], "returned": 5, "truncated": true, "results": [{"locus_tag": "A9601_03391", "gene_name": "psbB", "product": "photosystem II chlorophyll-binding protein CP47", "organism_strain": "Prochlorococcus AS9601", "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}]}
 
-  - title: Filter to one organism
-    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"], organism="MED4")
+  - title: Filter to specific organisms
+    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"], organisms=["MED4", "AS9601"])
 
   - title: Compare membership across groups
     call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], summary=True)
     response: |
-      {"total_matching": 22, "total_genes": 13, "by_group": [{"group_id": "eggnog:COG0592@2", "count": 13}, {"group_id": "cyanorak:CK_00000570", "count": 9}], "returned": 0, "truncated": true, "results": []}
+      {"total_matching": 22, "total_genes": 22, "total_categories": 2, "genes_per_group_max": 13, "genes_per_group_median": 11.0, "top_groups": [{"group_id": "eggnog:COG0592@2", "count": 13}, {"group_id": "cyanorak:CK_00000570", "count": 9}], "returned": 0, "truncated": true, "results": []}
 
   - title: From text search to member genes
     steps: |
@@ -42,6 +42,7 @@ chaining:
 mistakes:
   - "group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570', not 'CK_00000570')"
   - "A gene in multiple input groups appears once per group — rows are gene × group, not distinct genes. Use total_genes for the deduplicated count."
+  - "organisms is a list, not a string — use ['MED4'] not 'MED4'"
   - wrong: "genes_by_homolog_group(group_ids=['photosystem'])  # passing text, not IDs"
     right: "search_homolog_groups(search_text='photosystem')  # search first, then use IDs"
   - wrong: "len(results)  # actual count"

@@ -31,8 +31,6 @@ Mirrors `genes_by_ontology` in the ontology triplet.
   `search_homolog_groups`, see which organisms have members
 - **Batch group lookup** — pass multiple group IDs, use `by_group`
   summary to compare member counts
-- **Chain:** `search_homolog_groups` → `genes_by_homolog_group` →
-  `differential_expression_by_gene`
 
 ## KG dependencies
 
@@ -44,7 +42,6 @@ Mirrors `genes_by_ontology` in the ontology triplet.
   `member_count`, `organism_count`, `description`,
   `functional_description`, `genera`, `has_cross_genus_members`
 - `Gene_in_ortholog_group` edges (Gene → OrthologGroup)
-
 All properties verified present in live KG (2026-03-26).
 
 ---
@@ -62,9 +59,9 @@ async def genes_by_homolog_group(
         description="Ortholog group IDs (from search_homolog_groups or gene_homologs). "
         "E.g. ['cyanorak:CK_00000570', 'eggnog:COG0592@2'].",
     )],
-    organism: Annotated[str | None, Field(
-        description="Filter by organism (case-insensitive substring). "
-        "E.g. 'MED4', 'Alteromonas'. "
+    organisms: Annotated[list[str] | None, Field(
+        description="Filter by organisms (case-insensitive substring, each entry "
+        "matched independently). E.g. ['MED4', 'AS9601']. "
         "Use list_organisms to see valid values.",
     )] = None,
     summary: Annotated[bool, Field(
@@ -72,7 +69,7 @@ async def genes_by_homolog_group(
     )] = False,
     verbose: Annotated[bool, Field(
         description="Include gene_summary, function_description, and "
-        "group context (consensus_product, source, taxonomic_level).",
+        "group context (consensus_product, source).",
     )] = False,
     limit: Annotated[int, Field(
         description="Max results.", ge=1,
@@ -84,8 +81,14 @@ async def genes_by_homolog_group(
     returns member genes per organism. One row per gene × group (a gene
     in multiple input groups appears once per group).
 
+    Two list filters — each reports not_found (doesn't exist in KG) +
+    not_matched (exists, zero results after other filters):
+    - group_ids: ortholog groups (required)
+    - organisms: restrict to specific organisms
+
     For group discovery by text, use search_homolog_groups first.
     For gene → group direction, use gene_homologs.
+    For expression by ortholog groups, use differential_expression_by_ortholog.
     """
 ```
 
@@ -95,34 +98,21 @@ async def genes_by_homolog_group(
 {
     "total_matching": 33,         # gene×group rows matching filters
     "total_genes": 30,            # distinct genes (a gene in 2 groups counted once)
+    "total_categories": 12,       # distinct gene categories
+    "genes_per_group_max": 13,    # largest group's gene count
+    "genes_per_group_median": 3.0,# median gene count across groups
     "by_organism": [{"organism": "Prochlorococcus MED4", "count": 2}, ...],
-    "by_category": [{"category": "Photosynthesis", "count": 9}, ...],
-    "by_group": [{"group_id": "eggnog:COG0592@2", "count": 13}, ...],
-    "not_found": [],              # input group_ids not in KG
+    "top_categories": [{"category": "Photosynthesis", "count": 9}, ...],  # top 5
+    "top_groups": [{"group_id": "eggnog:COG0592@2", "count": 13}, ...],   # top 5
+    "not_found_groups": [],       # group_ids with no OrthologGroup node
+    "not_matched_groups": [],     # groups exist but 0 members after organism filter
+    "not_found_organisms": [],    # organisms matching no Gene nodes in KG
+    "not_matched_organisms": [],  # organisms exist but 0 genes in these groups
     "returned": 5,
     "truncated": true,
     "results": [...]
 }
 ```
-
-**Per-result columns (compact — 5):**
-`locus_tag`, `gene_name`, `product`, `organism_strain`, `gene_category`
-
-**Verbose adds (5):**
-`gene_summary`, `function_description`, `group_id`, `consensus_product`,
-`source`
-
-**Design note — `group_id` in results:** In compact mode, all results
-for a single `group_ids` call share the same group context. When
-multiple group IDs are passed, `group_id` moves to compact mode to
-disambiguate. However, the common case is single-group lookup, so
-keeping `group_id` in verbose avoids redundancy. The `by_group`
-summary always shows per-group counts regardless.
-
-**Revised:** `group_id` is always in compact results — it's the
-entity × dimension key (gene × group). Without it, rows from
-multi-group queries are ambiguous. This matches `genes_by_ontology`
-where `matched_terms` tracks the term dimension.
 
 **Per-result columns (compact — 6):**
 `locus_tag`, `gene_name`, `product`, `organism_strain`,
@@ -142,20 +132,35 @@ batch input of multiple group IDs can produce large results.
 |---|---|---|
 | `total_matching` | int | Gene×group rows matching all filters |
 | `total_genes` | int | Distinct genes (a gene in 2 input groups counted once) |
-| `by_organism` | list[dict] | `[{organism, count}]` sorted by count desc |
-| `by_category` | list[dict] | `[{category, count}]` sorted by count desc |
-| `by_group` | list[dict] | `[{group_id, count}]` sorted by count desc |
+| `total_categories` | int | Distinct gene categories |
+| `genes_per_group_max` | int | Largest group's gene count |
+| `genes_per_group_median` | float | Median gene count across groups |
+| `by_organism` | list[dict] | `[{organism, count}]` sorted by count desc (all) |
+| `top_categories` | list[dict] | `[{category, count}]` sorted by count desc (top 5) |
+| `top_groups` | list[dict] | `[{group_id, count}]` sorted by count desc (top 5) |
 
-### Batch handling
+### Batch handling — per-filter not_found + not_matched
+
+Each list filter gets **two** diagnostic lists:
+
+- **not_found** — input value doesn't exist in the KG at all
+- **not_matched** — exists in KG but contributed zero rows after other filters
 
 | Field | Type | Description |
 |---|---|---|
-| `not_found` | list[str] | Input group_ids not in KG. Empty when all matched. |
+| `not_found_groups` | list[str] | Input `group_ids` with no OrthologGroup node in KG. |
+| `not_matched_groups` | list[str] | Groups that exist but have zero member genes after organism filter. |
+| `not_found_organisms` | list[str] | Input `organisms` entries matching zero Gene nodes in KG (bad name). |
+| `not_matched_organisms` | list[str] | Organisms that exist in KG but have zero genes in the requested groups. |
 
-No `no_members` field (unlike `gene_homologs`'s `no_groups`): an
-OrthologGroup without members shouldn't exist in the KG. If it does,
-it just returns 0 rows for that group — `by_group` won't list it,
-and the user can infer from comparing input vs `by_group`.
+**Semantics:**
+- not_found is absolute — checked against KG independently of other
+  filters. "This ID doesn't exist."
+- not_matched is contextual — depends on the intersection of filters.
+  "This exists, but nothing matched given the other inputs."
+- An input appears in at most one of {not_found, not_matched} — never
+  both (not_found takes precedence).
+- When a filter is None, both its lists are empty `[]`.
 
 ### Detail mode
 
@@ -175,8 +180,10 @@ and the user can infer from comparing input vs `by_group`.
 ### Zero-match behavior
 
 When `total_matching=0`: all summary fields present, counts are 0,
-`total_genes=0`, breakdowns are empty lists, `results=[]`,
-`returned=0`, `truncated=False`. `not_found` lists all input group_ids.
+`total_genes=0`, `total_categories=0`, `genes_per_group_max=0`,
+`genes_per_group_median=0`, breakdowns are empty lists,
+`results=[]`, `returned=0`, `truncated=False`. Each input value
+appears in either its not_found or not_matched list.
 
 **Sort key:** `group_id ASC, organism_strain ASC, locus_tag ASC`
 
@@ -194,43 +201,93 @@ When `total_matching=0`: all summary fields present, counts are 0,
 def build_genes_by_homolog_group_summary(
     *,
     group_ids: list[str],
-    organism: str | None = None,
+    organisms: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for genes_by_homolog_group.
 
-    RETURN keys: total_matching, total_genes, by_organism, by_category,
-    by_group, not_found.
+    RETURN keys: total_matching, total_genes, total_categories,
+    genes_per_group_max, genes_per_group_median,
+    by_organism, top_categories, top_groups,
+    not_found_groups, not_matched_groups.
     """
 ```
 
-**Verified Cypher:**
+**Cypher (sketch — needs live verification):**
 
 ```cypher
+// Phase 1: find groups + member genes (with organism filter)
 UNWIND $group_ids AS gid
 OPTIONAL MATCH (og:OrthologGroup {id: gid})
 OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og)
-WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')
-       WHERE toLower(g.organism_strain) CONTAINS word))
-WITH gid, og, g
-WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS not_found_raw,
+WHERE ($organisms IS NULL OR ANY(org_input IN $organisms
+       WHERE ALL(word IN split(toLower(org_input), ' ')
+             WHERE toLower(g.organism_strain) CONTAINS word)))
+// Phase 2: collect not_found, not_matched, aggregates
+WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS nf_groups_raw,
+     collect(DISTINCT CASE WHEN og IS NOT NULL AND g IS NULL THEN gid END) AS nm_groups_raw,
      collect(CASE WHEN g IS NOT NULL THEN
        {lt: g.locus_tag, org: g.organism_strain,
         cat: coalesce(g.gene_category, 'Unknown'), gid: gid} END) AS rows
-WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found, rows
-WITH not_found,
+WITH [x IN nf_groups_raw WHERE x IS NOT NULL] AS not_found_groups,
+     [x IN nm_groups_raw WHERE x IS NOT NULL] AS not_matched_groups,
+     rows
+WITH not_found_groups, not_matched_groups,
      size(rows) AS total_matching,
      size(apoc.coll.toSet([r IN rows | r.lt])) AS total_genes,
+     size(apoc.coll.toSet([r IN rows | r.cat])) AS total_categories,
      apoc.coll.frequencies([r IN rows | r.org]) AS by_organism,
-     apoc.coll.frequencies([r IN rows | r.cat]) AS by_category,
-     apoc.coll.frequencies([r IN rows | r.gid]) AS by_group
-RETURN total_matching, total_genes, not_found, by_organism, by_category, by_group
+     apoc.coll.frequencies([r IN rows | r.cat]) AS by_category_raw,
+     apoc.coll.frequencies([r IN rows | r.gid]) AS by_group_raw
+RETURN total_matching, total_genes, total_categories,
+       not_found_groups, not_matched_groups,
+       by_organism, by_category_raw, by_group_raw
+// API layer: sorts by count desc, caps top_categories/top_groups to 5,
+// computes genes_per_group_max/median from by_group_raw counts
 ```
 
-**Verified against live KG (2026-03-26):**
-- 3 group_ids → total_matching=33, by_group counts match detail ✓
-- With organism="MED4" → total_matching=2 ✓
-- With 1 fake group_id → not_found=['FAKE_GROUP_999'] ✓
-- All fake group_ids → total_matching=0, not_found=[all] ✓
+### `build_genes_by_homolog_group_diagnostics`
+
+Separate lightweight query for organism not_found vs not_matched.
+
+```python
+def build_genes_by_homolog_group_diagnostics(
+    *,
+    group_ids: list[str],
+    organisms: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Validate organisms against KG + result set.
+
+    RETURN keys: not_found_organisms, not_matched_organisms.
+    Returns empty lists when organisms is None.
+    """
+```
+
+**Cypher (sketch):**
+
+```cypher
+WITH $organisms AS org_inputs
+UNWIND CASE WHEN org_inputs IS NULL THEN [null]
+       ELSE org_inputs END AS org_input
+// Check existence in KG (any Gene node matching this organism)
+OPTIONAL MATCH (g_any:Gene)
+WHERE org_input IS NOT NULL
+  AND ALL(word IN split(toLower(org_input), ' ')
+          WHERE toLower(g_any.organism_strain) CONTAINS word)
+WITH org_input, count(g_any) AS kg_count
+// For those that exist, check if they match any group member
+OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup)
+WHERE org_input IS NOT NULL AND kg_count > 0
+  AND og.id IN $group_ids
+  AND ALL(word IN split(toLower(org_input), ' ')
+          WHERE toLower(g.organism_strain) CONTAINS word)
+WITH org_input, kg_count, count(g) AS matched_count
+WITH collect(CASE WHEN org_input IS NOT NULL AND kg_count = 0
+             THEN org_input END) AS nf_raw,
+     collect(CASE WHEN org_input IS NOT NULL AND kg_count > 0
+                   AND matched_count = 0 THEN org_input END) AS nm_raw
+RETURN [x IN nf_raw WHERE x IS NOT NULL] AS not_found_organisms,
+       [x IN nm_raw WHERE x IS NOT NULL] AS not_matched_organisms
+```
 
 ### `build_genes_by_homolog_group`
 
@@ -238,7 +295,7 @@ RETURN total_matching, total_genes, not_found, by_organism, by_category, by_grou
 def build_genes_by_homolog_group(
     *,
     group_ids: list[str],
-    organism: str | None = None,
+    organisms: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
 ) -> tuple[str, dict]:
@@ -251,13 +308,14 @@ def build_genes_by_homolog_group(
     """
 ```
 
-**Verified Cypher (compact):**
+**Cypher (compact):**
 
 ```cypher
 UNWIND $group_ids AS gid
 MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup {id: gid})
-WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')
-       WHERE toLower(g.organism_strain) CONTAINS word))
+WHERE ($organisms IS NULL OR ANY(org_input IN $organisms
+       WHERE ALL(word IN split(toLower(org_input), ' ')
+             WHERE toLower(g.organism_strain) CONTAINS word)))
 RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,
        g.product AS product, g.organism_strain AS organism_strain,
        g.gene_category AS gene_category, og.id AS group_id
@@ -275,13 +333,12 @@ LIMIT $limit  -- when limit is not None
 ```
 
 **Design notes:**
-- No shared WHERE helper needed (unlike `gene_homologs` which filters
-  on OG properties). This tool filters on organism only — the
-  `group_ids` are exact-match via `{id: gid}`.
+- `organisms` list uses OR semantics: a gene matches if it belongs to
+  ANY of the listed organisms. Cross-organism is the point.
 - `UNWIND $group_ids AS gid` + `MATCH ... {id: gid}` handles batch
   naturally — Neo4j uses the index on `OrthologGroup.id`.
 - Detail query only returns matched groups (MATCH, not OPTIONAL MATCH)
-  — `not_found` comes from the summary query.
+  — `not_found_groups` comes from the summary query.
 
 ---
 
@@ -292,7 +349,7 @@ LIMIT $limit  -- when limit is not None
 ```python
 def genes_by_homolog_group(
     group_ids: list[str],
-    organism: str | None = None,
+    organisms: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -301,12 +358,12 @@ def genes_by_homolog_group(
 ) -> dict:
     """Find member genes of ortholog groups.
 
-    Returns dict with keys: total_matching, total_genes, by_organism,
-    by_category, by_group, not_found, returned, truncated, results.
-    Per result (compact): locus_tag, gene_name, product,
-    organism_strain, gene_category, group_id.
-    Per result (verbose): adds gene_summary, function_description,
-    consensus_product, source.
+    Returns dict with keys: total_matching, total_genes,
+    total_categories, genes_per_group_max, genes_per_group_median,
+    by_organism, top_categories, top_groups,
+    not_found_groups, not_matched_groups,
+    not_found_organisms, not_matched_organisms,
+    returned, truncated, results.
 
     summary=True: results=[], summary fields only.
 
@@ -316,12 +373,17 @@ def genes_by_homolog_group(
 ```
 
 **Notes:**
-- 2-query pattern: summary always runs, detail skipped when `limit=0`
-- No Lucene search, no retry logic needed
-- Validates `group_ids` non-empty (raises `ValueError`)
-- `_apoc_freq_to_dict` to reshape by_organism/by_category/by_group
-  from apoc `{item, count}` format to domain keys
-- Organism filter passed to both summary and detail builders
+- 3-query pattern: summary + diagnostics + detail (skip when `limit=0`)
+- Summary query: `not_found_groups`, `not_matched_groups`, all
+  breakdowns. Returns `by_category_raw` and `by_group_raw` as full
+  frequency lists; API layer sorts desc, caps to top 5 for
+  `top_categories`/`top_groups`, and computes
+  `genes_per_group_max`/`genes_per_group_median` from `by_group_raw`
+  counts
+- Diagnostics query: `not_found_organisms`, `not_matched_organisms`
+  (skipped when `organisms is None`)
+- Detail query: skipped when `limit=0`
+- `_rename_freq` to reshape `{item, count}` → domain keys
 
 ---
 
@@ -337,7 +399,7 @@ class GenesByHomologGroupResult(BaseModel):
     gene_name: str | None = Field(default=None,
         description="Gene name (e.g. 'psbB')")
     product: str | None = Field(default=None,
-        description="Gene product (e.g. 'photosystem II chlorophyll-binding protein CP47')")
+        description="Gene product")
     organism_strain: str = Field(
         description="Organism (e.g. 'Prochlorococcus MED4')")
     gene_category: str | None = Field(default=None,
@@ -350,110 +412,38 @@ class GenesByHomologGroupResult(BaseModel):
     function_description: str | None = Field(default=None,
         description="Curated functional description")
     consensus_product: str | None = Field(default=None,
-        description="Group consensus product (e.g. 'photosystem II chlorophyll-binding protein CP47')")
+        description="Group consensus product")
     source: str | None = Field(default=None,
         description="OG source (e.g. 'cyanorak')")
 
 class HomologGroupOrganismBreakdown(BaseModel):
-    organism: str = Field(
-        description="Organism strain (e.g. 'Prochlorococcus MED4')")
-    count: int = Field(description="Member genes from this organism")
+    organism: str
+    count: int
 
 class HomologGroupCategoryBreakdown(BaseModel):
-    category: str = Field(
-        description="Gene category (e.g. 'Photosynthesis')")
-    count: int = Field(description="Member genes in this category")
+    category: str
+    count: int
 
 class HomologGroupGroupBreakdown(BaseModel):
-    group_id: str = Field(
-        description="Ortholog group ID (e.g. 'cyanorak:CK_00000570')")
-    count: int = Field(description="Member genes in this group")
+    group_id: str
+    count: int
 
 class GenesByHomologGroupResponse(BaseModel):
-    total_matching: int = Field(
-        description="Gene×group rows matching filters (e.g. 33)")
-    total_genes: int = Field(
-        description="Distinct genes (a gene in 2 input groups counted once, e.g. 30)")
-    by_organism: list[HomologGroupOrganismBreakdown] = Field(
-        description="Member counts per organism, sorted by count desc")
-    by_category: list[HomologGroupCategoryBreakdown] = Field(
-        description="Member counts per gene category, sorted by count desc")
-    by_group: list[HomologGroupGroupBreakdown] = Field(
-        description="Member counts per input group, sorted by count desc")
-    not_found: list[str] = Field(default_factory=list,
-        description="Input group_ids not found in KG")
-    returned: int = Field(description="Results in this response")
-    truncated: bool = Field(
-        description="True if total_matching > returned")
-    results: list[GenesByHomologGroupResult] = Field(
-        default_factory=list, description="One row per gene × group")
-```
-
-### Wrapper
-
-```python
-@mcp.tool(
-    tags={"genes", "homology"},
-    annotations={"readOnlyHint": True},
-)
-async def genes_by_homolog_group(
-    ctx: Context,
-    group_ids: Annotated[list[str], Field(
-        description="Ortholog group IDs (from search_homolog_groups or "
-        "gene_homologs). E.g. ['cyanorak:CK_00000570'].",
-    )],
-    organism: Annotated[str | None, Field(
-        description="Filter by organism (case-insensitive substring). "
-        "E.g. 'MED4', 'Alteromonas'. "
-        "Use list_organisms to see valid values.",
-    )] = None,
-    summary: Annotated[bool, Field(
-        description="When true, return only summary fields (results=[]).",
-    )] = False,
-    verbose: Annotated[bool, Field(
-        description="Include gene_summary, function_description, "
-        "consensus_product, source in results.",
-    )] = False,
-    limit: Annotated[int, Field(
-        description="Max results.", ge=1,
-    )] = 5,
-) -> GenesByHomologGroupResponse:
-    """Find member genes of ortholog groups.
-
-    Takes group IDs from search_homolog_groups or gene_homologs and
-    returns member genes per organism. One row per gene × group.
-
-    For group discovery by text, use search_homolog_groups first.
-    For gene → group direction, use gene_homologs.
-    """
-    await ctx.info(f"genes_by_homolog_group group_ids={group_ids} organism={organism}")
-    try:
-        conn = _conn(ctx)
-        data = api.genes_by_homolog_group(
-            group_ids, organism=organism,
-            summary=summary, verbose=verbose, limit=limit, conn=conn,
-        )
-        by_organism = [HomologGroupOrganismBreakdown(**b) for b in data["by_organism"]]
-        by_category = [HomologGroupCategoryBreakdown(**b) for b in data["by_category"]]
-        by_group = [HomologGroupGroupBreakdown(**b) for b in data["by_group"]]
-        results = [GenesByHomologGroupResult(**r) for r in data["results"]]
-        return GenesByHomologGroupResponse(
-            total_matching=data["total_matching"],
-            total_genes=data["total_genes"],
-            by_organism=by_organism,
-            by_category=by_category,
-            by_group=by_group,
-            not_found=data["not_found"],
-            returned=data["returned"],
-            truncated=data["truncated"],
-            results=results,
-        )
-    except ValueError as e:
-        await ctx.warning(f"genes_by_homolog_group error: {e}")
-        raise ToolError(str(e))
-    except Exception as e:
-        await ctx.error(f"genes_by_homolog_group unexpected error: {e}")
-        raise ToolError(f"Error in genes_by_homolog_group: {e}")
+    total_matching: int
+    total_genes: int
+    total_categories: int
+    genes_per_group_max: int
+    genes_per_group_median: float
+    by_organism: list[HomologGroupOrganismBreakdown]
+    top_categories: list[HomologGroupCategoryBreakdown]
+    top_groups: list[HomologGroupGroupBreakdown]
+    not_found_groups: list[str] = Field(default_factory=list)
+    not_matched_groups: list[str] = Field(default_factory=list)
+    not_found_organisms: list[str] = Field(default_factory=list)
+    not_matched_organisms: list[str] = Field(default_factory=list)
+    returned: int
+    truncated: bool
+    results: list[GenesByHomologGroupResult] = Field(default_factory=list)
 ```
 
 ---
@@ -466,7 +456,7 @@ async def genes_by_homolog_group(
 class TestBuildGenesByHomologGroup:
     test_single_group_id
     test_multiple_group_ids
-    test_organism_filter_clause
+    test_organisms_filter_clause
     test_returns_expected_columns
     test_verbose_columns
     test_order_by
@@ -474,9 +464,15 @@ class TestBuildGenesByHomologGroup:
     test_limit_none
 
 class TestBuildGenesByHomologGroupSummary:
-    test_returns_summary_keys
-    test_organism_filter
-    test_not_found_detection
+    test_returns_summary_keys  # total_matching, total_genes, total_categories, etc.
+    test_organisms_filter
+    test_not_found_groups_detection
+    test_not_matched_groups_detection
+    test_top_categories_and_top_groups_in_return
+
+class TestBuildGenesByHomologGroupDiagnostics:
+    test_organisms_none_returns_empty
+    test_organisms_not_found_vs_not_matched
 ```
 
 ### Unit: API function (`test_api_functions.py`)
@@ -484,11 +480,16 @@ class TestBuildGenesByHomologGroupSummary:
 ```
 class TestGenesByHomologGroup:
     test_returns_dict
-    test_passes_params (group_ids, organism, verbose, limit)
+    test_passes_params (group_ids, organisms, verbose, limit)
     test_summary_sets_limit_zero
     test_creates_conn_when_none
     test_empty_group_ids_raises
     test_importable_from_package
+    test_not_found_and_not_matched_fields
+    test_top_categories_capped_at_5
+    test_top_groups_capped_at_5
+    test_genes_per_group_stats
+    test_total_categories_count
 ```
 
 ### Unit: MCP wrapper (`test_tool_wrappers.py`)
@@ -497,9 +498,12 @@ class TestGenesByHomologGroup:
 class TestGenesByHomologGroupWrapper:
     test_returns_dict_envelope
     test_empty_results
-    test_params_forwarded (group_ids, organism, summary, verbose, limit)
+    test_params_forwarded (group_ids, organisms, summary, verbose, limit)
     test_truncation_metadata
-    test_not_found
+    test_not_found_groups
+    test_not_matched_groups
+    test_not_found_organisms
+    test_not_matched_organisms
 
 Update EXPECTED_TOOLS to include "genes_by_homolog_group".
 ```
@@ -509,10 +513,23 @@ Update EXPECTED_TOOLS to include "genes_by_homolog_group".
 Against live KG:
 - Single group_id → expected member count
 - Multiple group_ids → results from all groups
-- Organism filter reduces results
-- Not-found group_id → appears in not_found
+- Organisms filter reduces results
+- Fake group_id → appears in not_found_groups
+- Real group with organism filter excluding all members → not_matched_groups
+- Fake organism → appears in not_found_organisms
+- Real organism not in these groups → not_matched_organisms
 - Each result has expected compact columns
 - Summary total_matching == detail count
+- top_categories and top_groups capped at 5
+- genes_per_group_max/median values are correct
+
+### Integration (`test_api_contract.py`)
+
+Update `TestGenesByHomologGroupContract` — return shape changed:
+- New keys: `total_categories`, `genes_per_group_max`,
+  `genes_per_group_median`
+- Renamed keys: `by_category` → `top_categories`,
+  `by_group` → `top_groups`
 
 ### Regression (`test_regression.py`)
 
@@ -525,6 +542,13 @@ Add baseline fixtures:
 - `genes_by_homolog_group_basic.yml` (single group)
 - `genes_by_homolog_group_organism_filter.yml`
 - `genes_by_homolog_group_verbose.yml`
+
+### Eval (`test_eval.py`)
+
+Add to `TOOL_BUILDERS`:
+```python
+"genes_by_homolog_group": build_genes_by_homolog_group,
+```
 
 ### Eval cases (`cases.yaml`)
 
@@ -540,10 +564,10 @@ Add baseline fixtures:
 
 - id: genes_by_homolog_group_organism_filter
   tool: genes_by_homolog_group
-  desc: Group members filtered by organism
+  desc: Group members filtered by organisms
   params:
     group_ids: ["cyanorak:CK_00000570"]
-    organism: "MED4"
+    organisms: ["MED4"]
   expect:
     min_rows: 1
     columns: [locus_tag, organism_strain, group_id]
@@ -560,7 +584,132 @@ Add baseline fixtures:
 
 ---
 
+## Comparison: genes_by_homolog_group vs differential_expression_by_gene
+
+### Inputs
+
+| Parameter | genes_by_homolog_group | differential_expression_by_gene |
+|---|---|---|
+| Primary input | `group_ids: list[str]` (required) | At least one of organism/locus_tags/experiment_ids |
+| Organism filter | `organisms: list[str]\|None` — multi-select, OR semantics, cross-organism OK | `organism: str\|None` — single fuzzy string, enforces single organism |
+| Gene filter | — (genes come from group membership) | `locus_tags: list[str]\|None` — direct gene input |
+| Experiment filter | — | `experiment_ids: list[str]\|None` |
+| Expression filters | — | `direction: up\|down\|None`, `significant_only: bool` |
+| summary/verbose/limit | Same pattern | Same pattern |
+
+### Summary fields
+
+| Field | genes_by_homolog_group | differential_expression_by_gene |
+|---|---|---|
+| Row count | `total_matching` (gene×group rows) | `total_rows` (gene×experiment×timepoint rows) |
+| Gene count | `total_genes` (distinct genes) | `matching_genes` (distinct genes) |
+| Category count | `total_categories` (distinct) | — |
+| Group size stats | `genes_per_group_max`, `genes_per_group_median` | — |
+| Organism breakdown | `by_organism` [{organism, count}] (all) | — (single organism) |
+| Category breakdown | `top_categories` [{category, count}] (top 5) | `top_categories` (top 5) |
+| Primary dimension | `top_groups` [{group_id, count}] (top 5) | `experiments` (nested per-experiment) |
+| Expression signal | — | `rows_by_status` {sig_up, sig_down, not_sig} |
+| not_found | `not_found_groups`, `not_found_organisms` | `not_found` (locus_tags only) |
+| not_matched | `not_matched_groups`, `not_matched_organisms` | `no_expression` (genes with 0 edges) |
+
+### Detail result columns
+
+| Column | genes_by_homolog_group | differential_expression_by_gene |
+|---|---|---|
+| Gene identity | `locus_tag`, `gene_name` | `locus_tag`, `gene_name` |
+| Gene annotation | `product`, `gene_category` | — (compact), `product`, `gene_category` (verbose) |
+| Organism | `organism_strain` | — (single organism in header) |
+| Primary dimension | `group_id` | `experiment_id`, `treatment_type` |
+| Expression data | — | `timepoint`, `log2fc`, `padj`, `rank`, `expression_status` |
+| Sort key | group_id ASC, organism ASC, locus_tag ASC | \|log2FC\| DESC |
+
+---
+
+## Comparison: homolog tool triplet
+
+### Input parameters
+
+| Parameter | search_homolog_groups | genes_by_homolog_group | gene_homologs |
+|---|---|---|---|
+| Primary input | `search_text: str` | `group_ids: list[str]` | `locus_tags: list[str]` |
+| Direction | Text → groups | Groups → genes | Genes → groups |
+| Organism filter | — | `organisms: list[str]\|None` | — |
+| Source filter | `source: str\|None` | — | `source: str\|None` |
+| Level filter | `taxonomic_level: str\|None` | — | `taxonomic_level: str\|None` |
+| Rank filter | `max_specificity_rank: int\|None` | — | `max_specificity_rank: int\|None` |
+| summary/verbose/limit | ✓ | ✓ | ✓ |
+
+### Summary fields
+
+| Field | search_homolog_groups | genes_by_homolog_group | gene_homologs |
+|---|---|---|---|
+| Row count | `total_matching` (groups) | `total_matching` (gene×group) | `total_matching` (gene×group) |
+| Entity count | `total_entries` (all OGs) | `total_genes` (distinct genes) | — |
+| Category count | — | `total_categories` (distinct) | — |
+| Group size stats | — | `genes_per_group_max`, `genes_per_group_median` | — |
+| by_organism | — | ✓ [{organism, count}] (all) | ✓ [{organism, count}] |
+| top_categories | — | ✓ [{category, count}] (top 5) | — |
+| top_groups | — | ✓ [{group_id, count}] (top 5) | — |
+| by_source | ✓ [{source, count}] | — | ✓ [{source, count}] |
+| by_level | ✓ [{taxonomic_level, count}] | — | — |
+| Score stats | `score_max`, `score_median` | — | — |
+| not_found | — | `not_found_{groups,organisms}` | `not_found` (locus_tags) |
+| not_matched | — | `not_matched_{groups,organisms}` | `no_groups` (genes with 0 OGs) |
+
+### Compact result columns
+
+| Column | search_homolog_groups | genes_by_homolog_group | gene_homologs |
+|---|---|---|---|
+| Gene identity | — | `locus_tag`, `gene_name` | `locus_tag`, `organism_strain` |
+| Gene annotation | — | `product`, `organism_strain`, `gene_category` | — |
+| Group identity | `group_id`, `group_name` | `group_id` | `group_id` |
+| Group annotation | `consensus_gene_name`, `consensus_product` | — | `consensus_gene_name`, `consensus_product` |
+| Group metadata | `source`, `taxonomic_level`, `specificity_rank` | — | `taxonomic_level`, `source`, `specificity_rank` |
+| Group size | `member_count`, `organism_count` | — | — |
+| Search score | `score` | — | — |
+
+### Chaining flow
+
+```
+search_homolog_groups(text)  →  group_ids
+                                    ↓
+                         genes_by_homolog_group(group_ids)  →  locus_tags
+                                    ↓                              ↓
+                    differential_expression_by_ortholog          gene_overview
+
+gene_homologs(locus_tags)  →  group_ids  →  genes_by_homolog_group
+```
+
+---
+
+## KG verification (2026-03-26)
+
+Verified against live KG:
+- Organism list filter (OR semantics): `["MED4", "AS9601"]` → 2 genes ✓
+- not_found_groups: `["FAKE_GROUP"]` detected ✓
+- not_found_organisms: `["NONEXISTENT_ORG"]` detected (gene_count=0) ✓
+- by_expression for CK_00000570: 5 has_data, 4 no_data (9 total) ✓
+- Full summary with organism filter + not_found_groups: works ✓
+
+---
+
 ## About Content
+
+Auto-generated from Pydantic models + input YAML. Served via MCP
+resource at `docs://tools/genes_by_homolog_group`.
+
+### Build
+
+```bash
+uv run python scripts/build_about_content.py genes_by_homolog_group
+```
+
+### Verify
+
+```bash
+pytest tests/unit/test_about_content.py -v
+pytest tests/integration/test_about_examples.py -v
+```
 
 ### Input YAML
 
@@ -572,45 +721,34 @@ examples:
     call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
     response: |
       {
-        "total_matching": 9,
+        "total_matching": 9, "total_genes": 9,
+        "total_categories": 1,
+        "genes_per_group_max": 9, "genes_per_group_median": 9.0,
         "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1}, ...],
-        "by_category": [{"category": "Photosynthesis", "count": 9}],
-        "by_group": [{"group_id": "cyanorak:CK_00000570", "count": 9}],
-        "not_found": [],
+        "top_categories": [{"category": "Photosynthesis", "count": 9}],
+        "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 9}],
+        "not_found_groups": [], "not_matched_groups": [],
+        "not_found_organisms": [], "not_matched_organisms": [],
         "returned": 5, "truncated": true,
-        "results": [
-          {"locus_tag": "A9601_03391", "gene_name": "psbB",
-           "product": "photosystem II chlorophyll-binding protein CP47",
-           "organism_strain": "Prochlorococcus AS9601",
-           "gene_category": "Photosynthesis",
-           "group_id": "cyanorak:CK_00000570"},
-          ...
-        ]
+        "results": [...]
       }
 
-  - title: Filter to one organism
-    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"], organism="MED4")
+  - title: Filter to specific organisms
+    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"], organisms=["MED4", "AS9601"])
 
-  - title: From text search to member genes
+  - title: From text search to expression by ortholog
     steps: |
       Step 1: search_homolog_groups(search_text="photosystem II")
-              → collect group_ids from results (e.g. "cyanorak:CK_00000570")
+              → collect group_ids
 
-      Step 2: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
-              → find member genes per organism
+      Step 2: genes_by_homolog_group(group_ids=[...])
+              → see members per organism
 
-      Step 3: gene_overview(locus_tags=["PMM0315", ...])
-              → check data availability for discovered genes
+      Step 3: differential_expression_by_ortholog(group_ids=[...], organisms=[...])
+              → expression data framed by ortholog group
 
-  - title: Compare membership across groups
-    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], summary=true)
-    response: |
-      {
-        "total_matching": 22,
-        "by_group": [{"group_id": "eggnog:COG0592@2", "count": 13},
-                     {"group_id": "cyanorak:CK_00000570", "count": 9}],
-        "returned": 0, "truncated": true, "results": []
-      }
+  - title: Compare membership across groups (summary only)
+    call: genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], summary=True)
 
 verbose_fields:
   - gene_summary
@@ -620,21 +758,16 @@ verbose_fields:
 
 chaining:
   - "search_homolog_groups → genes_by_homolog_group"
+  - "genes_by_homolog_group → differential_expression_by_ortholog"
   - "genes_by_homolog_group → gene_overview"
-  - "genes_by_homolog_group → differential_expression_by_gene"
   - "gene_homologs → genes_by_homolog_group"
 
 mistakes:
   - "group_ids must be full IDs with prefix (e.g. 'cyanorak:CK_00000570', not 'CK_00000570')"
-  - "A gene in multiple input groups appears once per group — rows are gene × group, not distinct genes"
+  - "A gene in multiple input groups appears once per group — rows are gene × group, not distinct genes. Use total_genes for deduplicated count."
+  - "organisms is a list, not a string — use ['MED4'] not 'MED4'"
   - wrong: "genes_by_homolog_group(group_ids=['photosystem'])  # passing text, not IDs"
     right: "search_homolog_groups(search_text='photosystem')  # search first, then use IDs"
-```
-
-### Build
-
-```bash
-uv run python scripts/build_about_content.py genes_by_homolog_group
 ```
 
 ---
@@ -643,28 +776,28 @@ uv run python scripts/build_about_content.py genes_by_homolog_group
 
 | Step | Layer | File | What |
 |------|-------|------|------|
-| 1 | Query builder | `kg/queries_lib.py` | `build_genes_by_homolog_group()` + `build_genes_by_homolog_group_summary()` |
+| 1 | Query builder | `kg/queries_lib.py` | `build_genes_by_homolog_group()` + `build_genes_by_homolog_group_summary()` + `build_genes_by_homolog_group_diagnostics()` |
 | 2 | API function | `api/functions.py` | `genes_by_homolog_group()` |
 | 3 | Exports | `api/__init__.py`, `multiomics_explorer/__init__.py` | Add to `__all__` |
 | 4 | MCP wrapper | `mcp_server/tools.py` | Pydantic models + wrapper |
-| 5 | Unit tests | `tests/unit/test_query_builders.py` | `TestBuildGenesByHomologGroup` + `TestBuildGenesByHomologGroupSummary` |
-| 6 | Unit tests | `tests/unit/test_api_functions.py` | `TestGenesByHomologGroup` |
-| 7 | Unit tests | `tests/unit/test_tool_wrappers.py` | `TestGenesByHomologGroupWrapper` + update EXPECTED_TOOLS |
-| 8 | Unit tests | `tests/unit/test_tool_correctness.py` | Add expected keys |
-| 9 | Regression | `tests/regression/test_regression.py` | Add to TOOL_BUILDERS + baselines |
-| 10 | Eval cases | `tests/evals/cases.yaml` | Add cases |
-| 11 | About content | `multiomics_explorer/inputs/tools/genes_by_homolog_group.yaml` | Input YAML → build |
-| 12 | Docs | `CLAUDE.md` | Add row to MCP Tools table |
-| 13 | Code review | — | Run code-review skill |
+| 5 | Unit tests | `tests/unit/test_query_builders.py` | Query builder tests |
+| 6 | Unit tests | `tests/unit/test_api_functions.py` | API function tests |
+| 7 | Unit tests | `tests/unit/test_tool_wrappers.py` | Wrapper tests + EXPECTED_TOOLS |
+| 8 | Unit tests | `tests/unit/test_tool_correctness.py` | Expected keys |
+| 9 | Integration | `tests/integration/test_api_contract.py` | Update return shape contract |
+| 10 | Regression | `tests/regression/test_regression.py` | TOOL_BUILDERS + baselines |
+| 11 | Eval | `tests/evals/test_eval.py` | TOOL_BUILDERS |
+| 12 | Eval cases | `tests/evals/cases.yaml` | Add cases |
+| 13 | About content | `inputs/tools/genes_by_homolog_group.yaml` | Input YAML → build + verify |
+| 14 | Docs | `CLAUDE.md` | Update tools table |
+| 15 | Code review | — | Run code-review skill |
 
 ---
 
 ## Documentation
 
-- `CLAUDE.md`: add `genes_by_homolog_group` row to MCP Tools table —
+- `CLAUDE.md`: update `genes_by_homolog_group` row —
   "Group IDs → member genes per organism. Summary fields (by_organism,
-  by_category, by_group). Filterable by organism."
-
-## Code Review
-
-Run code-review skill (full checklist) as final step.
+  top_categories, top_groups, total_categories,
+  genes_per_group_max/median). Batch tool with not_found/not_matched
+  for groups and organisms. Filterable by organism."

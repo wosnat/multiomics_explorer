@@ -29,6 +29,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
     build_genes_by_homolog_group,
+    build_genes_by_homolog_group_diagnostics,
     build_genes_by_homolog_group_summary,
     build_search_ontology,
     build_search_ontology_summary,
@@ -1774,16 +1775,16 @@ class TestBuildGenesByHomologGroup:
             group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"])
         assert len(params["group_ids"]) == 2
 
-    def test_organism_filter_clause(self):
+    def test_organisms_filter_clause(self):
         cypher, params = build_genes_by_homolog_group(
-            group_ids=["cyanorak:CK_1"], organism="MED4")
-        assert "$organism IS NULL" in cypher
-        assert params["organism"] == "MED4"
+            group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+        assert "$organisms IS NULL" in cypher
+        assert params["organisms"] == ["MED4"]
 
-    def test_no_organism_filter(self):
+    def test_no_organisms_filter(self):
         cypher, params = build_genes_by_homolog_group(
             group_ids=["cyanorak:CK_1"])
-        assert params["organism"] is None
+        assert params["organisms"] is None
 
     def test_returns_expected_columns(self):
         cypher, _ = build_genes_by_homolog_group(
@@ -1831,19 +1832,44 @@ class TestBuildGenesByHomologGroupSummary:
             group_ids=["cyanorak:CK_1"])
         assert "total_matching" in cypher
         assert "total_genes" in cypher
-        assert "not_found" in cypher
+        assert "total_categories" in cypher
+        assert "not_found_groups" in cypher
+        assert "not_matched_groups" in cypher
         assert "by_organism" in cypher
-        assert "by_category" in cypher
-        assert "by_group" in cypher
+        assert "by_category_raw" in cypher
+        assert "by_group_raw" in cypher
 
-    def test_organism_filter(self):
+    def test_organisms_filter(self):
         cypher, params = build_genes_by_homolog_group_summary(
-            group_ids=["cyanorak:CK_1"], organism="MED4")
-        assert "$organism IS NULL" in cypher
-        assert params["organism"] == "MED4"
+            group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+        assert "$organisms IS NULL" in cypher
+        assert params["organisms"] == ["MED4"]
 
-    def test_not_found_detection(self):
+    def test_not_found_groups_detection(self):
         cypher, _ = build_genes_by_homolog_group_summary(
             group_ids=["cyanorak:CK_1"])
         assert "OPTIONAL MATCH" in cypher
-        assert "not_found" in cypher
+        assert "not_found_groups" in cypher
+        assert "not_matched_groups" in cypher
+
+
+class TestBuildGenesByHomologGroupDiagnostics:
+    """Tests for build_genes_by_homolog_group_diagnostics."""
+
+    def test_returns_expected_keys(self):
+        cypher, _ = build_genes_by_homolog_group_diagnostics(
+            group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+        assert "not_found_organisms" in cypher
+        assert "not_matched_organisms" in cypher
+
+    def test_organisms_list_in_params(self):
+        cypher, params = build_genes_by_homolog_group_diagnostics(
+            group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+        assert params["organisms"] == ["MED4"]
+        assert params["group_ids"] == ["cyanorak:CK_1"]
+
+    def test_organisms_none_in_params(self):
+        cypher, params = build_genes_by_homolog_group_diagnostics(
+            group_ids=["cyanorak:CK_1"], organisms=None)
+        assert params["organisms"] is None
+        assert "not_found_organisms" in cypher

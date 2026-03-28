@@ -1058,10 +1058,10 @@
 
 - id: genes_by_homolog_group_organism_filter
   tool: genes_by_homolog_group
-  desc: Group members filtered by organism
+  desc: Group members filtered by organisms
   params:
     group_ids: ["cyanorak:CK_00000570"]
-    organism: "MED4"
+    organisms: ["MED4"]
   expect:
     min_rows: 1
     columns: [locus_tag, organism_strain, group_id]

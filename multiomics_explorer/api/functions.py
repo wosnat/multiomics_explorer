@@ -46,6 +46,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
     build_genes_by_homolog_group,
+    build_genes_by_homolog_group_diagnostics,
     build_genes_by_homolog_group_summary,
     build_search_ontology,
     build_search_ontology_summary,
@@ -908,7 +909,7 @@ def search_homolog_groups(
 
 def genes_by_homolog_group(
     group_ids: list[str],
-    organism: str | None = None,
+    organisms: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -917,8 +918,12 @@ def genes_by_homolog_group(
 ) -> dict:
     """Find member genes of ortholog groups.
 
-    Returns dict with keys: total_matching, total_genes, by_organism,
-    by_category, by_group, not_found, returned, truncated, results.
+    Returns dict with keys: total_matching, total_genes,
+    total_categories, genes_per_group_max, genes_per_group_median,
+    by_organism, top_categories, top_groups,
+    not_found_groups, not_matched_groups,
+    not_found_organisms, not_matched_organisms,
+    returned, truncated, results.
     Per result (compact): locus_tag, gene_name, product,
     organism_strain, gene_category, group_id.
     Per result (verbose): adds gene_summary, function_description,
@@ -938,7 +943,7 @@ def genes_by_homolog_group(
 
     # Summary query — always runs
     sum_cypher, sum_params = build_genes_by_homolog_group_summary(
-        group_ids=group_ids, organism=organism,
+        group_ids=group_ids, organisms=organisms,
     )
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
@@ -949,15 +954,36 @@ def genes_by_homolog_group(
             reverse=True,
         )
 
+    by_group_all = _rename_freq(raw_summary["by_group_raw"], "group_id")
+    group_counts = [g["count"] for g in by_group_all]
+
     total_matching = raw_summary["total_matching"]
     envelope = {
         "total_matching": total_matching,
         "total_genes": raw_summary["total_genes"],
+        "total_categories": raw_summary["total_categories"],
+        "genes_per_group_max": max(group_counts) if group_counts else 0,
+        "genes_per_group_median": (
+            statistics.median(group_counts) if group_counts else 0
+        ),
         "by_organism": _rename_freq(raw_summary["by_organism"], "organism"),
-        "by_category": _rename_freq(raw_summary["by_category"], "category"),
-        "by_group": _rename_freq(raw_summary["by_group"], "group_id"),
-        "not_found": raw_summary["not_found"],
+        "top_categories": _rename_freq(raw_summary["by_category_raw"], "category")[:5],
+        "top_groups": by_group_all[:5],
+        "not_found_groups": raw_summary["not_found_groups"],
+        "not_matched_groups": raw_summary["not_matched_groups"],
     }
+
+    # Diagnostics query — only when organisms filter is active
+    if organisms is not None:
+        diag_cypher, diag_params = build_genes_by_homolog_group_diagnostics(
+            group_ids=group_ids, organisms=organisms,
+        )
+        raw_diag = conn.execute_query(diag_cypher, **diag_params)[0]
+        envelope["not_found_organisms"] = raw_diag["not_found_organisms"]
+        envelope["not_matched_organisms"] = raw_diag["not_matched_organisms"]
+    else:
+        envelope["not_found_organisms"] = []
+        envelope["not_matched_organisms"] = []
 
     # Detail query — skip when limit=0
     if limit == 0:
@@ -967,7 +993,7 @@ def genes_by_homolog_group(
         return envelope
 
     det_cypher, det_params = build_genes_by_homolog_group(
-        group_ids=group_ids, organism=organism,
+        group_ids=group_ids, organisms=organisms,
         verbose=verbose, limit=limit,
     )
     results = conn.execute_query(det_cypher, **det_params)

@@ -1777,14 +1777,26 @@ def register_tools(mcp: FastMCP):
             description="Gene×group rows matching filters (e.g. 33)")
         total_genes: int = Field(
             description="Distinct genes (a gene in 2 input groups counted once, e.g. 30)")
+        total_categories: int = Field(
+            description="Distinct gene categories (e.g. 12)")
+        genes_per_group_max: int = Field(
+            description="Largest group's gene count (e.g. 13)")
+        genes_per_group_median: float = Field(
+            description="Median gene count across groups (e.g. 3.0)")
         by_organism: list[HomologGroupOrganismBreakdown] = Field(
-            description="Member counts per organism, sorted by count desc")
-        by_category: list[HomologGroupCategoryBreakdown] = Field(
-            description="Member counts per gene category, sorted by count desc")
-        by_group: list[HomologGroupGroupBreakdown] = Field(
-            description="Member counts per input group, sorted by count desc")
-        not_found: list[str] = Field(default_factory=list,
+            description="Member counts per organism, sorted by count desc (all)")
+        top_categories: list[HomologGroupCategoryBreakdown] = Field(
+            description="Top 5 gene categories by member count, sorted by count desc")
+        top_groups: list[HomologGroupGroupBreakdown] = Field(
+            description="Top 5 groups by member count, sorted by count desc")
+        not_found_groups: list[str] = Field(default_factory=list,
             description="Input group_ids not found in KG")
+        not_matched_groups: list[str] = Field(default_factory=list,
+            description="Groups that exist but have 0 member genes after organism filter")
+        not_found_organisms: list[str] = Field(default_factory=list,
+            description="Organism filter values matching zero Gene nodes in KG")
+        not_matched_organisms: list[str] = Field(default_factory=list,
+            description="Organisms in KG but with zero genes in the requested groups")
         returned: int = Field(description="Results in this response")
         truncated: bool = Field(
             description="True if total_matching > returned")
@@ -1801,9 +1813,9 @@ def register_tools(mcp: FastMCP):
             description="Ortholog group IDs (from search_homolog_groups or "
             "gene_homologs). E.g. ['cyanorak:CK_00000570'].",
         )],
-        organism: Annotated[str | None, Field(
-            description="Filter by organism (case-insensitive substring). "
-            "E.g. 'MED4', 'Alteromonas'. "
+        organisms: Annotated[list[str] | None, Field(
+            description="Filter by organisms (case-insensitive substring, each entry "
+            "matched independently). E.g. ['MED4', 'AS9601']. "
             "Use list_organisms to see valid values.",
         )] = None,
         summary: Annotated[bool, Field(
@@ -1822,27 +1834,38 @@ def register_tools(mcp: FastMCP):
         Takes group IDs from search_homolog_groups or gene_homologs and
         returns member genes per organism. One row per gene × group.
 
+        Two list filters — each reports not_found + not_matched:
+        - group_ids: ortholog groups (required)
+        - organisms: restrict to specific organisms
+
         For group discovery by text, use search_homolog_groups first.
         For gene → group direction, use gene_homologs.
+        For expression by ortholog groups, use differential_expression_by_ortholog.
         """
-        await ctx.info(f"genes_by_homolog_group group_ids={group_ids} organism={organism}")
+        await ctx.info(f"genes_by_homolog_group group_ids={group_ids} organisms={organisms}")
         try:
             conn = _conn(ctx)
             data = api.genes_by_homolog_group(
-                group_ids, organism=organism,
+                group_ids, organisms=organisms,
                 summary=summary, verbose=verbose, limit=limit, conn=conn,
             )
             by_organism = [HomologGroupOrganismBreakdown(**b) for b in data["by_organism"]]
-            by_category = [HomologGroupCategoryBreakdown(**b) for b in data["by_category"]]
-            by_group = [HomologGroupGroupBreakdown(**b) for b in data["by_group"]]
+            top_categories = [HomologGroupCategoryBreakdown(**b) for b in data["top_categories"]]
+            top_groups = [HomologGroupGroupBreakdown(**b) for b in data["top_groups"]]
             results = [GenesByHomologGroupResult(**r) for r in data["results"]]
             response = GenesByHomologGroupResponse(
                 total_matching=data["total_matching"],
                 total_genes=data["total_genes"],
+                total_categories=data["total_categories"],
+                genes_per_group_max=data["genes_per_group_max"],
+                genes_per_group_median=data["genes_per_group_median"],
                 by_organism=by_organism,
-                by_category=by_category,
-                by_group=by_group,
-                not_found=data["not_found"],
+                top_categories=top_categories,
+                top_groups=top_groups,
+                not_found_groups=data["not_found_groups"],
+                not_matched_groups=data["not_matched_groups"],
+                not_found_organisms=data["not_found_organisms"],
+                not_matched_organisms=data["not_matched_organisms"],
                 returned=data["returned"],
                 truncated=data["truncated"],
                 results=results,

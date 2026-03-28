@@ -1677,34 +1677,80 @@ def build_search_homolog_groups(
 def build_genes_by_homolog_group_summary(
     *,
     group_ids: list[str],
-    organism: str | None = None,
+    organisms: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for genes_by_homolog_group.
 
-    RETURN keys: total_matching, total_genes, by_organism, by_category,
-    by_group, not_found.
+    RETURN keys: total_matching, total_genes, total_categories,
+    by_organism, by_category_raw, by_group_raw,
+    not_found_groups, not_matched_groups.
     """
-    params: dict = {"group_ids": group_ids, "organism": organism}
+    params: dict = {"group_ids": group_ids, "organisms": organisms}
 
     cypher = (
         "UNWIND $group_ids AS gid\n"
         "OPTIONAL MATCH (og:OrthologGroup {id: gid})\n"
         "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og)\n"
-        "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
-        "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+        "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
+        "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
+        "             WHERE toLower(g.organism_strain) CONTAINS word)))\n"
         "WITH gid, og, g\n"
-        "WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS not_found_raw,\n"
+        "WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS nf_groups_raw,\n"
+        "     collect(DISTINCT CASE WHEN og IS NOT NULL AND g IS NULL\n"
+        "             THEN gid END) AS nm_groups_raw,\n"
         "     collect(CASE WHEN g IS NOT NULL THEN\n"
         "       {lt: g.locus_tag, org: g.organism_strain,\n"
         "        cat: coalesce(g.gene_category, 'Unknown'), gid: gid} END) AS rows\n"
-        "WITH [x IN not_found_raw WHERE x IS NOT NULL] AS not_found, rows\n"
-        "WITH not_found,\n"
+        "WITH [x IN nf_groups_raw WHERE x IS NOT NULL] AS not_found_groups,\n"
+        "     [x IN nm_groups_raw WHERE x IS NOT NULL] AS not_matched_groups,\n"
+        "     rows\n"
+        "WITH not_found_groups, not_matched_groups,\n"
         "     size(rows) AS total_matching,\n"
         "     size(apoc.coll.toSet([r IN rows | r.lt])) AS total_genes,\n"
+        "     size(apoc.coll.toSet([r IN rows | r.cat])) AS total_categories,\n"
         "     apoc.coll.frequencies([r IN rows | r.org]) AS by_organism,\n"
-        "     apoc.coll.frequencies([r IN rows | r.cat]) AS by_category,\n"
-        "     apoc.coll.frequencies([r IN rows | r.gid]) AS by_group\n"
-        "RETURN total_matching, total_genes, not_found, by_organism, by_category, by_group"
+        "     apoc.coll.frequencies([r IN rows | r.cat]) AS by_category_raw,\n"
+        "     apoc.coll.frequencies([r IN rows | r.gid]) AS by_group_raw\n"
+        "RETURN total_matching, total_genes, total_categories,\n"
+        "       not_found_groups, not_matched_groups,\n"
+        "       by_organism, by_category_raw, by_group_raw"
+    )
+    return cypher, params
+
+
+def build_genes_by_homolog_group_diagnostics(
+    *,
+    group_ids: list[str],
+    organisms: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Validate organisms against KG + result set.
+
+    RETURN keys: not_found_organisms, not_matched_organisms.
+    Returns empty lists when organisms is None.
+    """
+    params: dict = {"group_ids": group_ids, "organisms": organisms}
+
+    cypher = (
+        "WITH $organisms AS org_inputs\n"
+        "UNWIND CASE WHEN org_inputs IS NULL THEN [null]\n"
+        "       ELSE org_inputs END AS org_input\n"
+        "OPTIONAL MATCH (g_any:Gene)\n"
+        "WHERE org_input IS NOT NULL\n"
+        "  AND ALL(word IN split(toLower(org_input), ' ')\n"
+        "          WHERE toLower(g_any.organism_strain) CONTAINS word)\n"
+        "WITH org_input, count(g_any) AS kg_count\n"
+        "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+        "WHERE org_input IS NOT NULL AND kg_count > 0\n"
+        "  AND og.id IN $group_ids\n"
+        "  AND ALL(word IN split(toLower(org_input), ' ')\n"
+        "          WHERE toLower(g.organism_strain) CONTAINS word)\n"
+        "WITH org_input, kg_count, count(g) AS matched_count\n"
+        "WITH collect(CASE WHEN org_input IS NOT NULL AND kg_count = 0\n"
+        "             THEN org_input END) AS nf_raw,\n"
+        "     collect(CASE WHEN org_input IS NOT NULL AND kg_count > 0\n"
+        "                   AND matched_count = 0 THEN org_input END) AS nm_raw\n"
+        "RETURN [x IN nf_raw WHERE x IS NOT NULL] AS not_found_organisms,\n"
+        "       [x IN nm_raw WHERE x IS NOT NULL] AS not_matched_organisms"
     )
     return cypher, params
 
@@ -1712,7 +1758,7 @@ def build_genes_by_homolog_group_summary(
 def build_genes_by_homolog_group(
     *,
     group_ids: list[str],
-    organism: str | None = None,
+    organisms: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
 ) -> tuple[str, dict]:
@@ -1723,7 +1769,7 @@ def build_genes_by_homolog_group(
     RETURN keys (verbose): adds gene_summary, function_description,
     consensus_product, source.
     """
-    params: dict = {"group_ids": group_ids, "organism": organism}
+    params: dict = {"group_ids": group_ids, "organisms": organisms}
 
     verbose_cols = (
         ",\n       g.gene_summary AS gene_summary"
@@ -1742,8 +1788,9 @@ def build_genes_by_homolog_group(
     cypher = (
         "UNWIND $group_ids AS gid\n"
         "MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup {id: gid})\n"
-        "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
-        "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+        "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
+        "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
+        "             WHERE toLower(g.organism_strain) CONTAINS word)))\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.organism_strain AS organism_strain,\n"
         f"       g.gene_category AS gene_category, og.id AS group_id{verbose_cols}\n"

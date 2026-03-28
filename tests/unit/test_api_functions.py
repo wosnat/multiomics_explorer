@@ -1948,11 +1948,11 @@ class TestGenesByHomologGroup:
 
     def test_returns_dict(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            [{"total_matching": 9, "total_genes": 9,
+            [{"total_matching": 9, "total_genes": 9, "total_categories": 1,
               "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
-              "by_category": [{"item": "Photosynthesis", "count": 9}],
-              "by_group": [{"item": "cyanorak:CK_00000570", "count": 9}],
-              "not_found": []}],
+              "by_category_raw": [{"item": "Photosynthesis", "count": 9}],
+              "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
+              "not_found_groups": [], "not_matched_groups": []}],
             [{"locus_tag": "PMM0315", "gene_name": "psbB",
               "product": "photosystem II", "organism_strain": "Prochlorococcus MED4",
               "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}],
@@ -1961,20 +1961,27 @@ class TestGenesByHomologGroup:
         assert isinstance(result, dict)
         assert result["total_matching"] == 9
         assert result["total_genes"] == 9
+        assert result["total_categories"] == 1
+        assert result["genes_per_group_max"] == 9
+        assert result["genes_per_group_median"] == 9
         assert len(result["by_organism"]) == 1
         assert result["by_organism"][0]["organism"] == "Prochlorococcus MED4"
-        assert len(result["by_group"]) == 1
-        assert result["by_group"][0]["group_id"] == "cyanorak:CK_00000570"
-        assert result["not_found"] == []
+        assert len(result["top_groups"]) == 1
+        assert result["top_groups"][0]["group_id"] == "cyanorak:CK_00000570"
+        assert result["not_found_groups"] == []
+        assert result["not_matched_groups"] == []
+        assert result["not_found_organisms"] == []
+        assert result["not_matched_organisms"] == []
         assert result["returned"] == 1
         assert len(result["results"]) == 1
 
     def test_summary_mode(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            [{"total_matching": 9, "total_genes": 9,
-              "by_organism": [], "by_category": [],
-              "by_group": [{"item": "cyanorak:CK_00000570", "count": 9}],
-              "not_found": []}],
+            [{"total_matching": 9, "total_genes": 9, "total_categories": 1,
+              "by_organism": [],
+              "by_category_raw": [],
+              "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
+              "not_found_groups": [], "not_matched_groups": []}],
         ]
         result = api.genes_by_homolog_group(
             ["cyanorak:CK_00000570"], summary=True, conn=mock_conn)
@@ -1983,15 +1990,15 @@ class TestGenesByHomologGroup:
         assert result["results"] == []
         assert mock_conn.execute_query.call_count == 1
 
-    def test_not_found(self, mock_conn):
+    def test_not_found_groups(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            [{"total_matching": 0, "total_genes": 0,
-              "by_organism": [], "by_category": [], "by_group": [],
-              "not_found": ["FAKE_GROUP"]}],
+            [{"total_matching": 0, "total_genes": 0, "total_categories": 0,
+              "by_organism": [], "by_category_raw": [], "by_group_raw": [],
+              "not_found_groups": ["FAKE_GROUP"], "not_matched_groups": []}],
         ]
         result = api.genes_by_homolog_group(
             ["FAKE_GROUP"], summary=True, conn=mock_conn)
-        assert result["not_found"] == ["FAKE_GROUP"]
+        assert result["not_found_groups"] == ["FAKE_GROUP"]
         assert result["total_matching"] == 0
 
     def test_validates_empty_group_ids(self, mock_conn):
@@ -2000,15 +2007,16 @@ class TestGenesByHomologGroup:
 
     def test_passes_params(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            [{"total_matching": 0, "total_genes": 0,
-              "by_organism": [], "by_category": [], "by_group": [],
-              "not_found": []}],
+            [{"total_matching": 0, "total_genes": 0, "total_categories": 0,
+              "by_organism": [], "by_category_raw": [], "by_group_raw": [],
+              "not_found_groups": [], "not_matched_groups": []}],
+            [{"not_found_organisms": [], "not_matched_organisms": []}],
         ]
         api.genes_by_homolog_group(
-            ["cyanorak:CK_1"], organism="MED4", summary=True, conn=mock_conn)
-        call_args = mock_conn.execute_query.call_args
-        cypher = call_args[0][0]
-        assert "$organism" in cypher
+            ["cyanorak:CK_1"], organisms=["MED4"], summary=True, conn=mock_conn)
+        first_call = mock_conn.execute_query.call_args_list[0]
+        cypher = first_call[0][0]
+        assert "$organisms" in cypher
 
     def test_importable_from_package(self):
         from multiomics_explorer import genes_by_homolog_group
