@@ -109,6 +109,7 @@ def resolve_gene(
     identifier: str,
     organism: str | None = None,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -137,12 +138,13 @@ def resolve_gene(
         reverse=True,
     )
 
-    results = all_results[:limit] if limit else all_results
+    results = all_results[offset:offset + limit] if limit else all_results[offset:]
     return {
         "total_matching": total,
         "by_organism": by_organism,
         "returned": len(results),
-        "truncated": total > len(results),
+        "offset": offset,
+        "truncated": (offset > 0 and total > 0) or (total > offset + len(results)),
         "results": results,
     }
 
@@ -496,6 +498,7 @@ def list_filter_values(
 def list_organisms(
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -512,11 +515,12 @@ def list_organisms(
     cypher, params = build_list_organisms(verbose=verbose)
     all_results = conn.execute_query(cypher, **params)
     total = len(all_results)
-    results = all_results[:limit] if limit else all_results
+    results = all_results[offset:offset + limit] if limit else all_results[offset:]
     return {
         "total_entries": total,
         "returned": len(results),
-        "truncated": total > len(results),
+        "offset": offset,
+        "truncated": total > offset + len(results),
         "results": results,
     }
 
@@ -528,6 +532,7 @@ def list_publications(
     author: str | None = None,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -587,7 +592,7 @@ def list_publications(
             reverse=True,
         )
 
-    results = all_results[:limit] if limit else all_results
+    results = all_results[offset:offset + limit] if limit else all_results[offset:]
 
     return {
         "total_entries": summary["total_entries"],
@@ -596,7 +601,8 @@ def list_publications(
         "by_treatment_type": _sorted_breakdown(tt_counts, "treatment_type"),
         "by_omics_type": _sorted_breakdown(omics_counts, "omics_type"),
         "returned": len(results),
-        "truncated": summary["total_matching"] > len(results),
+        "offset": offset,
+        "truncated": summary["total_matching"] > offset + len(results),
         "results": results,
     }
 

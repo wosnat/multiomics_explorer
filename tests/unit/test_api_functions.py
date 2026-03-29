@@ -102,7 +102,7 @@ class TestResolveGene:
     def test_empty_results(self, mock_conn):
         mock_conn.execute_query.return_value = []
         result = api.resolve_gene("FAKE0001", conn=mock_conn)
-        assert result == {"total_matching": 0, "by_organism": [], "returned": 0, "truncated": False, "results": []}
+        assert result == {"total_matching": 0, "by_organism": [], "returned": 0, "offset": 0, "truncated": False, "results": []}
 
     def test_empty_identifier_raises(self, mock_conn):
         with pytest.raises(ValueError, match="identifier must not be empty"):
@@ -137,6 +137,40 @@ class TestResolveGene:
         result = api.resolve_gene("PMM", limit=2, conn=mock_conn)
         assert result["total_matching"] == 5
         assert len(result["results"]) == 2
+
+    def test_offset_skips_results(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"locus_tag": f"PMM000{i}", "gene_name": "g",
+             "product": "p", "organism_name": "MED4"}
+            for i in range(5)
+        ]
+        result = api.resolve_gene("PMM", limit=2, offset=2, conn=mock_conn)
+        assert result["total_matching"] == 5
+        assert result["returned"] == 2
+        assert result["results"][0]["locus_tag"] == "PMM0002"
+        assert result["results"][1]["locus_tag"] == "PMM0003"
+        assert result["truncated"] is True
+
+    def test_offset_beyond_results(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"locus_tag": "PMM0001", "gene_name": "g",
+             "product": "p", "organism_name": "MED4"}
+        ]
+        result = api.resolve_gene("PMM", limit=10, offset=5, conn=mock_conn)
+        assert result["total_matching"] == 1
+        assert result["returned"] == 0
+        assert result["results"] == []
+        assert result["truncated"] is True
+
+    def test_offset_default_zero(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"locus_tag": f"PMM000{i}", "gene_name": "g",
+             "product": "p", "organism_name": "MED4"}
+            for i in range(3)
+        ]
+        result = api.resolve_gene("PMM", limit=2, conn=mock_conn)
+        assert result["results"][0]["locus_tag"] == "PMM0000"
+        assert result["offset"] == 0
 
 
 # ---------------------------------------------------------------------------
@@ -654,6 +688,21 @@ class TestListOrganisms:
         mock_conn.execute_query.return_value = self._ROWS
         result = api.list_organisms(conn=mock_conn)
         assert len(result["results"]) == 2
+
+    def test_offset_skips_results(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"organism_name": f"Org{i}", "genus": "G", "species": "S",
+             "strain": "s", "clade": None, "ncbi_taxon_id": i,
+             "gene_count": 100, "publication_count": 1,
+             "experiment_count": 1, "treatment_types": [], "omics_types": []}
+            for i in range(5)
+        ]
+        result = api.list_organisms(limit=2, offset=2, conn=mock_conn)
+        assert result["total_entries"] == 5
+        assert result["returned"] == 2
+        assert result["results"][0]["organism_name"] == "Org2"
+        assert result["offset"] == 2
+        assert result["truncated"] is True
 
 
 # ---------------------------------------------------------------------------
@@ -1285,6 +1334,21 @@ class TestListPublications:
         """from multiomics_explorer import list_publications works."""
         from multiomics_explorer import list_publications
         assert list_publications is api.list_publications
+
+    def test_offset_skips_results(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 5, "total_matching": 5}],  # summary
+            [{"doi": f"10.1234/{i}", "title": f"T{i}", "authors": "A",
+              "year": 2024, "journal": "J", "study_type": "S",
+              "organisms": ["MED4"], "experiment_count": 1,
+              "treatment_types": ["light"], "omics_types": ["RNASEQ"]}
+             for i in range(5)],  # detail
+        ]
+        result = api.list_publications(limit=2, offset=2, conn=mock_conn)
+        assert result["total_matching"] == 5
+        assert result["returned"] == 2
+        assert result["results"][0]["doi"] == "10.1234/2"
+        assert result["offset"] == 2
 
 
 class TestListExperiments:
