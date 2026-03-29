@@ -79,6 +79,10 @@ genes_by_function(search_text="photosystem")
 genes_by_function(search_text="nitrogen transport", organism="MED4", verbose=True)
 ```
 
+```example-response
+{"total_search_hits": 12, "total_matching": 4, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 4}], "by_category": [...], "score_max": 6.1, "score_median": 3.8, "returned": 4, "truncated": false, "results": [{"locus_tag": "PMM0001", "gene_name": "amt1", "product": "ammonium transporter", "organism_name": "Prochlorococcus MED4", "gene_category": "Nitrogen metabolism", "annotation_quality": 3, "score": 6.1, "function_description": "...", "gene_summary": "..."}]}
+```
+
 ### Example 3: Get counts only (no rows)
 
 ```example-call

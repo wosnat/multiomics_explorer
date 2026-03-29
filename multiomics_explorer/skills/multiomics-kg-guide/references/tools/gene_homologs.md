@@ -103,6 +103,10 @@ gene_homologs(locus_tags=["PMM0001"], source="cyanorak")
 gene_homologs(locus_tags=["PMM0001", "PMM0845"], summary=True)
 ```
 
+```example-response
+{"total_matching": 6, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}], "by_source": [{"source": "eggnog", "count": 4}, {"source": "cyanorak", "count": 2}], "not_found": [], "no_groups": [], "returned": 0, "truncated": true, "results": []}
+```
+
 ### Example 5: From resolve_gene to homologs
 
 ```

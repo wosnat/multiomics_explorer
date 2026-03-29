@@ -93,6 +93,10 @@ gene_ontology_terms(locus_tags=["PMM0001"])
 gene_ontology_terms(locus_tags=["PMM0001", "PMM0845", "EZ55_00275"], summary=True)
 ```
 
+```example-response
+{"total_matching": 3, "total_genes": 2, "total_terms": 3, "by_ontology": [{"ontology_type": "go_bp", "term_count": 3, "gene_count": 2}], "by_term": [{"term_id": "go:0006260", "term_name": "DNA replication", "ontology_type": "go_bp", "count": 1}, ...], "terms_per_gene_min": 1, "terms_per_gene_max": 2, "terms_per_gene_median": 1.5, "returned": 0, "truncated": true, "not_found": [], "no_terms": ["EZ55_00275"], "results": []}
+```
+
 ### Example 4: From overview to ontology details
 
 ```

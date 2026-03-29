@@ -108,6 +108,10 @@ list_experiments(summary=True)
 list_experiments(summary=True, organism="MED4")
 ```
 
+```example-response
+{"total_entries": 76, "total_matching": 31, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 30}, ...], "by_treatment_type": [{"treatment_type": "light_stress", "count": 8}, {"treatment_type": "nitrogen_stress", "count": 8}, ...], "by_omics_type": [...], "by_table_scope": [...], "time_course_count": 14, "returned": 0, "truncated": true, "results": []}
+```
+
 ### Example 3: Browse coculture experiments with Alteromonas
 
 ```example-call

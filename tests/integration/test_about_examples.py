@@ -25,6 +25,41 @@ def _parse_tool_expected_keys(content: str) -> list[str] | None:
     return None
 
 
+def _extract_top_level_keys(json_text: str) -> list[str]:
+    """Extract top-level keys from a JSON-like response (handles single-line
+    and multi-line, and tolerates '...' placeholders)."""
+    keys = []
+    depth = 0
+    in_string = False
+    escape = False
+    for i, ch in enumerate(json_text):
+        if escape:
+            escape = False
+            continue
+        if ch == '\\':
+            escape = True
+            continue
+        if ch == '"' and not in_string:
+            in_string = True
+            continue
+        if ch == '"' and in_string:
+            in_string = False
+            continue
+        if in_string:
+            continue
+        if ch in ('{', '['):
+            depth += 1
+        elif ch in ('}', ']'):
+            depth -= 1
+        elif ch == ':' and depth == 1:
+            # Find the key before this colon — scan back for "key"
+            before = json_text[:i].rstrip()
+            m = re.search(r'"(\w+)"\s*$', before)
+            if m:
+                keys.append(m.group(1))
+    return keys
+
+
 def _parse_examples(content: str) -> list[dict]:
     """Extract example-call and example-response blocks from about content.
 
@@ -45,8 +80,7 @@ def _parse_examples(content: str) -> list[dict]:
         response_keys = None
         resp_match = re.search(r"```example-response\n(.+?)\n```", remainder, re.DOTALL)
         if resp_match:
-            # Extract top-level keys from the JSON-like response
-            response_keys = re.findall(r'^\s*"(\w+)":', resp_match.group(1), re.MULTILINE)
+            response_keys = _extract_top_level_keys(resp_match.group(1))
 
         examples.append({
             "call": call,

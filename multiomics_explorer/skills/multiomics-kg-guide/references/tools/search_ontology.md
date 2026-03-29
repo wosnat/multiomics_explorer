@@ -69,6 +69,10 @@ search_ontology(search_text="replication", ontology="go_bp")
 search_ontology(search_text="transport", ontology="go_bp", summary=True)
 ```
 
+```example-response
+{"total_entries": 2448, "total_matching": 219, "score_max": 1.58, "score_median": 1.21, "returned": 0, "truncated": true, "results": []}
+```
+
 ### Example 3: From search to gene discovery
 
 ```

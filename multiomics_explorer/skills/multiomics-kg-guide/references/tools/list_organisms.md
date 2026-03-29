@@ -83,6 +83,18 @@ list_organisms()
 list_organisms(verbose=True)
 ```
 
+```example-response
+{
+  "total_entries": 15,
+  "returned": 15,
+  "truncated": false,
+  "results": [
+    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": [...], "omics_types": [...], "family": "Prochlorococcaceae", "order": "Synechococcales", "tax_class": "Cyanophyceae", "phylum": "Cyanobacteriota", "kingdom": "Eubacteria", "superkingdom": "Bacteria", "lineage": "Bacteria;Cyanobacteriota;..."},
+    ...
+  ]
+}
+```
+
 ### Example 3: Chaining to genes and publications
 
 ```

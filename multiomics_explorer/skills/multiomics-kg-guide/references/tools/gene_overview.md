@@ -95,6 +95,10 @@ gene_overview(locus_tags=["PMM1428", "EZ55_00275"])
 gene_overview(locus_tags=["PMM0845", "PMM1428", "EZ55_00275"], summary=True)
 ```
 
+```example-response
+{"total_matching": 3, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}, {"organism_name": "Alteromonas macleodii EZ55", "count": 1}], "by_category": [{"category": "Unknown", "count": 2}, ...], "by_annotation_type": [{"annotation_type": "go_mf", "count": 2}, ...], "has_expression": 3, "has_significant_expression": 2, "has_orthologs": 3, "returned": 0, "truncated": true, "not_found": [], "results": []}
+```
+
 ### Example 4: From discovery to overview to details
 
 ```
