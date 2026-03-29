@@ -3,5 +3,5 @@ row_count: 1
 rows:
 - gene_name: dnaN
   locus_tag: PMT9312_0001
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, beta subunit

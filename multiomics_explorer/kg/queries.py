@@ -83,7 +83,7 @@ ORDER BY og.taxonomic_level, other.locus_tag
 EXPRESSION_FOR_GENE = """
 MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene {locus_tag: $locus_tag})
 RETURN e.name AS experiment, e.treatment_type AS treatment_type,
-       e.organism_strain AS organism_strain,
+       e.organism_name AS organism_name,
        r.expression_direction AS direction,
        r.log2_fold_change AS log2fc,
        r.adjusted_p_value AS padj,
@@ -94,7 +94,7 @@ ORDER BY abs(r.log2_fold_change) DESC
 GENES_UPREGULATED_BY_COCULTURE = """
 MATCH (e:Experiment {treatment_type: 'coculture'})-[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)
 WHERE e.coculture_partner CONTAINS $coculture_genus
-  AND e.organism_strain CONTAINS $target_strain
+  AND e.organism_name CONTAINS $target_strain
 RETURN g.locus_tag AS locus_tag, g.product AS product,
        r.log2_fold_change AS log2fc, r.adjusted_p_value AS padj,
        e.coculture_partner AS coculture_organism
@@ -105,7 +105,7 @@ LIMIT 50
 GENES_AFFECTED_BY_STRESS = """
 MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
 WHERE e.treatment_type = $treatment_type
-  AND e.organism_strain CONTAINS $strain
+  AND e.organism_name CONTAINS $strain
 RETURN g.locus_tag AS locus_tag, g.product AS product,
        r.expression_direction AS direction,
        r.log2_fold_change AS log2fc,
@@ -162,7 +162,7 @@ FEW_SHOT_EXAMPLES = [
             "MATCH (e:Experiment {treatment_type: 'coculture'})\n"
             "      -[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)\n"
             "WHERE e.coculture_partner CONTAINS 'Alteromonas'\n"
-            "  AND e.organism_strain CONTAINS 'MED4'\n"
+            "  AND e.organism_name CONTAINS 'MED4'\n"
             "RETURN g.locus_tag, g.product, r.log2_fold_change, e.name\n"
             "ORDER BY r.log2_fold_change DESC\n"
             "LIMIT 50"
@@ -170,7 +170,7 @@ FEW_SHOT_EXAMPLES = [
         "explanation": (
             "Expression uses Changes_expression_of (Experiment → Gene). "
             "Coculture experiments have treatment_type='coculture' and coculture_partner "
-            "containing the partner organism name. e.organism_strain is the target organism "
+            "containing the partner organism name. e.organism_name is the target organism "
             "whose genes are affected."
         ),
     },
@@ -179,7 +179,7 @@ FEW_SHOT_EXAMPLES = [
         "cypher": (
             "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
             "WHERE e.treatment_type = 'nutrient_stress'\n"
-            "  AND e.organism_strain CONTAINS 'MED4'\n"
+            "  AND e.organism_name CONTAINS 'MED4'\n"
             "  AND e.treatment CONTAINS 'nitrogen'\n"
             "RETURN g.locus_tag, g.product, r.expression_direction, r.log2_fold_change\n"
             "ORDER BY abs(r.log2_fold_change) DESC\n"

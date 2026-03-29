@@ -62,7 +62,7 @@ rows:
     in the quality control of integral membrane proteins'
   id: ncbigene:SYNW0305
   locus_tag: SYNW0305
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   preferred_id: ncbigene
   product: cell division protein FtsH1
   protein_family: AAA ATPase family; Peptidase M41 family; AAA ATPase family

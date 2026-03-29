@@ -5,98 +5,98 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: pilT1
   locus_tag: S8102_00201
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: twitching motility protein PilT
   score: 1.4037
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_04001
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_04021
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_04101
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_11331
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_14891
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_15831
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_15981
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_16041
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_17341
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: S8102_22071
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9052
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: S8102_24621
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: outer membrane porin
   score: 1.1942
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW0008
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved membrane protein
   score: 3.4283
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pilB
   locus_tag: SYNW0022
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: type II secretory pathway, ATPase PulE/Tfp pilus assembly pathway, ATPase
     PilB
   score: 0.9412
@@ -104,35 +104,35 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: murB
   locus_tag: SYNW0028
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N-acetylenolpyruvoylglucosamine reductase
   score: 4.196
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murC
   locus_tag: SYNW0029
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N-acetylmuramate-alanine ligase
   score: 1.5507
 - annotation_quality: 1
   gene_category: Carbohydrate metabolism
   gene_name: null
   locus_tag: SYNW0037
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved NADP-binding domain-containing protein
   score: 1.5174
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW0044
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 1.4037
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mrdA
   locus_tag: SYNW0050
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: transpeptidase involved in septal peptidoglycan synthesis (peptidoglycan
     synthetase precursor)
   score: 1.9236
@@ -140,287 +140,287 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: sqdX
   locus_tag: SYNW0051
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: sulfoquinovosyldiacylglycerol synthase
   score: 1.9236
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: spoIID
   locus_tag: SYNW0059
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: sporulation protein SpoIID
   score: 5.0037
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mgdA
   locus_tag: SYNW0060
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: monoglycosyldiacylglycerol (MGlcDG) synthase
   score: 3.9148
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tilS
   locus_tag: SYNW0075
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: tRNA(Ile)-lysidine synthetase
   score: 4.116
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rsfA
   locus_tag: SYNW0084
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferase, family 1
   score: 1.947
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: swmA
   locus_tag: SYNW0085
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell surface protein required for swimming motility
   score: 2.8317
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: secA
   locus_tag: SYNW0086
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: preprotein translocase SecA subunit
   score: 1.5548
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0087
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 1.6763
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0088
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 1.4619
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB1
   locus_tag: SYNW0097
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: fluoride exporter
   score: 6.3017
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB2
   locus_tag: SYNW0098
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: fluoride exporter
   score: 6.0925
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: SYNW0104
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: S-adenosyl-L-methionine-dependent methyltransferase
   score: 1.0391
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
   locus_tag: SYNW0122
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: rod shape-determining protein MreB
   score: 7.5328
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: mreC
   locus_tag: SYNW0123
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: rod shape-determining protein MreC
   score: 4.2947
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0124
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 3.3137
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW0129
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 3.5181
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: glmS
   locus_tag: SYNW0145
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glutamine---fructose-6-phosphate transaminase (isomerizing)
   score: 1.6133
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: manC
   locus_tag: SYNW0148
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: mannose-1-phosphate guanylyltransferase
   score: 1.6133
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0158
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved membrane protein
   score: 1.7586
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0167
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 2.0732
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0172
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: alpha-glycosyltransferase, family 4
   score: 2.0466
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0174
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-glycosyltransferase/glycogen phosphorylase
   score: 2.0208
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0175
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: nucleotide-diphospho-sugar transferase
   score: 1.3561
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0177
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyltransferase
   score: 1.9956
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0178
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferase 2 family protein
   score: 1.2905
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: kdsA
   locus_tag: SYNW0180
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 3-deoxy-8-phosphooctulonate synthase
   score: 1.4824
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: kdsB
   locus_tag: SYNW0184
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 3-deoxy-D-manno-octulosonate cytidylyltransferase
   score: 1.7548
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: kdsC
   locus_tag: SYNW0186
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 3-deoxy-D-manno-octulosonate 8-phosphate phosphatase KdsC
   score: 1.0127
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: kdsD
   locus_tag: SYNW0187
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: arabinose-5-phosphate isomerase
   score: 1.7171
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: galE
   locus_tag: SYNW0191
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-glucose 4-epimerase
   score: 1.5594
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNW0194
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: type I secretion system ABC transporter, HlyD family
   score: 0.9412
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0195
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferase, family 4
   score: 1.947
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: uxs
   locus_tag: SYNW0198
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-glucuronate decarboxylase
   score: 1.0127
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: ugd
   locus_tag: SYNW0199
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-glucose 6-dehydrogenase
   score: 1.4126
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: null
   locus_tag: SYNW0200
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: NAD dependent epimerase/dehydratase
   score: 1.6763
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: degT
   locus_tag: SYNW0220
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative pleiotropic regulatory protein
   score: 1.4891
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW0222
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved lipoprotein
   score: 1.2309
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: betP
   locus_tag: SYNW0229
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycine betaine transporter, BCCT family
   score: 1.7404
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: tagA
   locus_tag: SYNW0242
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-acetylglucosaminyldiphosphoundecaprenol N-acetyl-beta-D-mannosaminyltransferase
   score: 1.6133
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murJ
   locus_tag: SYNW0255
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: peptidoglycan lipid II flippase
   score: 1.0127
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rfe
   locus_tag: SYNW0260
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N-acetylmuramyl pentapeptide phosphotransferase/UDP-N- acetylglucosamine-1-phosphate
     transferase
   score: 1.6811
@@ -428,98 +428,98 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0265
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: protein of unknown function DUF3769
   score: 1.0391
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ams1
   locus_tag: SYNW0267
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: alpha-mannosidases, glycoside hydrolase family 38
   score: 0.7921
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: sll1424
   locus_tag: SYNW0274
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein (DUF3084)
   score: 3.1895
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0281
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: soluble lytic murein transglycosylase
   score: 2.1004
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: glmM
   locus_tag: SYNW0282
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: phosphoglucosamine mutase
   score: 0.8989
 - annotation_quality: 3
   gene_category: Transport
   gene_name: ictB
   locus_tag: SYNW0284
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: bicarbonate transporter, ICT family
   score: 1.766
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: ycf20
   locus_tag: SYNW0298
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterised membrane protein Ycf20
   score: 1.096
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsH1
   locus_tag: SYNW0305
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein FtsH1
   score: 6.3458
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0311
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-glycosyltransferase/glycogen phosphorylase superfamily protein
   score: 1.5467
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0325
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.4548
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: hli
   locus_tag: SYNW0330
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: high light inducible protein
   score: 3.1851
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0337
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: lipid A disaccharide synthase family protein
   score: 1.4103
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: smc
   locus_tag: SYNW0341
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: chromosome segregation protein
   score: 5.2039
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: null
   locus_tag: SYNW0363
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: SGNH hydrolase-type esterase and serralysin-like metalloprotease domains-containing
     protein
   score: 1.1595
@@ -527,546 +527,546 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0372
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.4417
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: neuB
   locus_tag: SYNW0394
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-acetylneuraminic acid synthetase
   score: 1.5594
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: neuA
   locus_tag: SYNW0398
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-acylneuraminate cytidylyltransferase
   score: 1.4126
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: kpsC
   locus_tag: SYNW0399
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: capsular polysaccharide export protein
   score: 1.2905
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: kpsS
   locus_tag: SYNW0400
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: capsular polysaccharide export protein
   score: 1.3117
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: kpsD2
   locus_tag: SYNW0404
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: polysaccharide biosynthesis/export family protein
   score: 1.5772
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0407
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferase, family 1
   score: 1.7307
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNW0410
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: hlyD secretion family protein
   score: 0.9877
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0412
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferase 2 family protein
   score: 1.3561
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0414
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: rhamnan synthesis F family protein
   score: 1.3117
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0416
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferases group 1 family protein
   score: 1.4417
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0419
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: capsular exopolysaccharide family domain protein
   score: 1.9063
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: kpsD
   locus_tag: SYNW0420
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: polysaccharide biosynthesis/export family protein
   score: 1.7404
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: galE
   locus_tag: SYNW0421
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-glucose 4-epimerase
   score: 1.601
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: gmd
   locus_tag: SYNW0422
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: GDP-mannose 4,6-dehydratase
   score: 1.5507
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: kdsB
   locus_tag: SYNW0425
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 3-deoxy-D-manno-octulosonate cytidylyltransferase
   score: 1.7548
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: neuA
   locus_tag: SYNW0444
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-acylneuraminate cytidylyltransferase
   score: 1.4126
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0445
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: polysaccharide biosynthesis family protein
   score: 1.3335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0446
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative aminotransferase (DegT family)
   score: 1.6763
 - annotation_quality: 3
   gene_category: Nucleotide metabolism
   gene_name: legI
   locus_tag: SYNW0448
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N,N^-diacetyllegionaminate synthase
   score: 1.6913
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: legG
   locus_tag: SYNW0449
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N,N^-diacetylbacillosamine 2-epimerase (hydrolysing)
   score: 1.6913
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0450
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: mobA-like NTP transferase domain protein
   score: 1.6089
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0453
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: possible beta-glycosyltransferase, family 2
   score: 1.9236
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pssJ
   locus_tag: SYNW0454
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: nucleotide-diphospho-sugar transferase
   score: 1.2905
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rfe
   locus_tag: SYNW0460
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferase 4 family protein
   score: 1.5097
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0461
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: polysaccharide biosynthesis family protein
   score: 1.8765
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsW
   locus_tag: SYNW0475
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein FtsW
   score: 11.1992
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0477
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-acetylmuramoyl-L-alanine amidase
   score: 1.4037
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0478
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: possible alpha-glycosyltransferase, family 4
   score: 1.5467
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0517
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: nucleotide-diphospho-sugar transferase
   score: 1.4288
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0528
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
   locus_tag: SYNW0530
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N-acetylmuramoylalanine--D-glutamate ligase
   score: 3.0949
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbV
   locus_tag: SYNW0537
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cytochrome c-550
   score: 1.0127
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
   locus_tag: SYNW0539
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: stage II sporulation protein D
   score: 4.8788
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: bamA
   locus_tag: SYNW0555
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: outer membrane protein insertion porin family
   score: 1.9236
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lpxC
   locus_tag: SYNW0556
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-3-O-[3-hydroxymyristoyl] N-acetylglucosamine deacetylase
   score: 1.4928
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lpxA
   locus_tag: SYNW0558
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: acyl-[acyl-carrier-protein]-UDP-N- acetylglucosamine O-acyltransferase
   score: 3.0047
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lpxB
   locus_tag: SYNW0559
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: lipid-A-disaccharide synthase
   score: 2.8421
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
   locus_tag: SYNW0576
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: type II toxin-antitoxin system, antitoxin Phd/YefM
   score: 4.3891
 - annotation_quality: 1
   gene_category: Cell cycle and division
   gene_name: null
   locus_tag: SYNW0578
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 2.911
 - annotation_quality: 3
   gene_category: Translation
   gene_name: gidB
   locus_tag: SYNW0626
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 16S rRNA (guanine(527)-N(7))-methyltransferase GidB
   score: 1.6449
 - annotation_quality: 3
   gene_category: Transport
   gene_name: kpsE
   locus_tag: SYNW0640
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: ABC-type polysaccharide efflux transporter, permease component
   score: 1.4548
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0641
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: O-antigen biosynthesis protein
   score: 1.7942
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0645
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 1.1595
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rfbB
   locus_tag: SYNW0646
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: dTDP-glucose-4,6-dehydratase
   score: 1.5594
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rfbD
   locus_tag: SYNW0647
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: dTDP-4-dehydrorhamnose reductase
   score: 1.6465
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rfbC
   locus_tag: SYNW0648
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: dTDP-4-dehydrorhamnose 3,5-epimerase
   score: 1.5507
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rfbA
   locus_tag: SYNW0649
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glucose-1-phosphate thymidylyltransferase
   score: 1.7171
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0654
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: possible polysaccharide-forming beta-glycosyltransferase, family 2
   score: 3.7581
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: sepF
   locus_tag: SYNW0661
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein SepF (Cdv2)
   score: 8.8689
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: dgdA
   locus_tag: SYNW0663
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: digalactosyldiacylglycerol (DGDG) synthase
   score: 1.947
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: SYNW0677
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: photosystem II D2 protein
   score: 0.708
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
   locus_tag: SYNW0703
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: RND efflux pump, MFP subunit, HlyD family
   score: 1.2754
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: null
   locus_tag: SYNW0729
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: alpha-glucan branching enzyme
   score: 0.6612
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0738
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.5241
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: yqeG
   locus_tag: SYNW0781
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: haloacid dehalogenase (HAD) family phosphatase
   score: 1.1942
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lpxD
   locus_tag: SYNW0783
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-3-O-[3-hydroxymyristoyl] glucosamine N-acyltransferase
   score: 2.5326
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: pilD
   locus_tag: SYNW0787
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: leader peptidase (prepilin peptidase) / N-methyltransferase
   score: 0.8603
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
   locus_tag: SYNW0796
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: small-conductance mechanosensitive ion channel, MscS family
   score: 1.766
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0821
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: polypeptide alpha-N-acetylglucosaminyltransferase
   score: 1.0668
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW0829
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein (DUF3386)
   score: 3.0417
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0853
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: transglycosylase-like protein
   score: 1.7404
 - annotation_quality: 1
   gene_category: Cell cycle and division
   gene_name: null
   locus_tag: SYNW0863
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 6.7093
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0872
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.8186
 - annotation_quality: 3
   gene_category: Translation
   gene_name: trmFO
   locus_tag: SYNW0899
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: methylenetetrahydrofolate--tRNA-(uracil(54)-C(5))-methyltransferase (FADH(2)-oxidizing)
   score: 1.1178
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recC
   locus_tag: SYNW0914
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: exodeoxyribonuclease V (RecBCD complex), gamma subunit
   score: 2.5795
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: manA
   locus_tag: SYNW0919
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: mannose-6-phosphate isomerase
   score: 1.0127
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
   locus_tag: SYNW0926
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell envelope-related transcriptional attenuator domain-containing protein
   score: 3.6593
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: uppS
   locus_tag: SYNW0934
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: di-trans,poly-cis-decaprenylcistransferase
   score: 0.8989
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: SYNW0938
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
   score: 1.1647
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
   locus_tag: SYNW0943
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: rare lipoprotein A
   score: 4.1812
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: swmB
   locus_tag: SYNW0953
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell surface protein required for swimming motility
   score: 2.5651
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: hlyD
   locus_tag: SYNW0958
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: hlyD secretion family protein
   score: 0.8989
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0961
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lytR
   locus_tag: SYNW0964
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell envelope-related transcriptional attenuator domain-containing protein
   score: 2.9849
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW0988
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyltransferase sugar-binding region containing DXD motif family protein
   score: 1.1942
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murF
   locus_tag: SYNW1002
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N-acetylmuramoyl-tripeptide--D-alanyl-D-alanine ligase
   score: 2.9461
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: glmU
   locus_tag: SYNW1003
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: bifunctional N-acetylglucosamine-1-phosphate uridyltransferase/glucosamine-1-phosphate
     acetyltransferase
   score: 1.4992
@@ -1074,336 +1074,336 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: amiC
   locus_tag: SYNW1009
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-acetylmuramoyl-L-alanine amidase
   score: 4.1462
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murI
   locus_tag: SYNW1010
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glutamate racemase
   score: 4.0114
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: prxQ
   locus_tag: SYNW1015
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 2-Cys peroxiredoxin
   score: 1.7622
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: ptrA
   locus_tag: SYNW1019
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: transcriptional phosphate regulator, Crp family
   score: 0.9412
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW1049
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 1.096
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ispA
   locus_tag: SYNW1079
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: signal peptidase II
   score: 1.4103
 - annotation_quality: 3
   gene_category: Transport
   gene_name: devB
   locus_tag: SYNW1085
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: ABC exporter membrane fusion, DevB family
   score: 1.1269
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: wcaA
   locus_tag: SYNW1089
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 2.0208
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: ddpX
   locus_tag: SYNW1094
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: D-alanyl-D-alanine dipeptidase
   score: 1.6449
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
   locus_tag: SYNW1098
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: D-alanyl-D-alanine carboxypeptidase
   score: 1.8784
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1133
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved membrane protein
   score: 1.4817
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW1148
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: methyltransferase domain protein
   score: 0.9877
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ctpA
   locus_tag: SYNW1175
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: photosystem II D1 protein carboxyl-terminal processing peptidase
   score: 1.601
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ftsH3
   locus_tag: SYNW1211
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: possible photosystem II D1 repair protein FtsH3
   score: 3.1213
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: ahpC
   locus_tag: SYNW1213
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 2-Cys peroxiredoxin
   score: 1.9368
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: nlpD
   locus_tag: SYNW1214
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: peptidoglycan-binding LysM
   score: 1.8784
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lptC
   locus_tag: SYNW1221
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: LptC-related, lipopolysaccharide assembly protein
   score: 1.4037
 - annotation_quality: 2
   gene_category: Cell cycle and division
   gene_name: cdv3
   locus_tag: SYNW1249
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: possible cell division protein Cdv3
   score: 11.4485
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pbp4
   locus_tag: SYNW1250
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: penicillin-binding-like protein Pbp4
   score: 1.7548
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1258
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-acetylmuramoyl-L-alanine amidase family protein
   score: 1.4161
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murQ
   locus_tag: SYNW1266
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-acetylmuramic acid 6-phosphate etherase
   score: 0.9412
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: prxQ
   locus_tag: SYNW1280
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 2-Cys peroxiredoxin
   score: 1.732
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: ilvA
   locus_tag: SYNW1293
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: threonine ammonia-lyase
   score: 1.4856
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: scpB
   locus_tag: SYNW1294
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: segregation and condensation protein B
   score: 8.3853
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ylmG1
   locus_tag: SYNW1295
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division membrane protein YlmG1 (factor involved in shape determination)
   score: 8.8277
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: psb29
   locus_tag: SYNW1302
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: photosystem II repair protein Psb29
   score: 3.0417
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW1350
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 1.5387
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW1355
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 3.0417
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1370
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 4.0615
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1458
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved membrane protein
   score: 1.5241
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1469
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.7586
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1476
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: lysozyme
   score: 0.8603
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW1489
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 1.1269
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: SYNW1503
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
   score: 1.8463
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1539
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 1.8621
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: null
   locus_tag: SYNW1565
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: regulator of chromosome condensation (RCC1) repeat family protein
   score: 1.1595
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: ftsH4
   locus_tag: SYNW1587
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein FtsH
   score: 6.1735
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW1595
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: P-loop containing nucleoside triphosphate hydrolases superfamily
   score: 1.1942
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: era
   locus_tag: SYNW1613
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: GTP-binding protein Era
   score: 2.201
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: zipN
   locus_tag: SYNW1619
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein ZipN
   score: 9.9526
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lnt
   locus_tag: SYNW1623
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: apolipoprotein N-acyltransferase
   score: 2.0732
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1628
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.1942
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murA
   locus_tag: SYNW1633
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N-acetylglucosamine 1-carboxyvinyltransferase
   score: 3.4684
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ddlB
   locus_tag: SYNW1641
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: D-alanine--D-alanine ligase family protein
   score: 3.9323
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsQ
   locus_tag: SYNW1643
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein FtsQ
   score: 11.8509
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsZ
   locus_tag: SYNW1644
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein FtsZ
   score: 10.2315
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: wcaJ
   locus_tag: SYNW1652
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative undecaprenyl-phosphate galactosephosphotransferase
   score: 1.9956
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1653
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein distantly related to alpha-glycosyltransferases
     family 4
   score: 2.0208
@@ -1411,112 +1411,112 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: pbp1
   locus_tag: SYNW1678
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: penicillin-binding-like protein 1A (PBP1A)(transpeptidase)
   score: 1.9956
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
   locus_tag: SYNW1684
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: GTP-binding protein LepA
   score: 1.4126
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murE
   locus_tag: SYNW1690
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
   score: 2.6836
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
   locus_tag: SYNW1701
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: small-conductance mechanosensitive ion channel, MscS family
   score: 1.8476
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
   locus_tag: SYNW1702
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: septum formation protein
   score: 5.0643
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
   locus_tag: SYNW1760
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein FtsI (peptidoglycan synthetase)
   score: 8.9855
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW1770
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 1.1942
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb27
   locus_tag: SYNW1772
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: photosystem II manganese cluster assembly protein Psb27
   score: 0.708
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
   locus_tag: SYNW1819
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: AAA domain protein
   score: 3.3431
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: nfrC
   locus_tag: SYNW1830
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-N-acetylglucosamine 2-epimerase
   score: 1.7171
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pilT2
   locus_tag: SYNW1831
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: twitching motility protein PilT
   score: 1.3795
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pilT2
   locus_tag: SYNW1832
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: twitching motility protein PilT
   score: 1.3795
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: petA
   locus_tag: SYNW1842
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: apocytochrome f
   score: 0.8989
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: lgt
   locus_tag: SYNW1843
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: phosphatidylglycerol:prolipoprotein diacylglycerol transferase
   score: 1.8196
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1850
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: UDP-glycosyltransferase/glycogen phosphorylase
   score: 1.8196
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1881
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 4-amino-4-deoxy-L-arabinose transferase and related glycosyltransferase
     of PMT family
   score: 1.5174
@@ -1524,238 +1524,238 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1882
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferase family GT1
   score: 1.6419
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: rseP
   locus_tag: SYNW1895
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: RIP metalloprotease RseP
   score: 1.8196
 - annotation_quality: 3
   gene_category: Translation
   gene_name: cgtA
   locus_tag: SYNW1928
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: obg family GTPase CgtA
   score: 1.7553
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW1957
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: LysM domain-containing protein
   score: 2.0466
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ctp
   locus_tag: SYNW1968
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: carboxy-terminal processing peptidase
   score: 1.6913
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: minC
   locus_tag: SYNW1970
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: septum formation inhibitor
   score: 8.1948
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: minD
   locus_tag: SYNW1971
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: septum site-determining protein MinD
   score: 7.9498
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: minE
   locus_tag: SYNW1972
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division topological specificity factor MinE
   score: 10.6028
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cpeB
   locus_tag: SYNW2017
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: C-phycoerythrin class I, beta subunit
   score: 1.1269
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
   locus_tag: SYNW2028
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: rare lipoA family protein
   score: 1.6089
 - annotation_quality: 0
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: SYNW2030
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 3.1851
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW2039
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved secreted protein
   score: 3.4283
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
   locus_tag: SYNW2041
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: nucleotide-binding protein
   score: 4.294
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: mrdB
   locus_tag: SYNW2042
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: rod shape determining protein
   score: 6.9494
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
   locus_tag: SYNW2098
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: alanine racemase
   score: 1.601
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2114
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: NLP/P60
   score: 4.0037
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2115
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 2.0466
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
   locus_tag: SYNW2119
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: RND family multidrug efflux transporter
   score: 6.1553
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2125
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved secreted protein
   score: 1.0668
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: som
   locus_tag: SYNW2128
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: outer membrane porin
   score: 1.096
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: YS02621
   locus_tag: SYNW2156
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: RND transporter, hydrophobe/amphiphile efflux-1 family protein
   score: 6.0537
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mdtA
   locus_tag: SYNW2157
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: multidrug efflux pump membrane fusion protein
   score: 1.1942
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: prxQ
   locus_tag: SYNW2162
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 2-Cys peroxiredoxin
   score: 1.732
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: anmK
   locus_tag: SYNW2170
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: anhydro-N-acetylmuramic acid kinase
   score: 2.7959
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: tolC
   locus_tag: SYNW2187
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: TolC-like outer membrane efflux protein, RND family
   score: 1.4891
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: uppP
   locus_tag: SYNW2189
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: undecaprenyl-diphosphatase
   score: 0.9412
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: SynDsbAB
   locus_tag: SYNW2193
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: disulfide bond forming protein
   score: 1.0391
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: bgl
   locus_tag: SYNW2208
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: N-Acetyl-D-glucosamine (anhydrous) N-Acetylmuramyl-tripeptide beta -1,4-N-acetylglucosaminidase
   score: 0.7619
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2209
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: beta-glycosyltransferase, family 2
   score: 3.9323
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: sulA
   locus_tag: SYNW2218
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division inhibitor
   score: 9.8677
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2220
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: dolichyl-phosphate-mannose-mannosyltransferase family protein
   score: 1.2309
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: som
   locus_tag: SYNW2224
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: outer membrane porin
   score: 1.096
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: som
   locus_tag: SYNW2227
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: outer membrane porin
   score: 1.096
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2229
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: inverting glycosyltransferase family 83 utilizing lipid monophospho-sugar
     donors
   score: 1.7942
@@ -1763,203 +1763,203 @@ rows:
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: SYNW2232
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: photosystem II D2 protein
   score: 0.708
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW2264
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 3.1851
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: scpA
   locus_tag: SYNW2265
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: scpA/B family protein
   score: 7.5441
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: cugP
   locus_tag: SYNW2266
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: mannose-1-phosphate guanylyltransferase
   score: 1.3623
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2277
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 1.2309
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2294
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: nucleotide-diphospho-sugar transferase
   score: 1.4288
 - annotation_quality: 3
   gene_category: Translation
   gene_name: rsmH
   locus_tag: SYNW2298
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 16S rRNA (cytosine(1402)-N(4))-methyltransferase
   score: 1.8765
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: dgkA
   locus_tag: SYNW2314
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: prokaryotic diacylglycerol kinase family protein
   score: 1.5594
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2321
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.4681
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murG
   locus_tag: SYNW2333
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: undecaprenyldiphospho-muramoylpentapeptide beta-N-acetylglucosaminyltransferase
   score: 2.8155
 - annotation_quality: 3
   gene_category: Translation
   gene_name: gidA
   locus_tag: SYNW2382
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: tRNA uridine 5-carboxymethylaminomethyl modification enzyme GidA
   score: 4.6725
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW2383
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved membrane protein
   score: 1.2309
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: gpgS
   locus_tag: SYNW2436
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glucosyl-3-phosphoglycerate synthase
   score: 3.8823
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: null
   locus_tag: SYNW2492
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycosyl transferase family, helical bundle domain protein
   score: 0.8989
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SYNW2503
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: O-antigen ligase family protein
   score: 1.8353
 - annotation_quality: 3
   gene_category: Translation
   gene_name: rpsF
   locus_tag: SYNW2511
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: 30S ribosomal protein S6
   score: 1.0127
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mraY
   locus_tag: SYNW2516
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: phospho-N-acetylmuramoyl-pentapeptide-transferase
   score: 3.2544
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spsA
   locus_tag: SYNW2520
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: sucrose phosphate synthase and phosphatase fusion protein
   score: 1.0706
 - annotation_quality: 2
   gene_category: Amino acid metabolism
   gene_name: null
   locus_tag: SYNW2525
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: alpha/beta hydrolase of unknown function (DUF1400)
   score: 2.911
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: TX72_RS01570
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: uncharacterized conserved membrane protein
   score: 1.7586
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: TX72_RS08795
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: unk13
   locus_tag: TX72_RS10140
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
   score: 3.8193
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: TX72_RS14390
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: TX72_RS14485
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: TX72_RS14825
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.7981
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: TX72_RS14915
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_0008
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved membrane protein
   score: 3.4283
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pilT1
   locus_tag: sync_0020
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: twitching motility protein PilT
   score: 1.2309
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pilB
   locus_tag: sync_0021
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: type II secretory pathway, ATPase PulE/Tfp pilus assembly pathway, ATPase
     PilB
   score: 0.9877
@@ -1967,35 +1967,35 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: murB
   locus_tag: sync_0027
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N-acetylenolpyruvoylglucosamine reductase
   score: 4.196
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murC
   locus_tag: sync_0028
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N-acetylmuramate-alanine ligase
   score: 1.5507
 - annotation_quality: 1
   gene_category: Carbohydrate metabolism
   gene_name: wcaG-1
   locus_tag: sync_0035
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved NADP-binding domain-containing protein
   score: 1.5174
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_0043
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 1.3561
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mrdA
   locus_tag: sync_0051
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: transpeptidase involved in septal peptidoglycan synthesis (peptidoglycan
     synthetase precursor)
   score: 1.947
@@ -2003,329 +2003,329 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: sqdX
   locus_tag: sync_0052
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: sulfoquinovosyldiacylglycerol synthase
   score: 1.9236
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: spoIID
   locus_tag: sync_0060
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: sporulation protein SpoIID
   score: 5.0037
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mgdA
   locus_tag: sync_0061
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: monoglycosyldiacylglycerol (MGlcDG) synthase
   score: 3.9148
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tilS
   locus_tag: sync_0071
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: tRNA(Ile)-lysidine synthetase
   score: 4.116
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0076
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: curli production assembly/transport component CsgG family protein
   score: 2.0466
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0085
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: possible alpha-glycosyltransferase, family 4
   score: 1.6763
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: secA
   locus_tag: sync_0086
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: preprotein translocase SecA subunit
   score: 1.5548
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB1
   locus_tag: sync_0094
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: fluoride exporter
   score: 6.3017
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB2
   locus_tag: sync_0095
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: fluoride exporter
   score: 6.0925
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
   locus_tag: sync_0100
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: RND family multidrug efflux transporter, MMPL family
   score: 5.9135
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
   locus_tag: sync_0111
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: rod shape-determining protein MreB
   score: 5.262
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: mreC
   locus_tag: sync_0112
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: rod shape-determining protein MreC
   score: 4.354
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0113
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 3.3137
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_0118
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 3.5181
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: glmS
   locus_tag: sync_0134
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glutamine---fructose-6-phosphate transaminase (isomerizing)
   score: 1.6811
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0139
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: possible beta-glycosyltransferase, family 2
   score: 2.0208
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: gmd
   locus_tag: sync_0146
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: GDP-mannose 4,6-dehydratase
   score: 1.6465
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: wcaJ
   locus_tag: sync_0147
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: undecaprenyl-phosphate glucose phosphotransferase
   score: 1.9956
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: kpsD3
   locus_tag: sync_0149
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: polysaccharide biosynthesis/export protein
   score: 1.5174
 - annotation_quality: 3
   gene_category: Lipid metabolism
   gene_name: null
   locus_tag: sync_0155
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: ceramide glucosyltransferase
   score: 1.6913
 - annotation_quality: 3
   gene_category: Lipid metabolism
   gene_name: null
   locus_tag: sync_0157
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: monogalactosyldiacylglycerol (MGDG) synthase family protein
   score: 1.8196
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: uxs
   locus_tag: sync_0159
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-glucuronate decarboxylase
   score: 1.096
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: manC
   locus_tag: sync_0160
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: mannose-1-phosphate guanylyltransferase
   score: 1.6465
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: legG
   locus_tag: sync_0169
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N,N^-diacetylbacillosamine 2-epimerase (hydrolysing)
   score: 1.6913
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: neuA
   locus_tag: sync_0170
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N-acylneuraminate cytidylyltransferase
   score: 1.4466
 - annotation_quality: 3
   gene_category: Nucleotide metabolism
   gene_name: legI
   locus_tag: sync_0174
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N,N^-diacetyllegionaminate synthase
   score: 1.6913
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: rfbE
   locus_tag: sync_0179
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: perosamine synthetase protein family
   score: 1.3623
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: neuA
   locus_tag: sync_0182
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N-acylneuraminate cytidylyltransferase
   score: 1.4126
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: wcaJ
   locus_tag: sync_0183
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: undecaprenyl-phosphate glucose phosphotransferase
   score: 1.9956
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0192
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: polysaccharide biosynthesis family protein
   score: 1.8476
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscL
   locus_tag: sync_0202
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: large-conductance mechanosensitive ion channel, MscL family
   score: 3.0564
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0207
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved membrane protein
   score: 1.7586
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0217
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: alpha-glycosyltransferase, family 4
   score: 2.0466
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0220
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-glycosyltransferase/glycogen phosphorylase
   score: 2.0466
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0221
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: possible alpha-glycosyltransferase, family 4
   score: 1.9956
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0222
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: possible alpha-glycosyltransferase, family 4
   score: 1.9956
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0223
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glycosyltransferase
   score: 1.9956
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0229
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.667
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: galE
   locus_tag: sync_0231
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-glucose 4-epimerase
   score: 1.601
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: ugd
   locus_tag: sync_0233
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-glucose 6-dehydrogenase
   score: 1.5199
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: wcaG-3
   locus_tag: sync_0234
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: NAD dependent epimerase/dehydratase
   score: 1.6763
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: degT
   locus_tag: sync_0253
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative pleiotropic regulatory protein
   score: 1.5174
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_0255
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved lipoprotein
   score: 1.2309
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: betP
   locus_tag: sync_0268
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glycine betaine transporter, BCCT family
   score: 1.766
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: tagA
   locus_tag: sync_0282
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N-acetylglucosaminyldiphosphoundecaprenol N-acetyl-beta-D-mannosaminyltransferase
   score: 1.6133
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murJ
   locus_tag: sync_0295
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: peptidoglycan lipid II flippase
   score: 1.0127
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rfe
   locus_tag: sync_0301
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N-acetylmuramyl pentapeptide phosphotransferase/UDP-N- acetylglucosamine-1-phosphate
     transferase
   score: 1.6811
@@ -2333,686 +2333,686 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0306
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: protein of unknown function DUF3769
   score: 1.0391
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ams1
   locus_tag: sync_0308
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: alpha-mannosidases, glycoside hydrolase family 38
   score: 0.7921
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: sll1424
   locus_tag: sync_0315
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein (DUF3084)
   score: 3.1895
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: slt
   locus_tag: sync_0323
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: soluble lytic murein transglycosylase
   score: 1.9236
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: glmM
   locus_tag: sync_0325
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: phosphoglucosamine mutase
   score: 0.8989
 - annotation_quality: 3
   gene_category: Transport
   gene_name: ictB
   locus_tag: sync_0327
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: bicarbonate transporter, ICT family
   score: 1.766
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0332
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: ycf20
   locus_tag: sync_0345
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterised membrane protein Ycf20
   score: 1.096
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsH1
   locus_tag: sync_0355
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division protein FtsH1
   score: 6.8612
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: gpgS
   locus_tag: sync_0360
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glucosyl-3-phosphoglycerate synthase
   score: 3.8823
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0392
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved secreted protein
   score: 1.0668
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
   locus_tag: sync_0397
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: RND family multidrug efflux transporter
   score: 6.1553
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0401
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: beta-glycosyltransferase, family 2
   score: 2.0466
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0402
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: NLP/P60
   score: 4.0561
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
   locus_tag: sync_0406
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: alanine racemase
   score: 1.7404
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: mrdB
   locus_tag: sync_0465
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: rod shape determining protein
   score: 7.1137
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
   locus_tag: sync_0466
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: nucleotide-binding protein
   score: 4.5934
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_0468
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved secreted protein
   score: 3.4283
 - annotation_quality: 0
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: sync_0480
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 3.1851
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
   locus_tag: sync_0482
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: rare lipoA family protein
   score: 1.7497
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: unk13
   locus_tag: sync_0493
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 3.8193
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cpeB
   locus_tag: sync_0495
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: C-phycoerythrin class I, beta subunit
   score: 1.1595
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0527
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.9052
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: minE
   locus_tag: sync_0544
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division topological specificity factor MinE
   score: 10.6028
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: minD
   locus_tag: sync_0545
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: septum site-determining protein MinD
   score: 5.2967
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: minC
   locus_tag: sync_0546
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: septum formation inhibitor
   score: 8.1948
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ctp
   locus_tag: sync_0548
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: carboxy-terminal processing peptidase
   score: 1.7404
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0565
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: LysM domain-containing protein
   score: 2.0208
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0592
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: possible polysaccharide-forming beta-glycosyltransferase, family 2
   score: 3.7581
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: sepF
   locus_tag: sync_0600
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division protein SepF (Cdv2)
   score: 8.8689
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: dgdA
   locus_tag: sync_0602
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: digalactosyldiacylglycerol (DGDG) synthase
   score: 1.947
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0621
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane beta-barrel domain protein
   score: 1.8509
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murE
   locus_tag: sync_0632
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
   score: 2.6836
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0635
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0644
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved membrane protein
   score: 1.5537
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
   locus_tag: sync_0652
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: GTP-binding protein LepA
   score: 1.4126
 - annotation_quality: 1
   gene_category: Cell motility
   gene_name: pilA
   locus_tag: sync_0654
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 3.7762
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0674
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8828
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: sync_0678
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane porin
   score: 1.1269
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pbp1
   locus_tag: sync_0695
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: penicillin-binding-like protein 1A (PBP1A)(transpeptidase)
   score: 1.9956
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: wcaJ
   locus_tag: sync_0723
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative undecaprenyl-phosphate galactosephosphotransferase
   score: 2.0208
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsZ
   locus_tag: sync_0731
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division protein FtsZ
   score: 10.2315
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsQ
   locus_tag: sync_0732
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division protein FtsQ
   score: 11.8509
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ddl
   locus_tag: sync_0734
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: D-alanine--D-alanine ligase family protein
   score: 3.9323
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ykfB
   locus_tag: sync_0736
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: L-Ala-D/L-Glu epimerase
   score: 1.7404
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murA
   locus_tag: sync_0746
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N-acetylglucosamine 1-carboxyvinyltransferase
   score: 3.4684
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0753
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.2309
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lnt
   locus_tag: sync_0758
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: apolipoprotein N-acyltransferase
   score: 2.0732
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: zipN
   locus_tag: sync_0765
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division protein ZipN
   score: 9.7315
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: era
   locus_tag: sync_0773
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: GTP-binding protein Era
   score: 1.9898
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_0812
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: P-loop containing nucleoside triphosphate hydrolases superfamily
   score: 1.1942
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: ftsH4
   locus_tag: sync_0825
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division protein FtsH
   score: 6.6385
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0879
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved membrane protein
   score: 1.4817
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
   locus_tag: sync_0895
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: septum formation protein
   score: 5.0643
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: sync_0897
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: photosystem II D2 protein
   score: 0.708
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
   locus_tag: sync_0929
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: RND efflux pump, MFP subunit, HlyD family
   score: 1.4619
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0959
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: null
   locus_tag: sync_0975
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: alpha-glucan branching enzyme
   score: 0.708
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_0987
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: alpha-glycosidase
   score: 1.2309
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lytR
   locus_tag: sync_1013
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell envelope-related transcriptional attenuator domain-containing protein
   score: 3.024
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: uppS
   locus_tag: sync_1031
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: di-trans,poly-cis-decaprenylcistransferase
   score: 0.8989
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
   locus_tag: sync_1040
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: NHPM bacteriocin system secretion protein, HlyD family
   score: 1.1942
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
   locus_tag: sync_1044
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell envelope-related transcriptional attenuator domain-containing protein
   score: 3.6952
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: manA
   locus_tag: sync_1052
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: mannose-6-phosphate isomerase
   score: 1.0127
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: recC
   locus_tag: sync_1055
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: exodeoxyribonuclease V (RecBCD complex), gamma subunit
   score: 2.5795
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1069
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane beta-barrel domain protein
   score: 1.2309
 - annotation_quality: 3
   gene_category: Translation
   gene_name: trmFO
   locus_tag: sync_1138
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: methylenetetrahydrofolate--tRNA-(uracil(54)-C(5))-methyltransferase (FADH(2)-oxidizing)
   score: 1.1178
 - annotation_quality: 1
   gene_category: Cell cycle and division
   gene_name: null
   locus_tag: sync_1169
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 6.7719
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1178
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: transglycosylase-like protein
   score: 1.7404
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1188
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.2905
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_1205
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein (DUF3386)
   score: 3.0417
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: sync_1216
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: hlyD secretion family protein
   score: 1.096
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
   locus_tag: sync_1267
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: small-conductance mechanosensitive ion channel, MscS family
   score: 1.7122
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_1268
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: methyltransferase domain protein
   score: 0.9877
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: ddpX
   locus_tag: sync_1279
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: D-alanyl-D-alanine dipeptidase
   score: 1.7404
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
   locus_tag: sync_1283
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: D-alanyl-D-alanine carboxypeptidase
   score: 1.8784
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ftsH3
   locus_tag: sync_1320
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: possible photosystem II D1 repair protein FtsH3
   score: 3.5305
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: nlpD
   locus_tag: sync_1325
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: peptidoglycan-binding LysM
   score: 1.9236
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lptC
   locus_tag: sync_1332
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: LptC-related, lipopolysaccharide assembly protein
   score: 1.4037
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: null
   locus_tag: sync_1347
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: spoIID/LytB domain protein
   score: 4.5597
 - annotation_quality: 2
   gene_category: Cell cycle and division
   gene_name: cdv3
   locus_tag: sync_1363
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: possible cell division protein Cdv3
   score: 11.4485
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pbp4
   locus_tag: sync_1364
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: penicillin-binding-like protein Pbp4
   score: 1.7548
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1378
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N-acetylmuramoyl-L-alanine amidase family protein
   score: 1.4161
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murQ
   locus_tag: sync_1386
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N-acetylmuramic acid 6-phosphate etherase
   score: 0.9412
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: ilvA
   locus_tag: sync_1411
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: threonine ammonia-lyase
   score: 1.3378
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: scpB
   locus_tag: sync_1412
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: segregation and condensation protein B
   score: 8.3853
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ylmG1
   locus_tag: sync_1413
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division membrane protein YlmG1 (factor involved in shape determination)
   score: 8.8686
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: psb29
   locus_tag: sync_1419
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: photosystem II repair protein Psb29
   score: 3.0417
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1434
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 2.1894
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: nfeD
   locus_tag: sync_1450
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: NfeD class II-like protein
   score: 1.5689
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1465
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: polysaccharide-forming beta-glycosyltransferase, family 2
   score: 1.9688
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
   locus_tag: sync_1482
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: small-conductance mechanosensitive ion channel, MscS family
   score: 1.3117
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: sync_1500
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane porin
   score: 1.1269
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: sync_1501
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane porin
   score: 1.1269
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1509
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 1.4037
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
   locus_tag: sync_1510
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: heavy metal efflux pump, CzcA family protein
   score: 5.9135
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murF
   locus_tag: sync_1531
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N-acetylmuramoyl-tripeptide--D-alanyl-D-alanine ligase
   score: 2.8801
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: glmU
   locus_tag: sync_1533
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: bifunctional N-acetylglucosamine-1-phosphate uridyltransferase/glucosamine-1-phosphate
     acetyltransferase
   score: 1.4992
@@ -3020,280 +3020,280 @@ rows:
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: sync_1542
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane porin
   score: 1.1269
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: amiC
   locus_tag: sync_1549
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N-acetylmuramoyl-L-alanine amidase
   score: 4.1462
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murI
   locus_tag: sync_1550
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glutamate racemase
   score: 3.98
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_1554
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 4.021
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ispA
   locus_tag: sync_1561
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: signal peptidase II
   score: 1.4103
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pbp2
   locus_tag: sync_1562
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: penicillin-binding-like protein PBP2
   score: 1.8784
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_1599
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 1.096
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1619
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N-acetylmuramoyl-L-alanine amidase
   score: 1.6165
 - annotation_quality: 3
   gene_category: Transport
   gene_name: devB
   locus_tag: sync_1657
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: ABC exporter membrane fusion, DevB family
   score: 1.1269
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: wcaA
   locus_tag: sync_1661
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: beta-glycosyltransferase, family 2
   score: 2.0208
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ctpA
   locus_tag: sync_1675
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: photosystem II D1 protein carboxyl-terminal processing peptidase
   score: 1.6449
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: pilD
   locus_tag: sync_1709
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: leader peptidase (prepilin peptidase) / N-methyltransferase
   score: 1.0668
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lpxD
   locus_tag: sync_1713
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-3-O-[3-hydroxymyristoyl] glucosamine N-acyltransferase
   score: 2.5326
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: yqeG
   locus_tag: sync_1715
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: haloacid dehalogenase (HAD) family phosphatase
   score: 1.1942
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1733
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1740
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1765
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1770
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: beta-glycosyltransferase, family 2
   score: 4.0388
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1777
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_1795
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 2.911
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1845
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized TonB box-containing membrane protein
   score: 1.27
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1847
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved membrane protein
   score: 1.5241
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1864
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: lysozyme
   score: 0.8603
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1874
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.4548
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1875
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.7122
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_1881
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 1.1269
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: sync_1897
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
   score: 1.8463
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1914
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein distantly related to glycosidases
   score: 1.1595
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1936
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: beta-glycosyltransferase, family 2
   score: 4.0388
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_1972
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 4.3874
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1980
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8186
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_1997
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
   locus_tag: sync_2009
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division protein FtsI (peptidoglycan synthetase)
   score: 8.9855
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_2020
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 1.1942
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb27
   locus_tag: sync_2022
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: photosystem II manganese cluster assembly protein Psb27
   score: 0.8603
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
   locus_tag: sync_2059
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glutamate-1-semialdehyde aminotransferase domainprotein
   score: 1.1942
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2078
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: rseP
   locus_tag: sync_2090
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: RIP metalloprotease RseP
   score: 1.8476
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2103
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glycosyl transferase family GT1
   score: 1.6419
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2104
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: 4-amino-4-deoxy-L-arabinose transferase and related glycosyltransferase
     of PMT family
   score: 1.5174
@@ -3301,482 +3301,482 @@ rows:
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2110
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: peptidase M23 family protein
   score: 3.2593
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2139
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-glycosyltransferase/glycogen phosphorylase
   score: 1.8196
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: lgt
   locus_tag: sync_2147
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: phosphatidylglycerol:prolipoprotein diacylglycerol transferase
   score: 1.8196
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: petA
   locus_tag: sync_2148
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: apocytochrome f
   score: 0.8989
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: pilT2
   locus_tag: sync_2158
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: twitching motility protein PilT
   score: 1.1942
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: nfrC
   locus_tag: sync_2159
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N-acetylglucosamine 2-epimerase
   score: 1.7171
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
   locus_tag: sync_2172
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: AAA domain protein
   score: 3.3431
 - annotation_quality: 1
   gene_category: Cell cycle and division
   gene_name: null
   locus_tag: sync_2198
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 2.911
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lpxB
   locus_tag: sync_2211
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: lipid-A-disaccharide synthase
   score: 2.8809
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lpxA
   locus_tag: sync_2212
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: acyl-[acyl-carrier-protein]-UDP-N- acetylglucosamine O-acyltransferase
   score: 3.0047
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lpxC
   locus_tag: sync_2214
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-3-O-[3-hydroxymyristoyl] N-acetylglucosamine deacetylase
   score: 1.5507
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: bamA
   locus_tag: sync_2215
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane protein insertion porin family
   score: 1.9236
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
   locus_tag: sync_2248
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: stage II sporulation protein D
   score: 4.8788
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbV
   locus_tag: sync_2250
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cytochrome c-550
   score: 1.0127
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
   locus_tag: sync_2260
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: UDP-N-acetylmuramoylalanine--D-glutamate ligase
   score: 3.0949
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2266
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscL
   locus_tag: sync_2281
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: large-conductance mechanosensitive ion channel, MscL family
   score: 1.3335
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: ftsW
   locus_tag: sync_2326
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division protein FtsW
   score: 10.176
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2335
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Translation
   gene_name: gidB
   locus_tag: sync_2346
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: 16S rRNA (guanine(527)-N(7))-methyltransferase GidB
   score: 1.6449
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2352
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.7981
 - annotation_quality: 3
   gene_category: Translation
   gene_name: cgtA
   locus_tag: sync_2394
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: obg family GTPase CgtA
   score: 1.7553
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: smc
   locus_tag: sync_2454
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: chromosome segregation protein
   score: 5.3444
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2457
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: lipid A disaccharide synthase family protein
   score: 1.4103
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: hli
   locus_tag: sync_2465
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: high light inducible protein
   score: 3.1851
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2472
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.4548
 - annotation_quality: 0
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2490
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved membrane protein
   score: 1.7586
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
   locus_tag: sync_2502
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: RND transporter, hydrophobe/amphiphile efflux-1 family protein
   score: 6.1304
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mdtA
   locus_tag: sync_2503
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: multidrug efflux pump membrane fusion protein
   score: 1.1942
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: anmK
   locus_tag: sync_2516
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: anhydro-N-acetylmuramic acid kinase
   score: 2.7959
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: tolC
   locus_tag: sync_2541
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: TolC-like outer membrane efflux protein, RND family
   score: 1.5772
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: uppP
   locus_tag: sync_2543
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: undecaprenyl-diphosphatase
   score: 0.9412
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: SynDsbAB
   locus_tag: sync_2547
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: disulfide bond forming protein
   score: 1.0668
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: bgl
   locus_tag: sync_2563
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: N-Acetyl-D-glucosamine (anhydrous) N-Acetylmuramyl-tripeptide beta -1,4-N-acetylglucosaminidase
   score: 0.8248
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2564
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: beta-glycosyltransferase, family 2
   score: 3.9323
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: sulA
   locus_tag: sync_2573
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: cell division inhibitor
   score: 10.0125
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: sync_2579
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane porin
   score: 1.1269
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: sync_2581
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: outer membrane porin
   score: 1.1269
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2583
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.4956
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2584
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: sync_2586
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: photosystem II D2 protein
   score: 0.708
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_2615
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 3.1851
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: scpA
   locus_tag: sync_2616
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: scpA/B family protein
   score: 7.5441
 - annotation_quality: 3
   gene_category: Central intermediary metabolism
   gene_name: cugP
   locus_tag: sync_2617
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: mannose-1-phosphate guanylyltransferase
   score: 1.3623
 - annotation_quality: 1
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2628
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
   score: 1.2309
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2632
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Translation
   gene_name: rsmH
   locus_tag: sync_2647
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: 16S rRNA (cytosine(1402)-N(4))-methyltransferase
   score: 1.7404
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2651
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: dgkA
   locus_tag: sync_2662
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: prokaryotic diacylglycerol kinase family protein
   score: 1.5594
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
   locus_tag: sync_2685
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: small-conductance mechanosensitive ion channel, MscS family
   score: 1.8765
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2687
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.7208
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2697
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.8609
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2698
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.4681
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2705
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: carbohydrate-binding module family 2-containing protein
   score: 1.1595
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murG
   locus_tag: sync_2714
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: undecaprenyldiphospho-muramoylpentapeptide beta-N-acetylglucosaminyltransferase
   score: 2.8756
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
   locus_tag: sync_2766
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: RND multidrug efflux transporter, MMPL family
   score: 6.3807
 - annotation_quality: 3
   gene_category: Translation
   gene_name: gidA
   locus_tag: sync_2796
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: tRNA uridine 5-carboxymethylaminomethyl modification enzyme GidA
   score: 4.6725
 - annotation_quality: 0
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_2797
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: uncharacterized conserved membrane protein
   score: 1.2502
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: sync_2798
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: peptidase M23 family protein
   score: 1.1269
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2800
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: putative membrane protein
   score: 1.9517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
   locus_tag: sync_2818
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: small-conductance mechanosensitive ion channel, MscS family
   score: 1.3335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
   locus_tag: sync_2824
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: small-conductance mechanosensitive ion channel, MscS family
   score: 1.8765
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hlyD
   locus_tag: sync_2862
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: type I secretion system ABC transporter, HlyD family
   score: 1.0391
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: null
   locus_tag: sync_2904
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glycosyl transferase family, helical bundle domain protein
   score: 0.8989
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: sync_2916
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: O-antigen ligase family protein
   score: 1.8353
 - annotation_quality: 3
   gene_category: Translation
   gene_name: rpsF
   locus_tag: sync_2926
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: 30S ribosomal protein S6
   score: 1.0127
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mraY
   locus_tag: sync_2931
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: phospho-N-acetylmuramoyl-pentapeptide-transferase
   score: 3.2544
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spsA
   locus_tag: sync_2936
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: sucrose phosphate synthase and phosphatase fusion protein
   score: 1.0706
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: sync_2942
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: alpha/beta hydrolase of unknown function (DUF1400)
   score: 2.911

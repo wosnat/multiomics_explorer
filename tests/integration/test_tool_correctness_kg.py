@@ -76,7 +76,7 @@ class TestResolveGeneCorrectnessKG:
         row = results[0]
         # Product may differ due to KG char escaping (' → ^, | → ,)
         assert row["product"] == _kg_escape(gene["product"])
-        assert row["organism_strain"] == gene["organism_strain"]
+        assert row["organism_name"] == gene["organism_name"]
 
     @pytest.mark.parametrize(
         "gene",
@@ -104,7 +104,7 @@ class TestResolveGeneCorrectnessKG:
         cypher, params = build_resolve_gene(identifier="dnaN", organism="MED4")
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
-        assert "MED4" in results[0]["organism_strain"]
+        assert "MED4" in results[0]["organism_name"]
 
     def test_lookup_by_all_identifiers_entry(self, conn):
         """PMM0446 should be found via its WP_ protein accession."""
@@ -153,8 +153,8 @@ class TestGenesByFunctionCorrectnessKG:
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         for r in results:
-            assert "MED4" in r["organism_strain"], (
-                f"Expected MED4, got {r['organism_strain']}"
+            assert "MED4" in r["organism_name"], (
+                f"Expected MED4, got {r['organism_name']}"
             )
 
     def test_quality_filter_reduces_results(self, conn):
@@ -183,7 +183,7 @@ class TestGenesByFunctionCorrectnessKG:
             search_text="chaperone",
         )
         results = conn.execute_query(cypher, **params)
-        orgs = {r["organism_strain"] for r in results}
+        orgs = {r["organism_name"] for r in results}
         assert len(orgs) >= 2, f"Expected multi-organism results, got {orgs}"
 
 
@@ -196,7 +196,7 @@ class TestGeneDetailsCorrectnessKG:
     """Validate gene details queries return flat g{.*} properties."""
 
     def test_well_annotated_prochlorococcus(self, conn):
-        """PMM0001 returns flat g{.*} with locus_tag, gene_name, product, organism_strain."""
+        """PMM0001 returns flat g{.*} with locus_tag, gene_name, product, organism_name."""
         cypher, params = build_gene_details(locus_tags=["PMM0001"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
@@ -205,17 +205,17 @@ class TestGeneDetailsCorrectnessKG:
         assert gene["locus_tag"] == "PMM0001"
         assert gene["gene_name"] == "dnaN"
         assert "product" in gene
-        assert "organism_strain" in gene
+        assert "organism_name" in gene
 
     def test_alteromonas_gene(self, conn):
-        """ALT831_RS00180 returns flat properties with organism_strain containing 'Alteromonas'."""
+        """ALT831_RS00180 returns flat properties with organism_name containing 'Alteromonas'."""
         cypher, params = build_gene_details(locus_tags=["ALT831_RS00180"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
         assert gene is not None
         assert gene["locus_tag"] == "ALT831_RS00180"
-        assert "Alteromonas" in gene["organism_strain"]
+        assert "Alteromonas" in gene["organism_name"]
 
 
 # ---------------------------------------------------------------------------
@@ -251,11 +251,11 @@ class TestGeneOverviewCorrectnessKG:
         assert r["closest_ortholog_group_size"] == 1
 
     def test_batch_mixed_organisms(self, conn):
-        """[PMM1428, EZ55_00275]: returns 2 rows with correct organism_strain."""
+        """[PMM1428, EZ55_00275]: returns 2 rows with correct organism_name."""
         cypher, params = build_gene_overview(locus_tags=["PMM1428", "EZ55_00275"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 2
-        orgs = {r["organism_strain"] for r in results}
+        orgs = {r["organism_name"] for r in results}
         assert len(orgs) == 2  # different organisms
 
     def test_nonexistent_gene_excluded(self, conn):
@@ -285,7 +285,7 @@ class TestGeneHomologsCorrectnessKG:
         cypher, params = build_gene_homologs(locus_tags=["PMM1375"])
         results = conn.execute_query(cypher, **params)
         for r in results:
-            for col in ("locus_tag", "organism_strain", "group_id",
+            for col in ("locus_tag", "organism_name", "group_id",
                         "consensus_gene_name", "consensus_product",
                         "taxonomic_level", "source"):
                 assert col in r, f"Missing compact column: {col}"
@@ -679,7 +679,7 @@ class TestGenesByOntologyCorrectnessKG:
             "Organism filter should reduce result count"
         )
         for r in filtered:
-            assert "MED4" in r["organism_strain"]
+            assert "MED4" in r["organism_name"]
 
     def test_multiple_term_ids(self, conn):
         """Multiple term IDs return union of results."""
@@ -730,7 +730,7 @@ class TestGenesByOntologyCorrectnessKG:
         assert len(results) >= 1
         for r in results:
             assert "locus_tag" in r
-            assert "organism_strain" in r
+            assert "organism_name" in r
 
     def test_cyanorak_role_hierarchy(self, conn):
         """CyanoRAK role hierarchy expansion returns genes."""
@@ -892,13 +892,13 @@ class TestGeneOntologyTermsCorrectnessKG:
         assert "MIT1002_03493" in locus_tags_found
 
     def test_verbose_includes_organism(self, conn):
-        """verbose=True adds organism_strain to results."""
+        """verbose=True adds organism_name to results."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="go_bp", verbose=True,
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
-        assert "organism_strain" in results[0]
+        assert "organism_name" in results[0]
 
 
 # ---------------------------------------------------------------------------

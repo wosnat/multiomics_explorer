@@ -10,7 +10,7 @@ examples:
         "total_matching": 1,
         "returned": 1, "truncated": false, "not_found": [],
         "results": [
-          {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MED4", "gene_category": "DNA replication", "annotation_quality": 3, "ec_numbers": ["2.7.7.7"], "cog_categories": ["L"], "kegg_ids": ["K02338"], ...}
+          {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4", "gene_category": "DNA replication", "annotation_quality": 3, "ec_numbers": ["2.7.7.7"], "cog_categories": ["L"], "kegg_ids": ["K02338"], ...}
         ]
       }
 

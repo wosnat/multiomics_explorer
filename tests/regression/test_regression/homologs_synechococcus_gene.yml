@@ -5,7 +5,7 @@ rows:
   consensus_product: cell division protein FtsH1
   group_id: cyanorak:CK_00008085
   locus_tag: SYNW0305
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -13,7 +13,7 @@ rows:
   consensus_product: cell division protein FtsH1
   group_id: eggnog:1GYE1@1129
   locus_tag: SYNW0305
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -21,7 +21,7 @@ rows:
   consensus_product: cell division protein FtsH1
   group_id: eggnog:COG0465@2
   locus_tag: SYNW0305
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria

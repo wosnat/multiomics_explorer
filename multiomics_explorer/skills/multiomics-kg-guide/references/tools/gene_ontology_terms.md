@@ -17,7 +17,7 @@ expansion), use genes_by_ontology. Use search_ontology to find terms by text.
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam') \| None | None | Filter to one ontology. None returns all. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include organism_strain per row. |
+| verbose | bool | False | Include organism_name per row. |
 | limit | int | 5 | Max results. |
 
 ## Response format
@@ -54,7 +54,7 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 
 | Field | Type | Description |
 |---|---|---|
-| organism_strain | string \| None (optional) | Organism (e.g. 'Prochlorococcus MED4') |
+| organism_name | string \| None (optional) | Organism (e.g. 'Prochlorococcus MED4') |
 
 ## Few-shot examples
 

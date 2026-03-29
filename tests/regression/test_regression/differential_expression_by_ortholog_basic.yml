@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_basic
-row_count: 50
+row_count: 58
 rows:
 - coculture_partner: null
   consensus_gene_name: psbB
@@ -8,7 +8,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   significant_down: 1
   significant_up: 0
   timepoint: null
@@ -22,7 +22,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: null
@@ -36,7 +36,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: null
@@ -50,35 +50,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
-  significant_down: 0
-  significant_up: 0
-  timepoint: 20h
-  timepoint_hours: 20.0
-  timepoint_order: 1
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 20h
-  timepoint_hours: 20.0
-  timepoint_order: 1
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 20h
@@ -92,7 +64,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 3h
@@ -106,7 +78,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 12h
@@ -120,7 +92,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 24h
@@ -134,21 +106,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
-  significant_down: 0
-  significant_up: 0
-  timepoint: null
-  timepoint_hours: null
-  timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: null
@@ -162,21 +120,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
-  significant_down: 0
-  significant_up: 0
-  timepoint: null
-  timepoint_hours: null
-  timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: null
@@ -190,7 +134,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 0h
@@ -204,7 +148,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 3h
@@ -218,7 +162,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 6h
@@ -232,7 +176,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: 12h
@@ -246,7 +190,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: 24h
@@ -260,251 +204,13 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: 48h
   timepoint_hours: 48.0
   timepoint_order: 6
   treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 0h
-  timepoint_hours: 0.0
-  timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 3h
-  timepoint_hours: 3.0
-  timepoint_order: 2
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 6h
-  timepoint_hours: 6.0
-  timepoint_order: 3
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 12h
-  timepoint_hours: 12.0
-  timepoint_order: 4
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 1
-  significant_up: 0
-  timepoint: 24h
-  timepoint_hours: 24.0
-  timepoint_order: 5
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 1
-  significant_up: 0
-  timepoint: 48h
-  timepoint_hours: 48.0
-  timepoint_order: 6
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_hdpe_plastic_leachate_50_mit9312_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus MIT9312
-  significant_down: 1
-  significant_up: 0
-  timepoint: null
-  timepoint_hours: null
-  timepoint_order: 1
-  treatment_type: plastic_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_hdpe_plastic_leachate_50_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 1
-  significant_up: 0
-  timepoint: null
-  timepoint_hours: null
-  timepoint_order: 1
-  treatment_type: plastic_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_pvc_plastic_leachate_2_mit9312_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus MIT9312
-  significant_down: 1
-  significant_up: 0
-  timepoint: null
-  timepoint_hours: null
-  timepoint_order: 1
-  treatment_type: plastic_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_pvc_plastic_leachate_2_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 1
-  significant_up: 0
-  timepoint: null
-  timepoint_hours: null
-  timepoint_order: 1
-  treatment_type: plastic_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 1
-  significant_up: 0
-  timepoint: 0h
-  timepoint_hours: 0.0
-  timepoint_order: 1
-  treatment_type: darkness
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 1
-  significant_up: 0
-  timepoint: 4h
-  timepoint_hours: 4.0
-  timepoint_order: 2
-  treatment_type: darkness
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 0
-  significant_up: 0
-  timepoint: 8h
-  timepoint_hours: 8.0
-  timepoint_order: 3
-  treatment_type: darkness
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 0
-  significant_up: 0
-  timepoint: 13h
-  timepoint_hours: 13.0
-  timepoint_order: 4
-  treatment_type: darkness
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 1
-  significant_up: 0
-  timepoint: 16h
-  timepoint_hours: 16.0
-  timepoint_order: 5
-  treatment_type: darkness
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 1
-  significant_up: 0
-  timepoint: 20h
-  timepoint_hours: 20.0
-  timepoint_order: 6
-  treatment_type: darkness
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus NATL2A
-  significant_down: 1
-  significant_up: 0
-  timepoint: 24h
-  timepoint_hours: 24.0
-  timepoint_order: 7
-  treatment_type: darkness
 - coculture_partner: Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
@@ -512,7 +218,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 11
@@ -526,7 +232,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 14
@@ -540,7 +246,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 31
@@ -554,7 +260,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 89
@@ -568,7 +274,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 18
@@ -582,7 +288,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 31
@@ -596,7 +302,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 60
@@ -610,7 +316,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 89
@@ -624,7 +330,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: days 60+89
@@ -638,7 +344,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 14
@@ -652,7 +358,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: days 60+89
@@ -666,7 +372,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 18
@@ -680,7 +386,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 31
@@ -694,10 +400,416 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 60
   timepoint_hours: 1440.0
   timepoint_order: 3
   treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MED4
+  significant_down: 0
+  significant_up: 0
+  timepoint: days 60+89
+  timepoint_hours: null
+  timepoint_order: 5
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_hdpe_plastic_leachate_50_mit9312_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus MIT9312
+  significant_down: 1
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type: plastic_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_pvc_plastic_leachate_2_mit9312_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus MIT9312
+  significant_down: 1
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type: plastic_stress
+- coculture_partner: Alteromonas macleodii HOT1A3
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type: coculture
+- coculture_partner: Alteromonas macleodii HOT1A3
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type: coculture
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 0h
+  timepoint_hours: 0.0
+  timepoint_order: 1
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 3h
+  timepoint_hours: 3.0
+  timepoint_order: 2
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 6h
+  timepoint_hours: 6.0
+  timepoint_order: 3
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 12h
+  timepoint_hours: 12.0
+  timepoint_order: 4
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 1
+  significant_up: 0
+  timepoint: 24h
+  timepoint_hours: 24.0
+  timepoint_order: 5
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 1
+  significant_up: 0
+  timepoint: 48h
+  timepoint_hours: 48.0
+  timepoint_order: 6
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_hdpe_plastic_leachate_50_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 1
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type: plastic_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_pvc_plastic_leachate_2_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 1
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type: plastic_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 1
+  significant_up: 0
+  timepoint: 0h
+  timepoint_hours: 0.0
+  timepoint_order: 1
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 1
+  significant_up: 0
+  timepoint: 4h
+  timepoint_hours: 4.0
+  timepoint_order: 2
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 0
+  significant_up: 0
+  timepoint: 8h
+  timepoint_hours: 8.0
+  timepoint_order: 3
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 0
+  significant_up: 0
+  timepoint: 13h
+  timepoint_hours: 13.0
+  timepoint_order: 4
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 1
+  significant_up: 0
+  timepoint: 16h
+  timepoint_hours: 16.0
+  timepoint_order: 5
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 1
+  significant_up: 0
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 6
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 1
+  significant_up: 0
+  timepoint: 24h
+  timepoint_hours: 24.0
+  timepoint_order: 7
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 0
+  significant_up: 0
+  timepoint: 1h extended darkness (36h)
+  timepoint_hours: 36.0
+  timepoint_order: 1
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 0
+  significant_up: 1
+  timepoint: 5h extended darkness (40h)
+  timepoint_hours: 40.0
+  timepoint_order: 2
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 0
+  significant_up: 1
+  timepoint: 13h extended darkness (48h)
+  timepoint_hours: 48.0
+  timepoint_order: 3
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 0
+  significant_up: 0
+  timepoint: 1h extended darkness (36h)
+  timepoint_hours: 36.0
+  timepoint_order: 1
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 0
+  significant_up: 0
+  timepoint: 5h extended darkness (40h)
+  timepoint_hours: 40.0
+  timepoint_order: 2
+  treatment_type: darkness
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus NATL2A
+  significant_down: 1
+  significant_up: 0
+  timepoint: 13h extended darkness (48h)
+  timepoint_hours: 48.0
+  timepoint_order: 3
+  treatment_type: darkness

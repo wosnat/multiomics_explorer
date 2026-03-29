@@ -22,7 +22,7 @@
     identifier: PMM0001
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain]
+    columns: [locus_tag, gene_name, product, organism_name]
     row0:
       locus_tag: PMM0001
 
@@ -54,7 +54,7 @@
   expect:
     min_rows: 1
     contains:
-      organism_strain: Prochlorococcus MED4
+      organism_name: Prochlorococcus MED4
 
 # ── Gene overview ──────────────────────────────────────────
 
@@ -66,7 +66,7 @@
   expect:
     min_rows: 1
     columns: [locus_tag, gene_name, product, gene_category,
-              annotation_quality, organism_strain, annotation_types,
+              annotation_quality, organism_name, annotation_types,
               expression_edge_count, significant_up_count, significant_down_count,
               closest_ortholog_group_size, closest_ortholog_genera]
 
@@ -77,7 +77,7 @@
     locus_tags: ["EZ55_00275"]
   expect:
     min_rows: 1
-    columns: [locus_tag, organism_strain]
+    columns: [locus_tag, organism_name]
 
 - id: gene_overview_batch
   tool: gene_overview
@@ -109,7 +109,7 @@
     locus_tags: [PMM0001]
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain, gene_category]
+    columns: [locus_tag, gene_name, product, organism_name, gene_category]
 
 # ── Homologs ─────────────────────────────────────────────
 
@@ -120,7 +120,7 @@
     locus_tags: [PMM0845]
   expect:
     min_rows: 1
-    columns: [locus_tag, organism_strain, group_id, consensus_gene_name,
+    columns: [locus_tag, organism_name, group_id, consensus_gene_name,
               consensus_product, taxonomic_level, source, specificity_rank]
 
 # ── Full-text search ────────────────────────────────────
@@ -132,7 +132,7 @@
     search_text: photosystem
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain, gene_category, annotation_quality, score]
+    columns: [locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, score]
 
 - id: genes_by_function_with_organism
   tool: genes_by_function
@@ -143,7 +143,7 @@
   expect:
     min_rows: 1
     contains:
-      organism_strain: Prochlorococcus MED4
+      organism_name: Prochlorococcus MED4
 
 # ── Homologs with members ───────────────────────────────
 
@@ -254,7 +254,7 @@
     identifier: ALT831_RS00180
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain]
+    columns: [locus_tag, gene_name, product, organism_name]
     row0:
       locus_tag: ALT831_RS00180
 
@@ -265,7 +265,7 @@
     identifier: SYNW0305
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain]
+    columns: [locus_tag, gene_name, product, organism_name]
     row0:
       locus_tag: SYNW0305
       gene_name: ftsH1
@@ -337,7 +337,7 @@
     search_text: naphthoate
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain, gene_category, annotation_quality, score]
+    columns: [locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, score]
 
 # ── Genes by function: return columns ──────────────────────────────
 
@@ -349,7 +349,7 @@
     limit: 10
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain,
+    columns: [locus_tag, gene_name, product, organism_name,
               gene_category, annotation_quality, score]
 
 # ── Genes by function: category filter ──────────────────────────
@@ -373,7 +373,7 @@
     limit: 10
   expect:
     min_rows: 5
-    columns: [locus_tag, gene_name, product, organism_strain, score]
+    columns: [locus_tag, gene_name, product, organism_name, score]
 
 - id: genes_by_function_cross_organism_superoxide
   tool: genes_by_function
@@ -421,7 +421,7 @@
     locus_tags: [ALT831_RS00180]
   expect:
     min_rows: 1
-    columns: [locus_tag, organism_strain]
+    columns: [locus_tag, organism_name]
 
 - id: gene_details_synechococcus
   tool: gene_details
@@ -430,7 +430,7 @@
     locus_tags: [SYNW0305]
   expect:
     min_rows: 1
-    columns: [locus_tag, organism_strain]
+    columns: [locus_tag, organism_name]
 
 # ── Homolog corner cases ──────────────────────────────────
 
@@ -441,7 +441,7 @@
     locus_tags: [PMM0001]
   expect:
     min_rows: 2
-    columns: [locus_tag, organism_strain, group_id, consensus_gene_name,
+    columns: [locus_tag, organism_name, group_id, consensus_gene_name,
               consensus_product, taxonomic_level, source, specificity_rank]
 
 - id: homologs_source_filter_cyanorak
@@ -506,11 +506,11 @@
 
 # ── Validation queries ─────────────────────────────────────
 
-- id: all_genes_have_organism_strain
+- id: all_genes_have_organism_name
   tool: raw_cypher
-  desc: Every gene node has the organism_strain property set
+  desc: Every gene node has the organism_name property set
   params:
-    query: "MATCH (g:Gene) WHERE g.organism_strain IS NULL RETURN count(g) AS cnt"
+    query: "MATCH (g:Gene) WHERE g.organism_name IS NULL RETURN count(g) AS cnt"
   expect:
     row0:
       cnt: 0
@@ -742,14 +742,14 @@
 
 - id: gene_ontology_terms_bp_all
   tool: gene_ontology_terms
-  desc: argR BP annotations (verbose includes organism_strain)
+  desc: argR BP annotations (verbose includes organism_name)
   params:
     locus_tags: ["MIT1002_03493"]
     ontology: go_bp
     verbose: true
   expect:
     min_rows: 5
-    columns: [locus_tag, term_id, term_name, organism_strain]
+    columns: [locus_tag, term_id, term_name, organism_name]
 
 - id: gene_ontology_terms_kegg
   tool: gene_ontology_terms
@@ -872,7 +872,7 @@
     term_ids: ["pfam:PF00712"]
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain]
+    columns: [locus_tag, gene_name, product, organism_name]
 
 - id: genes_by_ontology_pfam_clan
   tool: genes_by_ontology
@@ -882,7 +882,7 @@
     term_ids: ["pfam.clan:CL0060"]
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain]
+    columns: [locus_tag, gene_name, product, organism_name]
 
 - id: gene_ontology_terms_pfam
   tool: gene_ontology_terms
@@ -940,7 +940,7 @@
   params: {}
   expect:
     min_rows: 50
-    columns: [experiment_id, publication_doi, organism_strain,
+    columns: [experiment_id, publication_doi, organism_name,
               treatment_type, omics_type, is_time_course, gene_count]
 
 - id: list_experiments_organism
@@ -950,7 +950,7 @@
     organism: "MED4"
   expect:
     min_rows: 10
-    columns: [experiment_id, organism_strain, gene_count]
+    columns: [experiment_id, organism_name, gene_count]
 
 - id: list_experiments_treatment_types
   tool: list_experiments
@@ -1054,7 +1054,7 @@
     group_ids: ["cyanorak:CK_00000570"]
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain, gene_category, group_id]
+    columns: [locus_tag, gene_name, product, organism_name, gene_category, group_id]
 
 - id: genes_by_homolog_group_organism_filter
   tool: genes_by_homolog_group
@@ -1064,7 +1064,7 @@
     organisms: ["MED4"]
   expect:
     min_rows: 1
-    columns: [locus_tag, organism_strain, group_id]
+    columns: [locus_tag, organism_name, group_id]
 
 - id: genes_by_homolog_group_verbose
   tool: genes_by_homolog_group
@@ -1074,7 +1074,7 @@
     verbose: true
   expect:
     min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_strain, gene_category, group_id, gene_summary, function_description, consensus_product, source]
+    columns: [locus_tag, gene_name, product, organism_name, gene_category, group_id, gene_summary, function_description, consensus_product, source]
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene
@@ -1137,7 +1137,7 @@
   expect:
     min_rows: 1
     columns: [group_id, consensus_product, experiment_id,
-              treatment_type, organism_strain, timepoint_order,
+              treatment_type, organism_name, timepoint_order,
               genes_with_expression, significant_up, significant_down,
               not_significant]
 
@@ -1149,7 +1149,7 @@
     organisms: ["MED4", "MIT9313"]
   expect:
     min_rows: 1
-    columns: [group_id, organism_strain, genes_with_expression]
+    columns: [group_id, organism_name, genes_with_expression]
 
 - id: differential_expression_by_ortholog_significant
   tool: differential_expression_by_ortholog

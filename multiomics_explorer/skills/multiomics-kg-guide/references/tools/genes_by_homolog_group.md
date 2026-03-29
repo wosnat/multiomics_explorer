@@ -55,7 +55,7 @@ total_matching, total_genes, total_categories, genes_per_group_max, genes_per_gr
 | locus_tag | string | Gene locus tag (e.g. 'PMM0315') |
 | gene_name | string \| None (optional) | Gene name (e.g. 'psbB') |
 | product | string \| None (optional) | Gene product (e.g. 'photosystem II chlorophyll-binding protein CP47') |
-| organism_strain | string | Organism (e.g. 'Prochlorococcus MED4') |
+| organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | gene_category | string \| None (optional) | Functional category (e.g. 'Photosynthesis') |
 | group_id | string | Ortholog group ID (e.g. 'cyanorak:CK_00000570') |
 
@@ -77,7 +77,7 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
 ```
 
 ```example-response
-{"total_matching": 9, "total_genes": 9, "total_categories": 1, "genes_per_group_max": 9, "genes_per_group_median": 9.0, "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1}], "top_categories": [{"category": "Photosynthesis", "count": 9}], "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 9}], "not_found_groups": [], "not_matched_groups": [], "not_found_organisms": [], "not_matched_organisms": [], "returned": 5, "truncated": true, "results": [{"locus_tag": "A9601_03391", "gene_name": "psbB", "product": "photosystem II chlorophyll-binding protein CP47", "organism_strain": "Prochlorococcus AS9601", "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}]}
+{"total_matching": 9, "total_genes": 9, "total_categories": 1, "genes_per_group_max": 9, "genes_per_group_median": 9.0, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}], "top_categories": [{"category": "Photosynthesis", "count": 9}], "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 9}], "not_found_groups": [], "not_matched_groups": [], "not_found_organisms": [], "not_matched_organisms": [], "returned": 5, "truncated": true, "results": [{"locus_tag": "A9601_03391", "gene_name": "psbB", "product": "photosystem II chlorophyll-binding protein CP47", "organism_name": "Prochlorococcus AS9601", "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}]}
 ```
 
 ### Example 2: Filter to specific organisms

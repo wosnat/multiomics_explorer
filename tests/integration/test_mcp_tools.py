@@ -74,7 +74,7 @@ class TestGeneHomologs:
             assert "group_id" in r
             assert "source" in r
             assert "consensus_product" in r
-            assert "organism_strain" in r
+            assert "organism_name" in r
 
     def test_summary_returns_counts(self, conn):
         """build_gene_homologs_summary returns counts + breakdowns."""
@@ -263,19 +263,19 @@ class TestListExperiments:
     def test_summary_breakdown_counts_sum(self, conn):
         """by_organism experiment_counts sum to total_matching."""
         result = api.list_experiments(summary=True, conn=conn)
-        org_total = sum(b["experiment_count"] for b in result["by_organism"])
+        org_total = sum(b["count"] for b in result["by_organism"])
         assert org_total == result["total_matching"]
 
     def test_summary_treatment_type_counts_sum(self, conn):
-        """by_treatment_type experiment_counts sum to total_matching."""
+        """by_treatment_type counts sum to total_matching."""
         result = api.list_experiments(summary=True, conn=conn)
-        tt_total = sum(b["experiment_count"] for b in result["by_treatment_type"])
+        tt_total = sum(b["count"] for b in result["by_treatment_type"])
         assert tt_total == result["total_matching"]
 
     def test_summary_omics_type_counts_sum(self, conn):
-        """by_omics_type experiment_counts sum to total_matching."""
+        """by_omics_type counts sum to total_matching."""
         result = api.list_experiments(summary=True, conn=conn)
-        omics_total = sum(b["experiment_count"] for b in result["by_omics_type"])
+        omics_total = sum(b["count"] for b in result["by_omics_type"])
         assert omics_total == result["total_matching"]
 
     # --- Detail mode ---
@@ -293,7 +293,7 @@ class TestListExperiments:
         result = api.list_experiments(organism="MED4", conn=conn)
         assert result["total_matching"] >= 20
         for r in result["results"]:
-            assert "MED4" in r["organism_strain"] or (
+            assert "MED4" in r["organism_name"] or (
                 r.get("coculture_partner") and "MED4" in r.get("coculture_partner", "")
             )
 
@@ -329,7 +329,7 @@ class TestListExperiments:
         result = api.list_experiments(limit=5, conn=conn)
         for r in result["results"]:
             for col in ["experiment_id", "experiment_name",
-                        "publication_doi", "organism_strain",
+                        "publication_doi", "organism_name",
                         "treatment_type", "omics_type", "is_time_course",
                         "table_scope", "gene_count", "genes_by_status"]:
                 assert col in r, f"Missing column: {col}"
@@ -408,8 +408,8 @@ class TestDifferentialExpressionByGene:
         result = api.differential_expression_by_gene(
             organism="MED4", summary=True, conn=conn,
         )
-        assert "MED4" in result["organism_strain"]
-        assert result["total_rows"] > 0
+        assert "MED4" in result["organism_name"]
+        assert result["total_matching"] > 0
         assert result["results"] == []
         assert result["truncated"] is True
 
@@ -439,12 +439,12 @@ class TestDifferentialExpressionByGene:
             api.differential_expression_by_gene(conn=conn)
 
     def test_summary_consistency(self, conn):
-        """Summary total_rows matches detail row count (small dataset)."""
+        """Summary total_matching matches detail row count (small dataset)."""
         kwargs = dict(locus_tags=["PMM0001"], conn=conn)
         summary = api.differential_expression_by_gene(**kwargs, summary=True)
         detail = api.differential_expression_by_gene(**kwargs, limit=500)
-        assert summary["total_rows"] == detail["total_rows"]
-        assert summary["total_rows"] == len(detail["results"])
+        assert summary["total_matching"] == detail["total_matching"]
+        assert summary["total_matching"] == len(detail["results"])
 
 
 @pytest.mark.kg
@@ -456,13 +456,13 @@ class TestDifferentialExpressionByOrtholog:
         result = api.differential_expression_by_ortholog(
             group_ids=[self.KNOWN_GROUP], limit=10, conn=conn,
         )
-        assert result["total_rows"] > 0
+        assert result["total_matching"] > 0
         assert result["matching_genes"] >= 1
         assert result["matching_groups"] == 1
         assert result["returned"] >= 1
         row = result["results"][0]
         assert row["group_id"] == self.KNOWN_GROUP
-        for key in ("experiment_id", "treatment_type", "organism_strain",
+        for key in ("experiment_id", "treatment_type", "organism_name",
                      "timepoint_order", "genes_with_expression", "total_genes",
                      "significant_up", "significant_down", "not_significant"):
             assert key in row
@@ -484,8 +484,8 @@ class TestDifferentialExpressionByOrtholog:
             limit=50, conn=conn,
         )
         for row in result["results"]:
-            assert "MED4" in row["organism_strain"]
-        organisms = [b["organism"] for b in result["by_organism"]]
+            assert "MED4" in row["organism_name"]
+        organisms = [b["organism_name"] for b in result["by_organism"]]
         assert all("MED4" in o for o in organisms)
 
     def test_significant_only(self, conn):
@@ -527,7 +527,7 @@ class TestDifferentialExpressionByOrtholog:
             group_ids=["FAKE_GROUP_ID"], conn=conn,
         )
         assert "FAKE_GROUP_ID" in result["not_found_groups"]
-        assert result["total_rows"] == 0
+        assert result["total_matching"] == 0
         assert result["results"] == []
 
     def test_genes_with_expression_le_total_genes(self, conn):

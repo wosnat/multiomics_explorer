@@ -41,12 +41,12 @@ differential_expression_by_ortholog.
 ### Envelope
 
 ```expected-keys
-organism_strain, matching_genes, total_rows, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, returned, truncated, results
+organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, returned, truncated, results
 ```
 
-- **organism_strain** (string): Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')
+- **organism_name** (string): Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')
 - **matching_genes** (int): Distinct genes in results after filters (e.g. 5)
-- **total_rows** (int): Total gene x experiment x timepoint rows matching filters (e.g. 15)
+- **total_matching** (int): Total gene x experiment x timepoint rows matching filters (e.g. 15)
 - **rows_by_status** (ExpressionStatusBreakdown): Row counts by expression_status across all results
 - **median_abs_log2fc** (float | None): Median |log2FC| for significant rows only (e.g. 1.978). Null if no significant rows.
 - **max_abs_log2fc** (float | None): Max |log2FC| for significant rows only (e.g. 3.591). Null if no significant rows.
@@ -58,7 +58,7 @@ organism_strain, matching_genes, total_rows, rows_by_status, median_abs_log2fc, 
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG but with no expression data matching filters
 - **returned** (int): Rows in results (e.g. 5)
-- **truncated** (bool): True if total_rows > returned
+- **truncated** (bool): True if total_matching > returned
 
 ### Per-result fields
 
@@ -98,7 +98,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
 ```
 
 ```example-response
-{"organism_strain": "Prochlorococcus marinus subsp. pastoris str. CCMP1986", "matching_genes": 1875, "total_rows": 47237, "rows_by_status": {"significant_up": 8460, "significant_down": 7296, "not_significant": 31481}, "median_abs_log2fc": 1.2, "max_abs_log2fc": 12.3, "experiment_count": 47, "rows_by_treatment_type": {"coculture": 15000, "nitrogen_stress": 8000, ...}, "by_table_scope": {"all_detected_genes": 30000, "significant_only": 12000, "significant_any_timepoint": 5237}, "top_categories": [{"category": "Photosynthesis", "total_genes": 42, "significant_genes": 38}], "experiments": [...], "not_found": [], "no_expression": [], "returned": 0, "truncated": true, "results": []}
+{"organism_name": "Prochlorococcus marinus subsp. pastoris str. CCMP1986", "matching_genes": 1875, "total_matching": 47237, "rows_by_status": {"significant_up": 8460, "significant_down": 7296, "not_significant": 31481}, "median_abs_log2fc": 1.2, "max_abs_log2fc": 12.3, "experiment_count": 47, "rows_by_treatment_type": {"coculture": 15000, "nitrogen_stress": 8000, ...}, "by_table_scope": {"all_detected_genes": 30000, "significant_only": 12000, "significant_any_timepoint": 5237}, "top_categories": [{"category": "Photosynthesis", "total_genes": 42, "significant_genes": 38}], "experiments": [...], "not_found": [], "no_expression": [], "returned": 0, "truncated": true, "results": []}
 ```
 
 ### Example 2: Top responders in an organism
@@ -120,7 +120,7 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
 ```
 
 ```example-response
-{"organism_strain": "Alteromonas macleodii HOT1A3", "matching_genes": 2, "total_rows": 6, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "median_abs_log2fc": 2.78, "max_abs_log2fc": 3.591, "experiment_count": 1, "rows_by_treatment_type": {"nutrient_starvation": 6}, "by_table_scope": {"all_detected_genes": 6}, "top_categories": [{"category": "Inorganic ion transport", "total_genes": 1, "significant_genes": 1}, {"category": "Signal transduction", "total_genes": 1, "significant_genes": 1}], "experiments": [{"experiment_id": "10.1101/...", "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)", "treatment_type": "nutrient_starvation", "omics_type": "RNASEQ", "coculture_partner": null, "is_time_course": "true", "table_scope": "all_detected_genes", "table_scope_detail": null, "matching_genes": 2, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "timepoints": [{"timepoint": "day 18", "timepoint_hours": 432.0, "timepoint_order": 1, "matching_genes": 2, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 2}}]}], "not_found": [], "no_expression": [], "returned": 5, "truncated": true, "results": [{"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation", "timepoint": "days 60+89", "timepoint_hours": null, "timepoint_order": 3, "log2fc": 3.591, "padj": 1.13e-12, "rank": 77, "expression_status": "significant_up"}]}
+{"organism_name": "Alteromonas macleodii HOT1A3", "matching_genes": 2, "total_matching": 6, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "median_abs_log2fc": 2.78, "max_abs_log2fc": 3.591, "experiment_count": 1, "rows_by_treatment_type": {"nutrient_starvation": 6}, "by_table_scope": {"all_detected_genes": 6}, "top_categories": [{"category": "Inorganic ion transport", "total_genes": 1, "significant_genes": 1}, {"category": "Signal transduction", "total_genes": 1, "significant_genes": 1}], "experiments": [{"experiment_id": "10.1101/...", "experiment_name": "HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)", "treatment_type": "nutrient_starvation", "omics_type": "RNASEQ", "coculture_partner": null, "is_time_course": "true", "table_scope": "all_detected_genes", "table_scope_detail": null, "matching_genes": 2, "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}, "timepoints": [{"timepoint": "day 18", "timepoint_hours": 432.0, "timepoint_order": 1, "matching_genes": 2, "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 2}}]}], "not_found": [], "no_expression": [], "returned": 5, "truncated": true, "results": [{"locus_tag": "ACZ81_01830", "gene_name": "amtB", "experiment_id": "...", "treatment_type": "nutrient_starvation", "timepoint": "days 60+89", "timepoint_hours": null, "timepoint_order": 3, "log2fc": 3.591, "padj": 1.13e-12, "rank": 77, "expression_status": "significant_up"}]}
 ```
 
 ### Example 5: Chaining — find genes then check expression
@@ -191,7 +191,7 @@ Call once per organism — tool enforces single-organism constraint
 from multiomics_explorer import differential_expression_by_gene
 
 result = differential_expression_by_gene()
-# returns dict with keys: organism_strain, matching_genes, total_rows, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, results
+# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, results
 ```
 
 Use package import for bulk data extraction in scripts.

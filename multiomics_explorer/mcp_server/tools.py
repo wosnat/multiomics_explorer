@@ -28,11 +28,11 @@ def _fmt(results: list[dict], limit: int | None = None) -> str:
 
 
 def _group_by_organism(results: list[dict]) -> dict:
-    """Group gene results by organism_strain. Returns {organism: [genes], ...}."""
+    """Group gene results by organism_name. Returns {organism: [genes], ...}."""
     grouped: dict[str, list[dict]] = {}
     for row in results:
-        org = row.get("organism_strain", "Unknown")
-        entry = {k: v for k, v in row.items() if k != "organism_strain"}
+        org = row.get("organism_name", "Unknown")
+        entry = {k: v for k, v in row.items() if k != "organism_name"}
         grouped.setdefault(org, []).append(entry)
     return grouped
 
@@ -186,18 +186,18 @@ def register_tools(mcp: FastMCP):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III, beta subunit')")
-        organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
 
     class ResolveOrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        gene_count: int = Field(description="Number of matching genes in this organism (e.g. 1)")
+        count: int = Field(description="Number of matching genes in this organism (e.g. 1)")
 
     class ResolveGeneResponse(BaseModel):
         total_matching: int = Field(description="Total genes matching identifier + organism filter (e.g. 3)")
         by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted by count descending")
         returned: int = Field(description="Genes in this response (e.g. 3)")
         truncated: bool = Field(description="True if total_matching > returned")
-        results: list[GeneMatch] = Field(description="Matching genes sorted by organism_strain, locus_tag")
+        results: list[GeneMatch] = Field(description="Matching genes sorted by organism_name, locus_tag")
 
     @mcp.tool(
         tags={"genes", "discovery"},
@@ -251,7 +251,7 @@ def register_tools(mcp: FastMCP):
     # --- genes_by_function ---
 
     class FunctionOrganismBreakdown(BaseModel):
-        organism: str = Field(description="Organism strain (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
         count: int = Field(description="Number of matching genes")
 
     class FunctionCategoryBreakdown(BaseModel):
@@ -262,7 +262,7 @@ def register_tools(mcp: FastMCP):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta')")
-        organism_strain: str = Field(description="Organism strain (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
         gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Photosynthesis')")
         annotation_quality: int = Field(description="Annotation quality 0-3 (3=best)")
         score: float = Field(description="Fulltext relevance score")
@@ -367,7 +367,7 @@ def register_tools(mcp: FastMCP):
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta')")
         gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair')")
         annotation_quality: int | None = Field(default=None, description="Annotation quality score 0-3 (e.g. 3)")
-        organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
         annotation_types: list[str] = Field(default_factory=list, description="Ontology types with annotations (e.g. ['go_bp', 'ec', 'kegg'])")
         expression_edge_count: int = Field(default=0, description="Number of expression data points (e.g. 36)")
         significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations (e.g. 3)")
@@ -466,7 +466,7 @@ def register_tools(mcp: FastMCP):
         returned: int = Field(description="Results in this response (0 when summary=true)")
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
-        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*}. ~30 fields including locus_tag, gene_name, product, organism_strain, gene_category, annotation_quality, function_description, catalytic_activities, transporter_classification, cazy_ids, etc. Sparse fields only present when populated.")
+        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*}. ~30 fields including locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, transporter_classification, cazy_ids, etc. Sparse fields only present when populated.")
 
     @mcp.tool(
         tags={"genes"},
@@ -512,7 +512,7 @@ def register_tools(mcp: FastMCP):
 
     class GeneHomologResult(BaseModel):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
-        organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
         group_id: str = Field(description="Prefixed ortholog group ID for chaining to genes_by_homolog_group (e.g. 'cyanorak:CK_00000364', 'eggnog:COG0592@2')")
         consensus_gene_name: str | None = Field(default=None, description="Consensus gene name across group members (e.g. 'dnaN'). Often null.")
         consensus_product: str | None = Field(default=None, description="Consensus product across group members (e.g. 'DNA polymerase III, beta subunit')")
@@ -742,7 +742,7 @@ def register_tools(mcp: FastMCP):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III, beta subunit')")
-        organism_strain: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
         gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair')")
         # verbose only
         matched_terms: list[str] | None = Field(default=None, description="Input term IDs this gene was matched through (e.g. ['go:0006260'])")
@@ -750,7 +750,7 @@ def register_tools(mcp: FastMCP):
         function_description: str | None = Field(default=None, description="Curated functional description")
 
     class OntologyOrganismBreakdown(BaseModel):
-        organism: str = Field(description="Organism strain (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
         count: int = Field(description="Number of matching genes (e.g. 131)")
 
     class OntologyCategoryBreakdown(BaseModel):
@@ -845,7 +845,7 @@ def register_tools(mcp: FastMCP):
         term_name: str = Field(description="Term name (e.g. 'DNA replication')")
         ontology_type: str | None = Field(default=None, description="Ontology type when querying all (e.g. 'go_bp')")
         # verbose-only
-        organism_strain: str | None = Field(default=None, description="Organism (e.g. 'Prochlorococcus MED4')")
+        organism_name: str | None = Field(default=None, description="Organism (e.g. 'Prochlorococcus MED4')")
 
     class OntologyTypeBreakdown(BaseModel):
         ontology_type: str = Field(description="Ontology type (e.g. 'go_bp', 'kegg')")
@@ -892,7 +892,7 @@ def register_tools(mcp: FastMCP):
             description="When true, return only summary fields (results=[]).",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include organism_strain per row.",
+            description="Include organism_name per row.",
         )] = False,
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
@@ -943,15 +943,15 @@ def register_tools(mcp: FastMCP):
 
     class PubOrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        publication_count: int = Field(description="Number of publications studying this organism (e.g. 11)")
+        count: int = Field(description="Number of publications studying this organism (e.g. 11)")
 
     class PubTreatmentTypeBreakdown(BaseModel):
         treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
-        publication_count: int = Field(description="Number of publications (e.g. 5)")
+        count: int = Field(description="Number of publications (e.g. 5)")
 
     class PubOmicsTypeBreakdown(BaseModel):
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
-        publication_count: int = Field(description="Number of publications (e.g. 12)")
+        count: int = Field(description="Number of publications (e.g. 12)")
 
     class ListPublicationsResponse(BaseModel):
         total_entries: int = Field(description="Total publications in KG (unfiltered)")
@@ -1051,7 +1051,7 @@ def register_tools(mcp: FastMCP):
         experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq')")
         experiment_name: str = Field(description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")
         publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
-        organism_strain: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4')")
         treatment_type: str = Field(description="Treatment category (e.g. 'coculture', 'nitrogen_stress')")
         coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism (e.g. 'Alteromonas macleodii HOT1A3', 'Phage')")
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS')")
@@ -1074,24 +1074,24 @@ def register_tools(mcp: FastMCP):
         experimental_context: str | None = Field(default=None, description="Context summary (e.g. 'in Pro99 medium under continuous light')")
 
     class OrganismBreakdown(BaseModel):
-        organism_strain: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        experiment_count: int = Field(description="Number of experiments for this organism (e.g. 46)")
+        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
+        count: int = Field(description="Number of experiments for this organism (e.g. 46)")
 
     class TreatmentTypeBreakdown(BaseModel):
         treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
-        experiment_count: int = Field(description="Number of experiments (e.g. 16)")
+        count: int = Field(description="Number of experiments (e.g. 16)")
 
     class OmicsTypeBreakdown(BaseModel):
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
-        experiment_count: int = Field(description="Number of experiments (e.g. 48)")
+        count: int = Field(description="Number of experiments (e.g. 48)")
 
     class PublicationBreakdown(BaseModel):
         publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
-        experiment_count: int = Field(description="Number of experiments from this publication (e.g. 5)")
+        count: int = Field(description="Number of experiments from this publication (e.g. 5)")
 
     class TableScopeBreakdown(BaseModel):
         table_scope: str = Field(description="Table scope value (e.g. 'all_detected_genes', 'significant_only')")
-        experiment_count: int = Field(description="Number of experiments with this scope (e.g. 22)")
+        count: int = Field(description="Number of experiments with this scope (e.g. 22)")
 
     class ListExperimentsResponse(BaseModel):
         total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
@@ -1416,14 +1416,14 @@ def register_tools(mcp: FastMCP):
         )
 
     class DifferentialExpressionByGeneResponse(BaseModel):
-        organism_strain: str = Field(
+        organism_name: str = Field(
             description="Single organism for all results"
             " (e.g. 'Alteromonas macleodii HOT1A3')",
         )
         matching_genes: int = Field(
             description="Distinct genes in results after filters (e.g. 5)",
         )
-        total_rows: int = Field(
+        total_matching: int = Field(
             description="Total gene x experiment x timepoint rows"
             " matching filters (e.g. 15)",
         )
@@ -1471,7 +1471,7 @@ def register_tools(mcp: FastMCP):
             description="Rows in results (e.g. 5)",
         )
         truncated: bool = Field(
-            description="True if total_rows > returned",
+            description="True if total_matching > returned",
         )
         results: list[ExpressionRow] = Field(default_factory=list)
 
@@ -1590,9 +1590,9 @@ def register_tools(mcp: FastMCP):
             ]
 
             response = DifferentialExpressionByGeneResponse(
-                organism_strain=data["organism_strain"],
+                organism_name=data["organism_name"],
                 matching_genes=data["matching_genes"],
-                total_rows=data["total_rows"],
+                total_matching=data["total_matching"],
                 rows_by_status=ExpressionStatusBreakdown(
                     **data["rows_by_status"]
                 ),
@@ -1610,7 +1610,7 @@ def register_tools(mcp: FastMCP):
                 results=result_models,
             )
             await ctx.info(
-                f"Returning {response.returned} of {response.total_rows}"
+                f"Returning {response.returned} of {response.total_matching}"
                 f" rows ({response.experiment_count} experiments)"
             )
             return response
@@ -1760,7 +1760,7 @@ def register_tools(mcp: FastMCP):
             description="Gene name (e.g. 'psbB')")
         product: str | None = Field(default=None,
             description="Gene product (e.g. 'photosystem II chlorophyll-binding protein CP47')")
-        organism_strain: str = Field(
+        organism_name: str = Field(
             description="Organism (e.g. 'Prochlorococcus MED4')")
         gene_category: str | None = Field(default=None,
             description="Functional category (e.g. 'Photosynthesis')")
@@ -1777,8 +1777,8 @@ def register_tools(mcp: FastMCP):
             description="OG source (e.g. 'cyanorak')")
 
     class HomologGroupOrganismBreakdown(BaseModel):
-        organism: str = Field(
-            description="Organism strain (e.g. 'Prochlorococcus MED4')")
+        organism_name: str = Field(
+            description="Organism name (e.g. 'Prochlorococcus MED4')")
         count: int = Field(description="Member genes from this organism")
 
     class HomologGroupCategoryBreakdown(BaseModel):
@@ -1923,7 +1923,7 @@ def register_tools(mcp: FastMCP):
             description="Treatment category"
             " (e.g. 'nitrogen_limitation')",
         )
-        organism_strain: str = Field(
+        organism_name: str = Field(
             description="Organism (e.g. 'Prochlorococcus MED4')",
         )
         coculture_partner: str | None = Field(
@@ -2003,16 +2003,24 @@ def register_tools(mcp: FastMCP):
         treatment_type: str = Field(
             description="Treatment category",
         )
-        organism_strain: str = Field(
-            description="Organism strain",
+        organism_name: str = Field(
+            description="Organism name",
         )
         significant_genes: int = Field(
             description="Distinct significant genes in this experiment"
             " across groups",
         )
 
+    class DEByOrthologOrganismBreakdown(BaseModel):
+        organism_name: str = Field(
+            description="Organism name (e.g. 'Prochlorococcus MED4')",
+        )
+        count: int = Field(
+            description="Rows for this organism",
+        )
+
     class DifferentialExpressionByOrthologResponse(BaseModel):
-        total_rows: int = Field(
+        total_matching: int = Field(
             description="Gene x experiment x timepoint rows"
             " matching all filters",
         )
@@ -2042,11 +2050,10 @@ def register_tools(mcp: FastMCP):
         truncated: bool = Field(
             description="True if more results exist than returned",
         )
-        by_organism: list[dict] = Field(
-            description="[{organism, count}] — rows per organism,"
-            " sorted desc",
+        by_organism: list[DEByOrthologOrganismBreakdown] = Field(
+            description="Rows per organism, sorted by count desc",
         )
-        rows_by_status: dict = Field(
+        rows_by_status: dict[str, int] = Field(
             description="{significant_up, significant_down,"
             " not_significant}",
         )
@@ -2118,6 +2125,10 @@ def register_tools(mcp: FastMCP):
             description="If true, return only statistically significant"
             " rows.",
         )] = False,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields"
+            " (results=[]).",
+        )] = False,
         verbose: Annotated[bool, Field(
             description="Add experiment_name, treatment, omics_type, "
             "table_scope, table_scope_detail to each row.",
@@ -2131,6 +2142,10 @@ def register_tools(mcp: FastMCP):
         Cross-organism by design — results at group x experiment x timepoint
         granularity showing how many group members respond. Gene counts,
         not individual genes.
+
+        Returns summary statistics (always) + top results sorted by significant
+        gene count. Default limit=5 gives a quick overview.
+        Set summary=True for counts only, or increase limit for more rows.
 
         Three list filters — each reports not_found + not_matched:
         - group_ids (required): ortholog groups
@@ -2153,6 +2168,7 @@ def register_tools(mcp: FastMCP):
                 experiment_ids=experiment_ids,
                 direction=direction,
                 significant_only=significant_only,
+                summary=summary,
                 verbose=verbose,
                 limit=limit,
                 conn=conn,
@@ -2172,7 +2188,7 @@ def register_tools(mcp: FastMCP):
             ]
 
             response = DifferentialExpressionByOrthologResponse(
-                total_rows=data["total_rows"],
+                total_matching=data["total_matching"],
                 matching_genes=data["matching_genes"],
                 matching_groups=data["matching_groups"],
                 experiment_count=data["experiment_count"],
@@ -2181,7 +2197,7 @@ def register_tools(mcp: FastMCP):
                 results=results,
                 returned=data["returned"],
                 truncated=data["truncated"],
-                by_organism=data["by_organism"],
+                by_organism=[DEByOrthologOrganismBreakdown(**b) for b in data["by_organism"]],
                 rows_by_status=data["rows_by_status"],
                 rows_by_treatment_type=data["rows_by_treatment_type"],
                 by_table_scope=data["by_table_scope"],

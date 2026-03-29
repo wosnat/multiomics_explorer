@@ -46,7 +46,7 @@ total_matching, by_organism, by_category, by_term, returned, truncated, results
 | locus_tag | string | Gene locus tag (e.g. 'PMM0001') |
 | gene_name | string \| None (optional) | Gene name (e.g. 'dnaN') |
 | product | string \| None (optional) | Gene product (e.g. 'DNA polymerase III, beta subunit') |
-| organism_strain | string | Organism (e.g. 'Prochlorococcus MED4') |
+| organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | gene_category | string \| None (optional) | Functional category (e.g. 'Replication and repair') |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -68,12 +68,12 @@ genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
 ```example-response
 {
   "total_matching": 411,
-  "by_organism": [{"organism": "Alteromonas macleodii EZ55", "count": 44}, ...],
+  "by_organism": [{"organism_name": "Alteromonas macleodii EZ55", "count": 44}, ...],
   "by_category": [{"category": "Replication and repair", "count": 321}, ...],
   "by_term": [{"term_id": "go:0006260", "count": 411}],
   "returned": 5, "truncated": true,
   "results": [
-    {"locus_tag": "A9601_00001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus AS9601", "gene_category": "Replication and repair"},
+    {"locus_tag": "A9601_00001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus AS9601", "gene_category": "Replication and repair"},
     ...
   ]
 }
@@ -88,7 +88,7 @@ genes_by_ontology(term_ids=["go:0006260", "go:0006412"], ontology="go_bp", summa
 ```example-response
 {
   "total_matching": 1742,
-  "by_organism": [{"organism": "Alteromonas macleodii EZ55", "count": 152}, ...],
+  "by_organism": [{"organism_name": "Alteromonas macleodii EZ55", "count": 152}, ...],
   "by_category": [{"category": "Translation", "count": 1182}, ...],
   "by_term": [{"term_id": "go:0006412", "count": 1331}, {"term_id": "go:0006260", "count": 411}],
   "returned": 0, "truncated": true, "results": []

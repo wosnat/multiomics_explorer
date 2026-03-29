@@ -23,7 +23,7 @@ rows:
   gene_summary: 'IS630 family transposase :: Winged helix-turn helix'
   id: ncbigene:ALT831_RS00180
   locus_tag: ALT831_RS00180
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   preferred_id: ncbigene
   product: IS630 family transposase
   protein_id: WP_197047964.1

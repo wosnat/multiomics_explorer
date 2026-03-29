@@ -39,7 +39,7 @@ examples:
               → find other genes with same term
 
 verbose_fields:
-  - organism_strain
+  - organism_name
 
 chaining:
   - "gene_overview → gene_ontology_terms (check annotation_types first)"

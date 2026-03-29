@@ -7,7 +7,7 @@ rows:
   gene_count: 3950
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 163
   significant_up_count: 112
@@ -33,7 +33,7 @@ rows:
   gene_count: 1849
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 3
   significant_up_count: 59
@@ -60,7 +60,7 @@ rows:
   gene_count: 7120
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 394
   significant_up_count: 609
@@ -111,7 +111,7 @@ rows:
   gene_count: 4272
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 556
   significant_up_count: 599
@@ -150,7 +150,7 @@ rows:
   gene_count: 9245
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 834
   significant_up_count: 553
@@ -201,7 +201,7 @@ rows:
   gene_count: 3698
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 640
   significant_up_count: 602
@@ -234,7 +234,7 @@ rows:
   gene_count: 27
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.3389/fmicb.2022.1038136
   significant_down_count: 14
   significant_up_count: 13
@@ -260,7 +260,7 @@ rows:
   gene_count: 2534
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2017.88
   significant_down_count: 326
   significant_up_count: 271
@@ -299,7 +299,7 @@ rows:
   gene_count: 1714
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 272
   significant_up_count: 24
@@ -325,7 +325,7 @@ rows:
   gene_count: 49
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 36
   significant_up_count: 13
@@ -369,7 +369,7 @@ rows:
   gene_count: 51
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 42
   significant_up_count: 9
@@ -420,7 +420,7 @@ rows:
   gene_count: 29
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 21
   significant_up_count: 8
@@ -459,7 +459,7 @@ rows:
   gene_count: 32
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 20
   significant_up_count: 12
@@ -509,7 +509,7 @@ rows:
   gene_count: 166
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
   significant_down_count: 45
   significant_up_count: 121
@@ -537,7 +537,7 @@ rows:
   gene_count: 4
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
   significant_down_count: 0
   significant_up_count: 4
@@ -565,7 +565,7 @@ rows:
   gene_count: 285
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
   significant_down_count: 211
   significant_up_count: 74
@@ -593,7 +593,7 @@ rows:
   gene_count: 252
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2015.36
   significant_down_count: 204
   significant_up_count: 48
@@ -620,7 +620,7 @@ rows:
   gene_count: 112
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
   significant_down_count: 32
   significant_up_count: 60
@@ -646,7 +646,7 @@ rows:
   gene_count: 224
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
   significant_down_count: 35
   significant_up_count: 90
@@ -678,7 +678,7 @@ rows:
   gene_count: 112
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
   significant_down_count: 66
   significant_up_count: 40
@@ -704,7 +704,7 @@ rows:
   gene_count: 360
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/nature06130
   significant_down_count: 0
   significant_up_count: 117
@@ -772,7 +772,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
   significant_down_count: 40
   significant_up_count: 64
@@ -800,7 +800,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
   significant_down_count: 7
   significant_up_count: 2
@@ -828,7 +828,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
   significant_down_count: 1
   significant_up_count: 1
@@ -856,7 +856,7 @@ rows:
   gene_count: 1696
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
   significant_down_count: 23
   significant_up_count: 20
@@ -883,7 +883,7 @@ rows:
   gene_count: 1696
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
   significant_down_count: 14
   significant_up_count: 18
@@ -910,7 +910,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
   significant_down_count: 59
   significant_up_count: 115
@@ -938,7 +938,7 @@ rows:
   gene_count: 10176
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
   significant_down_count: 476
   significant_up_count: 392
@@ -994,7 +994,7 @@ rows:
   gene_count: 170
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1073/pnas.0601301103
   significant_down_count: 6
   significant_up_count: 48
@@ -1044,7 +1044,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
   significant_down_count: 3
   significant_up_count: 22
@@ -1072,7 +1072,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/JB.01097-06
   significant_down_count: 3
   significant_up_count: 69

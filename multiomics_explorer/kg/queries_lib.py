@@ -84,10 +84,10 @@ def build_resolve_gene(
         "    OR toLower(g.gene_name) = toLower($identifier)\n"
         "    OR ANY(id IN g.all_identifiers WHERE toLower(id) = toLower($identifier))\n"
         "  )\n"
-        "  AND ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_strain) CONTAINS word))\n"
+        "  AND ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_name) CONTAINS word))\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.product AS product, g.organism_strain AS organism_strain\n"
-        "ORDER BY g.organism_strain, g.locus_tag"
+        "       g.product AS product, g.organism_name AS organism_name\n"
+        "ORDER BY g.organism_name, g.locus_tag"
     )
     return cypher, {"identifier": identifier, "organism": organism}
 
@@ -96,7 +96,7 @@ def _genes_by_function_filter_clause() -> str:
     """Return the shared WHERE filter expression for genes_by_function builders."""
     return (
         "($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_strain) CONTAINS word))\n"
+        " WHERE toLower(g.organism_name) CONTAINS word))\n"
         "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
         "  AND ($category IS NULL OR g.gene_category = $category)"
     )
@@ -144,7 +144,7 @@ def build_genes_by_function_summary(
         "       CASE WHEN matches = 1 THEN score END, 0.5\n"
         "     ) AS score_median,\n"
         "     [x IN collect(\n"
-        "       CASE WHEN matches = 1 THEN g.organism_strain END\n"
+        "       CASE WHEN matches = 1 THEN g.organism_name END\n"
         "     ) WHERE x IS NOT NULL] AS organisms,\n"
         "     [x IN collect(\n"
         "       CASE WHEN matches = 1 THEN g.gene_category END\n"
@@ -171,7 +171,7 @@ def build_genes_by_function(
     """Build detail Cypher for genes_by_function.
 
     RETURN keys (compact): locus_tag, gene_name, product,
-    organism_strain, gene_category, annotation_quality, score.
+    organism_name, gene_category, annotation_quality, score.
     RETURN keys (verbose): adds function_description, gene_summary.
     """
     params = _genes_by_function_params(
@@ -197,7 +197,7 @@ def build_genes_by_function(
         "YIELD node AS g, score\n"
         f"WHERE {filt}\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.product AS product, g.organism_strain AS organism_strain,\n"
+        "       g.product AS product, g.organism_name AS organism_name,\n"
         "       g.gene_category AS gene_category,\n"
         f"       g.annotation_quality AS annotation_quality, score{verbose_cols}\n"
         f"ORDER BY score DESC, g.locus_tag{limit_clause}"
@@ -225,7 +225,7 @@ def build_gene_overview_summary(
         "     [g IN genes WHERE g IS NOT NULL] AS found\n"
         "WITH not_found, found,\n"
         "     size(found) AS total_matching,\n"
-        "     [g IN found | g.organism_strain] AS orgs,\n"
+        "     [g IN found | g.organism_name] AS orgs,\n"
         "     [g IN found | g.gene_category] AS cats,\n"
         "     apoc.coll.flatten([g IN found | g.annotation_types]) AS all_atypes\n"
         "RETURN total_matching,\n"
@@ -249,7 +249,7 @@ def build_gene_overview(
     """Build detail Cypher for gene_overview.
 
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
-    annotation_quality, organism_strain, annotation_types,
+    annotation_quality, organism_name, annotation_types,
     expression_edge_count, significant_up_count, significant_down_count,
     closest_ortholog_group_size, closest_ortholog_genera.
     RETURN keys (verbose): adds gene_summary, function_description,
@@ -276,7 +276,7 @@ def build_gene_overview(
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         "       g.annotation_quality AS annotation_quality,\n"
-        "       g.organism_strain AS organism_strain,\n"
+        "       g.organism_name AS organism_name,\n"
         "       g.annotation_types AS annotation_types,\n"
         "       g.expression_edge_count AS expression_edge_count,\n"
         "       g.significant_up_count AS significant_up_count,\n"
@@ -324,7 +324,7 @@ def build_gene_stub(*, gene_id: str) -> tuple[str, dict]:
     cypher = (
         "MATCH (g:Gene {locus_tag: $lt})\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.product AS product, g.organism_strain AS organism_strain"
+        "       g.product AS product, g.organism_name AS organism_name"
     )
     return cypher, {"lt": gene_id}
 
@@ -378,7 +378,7 @@ def build_gene_homologs_summary(
         "WITH\n"
         "  collect(CASE WHEN g IS NULL THEN lt END) AS nf_raw,\n"
         "  collect(CASE WHEN g IS NOT NULL AND size(groups) = 0 THEN lt END) AS ng_raw,\n"
-        "  [row IN collect({org: CASE WHEN size(groups) > 0 THEN g.organism_strain END,\n"
+        "  [row IN collect({org: CASE WHEN size(groups) > 0 THEN g.organism_name END,\n"
         "                    srcs: [x IN groups | x.source]})\n"
         "   WHERE row.org IS NOT NULL] AS matched\n"
         "UNWIND CASE WHEN size(matched) = 0 THEN [null] ELSE matched END AS m\n"
@@ -405,7 +405,7 @@ def build_gene_homologs(
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_homologs.
 
-    RETURN keys (compact): locus_tag, organism_strain, group_id,
+    RETURN keys (compact): locus_tag, organism_name, group_id,
     consensus_gene_name, consensus_product, taxonomic_level, source,
     specificity_rank.
     RETURN keys (verbose): adds member_count, organism_count, genera,
@@ -439,7 +439,7 @@ def build_gene_homologs(
         "UNWIND $locus_tags AS lt\n"
         "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
         f"{where_block}"
-        "RETURN g.locus_tag AS locus_tag, g.organism_strain AS organism_strain,\n"
+        "RETURN g.locus_tag AS locus_tag, g.organism_name AS organism_name,\n"
         "       og.id AS group_id,\n"
         "       og.consensus_gene_name AS consensus_gene_name,\n"
         "       og.consensus_product AS consensus_product,\n"
@@ -678,7 +678,7 @@ def _list_experiments_where(
     if organism:
         conditions.append(
             "(ALL(word IN split(toLower($org), ' ')"
-            " WHERE toLower(e.organism_strain) CONTAINS word)"
+            " WHERE toLower(e.organism_name) CONTAINS word)"
             " OR ALL(word IN split(toLower($org), ' ')"
             " WHERE toLower(e.coculture_partner) CONTAINS word))"
         )
@@ -729,7 +729,7 @@ def build_list_experiments(
     """Build Cypher for listing experiments with precomputed gene count stats.
 
     RETURN keys (compact): experiment_id, experiment_name, publication_doi,
-    organism_strain, treatment_type, coculture_partner, omics_type,
+    organism_name, treatment_type, coculture_partner, omics_type,
     is_time_course, table_scope, table_scope_detail,
     gene_count, significant_up_count, significant_down_count,
     time_point_count, time_point_labels, time_point_orders, time_point_hours,
@@ -769,7 +769,7 @@ def build_list_experiments(
         "e.id AS experiment_id,\n"
         "       e.name AS experiment_name,\n"
         "       p.doi AS publication_doi,\n"
-        "       e.organism_strain AS organism_strain,\n"
+        "       e.organism_name AS organism_name,\n"
         "       e.treatment_type AS treatment_type,\n"
         "       e.coculture_partner AS coculture_partner,\n"
         "       e.omics_type AS omics_type,\n"
@@ -796,7 +796,7 @@ def build_list_experiments(
             f"{where_block}"
             f"RETURN {return_cols},\n"
             f"       score{verbose_cols}\n"
-            f"ORDER BY score DESC, e.organism_strain, e.name\n"
+            f"ORDER BY score DESC, e.organism_name, e.name\n"
             f"{limit_clause}"
         )
     else:
@@ -804,7 +804,7 @@ def build_list_experiments(
             "MATCH (p:Publication)-[:Has_experiment]->(e:Experiment)\n"
             f"{where_block}"
             f"RETURN {return_cols}{verbose_cols}\n"
-            f"ORDER BY p.publication_year DESC, e.organism_strain, e.name\n"
+            f"ORDER BY p.publication_year DESC, e.organism_name, e.name\n"
             f"{limit_clause}"
         )
 
@@ -839,7 +839,7 @@ def build_list_experiments_summary(
     )
 
     collect_cols = (
-        "collect(e.organism_strain) AS orgs,\n"
+        "collect(e.organism_name) AS orgs,\n"
         "     collect(e.treatment_type) AS tts,\n"
         "     collect(e.omics_type) AS omics,\n"
         "     collect(p.doi) AS dois,\n"
@@ -1046,8 +1046,8 @@ def build_genes_by_ontology_summary(
         f"{c['level_clause_tid']}\n"
         f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
         "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
-        "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
-        "WITH DISTINCT tid AS root_tid, g.locus_tag AS lt, g.organism_strain AS org,\n"
+        "       WHERE toLower(g.organism_name) CONTAINS word))\n"
+        "WITH DISTINCT tid AS root_tid, g.locus_tag AS lt, g.organism_name AS org,\n"
         "     coalesce(g.gene_category, 'Unknown') AS cat\n"
         "WITH collect({lt: lt, org: org, cat: cat, tid: root_tid}) AS rows\n"
         "WITH rows,\n"
@@ -1078,7 +1078,7 @@ def build_genes_by_ontology(
     """Build detail Cypher for genes_by_ontology.
 
     RETURN keys (compact): locus_tag, gene_name, product,
-    organism_strain, gene_category.
+    organism_name, gene_category.
     RETURN keys (verbose): adds matched_terms, gene_summary,
     function_description.
     """
@@ -1098,16 +1098,16 @@ def build_genes_by_ontology(
             f"{c['level_clause_tid']}\n"
             f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
             "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
-            "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+            "       WHERE toLower(g.organism_name) CONTAINS word))\n"
             "WITH DISTINCT tid, g\n"
             "WITH g, collect(DISTINCT tid) AS matched_terms\n"
             "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-            "       g.product AS product, g.organism_strain AS organism_strain,\n"
+            "       g.product AS product, g.organism_name AS organism_name,\n"
             "       g.gene_category AS gene_category,\n"
             "       matched_terms,\n"
             "       g.gene_summary AS gene_summary,\n"
             "       g.function_description AS function_description\n"
-            "ORDER BY g.organism_strain, g.locus_tag" + limit_clause
+            "ORDER BY g.organism_name, g.locus_tag" + limit_clause
         )
     else:
         cypher = (
@@ -1116,11 +1116,11 @@ def build_genes_by_ontology(
             f"{c['level_clause']}\n"
             f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
             "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
-            "       WHERE toLower(g.organism_strain) CONTAINS word))\n"
+            "       WHERE toLower(g.organism_name) CONTAINS word))\n"
             "RETURN DISTINCT g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-            "       g.product AS product, g.organism_strain AS organism_strain,\n"
+            "       g.product AS product, g.organism_name AS organism_name,\n"
             "       g.gene_category AS gene_category\n"
-            "ORDER BY g.organism_strain, g.locus_tag" + limit_clause
+            "ORDER BY g.organism_name, g.locus_tag" + limit_clause
         )
 
     return cypher, params
@@ -1205,7 +1205,7 @@ def build_gene_ontology_terms(
     """Build detail Cypher for gene_ontology_terms for ONE ontology.
 
     RETURN keys (compact): locus_tag, term_id, term_name.
-    RETURN keys (verbose): adds organism_strain.
+    RETURN keys (verbose): adds organism_name.
 
     Called by api/ — which adds ontology_type column and merges
     across ontologies when ontology=None.
@@ -1220,7 +1220,7 @@ def build_gene_ontology_terms(
     params: dict = {"locus_tags": locus_tags}
 
     verbose_cols = (
-        ",\n       g.organism_strain AS organism_strain"
+        ",\n       g.organism_name AS organism_name"
         if verbose else ""
     )
 
@@ -1279,7 +1279,7 @@ def _differential_expression_where(
     if organism:
         conditions.append(
             "ALL(word IN split(toLower($organism), ' ')"
-            " WHERE toLower(e.organism_strain) CONTAINS word)"
+            " WHERE toLower(e.organism_name) CONTAINS word)"
         )
         params["organism"] = organism
     if locus_tags:
@@ -1305,7 +1305,7 @@ def _differential_expression_where(
 def build_resolve_organism_for_organism(
     *, organism: str,
 ) -> tuple[str, dict]:
-    """Resolve distinct organism_strain values for a fuzzy organism name.
+    """Resolve distinct organism_name values for a fuzzy organism name.
 
     RETURN keys: organisms (list[str]).
     Uses the same word-based CONTAINS matching as list_experiments.
@@ -1313,8 +1313,8 @@ def build_resolve_organism_for_organism(
     cypher = (
         "MATCH (e:Experiment)-[:Changes_expression_of]->()\n"
         "WHERE ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(e.organism_strain) CONTAINS word)\n"
-        "RETURN collect(DISTINCT e.organism_strain) AS organisms"
+        " WHERE toLower(e.organism_name) CONTAINS word)\n"
+        "RETURN collect(DISTINCT e.organism_name) AS organisms"
     )
     return cypher, {"organism": organism}
 
@@ -1322,14 +1322,14 @@ def build_resolve_organism_for_organism(
 def build_resolve_organism_for_locus_tags(
     *, locus_tags: list[str],
 ) -> tuple[str, dict]:
-    """Resolve distinct organism_strain values for a list of locus_tags.
+    """Resolve distinct organism_name values for a list of locus_tags.
 
     RETURN keys: organisms (list[str]).
     """
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "MATCH (g:Gene {locus_tag: lt})\n"
-        "RETURN collect(DISTINCT g.organism_strain) AS organisms"
+        "RETURN collect(DISTINCT g.organism_name) AS organisms"
     )
     return cypher, {"locus_tags": locus_tags}
 
@@ -1337,14 +1337,14 @@ def build_resolve_organism_for_locus_tags(
 def build_resolve_organism_for_experiments(
     *, experiment_ids: list[str],
 ) -> tuple[str, dict]:
-    """Resolve distinct organism_strain values for a list of experiment IDs.
+    """Resolve distinct organism_name values for a list of experiment IDs.
 
     RETURN keys: organisms (list[str]).
     """
     cypher = (
         "UNWIND $experiment_ids AS eid\n"
         "MATCH (e:Experiment {id: eid})\n"
-        "RETURN collect(DISTINCT e.organism_strain) AS organisms"
+        "RETURN collect(DISTINCT e.organism_name) AS organisms"
     )
     return cypher, {"experiment_ids": experiment_ids}
 
@@ -1364,7 +1364,7 @@ def build_differential_expression_by_gene_summary_global(
 ) -> tuple[str, dict]:
     """Global aggregate stats for differential_expression_by_gene.
 
-    RETURN keys: total_rows, matching_genes, rows_by_status,
+    RETURN keys: total_matching, matching_genes, rows_by_status,
     rows_by_treatment_type, by_table_scope, median_abs_log2fc, max_abs_log2fc.
     rows_by_status = apoc list [{item, count}] — api/ converts to dict.
     rows_by_treatment_type = apoc list [{item, count}] — api/ converts to dict.
@@ -1380,7 +1380,7 @@ def build_differential_expression_by_gene_summary_global(
     cypher = (
         "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
         f"{where_block}"
-        "RETURN count(*) AS total_rows,\n"
+        "RETURN count(*) AS total_matching,\n"
         "       count(DISTINCT g.locus_tag) AS matching_genes,\n"
         "       apoc.coll.frequencies(collect(r.expression_status)) AS rows_by_status,\n"
         "       apoc.coll.frequencies(collect(e.treatment_type)) AS rows_by_treatment_type,\n"
@@ -1405,7 +1405,7 @@ def build_differential_expression_by_gene_summary_by_experiment(
 ) -> tuple[str, dict]:
     """Per-experiment breakdown with nested timepoints (single organism enforced).
 
-    RETURN keys: organism_strain, experiments.
+    RETURN keys: organism_name, experiments.
     experiments: list of dicts, each with nested timepoints.
     rows_by_status at both experiment and timepoint level (APOC list format).
     is_time_course included per experiment so api/ can null-out timepoints.
@@ -1444,8 +1444,8 @@ def build_differential_expression_by_gene_summary_by_experiment(
         "              matching_genes: matching_genes,\n"
         "              rows_by_status: rows_by_status,\n"
         "              timepoints: timepoints}) AS experiments,\n"
-        "     e.organism_strain AS organism_strain\n"
-        "RETURN organism_strain, experiments"
+        "     e.organism_name AS organism_name\n"
+        "RETURN organism_name, experiments"
     )
     return cypher, params
 
@@ -1715,13 +1715,13 @@ def build_genes_by_homolog_group_summary(
         "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og)\n"
         "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
         "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
-        "             WHERE toLower(g.organism_strain) CONTAINS word)))\n"
+        "             WHERE toLower(g.organism_name) CONTAINS word)))\n"
         "WITH gid, og, g\n"
         "WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS nf_groups_raw,\n"
         "     collect(DISTINCT CASE WHEN og IS NOT NULL AND g IS NULL\n"
         "             THEN gid END) AS nm_groups_raw,\n"
         "     collect(CASE WHEN g IS NOT NULL THEN\n"
-        "       {lt: g.locus_tag, org: g.organism_strain,\n"
+        "       {lt: g.locus_tag, org: g.organism_name,\n"
         "        cat: coalesce(g.gene_category, 'Unknown'), gid: gid} END) AS rows\n"
         "WITH [x IN nf_groups_raw WHERE x IS NOT NULL] AS not_found_groups,\n"
         "     [x IN nm_groups_raw WHERE x IS NOT NULL] AS not_matched_groups,\n"
@@ -1759,13 +1759,13 @@ def build_genes_by_homolog_group_diagnostics(
         "OPTIONAL MATCH (g_any:Gene)\n"
         "WHERE org_input IS NOT NULL\n"
         "  AND ALL(word IN split(toLower(org_input), ' ')\n"
-        "          WHERE toLower(g_any.organism_strain) CONTAINS word)\n"
+        "          WHERE toLower(g_any.organism_name) CONTAINS word)\n"
         "WITH org_input, count(g_any) AS kg_count\n"
         "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
         "WHERE org_input IS NOT NULL AND kg_count > 0\n"
         "  AND og.id IN $group_ids\n"
         "  AND ALL(word IN split(toLower(org_input), ' ')\n"
-        "          WHERE toLower(g.organism_strain) CONTAINS word)\n"
+        "          WHERE toLower(g.organism_name) CONTAINS word)\n"
         "WITH org_input, kg_count, count(g) AS matched_count\n"
         "WITH collect(CASE WHEN org_input IS NOT NULL AND kg_count = 0\n"
         "             THEN org_input END) AS nf_raw,\n"
@@ -1787,7 +1787,7 @@ def build_genes_by_homolog_group(
     """Build detail Cypher for genes_by_homolog_group.
 
     RETURN keys (compact): locus_tag, gene_name, product,
-    organism_strain, gene_category, group_id.
+    organism_name, gene_category, group_id.
     RETURN keys (verbose): adds gene_summary, function_description,
     consensus_product, source.
     """
@@ -1812,11 +1812,11 @@ def build_genes_by_homolog_group(
         "MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup {id: gid})\n"
         "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
         "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
-        "             WHERE toLower(g.organism_strain) CONTAINS word)))\n"
+        "             WHERE toLower(g.organism_name) CONTAINS word)))\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-        "       g.product AS product, g.organism_strain AS organism_strain,\n"
+        "       g.product AS product, g.organism_name AS organism_name,\n"
         f"       g.gene_category AS gene_category, og.id AS group_id{verbose_cols}\n"
-        f"ORDER BY og.id, g.organism_strain, g.locus_tag{limit_clause}"
+        f"ORDER BY og.id, g.organism_name, g.locus_tag{limit_clause}"
     )
     return cypher, params
 
@@ -1844,7 +1844,7 @@ def _differential_expression_by_ortholog_where(
         conditions.append(
             "ANY(org_input IN $organisms"
             " WHERE ALL(word IN split(toLower(org_input), ' ')"
-            " WHERE toLower(e.organism_strain) CONTAINS word))"
+            " WHERE toLower(e.organism_name) CONTAINS word))"
         )
         params["organisms"] = organisms
     if experiment_ids:
@@ -1874,7 +1874,7 @@ def build_differential_expression_by_ortholog_summary_global(
 ) -> tuple[str, dict]:
     """Global aggregate stats for differential_expression_by_ortholog.
 
-    RETURN keys: total_rows, matching_genes, matching_groups,
+    RETURN keys: total_matching, matching_genes, matching_groups,
     experiment_count, by_organism, rows_by_status, rows_by_treatment_type,
     by_table_scope, sig_log2fcs, not_found_groups, not_matched_groups.
     """
@@ -1896,7 +1896,7 @@ def build_differential_expression_by_ortholog_summary_global(
         "WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS nf_raw,\n"
         "     collect(DISTINCT CASE WHEN og IS NOT NULL THEN gid END) AS found_gids,\n"
         "     collect(CASE WHEN r IS NOT NULL THEN {\n"
-        "       gid: gid, lt: g.locus_tag, org: e.organism_strain,\n"
+        "       gid: gid, lt: g.locus_tag, org: e.organism_name,\n"
         "       status: r.expression_status, tt: e.treatment_type,\n"
         "       ts: e.table_scope, eid: e.id,\n"
         "       log2fc: r.log2_fold_change\n"
@@ -1909,7 +1909,7 @@ def build_differential_expression_by_ortholog_summary_global(
         "      WHERE NOT gid IN apoc.coll.toSet([r IN rows | r.gid])\n"
         "     ] AS not_matched_groups,\n"
         "     rows\n"
-        "RETURN size(rows) AS total_rows,\n"
+        "RETURN size(rows) AS total_matching,\n"
         "       size(apoc.coll.toSet([r IN rows | r.lt])) AS matching_genes,\n"
         "       size(apoc.coll.toSet([r IN rows | r.gid])) AS matching_groups,\n"
         "       size(apoc.coll.toSet([r IN rows | r.eid])) AS experiment_count,\n"
@@ -1978,7 +1978,7 @@ def build_differential_expression_by_ortholog_top_experiments(
     """Top experiments by significant gene count across ortholog groups.
 
     RETURN keys: top_experiments (list of dicts with experiment_id,
-    treatment_type, organism_strain, significant_genes).
+    treatment_type, organism_name, significant_genes).
     """
     conditions, params = _differential_expression_by_ortholog_where(
         organisms=organisms, experiment_ids=experiment_ids,
@@ -2001,7 +2001,7 @@ def build_differential_expression_by_ortholog_top_experiments(
         "RETURN collect({\n"
         "  experiment_id: e.id,\n"
         "  treatment_type: e.treatment_type,\n"
-        "  organism_strain: e.organism_strain,\n"
+        "  organism_name: e.organism_name,\n"
         "  significant_genes: significant_genes\n"
         "}) AS top_experiments"
     )
@@ -2021,12 +2021,12 @@ def build_differential_expression_by_ortholog_results(
     direction: str | None = None,
     significant_only: bool = False,
     verbose: bool = False,
-    limit: int = 50,
+    limit: int | None = None,
 ) -> tuple[str, dict]:
     """Build detail Cypher for differential_expression_by_ortholog.
 
     RETURN keys (compact — 13): group_id, consensus_gene_name,
-    consensus_product, experiment_id, treatment_type, organism_strain,
+    consensus_product, experiment_id, treatment_type, organism_name,
     coculture_partner, timepoint, timepoint_hours, timepoint_order,
     genes_with_expression, significant_up, significant_down, not_significant.
     RETURN keys (verbose): adds experiment_name, treatment, omics_type,
@@ -2037,7 +2037,6 @@ def build_differential_expression_by_ortholog_results(
         direction=direction, significant_only=significant_only,
     )
     params["group_ids"] = group_ids
-    params["limit"] = limit
 
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
@@ -2066,7 +2065,7 @@ def build_differential_expression_by_ortholog_results(
         "       og.consensus_product AS consensus_product,\n"
         "       e.id AS experiment_id,\n"
         "       e.treatment_type AS treatment_type,\n"
-        "       e.organism_strain AS organism_strain,\n"
+        "       e.organism_name AS organism_name,\n"
         "       e.coculture_partner AS coculture_partner,\n"
         "       tp AS timepoint,\n"
         "       tph AS timepoint_hours,\n"
@@ -2077,8 +2076,10 @@ def build_differential_expression_by_ortholog_results(
         '       size([s IN statuses WHERE s = "not_significant"]) AS not_significant'
         f"{verbose_cols}\n"
         "ORDER BY og.id ASC, e.id ASC, tpo ASC\n"
-        "LIMIT $limit"
     )
+    if limit is not None:
+        cypher += "LIMIT $limit"
+        params["limit"] = limit
     return cypher, params
 
 
@@ -2094,7 +2095,7 @@ def build_differential_expression_by_ortholog_membership_counts(
 ) -> tuple[str, dict]:
     """Gene counts per ortholog group per organism (no expression filter).
 
-    RETURN keys: group_id, organism_strain, total_genes.
+    RETURN keys: group_id, organism_name, total_genes.
     """
     params: dict = {"group_ids": group_ids, "organisms": organisms}
 
@@ -2103,11 +2104,11 @@ def build_differential_expression_by_ortholog_membership_counts(
         "MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup {id: gid})\n"
         "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
         "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
-        "             WHERE toLower(g.organism_strain) CONTAINS word)))\n"
+        "             WHERE toLower(g.organism_name) CONTAINS word)))\n"
         "RETURN og.id AS group_id,\n"
-        "       g.organism_strain AS organism_strain,\n"
+        "       g.organism_name AS organism_name,\n"
         "       count(g) AS total_genes\n"
-        "ORDER BY og.id ASC, g.organism_strain ASC"
+        "ORDER BY og.id ASC, g.organism_name ASC"
     )
     return cypher, params
 
@@ -2149,13 +2150,13 @@ def _build_de_by_ortholog_organism_diagnostics(
         "OPTIONAL MATCH (g_any:Gene)\n"
         "WHERE org_input IS NOT NULL\n"
         "  AND ALL(word IN split(toLower(org_input), ' ')\n"
-        "          WHERE toLower(g_any.organism_strain) CONTAINS word)\n"
+        "          WHERE toLower(g_any.organism_name) CONTAINS word)\n"
         "WITH org_input, count(g_any) AS kg_count\n"
         "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
         "WHERE org_input IS NOT NULL AND kg_count > 0\n"
         "  AND og.id IN $group_ids\n"
         "  AND ALL(word IN split(toLower(org_input), ' ')\n"
-        "          WHERE toLower(g.organism_strain) CONTAINS word)\n"
+        "          WHERE toLower(g.organism_name) CONTAINS word)\n"
         "OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)"
         f"{expression_where}\n"
         "WITH org_input, kg_count, count(r) AS matched_count\n"

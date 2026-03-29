@@ -32,7 +32,7 @@ returned, truncated, warnings, results
 ### Example 1: Count genes per organism strain
 
 ```example-call
-run_cypher(query="MATCH (g:Gene) RETURN g.organism_strain AS strain, count(g) AS gene_count ORDER BY gene_count DESC")
+run_cypher(query="MATCH (g:Gene) RETURN g.organism_name AS strain, count(g) AS gene_count ORDER BY gene_count DESC")
 ```
 
 ```example-response

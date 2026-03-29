@@ -89,7 +89,7 @@ class TestResolveGene:
         mock_conn.execute_query.return_value = [
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
              "product": "DNA polymerase III subunit beta",
-             "organism_strain": "Prochlorococcus marinus MED4"},
+             "organism_name": "Prochlorococcus marinus MED4"},
         ]
         result = api.resolve_gene("PMM0001", conn=mock_conn)
         assert isinstance(result, dict)
@@ -121,7 +121,7 @@ class TestResolveGene:
     def test_limit_slices_results(self, mock_conn):
         mock_conn.execute_query.return_value = [
             {"locus_tag": f"PMM000{i}", "gene_name": "g",
-             "product": "p", "organism_strain": "MED4"}
+             "product": "p", "organism_name": "MED4"}
             for i in range(3)
         ]
         result = api.resolve_gene("PMM", limit=2, conn=mock_conn)
@@ -131,7 +131,7 @@ class TestResolveGene:
     def test_total_matching_reflects_full_count(self, mock_conn):
         mock_conn.execute_query.return_value = [
             {"locus_tag": f"PMM000{i}", "gene_name": "g",
-             "product": "p", "organism_strain": "MED4"}
+             "product": "p", "organism_name": "MED4"}
             for i in range(5)
         ]
         result = api.resolve_gene("PMM", limit=2, conn=mock_conn)
@@ -161,7 +161,7 @@ class TestGenesByFunction:
         return [
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
              "product": "DNA polymerase III subunit beta",
-             "organism_strain": "Prochlorococcus MED4",
+             "organism_name": "Prochlorococcus MED4",
              "gene_category": "DNA replication",
              "annotation_quality": 3, "score": 5.0},
         ]
@@ -289,7 +289,7 @@ class TestGeneOverview:
              "product": "DNA polymerase III subunit beta",
              "gene_category": "DNA replication",
              "annotation_quality": 3,
-             "organism_strain": "Prochlorococcus MED4",
+             "organism_name": "Prochlorococcus MED4",
              "annotation_types": ["go_bp", "ec", "kegg"],
              "expression_edge_count": 10,
              "significant_up_count": 3, "significant_down_count": 2,
@@ -392,7 +392,7 @@ class TestGeneDetails:
     def test_returns_envelope(self, mock_conn):
         gene_props = {"locus_tag": "PMM0001", "gene_name": "dnaN",
                        "product": "DNA polymerase III subunit beta",
-                       "organism_strain": "Prochlorococcus MED4"}
+                       "organism_name": "Prochlorococcus MED4"}
         mock_conn.execute_query.side_effect = [
             [{"total_matching": 1, "not_found": []}],  # summary
             [{"gene": gene_props}],  # detail
@@ -447,12 +447,12 @@ class TestGeneHomologs:
     def _detail_rows(self):
         """Helper: mock detail query result rows."""
         return [
-            {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
+            {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4",
              "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
              "taxonomic_level": "curated", "source": "cyanorak",
              "specificity_rank": 0},
-            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102",
+            {"locus_tag": "SYNW0305", "organism_name": "Synechococcus WH8102",
              "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
              "taxonomic_level": "curated", "source": "cyanorak",
@@ -766,7 +766,7 @@ class TestGenesByOntology:
         """Helper: mock detail query result rows."""
         return [
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
-             "product": "DNA polymerase III", "organism_strain": "Prochlorococcus MED4",
+             "product": "DNA polymerase III", "organism_name": "Prochlorococcus MED4",
              "gene_category": "Replication and repair"},
         ]
 
@@ -1308,7 +1308,7 @@ class TestListExperiments:
             "experiment_id": "test_exp_1",
             "experiment_name": "Test Experiment 1",
             "publication_doi": "10.1234/test",
-            "organism_strain": "Prochlorococcus MED4",
+            "organism_name": "Prochlorococcus MED4",
             "treatment_type": "coculture",
             "coculture_partner": "Alteromonas macleodii HOT1A3",
             "omics_type": "RNASEQ",
@@ -1370,8 +1370,8 @@ class TestListExperiments:
         assert result["results"] == []
         assert result["returned"] == 0
         assert result["truncated"] is True
-        assert result["by_organism"][0]["organism_strain"] == "Prochlorococcus MED4"
-        assert result["by_organism"][0]["experiment_count"] == 30
+        assert result["by_organism"][0]["organism_name"] == "Prochlorococcus MED4"
+        assert result["by_organism"][0]["count"] == 30
         # No detail query call — only 2 execute_query calls
         assert mock_conn.execute_query.call_count == 2
 
@@ -1498,13 +1498,13 @@ class TestListExperiments:
             self._summary_result(),
         ]
         result = api.list_experiments(summary=True, conn=mock_conn)
-        assert result["by_organism"][0]["organism_strain"] == "Prochlorococcus MED4"
-        assert result["by_organism"][0]["experiment_count"] == 30
+        assert result["by_organism"][0]["organism_name"] == "Prochlorococcus MED4"
+        assert result["by_organism"][0]["count"] == 30
         assert result["by_treatment_type"][0]["treatment_type"] == "coculture"
         assert result["by_omics_type"][0]["omics_type"] == "RNASEQ"
         assert result["by_publication"][0]["publication_doi"] == "10.1038/ismej.2016.70"
         assert result["by_table_scope"][0]["table_scope"] == "gene_level"
-        assert result["by_table_scope"][0]["experiment_count"] == 40
+        assert result["by_table_scope"][0]["count"] == 40
 
     def test_creates_conn_when_none(self):
         """Default conn used when None."""
@@ -1540,10 +1540,10 @@ class TestDifferentialExpressionByGene:
             orgs = ["Prochlorococcus MED4"]
         return [{"organisms": orgs}]
 
-    def _global_summary(self, total_rows=15, matching_genes=5):
+    def _global_summary(self, total_matching=15, matching_genes=5):
         """Mock global summary query result."""
         return [{
-            "total_rows": total_rows,
+            "total_matching": total_matching,
             "matching_genes": matching_genes,
             "rows_by_status": [
                 {"item": "significant_up", "count": 3},
@@ -1562,7 +1562,7 @@ class TestDifferentialExpressionByGene:
     def _experiment_summary(self):
         """Mock per-experiment summary result."""
         return [{
-            "organism_strain": "Prochlorococcus MED4",
+            "organism_name": "Prochlorococcus MED4",
             "experiments": [
                 {
                     "experiment_id": "exp1",
@@ -1645,15 +1645,15 @@ class TestDifferentialExpressionByGene:
         )
         assert isinstance(result, dict)
         for key in [
-            "organism_strain", "matching_genes", "total_rows",
+            "organism_name", "matching_genes", "total_matching",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
             "experiment_count", "rows_by_treatment_type", "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
             "returned", "truncated", "results",
         ]:
             assert key in result
-        assert result["organism_strain"] == "Prochlorococcus MED4"
-        assert result["total_rows"] == 15
+        assert result["organism_name"] == "Prochlorococcus MED4"
+        assert result["total_matching"] == 15
         assert result["matching_genes"] == 5
         assert result["returned"] == 1
         assert len(result["results"]) == 1
@@ -1683,7 +1683,7 @@ class TestDifferentialExpressionByGene:
         )
         assert result["results"] == []
         assert result["returned"] == 0
-        assert result["truncated"] is True  # total_rows=15 > 0
+        assert result["truncated"] is True  # total_matching=15 > 0
         assert mock_conn.execute_query.call_count == 4  # no detail call
 
     def test_no_filters_raises(self, mock_conn):
@@ -1729,7 +1729,7 @@ class TestDifferentialExpressionByGene:
             )
 
     def test_truncated_true(self, mock_conn):
-        """truncated=True when total_rows > returned."""
+        """truncated=True when total_matching > returned."""
         mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
         result = api.differential_expression_by_gene(
             organism="MED4", conn=mock_conn
@@ -1739,7 +1739,7 @@ class TestDifferentialExpressionByGene:
     def test_experiments_sorted_by_significant(self, mock_conn):
         """Experiments sorted by total significant rows DESC."""
         exp_summary = [{
-            "organism_strain": "Prochlorococcus MED4",
+            "organism_name": "Prochlorococcus MED4",
             "experiments": [
                 {
                     "experiment_id": "low_sig",
@@ -1791,7 +1791,7 @@ class TestDifferentialExpressionByGene:
     def test_non_time_course_timepoints_null(self, mock_conn):
         """Non-time-course experiments have timepoints=None."""
         exp_summary = [{
-            "organism_strain": "Prochlorococcus MED4",
+            "organism_name": "Prochlorococcus MED4",
             "experiments": [
                 {
                     "experiment_id": "single_tp",
@@ -1822,7 +1822,7 @@ class TestDifferentialExpressionByGene:
         }]
         mock_conn.execute_query.side_effect = [
             self._organism_result(),
-            self._global_summary(total_rows=5, matching_genes=1),
+            self._global_summary(total_matching=5, matching_genes=1),
             exp_summary,
             self._diagnostics_summary(),
             self._detail_rows(),
@@ -1867,15 +1867,15 @@ class TestDifferentialExpressionByGene:
             mock_instance = MockConn.return_value
             mock_instance.execute_query.side_effect = [
                 self._organism_result(),
-                self._global_summary(total_rows=0, matching_genes=0),
-                [{"organism_strain": "Prochlorococcus MED4", "experiments": []}],
+                self._global_summary(total_matching=0, matching_genes=0),
+                [{"organism_name": "Prochlorococcus MED4", "experiments": []}],
                 self._diagnostics_summary(),
             ]
             result = api.differential_expression_by_gene(
                 organism="MED4", summary=True,
             )
         MockConn.assert_called_once()
-        assert result["total_rows"] == 0
+        assert result["total_matching"] == 0
 
     def test_importable_from_package(self):
         """from multiomics_explorer import differential_expression_by_gene works."""
@@ -1974,7 +1974,7 @@ class TestGenesByHomologGroup:
               "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
               "not_found_groups": [], "not_matched_groups": []}],
             [{"locus_tag": "PMM0315", "gene_name": "psbB",
-              "product": "photosystem II", "organism_strain": "Prochlorococcus MED4",
+              "product": "photosystem II", "organism_name": "Prochlorococcus MED4",
               "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}],
         ]
         result = api.genes_by_homolog_group(["cyanorak:CK_00000570"], conn=mock_conn)
@@ -1985,7 +1985,7 @@ class TestGenesByHomologGroup:
         assert result["genes_per_group_max"] == 9
         assert result["genes_per_group_median"] == 9
         assert len(result["by_organism"]) == 1
-        assert result["by_organism"][0]["organism"] == "Prochlorococcus MED4"
+        assert result["by_organism"][0]["organism_name"] == "Prochlorococcus MED4"
         assert len(result["top_groups"]) == 1
         assert result["top_groups"][0]["group_id"] == "cyanorak:CK_00000570"
         assert result["not_found_groups"] == []
@@ -2049,7 +2049,7 @@ class TestDifferentialExpressionByOrtholog:
     def test_returns_dict(self, mock_conn):
         # Mock all 5 query results
         mock_conn.execute_query.side_effect = [
-            [{"total_rows": 10, "matching_genes": 3, "matching_groups": 1,
+            [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
               "experiment_count": 2, "by_organism": [], "rows_by_status": [],
               "rows_by_treatment_type": [], "by_table_scope": [],
               "sig_log2fcs": [1.5, 2.0], "not_found_groups": [],
@@ -2063,7 +2063,7 @@ class TestDifferentialExpressionByOrtholog:
             group_ids=["g1"], conn=mock_conn,
         )
         assert isinstance(result, dict)
-        assert "total_rows" in result
+        assert "total_matching" in result
         assert "results" in result
         assert "returned" in result
         assert "truncated" in result
@@ -2080,7 +2080,7 @@ class TestDifferentialExpressionByOrtholog:
 
     def test_median_max_computation(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            [{"total_rows": 5, "matching_genes": 2, "matching_groups": 1,
+            [{"total_matching": 5, "matching_genes": 2, "matching_groups": 1,
               "experiment_count": 1, "by_organism": [], "rows_by_status": [],
               "rows_by_treatment_type": [], "by_table_scope": [],
               "sig_log2fcs": [1.0, 2.0, 3.0], "not_found_groups": [],
@@ -2098,7 +2098,7 @@ class TestDifferentialExpressionByOrtholog:
 
     def test_empty_sig_log2fcs(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            [{"total_rows": 0, "matching_genes": 0, "matching_groups": 0,
+            [{"total_matching": 0, "matching_genes": 0, "matching_groups": 0,
               "experiment_count": 0, "by_organism": [], "rows_by_status": [],
               "rows_by_treatment_type": [], "by_table_scope": [],
               "sig_log2fcs": [], "not_found_groups": ["g1"],
@@ -2116,23 +2116,43 @@ class TestDifferentialExpressionByOrtholog:
 
     def test_total_genes_join(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            [{"total_rows": 1, "matching_genes": 1, "matching_groups": 1,
+            [{"total_matching": 1, "matching_genes": 1, "matching_groups": 1,
               "experiment_count": 1, "by_organism": [], "rows_by_status": [],
               "rows_by_treatment_type": [], "by_table_scope": [],
               "sig_log2fcs": [], "not_found_groups": [],
               "not_matched_groups": []}],
             [{"top_groups": []}],
             [{"top_experiments": []}],
-            [{"group_id": "g1", "organism_strain": "MED4",
+            [{"group_id": "g1", "organism_name": "MED4",
               "genes_with_expression": 2, "significant_up": 1,
               "significant_down": 0, "not_significant": 1}],  # Q4
-            [{"group_id": "g1", "organism_strain": "MED4",
+            [{"group_id": "g1", "organism_name": "MED4",
               "total_genes": 5}],  # Q5
         ]
         result = api.differential_expression_by_ortholog(
             group_ids=["g1"], conn=mock_conn,
         )
         assert result["results"][0]["total_genes"] == 5
+
+    def test_summary_true_skips_detail(self, mock_conn):
+        """summary=True sets limit=0, returns results=[]."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
+              "experiment_count": 2, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "by_table_scope": [],
+              "sig_log2fcs": [1.5, 2.0], "not_found_groups": [],
+              "not_matched_groups": []}],  # Q1 global summary
+            [{"top_groups": []}],  # Q2 top_groups
+            [{"top_experiments": []}],  # Q3 top_experiments
+            # Q4 results SKIPPED (limit=0)
+            [],  # Q5 membership counts
+        ]
+        result = api.differential_expression_by_ortholog(
+            group_ids=["g1"], summary=True, conn=mock_conn,
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert mock_conn.execute_query.call_count == 4  # no detail query
 
     def test_importable_from_package(self):
         from multiomics_explorer import differential_expression_by_ortholog as fn

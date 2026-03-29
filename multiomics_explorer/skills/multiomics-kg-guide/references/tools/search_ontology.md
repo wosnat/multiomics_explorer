@@ -26,8 +26,8 @@ total_entries, total_matching, score_max, score_median, returned, truncated, res
 
 - **total_entries** (int): Total terms in this ontology (e.g. 847)
 - **total_matching** (int): Terms matching the search (e.g. 31)
-- **score_max** (float): Highest relevance score (e.g. 5.23)
-- **score_median** (float): Median relevance score (e.g. 2.1)
+- **score_max** (float | None): Highest relevance score (null if 0 matches, e.g. 5.23)
+- **score_median** (float | None): Median relevance score (null if 0 matches, e.g. 2.1)
 - **returned** (int): Results in this response (0 when summary=true)
 - **truncated** (bool): True if total_matching > returned
 

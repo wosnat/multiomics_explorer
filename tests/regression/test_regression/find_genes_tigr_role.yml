@@ -4,395 +4,395 @@ rows:
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: A9601_01791
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: A9601_04551
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: A9601_04701
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: malate:quinone oxidoreductase
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: A9601_09301
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: A9601_14971
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: dihydrolipoamide dehydrogenase
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: A9601_16681
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: A9601_18051
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: isocitrate dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: A9601_19101
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: NATL1_02341
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: NATL1_04561
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: NATL1_04721
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: malate:quinone oxidoreductase
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: NATL1_09511
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: NATL1_17171
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: dihydrolipoamide dehydrogenase
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: NATL1_18661
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: NATL1_20451
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: isocitrate dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: NATL1_21811
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: P9301_01811
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: P9301_04241
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: P9301_04391
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: malate:quinone oxidoreductase
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: P9301_09281
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: P9301_14831
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: dihydrolipoamide dehydrogenase
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: P9301_16561
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: P9301_17881
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: isocitrate dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: P9301_18911
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: PMM0161
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: PMM0405
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: PMM0419
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: malate:quinone oxidoreductase
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: PMM0930
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: PMM1298
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: dihydrolipoamide dehydrogenase
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: PMM1466
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: PMM1596
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: isocitrate dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: PMM1700
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: PMN2A_0281
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: PMN2A_0864
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: dihydrolipoamide dehydrogenase
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: PMN2A_0997
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: PMN2A_1170
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: isocitrate dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: PMN2A_1308
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: PMN2A_1528
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: PMN2A_1739
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: PMN2A_1753
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: malate:quinone oxidoreductase
 - gene_category: Carbohydrate metabolism
   gene_name: sdhC
   locus_tag: PMT0131
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: succinate dehydrogenase/fumarate reductase, transmembrane subunit
 - gene_category: Stress response and adaptation
   gene_name: sdhA
   locus_tag: PMT0132
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: succinate dehydrogenase/fumarate reductase, flavoprotein subunit
 - gene_category: Stress response and adaptation
   gene_name: sdhB
   locus_tag: PMT0133
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: succinate dehydrogenase/fumarate reductase, Fe-S protein subunit
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: PMT0220
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: PMT0255
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: malate:quinone oxidoreductase
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: PMT0335
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: dihydrolipoamide dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: PMT0618
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: PMT1485
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: PMT1935
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: isocitrate dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: PMT2021
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: PMT2249
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: PMT9312_0163
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: PMT9312_0400
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: PMT9312_0415
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: malate:quinone oxidoreductase
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: PMT9312_0869
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: PMT9312_1394
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: dihydrolipoamide dehydrogenase
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: PMT9312_1559
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: PMT9312_1688
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: isocitrate dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: PMT9312_1793
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: SYNW0166
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: isocitrate dehydrogenase
 - gene_category: Stress response and adaptation
   gene_name: sdhB
   locus_tag: SYNW0590
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: succinate dehydrogenase/fumarate reductase, Fe-S protein subunit
 - gene_category: Stress response and adaptation
   gene_name: sdhA
   locus_tag: SYNW0591
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: succinate dehydrogenase/fumarate reductase, flavoprotein subunit
 - gene_category: Carbohydrate metabolism
   gene_name: sdhC
   locus_tag: SYNW0592
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: succinate dehydrogenase/fumarate reductase, transmembrane subunit
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: SYNW0637
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: SYNW0671
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: SYNW1055
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: SYNW1630
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: dihydrolipoamide dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: SYNW1686
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: malate:quinone oxidoreductase
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: SYNW2275
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: SYNW2500
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: icd
   locus_tag: sync_0214
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: isocitrate dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: pdhC
   locus_tag: sync_0617
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
 - gene_category: Carbohydrate metabolism
   gene_name: mqoA
   locus_tag: sync_0648
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: malate:quinone oxidoreductase
 - gene_category: Amino acid metabolism
   gene_name: lpdA
   locus_tag: sync_0750
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: dihydrolipoamide dehydrogenase
 - gene_category: Carbohydrate metabolism
   gene_name: phdB
   locus_tag: sync_1590
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: pyruvate dehydrogenase E1 component beta subunit
 - gene_category: Carbohydrate metabolism
   gene_name: gabD
   locus_tag: sync_1835
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: succinate-semialdehyde dehydrogenase
 - gene_category: Amino acid metabolism
   gene_name: fumC
   locus_tag: sync_2336
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: fumarate hydratase, class II
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
   locus_tag: sync_2626
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: citrate synthase
 - gene_category: Carbohydrate metabolism
   gene_name: acnB
   locus_tag: sync_2910
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase

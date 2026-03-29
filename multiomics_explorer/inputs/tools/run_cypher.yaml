@@ -1,6 +1,6 @@
 examples:
   - title: Count genes per organism strain
-    call: run_cypher(query="MATCH (g:Gene) RETURN g.organism_strain AS strain, count(g) AS gene_count ORDER BY gene_count DESC")
+    call: run_cypher(query="MATCH (g:Gene) RETURN g.organism_name AS strain, count(g) AS gene_count ORDER BY gene_count DESC")
     response: |
       {
         "returned": 12,

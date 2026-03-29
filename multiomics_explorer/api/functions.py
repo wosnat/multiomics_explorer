@@ -115,7 +115,7 @@ def resolve_gene(
 
     Returns dict with keys: total_matching, by_organism, returned, truncated,
     results.
-    Per result: locus_tag, gene_name, product, organism_strain.
+    Per result: locus_tag, gene_name, product, organism_name.
     """
     if not identifier or not identifier.strip():
         logger.debug("resolve_gene: empty identifier")
@@ -128,11 +128,11 @@ def resolve_gene(
     # Compute by_organism from all matching results
     org_counts: dict[str, int] = {}
     for row in all_results:
-        org = row.get("organism_strain", "Unknown")
+        org = row.get("organism_name", "Unknown")
         org_counts[org] = org_counts.get(org, 0) + 1
     by_organism = sorted(
-        [{"organism_name": k, "gene_count": v} for k, v in org_counts.items()],
-        key=lambda x: x["gene_count"],
+        [{"organism_name": k, "count": v} for k, v in org_counts.items()],
+        key=lambda x: x["count"],
         reverse=True,
     )
 
@@ -162,7 +162,7 @@ def genes_by_function(
     Returns dict with keys: total_entries, total_matching,
     by_organism, by_category, score_max, score_median,
     returned, truncated, results.
-    Per result: locus_tag, gene_name, product, organism_strain,
+    Per result: locus_tag, gene_name, product, organism_name,
     gene_category, annotation_quality, score.
     Verbose adds: function_description, gene_summary.
     """
@@ -208,7 +208,7 @@ def genes_by_function(
     envelope = {
         "total_entries": raw_summary["total_entries"],
         "total_matching": total_matching,
-        "by_organism": _rename_freq(raw_summary["by_organism"], "organism"),
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
         "by_category": _rename_freq(raw_summary["by_category"], "category"),
         "score_max": raw_summary["score_max"],
         "score_median": raw_summary["score_median"],
@@ -252,7 +252,7 @@ def gene_overview(
     by_annotation_type, has_expression, has_significant_expression,
     has_orthologs, returned, truncated, not_found, results.
     Per result: locus_tag, gene_name, product, gene_category,
-    annotation_quality, organism_strain, annotation_types,
+    annotation_quality, organism_name, annotation_types,
     expression_edge_count, significant_up_count, significant_down_count,
     closest_ortholog_group_size, closest_ortholog_genera.
     Verbose adds: gene_summary, function_description, all_identifiers.
@@ -374,7 +374,7 @@ def gene_homologs(
 
     Returns dict with keys: total_matching, by_organism, by_source,
     returned, truncated, not_found, no_groups, results.
-    Per result (compact): locus_tag, organism_strain, group_id,
+    Per result (compact): locus_tag, organism_name, group_id,
     consensus_gene_name, consensus_product, taxonomic_level, source,
     specificity_rank.
     Per result (verbose): adds member_count, organism_count, genera,
@@ -569,8 +569,8 @@ def list_publications(
 
     def _sorted_breakdown(counts, key_name):
         return sorted(
-            [{key_name: k, "publication_count": v} for k, v in counts.items()],
-            key=lambda x: x["publication_count"],
+            [{key_name: k, "count": v} for k, v in counts.items()],
+            key=lambda x: x["count"],
             reverse=True,
         )
 
@@ -613,7 +613,7 @@ def list_experiments(
     returned=0, truncated=True.
     When summary=False (default): results populated with experiments.
     Per result: experiment_id, experiment_name, publication_doi,
-    organism_strain, treatment_type, coculture_partner, omics_type,
+    organism_name, treatment_type, coculture_partner, omics_type,
     is_time_course (bool), table_scope, table_scope_detail,
     gene_count, genes_by_status (dict),
     timepoints (list, omitted if not time-course).
@@ -666,15 +666,15 @@ def list_experiments(
     # Rename apoc.coll.frequencies {item, count} to domain keys, sort desc
     def _rename_freq(freq_list, key_name):
         return sorted(
-            [{key_name: f["item"], "experiment_count": f["count"]} for f in freq_list],
-            key=lambda x: x["experiment_count"],
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
             reverse=True,
         )
 
     envelope = {
         "total_entries": total_entries,
         "total_matching": raw_summary["total_matching"],
-        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_strain"),
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
         "by_treatment_type": _rename_freq(raw_summary["by_treatment_type"], "treatment_type"),
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
         "by_publication": _rename_freq(raw_summary["by_publication"], "publication_doi"),
@@ -966,7 +966,7 @@ def genes_by_homolog_group(
     not_found_organisms, not_matched_organisms,
     returned, truncated, results.
     Per result (compact): locus_tag, gene_name, product,
-    organism_strain, gene_category, group_id.
+    organism_name, gene_category, group_id.
     Per result (verbose): adds gene_summary, function_description,
     consensus_product, source.
 
@@ -1007,7 +1007,7 @@ def genes_by_homolog_group(
         "genes_per_group_median": (
             statistics.median(group_counts) if group_counts else 0
         ),
-        "by_organism": _rename_freq(raw_summary["by_organism"], "organism"),
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
         "top_categories": _rename_freq(raw_summary["by_category_raw"], "category")[:5],
         "top_groups": by_group_all[:5],
         "not_found_groups": raw_summary["not_found_groups"],
@@ -1059,7 +1059,7 @@ def genes_by_ontology(
 
     Returns dict with keys: total_matching, by_organism, by_category,
     by_term, returned, truncated, results.
-    Per result: locus_tag, gene_name, product, organism_strain,
+    Per result: locus_tag, gene_name, product, organism_name,
     gene_category.
     Verbose adds: matched_terms, gene_summary, function_description.
     """
@@ -1086,7 +1086,7 @@ def genes_by_ontology(
     total_matching = raw_summary["total_matching"]
     envelope = {
         "total_matching": total_matching,
-        "by_organism": _rename_freq(raw_summary["by_organism"], "organism"),
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
         "by_category": _rename_freq(raw_summary["by_category"], "category"),
         "by_term": _rename_freq(raw_summary["by_term"], "term_id"),
     }
@@ -1126,7 +1126,7 @@ def gene_ontology_terms(
     terms_per_gene_median, returned, truncated, not_found, no_terms,
     results.
     Per result: locus_tag, term_id, term_name.
-    Verbose adds: organism_strain.
+    Verbose adds: organism_name.
     All-ontology queries add: ontology_type.
 
     Raises ValueError if ontology is invalid or locus_tags is empty.
@@ -1338,7 +1338,7 @@ def _validate_organism_inputs(
 ) -> str:
     """Pre-validate that all inputs refer to a single organism.
 
-    Returns the resolved organism_strain string.
+    Returns the resolved organism_name string.
     Raises ValueError on validation failure.
     """
     resolved: dict[str, list[str]] = {}
@@ -1435,7 +1435,7 @@ def differential_expression_by_gene(
             is ambiguous.
 
     Returns:
-        dict with keys: organism_strain, matching_genes, total_rows,
+        dict with keys: organism_name, matching_genes, total_matching,
         rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
         rows_by_treatment_type, by_table_scope, top_categories, experiments,
         returned, truncated, not_found, no_expression, results.
@@ -1467,7 +1467,7 @@ def differential_expression_by_gene(
     )
 
     # Pre-validate single organism
-    organism_strain = _validate_organism_inputs(
+    organism_name = _validate_organism_inputs(
         organism, locus_tags, experiment_ids, conn
     )
 
@@ -1477,7 +1477,7 @@ def differential_expression_by_gene(
     )
     global_raw = conn.execute_query(global_cypher, **global_params)[0]
 
-    total_rows = global_raw["total_rows"]
+    total_matching = global_raw["total_matching"]
     matching_genes = global_raw["matching_genes"]
     rows_by_status = _apoc_freq_to_dict(global_raw["rows_by_status"])
     rows_by_treatment_type = _apoc_freq_to_treatment_dict(
@@ -1550,9 +1550,9 @@ def differential_expression_by_gene(
 
     returned = len(results)
     envelope = {
-        "organism_strain": organism_strain,
+        "organism_name": organism_name,
         "matching_genes": matching_genes,
-        "total_rows": total_rows,
+        "total_matching": total_matching,
         "rows_by_status": rows_by_status,
         "median_abs_log2fc": global_raw["median_abs_log2fc"],
         "max_abs_log2fc": global_raw["max_abs_log2fc"],
@@ -1564,7 +1564,7 @@ def differential_expression_by_gene(
         "not_found": not_found,
         "no_expression": no_expression,
         "returned": returned,
-        "truncated": total_rows > returned,
+        "truncated": total_matching > returned,
         "results": results,
     }
     return envelope
@@ -1576,8 +1576,9 @@ def differential_expression_by_ortholog(
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
+    summary: bool = False,
     verbose: bool = False,
-    limit: int = 50,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1587,7 +1588,7 @@ def differential_expression_by_ortholog(
     granularity showing how many group members respond (gene counts,
     not individual genes).
 
-    Returns dict with keys: total_rows, matching_genes, matching_groups,
+    Returns dict with keys: total_matching, matching_genes, matching_groups,
     experiment_count, median_abs_log2fc, max_abs_log2fc,
     by_organism, rows_by_status, rows_by_treatment_type, by_table_scope,
     top_groups, top_experiments,
@@ -1596,7 +1597,7 @@ def differential_expression_by_ortholog(
     not_found_experiments, not_matched_experiments,
     returned, truncated, results.
     Per result (compact): group_id, consensus_gene_name, consensus_product,
-    experiment_id, treatment_type, organism_strain, coculture_partner,
+    experiment_id, treatment_type, organism_name, coculture_partner,
     timepoint, timepoint_hours, timepoint_order,
     genes_with_expression, total_genes,
     significant_up, significant_down, not_significant.
@@ -1613,6 +1614,9 @@ def differential_expression_by_ortholog(
         raise ValueError(
             f"Invalid direction '{direction}'. Valid: {sorted(_VALID_DIRECTIONS)}"
         )
+
+    if summary:
+        limit = 0
 
     conn = _default_conn(conn)
 
@@ -1658,11 +1662,14 @@ def differential_expression_by_ortholog(
     )
     top_exp_raw = conn.execute_query(te_cypher, **te_params)
 
-    # --- Q4: results (always, with limit) ---
-    res_cypher, res_params = build_differential_expression_by_ortholog_results(
-        group_ids=group_ids, **filter_kwargs, verbose=verbose, limit=limit,
-    )
-    results = conn.execute_query(res_cypher, **res_params)
+    # --- Q4: results (skip when limit=0 / summary mode) ---
+    if limit == 0:
+        results = []
+    else:
+        res_cypher, res_params = build_differential_expression_by_ortholog_results(
+            group_ids=group_ids, **filter_kwargs, verbose=verbose, limit=limit,
+        )
+        results = conn.execute_query(res_cypher, **res_params)
 
     # --- Q5: membership_counts (always) ---
     mc_cypher, mc_params = (
@@ -1672,11 +1679,11 @@ def differential_expression_by_ortholog(
     )
     mc_rows = conn.execute_query(mc_cypher, **mc_params)
     mc_lookup = {
-        (r["group_id"], r["organism_strain"]): r["total_genes"]
+        (r["group_id"], r["organism_name"]): r["total_genes"]
         for r in mc_rows
     }
     for r in results:
-        key = (r["group_id"], r["organism_strain"])
+        key = (r["group_id"], r["organism_name"])
         r["total_genes"] = mc_lookup.get(key, 0)
 
     # --- Q6: diagnostics (conditional) ---
@@ -1713,10 +1720,10 @@ def differential_expression_by_ortholog(
             reverse=True,
         )
 
-    by_organism = _rename_freq(global_raw["by_organism"], "organism")
+    by_organism = _rename_freq(global_raw["by_organism"], "organism_name")
 
     envelope = {
-        "total_rows": global_raw["total_rows"],
+        "total_matching": global_raw["total_matching"],
         "matching_genes": global_raw["matching_genes"],
         "matching_groups": global_raw["matching_groups"],
         "experiment_count": global_raw["experiment_count"],
@@ -1739,7 +1746,7 @@ def differential_expression_by_ortholog(
         "not_found_experiments": not_found_experiments,
         "not_matched_experiments": not_matched_experiments,
         "returned": len(results),
-        "truncated": len(results) >= limit,
+        "truncated": global_raw["total_matching"] > len(results),
         "results": results,
     }
     return envelope

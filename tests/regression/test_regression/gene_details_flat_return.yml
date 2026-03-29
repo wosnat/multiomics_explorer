@@ -81,7 +81,7 @@ rows:
     of DNA replication'
   id: ncbigene:PMM0001
   locus_tag: PMM0001
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   preferred_id: ncbigene
   product: DNA polymerase III, beta subunit
   protein_family: Beta sliding clamp family

@@ -3,5 +3,5 @@ row_count: 1
 rows:
 - gene_name: ftsH1
   locus_tag: SYNW0305
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: cell division protein FtsH1

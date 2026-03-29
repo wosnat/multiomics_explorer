@@ -8,7 +8,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: null
@@ -22,7 +22,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: null
@@ -36,35 +36,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
-  significant_down: 0
-  significant_up: 0
-  timepoint: 20h
-  timepoint_hours: 20.0
-  timepoint_order: 1
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 20h
-  timepoint_hours: 20.0
-  timepoint_order: 1
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 20h
@@ -78,7 +50,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 3h
@@ -92,7 +64,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 12h
@@ -106,7 +78,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 24h
@@ -120,21 +92,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
-  significant_down: 0
-  significant_up: 0
-  timepoint: null
-  timepoint_hours: null
-  timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: null
@@ -148,21 +106,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
-  significant_down: 0
-  significant_up: 0
-  timepoint: null
-  timepoint_hours: null
-  timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: null
@@ -176,7 +120,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 0h
@@ -190,7 +134,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 3h
@@ -204,7 +148,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: 6h
@@ -218,7 +162,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: 12h
@@ -232,7 +176,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: 24h
@@ -246,91 +190,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
-  significant_down: 1
-  significant_up: 0
-  timepoint: 48h
-  timepoint_hours: 48.0
-  timepoint_order: 6
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 0h
-  timepoint_hours: 0.0
-  timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 3h
-  timepoint_hours: 3.0
-  timepoint_order: 2
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 6h
-  timepoint_hours: 6.0
-  timepoint_order: 3
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 1
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 0
-  significant_up: 0
-  timepoint: 12h
-  timepoint_hours: 12.0
-  timepoint_order: 4
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus MIT9313
-  significant_down: 1
-  significant_up: 0
-  timepoint: 24h
-  timepoint_hours: 24.0
-  timepoint_order: 5
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: 48h
@@ -344,7 +204,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 11
@@ -358,7 +218,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 14
@@ -372,7 +232,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 31
@@ -386,7 +246,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 89
@@ -400,7 +260,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 18
@@ -414,7 +274,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 31
@@ -428,7 +288,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 60
@@ -442,7 +302,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 89
@@ -456,7 +316,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: days 60+89
@@ -470,7 +330,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 14
@@ -484,7 +344,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: days 60+89
@@ -498,7 +358,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 18
@@ -512,7 +372,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 31
@@ -526,7 +386,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 0
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
   timepoint: day 60
@@ -540,7 +400,7 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: day 89
@@ -554,10 +414,150 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
   timepoint: days 60+89
   timepoint_hours: null
   timepoint_order: 5
+  treatment_type: nitrogen_stress
+- coculture_partner: Alteromonas macleodii HOT1A3
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type: coculture
+- coculture_partner: Alteromonas macleodii HOT1A3
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type: coculture
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 0h
+  timepoint_hours: 0.0
+  timepoint_order: 1
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 3h
+  timepoint_hours: 3.0
+  timepoint_order: 2
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 6h
+  timepoint_hours: 6.0
+  timepoint_order: 3
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 0
+  significant_up: 0
+  timepoint: 12h
+  timepoint_hours: 12.0
+  timepoint_order: 4
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 1
+  significant_up: 0
+  timepoint: 24h
+  timepoint_hours: 24.0
+  timepoint_order: 5
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus MIT9313
+  significant_down: 1
+  significant_up: 0
+  timepoint: 48h
+  timepoint_hours: 48.0
+  timepoint_order: 6
   treatment_type: nitrogen_stress

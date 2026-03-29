@@ -275,7 +275,7 @@ def generate_output() -> str:
     parts.append('        "locus_tag": gene["locus_tag"],')
     parts.append('        "gene_name": gene.get("gene_name"),')
     parts.append('        "product": gene.get("product"),')
-    parts.append('        "organism_strain": gene.get("organism_strain"),')
+    parts.append('        "organism_name": gene.get("organism_name"),')
     parts.append("    }")
     parts.append("")
     parts.append("")
@@ -287,7 +287,7 @@ def generate_output() -> str:
     parts.append('        "product": gene.get("product"),')
     parts.append('        "function_description": gene.get("function_description"),')
     parts.append('        "gene_summary": gene.get("gene_summary"),')
-    parts.append('        "organism_strain": gene.get("organism_strain"),')
+    parts.append('        "organism_name": gene.get("organism_name"),')
     parts.append('        "annotation_quality": gene.get("annotation_quality"),')
     parts.append('        "score": score,')
     parts.append("    }")
@@ -296,7 +296,7 @@ def generate_output() -> str:
     parts.append("# Filter helpers")
     parts.append("def genes_by_organism(organism_substring):")
     parts.append(
-        '    return [g for g in GENES if organism_substring in g.get("organism_strain", "")]'
+        '    return [g for g in GENES if organism_substring in g.get("organism_name", "")]'
     )
     parts.append("")
     parts.append("")
@@ -331,7 +331,7 @@ if __name__ == "__main__":
     locus_tags = [g["locus_tag"] for g in SELECTED_GENES]
     for lt in locus_tags:
         g = next(sg for sg in SELECTED_GENES if sg["locus_tag"] == lt)
-        org = g.get("organism_strain", "?")
+        org = g.get("organism_name", "?")
         name = g.get("gene_name", "—")
         product = g.get("product", "—")[:60]
         print(f"    {lt:25s} {org:35s} {name:15s} {product}")

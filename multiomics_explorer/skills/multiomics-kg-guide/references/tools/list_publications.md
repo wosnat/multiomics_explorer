@@ -71,9 +71,9 @@ list_publications()
 ```example-response
 {
   "total_entries": 21, "total_matching": 21,
-  "by_organism": [{"organism_name": "Prochlorococcus MED4", "publication_count": 11}, ...],
-  "by_treatment_type": [{"treatment_type": "coculture", "publication_count": 5}, ...],
-  "by_omics_type": [{"omics_type": "RNASEQ", "publication_count": 12}, ...],
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 11}, ...],
+  "by_treatment_type": [{"treatment_type": "coculture", "count": 5}, ...],
+  "by_omics_type": [{"omics_type": "RNASEQ", "count": 12}, ...],
   "returned": 5, "truncated": true,
   "results": [
     {"doi": "10.1101/2025.11.24.690089", "title": "Transcriptomic and Proteomic...", "year": 2025, "experiment_count": 10, ...},

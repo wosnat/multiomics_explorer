@@ -5,7 +5,7 @@ rows:
   consensus_product: NADH dehydrogenase subunit NdhV
   group_id: cyanorak:CK_00000853
   locus_tag: PMM0845
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -13,7 +13,7 @@ rows:
   consensus_product: NADH dehydrogenase subunit NdhV
   group_id: eggnog:1MMP8@1212
   locus_tag: PMM0845
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -21,7 +21,7 @@ rows:
   consensus_product: NADH dehydrogenase subunit NdhV
   group_id: eggnog:31HP9@2
   locus_tag: PMM0845
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria

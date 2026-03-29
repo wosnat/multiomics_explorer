@@ -134,7 +134,7 @@ GENES = [
         "old_locus_tags": [
             "PMM0001"
         ],
-        "organism_strain": "Prochlorococcus MED4",
+        "organism_name": "Prochlorococcus MED4",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00000364",
@@ -253,7 +253,7 @@ GENES = [
         "old_locus_tags": [
             "PMM0002"
         ],
-        "organism_strain": "Prochlorococcus MED4",
+        "organism_name": "Prochlorococcus MED4",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00000363",
@@ -483,7 +483,7 @@ GENES = [
         "old_locus_tags": [
             "PMM0446"
         ],
-        "organism_strain": "Prochlorococcus MED4",
+        "organism_name": "Prochlorococcus MED4",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00000614",
@@ -666,7 +666,7 @@ GENES = [
         "old_locus_tags": [
             "PMT9312_0001"
         ],
-        "organism_strain": "Prochlorococcus MIT9312",
+        "organism_name": "Prochlorococcus MIT9312",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00000364",
@@ -728,7 +728,7 @@ GENES = [
         "gene_summary": "hypothetical protein",
         "locus_tag": "PMT9312_0342",
         "locus_tag_cyanorak": "CK_Pro_MIT9312_00342",
-        "organism_strain": "Prochlorococcus MIT9312",
+        "organism_name": "Prochlorococcus MIT9312",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00038231",
@@ -865,7 +865,7 @@ GENES = [
         "old_locus_tags": [
             "PMN2A_0044"
         ],
-        "organism_strain": "Prochlorococcus NATL2A",
+        "organism_name": "Prochlorococcus NATL2A",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00000769",
@@ -952,7 +952,7 @@ GENES = [
         "locus_tag": "ALT831_RS00180",
         "locus_tag_ncbi": "ALT831_RS00180",
         "max_annot_lvl": "1236|Gammaproteobacteria",
-        "organism_strain": "Alteromonas macleodii MIT1002",
+        "organism_name": "Alteromonas macleodii MIT1002",
         "ortholog_groups": [
             {
                 "og_id": "eggnog:COG3415@2",
@@ -999,7 +999,7 @@ GENES = [
         ],
         "locus_tag": "ALT831_RS00590",
         "locus_tag_ncbi": "ALT831_RS00590",
-        "organism_strain": "Alteromonas macleodii MIT1002",
+        "organism_name": "Alteromonas macleodii MIT1002",
         "product": "hypothetical protein",
         "product_source": "ncbi",
         "protein_id": "WP_156080631.1",
@@ -1077,7 +1077,7 @@ GENES = [
         "locus_tag": "ALT831_RS03440",
         "locus_tag_ncbi": "ALT831_RS03440",
         "max_annot_lvl": "1236|Gammaproteobacteria",
-        "organism_strain": "Alteromonas macleodii MIT1002",
+        "organism_name": "Alteromonas macleodii MIT1002",
         "ortholog_groups": [
             {
                 "og_id": "eggnog:COG0737@2",
@@ -1158,7 +1158,7 @@ GENES = [
         "locus_tag": "ALTBGP6_RS03775",
         "locus_tag_ncbi": "ALTBGP6_RS03775",
         "max_annot_lvl": "1236|Gammaproteobacteria",
-        "organism_strain": "Alteromonas macleodii EZ55",
+        "organism_name": "Alteromonas macleodii EZ55",
         "ortholog_groups": [
             {
                 "og_id": "eggnog:COG2832@2",
@@ -1373,7 +1373,7 @@ GENES = [
         "old_locus_tags": [
             "SYNW0305"
         ],
-        "organism_strain": "Synechococcus WH8102",
+        "organism_name": "Synechococcus WH8102",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00008085",
@@ -1443,7 +1443,7 @@ GENES = [
         ],
         "locus_tag": "S8102_04001",
         "locus_tag_cyanorak": "CK_Syn_WH8102_04001",
-        "organism_strain": "Synechococcus WH8102",
+        "organism_name": "Synechococcus WH8102",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00056274",
@@ -1518,7 +1518,7 @@ GENES = [
         "locus_tag": "SYNC_RS13265",
         "locus_tag_ncbi": "SYNC_RS13265",
         "max_annot_lvl": "1117|Cyanobacteria",
-        "organism_strain": "Synechococcus CC9311",
+        "organism_name": "Synechococcus CC9311",
         "ortholog_groups": [
             {
                 "og_id": "eggnog:COG0521@2",
@@ -1693,7 +1693,7 @@ GENES = [
         "old_locus_tags": [
             "PMM0630"
         ],
-        "organism_strain": "Prochlorococcus MED4",
+        "organism_name": "Prochlorococcus MED4",
         "ortholog_groups": [
             {
                 "og_id": "cyanorak:CK_00000753",
@@ -1783,7 +1783,7 @@ GENES = [
         "locus_tag": "ALTBGP6_RS12485",
         "locus_tag_ncbi": "ALTBGP6_RS12485",
         "max_annot_lvl": "135623|Vibrionales",
-        "organism_strain": "Alteromonas macleodii EZ55",
+        "organism_name": "Alteromonas macleodii EZ55",
         "ortholog_groups": [
             {
                 "og_id": "eggnog:COG1335@2",
@@ -1830,7 +1830,7 @@ def as_resolve_gene_result(gene):
         "locus_tag": gene["locus_tag"],
         "gene_name": gene.get("gene_name"),
         "product": gene.get("product"),
-        "organism_strain": gene.get("organism_strain"),
+        "organism_name": gene.get("organism_name"),
     }
 
 
@@ -1840,7 +1840,7 @@ def as_genes_by_function_result(gene, score=1.0, verbose=False):
         "locus_tag": gene["locus_tag"],
         "gene_name": gene.get("gene_name"),
         "product": gene.get("product"),
-        "organism_strain": gene.get("organism_strain"),
+        "organism_name": gene.get("organism_name"),
         "gene_category": gene.get("gene_category"),
         "annotation_quality": gene.get("annotation_quality"),
         "score": score,
@@ -1853,7 +1853,7 @@ def as_genes_by_function_result(gene, score=1.0, verbose=False):
 
 # Filter helpers
 def genes_by_organism(organism_substring):
-    return [g for g in GENES if organism_substring in g.get("organism_strain", "")]
+    return [g for g in GENES if organism_substring in g.get("organism_name", "")]
 
 
 def genes_with_property(prop):

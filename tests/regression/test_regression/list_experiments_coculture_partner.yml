@@ -7,7 +7,7 @@ rows:
   gene_count: 1849
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 3
   significant_up_count: 59
@@ -34,7 +34,7 @@ rows:
   gene_count: 1714
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 272
   significant_up_count: 24
@@ -61,7 +61,7 @@ rows:
   gene_count: 2267
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 45
   significant_up_count: 153
@@ -88,7 +88,7 @@ rows:
   gene_count: 2268
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 3
   significant_up_count: 96
@@ -115,7 +115,7 @@ rows:
   gene_count: 2471
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1038/ismej.2016.82
   significant_down_count: 352
   significant_up_count: 221

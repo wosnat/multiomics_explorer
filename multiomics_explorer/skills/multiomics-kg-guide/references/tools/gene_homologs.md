@@ -44,7 +44,7 @@ total_matching, by_organism, by_source, returned, truncated, not_found, no_group
 | Field | Type | Description |
 |---|---|---|
 | locus_tag | string | Gene locus tag (e.g. 'PMM0001') |
-| organism_strain | string | Organism (e.g. 'Prochlorococcus MED4') |
+| organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | group_id | string | Prefixed ortholog group ID for chaining to genes_by_homolog_group (e.g. 'cyanorak:CK_00000364', 'eggnog:COG0592@2') |
 | consensus_gene_name | string \| None (optional) | Consensus gene name across group members (e.g. 'dnaN'). Often null. |
 | consensus_product | string \| None (optional) | Consensus product across group members (e.g. 'DNA polymerase III, beta subunit') |
@@ -78,8 +78,8 @@ gene_homologs(locus_tags=["PMM0001"])
   "by_source": [{"source": "eggnog", "count": 2}, {"source": "cyanorak", "count": 1}],
   "returned": 3, "truncated": false, "not_found": [], "no_groups": [],
   "results": [
-    {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4", "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN", "consensus_product": "DNA polymerase III, beta subunit", "taxonomic_level": "curated", "source": "cyanorak", "specificity_rank": 0},
-    {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4", "group_id": "eggnog:1MKTR@1212", ...},
+    {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4", "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN", "consensus_product": "DNA polymerase III, beta subunit", "taxonomic_level": "curated", "source": "cyanorak", "specificity_rank": 0},
+    {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4", "group_id": "eggnog:1MKTR@1212", ...},
     ...
   ]
 }

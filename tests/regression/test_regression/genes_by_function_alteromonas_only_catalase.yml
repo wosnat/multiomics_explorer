@@ -5,97 +5,97 @@ rows:
   gene_category: Energy production
   gene_name: katA
   locus_tag: ACZ81_02025
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   product: catalase
   score: 13.4093
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: ACZ81_11985
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   product: catalase
   score: 13.4093
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: katG
   locus_tag: ACZ81_16125
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   product: catalase/peroxidase HPI
   score: 10.8595
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katB
   locus_tag: ACZ81_16915
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   product: catalase
   score: 10.4916
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: EZ55_00433
-  organism_strain: Alteromonas macleodii EZ55
+  organism_name: Alteromonas macleodii EZ55
   product: catalase
   score: 13.4093
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: EZ55_02459
-  organism_strain: Alteromonas macleodii EZ55
+  organism_name: Alteromonas macleodii EZ55
   product: catalase
   score: 13.4093
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: EZ55_02907
-  organism_strain: Alteromonas macleodii EZ55
+  organism_name: Alteromonas macleodii EZ55
   product: catalase family protein
   score: 10.8525
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: katG
   locus_tag: EZ55_03362
-  organism_strain: Alteromonas macleodii EZ55
+  organism_name: Alteromonas macleodii EZ55
   product: catalase/peroxidase HPI
   score: 10.8595
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katB
   locus_tag: EZ55_03522
-  organism_strain: Alteromonas macleodii EZ55
+  organism_name: Alteromonas macleodii EZ55
   product: catalase
   score: 10.4916
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: MIT1002_00461
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   product: catalase
   score: 13.4093
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: MIT1002_02464
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   product: catalase
   score: 13.4453
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katE
   locus_tag: MIT1002_02513
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   product: catalase
   score: 10.3483
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: katG
   locus_tag: MIT1002_03345
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   product: catalase/peroxidase HPI
   score: 11.2445
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katB
   locus_tag: MIT1002_03530
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   product: catalase
   score: 10.4916

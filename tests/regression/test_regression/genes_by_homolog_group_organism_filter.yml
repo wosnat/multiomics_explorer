@@ -5,5 +5,5 @@ rows:
   gene_name: psbB
   group_id: cyanorak:CK_00000570
   locus_tag: PMM0315
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: photosystem II chlorophyll-binding protein CP47

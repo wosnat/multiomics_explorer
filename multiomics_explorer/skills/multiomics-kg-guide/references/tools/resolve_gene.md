@@ -40,7 +40,7 @@ total_matching, by_organism, returned, truncated, results
 | locus_tag | string | Gene locus tag (e.g. 'PMM0001') |
 | gene_name | string \| None (optional) | Gene name (e.g. 'dnaN') |
 | product | string \| None (optional) | Gene product (e.g. 'DNA polymerase III, beta subunit') |
-| organism_strain | string | Organism (e.g. 'Prochlorococcus MED4') |
+| organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 
 ## Few-shot examples
 
@@ -53,11 +53,11 @@ resolve_gene(identifier="PMM0001")
 ```example-response
 {
   "total_matching": 1,
-  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}],
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
   "returned": 1,
   "truncated": false,
   "results": [
-    {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MED4"}
+    {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4"}
   ]
 }
 ```
@@ -71,7 +71,7 @@ resolve_gene(identifier="dnaN")
 ```example-response
 {
   "total_matching": 15,
-  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}, {"organism_name": "Prochlorococcus MIT9312", "gene_count": 1}, ...],
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}, {"organism_name": "Prochlorococcus MIT9312", "count": 1}, ...],
   "returned": 5,
   "truncated": true,
   "results": [

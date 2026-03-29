@@ -8,7 +8,7 @@ rows:
   gene_count: 4452
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 578
   significant_up_count: 433
@@ -41,7 +41,7 @@ rows:
   gene_count: 11130
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 1003
   significant_up_count: 1379
@@ -92,7 +92,7 @@ rows:
   gene_count: 11850
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 1648
   significant_up_count: 778
@@ -131,7 +131,7 @@ rows:
   gene_count: 19750
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 2449
   significant_up_count: 1675
@@ -176,187 +176,13 @@ rows:
   - '3950'
   treatment_type: nitrogen_stress
 - coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
-  gene_count: 4272
-  is_time_course: 'true'
-  omics_type: PROTEOMICS
-  organism_strain: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 556
-  significant_up_count: 599
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 3
-  time_point_hours:
-  - '2136.0'
-  - '336.0'
-  - '744.0'
-  time_point_labels:
-  - day 14
-  - day 31
-  - day 89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  time_point_significant_down:
-  - '204'
-  - '257'
-  - '95'
-  time_point_significant_up:
-  - '264'
-  - '295'
-  - '40'
-  time_point_totals:
-  - '1424'
-  - '1424'
-  - '1424'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
-  gene_count: 7120
-  is_time_course: 'true'
-  omics_type: PROTEOMICS
-  organism_strain: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 394
-  significant_up_count: 609
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 5
-  time_point_hours:
-  - '-1.0'
-  - '1440.0'
-  - '2136.0'
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  - day 60
-  - day 89
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  time_point_significant_down:
-  - '137'
-  - '14'
-  - '74'
-  - '77'
-  - '92'
-  time_point_significant_up:
-  - '111'
-  - '145'
-  - '157'
-  - '161'
-  - '35'
-  time_point_totals:
-  - '1424'
-  - '1424'
-  - '1424'
-  - '1424'
-  - '1424'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
-  gene_count: 3698
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 640
-  significant_up_count: 602
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 2
-  time_point_hours:
-  - '-1.0'
-  - '336.0'
-  time_point_labels:
-  - day 14
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  time_point_significant_down:
-  - '168'
-  - '472'
-  time_point_significant_up:
-  - '197'
-  - '405'
-  time_point_totals:
-  - '1849'
-  - '1849'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
-  gene_count: 9245
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 834
-  significant_up_count: 553
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 5
-  time_point_hours:
-  - '-1.0'
-  - '1440.0'
-  - '2136.0'
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  - day 60
-  - day 89
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  time_point_significant_down:
-  - '159'
-  - '169'
-  - '226'
-  - '235'
-  - '45'
-  time_point_significant_up:
-  - '108'
-  - '116'
-  - '134'
-  - '156'
-  - '39'
-  time_point_totals:
-  - '1849'
-  - '1849'
-  - '1849'
-  - '1849'
-  - '1849'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq
   experiment_name: MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle
     vs Parental co-culture under 13:11 diel light:dark cycle (RNASEQ)
   gene_count: 26992
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1093/ismeco/ycae131
   significant_down_count: 350
   significant_up_count: 298
@@ -413,151 +239,13 @@ rows:
   - '3856'
   treatment_type: darkness
 - coculture_partner: null
-  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
-  experiment_name: NATL2A Dark-tolerant co-culture under 13:11 diel light:dark cycle
-    vs Parental co-culture under 13:11 diel light:dark cycle (RNASEQ)
-  gene_count: 14105
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus NATL2A
-  publication_doi: 10.1093/ismeco/ycae131
-  significant_down_count: 4233
-  significant_up_count: 3875
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 7
-  time_point_hours:
-  - '0.0'
-  - '13.0'
-  - '16.0'
-  - '20.0'
-  - '24.0'
-  - '4.0'
-  - '8.0'
-  time_point_labels:
-  - 0h
-  - 13h
-  - 16h
-  - 20h
-  - 24h
-  - 4h
-  - 8h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  - '7'
-  time_point_significant_down:
-  - '291'
-  - '446'
-  - '483'
-  - '691'
-  - '746'
-  - '772'
-  - '804'
-  time_point_significant_up:
-  - '263'
-  - '322'
-  - '421'
-  - '662'
-  - '678'
-  - '725'
-  - '804'
-  time_point_totals:
-  - '2015'
-  - '2015'
-  - '2015'
-  - '2015'
-  - '2015'
-  - '2015'
-  - '2015'
-  treatment_type: darkness
-- coculture_partner: Phage
-  experiment_id: 10.1111/1462-2920.14513_viral_viral_dom_vdom_addition_mit9313_rnaseq
-  experiment_name: MIT9313 Viral DOM (vDOM) addition vs Pro99 growth medium control
-    (RNASEQ)
-  gene_count: 3852
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus MIT9313
-  publication_doi: 10.1111/1462-2920.14513
-  significant_down_count: 373
-  significant_up_count: 461
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 9
-  time_point_hours:
-  - '0.5'
-  - '1.0'
-  - '12.0'
-  - '2.0'
-  - '24.0'
-  - '4.0'
-  - '48.0'
-  - '72.0'
-  - '8.0'
-  time_point_labels:
-  - 0.5h
-  - 12h
-  - 1h
-  - 24h
-  - 2h
-  - 48h
-  - 4h
-  - 72h
-  - 8h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  - '7'
-  - '8'
-  - '9'
-  time_point_significant_down:
-  - '1'
-  - '106'
-  - '106'
-  - '17'
-  - '25'
-  - '41'
-  - '60'
-  - '8'
-  - '9'
-  time_point_significant_up:
-  - '100'
-  - '14'
-  - '22'
-  - '46'
-  - '62'
-  - '64'
-  - '71'
-  - '74'
-  - '8'
-  time_point_totals:
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  - '428'
-  treatment_type: viral
-- coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_mit1002_rnaseq
   experiment_name: MIT1002 Extended darkness vs 13:11 diel light:dark cycle control
     (RNASEQ)
   gene_count: 350
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1128/mSystems.00040-18
   significant_down_count: 279
   significant_up_count: 71
@@ -584,90 +272,186 @@ rows:
   - '175'
   treatment_type: darkness
 - coculture_partner: null
-  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
-  experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
-    (RNASEQ)
-  gene_count: 5862
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  gene_count: 4272
   is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus NATL2A
-  publication_doi: 10.1128/mSystems.00040-18
-  significant_down_count: 2067
-  significant_up_count: 1176
-  table_scope: significant_any_timepoint
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 556
+  significant_up_count: 599
+  table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 3
   time_point_hours:
-  - '36.0'
-  - '40.0'
-  - '48.0'
+  - '2136.0'
+  - '336.0'
+  - '744.0'
   time_point_labels:
-  - 13h extended darkness (48h)
-  - 1h extended darkness (36h)
-  - 5h extended darkness (40h)
+  - day 14
+  - day 31
+  - day 89
   time_point_orders:
   - '1'
   - '2'
   - '3'
   time_point_significant_down:
-  - '1104'
-  - '174'
-  - '789'
+  - '204'
+  - '257'
+  - '95'
   time_point_significant_up:
-  - '134'
-  - '472'
-  - '570'
+  - '264'
+  - '295'
+  - '40'
   time_point_totals:
-  - '1954'
-  - '1954'
-  - '1954'
-  treatment_type: darkness
+  - '1424'
+  - '1424'
+  - '1424'
+  treatment_type: nitrogen_stress
 - coculture_partner: null
-  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
-  experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
-    (RNASEQ)
-  gene_count: 5862
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  gene_count: 7120
   is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus NATL2A
-  publication_doi: 10.1128/mSystems.00040-18
-  significant_down_count: 1410
-  significant_up_count: 791
-  table_scope: significant_any_timepoint
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 394
+  significant_up_count: 609
+  table_scope: all_detected_genes
   table_scope_detail: ''
-  time_point_count: 3
+  time_point_count: 5
   time_point_hours:
-  - '36.0'
-  - '40.0'
-  - '48.0'
+  - '-1.0'
+  - '1440.0'
+  - '2136.0'
+  - '432.0'
+  - '744.0'
   time_point_labels:
-  - 13h extended darkness (48h)
-  - 1h extended darkness (36h)
-  - 5h extended darkness (40h)
+  - day 18
+  - day 31
+  - day 60
+  - day 89
+  - days 60+89
   time_point_orders:
   - '1'
   - '2'
   - '3'
+  - '4'
+  - '5'
   time_point_significant_down:
-  - '129'
-  - '460'
-  - '821'
+  - '137'
+  - '14'
+  - '74'
+  - '77'
+  - '92'
+  time_point_significant_up:
+  - '111'
+  - '145'
+  - '157'
+  - '161'
+  - '35'
+  time_point_totals:
+  - '1424'
+  - '1424'
+  - '1424'
+  - '1424'
+  - '1424'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  gene_count: 3698
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 640
+  significant_up_count: 602
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 2
+  time_point_hours:
+  - '-1.0'
+  - '336.0'
+  time_point_labels:
+  - day 14
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '168'
+  - '472'
+  time_point_significant_up:
+  - '197'
+  - '405'
+  time_point_totals:
+  - '1849'
+  - '1849'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (RNASEQ)
+  gene_count: 9245
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 834
+  significant_up_count: 553
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 5
+  time_point_hours:
+  - '-1.0'
+  - '1440.0'
+  - '2136.0'
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  - day 60
+  - day 89
+  - days 60+89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  time_point_significant_down:
+  - '159'
+  - '169'
+  - '226'
+  - '235'
+  - '45'
   time_point_significant_up:
   - '108'
-  - '272'
-  - '411'
+  - '116'
+  - '134'
+  - '156'
+  - '39'
   time_point_totals:
-  - '1954'
-  - '1954'
-  - '1954'
-  treatment_type: darkness
+  - '1849'
+  - '1849'
+  - '1849'
+  - '1849'
+  - '1849'
+  treatment_type: nitrogen_stress
 - coculture_partner: null
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   gene_count: 2534
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2017.88
   significant_down_count: 326
   significant_up_count: 271
@@ -705,7 +489,7 @@ rows:
   gene_count: 51
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 42
   significant_up_count: 9
@@ -755,7 +539,7 @@ rows:
   gene_count: 49
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 36
   significant_up_count: 13
@@ -800,7 +584,7 @@ rows:
   gene_count: 29
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 21
   significant_up_count: 8
@@ -839,7 +623,7 @@ rows:
   gene_count: 32
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0165375
   significant_down_count: 20
   significant_up_count: 12
@@ -883,200 +667,13 @@ rows:
   - '5'
   - '8'
   treatment_type: viral
-- coculture_partner: Alteromonas macleodii MIT1002
-  experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
-  experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
-    Prochlorococcus NATL2A (RNASEQ)
-  gene_count: 2471
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus NATL2A
-  publication_doi: 10.1038/ismej.2016.82
-  significant_down_count: 352
-  significant_up_count: 221
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 7
-  time_point_hours:
-  - '-12.0'
-  - '12.0'
-  - '2.0'
-  - '24.0'
-  - '4.0'
-  - '48.0'
-  - '6.0'
-  time_point_labels:
-  - -12h
-  - 12h
-  - 24h
-  - 2h
-  - 48h
-  - 4h
-  - 6h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  - '7'
-  time_point_significant_down:
-  - '0'
-  - '0'
-  - '0'
-  - '12'
-  - '122'
-  - '141'
-  - '77'
-  time_point_significant_up:
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '117'
-  - '8'
-  - '96'
-  time_point_totals:
-  - '353'
-  - '353'
-  - '353'
-  - '353'
-  - '353'
-  - '353'
-  - '353'
-  treatment_type: coculture
-- coculture_partner: null
-  experiment_id: 10.1111/1462-2920.13104_phosphorus_stress_plimited_natl2a_rnaseq_uninfected
-  experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
-  gene_count: 204
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus NATL2A
-  publication_doi: 10.1111/1462-2920.13104
-  significant_down_count: 4
-  significant_up_count: 41
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 6
-  time_point_hours:
-  - '24.0'
-  - '4.0'
-  - '46.0'
-  - '50.0'
-  - '59.0'
-  - '59.0'
-  time_point_labels:
-  - 24h
-  - 46h
-  - 4h
-  - 50h (P added)
-  - 59h
-  - 59h (P added)
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  time_point_significant_down:
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '1'
-  - '3'
-  time_point_significant_up:
-  - '10'
-  - '15'
-  - '2'
-  - '4'
-  - '4'
-  - '6'
-  time_point_totals:
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  treatment_type: phosphorus_stress
-- coculture_partner: null
-  experiment_id: 10.1111/1462-2920.13104_phosphorus_stress_plimited_natl2a_rnaseq_infected
-  experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
-  gene_count: 272
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_strain: Prochlorococcus NATL2A
-  publication_doi: 10.1111/1462-2920.13104
-  significant_down_count: 0
-  significant_up_count: 118
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 8
-  time_point_hours:
-  - '47.0'
-  - '48.0'
-  - '49.0'
-  - '51.0'
-  - '55.0'
-  - '55.0'
-  - '59.0'
-  - '59.0'
-  time_point_labels:
-  - 47h
-  - 48h
-  - 49h
-  - 51h
-  - 55h
-  - 55h (P added)
-  - 59h
-  - 59h (P added)
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  - '7'
-  - '8'
-  time_point_significant_down:
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  time_point_significant_up:
-  - '13'
-  - '16'
-  - '18'
-  - '18'
-  - '18'
-  - '18'
-  - '8'
-  - '9'
-  time_point_totals:
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  treatment_type: phosphorus_stress
 - coculture_partner: null
   experiment_id: 10.1038/ismej.2011.49_iron_stress_iron_starvation_med4_med4_microarray_light
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
   gene_count: 224
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
   significant_down_count: 35
   significant_up_count: 90
@@ -1102,52 +699,13 @@ rows:
   - '112'
   - '112'
   treatment_type: iron_stress
-- coculture_partner: null
-  experiment_id: 10.1038/ismej.2011.49_iron_stress_iron_starvation_mit9313_mit9313_microarray
-  experiment_name: MIT9313 Iron starvation (MIT9313) vs Iron-replete control (MIT9313)
-    (MICROARRAY)
-  gene_count: 291
-  is_time_course: 'true'
-  omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MIT9313
-  publication_doi: 10.1038/ismej.2011.49
-  significant_down_count: 46
-  significant_up_count: 68
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 3
-  time_point_hours:
-  - '16.0'
-  - '28.0'
-  - '53.0'
-  time_point_labels:
-  - 16h
-  - 28h
-  - 53h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  time_point_significant_down:
-  - '3'
-  - '35'
-  - '8'
-  time_point_significant_up:
-  - '14'
-  - '45'
-  - '9'
-  time_point_totals:
-  - '97'
-  - '97'
-  - '97'
-  treatment_type: iron_stress
 - coculture_partner: Phage
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
   experiment_name: MED4 Phage infected vs Pro99 medium phage infection baseline (MICROARRAY)
   gene_count: 360
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/nature06130
   significant_down_count: 0
   significant_up_count: 117
@@ -1216,7 +774,7 @@ rows:
   gene_count: 10176
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
   significant_down_count: 476
   significant_up_count: 392
@@ -1272,7 +830,7 @@ rows:
   gene_count: 170
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1073/pnas.0601301103
   significant_down_count: 6
   significant_up_count: 48
@@ -1316,6 +874,120 @@ rows:
   - '34'
   - '34'
   treatment_type: phosphorus_stress
+- coculture_partner: Phage
+  experiment_id: 10.1111/1462-2920.14513_viral_viral_dom_vdom_addition_mit9313_rnaseq
+  experiment_name: MIT9313 Viral DOM (vDOM) addition vs Pro99 growth medium control
+    (RNASEQ)
+  gene_count: 3852
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.14513
+  significant_down_count: 373
+  significant_up_count: 461
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 9
+  time_point_hours:
+  - '0.5'
+  - '1.0'
+  - '12.0'
+  - '2.0'
+  - '24.0'
+  - '4.0'
+  - '48.0'
+  - '72.0'
+  - '8.0'
+  time_point_labels:
+  - 0.5h
+  - 12h
+  - 1h
+  - 24h
+  - 2h
+  - 48h
+  - 4h
+  - 72h
+  - 8h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  - '9'
+  time_point_significant_down:
+  - '1'
+  - '106'
+  - '106'
+  - '17'
+  - '25'
+  - '41'
+  - '60'
+  - '8'
+  - '9'
+  time_point_significant_up:
+  - '100'
+  - '14'
+  - '22'
+  - '46'
+  - '62'
+  - '64'
+  - '71'
+  - '74'
+  - '8'
+  time_point_totals:
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  - '428'
+  treatment_type: viral
+- coculture_partner: null
+  experiment_id: 10.1038/ismej.2011.49_iron_stress_iron_starvation_mit9313_mit9313_microarray
+  experiment_name: MIT9313 Iron starvation (MIT9313) vs Iron-replete control (MIT9313)
+    (MICROARRAY)
+  gene_count: 291
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2011.49
+  significant_down_count: 46
+  significant_up_count: 68
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 3
+  time_point_hours:
+  - '16.0'
+  - '28.0'
+  - '53.0'
+  time_point_labels:
+  - 16h
+  - 28h
+  - 53h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significant_down:
+  - '3'
+  - '35'
+  - '8'
+  time_point_significant_up:
+  - '14'
+  - '45'
+  - '9'
+  time_point_totals:
+  - '97'
+  - '97'
+  - '97'
+  treatment_type: iron_stress
 - coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
   experiment_name: MIT9313 Nitrogen deprivation (MIT9313) vs N-replete Pro99 medium
@@ -1323,7 +995,7 @@ rows:
   gene_count: 13446
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/msb4100087
   significant_down_count: 604
   significant_up_count: 305
@@ -1379,7 +1051,7 @@ rows:
   gene_count: 708
   is_time_course: 'true'
   omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1073/pnas.0601301103
   significant_down_count: 143
   significant_up_count: 39
@@ -1416,4 +1088,332 @@ rows:
   - '177'
   - '177'
   - '177'
+  treatment_type: phosphorus_stress
+- coculture_partner: null
+  experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
+  experiment_name: NATL2A Dark-tolerant co-culture under 13:11 diel light:dark cycle
+    vs Parental co-culture under 13:11 diel light:dark cycle (RNASEQ)
+  gene_count: 14105
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus NATL2A
+  publication_doi: 10.1093/ismeco/ycae131
+  significant_down_count: 4233
+  significant_up_count: 3875
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 7
+  time_point_hours:
+  - '0.0'
+  - '13.0'
+  - '16.0'
+  - '20.0'
+  - '24.0'
+  - '4.0'
+  - '8.0'
+  time_point_labels:
+  - 0h
+  - 13h
+  - 16h
+  - 20h
+  - 24h
+  - 4h
+  - 8h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '291'
+  - '446'
+  - '483'
+  - '691'
+  - '746'
+  - '772'
+  - '804'
+  time_point_significant_up:
+  - '263'
+  - '322'
+  - '421'
+  - '662'
+  - '678'
+  - '725'
+  - '804'
+  time_point_totals:
+  - '2015'
+  - '2015'
+  - '2015'
+  - '2015'
+  - '2015'
+  - '2015'
+  - '2015'
+  treatment_type: darkness
+- coculture_partner: null
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
+  experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
+    (RNASEQ)
+  gene_count: 5862
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus NATL2A
+  publication_doi: 10.1128/mSystems.00040-18
+  significant_down_count: 2067
+  significant_up_count: 1176
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 3
+  time_point_hours:
+  - '36.0'
+  - '40.0'
+  - '48.0'
+  time_point_labels:
+  - 13h extended darkness (48h)
+  - 1h extended darkness (36h)
+  - 5h extended darkness (40h)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significant_down:
+  - '1104'
+  - '174'
+  - '789'
+  time_point_significant_up:
+  - '134'
+  - '472'
+  - '570'
+  time_point_totals:
+  - '1954'
+  - '1954'
+  - '1954'
+  treatment_type: darkness
+- coculture_partner: null
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
+  experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
+    (RNASEQ)
+  gene_count: 5862
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus NATL2A
+  publication_doi: 10.1128/mSystems.00040-18
+  significant_down_count: 1410
+  significant_up_count: 791
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 3
+  time_point_hours:
+  - '36.0'
+  - '40.0'
+  - '48.0'
+  time_point_labels:
+  - 13h extended darkness (48h)
+  - 1h extended darkness (36h)
+  - 5h extended darkness (40h)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significant_down:
+  - '129'
+  - '460'
+  - '821'
+  time_point_significant_up:
+  - '108'
+  - '272'
+  - '411'
+  time_point_totals:
+  - '1954'
+  - '1954'
+  - '1954'
+  treatment_type: darkness
+- coculture_partner: Alteromonas macleodii MIT1002
+  experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
+  experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
+    Prochlorococcus NATL2A (RNASEQ)
+  gene_count: 2471
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus NATL2A
+  publication_doi: 10.1038/ismej.2016.82
+  significant_down_count: 352
+  significant_up_count: 221
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 7
+  time_point_hours:
+  - '-12.0'
+  - '12.0'
+  - '2.0'
+  - '24.0'
+  - '4.0'
+  - '48.0'
+  - '6.0'
+  time_point_labels:
+  - -12h
+  - 12h
+  - 24h
+  - 2h
+  - 48h
+  - 4h
+  - 6h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '0'
+  - '12'
+  - '122'
+  - '141'
+  - '77'
+  time_point_significant_up:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '117'
+  - '8'
+  - '96'
+  time_point_totals:
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  - '353'
+  treatment_type: coculture
+- coculture_partner: null
+  experiment_id: 10.1111/1462-2920.13104_phosphorus_stress_plimited_natl2a_rnaseq_uninfected
+  experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
+  gene_count: 204
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus NATL2A
+  publication_doi: 10.1111/1462-2920.13104
+  significant_down_count: 4
+  significant_up_count: 41
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 6
+  time_point_hours:
+  - '24.0'
+  - '4.0'
+  - '46.0'
+  - '50.0'
+  - '59.0'
+  - '59.0'
+  time_point_labels:
+  - 24h
+  - 46h
+  - 4h
+  - 50h (P added)
+  - 59h
+  - 59h (P added)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '1'
+  - '3'
+  time_point_significant_up:
+  - '10'
+  - '15'
+  - '2'
+  - '4'
+  - '4'
+  - '6'
+  time_point_totals:
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  treatment_type: phosphorus_stress
+- coculture_partner: null
+  experiment_id: 10.1111/1462-2920.13104_phosphorus_stress_plimited_natl2a_rnaseq_infected
+  experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
+  gene_count: 272
+  is_time_course: 'true'
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus NATL2A
+  publication_doi: 10.1111/1462-2920.13104
+  significant_down_count: 0
+  significant_up_count: 118
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 8
+  time_point_hours:
+  - '47.0'
+  - '48.0'
+  - '49.0'
+  - '51.0'
+  - '55.0'
+  - '55.0'
+  - '59.0'
+  - '59.0'
+  time_point_labels:
+  - 47h
+  - 48h
+  - 49h
+  - 51h
+  - 55h
+  - 55h (P added)
+  - 59h
+  - 59h (P added)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  time_point_significant_up:
+  - '13'
+  - '16'
+  - '18'
+  - '18'
+  - '18'
+  - '18'
+  - '8'
+  - '9'
+  time_point_totals:
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
   treatment_type: phosphorus_stress

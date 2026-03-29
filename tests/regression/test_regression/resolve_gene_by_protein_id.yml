@@ -3,5 +3,5 @@ row_count: 1
 rows:
 - gene_name: ctaCI
   locus_tag: PMM0446
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: cytochrome c oxidase subunit II

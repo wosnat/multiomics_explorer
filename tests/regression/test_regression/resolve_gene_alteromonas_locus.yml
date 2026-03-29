@@ -3,5 +3,5 @@ row_count: 1
 rows:
 - gene_name: null
   locus_tag: ALT831_RS00180
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   product: IS630 family transposase

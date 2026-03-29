@@ -8,6 +8,10 @@ Cross-organism by design — results at group x experiment x timepoint
 granularity showing how many group members respond. Gene counts,
 not individual genes.
 
+Returns summary statistics (always) + top results sorted by significant
+gene count. Default limit=5 gives a quick overview.
+Set summary=True for counts only, or increase limit for more rows.
+
 Three list filters — each reports not_found + not_matched:
 - group_ids (required): ortholog groups
 - organisms: restrict to specific organisms
@@ -26,6 +30,7 @@ For per-gene expression, use differential_expression_by_gene.
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
 | direction | string ('up', 'down') \| None | None | Filter by expression direction. |
 | significant_only | bool | False | If true, return only statistically significant rows. |
+| summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Add experiment_name, treatment, omics_type, table_scope, table_scope_detail to each row. |
 | limit | int | 5 | Max result rows. |
 
@@ -34,10 +39,10 @@ For per-gene expression, use differential_expression_by_gene.
 ### Envelope
 
 ```expected-keys
-total_rows, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, truncated, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, truncated, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
-- **total_rows** (int): Gene x experiment x timepoint rows matching all filters
+- **total_matching** (int): Gene x experiment x timepoint rows matching all filters
 - **matching_genes** (int): Distinct genes with expression
 - **matching_groups** (int): Distinct groups with >=1 gene having expression
 - **experiment_count** (int): Distinct experiments in results
@@ -45,7 +50,7 @@ total_rows, matching_genes, matching_groups, experiment_count, median_abs_log2fc
 - **max_abs_log2fc** (float | None): Max |log2FC| for significant rows. Null if none.
 - **returned** (int): Rows in results
 - **truncated** (bool): True if more results exist than returned
-- **by_organism** (list[object]): [{organism, count}] — rows per organism, sorted desc
+- **by_organism** (list[DEByOrthologOrganismBreakdown]): Rows per organism, sorted by count desc
 - **rows_by_status** (object): {significant_up, significant_down, not_significant}
 - **rows_by_treatment_type** (object): Row counts by treatment type
 - **by_table_scope** (object): Row counts by experiment table_scope
@@ -67,7 +72,7 @@ total_rows, matching_genes, matching_groups, experiment_count, median_abs_log2fc
 | consensus_product | string | Group product description (e.g. 'photosystem II chlorophyll-binding protein CP47') |
 | experiment_id | string | Experiment ID |
 | treatment_type | string | Treatment category (e.g. 'nitrogen_limitation') |
-| organism_strain | string | Organism (e.g. 'Prochlorococcus MED4') |
+| organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | coculture_partner | string \| None (optional) | Coculture partner organism, if applicable |
 | timepoint | string \| None | Timepoint label (e.g. '24h'). Null when edge has no label. |
 | timepoint_hours | float \| None | Numeric hours (e.g. 24.0). Null for non-numeric labels. |
@@ -140,7 +145,7 @@ differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detai
 from multiomics_explorer import differential_expression_by_ortholog
 
 result = differential_expression_by_ortholog(group_ids=...)
-# returns dict with keys: total_rows, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
 Use package import for bulk data extraction in scripts.

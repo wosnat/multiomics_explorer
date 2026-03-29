@@ -45,11 +45,11 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 | product | string \| None (optional) | Gene product (e.g. 'DNA polymerase III subunit beta') |
 | gene_category | string \| None (optional) | Functional category (e.g. 'Replication and repair') |
 | annotation_quality | int \| None (optional) | Annotation quality score 0-3 (e.g. 3) |
-| organism_strain | string | Organism (e.g. 'Prochlorococcus MED4') |
+| organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | annotation_types | list[string] (optional) | Ontology types with annotations (e.g. ['go_bp', 'ec', 'kegg']) |
 | expression_edge_count | int (optional) | Number of expression data points (e.g. 36) |
-| significant_up_count | int (optional) | Significant upregulated DE observations (e.g. 3) |
-| significant_down_count | int (optional) | Significant downregulated DE observations (e.g. 2) |
+| significant_up_count | int (optional) | Significant up-regulated DE observations (e.g. 3) |
+| significant_down_count | int (optional) | Significant down-regulated DE observations (e.g. 2) |
 | closest_ortholog_group_size | int \| None (optional) | Size of tightest ortholog group (e.g. 9) |
 | closest_ortholog_genera | list[string] \| None (optional) | Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus']) |
 
@@ -78,7 +78,7 @@ gene_overview(locus_tags=["PMM1428"])
   "has_expression": 1, "has_significant_expression": 1, "has_orthologs": 1,
   "returned": 1, "truncated": false, "not_found": [],
   "results": [
-    {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein", "gene_category": "Unknown", "annotation_quality": 3, "organism_strain": "Prochlorococcus MED4", "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"], "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9, "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]}
+    {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein", "gene_category": "Unknown", "annotation_quality": 3, "organism_name": "Prochlorococcus MED4", "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"], "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9, "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]}
   ]
 }
 ```

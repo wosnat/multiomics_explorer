@@ -8,7 +8,7 @@ rows:
   gene_count: 11130
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 1003
   significant_up_count: 1379
@@ -59,7 +59,7 @@ rows:
   gene_count: 4452
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 578
   significant_up_count: 433
@@ -92,7 +92,7 @@ rows:
   gene_count: 7120
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 394
   significant_up_count: 609
@@ -143,7 +143,7 @@ rows:
   gene_count: 4272
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 556
   significant_up_count: 599

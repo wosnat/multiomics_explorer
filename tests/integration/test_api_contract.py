@@ -46,7 +46,7 @@ class TestResolveGeneContract:
 
     def test_result_keys(self, conn):
         result = api.resolve_gene(KNOWN_GENE, conn=conn)
-        expected_keys = {"locus_tag", "gene_name", "product", "organism_strain"}
+        expected_keys = {"locus_tag", "gene_name", "product", "organism_name"}
         assert set(result["results"][0].keys()) == expected_keys
 
     def test_not_found_returns_empty(self, conn):
@@ -76,7 +76,7 @@ class TestGenesByFunctionContract:
     def test_result_keys(self, conn):
         result = api.genes_by_function("DNA polymerase", conn=conn)
         expected_keys = {
-            "locus_tag", "gene_name", "product", "organism_strain",
+            "locus_tag", "gene_name", "product", "organism_name",
             "gene_category", "annotation_quality", "score",
         }
         assert set(result["results"][0].keys()) == expected_keys
@@ -108,7 +108,7 @@ class TestGeneOverviewContract:
         result = api.gene_overview([KNOWN_GENE], conn=conn)
         expected_keys = {
             "locus_tag", "gene_name", "product",
-            "gene_category", "annotation_quality", "organism_strain",
+            "gene_category", "annotation_quality", "organism_name",
             "annotation_types", "expression_edge_count",
             "significant_up_count", "significant_down_count", "closest_ortholog_group_size",
             "closest_ortholog_genera",
@@ -150,7 +150,7 @@ class TestGeneHomologsContract:
         result = api.gene_homologs([KNOWN_GENE], conn=conn)
         assert len(result["results"]) >= 1
         expected_keys = {
-            "locus_tag", "organism_strain", "group_id",
+            "locus_tag", "organism_name", "group_id",
             "consensus_gene_name", "consensus_product",
             "taxonomic_level", "source", "specificity_rank",
         }
@@ -247,7 +247,7 @@ class TestGenesByOntologyContract:
     def test_result_keys(self, conn):
         result = api.genes_by_ontology(["go:0006260"], "go_bp", conn=conn)
         expected_keys = {"locus_tag", "gene_name", "product",
-                         "organism_strain", "gene_category"}
+                         "organism_name", "gene_category"}
         assert set(result["results"][0].keys()) == expected_keys
 
     def test_summary_mode(self, conn):
@@ -352,7 +352,7 @@ class TestDifferentialExpressionByGeneContract:
         )
         assert isinstance(result, dict)
         expected_keys = {
-            "organism_strain", "matching_genes", "total_rows",
+            "organism_name", "matching_genes", "total_matching",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
             "experiment_count", "rows_by_treatment_type", "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
@@ -366,7 +366,7 @@ class TestDifferentialExpressionByGeneContract:
         )
         rbs = result["rows_by_status"]
         assert set(rbs.keys()) == {"significant_up", "significant_down", "not_significant"}
-        assert sum(rbs.values()) == result["total_rows"]
+        assert sum(rbs.values()) == result["total_matching"]
 
     def test_result_row_keys(self, conn):
         result = api.differential_expression_by_gene(
@@ -416,7 +416,7 @@ class TestDifferentialExpressionByOrthologContract:
         )
         assert isinstance(result, dict)
         expected_keys = {
-            "total_rows", "matching_genes", "matching_groups",
+            "total_matching", "matching_genes", "matching_groups",
             "experiment_count", "median_abs_log2fc", "max_abs_log2fc",
             "results", "returned", "truncated",
             "by_organism", "rows_by_status", "rows_by_treatment_type",
@@ -433,7 +433,7 @@ class TestDifferentialExpressionByOrthologContract:
         )
         rbs = result["rows_by_status"]
         assert set(rbs.keys()) == {"significant_up", "significant_down", "not_significant"}
-        assert sum(rbs.values()) == result["total_rows"]
+        assert sum(rbs.values()) == result["total_matching"]
 
     def test_result_row_keys_compact(self, conn):
         result = api.differential_expression_by_ortholog(
@@ -443,7 +443,7 @@ class TestDifferentialExpressionByOrthologContract:
         row = result["results"][0]
         expected_compact = {
             "group_id", "consensus_gene_name", "consensus_product",
-            "experiment_id", "treatment_type", "organism_strain",
+            "experiment_id", "treatment_type", "organism_name",
             "coculture_partner", "timepoint", "timepoint_hours",
             "timepoint_order", "genes_with_expression", "total_genes",
             "significant_up", "significant_down", "not_significant",
@@ -479,7 +479,7 @@ class TestDifferentialExpressionByOrthologContract:
         if result["top_experiments"]:
             te = result["top_experiments"][0]
             assert set(te.keys()) == {
-                "experiment_id", "treatment_type", "organism_strain",
+                "experiment_id", "treatment_type", "organism_name",
                 "significant_genes",
             }
 
@@ -490,7 +490,7 @@ class TestDifferentialExpressionByOrthologContract:
         assert isinstance(result["by_organism"], list)
         if result["by_organism"]:
             bo = result["by_organism"][0]
-            assert "organism" in bo
+            assert "organism_name" in bo
             assert "count" in bo
 
     def test_diagnostic_fields_present(self, conn):

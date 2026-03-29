@@ -172,7 +172,7 @@ Do not trust Cypher by reading alone — run it. For each builder:
 ## Naming conventions
 
 - [ ] Return field names use standard names where applicable?
-      (`locus_tag`, `gene_name`, `product`, `organism_strain`, `score`)
+      (`locus_tag`, `gene_name`, `product`, `organism_name`, `score`)
 - [ ] New parameter names follow existing conventions?
       (`organism`, `search_text`, `ontology`, `category`, `limit`, `summary`, `verbose`)
 - [ ] Test class naming follows conventions?

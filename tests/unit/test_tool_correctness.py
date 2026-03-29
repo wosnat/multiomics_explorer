@@ -69,7 +69,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_name", "Unknown"), "count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier=locus_tag)
 
@@ -78,7 +78,7 @@ class TestResolveGeneCorrectness:
         r = result.results[0]
         assert r.locus_tag == locus_tag
         assert r.product == gene.get("product")
-        assert r.organism_strain == gene.get("organism_strain")
+        assert r.organism_name == gene.get("organism_name")
 
     @pytest.mark.asyncio
     async def test_lookup_by_gene_name_dnaN(self, tool_fns, mock_ctx):
@@ -87,7 +87,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_name", "Unknown"), "count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="dnaN")
 
@@ -101,7 +101,7 @@ class TestResolveGeneCorrectness:
         mit9312 = as_resolve_gene_result(GENES_BY_LOCUS["PMT9312_0001"])
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 2, "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}, {"organism_name": "Prochlorococcus MIT9312", "gene_count": 1}], "returned": 2, "truncated": False, "results": [med4, mit9312]},
+            return_value={"total_matching": 2, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}, {"organism_name": "Prochlorococcus MIT9312", "count": 1}], "returned": 2, "truncated": False, "results": [med4, mit9312]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="dnaN")
 
@@ -109,7 +109,7 @@ class TestResolveGeneCorrectness:
         assert result.returned == 2
         loci = {r.locus_tag for r in result.results}
         assert loci == {"PMM0001", "PMT9312_0001"}
-        organisms = {r.organism_strain for r in result.results}
+        organisms = {r.organism_name for r in result.results}
         assert "Prochlorococcus MED4" in organisms
         assert "Prochlorococcus MIT9312" in organisms
 
@@ -120,14 +120,14 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_name", "Unknown"), "count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="WP_011132082.1")
 
         r = result.results[0]
         assert r.locus_tag == "PMM0446"
         assert r.gene_name == "ctaCI"
-        assert r.organism_strain == gene["organism_strain"]
+        assert r.organism_name == gene["organism_name"]
 
     @pytest.mark.asyncio
     async def test_gene_without_real_gene_name(self, tool_fns, mock_ctx):
@@ -136,7 +136,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_name", "Unknown"), "count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="S8102_04001")
 
@@ -151,7 +151,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_name", "Unknown"), "count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="ALT831_RS00180")
 
@@ -164,14 +164,14 @@ class TestResolveGeneCorrectness:
         med4 = as_resolve_gene_result(GENES_BY_LOCUS["PMM0001"])
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}], "returned": 1, "truncated": False, "results": [med4]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}], "returned": 1, "truncated": False, "results": [med4]},
         ):
             result = await tool_fns["resolve_gene"](
                 mock_ctx, identifier="dnaN", organism="MED4",
             )
 
         assert result.total_matching == 1
-        assert result.results[0].organism_strain == "Prochlorococcus MED4"
+        assert result.results[0].organism_name == "Prochlorococcus MED4"
 
     @pytest.mark.asyncio
     async def test_alternate_identifier_lookup(self, tool_fns, mock_ctx):
@@ -180,7 +180,7 @@ class TestResolveGeneCorrectness:
         row = as_resolve_gene_result(gene)
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
-            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_strain", "Unknown"), "gene_count": 1}], "returned": 1, "truncated": False, "results": [row]},
+            return_value={"total_matching": 1, "by_organism": [{"organism_name": row.get("organism_name", "Unknown"), "count": 1}], "returned": 1, "truncated": False, "results": [row]},
         ):
             result = await tool_fns["resolve_gene"](mock_ctx, identifier="TX50_RS00020")
 
@@ -202,7 +202,7 @@ class TestGenesByFunctionCorrectness:
         return {
             "total_entries": 100,
             "total_matching": total_matching,
-            "by_organism": [{"organism": "Prochlorococcus MED4", "count": len(results)}],
+            "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": len(results)}],
             "by_category": [{"category": "DNA replication", "count": len(results)}],
             "score_max": results[0]["score"] if results else None,
             "score_median": results[0]["score"] if results else None,
@@ -302,7 +302,7 @@ class TestGeneDetailsCorrectness:
             "locus_tag": "PMM0001",
             "gene_name": "dnaN",
             "product": "DNA polymerase III, beta subunit",
-            "organism_strain": "Prochlorococcus MED4",
+            "organism_name": "Prochlorococcus MED4",
             "gene_category": "DNA replication",
             "annotation_quality": 3,
             "ec_numbers": ["2.7.7.7"],
@@ -320,7 +320,7 @@ class TestGeneDetailsCorrectness:
         r = result.results[0]
         assert r["locus_tag"] == "PMM0001"
         assert r["gene_name"] == "dnaN"
-        assert r["organism_strain"] == "Prochlorococcus MED4"
+        assert r["organism_name"] == "Prochlorococcus MED4"
 
     @pytest.mark.asyncio
     async def test_alteromonas_gene_eggnog_only(self, tool_fns, mock_ctx):
@@ -329,7 +329,7 @@ class TestGeneDetailsCorrectness:
             "locus_tag": "ALT831_RS00180",
             "gene_name": None,
             "product": "IS630 family transposase",
-            "organism_strain": "Alteromonas macleodii MIT1002",
+            "organism_name": "Alteromonas macleodii MIT1002",
             "annotation_quality": 2,
         }
         conn = _conn_from(mock_ctx)
@@ -343,7 +343,7 @@ class TestGeneDetailsCorrectness:
         assert result.total_matching == 1
         r = result.results[0]
         assert r["locus_tag"] == "ALT831_RS00180"
-        assert r["organism_strain"] == "Alteromonas macleodii MIT1002"
+        assert r["organism_name"] == "Alteromonas macleodii MIT1002"
 
 
 # ---------------------------------------------------------------------------
@@ -367,7 +367,7 @@ class TestGeneOverviewCorrectness:
         "results": [
             {"locus_tag": "PMM1428", "gene_name": "test", "product": "test product",
              "gene_category": "Photosynthesis", "annotation_quality": 3,
-             "organism_strain": "Prochlorococcus MED4",
+             "organism_name": "Prochlorococcus MED4",
              "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"],
              "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2,
              "closest_ortholog_group_size": 9,
@@ -401,13 +401,13 @@ class TestGeneOverviewCorrectness:
             "results": [
                 {"locus_tag": "PMM1428", "gene_name": "a", "product": "p1",
                  "gene_category": None, "annotation_quality": 3,
-                 "organism_strain": "Prochlorococcus MED4",
+                 "organism_name": "Prochlorococcus MED4",
                  "annotation_types": ["go_mf"], "expression_edge_count": 36,
                  "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9,
                  "closest_ortholog_genera": ["Prochlorococcus"]},
                 {"locus_tag": "EZ55_00275", "gene_name": None, "product": "p2",
                  "gene_category": None, "annotation_quality": 0,
-                 "organism_strain": "Alteromonas EZ55",
+                 "organism_name": "Alteromonas EZ55",
                  "annotation_types": [], "expression_edge_count": 0,
                  "significant_up_count": 0, "significant_down_count": 0, "closest_ortholog_group_size": 1,
                  "closest_ortholog_genera": []},
@@ -455,12 +455,12 @@ class TestGeneHomologsCorrectness:
     }
 
     _SAMPLE_RESULTS = [
-        {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
+        {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4",
          "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
          "consensus_product": "DNA polymerase III, beta subunit",
          "taxonomic_level": "curated", "source": "cyanorak",
          "specificity_rank": 0},
-        {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
+        {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4",
          "group_id": "eggnog:COG0592@2", "consensus_gene_name": "dnaN",
          "consensus_product": "DNA polymerase III, beta subunit",
          "taxonomic_level": "Bacteria", "source": "eggnog",
@@ -491,7 +491,7 @@ class TestGeneHomologsCorrectness:
     async def test_batch_input_multiple_genes(self, tool_fns, mock_ctx):
         """Batch query returns rows for multiple genes."""
         batch_results = self._SAMPLE_RESULTS + [
-            {"locus_tag": "PMM0845", "organism_strain": "Prochlorococcus MED4",
+            {"locus_tag": "PMM0845", "organism_name": "Prochlorococcus MED4",
              "group_id": "cyanorak:CK_00000853", "consensus_gene_name": "ndhV",
              "consensus_product": "NADH dehydrogenase subunit NdhV",
              "taxonomic_level": "curated", "source": "cyanorak",

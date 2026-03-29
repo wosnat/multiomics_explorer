@@ -1,744 +1,747 @@
-nodes:
-  AnatomicalEntity:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-  BiologicalEntity:
-    properties:
-      all_identifiers: list
-      alternate_functional_descriptions: list
-      annotation_quality: int
-      annotation_types: list
-      closest_ortholog_genera: list
-      closest_ortholog_group_size: int
-      end: int
-      expression_edge_count: int
-      function_description: string
-      gene_category: string
-      gene_name: string
-      gene_summary: string
-      id: string
-      locus_tag: string
-      organism_strain: string
-      preferred_id: string
-      product: string
-      protein_id: string
-      significant_down_count: int
-      significant_up_count: int
-      start: int
-      strand: string
-      transporter_classification: list
-  BiologicalProcess:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-  BiologicalProcessOrActivity:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-  CellularComponent:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-  CogFunctionalCategory:
-    properties:
-      code: string
-      id: string
-      name: string
-      preferred_id: string
-  CyanorakRole:
-    properties:
-      code: string
-      id: string
-      name: string
-      preferred_id: string
-  EcNumber:
-    properties:
-      alternate_name: list
-      catalytic_activity: list
-      comments: list
-      id: string
-      name: string
-      preferred_id: string
-  Entity:
-    properties:
-      id: string
-      level: string
-      name: string
-      preferred_id: string
-  Experiment:
-    properties:
-      coculture_partner: string
-      control: string
-      experimental_context: string
-      gene_count: int
-      id: string
-      is_time_course: string
-      light_condition: string
-      light_intensity: string
-      medium: string
-      name: string
-      omics_type: string
-      organism_strain: string
-      preferred_id: string
-      significant_down_count: int
-      significant_up_count: int
-      statistical_test: string
-      table_scope: string
-      table_scope_detail: string
-      temperature: string
-      time_point_count: int
-      time_point_hours: list
-      time_point_labels: list
-      time_point_orders: list
-      time_point_significant_down: list
-      time_point_significant_up: list
-      time_point_totals: list
-      treatment: string
-      treatment_type: string
-  Gene:
-    properties:
-      all_identifiers: list
-      alternate_functional_descriptions: list
-      annotation_quality: int
-      annotation_types: list
-      closest_ortholog_genera: list
-      closest_ortholog_group_size: int
-      end: int
-      expression_edge_count: int
-      function_description: string
-      gene_category: string
-      gene_name: string
-      gene_summary: string
-      id: string
-      locus_tag: string
-      organism_strain: string
-      preferred_id: string
-      product: string
-      protein_id: string
-      significant_down_count: int
-      significant_up_count: int
-      start: int
-      strand: string
-      transporter_classification: list
-  GeneOntology:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-  GroupingClass:
-    properties:
-      consensus_gene_name: string
-      consensus_product: string
-      description: string
-      functional_description: string
-      genera: list
-      has_cross_genus_members: string
-      id: string
-      member_count: int
-      name: string
-      organism_count: int
-      preferred_id: string
-      source: string
-      specificity_rank: int
-      taxon_id: int
-      taxonomic_level: string
-  InformationContentEntity:
-    properties:
-      abstract: string
-      authors: list
-      description: string
-      doi: string
-      experiment_count: int
-      id: string
-      journal: string
-      omics_types: list
-      organisms: list
-      preferred_id: string
-      publication_year: int
-      study_type: string
-      title: string
-      treatment_types: list
-  InvestigativeProcess:
-    properties:
-      coculture_partner: string
-      control: string
-      experimental_context: string
-      gene_count: int
-      id: string
-      is_time_course: string
-      light_condition: string
-      light_intensity: string
-      medium: string
-      name: string
-      omics_type: string
-      organism_strain: string
-      preferred_id: string
-      significant_down_count: int
-      significant_up_count: int
-      statistical_test: string
-      table_scope: string
-      table_scope_detail: string
-      temperature: string
-      time_point_count: int
-      time_point_hours: list
-      time_point_labels: list
-      time_point_orders: list
-      time_point_significant_down: list
-      time_point_significant_up: list
-      time_point_totals: list
-      treatment: string
-      treatment_type: string
-  KeggTerm:
-    properties:
-      id: string
-      level: string
-      name: string
-      preferred_id: string
-  MolecularFunction:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-  NamedThing:
-    properties:
-      id: string
-      level: string
-      name: string
-      preferred_id: string
-  OrganismTaxon:
-    properties:
-      clade: string
-      experiment_count: int
-      family: string
-      gene_count: int
-      genus: string
-      id: string
-      kingdom: string
-      lineage: string
-      ncbi_taxon_id: int
-      omics_types: list
-      order: string
-      organism_name: string
-      phylum: string
-      preferred_id: string
-      preferred_name: string
-      publication_count: int
-      species: string
-      strain_name: string
-      superkingdom: string
-      tax_class: string
-      treatment_types: list
-  OrganismalEntity:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-  OrthologGroup:
-    properties:
-      consensus_gene_name: string
-      consensus_product: string
-      description: string
-      functional_description: string
-      genera: list
-      has_cross_genus_members: string
-      id: string
-      member_count: int
-      name: string
-      organism_count: int
-      preferred_id: string
-      source: string
-      specificity_rank: int
-      taxon_id: int
-      taxonomic_level: string
-  Pfam:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-      short_name: string
-  PfamClan:
-    properties:
-      id: string
-      name: string
-      preferred_id: string
-  Polypeptide:
-    properties:
-      annotation_score: float
-      cofactor_names: list
-      eggnog_ids: string
-      gene_names: list
-      go_biological_processes: list
-      id: string
-      is_reviewed: string
-      keyword_ids: list
-      keywords: list
-      locus_tag: string
-      molecular_mass: int
-      pfam_ids: list
-      preferred_id: string
-      protein_family: string
-      protein_synonyms: string
-      proteome_ids: list
-      refseq_ids: list
-      sequence_length: int
-      string_ids: string
-      transmembrane_regions: list
-  Protein:
-    properties:
-      annotation_score: float
-      cofactor_names: list
-      eggnog_ids: string
-      gene_names: list
-      go_biological_processes: list
-      id: string
-      is_reviewed: string
-      keyword_ids: list
-      keywords: list
-      locus_tag: string
-      molecular_mass: int
-      pfam_ids: list
-      preferred_id: string
-      protein_family: string
-      protein_synonyms: string
-      proteome_ids: list
-      refseq_ids: list
-      sequence_length: int
-      string_ids: string
-      transmembrane_regions: list
-  Publication:
-    properties:
-      abstract: string
-      authors: list
-      description: string
-      doi: string
-      experiment_count: int
-      id: string
-      journal: string
-      omics_types: list
-      organisms: list
-      preferred_id: string
-      publication_year: int
-      study_type: string
-      title: string
-      treatment_types: list
-  Schema_info:
-    properties:
-      id: string
-      preferred_id: string
-      schema_info: string
-  TigrRole:
-    properties:
-      code: string
-      id: string
-      name: string
-      preferred_id: string
-relationships:
-  Biological_process_is_a_biological_process:
-    properties: {}
-    source_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-  Biological_process_negatively_regulates_biological_process:
-    properties: {}
-    source_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-  Biological_process_part_of_biological_process:
-    properties: {}
-    source_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-  Biological_process_positively_regulates_biological_process:
-    properties: {}
-    source_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-  Cellular_component_is_a_cellular_component:
-    properties: {}
-    source_labels:
-    - AnatomicalEntity
-    - BiologicalEntity
-    - CellularComponent
-    - Entity
-    - NamedThing
-    - OrganismalEntity
-    target_labels:
-    - AnatomicalEntity
-    - BiologicalEntity
-    - CellularComponent
-    - Entity
-    - NamedThing
-    - OrganismalEntity
-  Cellular_component_part_of_cellular_component:
-    properties: {}
-    source_labels:
-    - AnatomicalEntity
-    - BiologicalEntity
-    - CellularComponent
-    - Entity
-    - NamedThing
-    - OrganismalEntity
-    target_labels:
-    - AnatomicalEntity
-    - BiologicalEntity
-    - CellularComponent
-    - Entity
-    - NamedThing
-    - OrganismalEntity
-  Changes_expression_of:
-    properties:
-      adjusted_p_value: float
-      expression_direction: string
-      expression_status: string
-      id: string
-      log2_fold_change: float
-      rank_by_effect: int
-      significant: string
-      time_point: string
-      time_point_hours: float
-      time_point_order: int
-    source_labels:
-    - Experiment
-    - InvestigativeProcess
-    target_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-  Cyanorak_role_is_a_cyanorak_role:
-    properties:
-      id: string
-    source_labels:
-    - CyanorakRole
-    - Entity
-    - NamedThing
-    target_labels:
-    - CyanorakRole
-    - Entity
-    - NamedThing
-  Ec_number_is_a_ec_number:
-    properties: {}
-    source_labels:
-    - EcNumber
-    - Entity
-    - NamedThing
-    target_labels:
-    - EcNumber
-    - Entity
-    - NamedThing
-  Gene_belongs_to_organism:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - Entity
-    - NamedThing
-    - OrganismTaxon
-  Gene_catalyzes_ec_number:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - EcNumber
-    - Entity
-    - NamedThing
-  Gene_enables_molecular_function:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - BiologicalProcessOrActivity
-    - Entity
-    - MolecularFunction
-    - NamedThing
-  Gene_encodes_protein:
-    properties:
-      licence: string
-      source: string
-      version: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - Entity
-    - NamedThing
-    - Polypeptide
-    - Protein
-  Gene_has_cyanorak_role:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - CyanorakRole
-    - Entity
-    - NamedThing
-  Gene_has_kegg_ko:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - Entity
-    - KeggTerm
-    - NamedThing
-  Gene_has_pfam:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - Entity
-    - NamedThing
-    - Pfam
-  Gene_has_tigr_role:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - Entity
-    - NamedThing
-    - TigrRole
-  Gene_in_cog_category:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - CogFunctionalCategory
-    - Entity
-    - NamedThing
-  Gene_in_ortholog_group:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - GroupingClass
-    - OrthologGroup
-  Gene_involved_in_biological_process:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - BiologicalProcess
-    - BiologicalProcessOrActivity
-    - Entity
-    - GeneOntology
-    - NamedThing
-  Gene_located_in_cellular_component:
-    properties:
-      id: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - Gene
-    - NamedThing
-    target_labels:
-    - AnatomicalEntity
-    - BiologicalEntity
-    - CellularComponent
-    - Entity
-    - NamedThing
-    - OrganismalEntity
-  Has_experiment:
-    properties:
-      id: string
-      licence: string
-      source: string
-      version: string
-    source_labels:
-    - Entity
-    - InformationContentEntity
-    - NamedThing
-    - Publication
-    target_labels:
-    - Experiment
-    - InvestigativeProcess
-  Kegg_term_is_a_kegg_term:
-    properties:
-      id: string
-    source_labels:
-    - Entity
-    - KeggTerm
-    - NamedThing
-    target_labels:
-    - Entity
-    - KeggTerm
-    - NamedThing
-  Molecular_function_is_a_molecular_function:
-    properties: {}
-    source_labels:
-    - BiologicalEntity
-    - BiologicalProcessOrActivity
-    - Entity
-    - MolecularFunction
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - BiologicalProcessOrActivity
-    - Entity
-    - MolecularFunction
-    - NamedThing
-  Molecular_function_part_of_molecular_function:
-    properties: {}
-    source_labels:
-    - BiologicalEntity
-    - BiologicalProcessOrActivity
-    - Entity
-    - MolecularFunction
-    - NamedThing
-    target_labels:
-    - BiologicalEntity
-    - BiologicalProcessOrActivity
-    - Entity
-    - MolecularFunction
-    - NamedThing
-  Og_has_cyanorak_role:
-    properties:
-      id: string
-    source_labels:
-    - GroupingClass
-    - OrthologGroup
-    target_labels:
-    - CyanorakRole
-    - Entity
-    - NamedThing
-  Og_in_cog_category:
-    properties:
-      id: string
-    source_labels:
-    - GroupingClass
-    - OrthologGroup
-    target_labels:
-    - CogFunctionalCategory
-    - Entity
-    - NamedThing
-  Pfam_in_pfam_clan:
-    properties:
-      id: string
-    source_labels:
-    - Entity
-    - NamedThing
-    - Pfam
-    target_labels:
-    - Entity
-    - NamedThing
-    - PfamClan
-  Protein_belongs_to_organism:
-    properties:
-      licence: string
-      source: string
-      version: string
-    source_labels:
-    - BiologicalEntity
-    - Entity
-    - NamedThing
-    - Polypeptide
-    - Protein
-    target_labels:
-    - Entity
-    - NamedThing
-    - OrganismTaxon
-  Tests_coculture_with:
-    properties:
-      id: string
-      licence: string
-      source: string
-      version: string
-    source_labels:
-    - Experiment
-    - InvestigativeProcess
-    target_labels:
-    - Entity
-    - NamedThing
-    - OrganismTaxon
+version: 1
+captured_at: '2026-03-29T08:45:34.334676+00:00'
+schema:
+  nodes:
+    AnatomicalEntity:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+    BiologicalEntity:
+      properties:
+        annotation_score: float
+        cofactor_names: list
+        eggnog_ids: string
+        gene_names: list
+        go_biological_processes: list
+        id: string
+        is_reviewed: string
+        keyword_ids: list
+        keywords: list
+        locus_tag: string
+        molecular_mass: int
+        pfam_ids: list
+        preferred_id: string
+        protein_family: string
+        protein_synonyms: string
+        proteome_ids: list
+        refseq_ids: list
+        sequence_length: int
+        string_ids: string
+        transmembrane_regions: list
+    BiologicalProcess:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+    BiologicalProcessOrActivity:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+    CellularComponent:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+    CogFunctionalCategory:
+      properties:
+        code: string
+        id: string
+        name: string
+        preferred_id: string
+    CyanorakRole:
+      properties:
+        code: string
+        id: string
+        name: string
+        preferred_id: string
+    EcNumber:
+      properties:
+        alternate_name: list
+        catalytic_activity: list
+        comments: list
+        id: string
+        name: string
+        preferred_id: string
+    Entity:
+      properties:
+        code: string
+        id: string
+        name: string
+        preferred_id: string
+    Experiment:
+      properties:
+        coculture_partner: string
+        control: string
+        experimental_context: string
+        gene_count: int
+        id: string
+        is_time_course: string
+        light_condition: string
+        light_intensity: string
+        medium: string
+        name: string
+        omics_type: string
+        organism_name: string
+        preferred_id: string
+        significant_down_count: int
+        significant_up_count: int
+        statistical_test: string
+        table_scope: string
+        table_scope_detail: string
+        temperature: string
+        time_point_count: int
+        time_point_hours: list
+        time_point_labels: list
+        time_point_orders: list
+        time_point_significant_down: list
+        time_point_significant_up: list
+        time_point_totals: list
+        treatment: string
+        treatment_type: string
+    Gene:
+      properties:
+        all_identifiers: list
+        alternate_functional_descriptions: list
+        annotation_quality: int
+        annotation_types: list
+        cazy_ids: list
+        closest_ortholog_genera: list
+        closest_ortholog_group_size: int
+        end: int
+        expression_edge_count: int
+        function_description: string
+        gene_category: string
+        gene_name: string
+        gene_name_synonyms: list
+        gene_summary: string
+        id: string
+        locus_tag: string
+        organism_name: string
+        preferred_id: string
+        product: string
+        protein_family: string
+        protein_id: string
+        significant_down_count: int
+        significant_up_count: int
+        start: int
+        strand: string
+        transmembrane_regions: list
+    GeneOntology:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+    GroupingClass:
+      properties:
+        consensus_gene_name: string
+        consensus_product: string
+        description: string
+        functional_description: string
+        genera: list
+        has_cross_genus_members: string
+        id: string
+        member_count: int
+        name: string
+        organism_count: int
+        preferred_id: string
+        source: string
+        specificity_rank: int
+        taxon_id: int
+        taxonomic_level: string
+    InformationContentEntity:
+      properties:
+        abstract: string
+        authors: list
+        description: string
+        doi: string
+        experiment_count: int
+        id: string
+        journal: string
+        omics_types: list
+        organisms: list
+        preferred_id: string
+        publication_year: int
+        study_type: string
+        title: string
+        treatment_types: list
+    InvestigativeProcess:
+      properties:
+        coculture_partner: string
+        control: string
+        experimental_context: string
+        gene_count: int
+        id: string
+        is_time_course: string
+        light_condition: string
+        light_intensity: string
+        medium: string
+        name: string
+        omics_type: string
+        organism_name: string
+        preferred_id: string
+        significant_down_count: int
+        significant_up_count: int
+        statistical_test: string
+        table_scope: string
+        table_scope_detail: string
+        temperature: string
+        time_point_count: int
+        time_point_hours: list
+        time_point_labels: list
+        time_point_orders: list
+        time_point_significant_down: list
+        time_point_significant_up: list
+        time_point_totals: list
+        treatment: string
+        treatment_type: string
+    KeggTerm:
+      properties:
+        id: string
+        level: string
+        name: string
+        preferred_id: string
+    MolecularFunction:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+    NamedThing:
+      properties:
+        code: string
+        id: string
+        name: string
+        preferred_id: string
+    OrganismTaxon:
+      properties:
+        clade: string
+        experiment_count: int
+        family: string
+        gene_count: int
+        genus: string
+        id: string
+        kingdom: string
+        lineage: string
+        ncbi_taxon_id: int
+        omics_types: list
+        order: string
+        organism_name: string
+        phylum: string
+        preferred_id: string
+        preferred_name: string
+        publication_count: int
+        species: string
+        strain_name: string
+        superkingdom: string
+        tax_class: string
+        treatment_types: list
+    OrganismalEntity:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+    OrthologGroup:
+      properties:
+        consensus_gene_name: string
+        consensus_product: string
+        description: string
+        functional_description: string
+        genera: list
+        has_cross_genus_members: string
+        id: string
+        member_count: int
+        name: string
+        organism_count: int
+        preferred_id: string
+        source: string
+        specificity_rank: int
+        taxon_id: int
+        taxonomic_level: string
+    Pfam:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+        short_name: string
+    PfamClan:
+      properties:
+        id: string
+        name: string
+        preferred_id: string
+    Polypeptide:
+      properties:
+        annotation_score: float
+        cofactor_names: list
+        eggnog_ids: string
+        gene_names: list
+        go_biological_processes: list
+        id: string
+        is_reviewed: string
+        keyword_ids: list
+        keywords: list
+        locus_tag: string
+        molecular_mass: int
+        pfam_ids: list
+        preferred_id: string
+        protein_family: string
+        protein_synonyms: string
+        proteome_ids: list
+        refseq_ids: list
+        sequence_length: int
+        string_ids: string
+        transmembrane_regions: list
+    Protein:
+      properties:
+        annotation_score: float
+        cofactor_names: list
+        eggnog_ids: string
+        gene_names: list
+        go_biological_processes: list
+        id: string
+        is_reviewed: string
+        keyword_ids: list
+        keywords: list
+        locus_tag: string
+        molecular_mass: int
+        pfam_ids: list
+        preferred_id: string
+        protein_family: string
+        protein_synonyms: string
+        proteome_ids: list
+        refseq_ids: list
+        sequence_length: int
+        string_ids: string
+        transmembrane_regions: list
+    Publication:
+      properties:
+        abstract: string
+        authors: list
+        description: string
+        doi: string
+        experiment_count: int
+        id: string
+        journal: string
+        omics_types: list
+        organisms: list
+        preferred_id: string
+        publication_year: int
+        study_type: string
+        title: string
+        treatment_types: list
+    Schema_info:
+      properties:
+        id: string
+        preferred_id: string
+        schema_info: string
+    TigrRole:
+      properties:
+        code: string
+        id: string
+        name: string
+        preferred_id: string
+  relationships:
+    Biological_process_is_a_biological_process:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      properties: {}
+    Biological_process_negatively_regulates_biological_process:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      properties: {}
+    Biological_process_part_of_biological_process:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      properties: {}
+    Biological_process_positively_regulates_biological_process:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      properties: {}
+    Cellular_component_is_a_cellular_component:
+      source_labels:
+      - AnatomicalEntity
+      - BiologicalEntity
+      - CellularComponent
+      - Entity
+      - NamedThing
+      - OrganismalEntity
+      target_labels:
+      - AnatomicalEntity
+      - BiologicalEntity
+      - CellularComponent
+      - Entity
+      - NamedThing
+      - OrganismalEntity
+      properties: {}
+    Cellular_component_part_of_cellular_component:
+      source_labels:
+      - AnatomicalEntity
+      - BiologicalEntity
+      - CellularComponent
+      - Entity
+      - NamedThing
+      - OrganismalEntity
+      target_labels:
+      - AnatomicalEntity
+      - BiologicalEntity
+      - CellularComponent
+      - Entity
+      - NamedThing
+      - OrganismalEntity
+      properties: {}
+    Changes_expression_of:
+      source_labels:
+      - Experiment
+      - InvestigativeProcess
+      target_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      properties:
+        adjusted_p_value: float
+        expression_direction: string
+        expression_status: string
+        id: string
+        log2_fold_change: float
+        rank_by_effect: int
+        significant: string
+        time_point: string
+        time_point_hours: float
+        time_point_order: int
+    Cyanorak_role_is_a_cyanorak_role:
+      source_labels:
+      - CyanorakRole
+      - Entity
+      - NamedThing
+      target_labels:
+      - CyanorakRole
+      - Entity
+      - NamedThing
+      properties:
+        id: string
+    Ec_number_is_a_ec_number:
+      source_labels:
+      - EcNumber
+      - Entity
+      - NamedThing
+      target_labels:
+      - EcNumber
+      - Entity
+      - NamedThing
+      properties: {}
+    Gene_belongs_to_organism:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - Entity
+      - NamedThing
+      - OrganismTaxon
+      properties:
+        id: string
+    Gene_catalyzes_ec_number:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - EcNumber
+      - Entity
+      - NamedThing
+      properties:
+        id: string
+    Gene_enables_molecular_function:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - BiologicalProcessOrActivity
+      - Entity
+      - MolecularFunction
+      - NamedThing
+      properties:
+        id: string
+    Gene_encodes_protein:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - Entity
+      - NamedThing
+      - Polypeptide
+      - Protein
+      properties:
+        licence: string
+        source: string
+        version: string
+    Gene_has_cyanorak_role:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - CyanorakRole
+      - Entity
+      - NamedThing
+      properties:
+        id: string
+    Gene_has_kegg_ko:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - Entity
+      - KeggTerm
+      - NamedThing
+      properties:
+        id: string
+    Gene_has_pfam:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - Entity
+      - NamedThing
+      - Pfam
+      properties:
+        id: string
+    Gene_has_tigr_role:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - Entity
+      - NamedThing
+      - TigrRole
+      properties:
+        id: string
+    Gene_in_cog_category:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - CogFunctionalCategory
+      - Entity
+      - NamedThing
+      properties:
+        id: string
+    Gene_in_ortholog_group:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - GroupingClass
+      - OrthologGroup
+      properties:
+        id: string
+    Gene_involved_in_biological_process:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      properties:
+        id: string
+    Gene_located_in_cellular_component:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      target_labels:
+      - AnatomicalEntity
+      - BiologicalEntity
+      - CellularComponent
+      - Entity
+      - NamedThing
+      - OrganismalEntity
+      properties:
+        id: string
+    Has_experiment:
+      source_labels:
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      - Publication
+      target_labels:
+      - Experiment
+      - InvestigativeProcess
+      properties:
+        id: string
+        licence: string
+        source: string
+        version: string
+    Kegg_term_is_a_kegg_term:
+      source_labels:
+      - Entity
+      - KeggTerm
+      - NamedThing
+      target_labels:
+      - Entity
+      - KeggTerm
+      - NamedThing
+      properties:
+        id: string
+    Molecular_function_is_a_molecular_function:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcessOrActivity
+      - Entity
+      - MolecularFunction
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - BiologicalProcessOrActivity
+      - Entity
+      - MolecularFunction
+      - NamedThing
+      properties: {}
+    Molecular_function_part_of_molecular_function:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcessOrActivity
+      - Entity
+      - MolecularFunction
+      - NamedThing
+      target_labels:
+      - BiologicalEntity
+      - BiologicalProcessOrActivity
+      - Entity
+      - MolecularFunction
+      - NamedThing
+      properties: {}
+    Og_has_cyanorak_role:
+      source_labels:
+      - GroupingClass
+      - OrthologGroup
+      target_labels:
+      - CyanorakRole
+      - Entity
+      - NamedThing
+      properties:
+        id: string
+    Og_in_cog_category:
+      source_labels:
+      - GroupingClass
+      - OrthologGroup
+      target_labels:
+      - CogFunctionalCategory
+      - Entity
+      - NamedThing
+      properties:
+        id: string
+    Pfam_in_pfam_clan:
+      source_labels:
+      - Entity
+      - NamedThing
+      - Pfam
+      target_labels:
+      - Entity
+      - NamedThing
+      - PfamClan
+      properties:
+        id: string
+    Protein_belongs_to_organism:
+      source_labels:
+      - BiologicalEntity
+      - Entity
+      - NamedThing
+      - Polypeptide
+      - Protein
+      target_labels:
+      - Entity
+      - NamedThing
+      - OrganismTaxon
+      properties:
+        licence: string
+        source: string
+        version: string
+    Tests_coculture_with:
+      source_labels:
+      - Experiment
+      - InvestigativeProcess
+      target_labels:
+      - Entity
+      - NamedThing
+      - OrganismTaxon
+      properties:
+        id: string
+        licence: string
+        source: string
+        version: string

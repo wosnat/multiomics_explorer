@@ -1,13 +1,175 @@
 case_id: list_experiments_treatment_types
 row_count: 31
 rows:
+- coculture_partner: Prochlorococcus MIT9312
+  experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 400 ppm pCO2 vs
+    Axenic at 400 ppm pCO2 (RNASEQ)
+  gene_count: 419
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/s43705-022-00197-2
+  significant_down_count: 111
+  significant_up_count: 308
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '111'
+  time_point_significant_up:
+  - '308'
+  time_point_totals:
+  - '419'
+  treatment_type: coculture
+- coculture_partner: Prochlorococcus MIT9312
+  experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 800 ppm pCO2 vs
+    Axenic at 800 ppm pCO2 (RNASEQ)
+  gene_count: 188
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/s43705-022-00197-2
+  significant_down_count: 84
+  significant_up_count: 104
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '84'
+  time_point_significant_up:
+  - '104'
+  time_point_totals:
+  - '188'
+  treatment_type: coculture
+- coculture_partner: Synechococcus CC9311
+  experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 400 ppm pCO2 vs Axenic
+    at 400 ppm pCO2 (RNASEQ)
+  gene_count: 293
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/s43705-022-00197-2
+  significant_down_count: 176
+  significant_up_count: 117
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '176'
+  time_point_significant_up:
+  - '117'
+  time_point_totals:
+  - '293'
+  treatment_type: coculture
+- coculture_partner: Synechococcus CC9311
+  experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 800 ppm pCO2 vs Axenic
+    at 800 ppm pCO2 (RNASEQ)
+  gene_count: 83
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/s43705-022-00197-2
+  significant_down_count: 52
+  significant_up_count: 31
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '52'
+  time_point_significant_up:
+  - '31'
+  time_point_totals:
+  - '83'
+  treatment_type: coculture
+- coculture_partner: Synechococcus WH8102
+  experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 400 ppm pCO2 vs Axenic
+    at 400 ppm pCO2 (RNASEQ)
+  gene_count: 136
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/s43705-022-00197-2
+  significant_down_count: 110
+  significant_up_count: 26
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '110'
+  time_point_significant_up:
+  - '26'
+  time_point_totals:
+  - '136'
+  treatment_type: coculture
+- coculture_partner: Synechococcus WH8102
+  experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
+  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 800 ppm pCO2 vs Axenic
+    at 800 ppm pCO2 (RNASEQ)
+  gene_count: 58
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/s43705-022-00197-2
+  significant_down_count: 31
+  significant_up_count: 27
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '31'
+  time_point_significant_up:
+  - '27'
+  time_point_totals:
+  - '58'
+  treatment_type: coculture
 - coculture_partner: Prochlorococcus MED4
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
   gene_count: 3950
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 163
   significant_up_count: 112
@@ -34,7 +196,7 @@ rows:
   gene_count: 11130
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 1003
   significant_up_count: 1379
@@ -85,7 +247,7 @@ rows:
   gene_count: 4452
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 578
   significant_up_count: 433
@@ -118,7 +280,7 @@ rows:
   gene_count: 19750
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 2449
   significant_up_count: 1675
@@ -169,7 +331,7 @@ rows:
   gene_count: 11850
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 1648
   significant_up_count: 778
@@ -201,13 +363,109 @@ rows:
   - '3950'
   - '3950'
   treatment_type: nitrogen_stress
+- coculture_partner: Prochlorococcus MIT9313
+  experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
+    inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
+  gene_count: 0
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1038/ismej.2016.70
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type: coculture
+- coculture_partner: Prochlorococcus MIT9313
+  experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
+    conditions (RNASEQ)
+  gene_count: 0
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1038/ismej.2016.70
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type: coculture
+- coculture_partner: Prochlorococcus NATL2A
+  experiment_id: 10.1038/ismej.2016.82_coculture_24_hours_after_coculturing_mit1002_rnaseq
+  experiment_name: MIT1002 24 hours after co-culturing with Prochlorococcus NATL2A
+    vs Co-culture with Prochlorococcus NATL2A (RNASEQ)
+  gene_count: 740
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1038/ismej.2016.82
+  significant_down_count: 0
+  significant_up_count: 458
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '24.0'
+  time_point_labels:
+  - 24h vs 12h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '458'
+  time_point_totals:
+  - '740'
+  treatment_type: coculture
+- coculture_partner: Prochlorococcus NATL2A
+  experiment_id: 10.1038/ismej.2016.82_coculture_48_hours_after_coculturing_mit1002_rnaseq
+  experiment_name: MIT1002 48 hours after co-culturing with Prochlorococcus NATL2A
+    vs Co-culture with Prochlorococcus NATL2A (RNASEQ)
+  gene_count: 740
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1038/ismej.2016.82
+  significant_down_count: 0
+  significant_up_count: 455
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '48.0'
+  time_point_labels:
+  - 48h vs 12h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '455'
+  time_point_totals:
+  - '740'
+  treatment_type: coculture
 - coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   gene_count: 1849
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 3
   significant_up_count: 59
@@ -234,7 +492,7 @@ rows:
   gene_count: 7120
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 394
   significant_up_count: 609
@@ -285,7 +543,7 @@ rows:
   gene_count: 4272
   is_time_course: 'true'
   omics_type: PROTEOMICS
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 556
   significant_up_count: 599
@@ -324,7 +582,7 @@ rows:
   gene_count: 9245
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 834
   significant_up_count: 553
@@ -375,7 +633,7 @@ rows:
   gene_count: 3698
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 640
   significant_up_count: 602
@@ -401,175 +659,13 @@ rows:
   - '1849'
   - '1849'
   treatment_type: nitrogen_stress
-- coculture_partner: Prochlorococcus MIT9312
-  experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 400 ppm pCO2 vs
-    Axenic at 400 ppm pCO2 (RNASEQ)
-  gene_count: 419
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii EZ55
-  publication_doi: 10.1038/s43705-022-00197-2
-  significant_down_count: 111
-  significant_up_count: 308
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '111'
-  time_point_significant_up:
-  - '308'
-  time_point_totals:
-  - '419'
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus MIT9312
-  experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 800 ppm pCO2 vs
-    Axenic at 800 ppm pCO2 (RNASEQ)
-  gene_count: 188
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii EZ55
-  publication_doi: 10.1038/s43705-022-00197-2
-  significant_down_count: 84
-  significant_up_count: 104
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '84'
-  time_point_significant_up:
-  - '104'
-  time_point_totals:
-  - '188'
-  treatment_type: coculture
-- coculture_partner: Synechococcus CC9311
-  experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 400 ppm pCO2 vs Axenic
-    at 400 ppm pCO2 (RNASEQ)
-  gene_count: 293
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii EZ55
-  publication_doi: 10.1038/s43705-022-00197-2
-  significant_down_count: 176
-  significant_up_count: 117
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '176'
-  time_point_significant_up:
-  - '117'
-  time_point_totals:
-  - '293'
-  treatment_type: coculture
-- coculture_partner: Synechococcus CC9311
-  experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 800 ppm pCO2 vs Axenic
-    at 800 ppm pCO2 (RNASEQ)
-  gene_count: 83
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii EZ55
-  publication_doi: 10.1038/s43705-022-00197-2
-  significant_down_count: 52
-  significant_up_count: 31
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '52'
-  time_point_significant_up:
-  - '31'
-  time_point_totals:
-  - '83'
-  treatment_type: coculture
-- coculture_partner: Synechococcus WH8102
-  experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 400 ppm pCO2 vs Axenic
-    at 400 ppm pCO2 (RNASEQ)
-  gene_count: 136
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii EZ55
-  publication_doi: 10.1038/s43705-022-00197-2
-  significant_down_count: 110
-  significant_up_count: 26
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '110'
-  time_point_significant_up:
-  - '26'
-  time_point_totals:
-  - '136'
-  treatment_type: coculture
-- coculture_partner: Synechococcus WH8102
-  experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 800 ppm pCO2 vs Axenic
-    at 800 ppm pCO2 (RNASEQ)
-  gene_count: 58
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii EZ55
-  publication_doi: 10.1038/s43705-022-00197-2
-  significant_down_count: 31
-  significant_up_count: 27
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '31'
-  time_point_significant_up:
-  - '27'
-  time_point_totals:
-  - '58'
-  treatment_type: coculture
 - coculture_partner: null
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   gene_count: 2534
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2017.88
   significant_down_count: 326
   significant_up_count: 271
@@ -601,102 +697,6 @@ rows:
   - '841'
   - '853'
   treatment_type: nitrogen_stress
-- coculture_partner: Prochlorococcus MIT9313
-  experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
-  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
-    inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii HOT1A3
-  publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus MIT9313
-  experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
-  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
-    conditions (RNASEQ)
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii HOT1A3
-  publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus NATL2A
-  experiment_id: 10.1038/ismej.2016.82_coculture_24_hours_after_coculturing_mit1002_rnaseq
-  experiment_name: MIT1002 24 hours after co-culturing with Prochlorococcus NATL2A
-    vs Co-culture with Prochlorococcus NATL2A (RNASEQ)
-  gene_count: 740
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii MIT1002
-  publication_doi: 10.1038/ismej.2016.82
-  significant_down_count: 0
-  significant_up_count: 458
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '24.0'
-  time_point_labels:
-  - 24h vs 12h
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '458'
-  time_point_totals:
-  - '740'
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus NATL2A
-  experiment_id: 10.1038/ismej.2016.82_coculture_48_hours_after_coculturing_mit1002_rnaseq
-  experiment_name: MIT1002 48 hours after co-culturing with Prochlorococcus NATL2A
-    vs Co-culture with Prochlorococcus NATL2A (RNASEQ)
-  gene_count: 740
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_strain: Alteromonas macleodii MIT1002
-  publication_doi: 10.1038/ismej.2016.82
-  significant_down_count: 0
-  significant_up_count: 455
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '48.0'
-  time_point_labels:
-  - 48h vs 12h
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '455'
-  time_point_totals:
-  - '740'
-  treatment_type: coculture
 - coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
@@ -704,7 +704,7 @@ rows:
   gene_count: 1714
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 272
   significant_up_count: 24
@@ -724,6 +724,117 @@ rows:
   time_point_totals:
   - '1714'
   treatment_type: coculture
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
+    medium (MED4) (MICROARRAY)
+  gene_count: 1696
+  is_time_course: 'false'
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/msb4100087
+  significant_down_count: 23
+  significant_up_count: 20
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '23'
+  time_point_significant_up:
+  - '20'
+  time_point_totals:
+  - '1696'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
+  experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
+    medium (MED4) (MICROARRAY)
+  gene_count: 1696
+  is_time_course: 'false'
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/msb4100087
+  significant_down_count: 14
+  significant_up_count: 18
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '14'
+  time_point_significant_up:
+  - '18'
+  time_point_totals:
+  - '1696'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
+    (MICROARRAY)
+  gene_count: 10176
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/msb4100087
+  significant_down_count: 476
+  significant_up_count: 392
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 6
+  time_point_hours:
+  - '0.0'
+  - '12.0'
+  - '24.0'
+  - '3.0'
+  - '48.0'
+  - '6.0'
+  time_point_labels:
+  - 0h
+  - 12h
+  - 24h
+  - 3h
+  - 48h
+  - 6h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  time_point_significant_down:
+  - '0'
+  - '123'
+  - '141'
+  - '162'
+  - '42'
+  - '8'
+  time_point_significant_up:
+  - '113'
+  - '145'
+  - '48'
+  - '5'
+  - '6'
+  - '75'
+  time_point_totals:
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
+  treatment_type: nitrogen_stress
 - coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -731,7 +842,7 @@ rows:
   gene_count: 2267
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 45
   significant_up_count: 153
@@ -758,7 +869,7 @@ rows:
   gene_count: 2268
   is_time_course: 'false'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 3
   significant_up_count: 96
@@ -778,6 +889,117 @@ rows:
   time_point_totals:
   - '2268'
   treatment_type: coculture
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
+  experiment_name: MIT9313 Growth on nitrite as sole N source (MIT9313) vs N-replete
+    Pro99 medium (MIT9313) (MICROARRAY)
+  gene_count: 2241
+  is_time_course: 'false'
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/msb4100087
+  significant_down_count: 8
+  significant_up_count: 12
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '8'
+  time_point_significant_up:
+  - '12'
+  time_point_totals:
+  - '2241'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
+  experiment_name: MIT9313 Growth on urea as sole N source (MIT9313) vs N-replete
+    Pro99 medium (MIT9313) (MICROARRAY)
+  gene_count: 2241
+  is_time_course: 'false'
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/msb4100087
+  significant_down_count: 61
+  significant_up_count: 49
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '61'
+  time_point_significant_up:
+  - '49'
+  time_point_totals:
+  - '2241'
+  treatment_type: nitrogen_stress
+- coculture_partner: null
+  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
+  experiment_name: MIT9313 Nitrogen deprivation (MIT9313) vs N-replete Pro99 medium
+    (MIT9313) (MICROARRAY)
+  gene_count: 13446
+  is_time_course: 'true'
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/msb4100087
+  significant_down_count: 604
+  significant_up_count: 305
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 6
+  time_point_hours:
+  - '0.0'
+  - '12.0'
+  - '24.0'
+  - '3.0'
+  - '48.0'
+  - '6.0'
+  time_point_labels:
+  - 0h
+  - 12h
+  - 24h
+  - 3h
+  - 48h
+  - 6h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '141'
+  - '339'
+  - '46'
+  - '78'
+  time_point_significant_up:
+  - '0'
+  - '1'
+  - '105'
+  - '123'
+  - '25'
+  - '51'
+  time_point_totals:
+  - '2241'
+  - '2241'
+  - '2241'
+  - '2241'
+  - '2241'
+  - '2241'
+  treatment_type: nitrogen_stress
 - coculture_partner: Alteromonas macleodii MIT1002
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
@@ -785,7 +1007,7 @@ rows:
   gene_count: 2471
   is_time_course: 'true'
   omics_type: RNASEQ
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1038/ismej.2016.82
   significant_down_count: 352
   significant_up_count: 221
@@ -841,225 +1063,3 @@ rows:
   - '353'
   - '353'
   treatment_type: coculture
-- coculture_partner: null
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
-  experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
-    medium (MED4) (MICROARRAY)
-  gene_count: 1696
-  is_time_course: 'false'
-  omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 23
-  significant_up_count: 20
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '23'
-  time_point_significant_up:
-  - '20'
-  time_point_totals:
-  - '1696'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
-  experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
-    medium (MED4) (MICROARRAY)
-  gene_count: 1696
-  is_time_course: 'false'
-  omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 14
-  significant_up_count: 18
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '14'
-  time_point_significant_up:
-  - '18'
-  time_point_totals:
-  - '1696'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
-  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
-    (MICROARRAY)
-  gene_count: 10176
-  is_time_course: 'true'
-  omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MED4
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 476
-  significant_up_count: 392
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 6
-  time_point_hours:
-  - '0.0'
-  - '12.0'
-  - '24.0'
-  - '3.0'
-  - '48.0'
-  - '6.0'
-  time_point_labels:
-  - 0h
-  - 12h
-  - 24h
-  - 3h
-  - 48h
-  - 6h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  time_point_significant_down:
-  - '0'
-  - '123'
-  - '141'
-  - '162'
-  - '42'
-  - '8'
-  time_point_significant_up:
-  - '113'
-  - '145'
-  - '48'
-  - '5'
-  - '6'
-  - '75'
-  time_point_totals:
-  - '1696'
-  - '1696'
-  - '1696'
-  - '1696'
-  - '1696'
-  - '1696'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
-  experiment_name: MIT9313 Growth on nitrite as sole N source (MIT9313) vs N-replete
-    Pro99 medium (MIT9313) (MICROARRAY)
-  gene_count: 2241
-  is_time_course: 'false'
-  omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MIT9313
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 8
-  significant_up_count: 12
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '8'
-  time_point_significant_up:
-  - '12'
-  time_point_totals:
-  - '2241'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
-  experiment_name: MIT9313 Growth on urea as sole N source (MIT9313) vs N-replete
-    Pro99 medium (MIT9313) (MICROARRAY)
-  gene_count: 2241
-  is_time_course: 'false'
-  omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MIT9313
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 61
-  significant_up_count: 49
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '61'
-  time_point_significant_up:
-  - '49'
-  time_point_totals:
-  - '2241'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  experiment_name: MIT9313 Nitrogen deprivation (MIT9313) vs N-replete Pro99 medium
-    (MIT9313) (MICROARRAY)
-  gene_count: 13446
-  is_time_course: 'true'
-  omics_type: MICROARRAY
-  organism_strain: Prochlorococcus MIT9313
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 604
-  significant_up_count: 305
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 6
-  time_point_hours:
-  - '0.0'
-  - '12.0'
-  - '24.0'
-  - '3.0'
-  - '48.0'
-  - '6.0'
-  time_point_labels:
-  - 0h
-  - 12h
-  - 24h
-  - 3h
-  - 48h
-  - 6h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  time_point_significant_down:
-  - '0'
-  - '0'
-  - '141'
-  - '339'
-  - '46'
-  - '78'
-  time_point_significant_up:
-  - '0'
-  - '1'
-  - '105'
-  - '123'
-  - '25'
-  - '51'
-  time_point_totals:
-  - '2241'
-  - '2241'
-  - '2241'
-  - '2241'
-  - '2241'
-  - '2241'
-  treatment_type: nitrogen_stress

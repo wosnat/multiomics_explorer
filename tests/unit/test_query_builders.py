@@ -61,7 +61,7 @@ class TestBuildResolveGene:
         cypher, params = build_resolve_gene(identifier="dnaN", organism="MED4")
         assert params["organism"] == "MED4"
         assert "toLower($organism)" in cypher
-        assert "toLower(g.organism_strain)" in cypher
+        assert "toLower(g.organism_name)" in cypher
 
     def test_organism_case_insensitive(self):
         """Organism filter uses toLower for case-insensitive matching."""
@@ -77,7 +77,7 @@ class TestBuildResolveGene:
 
     def test_returns_expected_columns(self):
         cypher, _ = build_resolve_gene(identifier="x")
-        for col in ["locus_tag", "gene_name", "product", "organism_strain"]:
+        for col in ["locus_tag", "gene_name", "product", "organism_name"]:
             assert col in cypher
 
     def test_matches_all_identifiers(self):
@@ -87,7 +87,7 @@ class TestBuildResolveGene:
 
     def test_order_by_organism_then_locus_tag(self):
         cypher, _ = build_resolve_gene(identifier="x")
-        assert "ORDER BY g.organism_strain, g.locus_tag" in cypher
+        assert "ORDER BY g.organism_name, g.locus_tag" in cypher
 
     def test_identifier_uses_tolower(self):
         """All three identifier match conditions use toLower for case-insensitive matching."""
@@ -138,7 +138,7 @@ class TestBuildGenesByFunction:
     def test_returns_expected_columns(self):
         """RETURN clause includes all compact columns."""
         cypher, _ = build_genes_by_function(search_text="x")
-        for col in ["locus_tag", "gene_name", "product", "organism_strain",
+        for col in ["locus_tag", "gene_name", "product", "organism_name",
                      "gene_category", "annotation_quality", "score"]:
             assert col in cypher
 
@@ -218,7 +218,7 @@ class TestBuildGeneOverview:
         assert params["locus_tags"] == ["PMM1428"]
         expected_columns = [
             "locus_tag", "gene_name", "product", "gene_category",
-            "annotation_quality", "organism_strain", "annotation_types",
+            "annotation_quality", "organism_name", "annotation_types",
             "expression_edge_count", "significant_up_count", "significant_down_count",
             "closest_ortholog_group_size", "closest_ortholog_genera",
         ]
@@ -352,7 +352,7 @@ class TestBuildGeneHomologs:
         """Compact mode (verbose=False) returns 8 columns."""
         cypher, _ = build_gene_homologs(locus_tags=["PMM0845"])
         for col in [
-            "locus_tag", "organism_strain", "group_id",
+            "locus_tag", "organism_name", "group_id",
             "consensus_gene_name", "consensus_product",
             "taxonomic_level", "source", "specificity_rank",
         ]:
@@ -791,7 +791,7 @@ class TestBuildGenesByOntology:
         cypher, _ = build_genes_by_ontology(
             ontology="go_bp", term_ids=["go:0006260"],
         )
-        for col in ["locus_tag", "gene_name", "product", "organism_strain"]:
+        for col in ["locus_tag", "gene_name", "product", "organism_name"]:
             assert col in cypher
 
     def test_invalid_ontology_raises_valueerror(self):
@@ -891,7 +891,7 @@ class TestBuildGenesByOntology:
         cypher, _ = build_genes_by_ontology(
             ontology="go_bp", term_ids=["go:0006260"],
         )
-        assert "ORDER BY g.organism_strain, g.locus_tag" in cypher
+        assert "ORDER BY g.organism_name, g.locus_tag" in cypher
 
     def test_gene_category_in_compact(self):
         cypher, _ = build_genes_by_ontology(
@@ -1001,18 +1001,18 @@ class TestBuildGeneOntologyTerms:
         assert "KeggTerm" in cypher
 
     def test_verbose_false(self):
-        """Compact mode does not include organism_strain in RETURN."""
+        """Compact mode does not include organism_name in RETURN."""
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="go_bp", verbose=False,
         )
-        assert "organism_strain" not in cypher
+        assert "organism_name" not in cypher
 
     def test_verbose_true(self):
-        """Verbose mode includes organism_strain in RETURN."""
+        """Verbose mode includes organism_name in RETURN."""
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="go_bp", verbose=True,
         )
-        assert "organism_strain" in cypher
+        assert "organism_name" in cypher
 
     def test_limit_clause(self):
         """LIMIT is added when limit is provided."""
@@ -1219,10 +1219,10 @@ class TestBuildListExperiments:
         assert params == {}
 
     def test_organism_filter(self):
-        """Organism filter uses ALL(word IN split) on organism_strain OR coculture_partner."""
+        """Organism filter uses ALL(word IN split) on organism_name OR coculture_partner."""
         cypher, params = build_list_experiments(organism="MED4")
         assert "ALL(word IN split(toLower($org)" in cypher
-        assert "toLower(e.organism_strain) CONTAINS word" in cypher
+        assert "toLower(e.organism_name) CONTAINS word" in cypher
         assert "toLower(e.coculture_partner) CONTAINS word" in cypher
         assert params["org"] == "MED4"
 
@@ -1291,7 +1291,7 @@ class TestBuildListExperiments:
         cypher, _ = build_list_experiments()
         for col in [
             "experiment_id", "experiment_name", "publication_doi",
-            "organism_strain", "treatment_type", "coculture_partner",
+            "organism_name", "treatment_type", "coculture_partner",
             "omics_type", "is_time_course",
             "table_scope", "table_scope_detail",
             "gene_count", "significant_up_count",
@@ -1324,7 +1324,7 @@ class TestBuildListExperiments:
     def test_order_by(self):
         """Without search_text, orders by year DESC, organism, name."""
         cypher, _ = build_list_experiments()
-        assert "ORDER BY p.publication_year DESC, e.organism_strain, e.name" in cypher
+        assert "ORDER BY p.publication_year DESC, e.organism_name, e.name" in cypher
 
     def test_limit_clause(self):
         """LIMIT is added when limit is provided."""
@@ -1500,7 +1500,7 @@ class TestBuildDifferentialExpressionByGeneSummaryGlobal:
     def test_returns_expected_keys(self):
         cypher, _ = build_differential_expression_by_gene_summary_global()
         for key in [
-            "total_rows", "matching_genes", "rows_by_status",
+            "total_matching", "matching_genes", "rows_by_status",
             "rows_by_treatment_type", "median_abs_log2fc", "max_abs_log2fc",
         ]:
             assert key in cypher
@@ -1527,7 +1527,7 @@ class TestBuildDifferentialExpressionByGeneSummaryByExperiment:
             build_differential_expression_by_gene_summary_by_experiment()
         )
         assert "Changes_expression_of" in cypher
-        assert "organism_strain" in cypher
+        assert "organism_name" in cypher
         assert "experiments" in cypher
         assert params == {}
 
@@ -1819,7 +1819,7 @@ class TestBuildGenesByHomologGroup:
         cypher, _ = build_genes_by_homolog_group(
             group_ids=["cyanorak:CK_1"])
         for col in ["locus_tag", "gene_name", "product",
-                     "organism_strain", "gene_category", "group_id"]:
+                     "organism_name", "gene_category", "group_id"]:
             assert f"AS {col}" in cypher
 
     def test_verbose_columns(self):
@@ -1962,7 +1962,7 @@ class TestBuildDifferentialExpressionByOrthologSummaryGlobal:
         cypher, _ = build_differential_expression_by_ortholog_summary_global(
             group_ids=["g1"],
         )
-        for key in ["total_rows", "matching_genes", "matching_groups",
+        for key in ["total_matching", "matching_genes", "matching_groups",
                      "experiment_count", "by_organism", "rows_by_status",
                      "rows_by_treatment_type", "by_table_scope",
                      "sig_log2fcs", "not_found_groups", "not_matched_groups"]:
@@ -2012,7 +2012,7 @@ class TestBuildDifferentialExpressionByOrthologResults:
             group_ids=["g1"],
         )
         for key in ["group_id", "consensus_gene_name", "consensus_product",
-                     "experiment_id", "treatment_type", "organism_strain",
+                     "experiment_id", "treatment_type", "organism_name",
                      "coculture_partner", "timepoint", "timepoint_hours",
                      "timepoint_order", "genes_with_expression",
                      "significant_up", "significant_down", "not_significant"]:
@@ -2039,6 +2039,13 @@ class TestBuildDifferentialExpressionByOrthologResults:
         assert "$limit" in cypher
         assert params["limit"] == 10
 
+    def test_limit_none(self):
+        cypher, params = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"], limit=None,
+        )
+        assert "LIMIT" not in cypher
+        assert "limit" not in params
+
     def test_order_by(self):
         cypher, _ = build_differential_expression_by_ortholog_results(
             group_ids=["g1"],
@@ -2053,7 +2060,7 @@ class TestBuildDifferentialExpressionByOrthologMembershipCounts:
         cypher, params = build_differential_expression_by_ortholog_membership_counts(
             group_ids=["g1"],
         )
-        for key in ["group_id", "organism_strain", "total_genes"]:
+        for key in ["group_id", "organism_name", "total_genes"]:
             assert key in cypher
 
     def test_organism_filter(self):

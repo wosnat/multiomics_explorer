@@ -314,11 +314,11 @@ class TestResolveGeneWrapper:
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
             return_value={
-                "total_matching": 1, "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}], "returned": 1, "truncated": False,
+                "total_matching": 1, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}], "returned": 1, "truncated": False,
                 "results": [
                     {"locus_tag": "PMM0001", "gene_name": "dnaN",
                      "product": "DNA pol III beta",
-                     "organism_strain": "Prochlorococcus MED4"},
+                     "organism_name": "Prochlorococcus MED4"},
                 ],
             },
         ):
@@ -332,7 +332,7 @@ class TestResolveGeneWrapper:
         assert r.locus_tag == "PMM0001"
         assert r.gene_name == "dnaN"
         assert r.product == "DNA pol III beta"
-        assert r.organism_strain == "Prochlorococcus MED4"
+        assert r.organism_name == "Prochlorococcus MED4"
 
     @pytest.mark.asyncio
     async def test_not_found_empty_results(self, tool_fns, mock_ctx):
@@ -353,14 +353,14 @@ class TestResolveGeneWrapper:
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
             return_value={
-                "total_matching": 3, "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1}, {"organism_name": "Prochlorococcus MIT9312", "gene_count": 1}, {"organism_name": "Synechococcus WH8102", "gene_count": 1}], "returned": 3, "truncated": False,
+                "total_matching": 3, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}, {"organism_name": "Prochlorococcus MIT9312", "count": 1}, {"organism_name": "Synechococcus WH8102", "count": 1}], "returned": 3, "truncated": False,
                 "results": [
                     {"locus_tag": "PMM0001", "gene_name": "dnaN",
-                     "product": "p1", "organism_strain": "Prochlorococcus MED4"},
+                     "product": "p1", "organism_name": "Prochlorococcus MED4"},
                     {"locus_tag": "PMT9312_0001", "gene_name": "dnaN",
-                     "product": "p2", "organism_strain": "Prochlorococcus MIT9312"},
+                     "product": "p2", "organism_name": "Prochlorococcus MIT9312"},
                     {"locus_tag": "SYNW0305", "gene_name": None,
-                     "product": "p3", "organism_strain": "Synechococcus WH8102"},
+                     "product": "p3", "organism_name": "Synechococcus WH8102"},
                 ],
             },
         ):
@@ -369,8 +369,8 @@ class TestResolveGeneWrapper:
         assert result.total_matching == 3
         assert result.returned == 3
         assert len(result.results) == 3
-        # Flat list — each entry has organism_strain as an attribute
-        organisms = {r.organism_strain for r in result.results}
+        # Flat list — each entry has organism_name as an attribute
+        organisms = {r.organism_name for r in result.results}
         assert organisms == {"Prochlorococcus MED4", "Prochlorococcus MIT9312", "Synechococcus WH8102"}
 
     @pytest.mark.asyncio
@@ -396,12 +396,12 @@ class TestResolveGeneWrapper:
         with patch(
             "multiomics_explorer.api.functions.resolve_gene",
             return_value={
-                "total_matching": 5, "by_organism": [{"organism_name": "Org1", "gene_count": 3}, {"organism_name": "Org2", "gene_count": 2}], "returned": 2, "truncated": True,
+                "total_matching": 5, "by_organism": [{"organism_name": "Org1", "count": 3}, {"organism_name": "Org2", "count": 2}], "returned": 2, "truncated": True,
                 "results": [
                     {"locus_tag": "PMM0001", "gene_name": "a",
-                     "product": "p1", "organism_strain": "Org1"},
+                     "product": "p1", "organism_name": "Org1"},
                     {"locus_tag": "PMM0002", "gene_name": "b",
-                     "product": "p2", "organism_strain": "Org2"},
+                     "product": "p2", "organism_name": "Org2"},
                 ],
             },
         ):
@@ -444,8 +444,8 @@ class TestGenesByFunctionWrapper:
     _SAMPLE_API_RETURN = {
         "total_entries": 100,
         "total_matching": 5,
-        "by_organism": [{"organism": "Prochlorococcus MED4", "count": 3},
-                        {"organism": "Synechococcus WH8102", "count": 2}],
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 3},
+                        {"organism_name": "Synechococcus WH8102", "count": 2}],
         "by_category": [{"category": "DNA replication", "count": 3},
                         {"category": "Photosynthesis", "count": 2}],
         "score_max": 8.5,
@@ -455,12 +455,12 @@ class TestGenesByFunctionWrapper:
         "results": [
             {"locus_tag": "PMM0001", "gene_name": "dnaN",
              "product": "DNA polymerase III subunit beta",
-             "organism_strain": "Prochlorococcus MED4",
+             "organism_name": "Prochlorococcus MED4",
              "gene_category": "DNA replication",
              "annotation_quality": 3, "score": 5.0},
             {"locus_tag": "SYNW0305", "gene_name": "ftsH1",
              "product": "ATP-dependent metalloprotease FtsH",
-             "organism_strain": "Synechococcus WH8102",
+             "organism_name": "Synechococcus WH8102",
              "gene_category": None,
              "annotation_quality": 2, "score": 3.5},
         ],
@@ -483,7 +483,7 @@ class TestGenesByFunctionWrapper:
         assert result.score_max == 8.5
         assert result.score_median == 4.2
         assert len(result.by_organism) == 2
-        assert result.by_organism[0].organism == "Prochlorococcus MED4"
+        assert result.by_organism[0].organism_name == "Prochlorococcus MED4"
         assert len(result.by_category) == 2
         assert len(result.results) == 2
         r = result.results[0]
@@ -599,13 +599,13 @@ class TestGeneOverviewWrapper:
         "results": [
             {"locus_tag": "PMM1428", "gene_name": "test", "product": "test product",
              "gene_category": "DNA replication", "annotation_quality": 3,
-             "organism_strain": "Prochlorococcus MED4",
+             "organism_name": "Prochlorococcus MED4",
              "annotation_types": ["go_bp"], "expression_edge_count": 36,
              "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9,
              "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]},
             {"locus_tag": "EZ55_00275", "gene_name": None, "product": "hypothetical",
              "gene_category": "Unknown", "annotation_quality": 0,
-             "organism_strain": "Alteromonas EZ55",
+             "organism_name": "Alteromonas EZ55",
              "annotation_types": [], "expression_edge_count": 0,
              "significant_up_count": 0, "significant_down_count": 0, "closest_ortholog_group_size": 1,
              "closest_ortholog_genera": []},
@@ -711,7 +711,7 @@ class TestGeneDetailsWrapper:
     @pytest.mark.asyncio
     async def test_returns_pydantic_model(self, tool_fns, mock_ctx):
         """V3: returns GeneDetailResponse Pydantic model."""
-        gene_data = {"locus_tag": "PMM0001", "product": "test", "organism_strain": "Prochlorococcus MED4"}
+        gene_data = {"locus_tag": "PMM0001", "product": "test", "organism_name": "Prochlorococcus MED4"}
         with patch(
             "multiomics_explorer.api.functions.gene_details",
             return_value={
@@ -753,12 +753,12 @@ class TestGeneHomologsWrapper:
         "not_found": [],
         "no_groups": [],
         "results": [
-            {"locus_tag": "PMM0001", "organism_strain": "Prochlorococcus MED4",
+            {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4",
              "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
              "taxonomic_level": "curated", "source": "cyanorak",
              "specificity_rank": 0},
-            {"locus_tag": "SYNW0305", "organism_strain": "Synechococcus WH8102",
+            {"locus_tag": "SYNW0305", "organism_name": "Synechococcus WH8102",
              "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
              "consensus_product": "DNA polymerase III subunit beta",
              "taxonomic_level": "curated", "source": "cyanorak",
@@ -1122,18 +1122,18 @@ class TestSearchOntologyWrapper:
 class TestGenesByOntologyWrapper:
     _SAMPLE_API_RETURN = {
         "total_matching": 2,
-        "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1},
-                       {"organism": "Alteromonas macleodii MIT1002", "count": 1}],
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1},
+                       {"organism_name": "Alteromonas macleodii MIT1002", "count": 1}],
         "by_category": [{"category": "Replication and repair", "count": 2}],
         "by_term": [{"term_id": "go:0006260", "count": 2}],
         "returned": 2,
         "truncated": False,
         "results": [
             {"locus_tag": "PMM0120", "gene_name": "dnaN", "product": "p1",
-             "organism_strain": "Prochlorococcus MED4",
+             "organism_name": "Prochlorococcus MED4",
              "gene_category": "Replication and repair"},
             {"locus_tag": "MIT1002_00001", "gene_name": "geneA", "product": "p2",
-             "organism_strain": "Alteromonas macleodii MIT1002",
+             "organism_name": "Alteromonas macleodii MIT1002",
              "gene_category": "Translation"},
         ],
     }
@@ -1152,7 +1152,7 @@ class TestGenesByOntologyWrapper:
         assert result.returned == 2
         assert result.truncated is False
         assert len(result.by_organism) == 2
-        assert result.by_organism[0].organism == "Prochlorococcus MED4"
+        assert result.by_organism[0].organism_name == "Prochlorococcus MED4"
         assert len(result.by_category) == 1
         assert len(result.by_term) == 1
         assert result.by_term[0].term_id == "go:0006260"
@@ -1584,9 +1584,9 @@ class TestListPublicationsWrapper:
             return_value={
                 "total_entries": 21,
                 "total_matching": 21,
-                "by_organism": [{"organism_name": "Prochlorococcus MED4", "publication_count": 1}],
-                "by_treatment_type": [{"treatment_type": "coculture", "publication_count": 1}],
-                "by_omics_type": [{"omics_type": "RNASEQ", "publication_count": 1}],
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+                "by_treatment_type": [{"treatment_type": "coculture", "count": 1}],
+                "by_omics_type": [{"omics_type": "RNASEQ", "count": 1}],
                 "returned": 1,
                 "truncated": True,
                 "results": [self._SAMPLE_PUB],
@@ -1680,11 +1680,11 @@ class TestListExperimentsWrapper:
     _SAMPLE_SUMMARY = {
         "total_entries": 76,
         "total_matching": 76,
-        "by_organism": [{"organism_strain": "Prochlorococcus MED4", "experiment_count": 30}],
-        "by_treatment_type": [{"treatment_type": "coculture", "experiment_count": 16}],
-        "by_omics_type": [{"omics_type": "RNASEQ", "experiment_count": 48}],
-        "by_publication": [{"publication_doi": "10.1038/ismej.2016.70", "experiment_count": 5}],
-        "by_table_scope": [{"table_scope": "all_detected_genes", "experiment_count": 22}],
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 30}],
+        "by_treatment_type": [{"treatment_type": "coculture", "count": 16}],
+        "by_omics_type": [{"omics_type": "RNASEQ", "count": 48}],
+        "by_publication": [{"publication_doi": "10.1038/ismej.2016.70", "count": 5}],
+        "by_table_scope": [{"table_scope": "all_detected_genes", "count": 22}],
         "time_course_count": 29,
         "score_max": None,
         "score_median": None,
@@ -1697,7 +1697,7 @@ class TestListExperimentsWrapper:
         "experiment_id": "test_exp_1",
         "experiment_name": "MED4 Coculture with Alteromonas HOT1A3 (RNASEQ)",
         "publication_doi": "10.1234/test",
-        "organism_strain": "Prochlorococcus MED4",
+        "organism_name": "Prochlorococcus MED4",
         "treatment_type": "coculture",
         "coculture_partner": "Alteromonas macleodii HOT1A3",
         "omics_type": "RNASEQ",
@@ -1729,8 +1729,8 @@ class TestListExperimentsWrapper:
         assert result.truncated is True
         assert result.results == []
         assert len(result.by_organism) == 1
-        assert result.by_organism[0].organism_strain == "Prochlorococcus MED4"
-        assert result.by_organism[0].experiment_count == 30
+        assert result.by_organism[0].organism_name == "Prochlorococcus MED4"
+        assert result.by_organism[0].count == 30
         assert result.time_course_count == 29
 
     @pytest.mark.asyncio
@@ -1931,7 +1931,7 @@ class TestListExperimentsWrapper:
             result = await tool_fns["list_experiments"](mock_ctx, summary=True)
         assert len(result.by_table_scope) == 1
         assert result.by_table_scope[0].table_scope == "all_detected_genes"
-        assert result.by_table_scope[0].experiment_count == 22
+        assert result.by_table_scope[0].count == 22
 
     @pytest.mark.asyncio
     async def test_genes_by_status_in_experiment(self, tool_fns, mock_ctx):
@@ -1974,9 +1974,9 @@ class TestListExperimentsWrapper:
 # ---------------------------------------------------------------------------
 class TestDifferentialExpressionByGeneWrapper:
     _SAMPLE_API_RETURN = {
-        "organism_strain": "Prochlorococcus MED4",
+        "organism_name": "Prochlorococcus MED4",
         "matching_genes": 5,
-        "total_rows": 15,
+        "total_matching": 15,
         "rows_by_status": {
             "significant_up": 3,
             "significant_down": 0,
@@ -2053,8 +2053,8 @@ class TestDifferentialExpressionByGeneWrapper:
             result = await tool_fns["differential_expression_by_gene"](
                 mock_ctx, organism="MED4",
             )
-        assert result.organism_strain == "Prochlorococcus MED4"
-        assert result.total_rows == 15
+        assert result.organism_name == "Prochlorococcus MED4"
+        assert result.total_matching == 15
         assert result.matching_genes == 5
         assert result.returned == 1
         assert result.truncated is True
@@ -2293,8 +2293,8 @@ class TestGenesByHomologGroupWrapper:
         "total_categories": 1,
         "genes_per_group_max": 9,
         "genes_per_group_median": 9.0,
-        "by_organism": [{"organism": "Prochlorococcus MED4", "count": 1},
-                        {"organism": "Prochlorococcus AS9601", "count": 1}],
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1},
+                        {"organism_name": "Prochlorococcus AS9601", "count": 1}],
         "top_categories": [{"category": "Photosynthesis", "count": 9}],
         "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 9}],
         "not_found_groups": [],
@@ -2306,12 +2306,12 @@ class TestGenesByHomologGroupWrapper:
         "results": [
             {"locus_tag": "A9601_03391", "gene_name": "psbB",
              "product": "photosystem II chlorophyll-binding protein CP47",
-             "organism_strain": "Prochlorococcus AS9601",
+             "organism_name": "Prochlorococcus AS9601",
              "gene_category": "Photosynthesis",
              "group_id": "cyanorak:CK_00000570"},
             {"locus_tag": "PMM0315", "gene_name": "psbB",
              "product": "photosystem II chlorophyll-binding protein CP47",
-             "organism_strain": "Prochlorococcus MED4",
+             "organism_name": "Prochlorococcus MED4",
              "gene_category": "Photosynthesis",
              "group_id": "cyanorak:CK_00000570"},
         ],
@@ -2428,13 +2428,13 @@ class TestDifferentialExpressionByOrthologWrapper:
     """Tests for differential_expression_by_ortholog MCP wrapper."""
 
     _SAMPLE_API_RETURN = {
-        "total_rows": 10,
+        "total_matching": 10,
         "matching_genes": 3,
         "matching_groups": 1,
         "experiment_count": 2,
         "median_abs_log2fc": 1.5,
         "max_abs_log2fc": 3.0,
-        "by_organism": [{"organism": "MED4", "count": 10}],
+        "by_organism": [{"organism_name": "MED4", "count": 10}],
         "rows_by_status": {"significant_up": 5, "significant_down": 3,
                            "not_significant": 2},
         "rows_by_treatment_type": {"nitrogen_limitation": 10},
@@ -2444,7 +2444,7 @@ class TestDifferentialExpressionByOrthologWrapper:
                         "significant_genes": 3, "total_genes": 5}],
         "top_experiments": [{"experiment_id": "EXP001",
                              "treatment_type": "nitrogen_limitation",
-                             "organism_strain": "MED4",
+                             "organism_name": "MED4",
                              "significant_genes": 3}],
         "not_found_groups": [],
         "not_matched_groups": [],
@@ -2458,7 +2458,7 @@ class TestDifferentialExpressionByOrthologWrapper:
             {"group_id": "g1", "consensus_gene_name": "psbB",
              "consensus_product": "CP47", "experiment_id": "EXP001",
              "treatment_type": "nitrogen_limitation",
-             "organism_strain": "MED4", "coculture_partner": None,
+             "organism_name": "MED4", "coculture_partner": None,
              "timepoint": "24h", "timepoint_hours": 24.0,
              "timepoint_order": 3, "genes_with_expression": 3,
              "total_genes": 5, "significant_up": 2,
@@ -2476,7 +2476,7 @@ class TestDifferentialExpressionByOrthologWrapper:
             result = await tool_fns["differential_expression_by_ortholog"](
                 mock_ctx, group_ids=["g1"],
             )
-        assert result.total_rows == 10
+        assert result.total_matching == 10
         assert result.returned == 1
         assert len(result.results) == 1
 
@@ -2490,6 +2490,7 @@ class TestDifferentialExpressionByOrthologWrapper:
                 mock_ctx, group_ids=["g1"],
                 organisms=["MED4"], direction="up",
                 significant_only=True, verbose=True, limit=10,
+                summary=True,
             )
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs
@@ -2499,11 +2500,12 @@ class TestDifferentialExpressionByOrthologWrapper:
         assert call_kwargs["significant_only"] is True
         assert call_kwargs["verbose"] is True
         assert call_kwargs["limit"] == 10
+        assert call_kwargs["summary"] is True
 
     @pytest.mark.asyncio
     async def test_empty_results(self, tool_fns, mock_ctx):
         empty_return = {
-            "total_rows": 0, "matching_genes": 0, "matching_groups": 0,
+            "total_matching": 0, "matching_genes": 0, "matching_groups": 0,
             "experiment_count": 0, "median_abs_log2fc": None,
             "max_abs_log2fc": None, "results": [], "returned": 0,
             "truncated": False,

@@ -5,7 +5,7 @@ rows:
   consensus_product: possible M protein repeat
   group_id: cyanorak:CK_00003570
   locus_tag: PMM1375
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated

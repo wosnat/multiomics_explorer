@@ -4,75 +4,75 @@ rows:
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: A9601_11931
-  organism_strain: Prochlorococcus AS9601
+  organism_name: Prochlorococcus AS9601
   product: glycerol dehydrogenase
 - gene_category: Energy production
   gene_name: null
   locus_tag: ACZ81_02780
-  organism_strain: Alteromonas macleodii HOT1A3
+  organism_name: Alteromonas macleodii HOT1A3
   product: zinc-dependent alcohol dehydrogenase family protein
 - gene_category: Energy production
   gene_name: gldA
   locus_tag: BSR22_08845
-  organism_strain: Prochlorococcus RSP50
+  organism_name: Prochlorococcus RSP50
   product: iron-containing alcohol dehydrogenase
 - gene_category: Energy production
   gene_name: null
   locus_tag: EZ55_02056
-  organism_strain: Alteromonas macleodii EZ55
+  organism_name: Alteromonas macleodii EZ55
   product: zinc-dependent alcohol dehydrogenase family protein
 - gene_category: Energy production
   gene_name: null
   locus_tag: MIT1002_00636
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   product: zinc-dependent alcohol dehydrogenase family protein
 - gene_category: Energy production
   gene_name: null
   locus_tag: MIT1002_02335
-  organism_strain: Alteromonas macleodii MIT1002
+  organism_name: Alteromonas macleodii MIT1002
   product: zinc-dependent alcohol dehydrogenase family protein
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: NATL1_14931
-  organism_strain: Prochlorococcus NATL1A
+  organism_name: Prochlorococcus NATL1A
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: P9301_11941
-  organism_strain: Prochlorococcus MIT9301
+  organism_name: Prochlorococcus MIT9301
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: PMM1087
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: PMN2A_0661
-  organism_strain: Prochlorococcus NATL2A
+  organism_name: Prochlorococcus NATL2A
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: PMT1062
-  organism_strain: Prochlorococcus MIT9313
+  organism_name: Prochlorococcus MIT9313
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: PMT9312_1098
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: SYNW0939
-  organism_strain: Synechococcus WH8102
+  organism_name: Synechococcus WH8102
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: sync_1026
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: glycerol dehydrogenase
 - gene_category: Energy production
   gene_name: null
   locus_tag: sync_2669
-  organism_strain: Synechococcus CC9311
+  organism_name: Synechococcus CC9311
   product: iron-containing alcohol dehydrogenase family protein

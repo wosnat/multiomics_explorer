@@ -3,5 +3,5 @@ row_count: 1
 rows:
 - gene_name: null
   locus_tag: PMT9312_0342
-  organism_strain: Prochlorococcus MIT9312
+  organism_name: Prochlorococcus MIT9312
   product: hypothetical protein

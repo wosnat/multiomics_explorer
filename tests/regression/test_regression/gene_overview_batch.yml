@@ -10,7 +10,7 @@ rows:
   gene_category: Unknown
   gene_name: null
   locus_tag: EZ55_00275
-  organism_strain: Alteromonas macleodii EZ55
+  organism_name: Alteromonas macleodii EZ55
   product: hypothetical protein
   significant_down_count: 0
   significant_up_count: 0
@@ -28,7 +28,7 @@ rows:
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM1428
-  organism_strain: Prochlorococcus MED4
+  organism_name: Prochlorococcus MED4
   product: EVE domain protein
   significant_down_count: 1
   significant_up_count: 4
