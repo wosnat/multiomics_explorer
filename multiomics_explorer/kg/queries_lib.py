@@ -124,10 +124,10 @@ def build_genes_by_function_summary(
 ) -> tuple[str, dict]:
     """Build summary Cypher for genes_by_function.
 
-    Uses conditional counting to compute total_entries (before filters)
-    and total_matching (after filters) in a single fulltext pass.
+    Uses conditional counting to compute total_search_hits (fulltext hits
+    before post-filters) and total_matching (after filters) in a single pass.
 
-    RETURN keys: total_entries, total_matching, by_organism, by_category,
+    RETURN keys: total_search_hits, total_matching, by_organism, by_category,
     score_max, score_median.
     """
     filt = _genes_by_function_filter_clause()
@@ -137,7 +137,7 @@ def build_genes_by_function_summary(
         f"WITH g, score,\n"
         f"     CASE WHEN {filt}\n"
         "     THEN 1 ELSE 0 END AS matches\n"
-        "WITH count(g) AS total_entries,\n"
+        "WITH count(g) AS total_search_hits,\n"
         "     sum(matches) AS total_matching,\n"
         "     max(CASE WHEN matches = 1 THEN score END) AS score_max,\n"
         "     percentileDisc(\n"
@@ -149,7 +149,7 @@ def build_genes_by_function_summary(
         "     [x IN collect(\n"
         "       CASE WHEN matches = 1 THEN g.gene_category END\n"
         "     ) WHERE x IS NOT NULL] AS categories\n"
-        "RETURN total_entries, total_matching, score_max, score_median,\n"
+        "RETURN total_search_hits, total_matching, score_max, score_median,\n"
         "       apoc.coll.frequencies(organisms) AS by_organism,\n"
         "       apoc.coll.frequencies(categories) AS by_category"
     )
@@ -677,12 +677,12 @@ def _list_experiments_where(
 
     if organism:
         conditions.append(
-            "(ALL(word IN split(toLower($org), ' ')"
+            "(ALL(word IN split(toLower($organism), ' ')"
             " WHERE toLower(e.organism_name) CONTAINS word)"
-            " OR ALL(word IN split(toLower($org), ' ')"
+            " OR ALL(word IN split(toLower($organism), ' ')"
             " WHERE toLower(e.coculture_partner) CONTAINS word))"
         )
-        params["org"] = organism
+        params["organism"] = organism
 
     if treatment_type:
         conditions.append("toLower(e.treatment_type) IN $treatment_types")
@@ -864,10 +864,10 @@ def build_list_experiments_summary(
             "MATCH (p:Publication)-[:Has_experiment]->(e)\n"
             f"{where_block}"
             f"WITH {collect_cols},\n"
-            "     collect(score) AS scores\n"
+            "     max(score) AS score_max,\n"
+            "     percentileDisc(score, 0.5) AS score_median\n"
             f"RETURN {return_cols},\n"
-            "       apoc.coll.max(scores) AS score_max,\n"
-            "       apoc.coll.sort(scores)[size(scores)/2] AS score_median"
+            "       score_max, score_median"
         )
     else:
         cypher = (
@@ -1052,17 +1052,11 @@ def build_genes_by_ontology_summary(
         "WITH collect({lt: lt, org: org, cat: cat, tid: root_tid}) AS rows\n"
         "WITH rows,\n"
         "     size(apoc.coll.toSet([r IN rows | r.lt])) AS total_matching,\n"
-        "     apoc.coll.frequencies([r IN rows | r.tid]) AS by_term\n"
-        "WITH total_matching, by_term, rows,\n"
-        "     apoc.coll.toSet([r IN rows | r.lt]) AS unique_lts\n"
-        "UNWIND unique_lts AS lt\n"
-        "WITH total_matching, by_term,\n"
-        "     [r IN rows WHERE r.lt = lt][0] AS rep\n"
-        "WITH total_matching, by_term,\n"
-        "     collect(rep.org) AS orgs, collect(rep.cat) AS cats\n"
+        "     apoc.coll.frequencies([r IN rows | r.tid]) AS by_term,\n"
+        "     apoc.coll.toSet([r IN rows | {lt: r.lt, org: r.org, cat: r.cat}]) AS unique_genes\n"
         "RETURN total_matching, by_term,\n"
-        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
-        "       apoc.coll.frequencies(cats) AS by_category"
+        "       apoc.coll.frequencies([g IN unique_genes | g.org]) AS by_organism,\n"
+        "       apoc.coll.frequencies([g IN unique_genes | g.cat]) AS by_category"
     )
     return cypher, {"term_ids": term_ids, "organism": organism}
 
@@ -1241,18 +1235,19 @@ def build_gene_ontology_terms(
     return cypher, params
 
 
-def build_gene_existence_check() -> tuple[str, dict]:
+def build_gene_existence_check(
+    *, locus_tags: list[str],
+) -> tuple[str, dict]:
     """Build query to check which locus_tags exist in the KG.
 
     RETURN keys: lt, found.
-    Pass locus_tags as parameter when executing.
     """
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
         "RETURN lt, g IS NOT NULL AS found"
     )
-    return cypher, {}
+    return cypher, {"locus_tags": locus_tags}
 
 
 # ---------------------------------------------------------------------------
@@ -1289,11 +1284,11 @@ def _differential_expression_where(
         conditions.append("e.id IN $experiment_ids")
         params["experiment_ids"] = experiment_ids
     if direction == "up":
-        conditions.append('r.expression_status = "significant_up"')
+        conditions.append("r.expression_status = 'significant_up'")
     elif direction == "down":
-        conditions.append('r.expression_status = "significant_down"')
+        conditions.append("r.expression_status = 'significant_down'")
     elif significant_only:
-        conditions.append('r.expression_status <> "not_significant"')
+        conditions.append("r.expression_status <> 'not_significant'")
     return conditions, params
 
 
@@ -1311,8 +1306,9 @@ def build_resolve_organism_for_organism(
     Uses the same word-based CONTAINS matching as list_experiments.
     """
     cypher = (
-        "MATCH (e:Experiment)-[:Changes_expression_of]->()\n"
-        "WHERE ALL(word IN split(toLower($organism), ' ')"
+        "MATCH (e:Experiment)\n"
+        "WHERE e.gene_count > 0\n"
+        "  AND ALL(word IN split(toLower($organism), ' ')"
         " WHERE toLower(e.organism_name) CONTAINS word)\n"
         "RETURN collect(DISTINCT e.organism_name) AS organisms"
     )
@@ -1386,10 +1382,10 @@ def build_differential_expression_by_gene_summary_global(
         "       apoc.coll.frequencies(collect(e.treatment_type)) AS rows_by_treatment_type,\n"
         "       apoc.coll.frequencies(collect(e.table_scope)) AS by_table_scope,\n"
         "       percentileCont(\n"
-        '           CASE WHEN r.expression_status <> "not_significant"\n'
+        "           CASE WHEN r.expression_status <> 'not_significant'\n"
         "                THEN abs(r.log2_fold_change) ELSE null END, 0.5\n"
         "       ) AS median_abs_log2fc,\n"
-        '       max(CASE WHEN r.expression_status <> "not_significant"\n'
+        "       max(CASE WHEN r.expression_status <> 'not_significant'\n"
         "               THEN abs(r.log2_fold_change) END) AS max_abs_log2fc"
     )
     return cypher, params
@@ -1479,7 +1475,7 @@ def build_differential_expression_by_gene_summary_diagnostics(
             f"{where_block}"
             "WITH g.gene_category AS category,\n"
             "     count(DISTINCT g.locus_tag) AS total_genes,\n"
-            '     count(DISTINCT CASE WHEN r.expression_status <> "not_significant"\n'
+            "     count(DISTINCT CASE WHEN r.expression_status <> 'not_significant'\n"
             "                         THEN g.locus_tag END) AS significant_genes\n"
             "ORDER BY significant_genes DESC\n"
             "RETURN [] AS not_found, [] AS no_expression,\n"
@@ -1522,7 +1518,7 @@ def build_differential_expression_by_gene_summary_diagnostics(
         "     [x IN no_expr_raw  WHERE x IS NOT NULL] AS no_expression,\n"
         "     g.gene_category AS category,\n"
         "     count(DISTINCT g.locus_tag) AS total_genes,\n"
-        '     count(DISTINCT CASE WHEN r.expression_status <> "not_significant"\n'
+        "     count(DISTINCT CASE WHEN r.expression_status <> 'not_significant'\n"
         "                         THEN g.locus_tag END) AS significant_genes\n"
         "ORDER BY significant_genes DESC\n"
         "RETURN not_found, no_expression,\n"
@@ -1565,7 +1561,7 @@ def build_differential_expression_by_gene(
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
     verbose_cols = (
-        ",\n       g.function_description AS product"
+        ",\n       g.product AS product"
         ",\n       e.name AS experiment_name"
         ",\n       e.treatment AS treatment"
         ",\n       g.gene_category AS gene_category"
@@ -1851,17 +1847,34 @@ def _differential_expression_by_ortholog_where(
         conditions.append("e.id IN $experiment_ids")
         params["experiment_ids"] = experiment_ids
     if direction == "up":
-        conditions.append('r.expression_status = "significant_up"')
+        conditions.append("r.expression_status = 'significant_up'")
     elif direction == "down":
-        conditions.append('r.expression_status = "significant_down"')
+        conditions.append("r.expression_status = 'significant_down'")
     elif significant_only:
-        conditions.append('r.expression_status <> "not_significant"')
+        conditions.append("r.expression_status <> 'not_significant'")
     return conditions, params
 
 
 # ---------------------------------------------------------------------------
 # Differential expression by ortholog — summary builders
 # ---------------------------------------------------------------------------
+
+
+def build_differential_expression_by_ortholog_group_check(
+    *,
+    group_ids: list[str],
+) -> tuple[str, dict]:
+    """Check which group_ids exist as OrthologGroup nodes.
+
+    RETURN keys: not_found (list[str]).
+    """
+    cypher = (
+        "UNWIND $group_ids AS gid\n"
+        "OPTIONAL MATCH (og:OrthologGroup {id: gid})\n"
+        "WITH collect(CASE WHEN og IS NULL THEN gid END) AS nf_raw\n"
+        "RETURN [x IN nf_raw WHERE x IS NOT NULL] AS not_found"
+    )
+    return cypher, {"group_ids": group_ids}
 
 
 def build_differential_expression_by_ortholog_summary_global(
@@ -1874,9 +1887,11 @@ def build_differential_expression_by_ortholog_summary_global(
 ) -> tuple[str, dict]:
     """Global aggregate stats for differential_expression_by_ortholog.
 
+    Uses MATCH (not OPTIONAL) — caller should pass only found group_ids.
+
     RETURN keys: total_matching, matching_genes, matching_groups,
     experiment_count, by_organism, rows_by_status, rows_by_treatment_type,
-    by_table_scope, sig_log2fcs, not_found_groups, not_matched_groups.
+    by_table_scope, sig_log2fcs, matched_group_ids.
     """
     conditions, params = _differential_expression_by_ortholog_where(
         organisms=organisms, experiment_ids=experiment_ids,
@@ -1888,27 +1903,17 @@ def build_differential_expression_by_ortholog_summary_global(
 
     cypher = (
         "UNWIND $group_ids AS gid\n"
-        "OPTIONAL MATCH (og:OrthologGroup {id: gid})\n"
-        "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og)\n"
-        "OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)\n"
+        "MATCH (og:OrthologGroup {id: gid})\n"
+        "MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og)\n"
+        "MATCH (e:Experiment)-[r:Changes_expression_of]->(g)\n"
         f"{where_block}"
-        "WITH gid, og, g, e, r\n"
-        "WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS nf_raw,\n"
-        "     collect(DISTINCT CASE WHEN og IS NOT NULL THEN gid END) AS found_gids,\n"
-        "     collect(CASE WHEN r IS NOT NULL THEN {\n"
-        "       gid: gid, lt: g.locus_tag, org: e.organism_name,\n"
-        "       status: r.expression_status, tt: e.treatment_type,\n"
-        "       ts: e.table_scope, eid: e.id,\n"
-        "       log2fc: r.log2_fold_change\n"
-        "     } END) AS rows_raw\n"
-        "WITH [x IN nf_raw WHERE x IS NOT NULL] AS not_found_groups,\n"
-        "     [r IN rows_raw WHERE r IS NOT NULL] AS rows,\n"
-        "     apoc.coll.toSet([x IN found_gids WHERE x IS NOT NULL]) AS found_gids\n"
-        "WITH not_found_groups,\n"
-        "     [gid IN found_gids\n"
-        "      WHERE NOT gid IN apoc.coll.toSet([r IN rows | r.gid])\n"
-        "     ] AS not_matched_groups,\n"
-        "     rows\n"
+        "WITH gid, g.locus_tag AS lt, e.organism_name AS org,\n"
+        "     r.expression_status AS status, e.treatment_type AS tt,\n"
+        "     e.table_scope AS ts, e.id AS eid,\n"
+        "     r.log2_fold_change AS log2fc\n"
+        "WITH collect({gid: gid, lt: lt, org: org,\n"
+        "              status: status, tt: tt, ts: ts,\n"
+        "              eid: eid, log2fc: log2fc}) AS rows\n"
         "RETURN size(rows) AS total_matching,\n"
         "       size(apoc.coll.toSet([r IN rows | r.lt])) AS matching_genes,\n"
         "       size(apoc.coll.toSet([r IN rows | r.gid])) AS matching_groups,\n"
@@ -1917,8 +1922,8 @@ def build_differential_expression_by_ortholog_summary_global(
         "       apoc.coll.frequencies([r IN rows | r.status]) AS rows_by_status,\n"
         "       apoc.coll.frequencies([r IN rows | r.tt]) AS rows_by_treatment_type,\n"
         "       apoc.coll.frequencies([r IN rows | r.ts]) AS by_table_scope,\n"
-        "       not_found_groups, not_matched_groups,\n"
-        '       [r IN rows WHERE r.status <> "not_significant" | abs(r.log2fc)]'
+        "       apoc.coll.toSet([r IN rows | r.gid]) AS matched_group_ids,\n"
+        "       [r IN rows WHERE r.status <> 'not_significant' | abs(r.log2fc)]"
         " AS sig_log2fcs"
     )
     return cypher, params
@@ -1952,7 +1957,7 @@ def build_differential_expression_by_ortholog_top_groups(
         f"{where_block}"
         "WITH og,\n"
         "     count(DISTINCT g.locus_tag) AS total_genes,\n"
-        '     count(DISTINCT CASE WHEN r.expression_status <> "not_significant"\n'
+        "     count(DISTINCT CASE WHEN r.expression_status <> 'not_significant'\n"
         "                         THEN g.locus_tag END) AS significant_genes\n"
         "ORDER BY significant_genes DESC, og.id ASC\n"
         "LIMIT 5\n"
@@ -1994,7 +1999,7 @@ def build_differential_expression_by_ortholog_top_experiments(
         "MATCH (e:Experiment)-[r:Changes_expression_of]->(g)\n"
         f"{where_block}"
         "WITH e,\n"
-        '     count(DISTINCT CASE WHEN r.expression_status <> "not_significant"\n'
+        "     count(DISTINCT CASE WHEN r.expression_status <> 'not_significant'\n"
         "                         THEN g.locus_tag END) AS significant_genes\n"
         "ORDER BY significant_genes DESC, e.id ASC\n"
         "LIMIT 5\n"
@@ -2071,9 +2076,9 @@ def build_differential_expression_by_ortholog_results(
         "       tph AS timepoint_hours,\n"
         "       tpo AS timepoint_order,\n"
         "       size(genes) AS genes_with_expression,\n"
-        '       size([s IN statuses WHERE s = "significant_up"]) AS significant_up,\n'
-        '       size([s IN statuses WHERE s = "significant_down"]) AS significant_down,\n'
-        '       size([s IN statuses WHERE s = "not_significant"]) AS not_significant'
+        "       size([s IN statuses WHERE s = 'significant_up']) AS significant_up,\n"
+        "       size([s IN statuses WHERE s = 'significant_down']) AS significant_down,\n"
+        "       size([s IN statuses WHERE s = 'not_significant']) AS not_significant"
         f"{verbose_cols}\n"
         "ORDER BY og.id ASC, e.id ASC, tpo ASC\n"
     )

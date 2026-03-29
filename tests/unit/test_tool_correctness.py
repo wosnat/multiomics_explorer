@@ -200,7 +200,7 @@ class TestGenesByFunctionCorrectness:
         if total_matching is None:
             total_matching = len(results)
         return {
-            "total_entries": 100,
+            "total_search_hits": 100,
             "total_matching": total_matching,
             "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": len(results)}],
             "by_category": [{"category": "DNA replication", "count": len(results)}],
@@ -276,7 +276,7 @@ class TestGenesByFunctionCorrectness:
                 mock_ctx, search_text="naphthoate synthase",
             )
 
-        assert hasattr(result, "total_entries")
+        assert hasattr(result, "total_search_hits")
         assert hasattr(result, "total_matching")
         assert hasattr(result, "by_organism")
         assert hasattr(result, "by_category")

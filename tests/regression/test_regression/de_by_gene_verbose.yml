@@ -12,14 +12,7 @@ rows:
   log2fc: -2.8863
   omics_type: RNASEQ
   padj: 0.0311
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 581
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -38,14 +31,7 @@ rows:
   log2fc: 2.23
   omics_type: RNASEQ
   padj: 0.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 75
   table_scope: filtered_subset
   table_scope_detail: Top 50% of genes by expression level
@@ -65,14 +51,7 @@ rows:
   log2fc: 1.885
   omics_type: RNASEQ
   padj: 0.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 459
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -92,14 +71,7 @@ rows:
   log2fc: 1.1985
   omics_type: MICROARRAY
   padj: 1.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 362
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -119,14 +91,7 @@ rows:
   log2fc: 1.1005
   omics_type: PROTEOMICS
   padj: 0.0007
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 213
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -146,14 +111,7 @@ rows:
   log2fc: 1.008
   omics_type: MICROARRAY
   padj: 1.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 462
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -172,14 +130,7 @@ rows:
   log2fc: 0.89
   omics_type: RNASEQ
   padj: 0.54
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 467
   table_scope: filtered_subset
   table_scope_detail: Top 50% of genes by expression level
@@ -198,14 +149,7 @@ rows:
   log2fc: 0.87
   omics_type: RNASEQ
   padj: 0.49
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 493
   table_scope: filtered_subset
   table_scope_detail: Top 50% of genes by expression level
@@ -225,14 +169,7 @@ rows:
   log2fc: 0.8628
   omics_type: MICROARRAY
   padj: 1.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 467
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -252,14 +189,7 @@ rows:
   log2fc: 0.7135
   omics_type: PROTEOMICS
   padj: 0.036
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 211
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -278,14 +208,7 @@ rows:
   log2fc: 0.7087
   omics_type: RNASEQ
   padj: 0.2466
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 248
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -305,14 +228,7 @@ rows:
   log2fc: 0.6293
   omics_type: RNASEQ
   padj: 0.0641
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 834
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -332,14 +248,7 @@ rows:
   log2fc: 0.6172
   omics_type: PROTEOMICS
   padj: 0.028
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 574
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -359,14 +268,7 @@ rows:
   log2fc: 0.5893
   omics_type: PROTEOMICS
   padj: 0.0135
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 549
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -386,14 +288,7 @@ rows:
   log2fc: 0.5614
   omics_type: PROTEOMICS
   padj: 0.0484
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 570
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -413,14 +308,7 @@ rows:
   log2fc: 0.5111
   omics_type: MICROARRAY
   padj: 1.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 722
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -440,14 +328,7 @@ rows:
   log2fc: 0.3774
   omics_type: PROTEOMICS
   padj: 0.191
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 717
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -467,14 +348,7 @@ rows:
   log2fc: 0.334
   omics_type: MICROARRAY
   padj: 1.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 694
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -494,14 +368,7 @@ rows:
   log2fc: 0.2121
   omics_type: MICROARRAY
   padj: 1.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 937
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -521,14 +388,7 @@ rows:
   log2fc: 0.1577
   omics_type: MICROARRAY
   padj: 1.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1299
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -548,14 +408,7 @@ rows:
   log2fc: 0.1564
   omics_type: MICROARRAY
   padj: 1.0
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1276
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -575,14 +428,7 @@ rows:
   log2fc: -0.1452
   omics_type: RNASEQ
   padj: 0.7754
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1578
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -602,14 +448,7 @@ rows:
   log2fc: -0.1271
   omics_type: RNASEQ
   padj: 0.8007
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1630
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -629,14 +468,7 @@ rows:
   log2fc: 0.1087
   omics_type: PROTEOMICS
   padj: 0.6459
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1316
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -656,14 +488,7 @@ rows:
   log2fc: 0.1035
   omics_type: PROTEOMICS
   padj: 0.665
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1323
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -683,14 +508,7 @@ rows:
   log2fc: -0.0794
   omics_type: RNASEQ
   padj: 0.8653
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1670
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -710,14 +528,7 @@ rows:
   log2fc: -0.0714
   omics_type: RNASEQ
   padj: 0.9335
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1616
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -737,14 +548,7 @@ rows:
   log2fc: -0.0161
   omics_type: RNASEQ
   padj: 0.9762
-  product: Confers DNA tethering and processivity to DNA polymerases and other proteins.
-    Acts as a clamp, forming a ring around DNA (a reaction catalyzed by the clamp-loading
-    complex) which diffuses in an ATP-independent manner freely and bidirectionally
-    along dsDNA. Initially characterized for its ability to contact the catalytic
-    subunit of DNA polymerase III (Pol III), a complex, multichain enzyme responsible
-    for most of the replicative synthesis in bacteria; Pol III exhibits 3^-5^ exonuclease
-    proofreading activity. The beta chain is required for initiation of replication
-    as well as for processivity of DNA replication
+  product: DNA polymerase III, beta subunit
   rank: 1823
   table_scope: all_detected_genes
   table_scope_detail: ''

@@ -143,10 +143,10 @@ class TestResolveGene:
 # genes_by_function
 # ---------------------------------------------------------------------------
 class TestGenesByFunction:
-    def _summary_result(self, total_entries=100, total_matching=5):
+    def _summary_result(self, total_search_hits=100, total_matching=5):
         """Helper: mock summary query result."""
         return [{
-            "total_entries": total_entries,
+            "total_search_hits": total_search_hits,
             "total_matching": total_matching,
             "score_max": 8.5,
             "score_median": 4.2,
@@ -174,7 +174,7 @@ class TestGenesByFunction:
         ]
         result = api.genes_by_function("DNA polymerase", conn=mock_conn)
         assert isinstance(result, dict)
-        assert "total_entries" in result
+        assert "total_search_hits" in result
         assert "total_matching" in result
         assert "by_organism" in result
         assert "by_category" in result
@@ -238,7 +238,7 @@ class TestGenesByFunction:
             mock_instance = MockConn.return_value
             mock_instance.execute_query.side_effect = [
                 [{  # summary
-                    "total_entries": 0, "total_matching": 0,
+                    "total_search_hits": 0, "total_matching": 0,
                     "score_max": None, "score_median": None,
                     "by_organism": [], "by_category": [],
                 }],
@@ -255,7 +255,7 @@ class TestGenesByFunction:
     def test_zero_match(self, mock_conn):
         """When summary returns total_matching=0, score_max=None, score_median=None."""
         mock_conn.execute_query.side_effect = [
-            [{"total_entries": 50, "total_matching": 0,
+            [{"total_search_hits": 50, "total_matching": 0,
               "score_max": None, "score_median": None,
               "by_organism": [], "by_category": []}],
         ]
@@ -1391,7 +1391,7 @@ class TestListExperiments:
         )
         # Summary query has filter params
         summary_call = mock_conn.execute_query.call_args_list[0]
-        assert "org" in summary_call[1]
+        assert "organism" in summary_call[1]
         assert "treatment_types" in summary_call[1]
         # Detail query has verbose + limit
         detail_call = mock_conn.execute_query.call_args_list[2]
@@ -2047,13 +2047,14 @@ class TestDifferentialExpressionByOrtholog:
     """Tests for differential_expression_by_ortholog API function."""
 
     def test_returns_dict(self, mock_conn):
-        # Mock all 5 query results
+        # Mock all 6 query results (Q1a group check + Q1b summary + Q2-Q5)
         mock_conn.execute_query.side_effect = [
+            [{"not_found": []}],  # Q1a group check
             [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
               "experiment_count": 2, "by_organism": [], "rows_by_status": [],
               "rows_by_treatment_type": [], "by_table_scope": [],
-              "sig_log2fcs": [1.5, 2.0], "not_found_groups": [],
-              "not_matched_groups": []}],  # Q1
+              "sig_log2fcs": [1.5, 2.0],
+              "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],  # Q2
             [{"top_experiments": []}],  # Q3
             [],  # Q4 results
@@ -2080,11 +2081,12 @@ class TestDifferentialExpressionByOrtholog:
 
     def test_median_max_computation(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"not_found": []}],  # Q1a
             [{"total_matching": 5, "matching_genes": 2, "matching_groups": 1,
               "experiment_count": 1, "by_organism": [], "rows_by_status": [],
               "rows_by_treatment_type": [], "by_table_scope": [],
-              "sig_log2fcs": [1.0, 2.0, 3.0], "not_found_groups": [],
-              "not_matched_groups": []}],
+              "sig_log2fcs": [1.0, 2.0, 3.0],
+              "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],
             [{"top_experiments": []}],
             [],
@@ -2098,11 +2100,8 @@ class TestDifferentialExpressionByOrtholog:
 
     def test_empty_sig_log2fcs(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            [{"total_matching": 0, "matching_genes": 0, "matching_groups": 0,
-              "experiment_count": 0, "by_organism": [], "rows_by_status": [],
-              "rows_by_treatment_type": [], "by_table_scope": [],
-              "sig_log2fcs": [], "not_found_groups": ["g1"],
-              "not_matched_groups": []}],
+            [{"not_found": ["g1"]}],  # Q1a: all groups not found
+            # Q1b skipped (no found groups)
             [{"top_groups": []}],
             [{"top_experiments": []}],
             [],
@@ -2116,11 +2115,12 @@ class TestDifferentialExpressionByOrtholog:
 
     def test_total_genes_join(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"not_found": []}],  # Q1a
             [{"total_matching": 1, "matching_genes": 1, "matching_groups": 1,
               "experiment_count": 1, "by_organism": [], "rows_by_status": [],
               "rows_by_treatment_type": [], "by_table_scope": [],
-              "sig_log2fcs": [], "not_found_groups": [],
-              "not_matched_groups": []}],
+              "sig_log2fcs": [],
+              "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],
             [{"top_experiments": []}],
             [{"group_id": "g1", "organism_name": "MED4",
@@ -2137,11 +2137,12 @@ class TestDifferentialExpressionByOrtholog:
     def test_summary_true_skips_detail(self, mock_conn):
         """summary=True sets limit=0, returns results=[]."""
         mock_conn.execute_query.side_effect = [
+            [{"not_found": []}],  # Q1a group check
             [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
               "experiment_count": 2, "by_organism": [], "rows_by_status": [],
               "rows_by_treatment_type": [], "by_table_scope": [],
-              "sig_log2fcs": [1.5, 2.0], "not_found_groups": [],
-              "not_matched_groups": []}],  # Q1 global summary
+              "sig_log2fcs": [1.5, 2.0],
+              "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],  # Q2 top_groups
             [{"top_experiments": []}],  # Q3 top_experiments
             # Q4 results SKIPPED (limit=0)
@@ -2152,7 +2153,7 @@ class TestDifferentialExpressionByOrtholog:
         )
         assert result["results"] == []
         assert result["returned"] == 0
-        assert mock_conn.execute_query.call_count == 4  # no detail query
+        assert mock_conn.execute_query.call_count == 5  # Q1a+Q1b+Q2+Q3+Q5
 
     def test_importable_from_package(self):
         from multiomics_explorer import differential_expression_by_ortholog as fn

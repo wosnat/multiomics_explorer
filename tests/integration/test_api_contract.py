@@ -68,7 +68,7 @@ class TestGenesByFunctionContract:
     def test_envelope_keys(self, conn):
         result = api.genes_by_function("DNA polymerase", conn=conn)
         expected_envelope = {
-            "total_entries", "total_matching", "by_organism", "by_category",
+            "total_search_hits", "total_matching", "by_organism", "by_category",
             "score_max", "score_median", "returned", "truncated", "results",
         }
         assert set(result.keys()) == expected_envelope

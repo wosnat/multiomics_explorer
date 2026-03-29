@@ -1,6 +1,5 @@
 """MCP tool implementations for the Multiomics Knowledge Graph."""
 
-import json
 import logging
 import re
 from typing import Annotated, Literal
@@ -19,22 +18,6 @@ def _conn(ctx: Context) -> GraphConnection:
     """Get the Neo4j connection from lifespan context."""
     return ctx.request_context.lifespan_context.conn
 
-
-def _fmt(results: list[dict], limit: int | None = None) -> str:
-    """Format query results as JSON string."""
-    if limit is not None:
-        results = results[:limit]
-    return json.dumps(results, indent=2, default=str)
-
-
-def _group_by_organism(results: list[dict]) -> dict:
-    """Group gene results by organism_name. Returns {organism: [genes], ...}."""
-    grouped: dict[str, list[dict]] = {}
-    for row in results:
-        org = row.get("organism_name", "Unknown")
-        entry = {k: v for k, v in row.items() if k != "organism_name"}
-        grouped.setdefault(org, []).append(entry)
-    return grouped
 
 
 def register_tools(mcp: FastMCP):
@@ -271,7 +254,7 @@ def register_tools(mcp: FastMCP):
         gene_summary: str | None = Field(default=None, description="Combined gene annotation summary")
 
     class GenesByFunctionResponse(BaseModel):
-        total_entries: int = Field(description="Total genes matching search text (before filters)")
+        total_search_hits: int = Field(description="Total genes matching search text (before organism/category/quality filters)")
         total_matching: int = Field(description="Total genes matching search + all filters")
         by_organism: list[FunctionOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
         by_category: list[FunctionCategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
@@ -339,7 +322,7 @@ def register_tools(mcp: FastMCP):
             by_category = [FunctionCategoryBreakdown(**b) for b in data["by_category"]]
             results = [GenesByFunctionResult(**r) for r in data["results"]]
             response = GenesByFunctionResponse(
-                total_entries=data["total_entries"],
+                total_search_hits=data["total_search_hits"],
                 total_matching=data["total_matching"],
                 by_organism=by_organism,
                 by_category=by_category,
@@ -350,7 +333,7 @@ def register_tools(mcp: FastMCP):
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "
-                           f"matching genes ({response.total_entries} before filters)")
+                           f"matching genes ({response.total_search_hits} search hits before filters)")
             return response
         except ValueError as e:
             await ctx.warning(f"genes_by_function error: {e}")

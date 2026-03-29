@@ -442,7 +442,7 @@ class TestResolveGeneWrapper:
 # ---------------------------------------------------------------------------
 class TestGenesByFunctionWrapper:
     _SAMPLE_API_RETURN = {
-        "total_entries": 100,
+        "total_search_hits": 100,
         "total_matching": 5,
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 3},
                         {"organism_name": "Synechococcus WH8102", "count": 2}],
@@ -468,7 +468,7 @@ class TestGenesByFunctionWrapper:
 
     @pytest.mark.asyncio
     async def test_returns_pydantic_envelope(self, tool_fns, mock_ctx):
-        """Response has total_entries, total_matching, by_organism, by_category, score_max, score_median, returned, truncated, results."""
+        """Response has total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, truncated, results."""
         with patch(
             "multiomics_explorer.api.functions.genes_by_function",
             return_value=self._SAMPLE_API_RETURN,
@@ -476,7 +476,7 @@ class TestGenesByFunctionWrapper:
             result = await tool_fns["genes_by_function"](
                 mock_ctx, search_text="DNA polymerase",
             )
-        assert result.total_entries == 100
+        assert result.total_search_hits == 100
         assert result.total_matching == 5
         assert result.returned == 2
         assert result.truncated is True
@@ -496,7 +496,7 @@ class TestGenesByFunctionWrapper:
         """When api returns no matches."""
         empty_return = {
             **self._SAMPLE_API_RETURN,
-            "total_entries": 50,
+            "total_search_hits": 50,
             "total_matching": 0,
             "by_organism": [],
             "by_category": [],

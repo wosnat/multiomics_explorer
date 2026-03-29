@@ -1,13 +1,10 @@
-"""P0: Tests for write-blocking in run_cypher and _fmt helper."""
+"""P0: Tests for write-blocking in run_cypher."""
 
-import json
 import re
 
 import pytest
 
-# Import the regex from api (where write-blocking lives) and formatter from tools
 from multiomics_explorer.api.functions import _WRITE_KEYWORDS
-from multiomics_explorer.mcp_server.tools import _fmt
 
 
 class TestWriteBlocking:
@@ -55,43 +52,3 @@ class TestWriteBlocking:
     def test_blocks_multiline_query(self):
         query = "MATCH (n)\nDELETE n"
         assert _WRITE_KEYWORDS.search(query)
-
-
-class TestFmt:
-    """Verify _fmt formatting helper."""
-
-    def test_empty_results(self):
-        result = _fmt([])
-        assert json.loads(result) == []
-
-    def test_single_row(self):
-        data = [{"gene": "PMM0001", "count": 1}]
-        result = _fmt(data)
-        parsed = json.loads(result)
-        assert len(parsed) == 1
-        assert parsed[0]["gene"] == "PMM0001"
-
-    def test_multi_row(self):
-        data = [{"id": i} for i in range(5)]
-        result = _fmt(data)
-        parsed = json.loads(result)
-        assert len(parsed) == 5
-
-    def test_limit_truncates(self):
-        data = [{"id": i} for i in range(10)]
-        result = _fmt(data, limit=3)
-        parsed = json.loads(result)
-        assert len(parsed) == 3
-
-    def test_limit_none_returns_all(self):
-        data = [{"id": i} for i in range(10)]
-        result = _fmt(data, limit=None)
-        parsed = json.loads(result)
-        assert len(parsed) == 10
-
-    def test_limit_zero_returns_empty(self):
-        """_fmt with limit=0 now correctly slices to 0 items (is not None check)."""
-        data = [{"id": i} for i in range(5)]
-        result = _fmt(data, limit=0)
-        parsed = json.loads(result)
-        assert len(parsed) == 0

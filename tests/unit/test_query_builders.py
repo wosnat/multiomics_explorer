@@ -38,6 +38,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene_summary_global,
     build_differential_expression_by_gene_summary_by_experiment,
     build_differential_expression_by_gene_summary_diagnostics,
+    build_differential_expression_by_ortholog_group_check,
     build_differential_expression_by_ortholog_summary_global,
     build_differential_expression_by_ortholog_top_groups,
     build_differential_expression_by_ortholog_top_experiments,
@@ -189,10 +190,10 @@ class TestBuildGenesByFunctionSummary:
         assert params["category"] == "Photosynthesis"
         assert params["min_quality"] == 2
 
-    def test_returns_total_entries_and_total_matching(self):
-        """RETURN clause includes both total_entries and total_matching."""
+    def test_returns_total_search_hits_and_total_matching(self):
+        """RETURN clause includes both total_search_hits and total_matching."""
         cypher, _ = build_genes_by_function_summary(search_text="x")
-        assert "total_entries" in cypher
+        assert "total_search_hits" in cypher
         assert "total_matching" in cypher
 
     def test_returns_breakdowns(self):
@@ -1076,15 +1077,15 @@ class TestBuildGeneOntologyTermsSummary:
 class TestBuildGeneExistenceCheck:
     def test_returns_cypher(self):
         """Cypher uses OPTIONAL MATCH pattern."""
-        cypher, _ = build_gene_existence_check()
+        cypher, _ = build_gene_existence_check(locus_tags=["PMM0001"])
         assert "OPTIONAL MATCH" in cypher
         assert "lt" in cypher
         assert "found" in cypher
 
-    def test_empty_params(self):
-        """params dict is empty (locus_tags passed at execute time)."""
-        _, params = build_gene_existence_check()
-        assert params == {}
+    def test_params_include_locus_tags(self):
+        """params dict includes locus_tags."""
+        _, params = build_gene_existence_check(locus_tags=["PMM0001", "PMM0002"])
+        assert params == {"locus_tags": ["PMM0001", "PMM0002"]}
 
 
 # ---------------------------------------------------------------------------
@@ -1221,10 +1222,10 @@ class TestBuildListExperiments:
     def test_organism_filter(self):
         """Organism filter uses ALL(word IN split) on organism_name OR coculture_partner."""
         cypher, params = build_list_experiments(organism="MED4")
-        assert "ALL(word IN split(toLower($org)" in cypher
+        assert "ALL(word IN split(toLower($organism)" in cypher
         assert "toLower(e.organism_name) CONTAINS word" in cypher
         assert "toLower(e.coculture_partner) CONTAINS word" in cypher
-        assert params["org"] == "MED4"
+        assert params["organism"] == "MED4"
 
     def test_treatment_type_filter(self):
         """Treatment type filter uses toLower IN with list param."""
@@ -1282,7 +1283,7 @@ class TestBuildListExperiments:
         )
         assert "WHERE" in cypher
         assert " AND " in cypher
-        assert params["org"] == "MED4"
+        assert params["organism"] == "MED4"
         assert params["treatment_types"] == ["coculture"]
         assert params["omics_types"] == ["RNASEQ"]
 
@@ -1354,8 +1355,8 @@ class TestBuildListExperimentsSummary:
     def test_with_filters(self):
         """Filters are applied to the summary query."""
         cypher, params = build_list_experiments_summary(organism="MED4")
-        assert "ALL(word IN split(toLower($org)" in cypher
-        assert params["org"] == "MED4"
+        assert "ALL(word IN split(toLower($organism)" in cypher
+        assert params["organism"] == "MED4"
 
     def test_search_text_fulltext(self):
         """search_text uses experimentFullText index and includes score distribution."""
@@ -1398,7 +1399,7 @@ class TestBuildListExperimentsSummary:
 class TestBuildResolveOrganismForOrganism:
     def test_basic(self):
         cypher, params = build_resolve_organism_for_organism(organism="MED4")
-        assert "Changes_expression_of" in cypher
+        assert "e.gene_count > 0" in cypher
         assert "organisms" in cypher
         assert params["organism"] == "MED4"
 
@@ -1473,29 +1474,29 @@ class TestBuildDifferentialExpressionByGeneSummaryGlobal:
         cypher, _ = build_differential_expression_by_gene_summary_global(
             direction="up"
         )
-        assert 'r.expression_status = "significant_up"' in cypher
+        assert "r.expression_status = 'significant_up'" in cypher
 
     def test_direction_down(self):
         cypher, _ = build_differential_expression_by_gene_summary_global(
             direction="down"
         )
-        assert 'r.expression_status = "significant_down"' in cypher
+        assert "r.expression_status = 'significant_down'" in cypher
 
     def test_significant_only(self):
         cypher, _ = build_differential_expression_by_gene_summary_global(
             significant_only=True
         )
-        assert 'r.expression_status <> "not_significant"' in cypher
+        assert "r.expression_status <> 'not_significant'" in cypher
 
     def test_direction_overrides_significant_only(self):
         cypher, _ = build_differential_expression_by_gene_summary_global(
             direction="up", significant_only=True
         )
-        assert 'r.expression_status = "significant_up"' in cypher
+        assert "r.expression_status = 'significant_up'" in cypher
         # The <> "not_significant" appears in CASE expressions (for median/max),
         # but should NOT appear in the WHERE clause when direction is set.
         where_part = cypher.split("RETURN")[0]
-        assert 'r.expression_status <> "not_significant"' not in where_part
+        assert "r.expression_status <> 'not_significant'" not in where_part
 
     def test_returns_expected_keys(self):
         cypher, _ = build_differential_expression_by_gene_summary_global()
@@ -1686,7 +1687,7 @@ class TestBuildDifferentialExpressionByGene:
         assert params["locus_tags"] == ["PMM0001"]
         assert params["experiment_ids"] == ["exp1"]
         assert params["limit"] == 20
-        assert 'r.expression_status = "significant_up"' in cypher
+        assert "r.expression_status = 'significant_up'" in cypher
         assert "product" in cypher
 
 
@@ -1904,6 +1905,18 @@ class TestBuildGenesByHomologGroupDiagnostics:
         assert "not_found_organisms" in cypher
 
 
+class TestBuildDifferentialExpressionByOrthologGroupCheck:
+    """Tests for build_differential_expression_by_ortholog_group_check."""
+
+    def test_returns_not_found(self):
+        cypher, params = build_differential_expression_by_ortholog_group_check(
+            group_ids=["g1", "g2"],
+        )
+        assert "OPTIONAL MATCH" in cypher
+        assert "not_found" in cypher
+        assert params["group_ids"] == ["g1", "g2"]
+
+
 class TestBuildDifferentialExpressionByOrthologSummaryGlobal:
     """Tests for build_differential_expression_by_ortholog_summary_global."""
 
@@ -1913,6 +1926,13 @@ class TestBuildDifferentialExpressionByOrthologSummaryGlobal:
         )
         assert "$group_ids" in cypher
         assert params["group_ids"] == ["cyanorak:CK_00000570"]
+
+    def test_uses_match_not_optional(self):
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["g1"],
+        )
+        assert "OPTIONAL MATCH" not in cypher
+        assert "MATCH (og:OrthologGroup" in cypher
 
     def test_multiple_groups(self):
         cypher, params = build_differential_expression_by_ortholog_summary_global(
@@ -1941,22 +1961,22 @@ class TestBuildDifferentialExpressionByOrthologSummaryGlobal:
             group_ids=["cyanorak:CK_00000570"],
             direction="up",
         )
-        assert 'r.expression_status = "significant_up"' in cypher
+        assert "r.expression_status = 'significant_up'" in cypher
 
     def test_significant_only(self):
         cypher, _ = build_differential_expression_by_ortholog_summary_global(
             group_ids=["cyanorak:CK_00000570"],
             significant_only=True,
         )
-        assert 'r.expression_status <> "not_significant"' in cypher
+        assert "r.expression_status <> 'not_significant'" in cypher
 
     def test_direction_takes_precedence(self):
         cypher, _ = build_differential_expression_by_ortholog_summary_global(
             group_ids=["g1"], direction="down", significant_only=True,
         )
-        assert 'r.expression_status = "significant_down"' in cypher
+        assert "r.expression_status = 'significant_down'" in cypher
         # Direction takes precedence: significant_only's WHERE clause is NOT added
-        assert 'r.expression_status <> "not_significant"' not in cypher
+        assert "r.expression_status <> 'not_significant'" not in cypher
 
     def test_returns_expected_keys(self):
         cypher, _ = build_differential_expression_by_ortholog_summary_global(
@@ -1965,7 +1985,7 @@ class TestBuildDifferentialExpressionByOrthologSummaryGlobal:
         for key in ["total_matching", "matching_genes", "matching_groups",
                      "experiment_count", "by_organism", "rows_by_status",
                      "rows_by_treatment_type", "by_table_scope",
-                     "sig_log2fcs", "not_found_groups", "not_matched_groups"]:
+                     "sig_log2fcs", "matched_group_ids"]:
             assert key in cypher, f"Missing RETURN key: {key}"
 
 
@@ -1984,7 +2004,7 @@ class TestBuildDifferentialExpressionByOrthologTopGroups:
         cypher, params = build_differential_expression_by_ortholog_top_groups(
             group_ids=["g1"], direction="up",
         )
-        assert 'r.expression_status = "significant_up"' in cypher
+        assert "r.expression_status = 'significant_up'" in cypher
 
 
 class TestBuildDifferentialExpressionByOrthologTopExperiments:
@@ -2130,7 +2150,7 @@ class TestBuildDifferentialExpressionByOrthologDiagnostics:
         )
         assert result is not None
         cypher, _ = result[0]
-        assert 'r.expression_status = "significant_up"' in cypher
+        assert "r.expression_status = 'significant_up'" in cypher
 
     def test_significant_only_forwarded_to_diagnostics(self):
         """significant_only filter must appear in diagnostic Cypher."""
@@ -2140,4 +2160,4 @@ class TestBuildDifferentialExpressionByOrthologDiagnostics:
         )
         assert result is not None
         cypher, _ = result[0]
-        assert 'r.expression_status <> "not_significant"' in cypher
+        assert "r.expression_status <> 'not_significant'" in cypher

@@ -100,7 +100,7 @@ async def genes_by_function(
     """
 ```
 
-**Return envelope:** `total_entries, total_matching, by_organism,
+**Return envelope:** `total_search_hits, total_matching, by_organism,
 by_category, score_max, score_median, returned, truncated, results`
 
 **Per-result columns (compact — 7):**
@@ -118,16 +118,16 @@ Frequently large result set → summary + limit pattern.
 
 | Field | Type | Description |
 |---|---|---|
-| `total_entries` | int | Total genes matching search text (before organism/category/min_quality filters) |
+| `total_search_hits` | int | Total genes matching search text (before organism/category/min_quality filters) |
 | `total_matching` | int | Total genes matching search + all filters |
 | `by_organism` | list | `[{organism, count}]` sorted desc (filtered) |
 | `by_category` | list | `[{category, count}]` sorted desc (filtered) |
 | `score_max` | float | Highest relevance score (filtered) |
 | `score_median` | float | Median relevance score (filtered) |
 
-`total_entries` gives filter selectivity context: "5 of 42
+`total_search_hits` gives filter selectivity context: "5 of 42
 photosystem genes are in MED4". When no filters are active,
-`total_entries == total_matching`.
+`total_search_hits == total_matching`.
 
 ### Zero-match behavior
 
@@ -198,12 +198,12 @@ def build_genes_by_function_summary(
 ) -> tuple[str, dict]:
     """Build summary Cypher for genes_by_function.
 
-    RETURN keys: total_entries, total_matching, by_organism,
+    RETURN keys: total_search_hits, total_matching, by_organism,
     by_category, score_max, score_median.
     """
 ```
 
-Cypher uses conditional counting to compute both `total_entries`
+Cypher uses conditional counting to compute both `total_search_hits`
 (before filters) and `total_matching` (after filters) in a single
 pass:
 
@@ -217,7 +217,7 @@ WITH g, score,
        AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)
        AND ($category IS NULL OR g.gene_category = $category)
      THEN 1 ELSE 0 END AS matches
-WITH count(g) AS total_entries,
+WITH count(g) AS total_search_hits,
      sum(matches) AS total_matching,
      max(CASE WHEN matches = 1 THEN score END) AS score_max,
      percentileDisc(
@@ -229,7 +229,7 @@ WITH count(g) AS total_entries,
      [x IN collect(
        CASE WHEN matches = 1 THEN g.gene_category END
      ) WHERE x IS NOT NULL] AS categories
-RETURN total_entries, total_matching, score_max, score_median,
+RETURN total_search_hits, total_matching, score_max, score_median,
        apoc.coll.frequencies(organisms) AS by_organism,
        apoc.coll.frequencies(categories) AS by_category
 ```
@@ -289,9 +289,9 @@ uses it as a WHERE clause. Filter conditions:
 - **No precomputed stats** — all summary fields are aggregated at query
   time from fulltext results. This is fine because fulltext search
   already limits the working set.
-- **`total_entries` via conditional counting** — avoids running the
+- **`total_search_hits` via conditional counting** — avoids running the
   fulltext query twice. Single pass: count all fulltext hits
-  (`total_entries`), then count those passing filters
+  (`total_search_hits`), then count those passing filters
   (`total_matching`).
 - **APOC `frequencies`** — returns `[{item, count}]`; api/ renames
   to domain keys (`organism`/`category`).
@@ -316,7 +316,7 @@ def genes_by_function(
 ) -> dict:
     """Search genes by functional annotation text.
 
-    Returns dict with keys: total_entries, total_matching,
+    Returns dict with keys: total_search_hits, total_matching,
     by_organism, by_category, score_max, score_median,
     returned, truncated, results.
     Per result: locus_tag, gene_name, product, organism_strain,
@@ -326,7 +326,7 @@ def genes_by_function(
 ```
 
 - `summary=True` → `limit=0`
-- Always run summary query → total_entries, total_matching, breakdowns,
+- Always run summary query → total_search_hits, total_matching, breakdowns,
   score stats
 - Skip detail when `limit=0`
 - Lucene retry on `ClientError` (both summary and detail queries)
@@ -370,7 +370,7 @@ class GenesByFunctionResult(BaseModel):
     gene_summary: str | None = Field(default=None, description="Combined gene annotation summary")
 
 class GenesByFunctionResponse(BaseModel):
-    total_entries: int = Field(description="Total genes matching search text (before filters)")
+    total_search_hits: int = Field(description="Total genes matching search text (before filters)")
     total_matching: int = Field(description="Total genes matching search + all filters")
     by_organism: list[OrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
     by_category: list[CategoryBreakdown] = Field(description="Gene counts per category, sorted desc")
@@ -436,7 +436,7 @@ class TestBuildGenesByFunction:
 class TestBuildGenesByFunctionSummary:
     test_no_filters
     test_with_filters
-    test_returns_total_entries_and_total_matching
+    test_returns_total_search_hits_and_total_matching
     test_shares_where_clause
 ```
 
@@ -446,7 +446,7 @@ class TestBuildGenesByFunctionSummary:
 class TestGenesByFunction:
     test_returns_dict
     test_summary_fields_present
-    test_total_entries_vs_total_matching
+    test_total_search_hits_vs_total_matching
     test_summary_true_skips_detail
     test_lucene_retry_on_error
     test_passes_params
@@ -463,7 +463,7 @@ class TestGenesByFunctionWrapper:
     test_empty_results
     test_params_forwarded
     test_truncation_metadata
-    test_total_entries_present
+    test_total_search_hits_present
     test_error_raises_tool_error
 
 Update EXPECTED_TOOLS to include "genes_by_function".
@@ -541,7 +541,7 @@ examples:
     call: genes_by_function(search_text="photosystem")
     response: |
       {
-        "total_entries": 42, "total_matching": 42,
+        "total_search_hits": 42, "total_matching": 42,
         "by_organism": [{"organism": "Synechococcus WH8102", "count": 8}, ...],
         "by_category": [{"category": "Photosynthesis", "count": 35}, ...],
         "score_max": 6.1, "score_median": 3.2,
@@ -552,11 +552,11 @@ examples:
         ]
       }
 
-  - title: Filter by organism (note total_entries vs total_matching)
+  - title: Filter by organism (note total_search_hits vs total_matching)
     call: genes_by_function(search_text="transport", organism="MED4")
     response: |
       {
-        "total_entries": 120, "total_matching": 15,
+        "total_search_hits": 120, "total_matching": 15,
         ...
       }
 
@@ -596,7 +596,7 @@ mistakes:
   - "Lucene syntax supported: quoted phrases, AND/OR, wildcards (*), fuzzy (~). Invalid syntax auto-retried with escaping."
   - "category filter is not validated — invalid values return empty results. Use list_filter_values to discover valid categories."
   - "by_organism and by_category reflect all matching genes (total_matching), not just the returned rows"
-  - "total_entries counts genes matching search text before organism/category/min_quality filters — compare with total_matching for filter selectivity"
+  - "total_search_hits counts genes matching search text before organism/category/min_quality filters — compare with total_matching for filter selectivity"
   - wrong: "genes_by_function(search_text='photosystem', limit=100)  # get everything"
     right: "genes_by_function(search_text='photosystem', summary=True)  # check counts first, then adjust limit"
 ```

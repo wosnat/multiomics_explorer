@@ -207,19 +207,18 @@ Migrate each to v3 (order flexible). Code review after each tool.
 | `search_ontology` | v3 upgrade: summary fields (total_entries, score_max/median), 2-query pattern, async, Pydantic. No verbose (all fields lightweight). No KG changes needed. | ✅ done 2026-03-23 |
 | `genes_by_ontology` | v3 upgrade: summary fields (total_matching, by_organism, by_category, by_term), 2-query pattern, async, Pydantic, Literal ontology. Verbose adds matched_terms, gene_summary, function_description. | ✅ done 2026-03-23 |
 | `gene_ontology_terms` | Batch tool: `locus_tags` list, `not_found`, `no_terms`, optional ontology filter, leaf-only (always), rich summary (by_ontology, by_term, annotation density stats). `leaf_only` param removed. | ✅ done 2026-03-24 |
-| `get_schema` → `kg_schema` | Rename + v3 upgrade | |
-| `list_filter_values` | v3 upgrade (simple, small result set) | |
-| `run_cypher` | v3 upgrade (keep limit=25 default) | |
+| `get_schema` → `kg_schema` | Rename + v3 upgrade | ✅ done 2026-03-29 |
+| `list_filter_values` | v3 upgrade (simple, small result set) | ✅ done 2026-03-29 |
+| `run_cypher` | v3 upgrade (keep limit=25 default) | ✅ done 2026-03-29 |
+| `gene_details` | New v3 tool — all Gene properties via `g{.*}`, batch `locus_tags`, summary/verbose/limit | ✅ done 2026-03-29 |
 
 **Gate per tool:** Tests pass. Code review passes.
 
-#### D5: Retire `get_gene_details`
+#### D5: Retire `get_gene_details` ✅
 
-- Remove from all layers
-- Update CLAUDE.md
-- `gene_overview` covers the use case; `run_cypher` for edge cases
-
-**Gate:** All references removed. Code review confirms clean removal.
+- `get_gene_details` removed from all layers (done 2026-03-29)
+- Replaced by `gene_details` (new v3 tool with batch support)
+- `gene_overview` remains the recommended entry point; `gene_details` for deep-dive
 
 ---
 
@@ -232,49 +231,46 @@ properties or precomputed stats, the KG spec is written, the KG
 is rebuilt, then Phase 2 (build) proceeds. KG work is incremental,
 driven by each tool's needs.
 
-#### E1: Homology tools
+#### E1: Homology tools ✅
 
-Phase 1 (definition) explores what OrthologGroup nodes currently
-have and writes KG specs for anything missing (`consensus_gene_name`,
-`consensus_product`, `genera`, `member_count`, `specificity_rank`,
-fulltext index on consensus fields).
+| Tool | Status |
+|---|---|
+| `search_homolog_groups` | ✅ done 2026-03-26 |
+| `genes_by_homolog_group` | ✅ done 2026-03-27 |
 
-| Tool | Type | KG needs |
-|---|---|---|
-| `search_homolog_groups` | New — text search on OrthologGroup | Fulltext index on consensus fields |
-| `genes_by_homolog_group` | New — group ID → member genes | OrthologGroup properties populated |
+Homology triplet (search → by_group → gene_homologs) chains correctly.
 
-**Gate per tool:** Tests pass. Code review passes. Homology triplet
-(search → by_group → gene_homologs) chains correctly.
+#### E2: Expression tools ✅
 
-#### E2: Expression tools
+| Tool | Status |
+|---|---|
+| `differential_expression_by_gene` | ✅ done 2026-03-28 |
+| `differential_expression_by_ortholog` | ✅ done 2026-03-29 |
 
-Phase 1 (definition) explores the expression schema and writes KG
-specs for precomputed stats needed on Experiment and OrthologGroup
-nodes. KG spec defines what to precompute; KG rebuild adds the
-properties; then the tool is built to read them.
-
-| Tool | Type | KG needs |
-|---|---|---|
-| `differential_expression_by_gene` | New — gene × experiment × timepoint | Experiment precomputed stats (`gene_count`, `significant_count`, time_point arrays) |
-| `differential_expression_by_ortholog` | New — cluster × experiment, cross-organism | OrthologGroup stats (`expression_experiment_count`, `expression_organism_count`, `conservation_pattern`) |
-
-Build `by_gene` first (simpler), then `by_ortholog` (requires
-ortholog group selection algorithm). Code review after each.
-
-**Gate per tool:** Tests pass. Code review passes. Summary fields
-include direction breakdown, top categories, median |log2FC|.
-Summary field consistency tests verify precomputed stats match
-actual data.
+Summary fields include direction breakdown, top categories/experiments, median |log2FC|.
+Cross-organism ortholog expression working end-to-end.
 
 ---
 
-### Future phases (after all tools are built)
+### Next phases — tool surface complete, ready for validation
+
+#### Phase 2 (roadmap): Stress test with real analysis
+
+New local repo, use Claude Code as researcher. Validate the tool
+surface with real biology questions before building skills or
+packaging. This is the critical validation gate.
+
+- Test multi-tool workflows (gene discovery → expression → orthologs)
+- Identify tool gaps, ergonomic issues, missing summary fields
+- Validate methodology doc patterns against real use
+- Document workflow patterns that emerge
+
+**Gate:** Confident the 18-tool surface supports real research
+workflows. Issues logged and fixed before building skills.
 
 #### Phase F: Research skills
 
-Build on top of the working tools. Not scoped yet — depends on
-tool surface being complete.
+Build on top of validated tools + workflow patterns from Phase 2.
 
 - F1: Layer 1 — `multiomics-kg-guide` (organize about content
   into agentskills.io structure, `sync_skills.sh`)
@@ -297,59 +293,32 @@ tool surface being complete.
 ## Step dependencies
 
 ```
-Phase H: Align v2 tools with v3 (quick)
-  H1 (list_experiments mode→summary) → H2 (other v2 tools) → H3 (verify skills)
+Phase H: ✅ complete
+Phase D: ✅ complete (D2–D5, all v1 tools migrated or retired)
+Phase E: ✅ complete (E1 homology + E2 expression tools)
 
-Phase D: Migrate v1 tools (after H)
-  D2 (gene_homologs) → D3 (genes_by_function) → D4 (remaining)
-    → D5 (retire get_gene_details)
-  Code review after each tool. KG spec if tool needs schema changes.
-
-Phase E: New tools (after D)
-  E1 (homology tools) — KG spec → KG rebuild → build tools
-  E2 (expression tools) — KG spec → KG rebuild → build tools
-  E1 and E2 can proceed in parallel if KG supports both
-  KG work is incremental — each tool's Phase 1 writes the KG spec
-
-Phase F, G: Future — after all tools are built
+→ Phase 2 (roadmap): Stress test with real analysis questions
+  → Phase F: Research skills (informed by Phase 2 findings)
+    → Phase G: Packaging + deployment
 ```
 
-**Quick wins (Phase H):** Small changes to align existing v2 tools
-with v3 conventions. Can be done immediately.
-
-**Parallel opportunities:**
-- E1 (homology tools) and E2 (expression tools) are independent
-  if KG supports both
-- D-phase tools are mostly independent of each other (order flexible)
+**Current state:** All 18 tools built, smoke-tested end-to-end
+(2026-03-29). Ready for Phase 2 validation.
 
 ---
 
 ## Coordinated work with KG repo
 
-KG changes are driven by tool needs. Each tool's Phase 1 (definition)
-writes a KG spec if needed (`docs/kg-specs/kg-spec-{tool}.md`).
-The KG rebuild happens before Phase 2 (build) of that tool.
-
-| Tool | KG spec needed | Coordination |
-|---|---|---|
-| D2: `gene_homologs` | Maybe — verify OrthologGroup properties exist | Check before build |
-| D4: `gene_overview` | Maybe — precomputed annotation stats | KG spec if adding stats |
-| E1: homology tools | Fulltext index + OrthologGroup properties | KG spec → rebuild → build |
-| E2: `differential_expression_by_gene` | Experiment precomputed stats | KG spec → rebuild → build |
-| E2: `differential_expression_by_ortholog` | OrthologGroup expression stats | KG spec → rebuild → build |
-
-D-phase tools may not need KG changes (existing schema may suffice).
-E-phase tools will almost certainly need KG specs.
+All KG specs written and KG rebuilt through E2. KG specs live in
+`docs/kg-specs/`. Future KG changes will be driven by Phase 2
+findings (e.g. missing properties discovered during real analysis).
 
 ---
 
-## Risks and mitigations
+## Risks and mitigations (forward-looking)
 
 | Risk | Mitigation |
 |---|---|
-| v2→v3 convention changes break existing v2 tools | H1-H2 are small, focused changes with tests |
-| Cascading renames (D2, D3) miss references | Grep before rename; regression tests catch drift |
-| Expression tools (E2) are complex to build | Build `by_gene` first (simpler), validate, then `by_ortholog` |
 | Precomputed stats drift from actual data | Summary field consistency tests; regenerate on every KG rebuild |
-| About content drifts from tool behavior | Auto-generated from Pydantic models; tests verify consistency |
+| Tool surface has gaps for real workflows | Phase 2 stress testing catches these before building skills |
 | Skills too prescriptive or not enough | Phase 2 stress testing (separate repo) refines before shipping |

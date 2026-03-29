@@ -58,6 +58,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_organism_for_organism,
     build_resolve_organism_for_locus_tags,
     build_resolve_organism_for_experiments,
+    build_differential_expression_by_ortholog_group_check,
     build_differential_expression_by_ortholog_summary_global,
     build_differential_expression_by_ortholog_top_groups,
     build_differential_expression_by_ortholog_top_experiments,
@@ -159,7 +160,7 @@ def genes_by_function(
 ) -> dict:
     """Search genes by functional annotation text.
 
-    Returns dict with keys: total_entries, total_matching,
+    Returns dict with keys: total_search_hits, total_matching,
     by_organism, by_category, score_max, score_median,
     returned, truncated, results.
     Per result: locus_tag, gene_name, product, organism_name,
@@ -206,7 +207,7 @@ def genes_by_function(
 
     total_matching = raw_summary["total_matching"]
     envelope = {
-        "total_entries": raw_summary["total_entries"],
+        "total_search_hits": raw_summary["total_search_hits"],
         "total_matching": total_matching,
         "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
         "by_category": _rename_freq(raw_summary["by_category"], "category"),
@@ -1144,8 +1145,8 @@ def gene_ontology_terms(
     conn = _default_conn(conn)
 
     # Step 1: gene existence check
-    exist_cypher, _ = build_gene_existence_check()
-    exist_rows = conn.execute_query(exist_cypher, locus_tags=locus_tags)
+    exist_cypher, exist_params = build_gene_existence_check(locus_tags=locus_tags)
+    exist_rows = conn.execute_query(exist_cypher, **exist_params)
     not_found = [r["lt"] for r in exist_rows if not r["found"]]
     found_tags = [r["lt"] for r in exist_rows if r["found"]]
 
@@ -1628,13 +1629,42 @@ def differential_expression_by_ortholog(
         significant_only=significant_only,
     )
 
-    # --- Q1: summary_global (always) ---
-    global_cypher, global_params = (
-        build_differential_expression_by_ortholog_summary_global(
-            group_ids=group_ids, **filter_kwargs,
+    # --- Q1a: group existence check ---
+    check_cypher, check_params = (
+        build_differential_expression_by_ortholog_group_check(
+            group_ids=group_ids,
         )
     )
-    global_raw = conn.execute_query(global_cypher, **global_params)[0]
+    not_found_groups = conn.execute_query(
+        check_cypher, **check_params
+    )[0]["not_found"]
+    found_group_ids = [
+        gid for gid in group_ids if gid not in not_found_groups
+    ]
+
+    # --- Q1b: summary_global (for found groups only) ---
+    _empty_global = {
+        "total_matching": 0, "matching_genes": 0,
+        "matching_groups": 0, "experiment_count": 0,
+        "by_organism": [], "rows_by_status": [],
+        "rows_by_treatment_type": [], "by_table_scope": [],
+        "sig_log2fcs": [], "matched_group_ids": [],
+    }
+    if found_group_ids:
+        global_cypher, global_params = (
+            build_differential_expression_by_ortholog_summary_global(
+                group_ids=found_group_ids, **filter_kwargs,
+            )
+        )
+        global_rows = conn.execute_query(global_cypher, **global_params)
+        global_raw = global_rows[0] if global_rows else _empty_global
+        not_matched_groups = [
+            gid for gid in found_group_ids
+            if gid not in global_raw["matched_group_ids"]
+        ]
+    else:
+        global_raw = _empty_global
+        not_matched_groups = []
 
     rows_by_status = _apoc_freq_to_dict(global_raw["rows_by_status"])
     rows_by_treatment_type = _apoc_freq_to_treatment_dict(
@@ -1739,8 +1769,8 @@ def differential_expression_by_ortholog(
         "top_experiments": (
             top_exp_raw[0]["top_experiments"] if top_exp_raw else []
         ),
-        "not_found_groups": global_raw["not_found_groups"],
-        "not_matched_groups": global_raw["not_matched_groups"],
+        "not_found_groups": not_found_groups,
+        "not_matched_groups": not_matched_groups,
         "not_found_organisms": not_found_organisms,
         "not_matched_organisms": not_matched_organisms,
         "not_found_experiments": not_found_experiments,
