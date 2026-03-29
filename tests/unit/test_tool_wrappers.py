@@ -2145,6 +2145,43 @@ class TestDifferentialExpressionByGeneWrapper:
                 )
 
     @pytest.mark.asyncio
+    async def test_no_filters_raises_tool_error(self, tool_fns, mock_ctx):
+        """No organism/locus_tags/experiment_ids → ValueError → ToolError."""
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            side_effect=ValueError("at least one of organism, locus_tags, experiment_ids"),
+        ):
+            with pytest.raises(ToolError, match="at least one"):
+                await tool_fns["differential_expression_by_gene"](mock_ctx)
+
+    @pytest.mark.asyncio
+    async def test_multi_organism_raises_tool_error(self, tool_fns, mock_ctx):
+        """Multi-organism locus_tags → ValueError → ToolError."""
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            side_effect=ValueError("organism.*matches multiple"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["differential_expression_by_gene"](
+                    mock_ctx, locus_tags=["PMM0001", "SYNW0305"],
+                )
+
+    @pytest.mark.asyncio
+    async def test_invalid_direction_raises_tool_error(self, tool_fns, mock_ctx):
+        """Invalid direction → ValueError → ToolError."""
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            side_effect=ValueError("Invalid direction"),
+        ):
+            with pytest.raises(ToolError, match="Invalid direction"):
+                await tool_fns["differential_expression_by_gene"](
+                    mock_ctx, organism="MED4", direction="up",
+                )
+
+    @pytest.mark.asyncio
     async def test_generic_error_raises_tool_error(self, tool_fns, mock_ctx):
         """RuntimeError caught and converted to ToolError."""
         from fastmcp.exceptions import ToolError

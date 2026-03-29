@@ -1,0 +1,14 @@
+case_id: genes_by_homolog_group_summary_organism_filter
+row_count: 1
+rows:
+- by_category_raw:
+  - '{''count'': 1, ''item'': ''Photosynthesis''}'
+  by_group_raw:
+  - '{''count'': 1, ''item'': ''cyanorak:CK_00000570''}'
+  by_organism:
+  - '{''count'': 1, ''item'': ''Prochlorococcus MED4''}'
+  not_found_groups: []
+  not_matched_groups: []
+  total_categories: 1
+  total_genes: 1
+  total_matching: 1

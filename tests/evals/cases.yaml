@@ -1129,6 +1129,65 @@
 # differential_expression_by_ortholog
 # ---------------------------------------------------------------------------
 
+- id: search_homolog_groups_summary_basic
+  tool: search_homolog_groups_summary
+  desc: Summary breakdowns for homolog group search
+  params:
+    search_text: photosynthesis
+  expect:
+    min_rows: 1
+    columns: [total_entries, total_matching, score_max, score_median,
+              by_source, by_level]
+
+- id: search_homolog_groups_summary_source_filter
+  tool: search_homolog_groups_summary
+  desc: Summary with source filter applied
+  params:
+    search_text: photosynthesis
+    source: cyanorak
+  expect:
+    min_rows: 1
+    columns: [total_entries, total_matching, score_max, score_median,
+              by_source, by_level]
+
+# ---------------------------------------------------------------------------
+# genes_by_homolog_group_summary
+# ---------------------------------------------------------------------------
+
+- id: genes_by_homolog_group_summary_basic
+  tool: genes_by_homolog_group_summary
+  desc: Summary of member genes for a homolog group
+  params:
+    group_ids: ["cyanorak:CK_00000570"]
+  expect:
+    min_rows: 1
+    columns: [total_matching, total_genes, total_categories,
+              by_organism, by_category_raw, by_group_raw,
+              not_found_groups, not_matched_groups]
+
+- id: genes_by_homolog_group_summary_organism_filter
+  tool: genes_by_homolog_group_summary
+  desc: Summary with organism filter
+  params:
+    group_ids: ["cyanorak:CK_00000570"]
+    organisms: ["MED4"]
+  expect:
+    min_rows: 1
+    columns: [total_matching, total_genes, by_organism]
+
+- id: genes_by_homolog_group_summary_not_found
+  tool: genes_by_homolog_group_summary
+  desc: Summary reports not_found for fake group IDs
+  params:
+    group_ids: ["cyanorak:FAKE_GROUP_999"]
+  expect:
+    min_rows: 1
+    columns: [total_matching, not_found_groups]
+
+# ---------------------------------------------------------------------------
+# differential_expression_by_ortholog
+# ---------------------------------------------------------------------------
+
 - id: differential_expression_by_ortholog_basic
   tool: differential_expression_by_ortholog
   desc: Single group expression across organisms

@@ -1,0 +1,12 @@
+case_id: genes_by_homolog_group_summary_not_found
+row_count: 1
+rows:
+- by_category_raw: []
+  by_group_raw: []
+  by_organism: []
+  not_found_groups:
+  - cyanorak:FAKE_GROUP_999
+  not_matched_groups: []
+  total_categories: 0
+  total_genes: 0
+  total_matching: 0

@@ -1,0 +1,11 @@
+case_id: search_homolog_groups_summary_source_filter
+row_count: 1
+rows:
+- by_level:
+  - '{''count'': 237, ''item'': ''curated''}'
+  by_source:
+  - '{''count'': 237, ''item'': ''cyanorak''}'
+  score_max: 3.8322
+  score_median: 1.0569
+  total_entries: 21122
+  total_matching: 237

@@ -28,23 +28,31 @@
 
 ## TOOL_BUILDERS dict
 
-Maps tool/case names to query builder functions. Uses **target**
-names after v3 migration (update as tools are renamed):
+Maps tool/case names to query builder functions. Cases pass ontology
+as a param — no per-ontology partials needed:
 
 ```python
 TOOL_BUILDERS = {
     "resolve_gene": build_resolve_gene,
-    "genes_by_function": build_genes_by_function,  # was: search_genes
+    "genes_by_function": build_genes_by_function,
     "gene_overview": build_gene_overview,
-    "gene_homologs": ...,  # was: get_homologs (multi-step)
-    # Per-ontology partial entries
-    "search_ontology_go_bp": partial(build_search_ontology, ontology="go_bp"),
-    # ...
+    "gene_details": build_gene_details,
+    "gene_homologs": build_gene_homologs,
+    "list_organisms": build_list_organisms,
+    "search_ontology": build_search_ontology,
+    "genes_by_ontology": build_genes_by_ontology,
+    "gene_ontology_terms": build_gene_ontology_terms,
+    "list_publications": build_list_publications,
+    "list_experiments": build_list_experiments,
+    "list_experiments_summary": build_list_experiments_summary,
+    "differential_expression_by_gene": build_differential_expression_by_gene,
+    "search_homolog_groups": build_search_homolog_groups,
+    "search_homolog_groups_summary": build_search_homolog_groups_summary,
+    "genes_by_homolog_group": build_genes_by_homolog_group,
+    "genes_by_homolog_group_summary": build_genes_by_homolog_group_summary,
+    "differential_expression_by_ortholog": build_differential_expression_by_ortholog_results,
 }
 ```
-
-**Note:** During transition, old builder names remain in the actual
-code until each tool is renamed. The above shows the target state.
 
 When adding a new tool:
 1. Add builder to `TOOL_BUILDERS`

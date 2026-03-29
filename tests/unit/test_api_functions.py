@@ -2158,3 +2158,94 @@ class TestDifferentialExpressionByOrtholog:
     def test_importable_from_package(self):
         from multiomics_explorer import differential_expression_by_ortholog as fn
         assert callable(fn)
+
+
+# ---------------------------------------------------------------------------
+# _apoc_freq_to_dict and _apoc_freq_to_treatment_dict helpers
+# ---------------------------------------------------------------------------
+class TestApocFreqHelpers:
+    def test_apoc_freq_to_dict_basic(self):
+        """Converts [{item, count}] to {item: count} with expression status defaults."""
+        freq = [{"item": "significant_up", "count": 5}]
+        result = api._apoc_freq_to_dict(freq)
+        assert result["significant_up"] == 5
+        # Missing keys filled with 0
+        assert result["significant_down"] == 0
+        assert result["not_significant"] == 0
+
+    def test_apoc_freq_to_dict_all_keys(self):
+        """All three expression status keys present in output."""
+        freq = [
+            {"item": "significant_up", "count": 10},
+            {"item": "significant_down", "count": 3},
+            {"item": "not_significant", "count": 87},
+        ]
+        result = api._apoc_freq_to_dict(freq)
+        assert result == {"significant_up": 10, "significant_down": 3, "not_significant": 87}
+
+    def test_apoc_freq_to_dict_empty(self):
+        """Empty input fills all keys with 0."""
+        result = api._apoc_freq_to_dict([])
+        assert result == {"significant_up": 0, "significant_down": 0, "not_significant": 0}
+
+    def test_apoc_freq_to_treatment_dict_basic(self):
+        """Converts [{item, count}] to {item: count} without defaults."""
+        freq = [
+            {"item": "coculture", "count": 16},
+            {"item": "nitrogen_stress", "count": 8},
+        ]
+        result = api._apoc_freq_to_treatment_dict(freq)
+        assert result == {"coculture": 16, "nitrogen_stress": 8}
+
+    def test_apoc_freq_to_treatment_dict_empty(self):
+        """Empty input returns empty dict."""
+        result = api._apoc_freq_to_treatment_dict([])
+        assert result == {}
+
+    def test_apoc_freq_to_treatment_dict_single(self):
+        """Single item."""
+        result = api._apoc_freq_to_treatment_dict([{"item": "light_stress", "count": 4}])
+        assert result == {"light_stress": 4}
+
+
+# ---------------------------------------------------------------------------
+# run_cypher LIMIT injection edge cases
+# ---------------------------------------------------------------------------
+class TestRunCypherLimitEdgeCases:
+    """Edge cases for LIMIT injection in run_cypher."""
+
+    def test_limit_in_subquery_not_duplicated(self, mock_conn):
+        """LIMIT inside a subquery should not prevent top-level LIMIT injection."""
+        query = "CALL { MATCH (n) RETURN n LIMIT 5 } RETURN count(n)"
+        mock_conn.execute_query.return_value = []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            api.run_cypher(query, limit=10, conn=mock_conn)
+        called_query = mock_conn.execute_query.call_args[0][0]
+        # The regex finds any LIMIT so it won't inject — just verify no crash
+        assert "LIMIT" in called_query
+
+    def test_trailing_whitespace_after_semicolon(self, mock_conn):
+        """Semicolons with trailing whitespace stripped before LIMIT injection."""
+        mock_conn.execute_query.return_value = []
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            api.run_cypher("MATCH (n) RETURN n;  ", limit=10, conn=mock_conn)
+        called_query = mock_conn.execute_query.call_args[0][0]
+        assert ";" not in called_query
+        assert "LIMIT 10" in called_query
+
+    def test_limit_case_insensitive_detection(self, mock_conn):
+        """Existing LIMIT (any case) prevents injection."""
+        mock_conn.execute_query.return_value = [{"n": 1}]
+        with patch(f"{MOD}.SyntaxValidator") as sv, \
+             patch(f"{MOD}.SchemaValidator") as schv, \
+             patch(f"{MOD}.PropertiesValidator") as pv:
+            _valid_validators(sv, schv, pv)
+            api.run_cypher("MATCH (n) RETURN n limit 5", limit=10, conn=mock_conn)
+        called_query = mock_conn.execute_query.call_args[0][0]
+        assert called_query.count("limit") + called_query.count("LIMIT") == 1

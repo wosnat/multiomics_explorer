@@ -8,7 +8,6 @@ Usage:
     pytest tests/regression/ --force-regen     # update baselines after intentional changes
 """
 
-from functools import partial
 from pathlib import Path
 
 import pytest
@@ -16,15 +15,15 @@ import yaml
 
 from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene,
+    build_differential_expression_by_ortholog_results,
+    build_gene_details,
+    build_gene_homologs,
     build_gene_ontology_terms,
     build_gene_overview,
-    build_gene_stub,
     build_genes_by_function,
     build_genes_by_homolog_group,
     build_genes_by_homolog_group_summary,
     build_genes_by_ontology,
-    build_gene_details,
-    build_gene_homologs,
     build_list_experiments,
     build_list_experiments_summary,
     build_list_gene_categories,
@@ -34,7 +33,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
     build_search_ontology,
-    build_differential_expression_by_ortholog_results,
 )
 
 # ---------------------------------------------------------------------------
@@ -55,28 +53,6 @@ TOOL_BUILDERS = {
     "search_ontology": build_search_ontology,
     "genes_by_ontology": build_genes_by_ontology,
     "gene_ontology_terms": build_gene_ontology_terms,
-    # Per-ontology partial entries for regression snapshots
-    "search_ontology_go_bp": partial(build_search_ontology, ontology="go_bp"),
-    "search_ontology_kegg": partial(build_search_ontology, ontology="kegg"),
-    "search_ontology_ec": partial(build_search_ontology, ontology="ec"),
-    "search_ontology_cog_category": partial(build_search_ontology, ontology="cog_category"),
-    "search_ontology_cyanorak_role": partial(build_search_ontology, ontology="cyanorak_role"),
-    "search_ontology_tigr_role": partial(build_search_ontology, ontology="tigr_role"),
-    "genes_by_ontology_go_bp": partial(build_genes_by_ontology, ontology="go_bp"),
-    "genes_by_ontology_kegg": partial(build_genes_by_ontology, ontology="kegg"),
-    "genes_by_ontology_ec": partial(build_genes_by_ontology, ontology="ec"),
-    "genes_by_ontology_cog_category": partial(build_genes_by_ontology, ontology="cog_category"),
-    "genes_by_ontology_cyanorak_role": partial(build_genes_by_ontology, ontology="cyanorak_role"),
-    "genes_by_ontology_tigr_role": partial(build_genes_by_ontology, ontology="tigr_role"),
-    "gene_ontology_terms_go_bp": partial(build_gene_ontology_terms, ontology="go_bp"),
-    "gene_ontology_terms_kegg": partial(build_gene_ontology_terms, ontology="kegg"),
-    "gene_ontology_terms_ec": partial(build_gene_ontology_terms, ontology="ec"),
-    "gene_ontology_terms_cog_category": partial(build_gene_ontology_terms, ontology="cog_category"),
-    "gene_ontology_terms_cyanorak_role": partial(build_gene_ontology_terms, ontology="cyanorak_role"),
-    "gene_ontology_terms_tigr_role": partial(build_gene_ontology_terms, ontology="tigr_role"),
-    "search_ontology_pfam": partial(build_search_ontology, ontology="pfam"),
-    "genes_by_ontology_pfam": partial(build_genes_by_ontology, ontology="pfam"),
-    "gene_ontology_terms_pfam": partial(build_gene_ontology_terms, ontology="pfam"),
     "list_publications": build_list_publications,
     "list_experiments": build_list_experiments,
     "list_experiments_summary": build_list_experiments_summary,

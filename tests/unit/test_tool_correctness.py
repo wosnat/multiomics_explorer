@@ -23,6 +23,7 @@ from tests.fixtures.gene_data import (
     as_genes_by_function_result,
     as_resolve_gene_result,
     genes_by_organism,
+    genes_with_property,
 )
 
 
@@ -531,3 +532,1070 @@ class TestGeneHomologsCorrectness:
         assert result.not_found == ["FAKE_GENE"]
         assert result.no_groups == ["A9601_RS13285"]
         assert result.results == []
+
+
+# ---------------------------------------------------------------------------
+# TestSearchOntologyCorrectness
+# ---------------------------------------------------------------------------
+class TestSearchOntologyCorrectness:
+    """Verify search_ontology returns correct data for realistic mock responses."""
+
+    @pytest.mark.asyncio
+    async def test_go_bp_search_returns_terms(self, tool_fns, mock_ctx):
+        """GO BP search returns term IDs and names."""
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={
+                "total_entries": 2448,
+                "total_matching": 31,
+                "score_max": 5.23,
+                "score_median": 2.1,
+                "returned": 3,
+                "truncated": True,
+                "results": [
+                    {"id": "go:0006260", "name": "DNA replication", "score": 5.23},
+                    {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 4.1},
+                    {"id": "go:0006270", "name": "DNA replication initiation", "score": 2.1},
+                ],
+            },
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp",
+            )
+
+        assert result.total_entries == 2448
+        assert result.total_matching == 31
+        assert result.returned == 3
+        assert result.truncated is True
+        assert result.score_max == 5.23
+        assert result.score_median == 2.1
+        assert len(result.results) == 3
+        assert result.results[0].id == "go:0006260"
+        assert result.results[0].name == "DNA replication"
+
+    @pytest.mark.asyncio
+    async def test_summary_mode_empty_results(self, tool_fns, mock_ctx):
+        """Summary mode returns counts with results=[]."""
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={
+                "total_entries": 847,
+                "total_matching": 12,
+                "score_max": 3.5,
+                "score_median": 1.8,
+                "returned": 0,
+                "truncated": True,
+                "results": [],
+            },
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="transport", ontology="go_bp", summary=True,
+            )
+
+        assert result.returned == 0
+        assert result.truncated is True
+        assert result.results == []
+        assert result.total_matching == 12
+
+    @pytest.mark.asyncio
+    async def test_zero_matches(self, tool_fns, mock_ctx):
+        """No matches returns score_max=None, score_median=None."""
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={
+                "total_entries": 500,
+                "total_matching": 0,
+                "score_max": None,
+                "score_median": None,
+                "returned": 0,
+                "truncated": False,
+                "results": [],
+            },
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="xyznonexistent", ontology="ec",
+            )
+
+        assert result.total_matching == 0
+        assert result.score_max is None
+        assert result.score_median is None
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("ontology", [
+        "go_bp", "go_mf", "go_cc", "kegg", "ec",
+        "cog_category", "cyanorak_role", "tigr_role", "pfam",
+    ])
+    async def test_all_ontologies_accepted(self, tool_fns, mock_ctx, ontology):
+        """Each valid ontology value is accepted without error."""
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={
+                "total_entries": 100, "total_matching": 1,
+                "score_max": 1.0, "score_median": 1.0,
+                "returned": 1, "truncated": False,
+                "results": [{"id": "test:001", "name": "test term", "score": 1.0}],
+            },
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="test", ontology=ontology,
+            )
+        assert result.total_matching == 1
+
+
+# ---------------------------------------------------------------------------
+# TestGenesByOntologyCorrectness
+# ---------------------------------------------------------------------------
+class TestGenesByOntologyCorrectness:
+    """Verify genes_by_ontology returns correct data for realistic mock responses."""
+
+    @pytest.mark.asyncio
+    async def test_single_term_returns_genes(self, tool_fns, mock_ctx):
+        """Single GO term returns annotated genes."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value={
+                "total_matching": 2,
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
+                "by_category": [{"category": "DNA replication", "count": 2}],
+                "by_term": [{"term_id": "go:0006260", "count": 2}],
+                "returned": 2,
+                "truncated": False,
+                "results": [
+                    {"locus_tag": "PMM0001", "gene_name": "dnaN",
+                     "product": "DNA polymerase III, beta subunit",
+                     "organism_name": "Prochlorococcus MED4",
+                     "gene_category": "DNA replication",
+                     "annotation_quality": 3, "term_id": "go:0006260",
+                     "term_name": "DNA replication"},
+                    {"locus_tag": "PMM0845", "gene_name": None,
+                     "product": "hypothetical protein",
+                     "organism_name": "Prochlorococcus MED4",
+                     "gene_category": None,
+                     "annotation_quality": 0, "term_id": "go:0006260",
+                     "term_name": "DNA replication"},
+                ],
+            },
+        ):
+            result = await tool_fns["genes_by_ontology"](
+                mock_ctx, term_ids=["go:0006260"], ontology="go_bp",
+            )
+
+        assert result.total_matching == 2
+        assert result.returned == 2
+        loci = {r.locus_tag for r in result.results}
+        assert loci == {"PMM0001", "PMM0845"}
+
+    @pytest.mark.asyncio
+    async def test_zero_match_empty_response(self, tool_fns, mock_ctx):
+        """Zero matches return empty results."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value={
+                "total_matching": 0,
+                "by_organism": [], "by_category": [], "by_term": [],
+                "returned": 0, "truncated": False, "results": [],
+            },
+        ):
+            result = await tool_fns["genes_by_ontology"](
+                mock_ctx, term_ids=["go:9999999"], ontology="go_bp",
+            )
+
+        assert result.total_matching == 0
+        assert result.results == []
+
+    @pytest.mark.asyncio
+    async def test_summary_mode(self, tool_fns, mock_ctx):
+        """Summary mode returns breakdowns with results=[]."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value={
+                "total_matching": 15,
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 15}],
+                "by_category": [{"category": "Transport", "count": 10}],
+                "by_term": [{"term_id": "go:0006810", "count": 15}],
+                "returned": 0, "truncated": True, "results": [],
+            },
+        ):
+            result = await tool_fns["genes_by_ontology"](
+                mock_ctx, term_ids=["go:0006810"], ontology="go_bp", summary=True,
+            )
+
+        assert result.returned == 0
+        assert result.truncated is True
+        assert result.total_matching == 15
+
+
+# ---------------------------------------------------------------------------
+# TestGeneOntologyTermsCorrectness
+# ---------------------------------------------------------------------------
+class TestGeneOntologyTermsCorrectness:
+    """Verify gene_ontology_terms returns correct ontology annotations for genes."""
+
+    @pytest.mark.asyncio
+    async def test_single_gene_returns_terms(self, tool_fns, mock_ctx):
+        """Single gene returns its ontology term annotations."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value={
+                "total_matching": 3,
+                "total_genes": 1,
+                "total_terms": 3,
+                "by_ontology": [
+                    {"ontology_type": "go_bp", "term_count": 2, "gene_count": 1},
+                    {"ontology_type": "go_mf", "term_count": 1, "gene_count": 1},
+                ],
+                "by_term": [
+                    {"term_id": "go:0006260", "term_name": "DNA replication",
+                     "ontology_type": "go_bp", "count": 1},
+                ],
+                "terms_per_gene_min": 3,
+                "terms_per_gene_max": 3,
+                "terms_per_gene_median": 3.0,
+                "returned": 3,
+                "truncated": False,
+                "not_found": [],
+                "results": [
+                    {"locus_tag": "PMM0001", "term_id": "go:0006260",
+                     "term_name": "DNA replication", "ontology_type": "go_bp"},
+                    {"locus_tag": "PMM0001", "term_id": "go:0006261",
+                     "term_name": "DNA-templated DNA replication", "ontology_type": "go_bp"},
+                    {"locus_tag": "PMM0001", "term_id": "go:0003887",
+                     "term_name": "DNA-directed DNA polymerase activity", "ontology_type": "go_mf"},
+                ],
+            },
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+
+        assert result.total_matching == 3
+        assert result.returned == 3
+        assert len(result.results) == 3
+        assert result.results[0].locus_tag == "PMM0001"
+        assert result.results[0].term_id == "go:0006260"
+        assert len(result.by_ontology) == 2
+
+    @pytest.mark.asyncio
+    async def test_batch_genes(self, tool_fns, mock_ctx):
+        """Batch query returns terms for multiple genes."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value={
+                "total_matching": 4,
+                "total_genes": 2,
+                "total_terms": 4,
+                "by_ontology": [{"ontology_type": "go_bp", "term_count": 4, "gene_count": 2}],
+                "by_term": [],
+                "terms_per_gene_min": 2,
+                "terms_per_gene_max": 2,
+                "terms_per_gene_median": 2.0,
+                "returned": 4,
+                "truncated": False,
+                "not_found": [],
+                "results": [
+                    {"locus_tag": "PMM0001", "term_id": "go:0006260",
+                     "term_name": "DNA replication", "ontology_type": "go_bp"},
+                    {"locus_tag": "PMM0001", "term_id": "go:0006261",
+                     "term_name": "DNA-templated DNA replication", "ontology_type": "go_bp"},
+                    {"locus_tag": "PMM0845", "term_id": "go:0015979",
+                     "term_name": "photosynthesis", "ontology_type": "go_bp"},
+                    {"locus_tag": "PMM0845", "term_id": "go:0009765",
+                     "term_name": "photosynthesis, light harvesting", "ontology_type": "go_bp"},
+                ],
+            },
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001", "PMM0845"],
+            )
+
+        loci = {r.locus_tag for r in result.results}
+        assert loci == {"PMM0001", "PMM0845"}
+
+    @pytest.mark.asyncio
+    async def test_not_found_genes(self, tool_fns, mock_ctx):
+        """Fake genes appear in not_found."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value={
+                "total_matching": 0,
+                "total_genes": 0,
+                "total_terms": 0,
+                "by_ontology": [], "by_term": [],
+                "terms_per_gene_min": 0,
+                "terms_per_gene_max": 0,
+                "terms_per_gene_median": 0.0,
+                "returned": 0,
+                "truncated": False,
+                "not_found": ["FAKE_GENE"],
+                "results": [],
+            },
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["FAKE_GENE"],
+            )
+
+        assert result.not_found == ["FAKE_GENE"]
+        assert result.results == []
+
+
+# ---------------------------------------------------------------------------
+# TestListPublicationsCorrectness
+# ---------------------------------------------------------------------------
+class TestListPublicationsCorrectness:
+    """Verify list_publications returns correct data."""
+
+    @pytest.mark.asyncio
+    async def test_returns_publications(self, tool_fns, mock_ctx):
+        """Publications returned with experiment summaries."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 12,
+                "total_matching": 2,
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
+                "by_treatment_type": [{"treatment_type": "coculture", "count": 1}],
+                "by_omics_type": [{"omics_type": "RNASEQ", "count": 2}],
+                "returned": 2,
+                "truncated": False,
+                "results": [
+                    {"doi": "10.1038/ismej.2016.70", "title": "Test paper 1",
+                     "authors": ["Smith A", "Jones B"], "year": 2016,
+                     "journal": "ISME Journal",
+                     "organisms": ["Prochlorococcus MED4"],
+                     "experiment_count": 5,
+                     "treatment_types": ["coculture"],
+                     "omics_types": ["RNASEQ"]},
+                    {"doi": "10.1111/test.2020", "title": "Test paper 2",
+                     "authors": ["Jones C"], "year": 2020,
+                     "journal": "Nature",
+                     "organisms": ["Prochlorococcus MIT9312"],
+                     "experiment_count": 3,
+                     "treatment_types": ["nitrogen_stress"],
+                     "omics_types": ["PROTEOMICS"]},
+                ],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+
+        assert result.total_entries == 12
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert len(result.results) == 2
+        assert result.results[0].doi == "10.1038/ismej.2016.70"
+        assert result.results[0].experiment_count == 5
+        assert result.results[0].authors == ["Smith A", "Jones B"]
+
+    @pytest.mark.asyncio
+    async def test_organism_filter(self, tool_fns, mock_ctx):
+        """Organism filter forwarded to API."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 12, "total_matching": 1,
+                "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                "returned": 1, "truncated": False,
+                "results": [
+                    {"doi": "10.1038/ismej.2016.70", "title": "Test",
+                     "authors": ["Smith A"], "year": 2016,
+                     "journal": "ISME Journal",
+                     "organisms": ["Prochlorococcus MED4"],
+                     "experiment_count": 5,
+                     "treatment_types": ["coculture"],
+                     "omics_types": ["RNASEQ"]},
+                ],
+            },
+        ) as mock_api:
+            await tool_fns["list_publications"](mock_ctx, organism="MED4")
+
+        assert mock_api.call_args.kwargs["organism"] == "MED4"
+
+
+# ---------------------------------------------------------------------------
+# TestListExperimentsCorrectness
+# ---------------------------------------------------------------------------
+class TestListExperimentsCorrectness:
+    """Verify list_experiments returns correct data with realistic mock responses."""
+
+    @classmethod
+    def _make_api_return(cls):
+        """Return a fresh deep copy of the sample API return to avoid .pop() mutation."""
+        import copy
+        return copy.deepcopy(cls._SAMPLE_API_RETURN_TEMPLATE)
+
+    _SAMPLE_API_RETURN_TEMPLATE = {
+        "total_entries": 76,
+        "total_matching": 2,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
+        "by_treatment_type": [{"treatment_type": "coculture", "count": 1},
+                               {"treatment_type": "light_stress", "count": 1}],
+        "by_omics_type": [{"omics_type": "RNASEQ", "count": 2}],
+        "by_publication": [{"publication_doi": "10.1038/test", "count": 2}],
+        "by_table_scope": [{"table_scope": "all_detected_genes", "count": 2}],
+        "time_course_count": 1,
+        "score_max": None,
+        "score_median": None,
+        "returned": 2,
+        "truncated": False,
+        "results": [
+            {"experiment_id": "exp_001",
+             "experiment_name": "MED4 Coculture",
+             "publication_doi": "10.1038/test",
+             "organism_name": "Prochlorococcus MED4",
+             "treatment_type": "coculture",
+             "coculture_partner": "Alteromonas HOT1A3",
+             "omics_type": "RNASEQ",
+             "is_time_course": False,
+             "table_scope": "all_detected_genes",
+             "table_scope_detail": None,
+             "gene_count": 1696,
+             "genes_by_status": {"significant_up": 245, "significant_down": 178, "not_significant": 1273}},
+            {"experiment_id": "exp_002",
+             "experiment_name": "MED4 Light Stress Time Course",
+             "publication_doi": "10.1038/test",
+             "organism_name": "Prochlorococcus MED4",
+             "treatment_type": "light_stress",
+             "coculture_partner": None,
+             "omics_type": "RNASEQ",
+             "is_time_course": True,
+             "table_scope": "all_detected_genes",
+             "table_scope_detail": None,
+             "gene_count": 1696,
+             "genes_by_status": {"significant_up": 450, "significant_down": 320, "not_significant": 926},
+             "timepoints": [
+                 {"timepoint": "2h", "timepoint_order": 1, "timepoint_hours": 2.0,
+                  "gene_count": 1696,
+                  "genes_by_status": {"significant_up": 50, "significant_down": 30, "not_significant": 1616}},
+                 {"timepoint": "24h", "timepoint_order": 2, "timepoint_hours": 24.0,
+                  "gene_count": 1696,
+                  "genes_by_status": {"significant_up": 400, "significant_down": 290, "not_significant": 1006}},
+             ]},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_experiments_with_breakdowns(self, tool_fns, mock_ctx):
+        """Full response with experiments and breakdowns."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._make_api_return(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+
+        assert result.total_entries == 76
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert len(result.results) == 2
+        assert result.results[0].experiment_id == "exp_001"
+        assert result.results[0].treatment_type == "coculture"
+        assert result.results[0].table_scope == "all_detected_genes"
+        assert len(result.by_table_scope) == 1
+
+    @pytest.mark.asyncio
+    async def test_time_course_experiment_has_timepoints(self, tool_fns, mock_ctx):
+        """Time-course experiment has timepoints list."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._make_api_return(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+
+        tc = result.results[1]
+        assert tc.is_time_course is True
+        assert len(tc.timepoints) == 2
+        assert tc.timepoints[0].timepoint == "2h"
+        assert tc.timepoints[1].genes_by_status.significant_up == 400
+
+
+# ---------------------------------------------------------------------------
+# TestDiffExprByGeneCorrectness
+# ---------------------------------------------------------------------------
+class TestDiffExprByGeneCorrectness:
+    """Verify differential_expression_by_gene returns correct data."""
+
+    @pytest.mark.asyncio
+    async def test_single_gene_expression(self, tool_fns, mock_ctx):
+        """Gene-centric DE returns rows per gene × experiment × timepoint."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value={
+                "organism_name": "Prochlorococcus MED4",
+                "matching_genes": 1,
+                "total_matching": 3,
+                "rows_by_status": {"significant_up": 1, "significant_down": 1, "not_significant": 1},
+                "median_abs_log2fc": 1.2,
+                "max_abs_log2fc": 3.5,
+                "experiment_count": 2,
+                "rows_by_treatment_type": {"coculture": 2, "light_stress": 1},
+                "by_table_scope": {"all_detected_genes": 3},
+                "top_categories": [{"category": "DNA replication", "total_genes": 1, "significant_genes": 1}],
+                "experiments": [
+                    {"experiment_id": "exp1", "experiment_name": "Coculture",
+                     "treatment_type": "coculture", "omics_type": "RNASEQ",
+                     "coculture_partner": None, "is_time_course": "true",
+                     "table_scope": "all_detected_genes",
+                     "matching_genes": 1,
+                     "rows_by_status": {"significant_up": 1, "significant_down": 1, "not_significant": 0},
+                     "total_rows": 2, "significant_rows": 1,
+                     "timepoints": [
+                         {"timepoint": "2h", "timepoint_hours": 2.0,
+                          "timepoint_order": 1, "matching_genes": 1,
+                          "rows_by_status": {"significant_up": 1, "significant_down": 0, "not_significant": 0},
+                          "total_rows": 1, "significant_rows": 1},
+                     ]},
+                ],
+                "not_found": [],
+                "no_expression": [],
+                "returned": 3,
+                "truncated": False,
+                "results": [
+                    {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                     "timepoint": "2h", "timepoint_hours": 2.0, "timepoint_order": 1,
+                     "log2fc": 2.5, "padj": 0.001, "rank": 1,
+                     "expression_status": "significant_up",
+                     "gene_name": "dnaN", "treatment_type": "coculture",
+                     "gene_category": "DNA replication"},
+                    {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                     "timepoint": "24h", "timepoint_hours": 24.0, "timepoint_order": 2,
+                     "log2fc": -1.8, "padj": 0.01, "rank": 2,
+                     "expression_status": "significant_down",
+                     "gene_name": "dnaN", "treatment_type": "coculture",
+                     "gene_category": "DNA replication"},
+                    {"locus_tag": "PMM0001", "experiment_id": "exp2",
+                     "timepoint": None, "timepoint_hours": None, "timepoint_order": 1,
+                     "log2fc": 0.3, "padj": 0.45, "rank": 1,
+                     "expression_status": "not_significant",
+                     "gene_name": "dnaN", "treatment_type": "light_stress",
+                     "gene_category": "DNA replication"},
+                ],
+            },
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+
+        assert result.organism_name == "Prochlorococcus MED4"
+        assert result.matching_genes == 1
+        assert result.total_matching == 3
+        assert result.returned == 3
+        assert len(result.results) == 3
+        r = result.results[0]
+        assert r.locus_tag == "PMM0001"
+        assert r.log2fc == 2.5
+        assert r.expression_status == "significant_up"
+
+    @pytest.mark.asyncio
+    async def test_not_found_and_no_expression(self, tool_fns, mock_ctx):
+        """not_found and no_expression populated for missing genes."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value={
+                "organism_name": "Prochlorococcus MED4",
+                "matching_genes": 0,
+                "total_matching": 0,
+                "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
+                "median_abs_log2fc": None,
+                "max_abs_log2fc": None,
+                "experiment_count": 0,
+                "rows_by_treatment_type": {},
+                "by_table_scope": {},
+                "top_categories": [],
+                "experiments": [],
+                "not_found": ["FAKE_GENE"],
+                "no_expression": ["PMM9999"],
+                "returned": 0,
+                "truncated": False,
+                "results": [],
+            },
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, locus_tags=["FAKE_GENE", "PMM9999"],
+            )
+
+        assert result.not_found == ["FAKE_GENE"]
+        assert result.no_expression == ["PMM9999"]
+        assert result.results == []
+
+
+# ---------------------------------------------------------------------------
+# TestHypotheticalAndECFixtureUsage
+# ---------------------------------------------------------------------------
+class TestFixtureSubsetUsage:
+    """Verify fixture subsets (GENES_HYPOTHETICAL, GENES_WITH_EC) are meaningful."""
+
+    def test_hypothetical_genes_have_no_gene_name(self):
+        """Hypothetical genes have annotation_quality == 0 or product containing 'hypothetical'."""
+        for gene in GENES_HYPOTHETICAL:
+            assert (
+                gene.get("annotation_quality", 0) == 0
+                or "hypothetical" in gene.get("product", "").lower()
+            ), f"{gene['locus_tag']} is not hypothetical"
+
+    def test_ec_genes_have_ec_numbers(self):
+        """Genes in GENES_WITH_EC have ec_numbers field."""
+        for gene in GENES_WITH_EC:
+            assert gene.get("ec_numbers"), (
+                f"{gene['locus_tag']} in GENES_WITH_EC but has no ec_numbers"
+            )
+
+    @pytest.mark.asyncio
+    async def test_hypothetical_gene_overview_low_quality(self, tool_fns, mock_ctx):
+        """Hypothetical genes returned with low annotation_quality via gene_overview."""
+        gene = GENES_HYPOTHETICAL[0]
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value={
+                "total_matching": 1,
+                "by_organism": [{"organism_name": gene["organism_name"], "count": 1}],
+                "by_category": [],
+                "by_annotation_type": [],
+                "has_expression": 0,
+                "has_significant_expression": 0,
+                "has_orthologs": 0,
+                "returned": 1,
+                "truncated": False,
+                "not_found": [],
+                "results": [
+                    {"locus_tag": gene["locus_tag"],
+                     "gene_name": gene.get("gene_name"),
+                     "product": gene.get("product"),
+                     "gene_category": gene.get("gene_category"),
+                     "annotation_quality": gene.get("annotation_quality", 0),
+                     "organism_name": gene["organism_name"],
+                     "annotation_types": [],
+                     "expression_edge_count": 0,
+                     "significant_up_count": 0,
+                     "significant_down_count": 0,
+                     "closest_ortholog_group_size": 0,
+                     "closest_ortholog_genera": []},
+                ],
+            },
+        ):
+            result = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=[gene["locus_tag"]],
+            )
+
+        r = result.results[0]
+        assert r.annotation_quality == gene.get("annotation_quality", 0)
+
+    @pytest.mark.asyncio
+    async def test_ec_gene_in_function_search(self, tool_fns, mock_ctx):
+        """Gene with EC number appears in function search results."""
+        gene = GENES_WITH_EC[0]
+        row = as_genes_by_function_result(gene, score=4.0)
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value={
+                "total_search_hits": 50,
+                "total_matching": 1,
+                "by_organism": [{"organism_name": gene["organism_name"], "count": 1}],
+                "by_category": [{"category": gene.get("gene_category", "Unknown"), "count": 1}],
+                "score_max": 4.0,
+                "score_median": 4.0,
+                "returned": 1,
+                "truncated": False,
+                "results": [row],
+            },
+        ):
+            result = await tool_fns["genes_by_function"](
+                mock_ctx, search_text="polymerase",
+            )
+
+        assert result.results[0].locus_tag == gene["locus_tag"]
+
+
+# ---------------------------------------------------------------------------
+# TestRunCypherCorrectness
+# ---------------------------------------------------------------------------
+class TestRunCypherCorrectness:
+    """Verify run_cypher returns correct data for realistic mock responses."""
+
+    @pytest.mark.asyncio
+    async def test_basic_query_returns_results(self, tool_fns, mock_ctx):
+        """Simple MATCH query returns results with envelope."""
+        with patch(
+            "multiomics_explorer.api.functions.run_cypher",
+            return_value={
+                "returned": 2,
+                "truncated": False,
+                "warnings": [],
+                "results": [
+                    {"locus_tag": "PMM0001", "gene_name": "dnaN"},
+                    {"locus_tag": "PMM0845", "gene_name": None},
+                ],
+            },
+        ):
+            result = await tool_fns["run_cypher"](
+                mock_ctx, query="MATCH (g:Gene) RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name LIMIT 2",
+            )
+
+        assert result.returned == 2
+        assert result.truncated is False
+        assert result.warnings == []
+        assert len(result.results) == 2
+        assert result.results[0]["locus_tag"] == "PMM0001"
+
+    @pytest.mark.asyncio
+    async def test_warnings_propagated(self, tool_fns, mock_ctx):
+        """Schema warnings from CyVer appear in response."""
+        with patch(
+            "multiomics_explorer.api.functions.run_cypher",
+            return_value={
+                "returned": 0,
+                "truncated": False,
+                "warnings": ["Label 'FakeNode' not in database"],
+                "results": [],
+            },
+        ):
+            result = await tool_fns["run_cypher"](
+                mock_ctx, query="MATCH (n:FakeNode) RETURN n",
+            )
+
+        assert result.returned == 0
+        assert result.warnings == ["Label 'FakeNode' not in database"]
+
+    @pytest.mark.asyncio
+    async def test_truncated_when_limit_reached(self, tool_fns, mock_ctx):
+        """truncated=True when returned == limit."""
+        with patch(
+            "multiomics_explorer.api.functions.run_cypher",
+            return_value={
+                "returned": 10,
+                "truncated": True,
+                "warnings": [],
+                "results": [{"n": i} for i in range(10)],
+            },
+        ):
+            result = await tool_fns["run_cypher"](
+                mock_ctx, query="MATCH (n) RETURN n", limit=10,
+            )
+
+        assert result.truncated is True
+        assert result.returned == 10
+
+
+# ---------------------------------------------------------------------------
+# TestSearchHomologGroupsCorrectness
+# ---------------------------------------------------------------------------
+class TestSearchHomologGroupsCorrectness:
+    """Verify search_homolog_groups returns correct data."""
+
+    @pytest.mark.asyncio
+    async def test_search_returns_groups(self, tool_fns, mock_ctx):
+        """Text search returns ortholog groups with scores."""
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value={
+                "total_entries": 21122,
+                "total_matching": 50,
+                "by_source": [{"source": "cyanorak", "count": 30},
+                              {"source": "eggnog", "count": 20}],
+                "by_level": [{"taxonomic_level": "curated", "count": 30}],
+                "score_max": 6.1,
+                "score_median": 2.0,
+                "returned": 3,
+                "truncated": True,
+                "results": [
+                    {"group_id": "cyanorak:CK_00000570", "group_name": "CK_00000570",
+                     "source": "cyanorak",
+                     "taxonomic_level": "curated", "specificity_rank": 0,
+                     "consensus_gene_name": "psaA",
+                     "consensus_product": "Photosystem I P700 chlorophyll a apoprotein A1",
+                     "member_count": 15, "organism_count": 15, "score": 6.1},
+                    {"group_id": "cyanorak:CK_00000571", "group_name": "CK_00000571",
+                     "source": "cyanorak",
+                     "taxonomic_level": "curated", "specificity_rank": 0,
+                     "consensus_gene_name": "psaB",
+                     "consensus_product": "Photosystem I P700 chlorophyll a apoprotein A2",
+                     "member_count": 15, "organism_count": 15, "score": 5.8},
+                    {"group_id": "eggnog:COG0592@2", "group_name": "COG0592@2",
+                     "source": "eggnog",
+                     "taxonomic_level": "Bacteria", "specificity_rank": 3,
+                     "consensus_gene_name": "dnaN",
+                     "consensus_product": "DNA polymerase III, beta subunit",
+                     "member_count": 200, "organism_count": 150, "score": 2.0},
+                ],
+            },
+        ):
+            result = await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="photosystem",
+            )
+
+        assert result.total_matching == 50
+        assert result.returned == 3
+        assert result.truncated is True
+        assert result.score_max == 6.1
+        assert len(result.results) == 3
+        assert result.results[0].group_id == "cyanorak:CK_00000570"
+        assert len(result.by_source) == 2
+
+    @pytest.mark.asyncio
+    async def test_summary_mode(self, tool_fns, mock_ctx):
+        """Summary mode returns counts only."""
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value={
+                "total_entries": 21122, "total_matching": 50,
+                "by_source": [{"source": "cyanorak", "count": 30}],
+                "by_level": [{"taxonomic_level": "curated", "count": 30}],
+                "score_max": 6.1, "score_median": 2.0,
+                "returned": 0, "truncated": True, "results": [],
+            },
+        ):
+            result = await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="photosystem", summary=True,
+            )
+
+        assert result.returned == 0
+        assert result.results == []
+        assert result.total_matching == 50
+
+
+# ---------------------------------------------------------------------------
+# TestGenesByHomologGroupCorrectness
+# ---------------------------------------------------------------------------
+class TestGenesByHomologGroupCorrectness:
+    """Verify genes_by_homolog_group returns correct data."""
+
+    @pytest.mark.asyncio
+    async def test_returns_member_genes(self, tool_fns, mock_ctx):
+        """Group IDs → member genes."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value={
+                "total_matching": 2,
+                "total_genes": 2,
+                "total_categories": 1,
+                "genes_per_group_max": 2,
+                "genes_per_group_median": 2.0,
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
+                "top_categories": [{"category": "DNA replication", "count": 2}],
+                "top_groups": [{"group_id": "cyanorak:CK_00000364", "count": 2}],
+                "not_found_groups": [],
+                "not_matched_groups": [],
+                "not_found_organisms": [],
+                "not_matched_organisms": [],
+                "returned": 2,
+                "truncated": False,
+                "results": [
+                    {"locus_tag": "PMM0001", "gene_name": "dnaN",
+                     "product": "DNA polymerase III, beta subunit",
+                     "organism_name": "Prochlorococcus MED4",
+                     "gene_category": "DNA replication",
+                     "annotation_quality": 3,
+                     "group_id": "cyanorak:CK_00000364"},
+                    {"locus_tag": "PMM0845", "gene_name": None,
+                     "product": "hypothetical protein",
+                     "organism_name": "Prochlorococcus MED4",
+                     "gene_category": None,
+                     "annotation_quality": 0,
+                     "group_id": "cyanorak:CK_00000364"},
+                ],
+            },
+        ):
+            result = await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["cyanorak:CK_00000364"],
+            )
+
+        assert result.total_matching == 2
+        assert result.returned == 2
+        assert len(result.results) == 2
+        assert result.results[0].locus_tag == "PMM0001"
+        assert result.not_found_groups == []
+
+    @pytest.mark.asyncio
+    async def test_not_found_groups(self, tool_fns, mock_ctx):
+        """Non-existent group IDs appear in not_found_groups."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value={
+                "total_matching": 0, "total_genes": 0, "total_categories": 0,
+                "genes_per_group_max": 0, "genes_per_group_median": 0.0,
+                "by_organism": [], "top_categories": [], "top_groups": [],
+                "not_found_groups": ["fake:group"],
+                "not_matched_groups": [],
+                "not_found_organisms": [],
+                "not_matched_organisms": [],
+                "returned": 0, "truncated": False, "results": [],
+            },
+        ):
+            result = await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["fake:group"],
+            )
+
+        assert result.not_found_groups == ["fake:group"]
+        assert result.results == []
+
+
+# ---------------------------------------------------------------------------
+# TestDiffExprByOrthologCorrectness
+# ---------------------------------------------------------------------------
+class TestDiffExprByOrthologCorrectness:
+    """Verify differential_expression_by_ortholog returns correct data."""
+
+    @pytest.mark.asyncio
+    async def test_returns_group_level_expression(self, tool_fns, mock_ctx):
+        """Cross-organism expression data at group × experiment × timepoint."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            return_value={
+                "total_matching": 2,
+                "matching_genes": 3,
+                "matching_groups": 1,
+                "experiment_count": 2,
+                "median_abs_log2fc": 1.5,
+                "max_abs_log2fc": 3.2,
+                "returned": 2,
+                "truncated": False,
+                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
+                "rows_by_status": {"significant_up": 1, "significant_down": 0, "not_significant": 1},
+                "rows_by_treatment_type": {"coculture": 2},
+                "by_table_scope": {"all_detected_genes": 2},
+                "top_groups": [{"group_id": "cyanorak:CK_00000570",
+                                "consensus_gene_name": "psaA",
+                                "consensus_product": "photosystem I",
+                                "significant_genes": 2, "total_genes": 3}],
+                "top_experiments": [{"experiment_id": "exp1",
+                                     "treatment_type": "coculture",
+                                     "organism_name": "Prochlorococcus MED4",
+                                     "significant_genes": 2}],
+                "not_found_groups": [],
+                "not_matched_groups": [],
+                "not_found_organisms": [],
+                "not_matched_organisms": [],
+                "not_found_experiments": [],
+                "not_matched_experiments": [],
+                "results": [
+                    {"group_id": "cyanorak:CK_00000570",
+                     "consensus_gene_name": "psaA",
+                     "consensus_product": "photosystem I",
+                     "experiment_id": "exp1", "treatment_type": "coculture",
+                     "organism_name": "Prochlorococcus MED4",
+                     "timepoint": "2h", "timepoint_hours": 2.0, "timepoint_order": 1,
+                     "genes_with_expression": 3, "total_genes": 3,
+                     "significant_up": 2, "significant_down": 0, "not_significant": 1},
+                    {"group_id": "cyanorak:CK_00000570",
+                     "consensus_gene_name": "psaA",
+                     "consensus_product": "photosystem I",
+                     "experiment_id": "exp2", "treatment_type": "light_stress",
+                     "organism_name": "Prochlorococcus MED4",
+                     "timepoint": None, "timepoint_hours": None, "timepoint_order": 1,
+                     "genes_with_expression": 3, "total_genes": 3,
+                     "significant_up": 0, "significant_down": 0, "not_significant": 3},
+                ],
+            },
+        ):
+            result = await tool_fns["differential_expression_by_ortholog"](
+                mock_ctx, group_ids=["cyanorak:CK_00000570"],
+            )
+
+        assert result.total_matching == 2
+        assert result.matching_groups == 1
+        assert result.experiment_count == 2
+        assert len(result.results) == 2
+        assert result.results[0].group_id == "cyanorak:CK_00000570"
+        assert result.rows_by_status["significant_up"] == 1
+
+    @pytest.mark.asyncio
+    async def test_not_found_groups(self, tool_fns, mock_ctx):
+        """Non-existent groups appear in not_found_groups."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            return_value={
+                "total_matching": 0, "matching_genes": 0, "matching_groups": 0,
+                "experiment_count": 0, "median_abs_log2fc": None, "max_abs_log2fc": None,
+                "returned": 0, "truncated": False,
+                "by_organism": [],
+                "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
+                "rows_by_treatment_type": {}, "by_table_scope": {},
+                "top_groups": [], "top_experiments": [],
+                "not_found_groups": ["fake:group"],
+                "not_matched_groups": [],
+                "not_found_organisms": [],
+                "not_matched_organisms": [],
+                "not_found_experiments": [],
+                "not_matched_experiments": [],
+                "results": [],
+            },
+        ):
+            result = await tool_fns["differential_expression_by_ortholog"](
+                mock_ctx, group_ids=["fake:group"],
+            )
+
+        assert result.not_found_groups == ["fake:group"]
+        assert result.results == []
+
+
+# ---------------------------------------------------------------------------
+# TestListOrganismsCorrectness
+# ---------------------------------------------------------------------------
+class TestListOrganismsCorrectness:
+    """Verify list_organisms returns correct data."""
+
+    @pytest.mark.asyncio
+    async def test_returns_organisms(self, tool_fns, mock_ctx):
+        """Returns organisms with taxonomy and counts."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 15,
+                "returned": 2,
+                "truncated": True,
+                "results": [
+                    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
+                     "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI",
+                     "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11,
+                     "experiment_count": 46,
+                     "treatment_types": ["coculture", "light_stress"],
+                     "omics_types": ["RNASEQ", "PROTEOMICS"]},
+                    {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas",
+                     "species": "Alteromonas macleodii", "strain": "EZ55", "clade": None,
+                     "ncbi_taxon_id": 28108, "gene_count": 4136, "publication_count": 2,
+                     "experiment_count": 13,
+                     "treatment_types": ["carbon_stress"],
+                     "omics_types": ["RNASEQ"]},
+                ],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+
+        assert result.total_entries == 15
+        assert result.returned == 2
+        assert result.truncated is True
+        assert len(result.results) == 2
+        assert result.results[0].organism_name == "Prochlorococcus MED4"
+        assert result.results[0].gene_count == 1976
+        assert result.results[1].genus == "Alteromonas"
+
+
+# ---------------------------------------------------------------------------
+# TestListFilterValuesCorrectness
+# ---------------------------------------------------------------------------
+class TestListFilterValuesCorrectness:
+    """Verify list_filter_values returns correct data."""
+
+    @pytest.mark.asyncio
+    async def test_returns_categories(self, tool_fns, mock_ctx):
+        """Returns gene categories with counts."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value={
+                "filter_type": "gene_category",
+                "total_entries": 26,
+                "returned": 26,
+                "truncated": False,
+                "results": [
+                    {"value": "Photosynthesis", "count": 770},
+                    {"value": "Transport", "count": 500},
+                    {"value": "DNA replication", "count": 120},
+                ],
+            },
+        ):
+            result = await tool_fns["list_filter_values"](mock_ctx)
+
+        assert result.filter_type == "gene_category"
+        assert result.total_entries == 26
+        assert result.returned == 26
+        assert result.truncated is False
+        assert len(result.results) == 3
+        assert result.results[0].value == "Photosynthesis"
+        assert result.results[0].count == 770

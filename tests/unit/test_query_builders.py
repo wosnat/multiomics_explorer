@@ -14,6 +14,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms_summary,
     build_gene_overview,
     build_gene_overview_summary,
+    build_gene_stub,
     build_genes_by_function,
     build_genes_by_function_summary,
     build_genes_by_ontology,
@@ -1338,6 +1339,57 @@ class TestBuildListExperiments:
         cypher, _ = build_list_experiments(limit=None)
         assert "LIMIT" not in cypher
 
+    def test_table_scope_filter(self):
+        """table_scope filter uses IN with list param."""
+        cypher, params = build_list_experiments(table_scope=["all_detected_genes"])
+        assert "e.table_scope IN $table_scopes" in cypher
+        assert params["table_scopes"] == ["all_detected_genes"]
+
+    def test_table_scope_multiple_values(self):
+        """table_scope with multiple values produces a list param."""
+        cypher, params = build_list_experiments(
+            table_scope=["all_detected_genes", "significant_only"],
+        )
+        assert "e.table_scope IN $table_scopes" in cypher
+        assert params["table_scopes"] == ["all_detected_genes", "significant_only"]
+
+    def test_table_scope_none_no_filter(self):
+        """table_scope=None does not add filter."""
+        cypher, _ = build_list_experiments(table_scope=None)
+        assert "table_scopes" not in cypher
+
+    def test_table_scope_combined_with_organism(self):
+        """table_scope + organism produces AND-joined WHERE."""
+        cypher, params = build_list_experiments(
+            organism="MED4", table_scope=["all_detected_genes"],
+        )
+        assert "e.table_scope IN $table_scopes" in cypher
+        assert "toLower($organism)" in cypher
+        assert " AND " in cypher
+
+
+class TestBuildGeneStub:
+    def test_returns_cypher_and_params(self):
+        cypher, params = build_gene_stub(gene_id="PMM0001")
+        assert "MATCH (g:Gene {locus_tag: $lt})" in cypher
+        assert params["lt"] == "PMM0001"
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_gene_stub(gene_id="PMM0001")
+        for col in ["locus_tag", "gene_name", "product", "organism_name"]:
+            assert col in cypher
+
+    def test_no_limit_or_order(self):
+        """gene_stub is a simple single-gene lookup — no LIMIT or ORDER BY."""
+        cypher, _ = build_gene_stub(gene_id="PMM0001")
+        assert "LIMIT" not in cypher
+        assert "ORDER BY" not in cypher
+
+    def test_param_name_is_lt(self):
+        """Parameter key is 'lt' (matching the Cypher $lt variable)."""
+        _, params = build_gene_stub(gene_id="SYNW0305")
+        assert params == {"lt": "SYNW0305"}
+
 
 class TestBuildListExperimentsSummary:
     def test_no_filters(self):
@@ -1389,6 +1441,19 @@ class TestBuildListExperimentsSummary:
             "by_publication", "by_table_scope",
         ]:
             assert key in cypher
+
+    def test_table_scope_filter(self):
+        """table_scope filter applied to summary query."""
+        cypher, params = build_list_experiments_summary(
+            table_scope=["all_detected_genes"],
+        )
+        assert "e.table_scope IN $table_scopes" in cypher
+        assert params["table_scopes"] == ["all_detected_genes"]
+
+    def test_table_scope_none_no_filter(self):
+        """table_scope=None does not add filter to summary."""
+        cypher, _ = build_list_experiments_summary(table_scope=None)
+        assert "table_scopes" not in cypher
 
 
 # ---------------------------------------------------------------------------
