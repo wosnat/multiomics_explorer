@@ -144,7 +144,7 @@ def resolve_gene(
         "by_organism": by_organism,
         "returned": len(results),
         "offset": offset,
-        "truncated": (offset > 0 and total > 0) or (total > offset + len(results)),
+        "truncated": total > offset + len(results),
         "results": results,
     }
 

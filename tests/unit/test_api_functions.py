@@ -160,7 +160,7 @@ class TestResolveGene:
         assert result["total_matching"] == 1
         assert result["returned"] == 0
         assert result["results"] == []
-        assert result["truncated"] is True
+        assert result["truncated"] is False
 
     def test_offset_default_zero(self, mock_conn):
         mock_conn.execute_query.return_value = [

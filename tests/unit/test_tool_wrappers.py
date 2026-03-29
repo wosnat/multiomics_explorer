@@ -303,6 +303,20 @@ class TestListOrganismsWrapper:
         assert result.returned == 2
         assert result.truncated is False  # 2 == 2
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 10, "returned": 2,
+                "truncated": True, "offset": 5, "results": [],
+            },
+        ) as mock_api:
+            result = await tool_fns["list_organisms"](mock_ctx, offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
+
 
 # ---------------------------------------------------------------------------
 # resolve_gene
@@ -435,6 +449,19 @@ class TestResolveGeneWrapper:
             with pytest.raises(ToolError, match="Error in resolve_gene"):
                 await tool_fns["resolve_gene"](mock_ctx, identifier="PMM0001")
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.resolve_gene",
+            return_value={
+                "total_matching": 10, "by_organism": [], "returned": 2,
+                "truncated": True, "offset": 5, "results": [],
+            },
+        ) as mock_api:
+            result = await tool_fns["resolve_gene"](mock_ctx, identifier="x", offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5 or (len(mock_api.call_args.args) > 3 and mock_api.call_args.args[3] == 5)
 
 
 # ---------------------------------------------------------------------------
@@ -1674,6 +1701,21 @@ class TestListPublicationsWrapper:
         ):
             with pytest.raises(ToolError, match="bad param"):
                 await tool_fns["list_publications"](mock_ctx)
+
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 20, "total_matching": 10,
+                "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                "returned": 2, "truncated": True, "offset": 5, "results": [],
+            },
+        ) as mock_api:
+            result = await tool_fns["list_publications"](mock_ctx, offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
 
 
 class TestListExperimentsWrapper:

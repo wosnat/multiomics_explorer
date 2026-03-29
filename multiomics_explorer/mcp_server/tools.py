@@ -123,6 +123,7 @@ def register_tools(mcp: FastMCP):
     class ListOrganismsResponse(BaseModel):
         total_entries: int = Field(description="Total organisms in the KG")
         returned: int = Field(description="Number of results returned")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if results were truncated by limit")
         results: list[OrganismResult]
 
@@ -139,6 +140,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> ListOrganismsResponse:
         """List all organisms with sequenced genomes in the knowledge graph.
 
@@ -148,14 +152,15 @@ def register_tools(mcp: FastMCP):
         filter uses partial matching — "MED4", "Prochlorococcus MED4", and
         "Prochlorococcus" all work.
         """
-        await ctx.info(f"list_organisms verbose={verbose} limit={limit}")
+        await ctx.info(f"list_organisms verbose={verbose} limit={limit} offset={offset}")
         try:
             conn = _conn(ctx)
-            result = api.list_organisms(verbose=verbose, limit=limit, conn=conn)
+            result = api.list_organisms(verbose=verbose, limit=limit, offset=offset, conn=conn)
             organisms = [OrganismResult(**r) for r in result["results"]]
             response = ListOrganismsResponse(
                 total_entries=result["total_entries"],
                 returned=result["returned"],
+                offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 results=organisms,
             )
@@ -179,6 +184,7 @@ def register_tools(mcp: FastMCP):
         total_matching: int = Field(description="Total genes matching identifier + organism filter (e.g. 3)")
         by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted by count descending")
         returned: int = Field(description="Genes in this response (e.g. 3)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[GeneMatch] = Field(description="Matching genes sorted by organism_name, locus_tag")
 
@@ -200,6 +206,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> ResolveGeneResponse:
         """Resolve a gene identifier to matching genes in the knowledge graph.
 
@@ -209,11 +218,11 @@ def register_tools(mcp: FastMCP):
         filter uses case-insensitive partial matching — 'MED4' and
         'Prochlorococcus MED4' both work.
         """
-        await ctx.info(f"resolve_gene identifier={identifier} organism={organism}")
+        await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset}")
         try:
             conn = _conn(ctx)
             result = api.resolve_gene(
-                identifier, organism=organism, limit=limit, conn=conn,
+                identifier, organism=organism, limit=limit, offset=offset, conn=conn,
             )
             genes = [GeneMatch(**r) for r in result["results"]]
             by_organism = [ResolveOrganismBreakdown(**b) for b in result["by_organism"]]
@@ -221,6 +230,7 @@ def register_tools(mcp: FastMCP):
                 total_matching=result["total_matching"],
                 by_organism=by_organism,
                 returned=result["returned"],
+                offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 results=genes,
             )
@@ -943,6 +953,7 @@ def register_tools(mcp: FastMCP):
         by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted by count descending")
         by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted by count descending")
         returned: int = Field(description="Publications in this response")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[PublicationResult]
 
@@ -975,6 +986,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> ListPublicationsResponse:
         """List publications with expression data in the knowledge graph.
 
@@ -983,13 +997,13 @@ def register_tools(mcp: FastMCP):
         specific experiments with list_experiments or genes with genes_by_function.
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
-                       f"search_text={search_text} author={author}")
+                       f"search_text={search_text} author={author} offset={offset}")
         try:
             conn = _conn(ctx)
             result = api.list_publications(
                 organism=organism, treatment_type=treatment_type,
                 search_text=search_text, author=author,
-                verbose=verbose, limit=limit, conn=conn,
+                verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             results = [PublicationResult(**r) for r in result["results"]]
             by_organism = [PubOrganismBreakdown(**b) for b in result["by_organism"]]
@@ -1002,6 +1016,7 @@ def register_tools(mcp: FastMCP):
                 by_treatment_type=by_treatment_type,
                 by_omics_type=by_omics_type,
                 returned=result["returned"],
+                offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 results=results,
             )
