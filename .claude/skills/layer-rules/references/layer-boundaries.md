@@ -46,6 +46,19 @@ def build_{name}(
   `WITH DISTINCT descendant`, which drops `tid` from scope. This
   applies to summary builders and verbose detail queries that track
   per-input-ID associations.
+- **WITH-as-rename also drops variables:** `WITH root AS descendant`
+  drops all other variables (including UNWIND loop vars like `tid`).
+  For UNWIND-based queries, carry them explicitly:
+  `WITH root AS descendant, tid`. See `expansion_tid` in
+  `_genes_by_ontology_cfg` for the pattern. Non-UNWIND queries
+  (batch `$term_ids IN`) are unaffected.
+- **CyVer validation:** All builders are validated against the live KG
+  via `tests/integration/test_cyver_queries.py`. SchemaValidator checks
+  labels/rels, PropertiesValidator checks property names, SyntaxValidator
+  checks syntax via param substitution (replacing `$param` with Cypher
+  literals). New builders must be added to the `_BUILDERS` list. New
+  map projection keys (e.g. `{alias: g.property}`) must be added to
+  `_KNOWN_MAP_KEYS` (PropertiesValidator false-positives).
 - **APOC is available.** Use throughout:
   - `apoc.coll.frequencies()` for per-dimension breakdowns in summary queries
   - `apoc.coll.max/min/sort` for distributions

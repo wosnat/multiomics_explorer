@@ -23,18 +23,28 @@ Queries using `$param` syntax (all our query builders) return `False` from
 This is a false negative — the query is syntactically valid, the driver just
 can't cache the plan without parameter values.
 
-`SchemaValidator` and `PropertiesValidator` need to be tested to confirm
-whether they also false-negative on parameterized queries.
+**Confirmed:** SchemaValidator and PropertiesValidator work correctly on
+parameterized queries — they return valid scores and detect bad labels/properties.
 
-**Implication for dev testing:** SyntaxValidator cannot be used as-is against
-query builder output. Options:
-1. Skip SyntaxValidator for parameterized queries (detect `$` in query string).
-2. Substitute dummy values before validating (fragile for complex types).
-3. Only run Schema + Properties validators against builders.
-4. Run SyntaxValidator only on queries without `$params`.
+**Resolution:** SyntaxValidator is skipped for parameterized queries (detect
+`$` in query string). Schema + Properties validators run on all builders.
+SyntaxValidator runs only on non-parameterized queries (e.g. `list_gene_categories`,
+`list_organisms`).
 
 **Implication for `run_cypher` tool:** Not a problem — tool users write raw
 Cypher without `$params`.
+
+### PropertiesValidator false positives on map projection keys
+
+PropertiesValidator cannot distinguish map projection keys (e.g.
+`{org: g.organism_name}`) from property accesses (e.g. `g.org`). It reports
+map keys like `org`, `cat`, `lt`, `cnt`, `terms` as missing node properties.
+
+PropertiesValidator also returns `None` (instead of a float score) for queries
+using fulltext indexes (`CALL db.index.fulltext.queryNodes`) or CALL subqueries.
+
+**Resolution:** `test_cyver_queries.py` filters known false-positive map keys
+via `_KNOWN_MAP_KEYS` set and accepts `None` scores as passing.
 
 ### Driver notification noise
 
@@ -59,34 +69,20 @@ does not check procedure availability, only Cypher syntax.
 
 ## Proposed dev/testing uses
 
-### 1. Post-rebuild query validation test (`@pytest.mark.kg`)
+### 1. Post-rebuild query validation test (`@pytest.mark.kg`) ✅
 
-After each KG rebuild, run CyVer against all queries in `kg/queries_lib.py`
-to catch schema drift (renamed labels, removed properties, missing rel types).
+Implemented in `tests/integration/test_cyver_queries.py`.
 
-**Scope questions to resolve:**
-- Which validators to use for parameterized queries? (see gotcha above)
-- Run Schema + Properties only? Or filter out `$param` queries first?
-- Test file: `tests/integration/test_cyver_queries.py` (new) or add to
-  `test_tool_correctness_kg.py`?
-- Threshold: fail on score < 1.0, or warn below a threshold?
-- How to extract query strings from builders (call each builder with
-  representative args vs. parse source)?
-
-**Sketch:**
-```python
-@pytest.mark.kg
-def test_all_builders_schema_valid(conn):
-    from CyVer import SchemaValidator
-    schv = SchemaValidator(conn.driver)
-    failures = []
-    for name, builder_fn in QUERY_BUILDERS.items():
-        cypher, _ = builder_fn()          # call with no-filter defaults
-        score, meta = schv.validate(cypher)
-        if score < 1.0:
-            failures.append((name, score, meta))
-    assert not failures, f"Schema issues: {failures}"
-```
+**Resolved scope decisions:**
+- **Validators:** SchemaValidator (strict, score == 1.0) + PropertiesValidator
+  (with false-positive filtering) on all builders. SyntaxValidator only on
+  non-parameterized queries.
+- **Test file:** `tests/integration/test_cyver_queries.py` (separate file).
+- **Threshold:** SchemaValidator: fail on score < 1.0. PropertiesValidator:
+  fail on score < 1.0 after filtering known false positives (map keys, None scores).
+- **Builder invocation:** Each builder called with representative dummy args via
+  `@pytest.mark.parametrize` for per-builder test reporting.
+- **Coverage:** ~105 builder variants (all builders × ontologies × verbose modes).
 
 ### 2. Add-or-update-tool skill step
 
@@ -111,8 +107,11 @@ against the deployed KG. Blocks merge if KG/query drift detected.
 
 ## Status
 
-- [ ] Decide which validators to use for parameterized queries
-- [ ] Test SchemaValidator + PropertiesValidator against parameterized queries
-- [ ] Decide test file structure for dev validation tests
+- [x] Decide which validators to use for parameterized queries
+  → Schema + Properties on all; Syntax only on non-parameterized.
+- [x] Test SchemaValidator + PropertiesValidator against parameterized queries
+  → Both work. Properties has false positives on map keys (filtered).
+- [x] Decide test file structure for dev validation tests
+  → `tests/integration/test_cyver_queries.py` with parametrize.
 - [ ] Decide whether to add CyVer step to add-or-update-tool skill
 - [ ] Decide CI integration approach (or defer)

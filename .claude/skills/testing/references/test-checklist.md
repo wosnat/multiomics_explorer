@@ -317,6 +317,19 @@ Current names: `get_schema`, `search_genes`, `get_gene_details`,
 
 ## Integration tests
 
+### CyVer query validation (`tests/integration/test_cyver_queries.py`)
+
+- Mark: `@pytest.mark.kg` on class
+- Validates all builder Cypher against live KG schema via CyVer
+- SchemaValidator (strict, score == 1.0) + PropertiesValidator (with
+  false-positive filtering) + SyntaxValidator (non-parameterized only)
+- **When adding a new builder:** add entry to `_BUILDERS` list with
+  representative args. If builder uses new map projection keys (e.g.
+  `{alias: g.property}`), add alias to `_KNOWN_MAP_KEYS`.
+- Ontology-dependent builders auto-expand via `ONTOLOGY_CONFIG` loop.
+- `build_differential_expression_by_ortholog_diagnostics` handled
+  separately in `_DE_ORTHO_DIAG_CASES` (returns list of queries).
+
 ### Correctness (`tests/integration/test_tool_correctness_kg.py`)
 
 - Mark: `@pytest.mark.kg` on class

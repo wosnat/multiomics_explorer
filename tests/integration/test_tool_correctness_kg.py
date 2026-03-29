@@ -18,6 +18,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_overview,
     build_gene_stub,
     build_genes_by_ontology,
+    build_genes_by_ontology_summary,
     build_gene_details,
     build_gene_homologs,
     build_gene_homologs_summary,
@@ -747,6 +748,34 @@ class TestGenesByOntologyCorrectnessKG:
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
+
+    def test_cog_category_flat_summary(self, conn):
+        """Flat ontology summary query must not lose tid variable scope."""
+        cypher, params = build_genes_by_ontology_summary(
+            ontology="cog_category", term_ids=["cog.category:C"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) == 1
+        assert results[0]["total_matching"] >= 1
+        assert len(results[0]["by_term"]) >= 1
+
+    def test_tigr_role_flat_summary(self, conn):
+        """Flat ontology summary query must not lose tid variable scope."""
+        cypher, params = build_genes_by_ontology_summary(
+            ontology="tigr_role", term_ids=["tigr.role:120"],
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) == 1
+        assert results[0]["total_matching"] >= 1
+
+    def test_cog_category_flat_verbose(self, conn):
+        """Flat ontology verbose query must not lose tid variable scope."""
+        cypher, params = build_genes_by_ontology(
+            ontology="cog_category", term_ids=["cog.category:C"], verbose=True,
+        )
+        results = conn.execute_query(cypher, **params)
+        assert len(results) >= 1
+        assert "matched_terms" in results[0]
 
     def test_pfam_domain(self, conn):
         """Pfam domain PF00712 returns annotated genes."""

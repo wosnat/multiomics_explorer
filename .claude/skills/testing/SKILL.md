@@ -19,6 +19,7 @@ and [regression guide](references/regression-guide.md) for golden-file tests.
 | `tests/unit/test_tool_correctness.py` | Fixture-based correctness (mocked) | No |
 | `tests/unit/test_write_blocking.py` | Write keyword regex | No |
 | `tests/unit/test_about_content.py` | About-file consistency with Pydantic schemas (expected-keys, param names) | No |
+| `tests/integration/test_cyver_queries.py` | CyVer schema/property validation of all builders | Yes |
 | `tests/integration/test_tool_correctness_kg.py` | Fixture-based correctness (live KG) | Yes |
 | `tests/integration/test_mcp_tools.py` | MCP smoke tests | Yes |
 | `tests/integration/test_api_contract.py` | API return-type contracts (shape + keys) | Yes |
@@ -71,6 +72,14 @@ When adding a new query builder for regression tests, add it to the
 When changing the return shape of any `api/functions.py` function, update the
 corresponding `Test{Name}Contract` class in `tests/integration/test_api_contract.py`.
 These tests capture the pre-change shape and will silently fail otherwise.
+
+## Important: CyVer builder coverage
+
+When adding a new query builder, add it to the `_BUILDERS` list in
+`tests/integration/test_cyver_queries.py` with representative args.
+If the builder introduces new map projection keys (e.g. `{alias: g.property}`),
+add the alias to `_KNOWN_MAP_KEYS`. Ontology-dependent builders auto-expand
+via the `ONTOLOGY_CONFIG` loop — no per-ontology entries needed.
 
 ## Important: KG char escaping
 

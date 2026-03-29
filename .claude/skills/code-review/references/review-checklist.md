@@ -160,6 +160,7 @@ Do not trust Cypher by reading alone — run it. For each builder:
 - [ ] `Test{Name}Wrapper` class in `test_tool_wrappers.py`?
 - [ ] Tool in `EXPECTED_TOOLS` list?
 - [ ] Builder in `TOOL_BUILDERS` dict?
+- [ ] Builder in `_BUILDERS` list in `test_cyver_queries.py`? (new map keys → `_KNOWN_MAP_KEYS`)
 - [ ] Eval cases in `cases.yaml`?
 - [ ] Integration tests if tool touches new data?
 - [ ] KG correctness tests (`test_tool_correctness_kg.py`) updated if builder signature changed?

@@ -996,8 +996,10 @@ def _genes_by_ontology_cfg(ontology: str) -> dict:
     if hierarchy_rels:
         hierarchy = "|".join(hierarchy_rels)
         expansion = f"MATCH (root)<-[:{hierarchy}*0..15]-(descendant)"
+        expansion_tid = expansion  # MATCH doesn't drop tid from scope
     else:
         expansion = "WITH root AS descendant"
+        expansion_tid = "WITH root AS descendant, tid"  # preserve tid for UNWIND queries
 
     # Per-tid root match (for UNWIND-based queries: verbose + summary)
     if parent_label:
@@ -1020,6 +1022,7 @@ def _genes_by_ontology_cfg(ontology: str) -> dict:
     return {
         "gene_rel": gene_rel,
         "expansion": expansion,
+        "expansion_tid": expansion_tid,
         "level_clause": level_clause,
         "level_clause_tid": level_clause_tid,
         "per_tid_root": per_tid_root,
@@ -1042,7 +1045,7 @@ def build_genes_by_ontology_summary(
     cypher = (
         "UNWIND $term_ids AS tid\n"
         f"{c['per_tid_root']}\n"
-        f"{c['expansion']}"
+        f"{c['expansion_tid']}"
         f"{c['level_clause_tid']}\n"
         f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
         "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
@@ -1088,7 +1091,7 @@ def build_genes_by_ontology(
         cypher = (
             "UNWIND $term_ids AS tid\n"
             f"{c['per_tid_root']}\n"
-            f"{c['expansion']}"
+            f"{c['expansion_tid']}"
             f"{c['level_clause_tid']}\n"
             f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
             "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
