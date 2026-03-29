@@ -33,13 +33,14 @@ For per-gene expression, use differential_expression_by_gene.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Add experiment_name, treatment, omics_type, table_scope, table_scope_detail to each row. |
 | limit | int | 5 | Max result rows. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, truncated, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
 - **total_matching** (int): Gene x experiment x timepoint rows matching all filters
@@ -49,6 +50,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 - **median_abs_log2fc** (float | None): Median |log2FC| for significant rows. Null if none.
 - **max_abs_log2fc** (float | None): Max |log2FC| for significant rows. Null if none.
 - **returned** (int): Rows in results
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if more results exist than returned
 - **by_organism** (list[DEByOrthologOrganismBreakdown]): Rows per organism, sorted by count desc
 - **rows_by_status** (object): {significant_up, significant_down, not_significant}
@@ -145,7 +147,7 @@ differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detai
 from multiomics_explorer import differential_expression_by_ortholog
 
 result = differential_expression_by_ortholog(group_ids=...)
-# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, offset, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
 Use package import for bulk data extraction in scripts.

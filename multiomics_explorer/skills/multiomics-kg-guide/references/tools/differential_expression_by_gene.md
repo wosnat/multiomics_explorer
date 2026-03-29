@@ -33,6 +33,7 @@ differential_expression_by_ortholog.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Add product, experiment_name, treatment, gene_category, omics_type, coculture_partner to each row. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -41,7 +42,7 @@ differential_expression_by_ortholog.
 ### Envelope
 
 ```expected-keys
-organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, returned, truncated, results
+organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, returned, offset, truncated, results
 ```
 
 - **organism_name** (string): Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')
@@ -58,6 +59,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG but with no expression data matching filters
 - **returned** (int): Rows in results (e.g. 5)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 
 ### Per-result fields
@@ -191,7 +193,7 @@ Call once per organism — tool enforces single-organism constraint
 from multiomics_explorer import differential_expression_by_gene
 
 result = differential_expression_by_gene()
-# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, results
+# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

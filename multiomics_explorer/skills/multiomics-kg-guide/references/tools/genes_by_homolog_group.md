@@ -24,18 +24,20 @@ For expression by ortholog groups, use differential_expression_by_ortholog.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include gene_summary, function_description, consensus_product, source in results. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_matching, total_genes, total_categories, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, returned, truncated, results
+total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, returned, truncated, results
 ```
 
 - **total_matching** (int): Gene×group rows matching filters (e.g. 33)
 - **total_genes** (int): Distinct genes (a gene in 2 input groups counted once, e.g. 30)
 - **total_categories** (int): Distinct gene categories (e.g. 12)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **genes_per_group_max** (int): Largest group's gene count (e.g. 13)
 - **genes_per_group_median** (float): Median gene count across groups (e.g. 3.0)
 - **by_organism** (list[HomologGroupOrganismBreakdown]): Member counts per organism, sorted by count desc (all)
@@ -148,7 +150,7 @@ response['total_matching']  # use total, not len
 from multiomics_explorer import genes_by_homolog_group
 
 result = genes_by_homolog_group(group_ids=...)
-# returns dict with keys: total_matching, total_genes, total_categories, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, results
+# returns dict with keys: total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, results
 ```
 
 Use package import for bulk data extraction in scripts.

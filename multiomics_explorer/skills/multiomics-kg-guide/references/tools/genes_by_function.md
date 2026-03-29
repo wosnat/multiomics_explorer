@@ -22,6 +22,7 @@ For gene details, use gene_overview.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include function_description and gene_summary. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
@@ -30,7 +31,7 @@ For gene details, use gene_overview.
 ### Envelope
 
 ```expected-keys
-total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, truncated, results
+total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, offset, truncated, results
 ```
 
 - **total_search_hits** (int): Total genes matching search text (before organism/category/quality filters)
@@ -40,6 +41,7 @@ total_search_hits, total_matching, by_organism, by_category, score_max, score_me
 - **score_max** (float | None): Highest relevance score (null if 0 matches)
 - **score_median** (float | None): Median relevance score (null if 0 matches)
 - **returned** (int): Number of results returned
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True when total_matching > returned
 
 ### Per-result fields
@@ -77,10 +79,6 @@ genes_by_function(search_text="photosystem")
 
 ```example-call
 genes_by_function(search_text="nitrogen transport", organism="MED4", verbose=True)
-```
-
-```example-response
-{"total_search_hits": 12, "total_matching": 4, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 4}], "by_category": [...], "score_max": 6.1, "score_median": 3.8, "returned": 4, "truncated": false, "results": [{"locus_tag": "PMM0001", "gene_name": "amt1", "product": "ammonium transporter", "organism_name": "Prochlorococcus MED4", "gene_category": "Nitrogen metabolism", "annotation_quality": 3, "score": 6.1, "function_description": "...", "gene_summary": "..."}]}
 ```
 
 ### Example 3: Get counts only (no rows)
@@ -143,7 +141,7 @@ result['total_matching']  # results may be truncated
 from multiomics_explorer import genes_by_function
 
 result = genes_by_function(search_text=...)
-# returns dict with keys: total_search_hits, total_matching, by_organism, by_category, score_max, score_median, results
+# returns dict with keys: total_search_hits, total_matching, by_organism, by_category, score_max, score_median, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

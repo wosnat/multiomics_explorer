@@ -18,17 +18,19 @@ gene_homologs. For ontology annotations, use gene_ontology_terms.
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'sync_0001']. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_matching, returned, truncated, not_found, results
+total_matching, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found from input locus_tags
 - **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 - **not_found** (list[string]): Input locus_tags not in KG
 
@@ -109,7 +111,7 @@ gene_details(locus_tags=['PMM0001']) — always a list
 from multiomics_explorer import gene_details
 
 result = gene_details(locus_tags=...)
-# returns dict with keys: total_matching, not_found, results
+# returns dict with keys: total_matching, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

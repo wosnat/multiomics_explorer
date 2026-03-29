@@ -15,13 +15,14 @@ wildcards (*), exact phrases ("..."), boolean (AND, OR).
 | ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam'. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, score_max, score_median, returned, truncated, results
+total_entries, total_matching, score_max, score_median, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total terms in this ontology (e.g. 847)
@@ -29,6 +30,7 @@ total_entries, total_matching, score_max, score_median, returned, truncated, res
 - **score_max** (float | None): Highest relevance score (null if 0 matches, e.g. 5.23)
 - **score_median** (float | None): Median relevance score (null if 0 matches, e.g. 2.1)
 - **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 
 ### Per-result fields
@@ -67,10 +69,6 @@ search_ontology(search_text="replication", ontology="go_bp")
 
 ```example-call
 search_ontology(search_text="transport", ontology="go_bp", summary=True)
-```
-
-```example-response
-{"total_entries": 2448, "total_matching": 219, "score_max": 1.58, "score_median": 1.21, "returned": 0, "truncated": true, "results": []}
 ```
 
 ### Example 3: From search to gene discovery
@@ -113,7 +111,7 @@ resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups
 from multiomics_explorer import search_ontology
 
 result = search_ontology(search_text=..., ontology=...)
-# returns dict with keys: total_entries, total_matching, score_max, score_median, results
+# returns dict with keys: total_entries, total_matching, score_max, score_median, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

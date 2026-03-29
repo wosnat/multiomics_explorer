@@ -19,13 +19,14 @@ expansion), use genes_by_ontology. Use search_ontology to find terms by text.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include organism_name per row. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, returned, truncated, not_found, no_terms, results
+total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, returned, offset, truncated, not_found, no_terms, results
 ```
 
 - **total_matching** (int): Total gene × term annotation rows
@@ -37,6 +38,7 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 - **terms_per_gene_max** (int): Most leaf terms on any gene with terms (e.g. 15)
 - **terms_per_gene_median** (float): Median leaf terms per gene with terms (e.g. 6.0)
 - **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 - **not_found** (list[string]): Input locus_tags not in KG
 - **no_terms** (list[string]): Input locus_tags in KG but with no terms for queried ontology
@@ -93,10 +95,6 @@ gene_ontology_terms(locus_tags=["PMM0001"])
 gene_ontology_terms(locus_tags=["PMM0001", "PMM0845", "EZ55_00275"], summary=True)
 ```
 
-```example-response
-{"total_matching": 3, "total_genes": 2, "total_terms": 3, "by_ontology": [{"ontology_type": "go_bp", "term_count": 3, "gene_count": 2}], "by_term": [{"term_id": "go:0006260", "term_name": "DNA replication", "ontology_type": "go_bp", "count": 1}, ...], "terms_per_gene_min": 1, "terms_per_gene_max": 2, "terms_per_gene_median": 1.5, "returned": 0, "truncated": true, "not_found": [], "no_terms": ["EZ55_00275"], "results": []}
-```
-
 ### Example 4: From overview to ontology details
 
 ```
@@ -132,7 +130,7 @@ resolve_gene → gene_ontology_terms
 from multiomics_explorer import gene_ontology_terms
 
 result = gene_ontology_terms(locus_tags=...)
-# returns dict with keys: total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, not_found, no_terms, results
+# returns dict with keys: total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, offset, not_found, no_terms, results
 ```
 
 Use package import for bulk data extraction in scripts.

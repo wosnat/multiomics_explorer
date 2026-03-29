@@ -16,13 +16,14 @@ data exists.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include gene_summary, function_description, all_identifiers. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, returned, truncated, not_found, results
+total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found in KG from input locus_tags
@@ -33,6 +34,7 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 - **has_significant_expression** (int): Genes with significant DE observations
 - **has_orthologs** (int): Genes with ortholog group membership
 - **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 - **not_found** (list[string]): Input locus_tags not in KG
 
@@ -95,10 +97,6 @@ gene_overview(locus_tags=["PMM1428", "EZ55_00275"])
 gene_overview(locus_tags=["PMM0845", "PMM1428", "EZ55_00275"], summary=True)
 ```
 
-```example-response
-{"total_matching": 3, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}, {"organism_name": "Alteromonas macleodii EZ55", "count": 1}], "by_category": [{"category": "Unknown", "count": 2}, ...], "by_annotation_type": [{"annotation_type": "go_mf", "count": 2}, ...], "has_expression": 3, "has_significant_expression": 2, "has_orthologs": 3, "returned": 0, "truncated": true, "not_found": [], "results": []}
-```
-
 ### Example 4: From discovery to overview to details
 
 ```
@@ -144,7 +142,7 @@ gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary te
 from multiomics_explorer import gene_overview
 
 result = gene_overview(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, not_found, results
+# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

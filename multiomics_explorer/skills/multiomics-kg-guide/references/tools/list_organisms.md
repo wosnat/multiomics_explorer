@@ -16,17 +16,19 @@ filter uses partial matching — "MED4", "Prochlorococcus MED4", and
 |---|---|---|---|
 | verbose | bool | False | Include full taxonomy hierarchy (family, order, class, phylum, kingdom, superkingdom, lineage). |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_entries, returned, truncated, results
+total_entries, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total organisms in the KG
 - **returned** (int): Number of results returned
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if results were truncated by limit
 
 ### Per-result fields
@@ -83,18 +85,6 @@ list_organisms()
 list_organisms(verbose=True)
 ```
 
-```example-response
-{
-  "total_entries": 15,
-  "returned": 15,
-  "truncated": false,
-  "results": [
-    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": [...], "omics_types": [...], "family": "Prochlorococcaceae", "order": "Synechococcales", "tax_class": "Cyanophyceae", "phylum": "Cyanobacteriota", "kingdom": "Eubacteria", "superkingdom": "Bacteria", "lineage": "Bacteria;Cyanobacteriota;..."},
-    ...
-  ]
-}
-```
-
 ### Example 3: Chaining to genes and publications
 
 ```
@@ -131,7 +121,7 @@ list_organisms → genes_by_ontology
 from multiomics_explorer import list_organisms
 
 result = list_organisms()
-# returns dict with keys: total_entries, results
+# returns dict with keys: total_entries, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

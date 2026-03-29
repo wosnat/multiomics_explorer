@@ -22,19 +22,21 @@ For text search on group names, use search_homolog_groups.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include group metadata: member_count, organism_count, genera, has_cross_genus_members, description, functional_description. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_source, returned, truncated, not_found, no_groups, results
+total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, results
 ```
 
 - **total_matching** (int): Total gene×group rows matching filters
 - **by_organism** (list[HomologOrganismBreakdown]): Gene×group counts per organism, sorted by count descending
 - **by_source** (list[HomologSourceBreakdown]): Gene×group counts per source, sorted by count descending
 - **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 - **not_found** (list[string]): Input locus_tags not in KG
 - **no_groups** (list[string]): Genes that exist but have zero matching ortholog groups
@@ -103,10 +105,6 @@ gene_homologs(locus_tags=["PMM0001"], source="cyanorak")
 gene_homologs(locus_tags=["PMM0001", "PMM0845"], summary=True)
 ```
 
-```example-response
-{"total_matching": 6, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}], "by_source": [{"source": "eggnog", "count": 4}, {"source": "cyanorak", "count": 2}], "not_found": [], "no_groups": [], "returned": 0, "truncated": true, "results": []}
-```
-
 ### Example 5: From resolve_gene to homologs
 
 ```
@@ -149,7 +147,7 @@ gene_homologs(locus_tags=['PMM0001']) — always a list
 from multiomics_explorer import gene_homologs
 
 result = gene_homologs(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_source, not_found, no_groups, results
+# returns dict with keys: total_matching, by_organism, by_source, offset, not_found, no_groups, results
 ```
 
 Use package import for bulk data extraction in scripts.

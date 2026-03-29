@@ -271,6 +271,7 @@ def register_tools(mcp: FastMCP):
         score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches)")
         score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches)")
         returned: int = Field(description="Number of results returned")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True when total_matching > returned")
         results: list[GenesByFunctionResult] = Field(description="Gene results ranked by relevance")
 
@@ -309,6 +310,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> GenesByFunctionResponse:
         """Search genes by functional annotation text.
 
@@ -326,7 +330,7 @@ def register_tools(mcp: FastMCP):
             data = api.genes_by_function(
                 search_text, organism=organism,
                 category=category, min_quality=min_quality,
-                summary=summary, verbose=verbose, limit=limit, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             by_organism = [FunctionOrganismBreakdown(**b) for b in data["by_organism"]]
             by_category = [FunctionCategoryBreakdown(**b) for b in data["by_category"]]
@@ -339,6 +343,7 @@ def register_tools(mcp: FastMCP):
                 score_max=data["score_max"],
                 score_median=data["score_median"],
                 returned=data["returned"],
+                offset=data.get("offset", 0),
                 truncated=data["truncated"],
                 results=results,
             )
@@ -393,6 +398,7 @@ def register_tools(mcp: FastMCP):
         has_significant_expression: int = Field(description="Genes with significant DE observations")
         has_orthologs: int = Field(description="Genes with ortholog group membership")
         returned: int = Field(description="Results in this response (0 when summary=true)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
         results: list[GeneOverviewResult] = Field(default_factory=list, description="One row per gene")
@@ -416,6 +422,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> GeneOverviewResponse:
         """Get an overview of genes: identity and data availability signals.
 
@@ -428,7 +437,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.gene_overview(
                 locus_tags, summary=summary, verbose=verbose,
-                limit=limit, conn=conn,
+                limit=limit, offset=offset, conn=conn,
             )
             by_organism = [OverviewOrganismBreakdown(**b) for b in data["by_organism"]]
             by_category = [OverviewCategoryBreakdown(**b) for b in data["by_category"]]
@@ -443,6 +452,7 @@ def register_tools(mcp: FastMCP):
                 has_significant_expression=data["has_significant_expression"],
                 has_orthologs=data["has_orthologs"],
                 returned=data["returned"],
+                offset=data.get("offset", 0),
                 truncated=data["truncated"],
                 not_found=data["not_found"],
                 results=results,
@@ -457,6 +467,7 @@ def register_tools(mcp: FastMCP):
     class GeneDetailResponse(BaseModel):
         total_matching: int = Field(description="Genes found from input locus_tags")
         returned: int = Field(description="Results in this response (0 when summary=true)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
         results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*}. ~30 fields including locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, transporter_classification, cazy_ids, etc. Sparse fields only present when populated.")
@@ -477,6 +488,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> GeneDetailResponse:
         """Get all properties for genes.
 
@@ -491,7 +505,7 @@ def register_tools(mcp: FastMCP):
         try:
             conn = _conn(ctx)
             data = api.gene_details(
-                locus_tags, summary=summary, limit=limit, conn=conn,
+                locus_tags, summary=summary, limit=limit, offset=offset, conn=conn,
             )
             return GeneDetailResponse(**data)
         except ValueError as e:
@@ -533,6 +547,7 @@ def register_tools(mcp: FastMCP):
         by_organism: list[HomologOrganismBreakdown] = Field(description="Gene×group counts per organism, sorted by count descending")
         by_source: list[HomologSourceBreakdown] = Field(description="Gene×group counts per source, sorted by count descending")
         returned: int = Field(description="Results in this response (0 when summary=true)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
         no_groups: list[str] = Field(default_factory=list, description="Genes that exist but have zero matching ortholog groups")
@@ -571,6 +586,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> GeneHomologsResponse:
         """Get ortholog group memberships for genes.
 
@@ -589,7 +607,7 @@ def register_tools(mcp: FastMCP):
                 locus_tags, source=source,
                 taxonomic_level=taxonomic_level,
                 max_specificity_rank=max_specificity_rank,
-                summary=summary, verbose=verbose, limit=limit, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             by_organism = [HomologOrganismBreakdown(**b) for b in data["by_organism"]]
             by_source = [HomologSourceBreakdown(**b) for b in data["by_source"]]
@@ -599,6 +617,7 @@ def register_tools(mcp: FastMCP):
                 by_organism=by_organism,
                 by_source=by_source,
                 returned=data["returned"],
+                offset=data.get("offset", 0),
                 truncated=data["truncated"],
                 not_found=data["not_found"],
                 no_groups=data["no_groups"],
@@ -682,6 +701,7 @@ def register_tools(mcp: FastMCP):
         score_max: float | None = Field(default=None, description="Highest relevance score (null if 0 matches, e.g. 5.23)")
         score_median: float | None = Field(default=None, description="Median relevance score (null if 0 matches, e.g. 2.1)")
         returned: int = Field(description="Results in this response (0 when summary=true)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[SearchOntologyResult] = Field(
             default_factory=list, description="One row per matching term",
@@ -707,6 +727,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> SearchOntologyResponse:
         """Browse ontology terms by text search (fuzzy, Lucene syntax).
 
@@ -718,7 +741,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.search_ontology(
                 search_text, ontology, summary=summary,
-                limit=limit, conn=conn,
+                limit=limit, offset=offset, conn=conn,
             )
             results = [SearchOntologyResult(**r) for r in data["results"]]
             return SearchOntologyResponse(**{**data, "results": results})
@@ -760,6 +783,7 @@ def register_tools(mcp: FastMCP):
         by_category: list[OntologyCategoryBreakdown] = Field(description="Gene counts per gene_category, sorted desc")
         by_term: list[OntologyTermBreakdown] = Field(description="Gene counts per input term, sorted desc (can overlap)")
         returned: int = Field(description="Results in this response (0 when summary=true)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[GenesByOntologyResult] = Field(
             default_factory=list, description="One row per distinct gene",
@@ -795,6 +819,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> GenesByOntologyResponse:
         """Find genes annotated to ontology terms, with hierarchy expansion.
 
@@ -810,7 +837,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.genes_by_ontology(
                 term_ids, ontology, organism=organism,
-                summary=summary, verbose=verbose, limit=limit, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             by_organism = [OntologyOrganismBreakdown(**b) for b in data["by_organism"]]
             by_category = [OntologyCategoryBreakdown(**b) for b in data["by_category"]]
@@ -822,6 +849,7 @@ def register_tools(mcp: FastMCP):
                 by_category=by_category,
                 by_term=by_term,
                 returned=data["returned"],
+                offset=data.get("offset", 0),
                 truncated=data["truncated"],
                 results=results,
             )
@@ -861,6 +889,7 @@ def register_tools(mcp: FastMCP):
         terms_per_gene_max: int = Field(description="Most leaf terms on any gene with terms (e.g. 15)")
         terms_per_gene_median: float = Field(description="Median leaf terms per gene with terms (e.g. 6.0)")
         returned: int = Field(description="Results in this response (0 when summary=true)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
         no_terms: list[str] = Field(default_factory=list, description="Input locus_tags in KG but with no terms for queried ontology")
@@ -890,6 +919,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> GeneOntologyTermsResponse:
         """Get ontology annotations for genes. One row per gene × term.
 
@@ -904,7 +936,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.gene_ontology_terms(
                 locus_tags, ontology=ontology,
-                summary=summary, verbose=verbose, limit=limit, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             results = [OntologyTermRow(**r) for r in data["results"]]
             by_ontology = [OntologyTypeBreakdown(**b) for b in data["by_ontology"]]
@@ -1095,6 +1127,7 @@ def register_tools(mcp: FastMCP):
         total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
         total_matching: int = Field(description="Experiments matching filters")
         returned: int = Field(description="Number of results returned (0 when summary=true)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if results were truncated by limit or summary=true")
         by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted by count descending")
         by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted by count descending")
@@ -1165,6 +1198,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> ListExperimentsResponse:
         """List differential expression experiments in the knowledge graph.
 
@@ -1187,7 +1223,7 @@ def register_tools(mcp: FastMCP):
                 coculture_partner=coculture_partner, search_text=search_text,
                 time_course_only=time_course_only, table_scope=table_scope,
                 summary=summary,
-                verbose=verbose, limit=limit, conn=conn,
+                verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
 
             # Build breakdown models
@@ -1217,6 +1253,7 @@ def register_tools(mcp: FastMCP):
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
                 returned=result["returned"],
+                offset=result.get("offset", 0),
                 truncated=result["truncated"],
                 by_organism=by_organism,
                 by_treatment_type=by_treatment_type,
@@ -1468,6 +1505,7 @@ def register_tools(mcp: FastMCP):
         returned: int = Field(
             description="Rows in results (e.g. 5)",
         )
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(
             description="True if total_matching > returned",
         )
@@ -1512,6 +1550,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> DifferentialExpressionByGeneResponse:
         """Gene-centric differential expression. One row per gene x experiment x timepoint.
 
@@ -1548,6 +1589,7 @@ def register_tools(mcp: FastMCP):
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
+                offset=offset,
                 conn=conn,
             )
 
@@ -1597,6 +1639,7 @@ def register_tools(mcp: FastMCP):
                 median_abs_log2fc=data["median_abs_log2fc"],
                 max_abs_log2fc=data["max_abs_log2fc"],
                 experiment_count=data["experiment_count"],
+                offset=data.get("offset", 0),
                 rows_by_treatment_type=data["rows_by_treatment_type"],
                 by_table_scope=data["by_table_scope"],
                 top_categories=top_cat_models,
@@ -1672,6 +1715,7 @@ def register_tools(mcp: FastMCP):
         score_median: float | None = Field(default=None,
             description="Median Lucene score (null if 0 matches, e.g. 1.06)")
         returned: int = Field(description="Results in this response (0 when summary=true)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         results: list[SearchHomologGroupsResult] = Field(
             default_factory=list, description="One row per matching ortholog group")
@@ -1708,6 +1752,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> SearchHomologGroupsResponse:
         """Search ortholog groups by text (Lucene). Returns group IDs for
         use with genes_by_homolog_group.
@@ -1723,7 +1770,7 @@ def register_tools(mcp: FastMCP):
                 search_text, source=source,
                 taxonomic_level=taxonomic_level,
                 max_specificity_rank=max_specificity_rank,
-                summary=summary, verbose=verbose, limit=limit, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             by_source = [SearchHomologGroupsSourceBreakdown(**b) for b in data["by_source"]]
             by_level = [SearchHomologGroupsLevelBreakdown(**b) for b in data["by_level"]]
@@ -1736,6 +1783,7 @@ def register_tools(mcp: FastMCP):
                 score_max=data["score_max"],
                 score_median=data["score_median"],
                 returned=data["returned"],
+                offset=data.get("offset", 0),
                 truncated=data["truncated"],
                 results=results,
             )
@@ -1796,6 +1844,7 @@ def register_tools(mcp: FastMCP):
             description="Distinct genes (a gene in 2 input groups counted once, e.g. 30)")
         total_categories: int = Field(
             description="Distinct gene categories (e.g. 12)")
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         genes_per_group_max: int = Field(
             description="Largest group's gene count (e.g. 13)")
         genes_per_group_median: float = Field(
@@ -1845,6 +1894,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max results.", ge=1,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> GenesByHomologGroupResponse:
         """Find member genes of ortholog groups.
 
@@ -1864,7 +1916,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.genes_by_homolog_group(
                 group_ids, organisms=organisms,
-                summary=summary, verbose=verbose, limit=limit, conn=conn,
+                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             by_organism = [HomologGroupOrganismBreakdown(**b) for b in data["by_organism"]]
             top_categories = [HomologGroupCategoryBreakdown(**b) for b in data["top_categories"]]
@@ -1884,6 +1936,7 @@ def register_tools(mcp: FastMCP):
                 not_found_organisms=data["not_found_organisms"],
                 not_matched_organisms=data["not_matched_organisms"],
                 returned=data["returned"],
+                offset=data.get("offset", 0),
                 truncated=data["truncated"],
                 results=results,
             )
@@ -2045,6 +2098,7 @@ def register_tools(mcp: FastMCP):
         returned: int = Field(
             description="Rows in results",
         )
+        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(
             description="True if more results exist than returned",
         )
@@ -2134,6 +2188,9 @@ def register_tools(mcp: FastMCP):
         limit: Annotated[int, Field(
             description="Max result rows.", ge=1, le=200,
         )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
     ) -> DifferentialExpressionByOrthologResponse:
         """Differential expression framed by ortholog groups.
 
@@ -2169,6 +2226,7 @@ def register_tools(mcp: FastMCP):
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
+                offset=offset,
                 conn=conn,
             )
             # Build Pydantic models from dict results
@@ -2194,6 +2252,7 @@ def register_tools(mcp: FastMCP):
                 max_abs_log2fc=data["max_abs_log2fc"],
                 results=results,
                 returned=data["returned"],
+                offset=data.get("offset", 0),
                 truncated=data["truncated"],
                 by_organism=[DEByOrthologOrganismBreakdown(**b) for b in data["by_organism"]],
                 rows_by_status=data["rows_by_status"],

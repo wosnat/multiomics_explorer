@@ -21,6 +21,7 @@ For per-gene ontology details, use gene_ontology_terms.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include matched_terms, gene_summary, function_description. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -29,7 +30,7 @@ For per-gene ontology details, use gene_ontology_terms.
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_term, returned, truncated, results
+total_matching, by_organism, by_category, by_term, returned, offset, truncated, results
 ```
 
 - **total_matching** (int): Distinct genes matching (e.g. 1742)
@@ -37,6 +38,7 @@ total_matching, by_organism, by_category, by_term, returned, truncated, results
 - **by_category** (list[OntologyCategoryBreakdown]): Gene counts per gene_category, sorted desc
 - **by_term** (list[OntologyTermBreakdown]): Gene counts per input term, sorted desc (can overlap)
 - **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 
 ### Per-result fields
@@ -144,7 +146,7 @@ search_ontology(search_text='replication', ontology='go_bp')  # search first, th
 from multiomics_explorer import genes_by_ontology
 
 result = genes_by_ontology(term_ids=..., ontology=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_term, results
+# returns dict with keys: total_matching, by_organism, by_category, by_term, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

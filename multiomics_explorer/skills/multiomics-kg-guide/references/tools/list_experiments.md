@@ -28,6 +28,7 @@ report all assayed genes (fair for cross-experiment comparison).
 | summary | bool | False | When true, return only summary breakdowns (by organism, treatment type, omics type, table scope) with no individual experiments. Use to orient before drilling into detail. |
 | verbose | bool | False | Include publication title, treatment/control descriptions, and experimental conditions (light, medium, temperature, statistical test, context). |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
@@ -36,12 +37,13 @@ report all assayed genes (fair for cross-experiment comparison).
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, truncated, by_organism, by_treatment_type, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered)
 - **total_matching** (int): Experiments matching filters
 - **returned** (int): Number of results returned (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if results were truncated by limit or summary=true
 - **by_organism** (list[OrganismBreakdown]): Experiment counts per organism, sorted by count descending
 - **by_treatment_type** (list[TreatmentTypeBreakdown]): Experiment counts per treatment type, sorted by count descending
@@ -106,10 +108,6 @@ list_experiments(summary=True)
 
 ```example-call
 list_experiments(summary=True, organism="MED4")
-```
-
-```example-response
-{"total_entries": 76, "total_matching": 31, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 30}, ...], "by_treatment_type": [{"treatment_type": "light_stress", "count": 8}, {"treatment_type": "nitrogen_stress", "count": 8}, ...], "by_omics_type": [...], "by_table_scope": [...], "time_course_count": 14, "returned": 0, "truncated": true, "results": []}
 ```
 
 ### Example 3: Browse coculture experiments with Alteromonas
@@ -185,7 +183,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
+# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -605,6 +605,17 @@ class TestGenesByFunctionWrapper:
                     mock_ctx, search_text="test",
                 )
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_function",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["genes_by_function"](mock_ctx, search_text="dna", offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
+
 
 # ---------------------------------------------------------------------------
 # gene_overview
@@ -733,6 +744,17 @@ class TestGeneOverviewWrapper:
         assert result.returned == 2
         assert result.truncated is True
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["gene_overview"](mock_ctx, locus_tags=["PMM1428"], offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
+
 
 class TestGeneDetailsWrapper:
     @pytest.mark.asyncio
@@ -764,6 +786,19 @@ class TestGeneDetailsWrapper:
         assert result.not_found == ["FAKE"]
         assert result.results == []
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_details",
+            return_value={
+                "total_matching": 1, "returned": 1, "truncated": False,
+                "offset": 5, "not_found": [], "results": [],
+            },
+        ) as mock_api:
+            result = await tool_fns["gene_details"](mock_ctx, locus_tags=["PMM0001"], offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
 
 
 # ---------------------------------------------------------------------------
@@ -916,6 +951,16 @@ class TestGeneHomologsWrapper:
                     mock_ctx, locus_tags=["PMM0001"], source="bad",
                 )
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["gene_homologs"](mock_ctx, locus_tags=["PMM0001"], offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
 
 
 # ---------------------------------------------------------------------------
@@ -1142,6 +1187,19 @@ class TestSearchOntologyWrapper:
                     mock_ctx, search_text="test", ontology="bad",
                 )
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp", offset=5,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
+
 
 # ---------------------------------------------------------------------------
 # genes_by_ontology
@@ -1270,6 +1328,19 @@ class TestGenesByOntologyWrapper:
                 await tool_fns["genes_by_ontology"](
                     mock_ctx, term_ids=["x"], ontology="go_bp",
                 )
+
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["genes_by_ontology"](
+                mock_ctx, term_ids=["go:0006260"], ontology="go_bp", offset=5,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
 
 
 # ---------------------------------------------------------------------------
@@ -1443,6 +1514,17 @@ class TestGeneOntologyTermsWrapper:
                 await tool_fns["gene_ontology_terms"](
                     mock_ctx, locus_tags=["PMM0001"],
                 )
+
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["gene_ontology_terms"](mock_ctx, locus_tags=["PMM0001"], offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
 
 
 # ---------------------------------------------------------------------------
@@ -2010,6 +2092,17 @@ class TestListExperimentsWrapper:
             with pytest.raises(ToolError, match="bad param"):
                 await tool_fns["list_experiments"](mock_ctx)
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value={**self._SAMPLE_SUMMARY, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["list_experiments"](mock_ctx, offset=5)
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene
@@ -2236,6 +2329,19 @@ class TestDifferentialExpressionByGeneWrapper:
                     mock_ctx, organism="MED4",
                 )
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4", offset=5,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
+
 
 # ---------------------------------------------------------------------------
 # search_homolog_groups
@@ -2358,6 +2464,19 @@ class TestSearchHomologGroupsWrapper:
                 await tool_fns["search_homolog_groups"](
                     mock_ctx, search_text="test", source="bad",
                 )
+
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="photosynthesis", offset=5,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
 
 
 # ---------------------------------------------------------------------------
@@ -2499,6 +2618,19 @@ class TestGenesByHomologGroupWrapper:
                     mock_ctx, group_ids=[],
                 )
 
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["cyanorak:CK_00000570"], offset=5,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_ortholog
@@ -2618,3 +2750,16 @@ class TestDifferentialExpressionByOrthologWrapper:
                 await tool_fns["differential_expression_by_ortholog"](
                     mock_ctx, group_ids=[],
                 )
+
+    @pytest.mark.asyncio
+    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
+        ) as mock_api:
+            result = await tool_fns["differential_expression_by_ortholog"](
+                mock_ctx, group_ids=["g1"], offset=5,
+            )
+        mock_api.assert_called_once()
+        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
+        assert call_kwargs.get("offset") == 5

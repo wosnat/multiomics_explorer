@@ -19,13 +19,14 @@ and functional_description fields.
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include description, functional_description, genera, has_cross_genus_members in results. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 ## Response format
 
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_source, by_level, score_max, score_median, returned, truncated, results
+total_entries, total_matching, by_source, by_level, score_max, score_median, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total OrthologGroup nodes in KG (e.g. 21122)
@@ -35,6 +36,7 @@ total_entries, total_matching, by_source, by_level, score_max, score_median, ret
 - **score_max** (float | None): Highest Lucene score (null if 0 matches, e.g. 6.13)
 - **score_median** (float | None): Median Lucene score (null if 0 matches, e.g. 1.06)
 - **returned** (int): Results in this response (0 when summary=true)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 
 ### Per-result fields
@@ -116,7 +118,7 @@ response['total_matching']  # use total, not len
 from multiomics_explorer import search_homolog_groups
 
 result = search_homolog_groups(search_text=...)
-# returns dict with keys: total_entries, total_matching, by_source, by_level, score_max, score_median, results
+# returns dict with keys: total_entries, total_matching, by_source, by_level, score_max, score_median, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

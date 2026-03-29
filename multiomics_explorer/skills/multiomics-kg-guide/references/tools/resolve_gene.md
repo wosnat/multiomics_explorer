@@ -17,6 +17,7 @@ filter uses case-insensitive partial matching — 'MED4' and
 | identifier | string | — | Gene identifier (case-insensitive) — locus_tag (e.g. 'PMM0001'), gene name (e.g. 'dnaN'), old locus tag, or RefSeq protein ID. |
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). E.g. 'MED4', 'Prochlorococcus MED4'. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -25,12 +26,13 @@ filter uses case-insensitive partial matching — 'MED4' and
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, returned, truncated, results
+total_matching, by_organism, returned, offset, truncated, results
 ```
 
 - **total_matching** (int): Total genes matching identifier + organism filter (e.g. 3)
 - **by_organism** (list[ResolveOrganismBreakdown]): Match counts per organism, sorted by count descending
 - **returned** (int): Genes in this response (e.g. 3)
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 
 ### Per-result fields
@@ -126,7 +128,7 @@ resolve_gene(identifier='PMM0001')  # exact identity resolution
 from multiomics_explorer import resolve_gene
 
 result = resolve_gene(identifier=...)
-# returns dict with keys: total_matching, by_organism, results
+# returns dict with keys: total_matching, by_organism, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

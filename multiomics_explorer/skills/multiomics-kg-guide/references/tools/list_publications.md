@@ -18,6 +18,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
 | verbose | bool | False | Include abstract and description. Default compact for routing. |
 | limit | int | 5 | Max results. |
+| offset | int | 0 | Number of results to skip for pagination. |
 
 **Discovery:** use `list_filter_values` for valid filter values, `list_organisms` for valid organism names.
 
@@ -26,7 +27,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, returned, truncated, results
+total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total publications in KG (unfiltered)
@@ -35,6 +36,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, re
 - **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted by count descending
 - **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted by count descending
 - **returned** (int): Publications in this response
+- **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
 
 ### Per-result fields
@@ -114,7 +116,7 @@ list_publications → genes_by_function
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.
