@@ -298,6 +298,25 @@ class TestGenesByFunction:
         assert result["score_max"] is None
         assert result["score_median"] is None
 
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.genes_by_function("DNA polymerase", offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.genes_by_function("DNA polymerase", offset=5, conn=mock_conn)
+        assert result["offset"] == 5
+
 
 # ---------------------------------------------------------------------------
 # gene_overview
@@ -418,6 +437,25 @@ class TestGeneOverview:
         from multiomics_explorer import gene_overview
         assert gene_overview is api.gene_overview
 
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.gene_overview(["PMM0001"], offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.gene_overview(["PMM0001"], offset=5, conn=mock_conn)
+        assert result["offset"] == 5
+
 
 # ---------------------------------------------------------------------------
 # gene_details
@@ -461,6 +499,28 @@ class TestGeneDetails:
         with pytest.raises(ValueError, match="non-empty"):
             api.gene_details([], conn=mock_conn)
 
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        gene_props = {"locus_tag": "PMM0001", "gene_name": "dnaN",
+                       "product": "p", "organism_name": "MED4"}
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 1, "not_found": []}],
+            [{"gene": gene_props}],
+        ]
+        api.gene_details(["PMM0001"], offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        gene_props = {"locus_tag": "PMM0001", "gene_name": "dnaN",
+                       "product": "p", "organism_name": "MED4"}
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 1, "not_found": []}],
+            [{"gene": gene_props}],
+        ]
+        result = api.gene_details(["PMM0001"], offset=5, conn=mock_conn)
+        assert result["offset"] == 5
 
 
 # ---------------------------------------------------------------------------
@@ -598,6 +658,25 @@ class TestGeneHomologs:
         """from multiomics_explorer import gene_homologs works."""
         from multiomics_explorer import gene_homologs
         assert gene_homologs is api.gene_homologs
+
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.gene_homologs(["PMM0001"], offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.gene_homologs(["PMM0001"], offset=5, conn=mock_conn)
+        assert result["offset"] == 5
 
 
 # ---------------------------------------------------------------------------
@@ -795,6 +874,25 @@ class TestSearchOntology:
         from multiomics_explorer import search_ontology as fn
         assert callable(fn)
 
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.search_ontology("DNA replication", "go_bp", offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.search_ontology("DNA replication", "go_bp", offset=5, conn=mock_conn)
+        assert result["offset"] == 5
+
 
 # ---------------------------------------------------------------------------
 # genes_by_ontology
@@ -882,6 +980,25 @@ class TestGenesByOntology:
         from multiomics_explorer import genes_by_ontology as fn
         assert callable(fn)
 
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        api.genes_by_ontology(["go:0006260"], "go_bp", offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._detail_rows(),
+        ]
+        result = api.genes_by_ontology(["go:0006260"], "go_bp", offset=5, conn=mock_conn)
+        assert result["offset"] == 5
+
 
 # ---------------------------------------------------------------------------
 # gene_ontology_terms
@@ -938,7 +1055,7 @@ class TestGeneOntologyTerms:
             "total_matching", "total_genes", "total_terms",
             "by_ontology", "by_term",
             "terms_per_gene_min", "terms_per_gene_max", "terms_per_gene_median",
-            "returned", "truncated", "not_found", "no_terms", "results",
+            "returned", "offset", "truncated", "not_found", "no_terms", "results",
         }
         assert set(result.keys()) == expected_keys
 
@@ -1046,6 +1163,39 @@ class TestGeneOntologyTerms:
         """from multiomics_explorer import gene_ontology_terms works."""
         from multiomics_explorer import gene_ontology_terms
         assert gene_ontology_terms is api.gene_ontology_terms
+
+    def test_offset_skips_results(self, mock_conn):
+        """offset skips rows from the merged detail result set."""
+        rows = [
+            {"locus_tag": "PMM0001", "term_id": f"go:{i:07d}", "term_name": f"t{i}"}
+            for i in range(5)
+        ]
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            [{
+                "gene_count": 1, "term_count": 5,
+                "by_term": [{"term_id": f"go:{i:07d}", "term_name": f"t{i}", "count": 1}
+                             for i in range(5)],
+                "gene_term_counts": [{"locus_tag": "PMM0001", "term_count": 5}],
+            }],
+            rows,
+        ]
+        result = api.gene_ontology_terms(["PMM0001"], "go_bp", limit=2, offset=2, conn=mock_conn)
+        assert result["offset"] == 2
+        # Rows sorted by (locus_tag, term_id), then offset=2 applied, then limit=2
+        assert len(result["results"]) == 2
+        assert result["results"][0]["term_id"] == "go:0000002"
+        assert result["results"][1]["term_id"] == "go:0000003"
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            self._exist_found("PMM0001"),
+            self._summary_row(),
+            self._detail_rows(),
+        ]
+        result = api.gene_ontology_terms(["PMM0001"], "go_bp", offset=5, conn=mock_conn)
+        assert result["offset"] == 5
 
 
 # ---------------------------------------------------------------------------
@@ -1589,6 +1739,27 @@ class TestListExperiments:
         from multiomics_explorer import list_experiments
         assert list_experiments is api.list_experiments
 
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._detail_row()],
+        ]
+        api.list_experiments(offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[2]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._detail_row()],
+        ]
+        result = api.list_experiments(offset=5, conn=mock_conn)
+        assert result["offset"] == 5
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene
@@ -1946,6 +2117,20 @@ class TestDifferentialExpressionByGene:
         from multiomics_explorer import differential_expression_by_gene
         assert differential_expression_by_gene is api.differential_expression_by_gene
 
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
+        api.differential_expression_by_gene(organism="MED4", offset=5, conn=mock_conn)
+        # detail call is the 5th call (index 4): organism pre-query + 3 summary + detail
+        detail_call = mock_conn.execute_query.call_args_list[4]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = self._mock_side_effect_organism_only()
+        result = api.differential_expression_by_gene(organism="MED4", offset=5, conn=mock_conn)
+        assert result["offset"] == 5
+
 
 class TestSearchHomologGroups:
     """Tests for search_homolog_groups API function."""
@@ -2026,6 +2211,37 @@ class TestSearchHomologGroups:
         from multiomics_explorer import search_homolog_groups
         assert search_homolog_groups is api.search_homolog_groups
 
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21122, "total_matching": 5,
+              "score_max": 3.5, "score_median": 2.0,
+              "by_source": [], "by_level": []}],
+            [{"group_id": "cyanorak:CK_1", "group_name": "CK_1",
+              "consensus_gene_name": "psbB", "consensus_product": "photosystem II",
+              "source": "cyanorak", "taxonomic_level": "curated",
+              "specificity_rank": 0, "member_count": 9, "organism_count": 9,
+              "score": 3.5}],
+        ]
+        api.search_homolog_groups("photosynthesis", offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21122, "total_matching": 5,
+              "score_max": 3.5, "score_median": 2.0,
+              "by_source": [], "by_level": []}],
+            [{"group_id": "cyanorak:CK_1", "group_name": "CK_1",
+              "consensus_gene_name": "psbB", "consensus_product": "photosystem II",
+              "source": "cyanorak", "taxonomic_level": "curated",
+              "specificity_rank": 0, "member_count": 9, "organism_count": 9,
+              "score": 3.5}],
+        ]
+        result = api.search_homolog_groups("photosynthesis", offset=5, conn=mock_conn)
+        assert result["offset"] == 5
+
 
 class TestGenesByHomologGroup:
     """Tests for genes_by_homolog_group API function."""
@@ -2105,6 +2321,37 @@ class TestGenesByHomologGroup:
     def test_importable_from_package(self):
         from multiomics_explorer import genes_by_homolog_group
         assert genes_by_homolog_group is api.genes_by_homolog_group
+
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail builder call."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 9, "total_genes": 9, "total_categories": 1,
+              "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
+              "by_category_raw": [{"item": "Photosynthesis", "count": 9}],
+              "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
+              "not_found_groups": [], "not_matched_groups": []}],
+            [{"locus_tag": "PMM0315", "gene_name": "psbB",
+              "product": "photosystem II", "organism_name": "Prochlorococcus MED4",
+              "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}],
+        ]
+        api.genes_by_homolog_group(["cyanorak:CK_00000570"], offset=5, conn=mock_conn)
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 9, "total_genes": 9, "total_categories": 1,
+              "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
+              "by_category_raw": [{"item": "Photosynthesis", "count": 9}],
+              "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
+              "not_found_groups": [], "not_matched_groups": []}],
+            [{"locus_tag": "PMM0315", "gene_name": "psbB",
+              "product": "photosystem II", "organism_name": "Prochlorococcus MED4",
+              "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}],
+        ]
+        result = api.genes_by_homolog_group(["cyanorak:CK_00000570"], offset=5, conn=mock_conn)
+        assert result["offset"] == 5
 
 
 class TestDifferentialExpressionByOrtholog:
@@ -2222,6 +2469,44 @@ class TestDifferentialExpressionByOrtholog:
     def test_importable_from_package(self):
         from multiomics_explorer import differential_expression_by_ortholog as fn
         assert callable(fn)
+
+    def test_offset_passed_to_builder(self, mock_conn):
+        """offset is forwarded to the detail (Q4) builder call."""
+        mock_conn.execute_query.side_effect = [
+            [{"not_found": []}],  # Q1a group check
+            [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
+              "experiment_count": 2, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "by_table_scope": [],
+              "sig_log2fcs": [1.5, 2.0],
+              "matched_group_ids": ["g1"]}],  # Q1b
+            [{"top_groups": []}],  # Q2
+            [{"top_experiments": []}],  # Q3
+            [],  # Q4 results
+            [],  # Q5 membership
+        ]
+        api.differential_expression_by_ortholog(group_ids=["g1"], offset=5, conn=mock_conn)
+        # Q4 is call index 4
+        detail_call = mock_conn.execute_query.call_args_list[4]
+        assert detail_call[1].get("offset") == 5
+
+    def test_offset_in_response(self, mock_conn):
+        """Result dict includes offset key."""
+        mock_conn.execute_query.side_effect = [
+            [{"not_found": []}],
+            [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
+              "experiment_count": 2, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "by_table_scope": [],
+              "sig_log2fcs": [1.5, 2.0],
+              "matched_group_ids": ["g1"]}],
+            [{"top_groups": []}],
+            [{"top_experiments": []}],
+            [],
+            [],
+        ]
+        result = api.differential_expression_by_ortholog(
+            group_ids=["g1"], offset=5, conn=mock_conn,
+        )
+        assert result["offset"] == 5
 
 
 # ---------------------------------------------------------------------------

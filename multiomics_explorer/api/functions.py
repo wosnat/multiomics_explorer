@@ -157,6 +157,7 @@ def genes_by_function(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -190,7 +191,7 @@ def genes_by_function(
     def _run_detail(st=search_text):
         kw = {**filter_kwargs, "search_text": st}
         cypher, params = build_genes_by_function(
-            **kw, verbose=verbose, limit=limit,
+            **kw, verbose=verbose, limit=limit, offset=offset,
         )
         return conn.execute_query(cypher, **params)
 
@@ -224,6 +225,7 @@ def genes_by_function(
     # Detail query — skip when limit=0
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
         return envelope
@@ -240,7 +242,8 @@ def genes_by_function(
             raise
 
     envelope["returned"] = len(results)
-    envelope["truncated"] = total_matching > len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
 
@@ -250,6 +253,7 @@ def gene_overview(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -302,17 +306,19 @@ def gene_overview(
     # Detail query — skip when limit=0
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
         return envelope
 
     det_cypher, det_params = build_gene_overview(
-        locus_tags=locus_tags, verbose=verbose, limit=limit,
+        locus_tags=locus_tags, verbose=verbose, limit=limit, offset=offset,
     )
     results = conn.execute_query(det_cypher, **det_params)
 
     envelope["returned"] = len(results)
-    envelope["truncated"] = total_matching > len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
 
@@ -321,6 +327,7 @@ def gene_details(
     locus_tags: list[str],
     summary: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -354,17 +361,19 @@ def gene_details(
     # Detail query — skip when limit=0
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
         return envelope
 
     det_cypher, det_params = build_gene_details(
-        locus_tags=locus_tags, limit=limit,
+        locus_tags=locus_tags, limit=limit, offset=offset,
     )
     results = [r["gene"] for r in conn.execute_query(det_cypher, **det_params)]
 
     envelope["returned"] = len(results)
-    envelope["truncated"] = total_matching > len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
 
@@ -378,6 +387,7 @@ def gene_homologs(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -451,18 +461,20 @@ def gene_homologs(
     # Detail query — skip when limit=0
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = envelope["total_matching"] > 0
         envelope["results"] = []
         return envelope
 
     det_cypher, det_params = build_gene_homologs(
         locus_tags=locus_tags, **filter_kwargs,
-        verbose=verbose, limit=limit,
+        verbose=verbose, limit=limit, offset=offset,
     )
     results = conn.execute_query(det_cypher, **det_params)
 
     envelope["returned"] = len(results)
-    envelope["truncated"] = envelope["total_matching"] > len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = envelope["total_matching"] > offset + len(results)
     envelope["results"] = results
     return envelope
 
@@ -619,6 +631,7 @@ def list_experiments(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -660,7 +673,7 @@ def list_experiments(
     def _run_detail(st=search_text):
         kw = {**filter_kwargs, "search_text": st}
         cypher, params = build_list_experiments(
-            **kw, verbose=verbose, limit=limit,
+            **kw, verbose=verbose, limit=limit, offset=offset,
         )
         return conn.execute_query(cypher, **params)
 
@@ -711,6 +724,7 @@ def list_experiments(
 
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = envelope["total_matching"] > 0
         envelope["results"] = []
         return envelope
@@ -776,7 +790,8 @@ def list_experiments(
         processed.append(r)
 
     envelope["returned"] = len(processed)
-    envelope["truncated"] = envelope["total_matching"] > len(processed)
+    envelope["offset"] = offset
+    envelope["truncated"] = envelope["total_matching"] > offset + len(processed)
     envelope["results"] = processed
     return envelope
 
@@ -786,6 +801,7 @@ def search_ontology(
     ontology: str,
     summary: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -832,13 +848,14 @@ def search_ontology(
     # Detail query — skip when limit=0
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
         return envelope
 
     try:
         det_cypher, det_params = build_search_ontology(
-            ontology=ontology, search_text=effective_text, limit=limit,
+            ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
         )
         results = conn.execute_query(det_cypher, **det_params)
     except Neo4jClientError:
@@ -846,14 +863,15 @@ def search_ontology(
             logger.debug("search_ontology detail: Lucene parse error, retrying")
             effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
             det_cypher, det_params = build_search_ontology(
-                ontology=ontology, search_text=effective_text, limit=limit,
+                ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
             )
             results = conn.execute_query(det_cypher, **det_params)
         else:
             raise
 
     envelope["returned"] = len(results)
-    envelope["truncated"] = total_matching > len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
 
@@ -866,6 +884,7 @@ def search_homolog_groups(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -945,6 +964,7 @@ def search_homolog_groups(
     # Detail query — skip when limit=0
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
         return envelope
@@ -952,7 +972,7 @@ def search_homolog_groups(
     try:
         det_cypher, det_params = build_search_homolog_groups(
             search_text=effective_text, **filter_kwargs,
-            verbose=verbose, limit=limit)
+            verbose=verbose, limit=limit, offset=offset)
         results = conn.execute_query(det_cypher, **det_params)
     except Neo4jClientError:
         if effective_text == search_text:
@@ -960,13 +980,14 @@ def search_homolog_groups(
             effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
             det_cypher, det_params = build_search_homolog_groups(
                 search_text=effective_text, **filter_kwargs,
-                verbose=verbose, limit=limit)
+                verbose=verbose, limit=limit, offset=offset)
             results = conn.execute_query(det_cypher, **det_params)
         else:
             raise
 
     envelope["returned"] = len(results)
-    envelope["truncated"] = total_matching > len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
 
@@ -977,6 +998,7 @@ def genes_by_homolog_group(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1052,18 +1074,20 @@ def genes_by_homolog_group(
     # Detail query — skip when limit=0
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
         return envelope
 
     det_cypher, det_params = build_genes_by_homolog_group(
         group_ids=group_ids, organisms=organisms,
-        verbose=verbose, limit=limit,
+        verbose=verbose, limit=limit, offset=offset,
     )
     results = conn.execute_query(det_cypher, **det_params)
 
     envelope["returned"] = len(results)
-    envelope["truncated"] = total_matching > len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
 
@@ -1075,6 +1099,7 @@ def genes_by_ontology(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1121,18 +1146,20 @@ def genes_by_ontology(
     # Detail query — skip when limit=0
     if limit == 0:
         envelope["returned"] = 0
+        envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
         return envelope
 
     det_cypher, det_params = build_genes_by_ontology(
         ontology=ontology, term_ids=term_ids, organism=organism,
-        verbose=verbose, limit=limit,
+        verbose=verbose, limit=limit, offset=offset,
     )
     results = conn.execute_query(det_cypher, **det_params)
 
     envelope["returned"] = len(results)
-    envelope["truncated"] = total_matching > len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
 
@@ -1143,6 +1170,7 @@ def gene_ontology_terms(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1222,7 +1250,7 @@ def gene_ontology_terms(
             for ont in ontologies:
                 det_cypher, det_params = build_gene_ontology_terms(
                     locus_tags=found_tags, ontology=ont,
-                    verbose=verbose, limit=limit,
+                    verbose=verbose, limit=None,
                 )
                 rows = conn.execute_query(det_cypher, **det_params)
                 if ontology is None:
@@ -1231,10 +1259,12 @@ def gene_ontology_terms(
                 all_detail_rows.extend(rows)
 
         all_detail_rows.sort(key=lambda r: (r["locus_tag"], r["term_id"]))
+        # Apply offset then limit on the merged result set
+        sliced = all_detail_rows[offset:]
         if limit is not None:
-            results = all_detail_rows[:limit]
+            results = sliced[:limit]
         else:
-            results = all_detail_rows
+            results = sliced
 
     # Sort breakdowns
     by_ontology.sort(key=lambda x: x["term_count"], reverse=True)
@@ -1268,7 +1298,8 @@ def gene_ontology_terms(
         "terms_per_gene_max": terms_per_gene_max,
         "terms_per_gene_median": terms_per_gene_median,
         "returned": len(results),
-        "truncated": total_matching > len(results),
+        "offset": offset,
+        "truncated": total_matching > offset + len(results),
         "not_found": not_found,
         "no_terms": no_terms,
         "results": results,
@@ -1450,6 +1481,7 @@ def differential_expression_by_gene(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1573,7 +1605,7 @@ def differential_expression_by_gene(
         results = []
     else:
         det_cypher, det_params = build_differential_expression_by_gene(
-            **filter_kwargs, verbose=verbose, limit=limit,
+            **filter_kwargs, verbose=verbose, limit=limit, offset=offset,
         )
         results = conn.execute_query(det_cypher, **det_params)
 
@@ -1593,7 +1625,8 @@ def differential_expression_by_gene(
         "not_found": not_found,
         "no_expression": no_expression,
         "returned": returned,
-        "truncated": total_matching > returned,
+        "offset": offset,
+        "truncated": total_matching > offset + returned,
         "results": results,
     }
     return envelope
@@ -1608,6 +1641,7 @@ def differential_expression_by_ortholog(
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1725,7 +1759,7 @@ def differential_expression_by_ortholog(
         results = []
     else:
         res_cypher, res_params = build_differential_expression_by_ortholog_results(
-            group_ids=group_ids, **filter_kwargs, verbose=verbose, limit=limit,
+            group_ids=group_ids, **filter_kwargs, verbose=verbose, limit=limit, offset=offset,
         )
         results = conn.execute_query(res_cypher, **res_params)
 
@@ -1804,7 +1838,8 @@ def differential_expression_by_ortholog(
         "not_found_experiments": not_found_experiments,
         "not_matched_experiments": not_matched_experiments,
         "returned": len(results),
-        "truncated": global_raw["total_matching"] > len(results),
+        "offset": offset,
+        "truncated": global_raw["total_matching"] > offset + len(results),
         "results": results,
     }
     return envelope
