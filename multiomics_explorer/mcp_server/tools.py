@@ -36,7 +36,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"utility", "schema"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def kg_schema(ctx: Context) -> KgSchemaResponse:
         """Get the knowledge graph schema: node labels with property names/types,
@@ -69,7 +69,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"filters", "discovery"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def list_filter_values(
         ctx: Context,
@@ -128,7 +128,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"organisms", "discovery"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def list_organisms(
         ctx: Context,
@@ -184,7 +184,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"genes", "discovery"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def resolve_gene(
         ctx: Context,
@@ -266,7 +266,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"genes", "discovery"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def genes_by_function(
         ctx: Context,
@@ -389,7 +389,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"genes"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def gene_overview(
         ctx: Context,
@@ -453,7 +453,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"genes"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def gene_details(
         ctx: Context,
@@ -530,7 +530,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"genes", "homology"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def gene_homologs(
         ctx: Context,
@@ -622,7 +622,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"raw", "escape-hatch"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def run_cypher(
         ctx: Context,
@@ -679,7 +679,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"ontology"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def search_ontology(
         ctx: Context,
@@ -757,7 +757,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"genes", "ontology"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def genes_by_ontology(
         ctx: Context,
@@ -858,7 +858,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"genes", "ontology"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def gene_ontology_terms(
         ctx: Context,
@@ -948,7 +948,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"publications", "discovery"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def list_publications(
         ctx: Context,
@@ -1093,7 +1093,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"experiments", "expression", "discovery"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def list_experiments(
         ctx: Context,
@@ -1460,7 +1460,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"expression", "genes"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def differential_expression_by_gene(
         ctx: Context,
@@ -1663,7 +1663,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"homology", "search"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def search_homolog_groups(
         ctx: Context,
@@ -1807,7 +1807,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"genes", "homology"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def genes_by_homolog_group(
         ctx: Context,
@@ -2084,7 +2084,7 @@ def register_tools(mcp: FastMCP):
 
     @mcp.tool(
         tags={"expression", "homology"},
-        annotations={"readOnlyHint": True},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
     )
     async def differential_expression_by_ortholog(
         ctx: Context,

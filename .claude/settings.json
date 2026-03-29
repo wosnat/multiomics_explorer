@@ -24,6 +24,11 @@
       "Bash(python -m pytest tests/unit/ tests/integration/ -m \"not kg or kg\" -v --tb=short)"
     ]
   },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "example-skills@anthropic-agent-skills": true
+  },
   "mcpServers": {
     "multiomics-kg": {
       "command": "uv",
