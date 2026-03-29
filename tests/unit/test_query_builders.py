@@ -172,6 +172,22 @@ class TestBuildGenesByFunction:
         cypher, _ = build_genes_by_function(search_text="x", limit=None)
         assert "LIMIT" not in cypher
 
+    def test_offset_emits_skip(self):
+        cypher, params = build_genes_by_function(
+            search_text="x", limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        # SKIP must come before LIMIT
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_genes_by_function(
+            search_text="x", limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
 
 class TestBuildGenesByFunctionSummary:
     def test_no_filters(self):
@@ -258,6 +274,21 @@ class TestBuildGeneOverview:
         cypher, _ = build_gene_overview(locus_tags=["PMM1428"])
         assert "ORDER BY g.locus_tag" in cypher
 
+    def test_offset_emits_skip(self):
+        cypher, params = build_gene_overview(
+            locus_tags=["PMM1428"], limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_gene_overview(
+            locus_tags=["PMM1428"], limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
 
 class TestBuildGeneOverviewSummary:
     def test_returns_summary_keys(self):
@@ -310,6 +341,21 @@ class TestBuildGeneDetails:
         """build_get_gene_details_homologs no longer importable from queries_lib."""
         import multiomics_explorer.kg.queries_lib as ql
         assert not hasattr(ql, "build_get_gene_details_homologs")
+
+    def test_offset_emits_skip(self):
+        cypher, params = build_gene_details(
+            locus_tags=["PMM0001"], limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_gene_details(
+            locus_tags=["PMM0001"], limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
 
 
 class TestBuildGeneDetailsSummary:
@@ -457,6 +503,21 @@ class TestBuildGeneHomologs:
         """Accepts multiple locus tags."""
         cypher, params = build_gene_homologs(locus_tags=["PMM0845", "PMM1428"])
         assert params["locus_tags"] == ["PMM0845", "PMM1428"]
+
+    def test_offset_emits_skip(self):
+        cypher, params = build_gene_homologs(
+            locus_tags=["PMM0845"], limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_gene_homologs(
+            locus_tags=["PMM0845"], limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
 
 
 class TestBuildGeneHomologsSummary:
@@ -705,6 +766,21 @@ class TestBuildSearchOntology:
         cypher, _ = build_search_ontology(ontology="go_bp", search_text="test")
         assert "ORDER BY score DESC" in cypher
 
+    def test_offset_emits_skip(self):
+        cypher, params = build_search_ontology(
+            ontology="go_bp", search_text="test", limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_search_ontology(
+            ontology="go_bp", search_text="test", limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
 
 class TestBuildSearchOntologySummary:
     def test_returns_summary_keys(self):
@@ -901,6 +977,21 @@ class TestBuildGenesByOntology:
         )
         assert "gene_category" in cypher
 
+    def test_offset_emits_skip(self):
+        cypher, params = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_genes_by_ontology(
+            ontology="go_bp", term_ids=["go:0006260"], limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
 
 class TestBuildGenesByOntologySummary:
     def test_returns_summary_keys(self):
@@ -1049,6 +1140,21 @@ class TestBuildGeneOntologyTerms:
             locus_tags=["PMM0001", "PMM0002"], ontology="go_bp",
         )
         assert params["locus_tags"] == ["PMM0001", "PMM0002"]
+
+    def test_offset_emits_skip(self):
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
 
 
 class TestBuildGeneOntologyTermsSummary:
@@ -1338,6 +1444,21 @@ class TestBuildListExperiments:
         """No LIMIT when limit is None."""
         cypher, _ = build_list_experiments(limit=None)
         assert "LIMIT" not in cypher
+
+    def test_offset_emits_skip(self):
+        cypher, params = build_list_experiments(
+            limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_list_experiments(
+            limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
 
     def test_table_scope_filter(self):
         """table_scope filter uses IN with list param."""
@@ -1755,6 +1876,21 @@ class TestBuildDifferentialExpressionByGene:
         assert "r.expression_status = 'significant_up'" in cypher
         assert "product" in cypher
 
+    def test_offset_emits_skip(self):
+        cypher, params = build_differential_expression_by_gene(
+            limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_differential_expression_by_gene(
+            limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
 
 class TestBuildSearchHomologGroups:
     """Tests for build_search_homolog_groups."""
@@ -1824,6 +1960,21 @@ class TestBuildSearchHomologGroups:
         cypher, params = build_search_homolog_groups(search_text="test")
         assert "LIMIT" not in cypher
         assert "limit" not in params
+
+    def test_offset_emits_skip(self):
+        cypher, params = build_search_homolog_groups(
+            search_text="test", limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_search_homolog_groups(
+            search_text="test", limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
 
 
 class TestBuildSearchHomologGroupsSummary:
@@ -1917,6 +2068,21 @@ class TestBuildGenesByHomologGroup:
             group_ids=["cyanorak:CK_1"])
         assert "LIMIT" not in cypher
         assert "limit" not in params
+
+    def test_offset_emits_skip(self):
+        cypher, params = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"], limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_genes_by_homolog_group(
+            group_ids=["cyanorak:CK_1"], limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
 
 
 class TestBuildGenesByHomologGroupSummary:
@@ -2136,6 +2302,21 @@ class TestBuildDifferentialExpressionByOrthologResults:
             group_ids=["g1"],
         )
         assert "ORDER BY" in cypher
+
+    def test_offset_emits_skip(self):
+        cypher, params = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"], limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+        assert cypher.index("SKIP") < cypher.index("LIMIT")
+
+    def test_offset_zero_no_skip(self):
+        cypher, params = build_differential_expression_by_ortholog_results(
+            group_ids=["g1"], limit=10, offset=0,
+        )
+        assert "SKIP" not in cypher
+        assert "offset" not in params
 
 
 class TestBuildDifferentialExpressionByOrthologMembershipCounts:

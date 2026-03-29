@@ -167,6 +167,7 @@ def build_genes_by_function(
     min_quality: int = 0,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for genes_by_function.
 
@@ -185,6 +186,11 @@ def build_genes_by_function(
         if verbose else ""
     )
 
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
@@ -200,7 +206,7 @@ def build_genes_by_function(
         "       g.product AS product, g.organism_name AS organism_name,\n"
         "       g.gene_category AS gene_category,\n"
         f"       g.annotation_quality AS annotation_quality, score{verbose_cols}\n"
-        f"ORDER BY score DESC, g.locus_tag{limit_clause}"
+        f"ORDER BY score DESC, g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params
 
@@ -245,6 +251,7 @@ def build_gene_overview(
     locus_tags: list[str],
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_overview.
 
@@ -264,6 +271,11 @@ def build_gene_overview(
         if verbose else ""
     )
 
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
@@ -283,16 +295,21 @@ def build_gene_overview(
         "       g.significant_down_count AS significant_down_count,\n"
         "       g.closest_ortholog_group_size AS closest_ortholog_group_size,\n"
         f"       g.closest_ortholog_genera AS closest_ortholog_genera{verbose_cols}\n"
-        f"ORDER BY g.locus_tag{limit_clause}"
+        f"ORDER BY g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params
 
 
 def build_gene_details(
-    *, locus_tags: list[str], limit: int | None = None,
+    *, locus_tags: list[str], limit: int | None = None, offset: int = 0,
 ) -> tuple[str, dict]:
     """Build query for full gene node properties (batch)."""
     params: dict = {"locus_tags": locus_tags}
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     limit_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
@@ -300,7 +317,7 @@ def build_gene_details(
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "MATCH (g:Gene {locus_tag: lt})\n"
-        f"RETURN g {{.*}} AS gene\nORDER BY g.locus_tag{limit_clause}"
+        f"RETURN g {{.*}} AS gene\nORDER BY g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params
 
@@ -402,6 +419,7 @@ def build_gene_homologs(
     max_specificity_rank: int | None = None,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_homologs.
 
@@ -429,6 +447,11 @@ def build_gene_homologs(
         if verbose else ""
     )
 
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
@@ -445,7 +468,7 @@ def build_gene_homologs(
         "       og.consensus_product AS consensus_product,\n"
         "       og.taxonomic_level AS taxonomic_level, og.source AS source,\n"
         f"       og.specificity_rank AS specificity_rank{verbose_cols}\n"
-        f"ORDER BY g.locus_tag, og.specificity_rank, og.source{limit_clause}"
+        f"ORDER BY g.locus_tag, og.specificity_rank, og.source{skip_clause}{limit_clause}"
     )
     return cypher, params
 
@@ -725,6 +748,7 @@ def build_list_experiments(
     table_scope: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build Cypher for listing experiments with precomputed gene count stats.
 
@@ -759,6 +783,11 @@ def build_list_experiments(
         if verbose else ""
     )
 
+    if offset:
+        skip_clause = "SKIP $offset\n"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     if limit is not None:
         limit_clause = "LIMIT $limit"
         params["limit"] = limit
@@ -797,7 +826,7 @@ def build_list_experiments(
             f"RETURN {return_cols},\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, e.organism_name, e.name\n"
-            f"{limit_clause}"
+            f"{skip_clause}{limit_clause}"
         )
     else:
         cypher = (
@@ -805,7 +834,7 @@ def build_list_experiments(
             f"{where_block}"
             f"RETURN {return_cols}{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, e.organism_name, e.name\n"
-            f"{limit_clause}"
+            f"{skip_clause}{limit_clause}"
         )
 
     return cypher, params
@@ -931,6 +960,7 @@ def build_search_ontology_summary(
 def build_search_ontology(
     *, ontology: str, search_text: str,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build Cypher for search_ontology.
 
@@ -942,7 +972,15 @@ def build_search_ontology(
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
 
+    params: dict = {"search_text": search_text}
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     limit_clause = "\nLIMIT $limit" if limit is not None else ""
+    if limit is not None:
+        params["limit"] = limit
 
     if parent_index:
         # UNION search across both indexes (e.g. Pfam domain + clan)
@@ -957,18 +995,15 @@ def build_search_ontology(
             "  RETURN t.id AS id, t.name AS name, score\n"
             "}\n"
             "RETURN id, name, score\n"
-            "ORDER BY score DESC" + limit_clause
+            "ORDER BY score DESC" + skip_clause + limit_clause
         )
     else:
         cypher = (
             f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "YIELD node AS t, score\n"
             "RETURN t.id AS id, t.name AS name, score\n"
-            "ORDER BY score DESC" + limit_clause
+            "ORDER BY score DESC" + skip_clause + limit_clause
         )
-    params: dict = {"search_text": search_text}
-    if limit is not None:
-        params["limit"] = limit
     return cypher, params
 
 
@@ -1071,6 +1106,7 @@ def build_genes_by_ontology(
     organism: str | None = None,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for genes_by_ontology.
 
@@ -1082,6 +1118,11 @@ def build_genes_by_ontology(
     c = _genes_by_ontology_cfg(ontology)
 
     params: dict = {"term_ids": term_ids, "organism": organism}
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     limit_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
@@ -1104,7 +1145,7 @@ def build_genes_by_ontology(
             "       matched_terms,\n"
             "       g.gene_summary AS gene_summary,\n"
             "       g.function_description AS function_description\n"
-            "ORDER BY g.organism_name, g.locus_tag" + limit_clause
+            "ORDER BY g.organism_name, g.locus_tag" + skip_clause + limit_clause
         )
     else:
         cypher = (
@@ -1117,7 +1158,7 @@ def build_genes_by_ontology(
             "RETURN DISTINCT g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
             "       g.product AS product, g.organism_name AS organism_name,\n"
             "       g.gene_category AS gene_category\n"
-            "ORDER BY g.organism_name, g.locus_tag" + limit_clause
+            "ORDER BY g.organism_name, g.locus_tag" + skip_clause + limit_clause
         )
 
     return cypher, params
@@ -1198,6 +1239,7 @@ def build_gene_ontology_terms(
     ontology: str,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_ontology_terms for ONE ontology.
 
@@ -1221,6 +1263,11 @@ def build_gene_ontology_terms(
         if verbose else ""
     )
 
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
@@ -1233,7 +1280,7 @@ def build_gene_ontology_terms(
         f"{leaf_filter}"
         "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
         f"       t.name AS term_name{verbose_cols}\n"
-        f"ORDER BY g.locus_tag, t.id{limit_clause}"
+        f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
     )
     return cypher, params
 
@@ -1546,6 +1593,7 @@ def build_differential_expression_by_gene(
     significant_only: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for differential_expression_by_gene.
 
@@ -1575,6 +1623,11 @@ def build_differential_expression_by_gene(
         if verbose else ""
     )
 
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
@@ -1598,7 +1651,7 @@ def build_differential_expression_by_gene(
         f"{verbose_cols}\n"
         "ORDER BY ABS(r.log2_fold_change) DESC, g.locus_tag ASC,"
         " e.id ASC, r.time_point_order ASC"
-        f"{limit_clause}"
+        f"{skip_clause}{limit_clause}"
     )
     return cypher, params
 
@@ -1648,6 +1701,7 @@ def build_search_homolog_groups(
     max_specificity_rank: int | None = None,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build Cypher for search_homolog_groups.
 
@@ -1673,6 +1727,11 @@ def build_search_homolog_groups(
         if verbose else ""
     )
 
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
@@ -1690,7 +1749,7 @@ def build_search_homolog_groups(
         "       og.specificity_rank AS specificity_rank,\n"
         "       og.member_count AS member_count, og.organism_count AS organism_count,\n"
         f"       score{verbose_cols}\n"
-        f"ORDER BY score DESC, og.specificity_rank, og.source{limit_clause}"
+        f"ORDER BY score DESC, og.specificity_rank, og.source{skip_clause}{limit_clause}"
     )
     return cypher, params
 
@@ -1782,6 +1841,7 @@ def build_genes_by_homolog_group(
     organisms: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for genes_by_homolog_group.
 
@@ -1800,6 +1860,11 @@ def build_genes_by_homolog_group(
         if verbose else ""
     )
 
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
@@ -1815,7 +1880,7 @@ def build_genes_by_homolog_group(
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.organism_name AS organism_name,\n"
         f"       g.gene_category AS gene_category, og.id AS group_id{verbose_cols}\n"
-        f"ORDER BY og.id, g.organism_name, g.locus_tag{limit_clause}"
+        f"ORDER BY og.id, g.organism_name, g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params
 
@@ -2030,6 +2095,7 @@ def build_differential_expression_by_ortholog_results(
     significant_only: bool = False,
     verbose: bool = False,
     limit: int | None = None,
+    offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for differential_expression_by_ortholog.
 
@@ -2056,6 +2122,11 @@ def build_differential_expression_by_ortholog_results(
         ",\n       e.table_scope_detail AS table_scope_detail"
         if verbose else ""
     )
+
+    if offset:
+        params["offset"] = offset
+    if limit is not None:
+        params["limit"] = limit
 
     cypher = (
         "UNWIND $group_ids AS gid\n"
@@ -2085,9 +2156,10 @@ def build_differential_expression_by_ortholog_results(
         f"{verbose_cols}\n"
         "ORDER BY og.id ASC, e.id ASC, tpo ASC\n"
     )
+    if offset:
+        cypher += "SKIP $offset\n"
     if limit is not None:
         cypher += "LIMIT $limit"
-        params["limit"] = limit
     return cypher, params
 
 
