@@ -49,7 +49,7 @@ Then start Claude Code in any project directory — the KG tools will be availab
 | `kg_schema` | Schema | Graph schema: node labels, relationship types, properties |
 | `run_cypher` | Schema | Raw Cypher escape hatch (read-only, validated) |
 | `resolve_gene` | Gene | Resolve gene identifier to graph nodes (case-insensitive) |
-| `get_gene_details` | Gene | All Gene node properties |
+| `gene_details` | Gene | All Gene node properties |
 | `gene_overview` | Gene | Batch gene routing: identity + data availability signals |
 | `genes_by_function` | Gene | Free-text search across functional annotations (Lucene) |
 | `list_filter_values` | Gene | Valid values for categorical filters |

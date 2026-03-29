@@ -6,7 +6,7 @@ Resolve a gene identifier to matching genes in the knowledge graph.
 
 Matching is case-insensitive — 'pmm0001', 'PMM0001', and 'Pmm0001'
 all work. Use the returned locus_tags with gene_overview,
-get_gene_details, gene_homologs, or gene_ontology_terms. The organism
+gene_details, gene_homologs, or gene_ontology_terms. The organism
 filter uses case-insensitive partial matching — 'MED4' and
 'Prochlorococcus MED4' both work.
 
@@ -102,7 +102,7 @@ Step 2: gene_overview(gene_ids=["PMM1070", "PMT9312_1073", ...])
 
 ```
 resolve_gene → gene_overview → gene_homologs
-resolve_gene → get_gene_details
+resolve_gene → gene_details
 resolve_gene → gene_ontology_terms
 ```
 

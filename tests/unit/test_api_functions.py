@@ -23,7 +23,7 @@ class TestTopLevelImports:
             gene_overview,
             genes_by_function,
             genes_by_ontology,
-            get_gene_details,
+            gene_details,
             kg_schema,
             list_filter_values,
             list_organisms,
@@ -386,26 +386,46 @@ class TestGeneOverview:
 
 
 # ---------------------------------------------------------------------------
-# get_gene_details
+# gene_details
 # ---------------------------------------------------------------------------
-class TestGetGeneDetails:
-    def test_returns_dict(self, mock_conn):
+class TestGeneDetails:
+    def test_returns_envelope(self, mock_conn):
         gene_props = {"locus_tag": "PMM0001", "gene_name": "dnaN",
-                       "product": "DNA polymerase III subunit beta"}
-        mock_conn.execute_query.return_value = [{"gene": gene_props}]
-        result = api.get_gene_details("PMM0001", conn=mock_conn)
-        assert isinstance(result, dict)
-        assert result["locus_tag"] == "PMM0001"
+                       "product": "DNA polymerase III subunit beta",
+                       "organism_strain": "Prochlorococcus MED4"}
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 1, "not_found": []}],  # summary
+            [{"gene": gene_props}],  # detail
+        ]
+        result = api.gene_details(["PMM0001"], conn=mock_conn)
+        assert result["total_matching"] == 1
+        assert result["returned"] == 1
+        assert result["truncated"] is False
+        assert result["not_found"] == []
+        assert result["results"][0]["locus_tag"] == "PMM0001"
 
-    def test_not_found_returns_none(self, mock_conn):
-        mock_conn.execute_query.return_value = [{"gene": None}]
-        result = api.get_gene_details("FAKE0001", conn=mock_conn)
-        assert result is None
+    def test_not_found(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 0, "not_found": ["FAKE0001"]}],  # summary
+            [],  # detail
+        ]
+        result = api.gene_details(["FAKE0001"], conn=mock_conn)
+        assert result["total_matching"] == 0
+        assert result["not_found"] == ["FAKE0001"]
+        assert result["results"] == []
 
-    def test_empty_results_returns_none(self, mock_conn):
-        mock_conn.execute_query.return_value = []
-        result = api.get_gene_details("FAKE0001", conn=mock_conn)
-        assert result is None
+    def test_summary_skips_detail(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"total_matching": 1, "not_found": []}
+        ]
+        result = api.gene_details(["PMM0001"], summary=True, conn=mock_conn)
+        assert result["returned"] == 0
+        assert result["results"] == []
+        assert mock_conn.execute_query.call_count == 1
+
+    def test_empty_locus_tags_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="non-empty"):
+            api.gene_details([], conn=mock_conn)
 
 
 

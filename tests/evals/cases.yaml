@@ -103,10 +103,10 @@
 # ── Gene details ─────────────────────────────────────────
 
 - id: gene_details_flat_return
-  tool: get_gene_details
+  tool: gene_details
   desc: Gene details returns flat g{.*} properties
   params:
-    gene_id: PMM0001
+    locus_tags: [PMM0001]
   expect:
     min_rows: 1
     columns: [locus_tag, gene_name, product, organism_strain, gene_category]
@@ -415,19 +415,19 @@
 # ── Gene details corner cases ─────────────────────────────
 
 - id: gene_details_alteromonas
-  tool: get_gene_details
+  tool: gene_details
   desc: Alteromonas gene details flat return
   params:
-    gene_id: ALT831_RS00180
+    locus_tags: [ALT831_RS00180]
   expect:
     min_rows: 1
     columns: [locus_tag, organism_strain]
 
 - id: gene_details_synechococcus
-  tool: get_gene_details
+  tool: gene_details
   desc: Synechococcus gene details flat return
   params:
-    gene_id: SYNW0305
+    locus_tags: [SYNW0305]
   expect:
     min_rows: 1
     columns: [locus_tag, organism_strain]

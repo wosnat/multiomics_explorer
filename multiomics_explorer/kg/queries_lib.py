@@ -288,13 +288,35 @@ def build_gene_overview(
     return cypher, params
 
 
-def build_get_gene_details(*, gene_id: str) -> tuple[str, dict]:
-    """Build query for full gene node properties."""
+def build_gene_details(
+    *, locus_tags: list[str], limit: int | None = None,
+) -> tuple[str, dict]:
+    """Build query for full gene node properties (batch)."""
+    params: dict = {"locus_tags": locus_tags}
+    limit_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
     cypher = (
-        "MATCH (g:Gene {locus_tag: $gene_id})\n"
-        "RETURN g {.*} AS gene"
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (g:Gene {locus_tag: lt})\n"
+        f"RETURN g {{.*}} AS gene\nORDER BY g.locus_tag{limit_clause}"
     )
-    return cypher, {"gene_id": gene_id}
+    return cypher, params
+
+
+def build_gene_details_summary(
+    *, locus_tags: list[str],
+) -> tuple[str, dict]:
+    """Build summary query for gene details: total + not_found."""
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
+        "WITH collect(CASE WHEN g IS NOT NULL THEN lt END) AS found,\n"
+        "     collect(CASE WHEN g IS NULL THEN lt END) AS not_found\n"
+        "RETURN size(found) AS total_matching, not_found"
+    )
+    return cypher, {"locus_tags": locus_tags}
 
 
 

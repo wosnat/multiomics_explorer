@@ -87,7 +87,7 @@ Target convention: `build_{name}` where `{name}` matches the api
 function name. Summary variant: `build_{name}_summary`.
 
 Existing variations (transitional):
-- `build_get_gene_details` → being retired
+- `build_gene_details` → being retired
 - `build_get_homologs_groups` + `build_get_homologs_members` → `gene_homologs`
 - `build_gene_stub` (helper, not a tool)
 - `build_list_gene_categories` (used by `list_filter_values`)

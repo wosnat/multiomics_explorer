@@ -117,18 +117,21 @@ class TestGeneOverviewContract:
 
 
 # ---------------------------------------------------------------------------
-# get_gene_details
+# gene_details
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
-class TestGetGeneDetailsContract:
-    def test_returns_dict(self, conn):
-        result = api.get_gene_details(KNOWN_GENE, conn=conn)
+class TestGeneDetailsContract:
+    def test_returns_envelope(self, conn):
+        result = api.gene_details([KNOWN_GENE], conn=conn)
         assert isinstance(result, dict)
-        assert "locus_tag" in result
+        assert "total_matching" in result
+        assert "results" in result
+        assert result["results"][0]["locus_tag"] == KNOWN_GENE
 
-    def test_not_found_returns_none(self, conn):
-        result = api.get_gene_details("NONEXISTENT_GENE_XYZ", conn=conn)
-        assert result is None
+    def test_not_found_in_envelope(self, conn):
+        result = api.gene_details(["NONEXISTENT_GENE_XYZ"], conn=conn)
+        assert result["total_matching"] == 0
+        assert "NONEXISTENT_GENE_XYZ" in result["not_found"]
 
 
 # ---------------------------------------------------------------------------

@@ -222,7 +222,7 @@ def register_tools(mcp: FastMCP):
 
         Matching is case-insensitive — 'pmm0001', 'PMM0001', and 'Pmm0001'
         all work. Use the returned locus_tags with gene_overview,
-        get_gene_details, gene_homologs, or gene_ontology_terms. The organism
+        gene_details, gene_homologs, or gene_ontology_terms. The organism
         filter uses case-insensitive partial matching — 'MED4' and
         'Prochlorococcus MED4' both work.
         """
@@ -461,9 +461,31 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"gene_overview unexpected error: {e}")
             raise ToolError(f"Error in gene_overview: {e}")
 
-    @mcp.tool()
-    def get_gene_details(ctx: Context, gene_id: str) -> str:
-        """Get all properties for a gene.
+    class GeneDetailResponse(BaseModel):
+        total_matching: int = Field(description="Genes found from input locus_tags")
+        returned: int = Field(description="Results in this response (0 when summary=true)")
+        truncated: bool = Field(description="True if total_matching > returned")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
+        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*}. ~30 fields including locus_tag, gene_name, product, organism_strain, gene_category, annotation_quality, function_description, catalytic_activities, transporter_classification, cazy_ids, etc. Sparse fields only present when populated.")
+
+    @mcp.tool(
+        tags={"genes"},
+        annotations={"readOnlyHint": True},
+    )
+    async def gene_details(
+        ctx: Context,
+        locus_tags: Annotated[list[str], Field(
+            description="Gene locus tags to look up. "
+            "E.g. ['PMM0001', 'sync_0001'].",
+        )],
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+    ) -> GeneDetailResponse:
+        """Get all properties for genes.
 
         This is a deep-dive tool — use gene_overview for the common case.
         Returns all Gene node properties including sparse fields
@@ -471,23 +493,20 @@ def register_tools(mcp: FastMCP):
 
         For organism taxonomy, use list_organisms. For homologs, use
         gene_homologs. For ontology annotations, use gene_ontology_terms.
-
-        Args:
-            gene_id: Gene locus_tag (e.g. "PMM0001", "sync_0001").
         """
-        logger.info("get_gene_details gene_id=%s", gene_id)
+        await ctx.info(f"gene_details locus_tags={locus_tags} summary={summary}")
         try:
             conn = _conn(ctx)
-            result = api.get_gene_details(gene_id, conn=conn)
-            if result is None:
-                return f"Gene '{gene_id}' not found."
-            return _fmt([result])
+            data = api.gene_details(
+                locus_tags, summary=summary, limit=limit, conn=conn,
+            )
+            return GeneDetailResponse(**data)
         except ValueError as e:
-            logger.warning("get_gene_details error: %s", e)
-            return f"Error: {e}"
+            await ctx.warning(f"gene_details error: {e}")
+            raise ToolError(str(e))
         except Exception as e:
-            logger.warning("get_gene_details unexpected error: %s", e)
-            return f"Error in get_gene_details: {e}"
+            await ctx.error(f"gene_details unexpected error: {e}")
+            raise ToolError(f"Error in gene_details: {e}")
 
     # --- gene_homologs ---
 

@@ -27,7 +27,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_homolog_group,
     build_genes_by_homolog_group_summary,
     build_genes_by_ontology,
-    build_get_gene_details,
+    build_gene_details,
     build_gene_homologs,
     build_list_gene_categories,
     build_list_experiments,
@@ -57,7 +57,7 @@ TOOL_BUILDERS = {
     "resolve_gene": build_resolve_gene,
     "genes_by_function": build_genes_by_function,
     "gene_overview": build_gene_overview,
-    "get_gene_details": build_get_gene_details,
+    "gene_details": build_gene_details,
     "gene_homologs": build_gene_homologs,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
@@ -101,8 +101,8 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
     if limit is not None:
         results = results[:limit]
 
-    # get_gene_details returns g{.*} AS gene — unwrap for flat column checks
-    if tool == "get_gene_details" and results and "gene" in results[0]:
+    # gene_details returns g{.*} AS gene — unwrap for flat column checks
+    if tool == "gene_details" and results and "gene" in results[0]:
         results = [r["gene"] for r in results if r.get("gene") is not None]
 
     return results

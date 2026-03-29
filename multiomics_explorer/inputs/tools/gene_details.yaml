@@ -1,0 +1,47 @@
+# Human-authored content for gene_details about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Full properties for a single gene
+    call: gene_details(locus_tags=["PMM0001"])
+    response: |
+      {
+        "total_matching": 1,
+        "returned": 1, "truncated": false, "not_found": [],
+        "results": [
+          {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_strain": "Prochlorococcus MED4", "gene_category": "DNA replication", "annotation_quality": 3, "ec_numbers": ["2.7.7.7"], "cog_categories": ["L"], "kegg_ids": ["K02338"], ...}
+        ]
+      }
+
+  - title: Batch deep-dive
+    call: gene_details(locus_tags=["PMM0001", "ALT831_RS00180"])
+
+  - title: Just check existence (summary only)
+    call: gene_details(locus_tags=["PMM0001", "FAKE_GENE"], summary=True)
+    response: |
+      {
+        "total_matching": 1,
+        "returned": 0, "truncated": true, "not_found": ["FAKE_GENE"],
+        "results": []
+      }
+
+  - title: From gene_overview to deep-dive
+    steps: |
+      Step 1: gene_overview(locus_tags=["PMM0001", "PMM0845"])
+              → see annotation_types, expression counts, ortholog summary
+
+      Step 2: gene_details(locus_tags=["PMM0001"])
+              → inspect all properties including sparse fields
+              (catalytic_activities, transporter_classification, cazy_ids, etc.)
+
+chaining:
+  - "gene_overview → gene_details"
+  - "resolve_gene → gene_details"
+  - "genes_by_function → gene_details"
+
+mistakes:
+  - "This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields"
+  - "Sparse fields (ec_numbers, cazy_ids, transporter_classification) are only present when the gene has them — check with gene_overview first"
+  - wrong: "gene_details(locus_tags='PMM0001')"
+    right: "gene_details(locus_tags=['PMM0001']) — always a list"

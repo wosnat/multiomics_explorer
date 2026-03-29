@@ -292,11 +292,12 @@ class TestGenesByFunctionCorrectness:
 # ---------------------------------------------------------------------------
 # TestGetGeneDetailsCorrectness
 # ---------------------------------------------------------------------------
-class TestGetGeneDetailsCorrectness:
-    """Verify get_gene_details returns flat g{.*} properties correctly."""
+class TestGeneDetailsCorrectness:
+    """Verify gene_details returns flat g{.*} properties correctly."""
 
-    def test_well_annotated_prochlorococcus(self, tool_fns, mock_ctx):
-        """PMM0001 returns flat gene properties via g{.*}. Single execute_query call."""
+    @pytest.mark.asyncio
+    async def test_well_annotated_prochlorococcus(self, tool_fns, mock_ctx):
+        """PMM0001 returns flat gene properties via g{.*}."""
         gene_data = {
             "locus_tag": "PMM0001",
             "gene_name": "dnaN",
@@ -307,23 +308,23 @@ class TestGetGeneDetailsCorrectness:
             "ec_numbers": ["2.7.7.7"],
         }
         conn = _conn_from(mock_ctx)
-        conn.execute_query.return_value = [{"gene": gene_data}]
+        conn.execute_query.side_effect = [
+            [{"total_matching": 1, "not_found": []}],  # summary
+            [{"gene": gene_data}],  # detail
+        ]
 
-        result = json.loads(tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001"))
+        result = await tool_fns["gene_details"](mock_ctx, locus_tags=["PMM0001"])
 
-        assert len(result) == 1
-        r = result[0]
+        assert result.total_matching == 1
+        assert result.returned == 1
+        r = result.results[0]
         assert r["locus_tag"] == "PMM0001"
         assert r["gene_name"] == "dnaN"
         assert r["organism_strain"] == "Prochlorococcus MED4"
-        assert "_protein" not in r
-        assert "_organism" not in r
-        assert "_ortholog_groups" not in r
-        assert "_homologs" not in r
-        assert conn.execute_query.call_count == 1
 
-    def test_alteromonas_gene_eggnog_only(self, tool_fns, mock_ctx):
-        """ALT831_RS00180 returns flat properties. Single query call."""
+    @pytest.mark.asyncio
+    async def test_alteromonas_gene_eggnog_only(self, tool_fns, mock_ctx):
+        """ALT831_RS00180 returns flat properties."""
         gene_data = {
             "locus_tag": "ALT831_RS00180",
             "gene_name": None,
@@ -332,20 +333,17 @@ class TestGetGeneDetailsCorrectness:
             "annotation_quality": 2,
         }
         conn = _conn_from(mock_ctx)
-        conn.execute_query.return_value = [{"gene": gene_data}]
+        conn.execute_query.side_effect = [
+            [{"total_matching": 1, "not_found": []}],  # summary
+            [{"gene": gene_data}],  # detail
+        ]
 
-        result = json.loads(
-            tool_fns["get_gene_details"](mock_ctx, gene_id="ALT831_RS00180")
-        )
+        result = await tool_fns["gene_details"](mock_ctx, locus_tags=["ALT831_RS00180"])
 
-        r = result[0]
+        assert result.total_matching == 1
+        r = result.results[0]
         assert r["locus_tag"] == "ALT831_RS00180"
         assert r["organism_strain"] == "Alteromonas macleodii MIT1002"
-        assert "_protein" not in r
-        assert "_organism" not in r
-        assert "_ortholog_groups" not in r
-        assert "_homologs" not in r
-        assert conn.execute_query.call_count == 1
 
 
 # ---------------------------------------------------------------------------

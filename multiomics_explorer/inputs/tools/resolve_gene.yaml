@@ -44,7 +44,7 @@ examples:
 
 chaining:
   - "resolve_gene → gene_overview → gene_homologs"
-  - "resolve_gene → get_gene_details"
+  - "resolve_gene → gene_details"
   - "resolve_gene → gene_ontology_terms"
 
 mistakes:

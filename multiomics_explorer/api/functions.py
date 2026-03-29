@@ -33,7 +33,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function_summary,
     build_genes_by_ontology,
     build_genes_by_ontology_summary,
-    build_get_gene_details,
+    build_gene_details,
+    build_gene_details_summary,
     build_gene_homologs,
     build_gene_homologs_summary,
     build_list_gene_categories,
@@ -305,22 +306,56 @@ def gene_overview(
     return envelope
 
 
-def get_gene_details(
-    gene_id: str,
+def gene_details(
+    locus_tags: list[str],
+    summary: bool = False,
+    limit: int | None = None,
     *,
     conn: GraphConnection | None = None,
-) -> dict | None:
-    """Get all properties for a gene node.
+) -> dict:
+    """Get all properties for genes (deep-dive complement to gene_overview).
 
-    Returns a flat dict of all Gene node properties, or None if the
-    gene is not found.
+    Returns dict with keys: total_matching, returned, truncated,
+    not_found, results.
+    Each result is a flat dict of all Gene node properties (g {.*}).
+
+    summary=True is sugar for limit=0: results=[], summary fields only.
+    not_found: input locus_tags not in KG.
     """
+    if not locus_tags:
+        raise ValueError("locus_tags must be a non-empty list")
+
+    if summary:
+        limit = 0
+
     conn = _default_conn(conn)
-    cypher, params = build_get_gene_details(gene_id=gene_id)
-    results = conn.execute_query(cypher, **params)
-    if not results or results[0]["gene"] is None:
-        return None
-    return results[0]["gene"]
+
+    # Summary query — always runs
+    sum_cypher, sum_params = build_gene_details_summary(locus_tags=locus_tags)
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    total_matching = raw_summary["total_matching"]
+    envelope: dict = {
+        "total_matching": total_matching,
+        "not_found": raw_summary["not_found"],
+    }
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    det_cypher, det_params = build_gene_details(
+        locus_tags=locus_tags, limit=limit,
+    )
+    results = [r["gene"] for r in conn.execute_query(det_cypher, **det_params)]
+
+    envelope["returned"] = len(results)
+    envelope["truncated"] = total_matching > len(results)
+    envelope["results"] = results
+    return envelope
 
 
 

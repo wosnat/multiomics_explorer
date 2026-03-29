@@ -47,7 +47,7 @@ def _conn_from(ctx):
 
 EXPECTED_TOOLS = [
     "kg_schema", "list_filter_values", "list_organisms", "resolve_gene",
-    "genes_by_function", "gene_overview", "get_gene_details",
+    "genes_by_function", "gene_overview", "gene_details",
     "gene_homologs", "run_cypher",
     "search_ontology", "search_homolog_groups", "genes_by_homolog_group",
     "genes_by_ontology", "gene_ontology_terms",
@@ -707,27 +707,35 @@ class TestGeneOverviewWrapper:
         assert result.truncated is True
 
 
-class TestGetGeneDetailsWrapper:
-    def test_not_found_message(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = [{"gene": None}]
-        result = tool_fns["get_gene_details"](mock_ctx, gene_id="FAKE")
-        assert "not found" in result
-
-    def test_not_found_empty_results(self, tool_fns, mock_ctx):
-        _conn_from(mock_ctx).execute_query.return_value = []
-        result = tool_fns["get_gene_details"](mock_ctx, gene_id="FAKE")
-        assert "not found" in result
-
-    def test_single_query_no_homologs(self, tool_fns, mock_ctx):
-        """Single execute_query call, no _homologs key in result."""
+class TestGeneDetailsWrapper:
+    @pytest.mark.asyncio
+    async def test_returns_pydantic_model(self, tool_fns, mock_ctx):
+        """V3: returns GeneDetailResponse Pydantic model."""
         gene_data = {"locus_tag": "PMM0001", "product": "test", "organism_strain": "Prochlorococcus MED4"}
-        conn = _conn_from(mock_ctx)
-        conn.execute_query.return_value = [{"gene": gene_data}]
-        result = json.loads(tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001"))
-        assert len(result) == 1
-        assert result[0]["locus_tag"] == "PMM0001"
-        assert "_homologs" not in result[0]
-        assert conn.execute_query.call_count == 1
+        with patch(
+            "multiomics_explorer.api.functions.gene_details",
+            return_value={
+                "total_matching": 1, "returned": 1, "truncated": False,
+                "not_found": [], "results": [gene_data],
+            },
+        ):
+            result = await tool_fns["gene_details"](mock_ctx, locus_tags=["PMM0001"])
+        assert hasattr(result, "total_matching")
+        assert result.total_matching == 1
+        assert result.results[0]["locus_tag"] == "PMM0001"
+
+    @pytest.mark.asyncio
+    async def test_not_found_in_envelope(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_details",
+            return_value={
+                "total_matching": 0, "returned": 0, "truncated": False,
+                "not_found": ["FAKE"], "results": [],
+            },
+        ):
+            result = await tool_fns["gene_details"](mock_ctx, locus_tags=["FAKE"])
+        assert result.not_found == ["FAKE"]
+        assert result.results == []
 
 
 
@@ -1486,13 +1494,15 @@ class TestErrorHandling:
             with pytest.raises(ToolError, match="Error in gene_overview"):
                 await tool_fns["gene_overview"](mock_ctx, locus_tags=["PMM0001"])
 
-    def test_get_gene_details_generic_error(self, tool_fns, mock_ctx):
+    @pytest.mark.asyncio
+    async def test_gene_details_generic_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
         with patch(
-            "multiomics_explorer.api.functions.get_gene_details",
+            "multiomics_explorer.api.functions.gene_details",
             side_effect=RuntimeError("timeout"),
         ):
-            result = tool_fns["get_gene_details"](mock_ctx, gene_id="PMM0001")
-        assert "Error in get_gene_details" in result
+            with pytest.raises(ToolError, match="Error in gene_details"):
+                await tool_fns["gene_details"](mock_ctx, locus_tags=["PMM0001"])
 
     @pytest.mark.asyncio
     async def test_gene_homologs_generic_error(self, tool_fns, mock_ctx):

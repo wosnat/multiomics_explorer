@@ -23,7 +23,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_homolog_group,
     build_genes_by_homolog_group_summary,
     build_genes_by_ontology,
-    build_get_gene_details,
+    build_gene_details,
     build_gene_homologs,
     build_list_experiments,
     build_list_experiments_summary,
@@ -49,7 +49,7 @@ TOOL_BUILDERS = {
     "resolve_gene": build_resolve_gene,
     "genes_by_function": build_genes_by_function,
     "gene_overview": build_gene_overview,
-    "get_gene_details": build_get_gene_details,
+    "gene_details": build_gene_details,
     "gene_homologs": build_gene_homologs,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
@@ -159,8 +159,8 @@ def test_regression(conn, case, data_regression):
         builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit")}
         cypher, query_params = builder(**builder_params)
         results = conn.execute_query(cypher, **query_params)
-        # get_gene_details returns g{.*} AS gene — unwrap for flat comparison
-        if tool == "get_gene_details" and results and "gene" in results[0]:
+        # gene_details returns g{.*} AS gene — unwrap for flat comparison
+        if tool == "gene_details" and results and "gene" in results[0]:
             results = [r["gene"] for r in results if r.get("gene") is not None]
 
     normalized = _normalize(results)

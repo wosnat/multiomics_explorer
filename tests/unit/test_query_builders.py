@@ -18,7 +18,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function_summary,
     build_genes_by_ontology,
     build_genes_by_ontology_summary,
-    build_get_gene_details,
+    build_gene_details,
+    build_gene_details_summary,
     build_list_gene_categories,
     build_list_organisms,
     build_list_publications,
@@ -280,20 +281,42 @@ class TestBuildGeneOverviewSummary:
         assert "CASE WHEN g IS NULL" in cypher
 
 
-class TestBuildGetGeneDetails:
-    def test_get_gene_details_simplified(self):
-        """g {.*} in RETURN, no nested sub-object traversals."""
-        cypher, params = build_get_gene_details(gene_id="PMM0001")
-        assert params["gene_id"] == "PMM0001"
+class TestBuildGeneDetails:
+    def test_batch_locus_tags(self):
+        """Batch query with locus_tags list, g {.*} in RETURN."""
+        cypher, params = build_gene_details(locus_tags=["PMM0001", "PMM0002"])
+        assert params["locus_tags"] == ["PMM0001", "PMM0002"]
+        assert "UNWIND $locus_tags" in cypher
         assert "g {.*}" in cypher
-        assert "Gene_encodes_protein" not in cypher
-        assert "Gene_belongs_to_organism" not in cypher
-        assert "Gene_in_ortholog_group" not in cypher
+        assert "ORDER BY" in cypher
+
+    def test_limit(self):
+        cypher, params = build_gene_details(locus_tags=["PMM0001"], limit=10)
+        assert params["limit"] == 10
+        assert "LIMIT $limit" in cypher
+
+    def test_no_limit(self):
+        cypher, params = build_gene_details(locus_tags=["PMM0001"])
+        assert "LIMIT" not in cypher
+
+    def test_build_get_gene_details_retired(self):
+        """build_get_gene_details no longer importable from queries_lib."""
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "build_get_gene_details")
 
     def test_build_get_gene_details_homologs_deleted(self):
         """build_get_gene_details_homologs no longer importable from queries_lib."""
         import multiomics_explorer.kg.queries_lib as ql
         assert not hasattr(ql, "build_get_gene_details_homologs")
+
+
+class TestBuildGeneDetailsSummary:
+    def test_summary_returns_total_and_not_found(self):
+        cypher, params = build_gene_details_summary(locus_tags=["PMM0001"])
+        assert params["locus_tags"] == ["PMM0001"]
+        assert "total_matching" in cypher
+        assert "not_found" in cypher
+        assert "OPTIONAL MATCH" in cypher
 
 
 class TestRemovedExpressionBuilders:

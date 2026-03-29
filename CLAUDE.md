@@ -40,7 +40,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `kg_schema` | Graph schema with node labels, relationship types, property names |
 | `resolve_gene` | Resolve a gene identifier (case-insensitive) to matching graph nodes. Returns flat list sorted by organism. |
 | `genes_by_function` | Free-text search across gene functional annotations (Lucene syntax). Rich summary fields (by_organism, by_category, score stats). Supports category and organism filtering. |
-| `get_gene_details` | All Gene node properties via g{.*} — use gene_overview for the common case |
+| `gene_details` | All Gene node properties via g{.*} — use gene_overview for the common case |
 | `gene_overview` | Batch gene routing: identity + data availability signals (annotation_types, expression counts, ortholog summary). Accepts locus_tags list. Rich summary fields (by_organism, by_category, by_annotation_type, expression/ortholog availability counts). |
 | `gene_homologs` | Batch: gene locus_tags → ortholog group memberships. Flat long format (one row per gene × group). Filterable by source/level/rank. |
 | `list_filter_values` | List valid values for categorical filters (gene categories) |

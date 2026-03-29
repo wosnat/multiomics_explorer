@@ -18,7 +18,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_overview,
     build_gene_stub,
     build_genes_by_ontology,
-    build_get_gene_details,
+    build_gene_details,
     build_gene_homologs,
     build_gene_homologs_summary,
     build_list_gene_categories,
@@ -192,12 +192,12 @@ class TestGenesByFunctionCorrectnessKG:
 # ---------------------------------------------------------------------------
 
 @pytest.mark.kg
-class TestGetGeneDetailsCorrectnessKG:
+class TestGeneDetailsCorrectnessKG:
     """Validate gene details queries return flat g{.*} properties."""
 
     def test_well_annotated_prochlorococcus(self, conn):
         """PMM0001 returns flat g{.*} with locus_tag, gene_name, product, organism_strain."""
-        cypher, params = build_get_gene_details(gene_id="PMM0001")
+        cypher, params = build_gene_details(locus_tags=["PMM0001"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
@@ -209,7 +209,7 @@ class TestGetGeneDetailsCorrectnessKG:
 
     def test_alteromonas_gene(self, conn):
         """ALT831_RS00180 returns flat properties with organism_strain containing 'Alteromonas'."""
-        cypher, params = build_get_gene_details(gene_id="ALT831_RS00180")
+        cypher, params = build_gene_details(locus_tags=["ALT831_RS00180"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         gene = results[0]["gene"]
