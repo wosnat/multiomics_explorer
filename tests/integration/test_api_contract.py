@@ -501,3 +501,193 @@ class TestDifferentialExpressionByOrthologContract:
                        "not_found_organisms", "not_matched_organisms",
                        "not_found_experiments", "not_matched_experiments"):
             assert isinstance(result[field], list)
+
+
+# ---------------------------------------------------------------------------
+# list_publications
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestListPublicationsContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.list_publications(conn=conn)
+        assert isinstance(result, dict)
+        expected_keys = {
+            "total_entries", "total_matching", "by_organism",
+            "by_treatment_type", "by_omics_type",
+            "returned", "truncated", "results",
+        }
+        assert expected_keys <= set(result.keys())
+        assert result["total_matching"] >= 15
+
+    def test_result_keys(self, conn):
+        result = api.list_publications(conn=conn)
+        row = result["results"][0]
+        for key in ("doi", "title", "authors", "year",
+                     "experiment_count", "organisms",
+                     "treatment_types", "omics_types"):
+            assert key in row
+
+    def test_verbose_adds_abstract(self, conn):
+        result = api.list_publications(verbose=True, limit=1, conn=conn)
+        row = result["results"][0]
+        assert "abstract" in row
+        assert "description" in row
+
+    def test_organism_filter_narrows(self, conn):
+        all_pubs = api.list_publications(conn=conn)
+        filtered = api.list_publications(organism="MED4", conn=conn)
+        assert filtered["total_matching"] <= all_pubs["total_matching"]
+        assert filtered["total_matching"] >= 5
+
+
+# ---------------------------------------------------------------------------
+# list_experiments
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestListExperimentsContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.list_experiments(conn=conn)
+        assert isinstance(result, dict)
+        expected_keys = {
+            "total_entries", "total_matching",
+            "by_organism", "by_treatment_type", "by_omics_type",
+            "by_publication", "by_table_scope", "time_course_count",
+            "returned", "truncated", "results",
+        }
+        assert expected_keys <= set(result.keys())
+        assert result["total_matching"] >= 70
+
+    def test_result_keys(self, conn):
+        result = api.list_experiments(limit=1, conn=conn)
+        row = result["results"][0]
+        for key in ("experiment_id", "experiment_name",
+                     "publication_doi", "organism_name",
+                     "treatment_type", "omics_type",
+                     "is_time_course", "table_scope",
+                     "gene_count", "genes_by_status"):
+            assert key in row
+
+    def test_verbose_adds_fields(self, conn):
+        result = api.list_experiments(verbose=True, limit=1, conn=conn)
+        row = result["results"][0]
+        for key in ("publication_title", "treatment", "control"):
+            assert key in row
+
+    def test_summary_mode(self, conn):
+        result = api.list_experiments(summary=True, conn=conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] >= 70
+        assert len(result["by_organism"]) >= 8
+
+    def test_table_scope_filter(self, conn):
+        result = api.list_experiments(
+            table_scope=["significant_only"], conn=conn,
+        )
+        for row in result["results"]:
+            assert row["table_scope"] == "significant_only"
+
+
+# ---------------------------------------------------------------------------
+# search_homolog_groups
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestSearchHomologGroupsContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.search_homolog_groups("photosynthesis", conn=conn)
+        assert isinstance(result, dict)
+        expected_keys = {
+            "total_entries", "total_matching", "by_source", "by_level",
+            "score_max", "score_median",
+            "returned", "truncated", "results",
+        }
+        assert set(result.keys()) == expected_keys
+        assert result["total_matching"] >= 5
+
+    def test_result_keys_compact(self, conn):
+        result = api.search_homolog_groups("photosynthesis", conn=conn)
+        expected_keys = {
+            "group_id", "group_name", "consensus_gene_name",
+            "consensus_product", "source", "taxonomic_level",
+            "specificity_rank", "member_count", "organism_count", "score",
+        }
+        assert set(result["results"][0].keys()) == expected_keys
+
+    def test_result_keys_verbose(self, conn):
+        result = api.search_homolog_groups(
+            "nitrogen", verbose=True, limit=1, conn=conn,
+        )
+        row = result["results"][0]
+        for key in ("description", "functional_description",
+                     "genera", "has_cross_genus_members"):
+            assert key in row
+
+    def test_by_source_shape(self, conn):
+        result = api.search_homolog_groups("kinase", conn=conn)
+        for b in result["by_source"]:
+            assert "source" in b
+            assert "count" in b
+
+    def test_by_level_shape(self, conn):
+        result = api.search_homolog_groups("kinase", conn=conn)
+        for b in result["by_level"]:
+            assert "taxonomic_level" in b
+            assert "count" in b
+
+
+# ---------------------------------------------------------------------------
+# genes_by_homolog_group
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGenesByHomologGroupContract:
+    KNOWN_GROUP = "cyanorak:CK_00000570"
+
+    def test_returns_dict_envelope(self, conn):
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], conn=conn,
+        )
+        assert isinstance(result, dict)
+        expected_keys = {
+            "total_matching", "total_genes", "total_categories",
+            "genes_per_group_max", "genes_per_group_median",
+            "by_organism", "top_categories", "top_groups",
+            "not_found_groups", "not_matched_groups",
+            "not_found_organisms", "not_matched_organisms",
+            "returned", "truncated", "results",
+        }
+        assert set(result.keys()) == expected_keys
+
+    def test_result_keys_compact(self, conn):
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], conn=conn,
+        )
+        expected_keys = {
+            "locus_tag", "gene_name", "product",
+            "organism_name", "gene_category", "group_id",
+        }
+        assert set(result["results"][0].keys()) == expected_keys
+
+    def test_result_keys_verbose(self, conn):
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], verbose=True, limit=1, conn=conn,
+        )
+        row = result["results"][0]
+        for key in ("gene_summary", "function_description",
+                     "consensus_product", "source"):
+            assert key in row
+
+    def test_not_found(self, conn):
+        result = api.genes_by_homolog_group(
+            group_ids=["FAKE_GROUP_XYZ"], conn=conn,
+        )
+        assert "FAKE_GROUP_XYZ" in result["not_found_groups"]
+        assert result["total_matching"] == 0
+
+    def test_by_organism_shape(self, conn):
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], conn=conn,
+        )
+        assert len(result["by_organism"]) >= 1
+        for b in result["by_organism"]:
+            assert "organism_name" in b
+            assert "count" in b

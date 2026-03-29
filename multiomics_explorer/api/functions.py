@@ -166,7 +166,11 @@ def genes_by_function(
     Per result: locus_tag, gene_name, product, organism_name,
     gene_category, annotation_quality, score.
     Verbose adds: function_description, gene_summary.
+
+    Raises ValueError if search_text is empty.
     """
+    if not search_text or not search_text.strip():
+        raise ValueError("search_text must not be empty.")
     if summary:
         limit = 0
 
@@ -257,7 +261,11 @@ def gene_overview(
     expression_edge_count, significant_up_count, significant_down_count,
     closest_ortholog_group_size, closest_ortholog_genera.
     Verbose adds: gene_summary, function_description, all_identifiers.
+
+    Raises ValueError if locus_tags is empty.
     """
+    if not locus_tags:
+        raise ValueError("locus_tags must not be empty.")
     if summary:
         limit = 0
 
@@ -381,10 +389,14 @@ def gene_homologs(
     Per result (verbose): adds member_count, organism_count, genera,
     has_cross_genus_members, description, functional_description.
 
+    Raises ValueError if locus_tags is empty.
+
     summary=True is sugar for limit=0: results=[], summary fields only.
     not_found: input locus_tags not in KG.
     no_groups: genes that exist but have zero matching OGs.
     """
+    if not locus_tags:
+        raise ValueError("locus_tags must not be empty.")
     if summary:
         limit = 0
 
@@ -779,6 +791,10 @@ def search_ontology(
     """
     if not search_text or not search_text.strip():
         raise ValueError("search_text must not be empty.")
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
     if summary:
         limit = 0
 
@@ -1066,6 +1082,10 @@ def genes_by_ontology(
     """
     if not term_ids:
         raise ValueError("term_ids must not be empty.")
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
     if summary:
         limit = 0
 
@@ -1269,6 +1289,8 @@ def run_cypher(
     a ParameterNotProvided notification — not a real syntax error. run_cypher users
     should write literal values, so this is not an issue in practice.
     """
+    if not query or not query.strip():
+        raise ValueError("query must not be empty.")
     conn = _default_conn(conn)
 
     # 1. Write blocking

@@ -13,6 +13,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_details,
     build_gene_homologs,
     build_gene_homologs_summary,
+    build_genes_by_homolog_group,
+    build_genes_by_homolog_group_summary,
     build_list_experiments,
     build_list_experiments_summary,
     build_list_organisms,
@@ -20,6 +22,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_publications_summary,
     build_resolve_gene,
     build_genes_by_function,
+    build_search_homolog_groups,
+    build_search_homolog_groups_summary,
 )
 from multiomics_explorer.api import functions as api
 from multiomics_explorer.api.functions import _WRITE_KEYWORDS
@@ -569,4 +573,282 @@ class TestDifferentialExpressionByOrtholog:
         )
         assert "FAKE_ORG" in result["not_found_organisms"]
         assert "FAKE_EXP" in result["not_found_experiments"]
+
+
+# ---------------------------------------------------------------------------
+# search_homolog_groups
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestSearchHomologGroups:
+    def test_basic_search(self, conn):
+        """Text search returns matching groups with expected columns."""
+        result = api.search_homolog_groups("photosynthesis", conn=conn)
+        assert result["total_matching"] >= 5
+        assert result["returned"] >= 1
+        row = result["results"][0]
+        for key in ("group_id", "group_name", "consensus_gene_name",
+                     "consensus_product", "source", "taxonomic_level",
+                     "specificity_rank", "member_count", "organism_count", "score"):
+            assert key in row
+
+    def test_source_filter_cyanorak(self, conn):
+        """Source filter restricts to cyanorak groups only."""
+        result = api.search_homolog_groups(
+            "photosynthesis", source="cyanorak", conn=conn,
+        )
+        assert result["total_matching"] >= 1
+        for row in result["results"]:
+            assert row["source"] == "cyanorak"
+        sources = [b["source"] for b in result["by_source"]]
+        assert sources == ["cyanorak"]
+
+    def test_source_filter_eggnog(self, conn):
+        """Source filter restricts to eggnog groups only."""
+        result = api.search_homolog_groups(
+            "polymerase", source="eggnog", conn=conn,
+        )
+        assert result["total_matching"] >= 1
+        for row in result["results"]:
+            assert row["source"] == "eggnog"
+
+    def test_max_specificity_rank(self, conn):
+        """max_specificity_rank caps group breadth."""
+        result = api.search_homolog_groups(
+            "photosynthesis", max_specificity_rank=0, conn=conn,
+        )
+        for row in result["results"]:
+            assert row["specificity_rank"] <= 0
+
+    def test_verbose_adds_fields(self, conn):
+        """Verbose mode includes description and genera."""
+        result = api.search_homolog_groups(
+            "nitrogen", verbose=True, limit=1, conn=conn,
+        )
+        if result["results"]:
+            row = result["results"][0]
+            for key in ("description", "functional_description",
+                        "genera", "has_cross_genus_members"):
+                assert key in row
+
+    def test_summary_mode(self, conn):
+        """Summary mode returns counts without detail rows."""
+        result = api.search_homolog_groups(
+            "photosynthesis", summary=True, conn=conn,
+        )
+        assert result["total_matching"] >= 5
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["truncated"] is True
+        assert len(result["by_source"]) >= 1
+        assert len(result["by_level"]) >= 1
+
+    def test_summary_consistency(self, conn):
+        """Summary total_matching matches detail row count."""
+        summary = api.search_homolog_groups(
+            "kinase", summary=True, conn=conn,
+        )
+        detail = api.search_homolog_groups(
+            "kinase", limit=500, conn=conn,
+        )
+        assert summary["total_matching"] == detail["total_matching"]
+        assert detail["total_matching"] == len(detail["results"])
+
+    def test_empty_search_raises(self, conn):
+        """Empty search_text raises ValueError."""
+        with pytest.raises(ValueError, match="search_text"):
+            api.search_homolog_groups("", conn=conn)
+
+    def test_invalid_source_raises(self, conn):
+        """Invalid source enum raises ValueError."""
+        with pytest.raises(ValueError, match="Invalid source"):
+            api.search_homolog_groups("kinase", source="invalid", conn=conn)
+
+    def test_score_fields_populated(self, conn):
+        """score_max and score_median are populated when results exist."""
+        result = api.search_homolog_groups("photosynthesis", conn=conn)
+        assert result["score_max"] is not None
+        assert result["score_median"] is not None
+        assert result["score_max"] >= result["score_median"]
+
+
+# ---------------------------------------------------------------------------
+# genes_by_homolog_group
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGenesByHomologGroup:
+    KNOWN_GROUP = "cyanorak:CK_00000570"
+
+    def test_basic_lookup(self, conn):
+        """Single group returns member genes."""
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], conn=conn,
+        )
+        assert result["total_matching"] >= 1
+        assert result["returned"] >= 1
+        row = result["results"][0]
+        for key in ("locus_tag", "gene_name", "product",
+                     "organism_name", "gene_category", "group_id"):
+            assert key in row
+        assert row["group_id"] == self.KNOWN_GROUP
+
+    def test_organisms_filter(self, conn):
+        """Organisms filter restricts results."""
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], organisms=["MED4"], conn=conn,
+        )
+        for row in result["results"]:
+            assert "MED4" in row["organism_name"]
+
+    def test_verbose_adds_fields(self, conn):
+        """Verbose mode adds gene_summary and group context."""
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], verbose=True, limit=1, conn=conn,
+        )
+        if result["results"]:
+            row = result["results"][0]
+            for key in ("gene_summary", "function_description",
+                        "consensus_product", "source"):
+                assert key in row
+
+    def test_summary_mode(self, conn):
+        """Summary mode returns counts without detail rows."""
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], summary=True, conn=conn,
+        )
+        assert result["total_matching"] >= 1
+        assert result["results"] == []
+        assert result["returned"] == 0
+
+    def test_not_found_groups(self, conn):
+        """Fake group ID appears in not_found_groups."""
+        result = api.genes_by_homolog_group(
+            group_ids=["FAKE_GROUP_XYZ"], conn=conn,
+        )
+        assert "FAKE_GROUP_XYZ" in result["not_found_groups"]
+        assert result["total_matching"] == 0
+
+    def test_not_matched_organisms(self, conn):
+        """Organism that exists but has no members appears in not_matched."""
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP],
+            organisms=["FAKE_ORG", "MED4"], conn=conn,
+        )
+        assert "FAKE_ORG" in result["not_found_organisms"]
+
+    def test_empty_group_ids_raises(self, conn):
+        """Empty group_ids raises ValueError."""
+        with pytest.raises(ValueError, match="group_ids must not be empty"):
+            api.genes_by_homolog_group(group_ids=[], conn=conn)
+
+    def test_multiple_groups(self, conn):
+        """Multiple groups return genes from all groups."""
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP, "cyanorak:CK_00000364"],
+            limit=200, conn=conn,
+        )
+        group_ids = {r["group_id"] for r in result["results"]}
+        assert len(group_ids) >= 2
+
+    def test_summary_consistency(self, conn):
+        """Summary total_matching matches detail row count."""
+        summary = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], summary=True, conn=conn,
+        )
+        detail = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP], limit=500, conn=conn,
+        )
+        assert summary["total_matching"] == detail["total_matching"]
+        assert detail["total_matching"] == len(detail["results"])
+
+    def test_top_groups_and_categories(self, conn):
+        """top_groups and top_categories are populated."""
+        result = api.genes_by_homolog_group(
+            group_ids=[self.KNOWN_GROUP, "cyanorak:CK_00000364"],
+            conn=conn,
+        )
+        assert len(result["top_groups"]) >= 1
+        assert result["top_groups"][0]["group_id"] in (
+            self.KNOWN_GROUP, "cyanorak:CK_00000364"
+        )
+        assert result["total_categories"] >= 1
+
+
+# ---------------------------------------------------------------------------
+# gene_overview
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGeneOverview:
+    def test_single_gene(self, conn):
+        """Single gene returns overview with routing signals."""
+        result = api.gene_overview(["PMM0001"], conn=conn)
+        assert result["total_matching"] == 1
+        assert result["returned"] == 1
+        row = result["results"][0]
+        assert row["locus_tag"] == "PMM0001"
+        for key in ("gene_name", "product", "gene_category",
+                     "annotation_quality", "organism_name",
+                     "annotation_types", "expression_edge_count",
+                     "significant_up_count", "significant_down_count",
+                     "closest_ortholog_group_size", "closest_ortholog_genera"):
+            assert key in row
+
+    def test_batch_pro_and_alt(self, conn):
+        """Batch with Pro + Alt genes returns both."""
+        result = api.gene_overview(
+            ["PMM1428", "EZ55_00275"], conn=conn,
+        )
+        assert result["total_matching"] == 2
+        tags = {r["locus_tag"] for r in result["results"]}
+        assert tags == {"PMM1428", "EZ55_00275"}
+
+    def test_not_found(self, conn):
+        """Non-existent gene appears in not_found."""
+        result = api.gene_overview(
+            ["PMM0001", "FAKE_GENE_XYZ"], conn=conn,
+        )
+        assert "FAKE_GENE_XYZ" in result["not_found"]
+        assert result["total_matching"] == 1
+
+    def test_summary_mode(self, conn):
+        """Summary mode returns counts without detail rows."""
+        result = api.gene_overview(
+            ["PMM0001"], summary=True, conn=conn,
+        )
+        assert result["total_matching"] == 1
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["has_expression"] >= 0
+        assert result["has_orthologs"] >= 0
+
+    def test_verbose_adds_fields(self, conn):
+        """Verbose mode adds gene_summary and function_description."""
+        result = api.gene_overview(
+            ["PMM0001"], verbose=True, conn=conn,
+        )
+        row = result["results"][0]
+        for key in ("gene_summary", "function_description", "all_identifiers"):
+            assert key in row
+
+    def test_by_organism_breakdown(self, conn):
+        """by_organism is populated for cross-organism batch."""
+        result = api.gene_overview(
+            ["PMM1428", "EZ55_00275"], conn=conn,
+        )
+        assert len(result["by_organism"]) == 2
+        org_total = sum(b["count"] for b in result["by_organism"])
+        assert org_total == result["total_matching"]
+
+    def test_expression_signals(self, conn):
+        """MED4 gene has expression data available."""
+        result = api.gene_overview(["PMM0001"], conn=conn)
+        row = result["results"][0]
+        assert row["expression_edge_count"] > 0
+
+    def test_summary_consistency(self, conn):
+        """Summary total_matching matches detail row count."""
+        tags = ["PMM0001", "PMM0845", "EZ55_00275"]
+        summary = api.gene_overview(tags, summary=True, conn=conn)
+        detail = api.gene_overview(tags, limit=500, conn=conn)
+        assert summary["total_matching"] == detail["total_matching"]
+        assert detail["total_matching"] == len(detail["results"])
 
