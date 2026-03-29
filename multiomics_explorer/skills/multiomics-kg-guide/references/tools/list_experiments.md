@@ -101,7 +101,7 @@ list_experiments(summary=True)
  "by_treatment_type": [{"treatment_type": "coculture", "count": 16}, ...],
  "by_omics_type": [{"omics_type": "RNASEQ", "count": 48}, ...],
  "by_table_scope": [{"table_scope": "all_detected_genes", "count": 40}, ...],
- "time_course_count": 29, "returned": 0, "truncated": true, "results": []}
+ "time_course_count": 29, "returned": 0, "truncated": true, "offset": 0, "results": []}
 ```
 
 ### Example 2: Summary for MED4 only

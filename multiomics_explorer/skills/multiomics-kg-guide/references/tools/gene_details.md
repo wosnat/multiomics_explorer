@@ -45,7 +45,7 @@ gene_details(locus_tags=["PMM0001"])
 ```example-response
 {
   "total_matching": 1,
-  "returned": 1, "truncated": false, "not_found": [],
+  "returned": 1, "truncated": false, "offset": 0, "not_found": [],
   "results": [
     {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4", "gene_category": "DNA replication", "annotation_quality": 3, "ec_numbers": ["2.7.7.7"], "cog_categories": ["L"], "kegg_ids": ["K02338"], ...}
   ]
@@ -67,7 +67,7 @@ gene_details(locus_tags=["PMM0001", "FAKE_GENE"], summary=True)
 ```example-response
 {
   "total_matching": 1,
-  "returned": 0, "truncated": true, "not_found": ["FAKE_GENE"],
+  "returned": 0, "truncated": true, "offset": 0, "not_found": ["FAKE_GENE"],
   "results": []
 }
 ```

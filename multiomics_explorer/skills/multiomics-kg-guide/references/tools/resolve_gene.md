@@ -58,6 +58,7 @@ resolve_gene(identifier="PMM0001")
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
   "returned": 1,
   "truncated": false,
+  "offset": 0,
   "results": [
     {"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus MED4"}
   ]
@@ -76,6 +77,7 @@ resolve_gene(identifier="dnaN")
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}, {"organism_name": "Prochlorococcus MIT9312", "count": 1}, ...],
   "returned": 5,
   "truncated": true,
+  "offset": 0,
   "results": [
     {"locus_tag": "PMM0001", "gene_name": "dnaN", ...},
     {"locus_tag": "PMT9312_0001", "gene_name": "dnaN", ...},

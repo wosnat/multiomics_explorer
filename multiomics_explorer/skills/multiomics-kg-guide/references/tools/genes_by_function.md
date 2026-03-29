@@ -72,7 +72,7 @@ genes_by_function(search_text="photosystem")
 ```
 
 ```example-response
-{"total_search_hits": 312, "total_matching": 312, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 42}, ...], "by_category": [{"category": "Photosynthesis", "count": 280}, ...], "score_max": 8.4, "score_median": 5.1, "returned": 5, "truncated": true, "results": [{"locus_tag": "PMM0001", "gene_name": "psbA", "product": "Photosystem II D1 protein", "organism_name": "Prochlorococcus MED4", "gene_category": "Photosynthesis", "annotation_quality": 3, "score": 8.4}]}
+{"total_search_hits": 312, "total_matching": 312, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 42}, ...], "by_category": [{"category": "Photosynthesis", "count": 280}, ...], "score_max": 8.4, "score_median": 5.1, "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "PMM0001", "gene_name": "psbA", "product": "Photosystem II D1 protein", "organism_name": "Prochlorococcus MED4", "gene_category": "Photosynthesis", "annotation_quality": 3, "score": 8.4}]}
 ```
 
 ### Example 2: Search with organism filter and verbose output
@@ -88,7 +88,7 @@ genes_by_function(search_text="chaperone", summary=True)
 ```
 
 ```example-response
-{"total_search_hits": 87, "total_matching": 87, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 18}, ...], "by_category": [{"category": "Protein folding and degradation", "count": 54}, ...], "score_max": 7.2, "score_median": 4.3, "returned": 0, "truncated": true, "results": []}
+{"total_search_hits": 87, "total_matching": 87, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 18}, ...], "by_category": [{"category": "Protein folding and degradation", "count": 54}, ...], "score_max": 7.2, "score_median": 4.3, "returned": 0, "truncated": true, "offset": 0, "results": []}
 ```
 
 ### Example 4: Chaining — find genes then inspect details

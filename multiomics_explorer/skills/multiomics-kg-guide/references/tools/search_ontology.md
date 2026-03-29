@@ -57,6 +57,7 @@ search_ontology(search_text="replication", ontology="go_bp")
   "score_median": 1.78,
   "returned": 5,
   "truncated": true,
+  "offset": 0,
   "results": [
     {"id": "go:0006260", "name": "DNA replication", "score": 2.48},
     {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 2.41},

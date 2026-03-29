@@ -6,7 +6,7 @@ examples:
   - title: Search by function
     call: search_homolog_groups(search_text="photosynthesis")
     response: |
-      {"total_entries": 21122, "total_matching": 884, "by_source": [{"source": "eggnog", "count": 647}, {"source": "cyanorak", "count": 237}], "by_level": [{"taxonomic_level": "Bacteria", "count": 218}, {"taxonomic_level": "curated", "count": 237}], "score_max": 6.13, "score_median": 1.06, "returned": 5, "truncated": true, "results": [{"group_id": "eggnog:30SSF@2", "group_name": "30SSF@2", "consensus_gene_name": "psbJ", "consensus_product": "photosystem II reaction center protein PsbJ", "source": "eggnog", "taxonomic_level": "Bacteria", "specificity_rank": 3, "member_count": 13, "organism_count": 13, "score": 6.13}]}
+      {"total_entries": 21122, "total_matching": 884, "by_source": [{"source": "eggnog", "count": 647}, {"source": "cyanorak", "count": 237}], "by_level": [{"taxonomic_level": "Bacteria", "count": 218}, {"taxonomic_level": "curated", "count": 237}], "score_max": 6.13, "score_median": 1.06, "returned": 5, "truncated": true, "offset": 0, "results": [{"group_id": "eggnog:30SSF@2", "group_name": "30SSF@2", "consensus_gene_name": "psbJ", "consensus_product": "photosystem II reaction center protein PsbJ", "source": "eggnog", "taxonomic_level": "Bacteria", "specificity_rank": 3, "member_count": 13, "organism_count": 13, "score": 6.13}]}
 
   - title: Filter to curated Cyanorak groups
     call: search_homolog_groups(search_text="kinase", source="cyanorak", max_specificity_rank=0)

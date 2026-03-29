@@ -75,7 +75,7 @@ gene_ontology_terms(locus_tags=["PMM0001"], ontology="go_bp")
     {"term_id": "go:0006271", "term_name": "DNA strand elongation involved in DNA replication", "ontology_type": "go_bp", "count": 1}
   ],
   "terms_per_gene_min": 2, "terms_per_gene_max": 2, "terms_per_gene_median": 2.0,
-  "returned": 2, "truncated": false, "not_found": [], "no_terms": [],
+  "returned": 2, "truncated": false, "offset": 0, "not_found": [], "no_terms": [],
   "results": [
     {"locus_tag": "PMM0001", "term_id": "go:0006260", "term_name": "DNA replication"},
     {"locus_tag": "PMM0001", "term_id": "go:0006271", "term_name": "DNA strand elongation involved in DNA replication"}
