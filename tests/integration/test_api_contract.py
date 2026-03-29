@@ -51,7 +51,7 @@ class TestResolveGeneContract:
 
     def test_not_found_returns_empty(self, conn):
         result = api.resolve_gene("NONEXISTENT_GENE_XYZ", conn=conn)
-        assert result == {"total_matching": 0, "by_organism": [], "returned": 0, "truncated": False, "results": []}
+        assert result == {"total_matching": 0, "by_organism": [], "returned": 0, "truncated": False, "offset": 0, "results": []}
 
 
 # ---------------------------------------------------------------------------
@@ -69,7 +69,7 @@ class TestGenesByFunctionContract:
         result = api.genes_by_function("DNA polymerase", conn=conn)
         expected_envelope = {
             "total_search_hits", "total_matching", "by_organism", "by_category",
-            "score_max", "score_median", "returned", "truncated", "results",
+            "score_max", "score_median", "returned", "truncated", "offset", "results",
         }
         assert set(result.keys()) == expected_envelope
 
@@ -99,6 +99,7 @@ class TestGeneOverviewContract:
         assert "has_orthologs" in result
         assert "returned" in result
         assert "truncated" in result
+        assert "offset" in result
         assert "not_found" in result
         assert "results" in result
         assert result["total_matching"] >= 1
@@ -143,7 +144,7 @@ class TestGeneHomologsContract:
         result = api.gene_homologs([KNOWN_GENE], conn=conn)
         assert isinstance(result, dict)
         for key in ("total_matching", "by_organism", "by_source",
-                     "returned", "truncated", "not_found", "no_groups", "results"):
+                     "returned", "truncated", "offset", "not_found", "no_groups", "results"):
             assert key in result
 
     def test_result_keys_compact(self, conn):
@@ -220,6 +221,7 @@ class TestSearchOntologyContract:
         assert "score_median" in result
         assert "returned" in result
         assert "truncated" in result
+        assert "offset" in result
         assert "results" in result
         assert result["total_matching"] >= 1
 
@@ -239,7 +241,7 @@ class TestGenesByOntologyContract:
         result = api.genes_by_ontology(["go:0006260"], "go_bp", conn=conn)
         assert isinstance(result, dict)
         for key in ("total_matching", "by_organism", "by_category",
-                     "by_term", "returned", "truncated", "results"):
+                     "by_term", "returned", "truncated", "offset", "results"):
             assert key in result
         assert result["total_matching"] >= 1
         assert result["returned"] >= 1
@@ -283,7 +285,7 @@ class TestGeneOntologyTermsContract:
             "by_ontology", "by_term",
             "terms_per_gene_min", "terms_per_gene_max",
             "terms_per_gene_median",
-            "returned", "truncated", "not_found", "no_terms",
+            "returned", "truncated", "offset", "not_found", "no_terms",
             "results",
         }
         assert expected_keys <= set(result.keys())
@@ -356,7 +358,7 @@ class TestDifferentialExpressionByGeneContract:
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
             "experiment_count", "rows_by_treatment_type", "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
-            "returned", "truncated", "results",
+            "returned", "truncated", "offset", "results",
         }
         assert set(result.keys()) == expected_keys
 
@@ -418,7 +420,7 @@ class TestDifferentialExpressionByOrthologContract:
         expected_keys = {
             "total_matching", "matching_genes", "matching_groups",
             "experiment_count", "median_abs_log2fc", "max_abs_log2fc",
-            "results", "returned", "truncated",
+            "results", "returned", "truncated", "offset",
             "by_organism", "rows_by_status", "rows_by_treatment_type",
             "by_table_scope", "top_groups", "top_experiments",
             "not_found_groups", "not_matched_groups",
@@ -514,7 +516,7 @@ class TestListPublicationsContract:
         expected_keys = {
             "total_entries", "total_matching", "by_organism",
             "by_treatment_type", "by_omics_type",
-            "returned", "truncated", "results",
+            "returned", "truncated", "offset", "results",
         }
         assert expected_keys <= set(result.keys())
         assert result["total_matching"] >= 15
@@ -552,7 +554,7 @@ class TestListExperimentsContract:
             "total_entries", "total_matching",
             "by_organism", "by_treatment_type", "by_omics_type",
             "by_publication", "by_table_scope", "time_course_count",
-            "returned", "truncated", "results",
+            "returned", "truncated", "offset", "results",
         }
         assert expected_keys <= set(result.keys())
         assert result["total_matching"] >= 70
@@ -599,7 +601,7 @@ class TestSearchHomologGroupsContract:
         expected_keys = {
             "total_entries", "total_matching", "by_source", "by_level",
             "score_max", "score_median",
-            "returned", "truncated", "results",
+            "returned", "truncated", "offset", "results",
         }
         assert set(result.keys()) == expected_keys
         assert result["total_matching"] >= 5
@@ -653,7 +655,7 @@ class TestGenesByHomologGroupContract:
             "by_organism", "top_categories", "top_groups",
             "not_found_groups", "not_matched_groups",
             "not_found_organisms", "not_matched_organisms",
-            "returned", "truncated", "results",
+            "returned", "truncated", "offset", "results",
         }
         assert set(result.keys()) == expected_keys
 
