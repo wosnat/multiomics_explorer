@@ -814,8 +814,9 @@ def search_ontology(
     if not search_text or not search_text.strip():
         raise ValueError("search_text must not be empty.")
     if ontology not in ONTOLOGY_CONFIG:
+        valid = ", ".join(sorted(ONTOLOGY_CONFIG))
         raise ValueError(
-            f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
+            f"Invalid ontology '{ontology}'. Valid: {valid}"
         )
     if summary:
         limit = 0
@@ -1112,10 +1113,14 @@ def genes_by_ontology(
     Verbose adds: matched_terms, gene_summary, function_description.
     """
     if not term_ids:
-        raise ValueError("term_ids must not be empty.")
-    if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(
-            f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
+            "term_ids must not be empty. "
+            "Use search_ontology to find term IDs."
+        )
+    if ontology not in ONTOLOGY_CONFIG:
+        valid = ", ".join(sorted(ONTOLOGY_CONFIG))
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {valid}"
         )
     if summary:
         limit = 0
@@ -1407,7 +1412,10 @@ def _validate_organism_inputs(
         cypher, params = build_resolve_organism_for_organism(organism=organism)
         orgs = conn.execute_query(cypher, **params)[0]["organisms"]
         if len(orgs) == 0:
-            raise ValueError(f"no organism matching '{organism}' found")
+            raise ValueError(
+                f"no organism matching '{organism}' found. "
+                "Use list_organisms to see valid organism names."
+            )
         if len(orgs) > 1:
             names = ", ".join(sorted(orgs))
             raise ValueError(
@@ -1450,7 +1458,9 @@ def _validate_organism_inputs(
         # No organism resolved from any input — shouldn't happen if at least
         # one input is provided, but handle gracefully
         raise ValueError(
-            "at least one of organism, locus_tags, or experiment_ids is required"
+            "at least one of organism, locus_tags, or experiment_ids is required. "
+            "Use list_organisms for organisms, resolve_gene for locus_tags, "
+            "or list_experiments for experiment_ids."
         )
 
     first = all_orgs[0][0]
@@ -1512,7 +1522,9 @@ def differential_expression_by_gene(
     # Require at least one filter
     if organism is None and locus_tags is None and experiment_ids is None:
         raise ValueError(
-            "at least one of organism, locus_tags, or experiment_ids is required"
+            "at least one of organism, locus_tags, or experiment_ids is required. "
+            "Use list_organisms for organisms, resolve_gene for locus_tags, "
+            "or list_experiments for experiment_ids."
         )
 
     if summary:
