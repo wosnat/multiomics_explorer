@@ -379,7 +379,8 @@ class TestDifferentialExpressionByGeneContract:
         expected_compact = {
             "locus_tag", "gene_name", "experiment_id", "treatment_type",
             "timepoint", "timepoint_hours", "timepoint_order",
-            "log2fc", "padj", "rank", "expression_status",
+            "log2fc", "padj", "rank", "rank_up", "rank_down",
+            "expression_status",
         }
         assert expected_compact <= set(row.keys())
 

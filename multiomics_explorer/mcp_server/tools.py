@@ -1405,6 +1405,18 @@ def register_tools(mcp: FastMCP):
             description="Rank by |log2FC| within experiment x timepoint;"
             " 1 = strongest (e.g. 77)",
         )
+        rank_up: int | None = Field(
+            default=None,
+            description="Rank by |log2FC| among significant_up genes"
+            " within experiment x timepoint."
+            " Null if not significant_up. 1 = strongest.",
+        )
+        rank_down: int | None = Field(
+            default=None,
+            description="Rank by |log2FC| among significant_down genes"
+            " within experiment x timepoint."
+            " Null if not significant_down. 1 = strongest.",
+        )
         expression_status: Literal[
             "significant_up", "significant_down", "not_significant"
         ] = Field(
