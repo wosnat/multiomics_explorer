@@ -694,3 +694,45 @@ class TestGenesByHomologGroupContract:
         for b in result["by_organism"]:
             assert "organism_name" in b
             assert "count" in b
+
+
+# ---------------------------------------------------------------------------
+# gene_response_profile
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGeneResponseProfileContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.gene_response_profile(
+            locus_tags=[KNOWN_GENE], conn=conn,
+        )
+        assert isinstance(result, dict)
+        expected_keys = {
+            "organism_name", "genes_queried", "genes_with_response",
+            "not_found", "no_expression",
+            "returned", "offset", "truncated", "results",
+        }
+        assert set(result.keys()) == expected_keys
+
+    def test_result_structure(self, conn):
+        result = api.gene_response_profile(
+            locus_tags=[KNOWN_GENE], conn=conn,
+        )
+        assert result["returned"] >= 1
+        gene = result["results"][0]
+        for key in ("locus_tag", "gene_name", "product", "gene_category",
+                     "groups_responded", "groups_not_responded",
+                     "groups_not_known", "response_summary"):
+            assert key in gene
+
+    def test_response_summary_fields(self, conn):
+        result = api.gene_response_profile(
+            locus_tags=[KNOWN_GENE], conn=conn,
+        )
+        gene = result["results"][0]
+        if gene["response_summary"]:
+            entry = next(iter(gene["response_summary"].values()))
+            for key in ("experiments_total", "experiments_tested",
+                         "experiments_up", "experiments_down",
+                         "timepoints_total", "timepoints_tested",
+                         "timepoints_up", "timepoints_down"):
+                assert key in entry

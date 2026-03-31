@@ -20,6 +20,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_homologs,
     build_gene_ontology_terms,
     build_gene_overview,
+    build_gene_response_profile,
     build_genes_by_function,
     build_genes_by_homolog_group,
     build_genes_by_homolog_group_summary,
@@ -62,6 +63,7 @@ TOOL_BUILDERS = {
     "genes_by_homolog_group": build_genes_by_homolog_group,
     "genes_by_homolog_group_summary": build_genes_by_homolog_group_summary,
     "differential_expression_by_ortholog": build_differential_expression_by_ortholog_results,
+    "gene_response_profile": build_gene_response_profile,
 }
 
 

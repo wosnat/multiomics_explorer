@@ -24,6 +24,8 @@ from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
     build_differential_expression_by_gene,
+    build_gene_response_profile_envelope,
+    build_gene_response_profile,
     build_differential_expression_by_gene_summary_by_experiment,
     build_differential_expression_by_gene_summary_diagnostics,
     build_differential_expression_by_gene_summary_global,
@@ -163,6 +165,7 @@ def _assert_properties_valid(score, meta, label: str):
 # ---------------------------------------------------------------------------
 
 _LOCUS = ["PMM0001"]
+_ORGANISM = "MED4"
 _GROUPS = ["OG_1"]
 _EIDS = ["EXP_1"]
 _TERM_IDS = ["GO:0008150"]
@@ -221,6 +224,13 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("de_by_ortholog_top_experiments", build_differential_expression_by_ortholog_top_experiments, {"group_ids": _GROUPS}),
     ("de_by_ortholog_results", build_differential_expression_by_ortholog_results, {"group_ids": _GROUPS}),
     ("de_by_ortholog_membership_counts", build_differential_expression_by_ortholog_membership_counts, {"group_ids": _GROUPS}),
+    # --- gene_response_profile ---
+    ("gene_response_profile_envelope", build_gene_response_profile_envelope,
+     {"locus_tags": _LOCUS, "organism_name": _ORGANISM}),
+    ("gene_response_profile", build_gene_response_profile,
+     {"locus_tags": _LOCUS, "organism_name": _ORGANISM}),
+    ("gene_response_profile_by_experiment", build_gene_response_profile,
+     {"locus_tags": _LOCUS, "organism_name": _ORGANISM, "group_by": "experiment"}),
 ]
 
 # Ontology-dependent builders: expand for each ontology key.
