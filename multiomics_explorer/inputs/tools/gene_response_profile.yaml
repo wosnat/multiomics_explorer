@@ -1,0 +1,42 @@
+# Human-authored content for gene_response_profile about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Gene response overview
+    call: gene_response_profile(locus_tags=["PMM0370", "PMM0920"])
+    response: |
+      {"organism_name": "Prochlorococcus marinus subsp. pastoris str. CCMP1986", "genes_queried": 2, "genes_with_response": 2, "not_found": [], "no_expression": [], "returned": 2, "offset": 0, "truncated": false, "results": [{"locus_tag": "PMM0370", "gene_name": "cynA", "product": "cyanate transporter", "gene_category": "Inorganic ion transport", "groups_responded": ["nitrogen_stress", "coculture"], "groups_not_responded": ["light_stress"], "groups_not_known": [], "response_summary": {"nitrogen_stress": {"experiments_total": 4, "experiments_tested": 3, "experiments_up": 3, "experiments_down": 0, "timepoints_total": 14, "timepoints_tested": 8, "timepoints_up": 8, "timepoints_down": 0, "up_best_rank": 3, "up_median_rank": 8.0, "up_max_log2fc": 5.7}}}]}
+
+  - title: Filter by treatment type
+    call: gene_response_profile(locus_tags=["PMM0370"], treatment_types=["nitrogen_stress", "coculture"])
+
+  - title: Per-experiment breakdown
+    call: gene_response_profile(locus_tags=["PMM0370"], group_by="experiment")
+
+  - title: Chaining — find responsive genes then profile them
+    steps: |
+      Step 1: genes_by_function(search_text="nitrogen transport", organism="MED4")
+              → collect locus_tags from results
+
+      Step 2: gene_response_profile(locus_tags=["PMM0370", ...])
+              → see which treatments each gene responds to
+
+      Step 3: differential_expression_by_gene(locus_tags=["PMM0370"], experiment_ids=["..."])
+              → drill into time course for a specific experiment
+
+chaining:
+  - "genes_by_function → gene_response_profile"
+  - "genes_by_ontology → gene_response_profile"
+  - "gene_overview → gene_response_profile (check expression_edge_count first)"
+  - "gene_response_profile → differential_expression_by_gene (drill into specific experiment)"
+
+mistakes:
+  - wrong: "Assuming groups_not_known means 'gene does not respond to this treatment'"
+    right: "groups_not_known means no expression data exists — the gene was not profiled or not reported for that treatment. Check experiments_total in the response_summary for coverage."
+  - wrong: "Comparing up_max_log2fc across different organisms or platforms"
+    right: "log2FC magnitudes are not directly comparable across platforms (microarray vs RNA-seq). Ranks are comparable."
+  - wrong: "Using this tool to see time course dynamics"
+    right: "This tool aggregates across timepoints. Use differential_expression_by_gene with a specific experiment to see temporal patterns."
+  - "Results are sorted by response breadth — genes responding to more treatments appear first"
+  - "Single organism enforced — call once per organism"
