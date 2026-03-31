@@ -2322,7 +2322,8 @@ def register_tools(mcp: FastMCP):
         gene_category: str | None = Field(description="Functional category (e.g. 'Inorganic ion transport')")
         groups_responded: list[str] = Field(description="Groups where gene is significant in at least one timepoint")
         groups_not_responded: list[str] = Field(description="Groups where expression edges exist but none significant")
-        groups_not_known: list[str] = Field(description="Groups with no expression edge for this gene")
+        groups_tested_not_responded: list[str] = Field(description="Groups where all experiments use full-coverage scope (significant_only/significant_any_timepoint) but gene has no expression edge — inferred as tested, not significant")
+        groups_not_known: list[str] = Field(description="Groups with no expression edge for this gene and scope does not confirm coverage")
         response_summary: dict[str, GeneResponseGroupSummary] = Field(description="Per-group detail. Keys are treatment types or experiment IDs depending on group_by.")
 
     class GeneResponseProfileResponse(BaseModel):
