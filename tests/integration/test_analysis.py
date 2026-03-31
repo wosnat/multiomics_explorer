@@ -3,6 +3,7 @@
 import pytest
 
 from multiomics_explorer.analysis import gene_set_compare, response_matrix
+from multiomics_explorer.api import functions as api
 
 KNOWN_GENE = "PMM0001"
 # Two genes known to have expression data in the KG
@@ -51,3 +52,52 @@ class TestGeneSetCompareIntegration:
         assert isinstance(result["shared_groups"], list)
         assert isinstance(result["divergent_groups"], list)
         assert len(result["summary_per_group"]) > 0
+
+
+@pytest.mark.kg
+class TestGeneResponseProfileTestedNotResponded:
+    """Validate groups_tested_not_responded with N-stress marker genes."""
+
+    # N-stress markers known to respond only to nitrogen
+    N_STRESS_GENES = ["PMM0965"]  # ureA
+
+    def test_urea_tested_not_responded_for_non_nitrogen(self, conn):
+        """ureA should be in groups_tested_not_responded for non-nitrogen
+        treatment groups with full-coverage scope, not in groups_not_known."""
+        result = api.gene_response_profile(
+            locus_tags=self.N_STRESS_GENES, conn=conn,
+        )
+        assert len(result["results"]) >= 1
+        gene = result["results"][0]
+
+        # ureA should respond to nitrogen
+        assert "nitrogen_stress" in gene["groups_responded"]
+
+        # Non-nitrogen groups with full-coverage scope should be tested_not_responded
+        tested_nr = gene.get("groups_tested_not_responded", [])
+        not_known = gene.get("groups_not_known", [])
+
+        # At least some non-nitrogen groups should move to tested_not_responded
+        assert len(tested_nr) > 0, (
+            f"Expected some groups in groups_tested_not_responded, "
+            f"got groups_not_known={not_known}"
+        )
+
+        # groups_tested_not_responded should not overlap with groups_not_known
+        overlap = set(tested_nr) & set(not_known)
+        assert not overlap, f"Overlap between tested_not_responded and not_known: {overlap}"
+
+    def test_groups_not_responded_unchanged(self, conn):
+        """Genes with all_detected_genes experiments that have not_significant
+        edges should remain in groups_not_responded (unchanged)."""
+        result = api.gene_response_profile(
+            locus_tags=["PMM0370"], conn=conn,  # cynA — responds broadly
+        )
+        gene = result["results"][0]
+
+        # groups_not_responded should only contain groups where edges exist
+        # (not inferred — those go to tested_not_responded)
+        for gk in gene["groups_not_responded"]:
+            assert gk in gene["response_summary"], (
+                f"Group {gk} in groups_not_responded but not in response_summary"
+            )
