@@ -38,6 +38,7 @@ GENE_UP_ONLY = {
     "groups_responded": ["nitrogen_stress"],
     "groups_not_responded": ["light_stress"],
     "groups_not_known": ["iron_stress"],
+    "groups_tested_not_responded": ["carbon_stress"],
     "response_summary": {
         "nitrogen_stress": {
             "experiments_total": 4, "experiments_tested": 4,
@@ -63,6 +64,7 @@ GENE_DOWN_ONLY = {
     "groups_responded": ["nitrogen_stress"],
     "groups_not_responded": [],
     "groups_not_known": ["light_stress", "iron_stress"],
+    "groups_tested_not_responded": [],
     "response_summary": {
         "nitrogen_stress": {
             "experiments_total": 4, "experiments_tested": 2,
@@ -82,6 +84,7 @@ GENE_MIXED = {
     "groups_responded": ["nitrogen_stress"],
     "groups_not_responded": ["light_stress"],
     "groups_not_known": ["iron_stress"],
+    "groups_tested_not_responded": ["carbon_stress"],
     "response_summary": {
         "nitrogen_stress": {
             "experiments_total": 4, "experiments_tested": 4,
@@ -223,6 +226,21 @@ class TestResponseMatrix:
         assert df.loc["GENE_D", "early"] == "mixed"
         # late: exp_3 (up=1, down=0) → up=1, down=0 → up
         assert df.loc["GENE_D", "late"] == "up"
+
+    def test_groups_tested_not_responded_classified_as_not_responded(self):
+        """groups_tested_not_responded should produce 'not_responded' cell values."""
+        api_result = _make_api_result([GENE_UP_ONLY])
+
+        with patch(
+            "multiomics_explorer.analysis.expression.api.gene_response_profile",
+            return_value=api_result,
+        ):
+            df = response_matrix(genes=["GENE_A"])
+
+        # carbon_stress is in groups_tested_not_responded → "not_responded"
+        assert df.loc["GENE_A", "carbon_stress"] == "not_responded"
+        # iron_stress is in groups_not_known → "not_known"
+        assert df.loc["GENE_A", "iron_stress"] == "not_known"
 
     def test_empty_result(self):
         """Verify empty DataFrame returned when no genes found."""

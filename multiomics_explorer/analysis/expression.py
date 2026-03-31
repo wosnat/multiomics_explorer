@@ -140,8 +140,9 @@ def response_matrix(
                         "experiments_down": label_down.get(label, 0),
                     })
         else:
-            # Use groups_not_responded and groups_not_known for non-response cells
+            # Use triage lists for non-response cells
             not_responded = set(gene.get("groups_not_responded", []))
+            tested_not_responded = set(gene.get("groups_tested_not_responded", []))
             not_known = set(gene.get("groups_not_known", []))
 
             # Groups present in response_summary (responded or not_responded)
@@ -152,6 +153,11 @@ def response_matrix(
                     record[group_key] = "not_responded"
                 else:
                     record[group_key] = _classify_direction(entry)
+
+            # Groups inferred as tested but not responded (no edge, full-coverage scope)
+            for group_key in tested_not_responded:
+                if group_key not in record:
+                    record[group_key] = "not_responded"
 
             # Groups only in not_known (no summary entry)
             for group_key in not_known:
