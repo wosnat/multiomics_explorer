@@ -133,19 +133,12 @@ def response_matrix(
             all_labels = set(group_map.values())
             for label in all_labels:
                 if label not in label_up and label not in label_down:
-                    # No matching experiments found in summary for this label
                     record[label] = "not_known"
                 else:
-                    up = label_up.get(label, 0)
-                    down = label_down.get(label, 0)
-                    if up > 0 and down > 0:
-                        record[label] = "mixed"
-                    elif up > 0:
-                        record[label] = "up"
-                    elif down > 0:
-                        record[label] = "down"
-                    else:
-                        record[label] = "not_responded"
+                    record[label] = _classify_direction({
+                        "experiments_up": label_up.get(label, 0),
+                        "experiments_down": label_down.get(label, 0),
+                    })
         else:
             # Use groups_not_responded and groups_not_known for non-response cells
             not_responded = set(gene.get("groups_not_responded", []))
