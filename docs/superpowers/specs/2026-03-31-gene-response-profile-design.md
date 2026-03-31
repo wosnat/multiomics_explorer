@@ -199,12 +199,12 @@ Sorting is done in Cypher via a two-pass query (see Query Strategy).
 
 ### Layer 1: Query builders (`kg/queries_lib.py`)
 
-Signature: `def build_gene_response_profile(*, locus_tags, ...) -> tuple[str, dict]`
+Signature: `def build_gene_response_profile(*, locus_tags, organism_name, ...) -> tuple[str, dict]`
 
 - All keyword-only args, returns `(cypher_string, params_dict)`
 - `$param_name` placeholders — no f-string interpolation of user input
 - `AS snake_case` aliases on all RETURN columns
-- Organism filter: `ALL(word IN split(toLower($organism), ' ') WHERE toLower(e.organism_name) CONTAINS word)`
+- `organism_name` is the resolved (exact) name from `_validate_organism_inputs` — uses exact match (`e.organism_name = $organism_name`), not fuzzy
 - Treatment type filter: `toLower(e.treatment_type) IN $treatment_types` with Python-side lowercasing
 - NULL behavior in aggregation:
   - `collect(r.rank_up)` drops NULLs — safe for computing min/median over non-null ranks only

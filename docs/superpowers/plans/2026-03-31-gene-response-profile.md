@@ -170,31 +170,36 @@ class TestBuildGeneResponseProfileEnvelope:
         """Envelope query with required params."""
         cypher, params = build_gene_response_profile_envelope(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
         )
         assert "MATCH" in cypher
         assert params["locus_tags"] == ["PMM0370"]
+        assert params["organism_name"] == "Prochlorococcus MED4"
 
     def test_returns_expected_columns(self):
         """All RETURN aliases present."""
         cypher, _ = build_gene_response_profile_envelope(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
         )
         for col in [
-            "found_genes", "organism_name", "has_expression",
+            "found_genes", "has_expression",
             "has_significant",
         ]:
             assert col in cypher
 
-    def test_organism_filter(self):
+    def test_organism_exact_match(self):
         cypher, params = build_gene_response_profile_envelope(
-            locus_tags=["PMM0370"], organism="MED4",
+            locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
         )
-        assert "toLower($organism)" in cypher
-        assert params["organism"] == "MED4"
+        assert "$organism_name" in cypher
+        assert "toLower" not in cypher.split("organism_name")[0]  # exact match, not fuzzy
 
     def test_treatment_types_filter(self):
         cypher, params = build_gene_response_profile_envelope(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
             treatment_types=["nitrogen_stress"],
         )
         assert "$treatment_types" in cypher
@@ -203,29 +208,33 @@ class TestBuildGeneResponseProfileEnvelope:
     def test_experiment_ids_filter(self):
         cypher, params = build_gene_response_profile_envelope(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
             experiment_ids=["exp1"],
         )
-        assert "e.id IN $experiment_ids" in cypher
+        assert "$experiment_ids" in cypher
         assert params["experiment_ids"] == ["exp1"]
 
     def test_group_by_treatment_type(self):
         cypher, _ = build_gene_response_profile_envelope(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
             group_by="treatment_type",
         )
-        assert "e.treatment_type" in cypher
+        assert "treatment_type" in cypher
 
     def test_group_by_experiment(self):
         cypher, _ = build_gene_response_profile_envelope(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
             group_by="experiment",
         )
-        assert "e.id" in cypher
+        assert ".id" in cypher
 
     def test_invalid_group_by_raises(self):
         with pytest.raises(ValueError, match="group_by"):
             build_gene_response_profile_envelope(
                 locus_tags=["PMM0370"],
+                organism_name="Prochlorococcus MED4",
                 group_by="invalid",
             )
 ```
@@ -237,29 +246,29 @@ Expected: FAIL — import error
 
 - [ ] **Step 3: Implement the shared WHERE helper and envelope builder**
 
-In `multiomics_explorer/kg/queries_lib.py`, first add the shared WHERE helper (used by both envelope and aggregation builders):
+In `multiomics_explorer/kg/queries_lib.py`, first add the shared WHERE helper (used by both envelope and aggregation builders). Note: `organism_name` is the **resolved** organism name (from `_validate_organism_inputs`), not a fuzzy match string — so we use exact match:
 
 ```python
 def _gene_response_profile_where(
     *,
-    organism: str | None = None,
+    organism_name: str | None = None,
     treatment_types: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     experiment_alias: str = "e",
 ) -> tuple[list[str], dict]:
     """Build WHERE conditions + params shared by gene_response_profile builders.
 
-    experiment_alias allows reuse with different MATCH variable names
-    (e.g. 'e' vs 'e2' in the envelope query's group_totals section).
+    organism_name is the resolved (exact) organism name from
+    _validate_organism_inputs — uses exact match, not fuzzy.
+    experiment_alias allows reuse with different MATCH variable names.
     """
     conditions: list[str] = []
     params: dict = {}
-    if organism:
+    if organism_name:
         conditions.append(
-            f"ALL(word IN split(toLower($organism), ' ')"
-            f" WHERE toLower({experiment_alias}.organism_name) CONTAINS word)"
+            f"{experiment_alias}.organism_name = $organism_name"
         )
-        params["organism"] = organism
+        params["organism_name"] = organism_name
     if treatment_types:
         conditions.append(
             f"toLower({experiment_alias}.treatment_type) IN $treatment_types"
@@ -283,23 +292,27 @@ def _group_key_expr(group_by: str, alias: str = "e") -> str:
         )
 ```
 
-Then the envelope builder:
+Then the envelope builder. Since the organism is resolved upfront by the API layer via `_validate_organism_inputs`, the query no longer needs to infer the organism from edges — it receives the exact `organism_name` and uses it directly for the group_totals MATCH:
 
 ```python
 def build_gene_response_profile_envelope(
     *,
     locus_tags: list[str],
-    organism: str | None = None,
+    organism_name: str,
     treatment_types: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     group_by: str = "treatment_type",
 ) -> tuple[str, dict]:
     """Build envelope query for gene_response_profile.
 
+    organism_name is required (resolved by API before calling).
+
     Returns per-gene existence/expression flags and per-group totals
     (experiment count, timepoint count) for the organism.
 
-    RETURN keys: found_genes (list), organism_name, has_expression
+    Verified against live KG 2026-03-31.
+
+    RETURN keys: found_genes (list), has_expression
     (list of locus_tags), has_significant (list), group_totals (list of
     {group_key, experiments, timepoints}).
     """
@@ -308,7 +321,7 @@ def build_gene_response_profile_envelope(
 
     # Conditions for the gene-expression MATCH (alias 'e')
     conditions_e, params = _gene_response_profile_where(
-        organism=organism, treatment_types=treatment_types,
+        organism_name=organism_name, treatment_types=treatment_types,
         experiment_ids=experiment_ids, experiment_alias="e",
     )
     params["locus_tags"] = locus_tags
@@ -318,11 +331,11 @@ def build_gene_response_profile_envelope(
 
     # Same conditions for the group-totals MATCH (alias 'e2')
     conditions_e2, _ = _gene_response_profile_where(
-        organism=organism, treatment_types=treatment_types,
+        organism_name=organism_name, treatment_types=treatment_types,
         experiment_ids=experiment_ids, experiment_alias="e2",
     )
     where_e2 = (
-        " AND " + " AND ".join(conditions_e2) if conditions_e2 else ""
+        "WHERE " + " AND ".join(conditions_e2)
     )
 
     cypher = (
@@ -338,22 +351,20 @@ def build_gene_response_profile_envelope(
         "     collect(DISTINCT g2.locus_tag) AS has_expression,\n"
         "     collect(DISTINCT CASE WHEN r.expression_status IN"
         " ['significant_up', 'significant_down']"
-        " THEN g2.locus_tag END) AS has_significant,\n"
-        "     collect(DISTINCT e.organism_name) AS organism_names\n"
+        " THEN g2.locus_tag END) AS has_significant\n"
         "\n"
-        # Part 3: Group totals — experiments and timepoints per group
+        # Part 3: Group totals for this organism
         "OPTIONAL MATCH (e2:Experiment)-[:Changes_expression_of]->(:Gene)\n"
-        f"WHERE e2.organism_name IN organism_names{where_e2}\n"
-        f"WITH found_genes, has_expression, has_significant, organism_names,\n"
+        f"{where_e2}\n"
+        f"WITH found_genes, has_expression, has_significant,\n"
         f"     {gk2} AS group_key,\n"
         "     collect(DISTINCT e2) AS group_experiments\n"
         "WITH found_genes, has_expression, has_significant,\n"
-        "     organism_names[0] AS organism_name,\n"
         "     collect({group_key: group_key,"
         " experiments: size(group_experiments),"
         " timepoints: reduce(s = 0, exp IN group_experiments |"
         " s + COALESCE(exp.time_point_count, 1))}) AS group_totals\n"
-        "RETURN found_genes, organism_name,"
+        "RETURN found_genes,"
         " has_expression, has_significant, group_totals"
     )
     return cypher, params
@@ -395,14 +406,17 @@ class TestBuildGeneResponseProfile:
         """Aggregation query with required params."""
         cypher, params = build_gene_response_profile(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
         )
         assert "MATCH" in cypher
         assert params["locus_tags"] == ["PMM0370"]
+        assert params["organism_name"] == "Prochlorococcus MED4"
 
     def test_returns_expected_columns(self):
         """All RETURN aliases present."""
         cypher, _ = build_gene_response_profile(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
         )
         for col in [
             "locus_tag", "gene_name", "product", "gene_category",
@@ -416,13 +430,15 @@ class TestBuildGeneResponseProfile:
     def test_order_by(self):
         cypher, _ = build_gene_response_profile(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
         )
         assert "ORDER BY" in cypher
         assert "groups_responded DESC" in cypher
 
     def test_skip_limit(self):
         cypher, params = build_gene_response_profile(
-            locus_tags=["PMM0370"], limit=10, offset=5,
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            limit=10, offset=5,
         )
         assert "SKIP $offset" in cypher
         assert "LIMIT $limit" in cypher
@@ -432,21 +448,23 @@ class TestBuildGeneResponseProfile:
     def test_group_by_treatment_type(self):
         cypher, _ = build_gene_response_profile(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
             group_by="treatment_type",
         )
-        assert "e.treatment_type" in cypher
+        assert "treatment_type" in cypher
 
     def test_group_by_experiment(self):
         cypher, _ = build_gene_response_profile(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
             group_by="experiment",
         )
-        # group key should use e.id
-        assert "e.id AS group_key" in cypher or "e.id" in cypher
+        assert ".id AS group_key" in cypher or ".id" in cypher
 
     def test_treatment_types_filter(self):
         cypher, params = build_gene_response_profile(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
             treatment_types=["nitrogen_stress"],
         )
         assert "$treatment_types" in cypher
@@ -455,15 +473,17 @@ class TestBuildGeneResponseProfile:
     def test_experiment_ids_filter(self):
         cypher, params = build_gene_response_profile(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
             experiment_ids=["exp1"],
         )
-        assert "e.id IN $experiment_ids" in cypher
+        assert "$experiment_ids" in cypher
         assert params["experiment_ids"] == ["exp1"]
 
     def test_invalid_group_by_raises(self):
         with pytest.raises(ValueError, match="group_by"):
             build_gene_response_profile(
                 locus_tags=["PMM0370"],
+                organism_name="Prochlorococcus MED4",
                 group_by="invalid",
             )
 
@@ -471,6 +491,7 @@ class TestBuildGeneResponseProfile:
         """Without limit, no SKIP/LIMIT in Cypher."""
         cypher, params = build_gene_response_profile(
             locus_tags=["PMM0370"],
+            organism_name="Prochlorococcus MED4",
         )
         assert "SKIP" not in cypher
         assert "LIMIT" not in cypher
@@ -491,7 +512,7 @@ In `multiomics_explorer/kg/queries_lib.py`, add:
 def build_gene_response_profile(
     *,
     locus_tags: list[str],
-    organism: str | None = None,
+    organism_name: str,
     treatment_types: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     group_by: str = "treatment_type",
@@ -516,7 +537,7 @@ def build_gene_response_profile(
     gk = _group_key_expr(group_by)
 
     conditions, params = _gene_response_profile_where(
-        organism=organism, treatment_types=treatment_types,
+        organism_name=organism_name, treatment_types=treatment_types,
         experiment_ids=experiment_ids,
     )
     params["locus_tags"] = locus_tags
@@ -526,7 +547,7 @@ def build_gene_response_profile(
 
     # Pass 2 WHERE: same filters minus locus_tags (already scoped by WITH g)
     pass2_conditions, _ = _gene_response_profile_where(
-        organism=organism, treatment_types=treatment_types,
+        organism_name=organism_name, treatment_types=treatment_types,
         experiment_ids=experiment_ids,
     )
     pass2_where = (
@@ -642,10 +663,21 @@ In `tests/unit/test_api_functions.py`, add:
 class TestGeneResponseProfile:
     """Tests for gene_response_profile API function."""
 
+    _ORGANISM = "Prochlorococcus marinus subsp. pastoris str. CCMP1986"
+
+    def _make_organism_resolution(self, mock_conn):
+        """Set up mock for _validate_organism_inputs.
+
+        _validate_organism_inputs calls build_resolve_organism_for_locus_tags
+        then executes it. We mock that to return our organism.
+        """
+        mock_conn.execute_query.return_value = [
+            {"organisms": [self._ORGANISM]}
+        ]
+
     def _make_envelope_result(
         self,
         found=None,
-        organism="Prochlorococcus marinus subsp. pastoris str. CCMP1986",
         has_expression=None,
         has_significant=None,
         group_totals=None,
@@ -653,7 +685,6 @@ class TestGeneResponseProfile:
         """Helper to build mock Q1 (envelope) result."""
         return [{
             "found_genes": found or ["PMM0370"],
-            "organism_name": organism,
             "has_expression": has_expression or ["PMM0370"],
             "has_significant": has_significant or ["PMM0370"],
             "group_totals": group_totals or [
@@ -703,6 +734,7 @@ class TestGeneResponseProfile:
 
     def test_returns_dict_with_results(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],  # organism resolution
             self._make_envelope_result(),
             self._make_agg_rows(),
         ]
@@ -722,6 +754,7 @@ class TestGeneResponseProfile:
 
     def test_not_found(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(found=["PMM0370"]),
             self._make_agg_rows(),
         ]
@@ -732,6 +765,7 @@ class TestGeneResponseProfile:
 
     def test_no_expression(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(
                 found=["PMM0370", "PMM1234"],
                 has_expression=["PMM0370"],
@@ -745,6 +779,7 @@ class TestGeneResponseProfile:
 
     def test_response_summary_structure(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(),
             self._make_agg_rows(),
         ]
@@ -765,6 +800,7 @@ class TestGeneResponseProfile:
 
     def test_directional_fields_present_when_up(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(),
             self._make_agg_rows(),
         ]
@@ -780,6 +816,7 @@ class TestGeneResponseProfile:
 
     def test_directional_fields_absent_when_no_up(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(),
             self._make_agg_rows(),
         ]
@@ -795,6 +832,7 @@ class TestGeneResponseProfile:
 
     def test_triage_lists(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(),
             self._make_agg_rows(),
         ]
@@ -811,6 +849,7 @@ class TestGeneResponseProfile:
         """Gene has edges for nitrogen_stress but not coculture."""
         agg_rows = [self._make_agg_rows()[0]]  # only nitrogen_stress
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(),
             agg_rows,
         ]
@@ -822,6 +861,7 @@ class TestGeneResponseProfile:
 
     def test_pagination(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
             self._make_envelope_result(
                 found=["PMM0001", "PMM0002", "PMM0003"],
                 has_significant=["PMM0001", "PMM0002", "PMM0003"],
@@ -911,10 +951,18 @@ def gene_response_profile(
 
     conn = _default_conn(conn)
 
+    # Resolve organism upfront — validates single-organism constraint
+    organism_name = _validate_organism_inputs(
+        organism=organism,
+        locus_tags=locus_tags,
+        experiment_ids=experiment_ids,
+        conn=conn,
+    )
+
     # Q1: Envelope — gene existence, expression flags, group totals
     env_cypher, env_params = build_gene_response_profile_envelope(
         locus_tags=locus_tags,
-        organism=organism,
+        organism_name=organism_name,
         treatment_types=treatment_types,
         experiment_ids=experiment_ids,
         group_by=group_by,
@@ -924,7 +972,6 @@ def gene_response_profile(
     found_genes = env_row["found_genes"]
     has_expression = set(env_row["has_expression"])
     has_significant = set(env_row["has_significant"])
-    organism_name = env_row["organism_name"]
     group_totals = {
         gt["group_key"]: {
             "experiments": gt["experiments"],
@@ -941,7 +988,7 @@ def gene_response_profile(
     # Q2: Aggregation — per gene x group detail (paginated)
     agg_cypher, agg_params = build_gene_response_profile(
         locus_tags=[lt for lt in found_genes if lt in has_expression],
-        organism=organism,
+        organism_name=organism_name,
         treatment_types=treatment_types,
         experiment_ids=experiment_ids,
         group_by=group_by,
@@ -1096,6 +1143,8 @@ class TestGeneResponseProfileWrapper:
     @pytest.mark.asyncio
     async def test_returns_response_model(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.side_effect = [
+            # Organism resolution
+            [{"organisms": ["Prochlorococcus MED4"]}],
             # Q1 envelope
             [{
                 "found_genes": ["PMM0370"],
@@ -1138,9 +1187,9 @@ class TestGeneResponseProfileWrapper:
     @pytest.mark.asyncio
     async def test_empty_results(self, tool_fns, mock_ctx):
         _conn_from(mock_ctx).execute_query.side_effect = [
+            [{"organisms": []}],  # organism resolution — no match
             [{
                 "found_genes": [],
-                "organism_name": None,
                 "has_expression": [],
                 "has_significant": [],
                 "group_totals": [],
@@ -1522,11 +1571,11 @@ Add entries to `_BUILDERS`:
 ```python
     # --- gene_response_profile ---
     ("gene_response_profile_envelope", build_gene_response_profile_envelope,
-     {"locus_tags": _LOCUS}),
+     {"locus_tags": _LOCUS, "organism_name": _ORGANISM}),
     ("gene_response_profile", build_gene_response_profile,
-     {"locus_tags": _LOCUS}),
+     {"locus_tags": _LOCUS, "organism_name": _ORGANISM}),
     ("gene_response_profile_by_experiment", build_gene_response_profile,
-     {"locus_tags": _LOCUS, "group_by": "experiment"}),
+     {"locus_tags": _LOCUS, "organism_name": _ORGANISM, "group_by": "experiment"}),
 ```
 
 - [ ] **Step 2: Add API contract test**
