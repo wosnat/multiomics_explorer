@@ -58,6 +58,7 @@ EXPECTED_TOOLS = [
     "differential_expression_by_ortholog",
     "gene_response_profile",
     "list_gene_clusters",
+    "gene_clusters_by_gene",
 ]
 
 
@@ -2888,3 +2889,49 @@ class TestListGeneClustersWrapper:
         assert kwargs["organism"] == "MED4"
         assert kwargs["cluster_type"] == "stress_response"
         assert kwargs["summary"] is True
+
+
+# ---------------------------------------------------------------------------
+# gene_clusters_by_gene
+# ---------------------------------------------------------------------------
+class TestGeneClustersByGeneWrapper:
+    """Tests for gene_clusters_by_gene MCP wrapper."""
+
+    _SAMPLE_API_RETURN = {
+        "total_matching": 2, "total_clusters": 2,
+        "genes_with_clusters": 2, "genes_without_clusters": 0,
+        "not_found": [], "not_matched": [],
+        "by_cluster_type": [{"cluster_type": "stress_response", "count": 2}],
+        "by_treatment_type": [{"treatment_type": "nitrogen_stress", "count": 2}],
+        "by_publication": [{"publication_doi": "10.1038/msb4100087", "count": 2}],
+        "returned": 1, "offset": 0, "truncated": True,
+        "results": [
+            {"locus_tag": "PMM0370", "gene_name": "cynA",
+             "cluster_id": "cluster:msb4100087:med4:up_n_transport",
+             "cluster_name": "MED4 cluster 1 (up, N transport)",
+             "cluster_type": "stress_response",
+             "membership_score": None, "member_count": 5},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_clusters_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["gene_clusters_by_gene"](
+                mock_ctx, locus_tags=["PMM0370"])
+        assert result.total_matching == 2
+        assert result.genes_with_clusters == 2
+        assert len(result.results) == 1
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.gene_clusters_by_gene",
+            side_effect=ValueError("locus_tags must not be empty"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["gene_clusters_by_gene"](
+                    mock_ctx, locus_tags=[])
