@@ -55,6 +55,7 @@ EXPECTED_TOOLS = [
     "list_experiments",
     "differential_expression_by_gene",
     "differential_expression_by_ortholog",
+    "gene_response_profile",
 ]
 
 
@@ -2763,3 +2764,55 @@ class TestDifferentialExpressionByOrthologWrapper:
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
+
+
+# ---------------------------------------------------------------------------
+# gene_response_profile
+# ---------------------------------------------------------------------------
+class TestGeneResponseProfileWrapper:
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],
+            [{
+                "found_genes": ["PMM0370"],
+                "has_expression": ["PMM0370"],
+                "has_significant": ["PMM0370"],
+                "group_totals": [
+                    {"group_key": "nitrogen_stress", "experiments": 4, "timepoints": 14},
+                ],
+            }],
+            [{
+                "locus_tag": "PMM0370", "gene_name": "cynA",
+                "product": "cyanate transporter", "gene_category": "Inorganic ion transport",
+                "group_key": "nitrogen_stress", "experiments_tested": 3,
+                "timepoints_tested": 8, "timepoints_up": 8, "timepoints_down": 0,
+                "rank_ups": [3, 5, 8], "rank_downs": [],
+                "log2fcs_up": [5.7, 4.2, 3.1], "log2fcs_down": [],
+                "experiments_up": 3, "experiments_down": 0,
+            }],
+        ]
+        result = await tool_fns["gene_response_profile"](mock_ctx, locus_tags=["PMM0370"])
+        assert hasattr(result, "results")
+        assert hasattr(result, "genes_queried")
+        assert hasattr(result, "returned")
+        assert hasattr(result, "truncated")
+        assert hasattr(result, "organism_name")
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, mock_ctx):
+        _conn_from(mock_ctx).execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],
+            [{"found_genes": [], "has_expression": [], "has_significant": [], "group_totals": []}],
+            [],
+        ]
+        result = await tool_fns["gene_response_profile"](mock_ctx, locus_tags=["FAKE999"])
+        assert result.results == []
+        assert result.returned == 0
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
+        _conn_from(mock_ctx).execute_query.side_effect = ValueError("bad")
+        with pytest.raises(ToolError):
+            await tool_fns["gene_response_profile"](mock_ctx, locus_tags=["PMM0370"])

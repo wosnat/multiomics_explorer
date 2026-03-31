@@ -2297,3 +2297,100 @@ def register_tools(mcp: FastMCP):
             raise ToolError(
                 f"Error in differential_expression_by_ortholog: {e}"
             )
+
+    # --- gene_response_profile ---
+
+    class GeneResponseGroupSummary(BaseModel):
+        experiments_total: int = Field(description="Total experiments for this group in the organism (e.g. 4)")
+        experiments_tested: int = Field(description="Experiments where this gene has expression edges (e.g. 3)")
+        experiments_up: int = Field(description="Experiments with significant_up in at least one timepoint (e.g. 3)")
+        experiments_down: int = Field(description="Experiments with significant_down in at least one timepoint (e.g. 0)")
+        timepoints_total: int = Field(description="Total timepoints across experiments for this group (e.g. 14)")
+        timepoints_tested: int = Field(description="Timepoints where gene has an expression edge (e.g. 8)")
+        timepoints_up: int = Field(description="Timepoints where gene is significant_up (e.g. 8)")
+        timepoints_down: int = Field(description="Timepoints where gene is significant_down (e.g. 0)")
+        up_best_rank: int | None = Field(default=None, description="Best (lowest) rank_up across significant_up timepoints. 1 = strongest. Present only when experiments_up > 0.")
+        up_median_rank: float | None = Field(default=None, description="Median rank_up across significant_up timepoints. Present only when experiments_up > 0.")
+        up_max_log2fc: float | None = Field(default=None, description="Largest positive log2FC across significant_up timepoints. Present only when experiments_up > 0.")
+        down_best_rank: int | None = Field(default=None, description="Best (lowest) rank_down across significant_down timepoints. 1 = strongest. Present only when experiments_down > 0.")
+        down_median_rank: float | None = Field(default=None, description="Median rank_down across significant_down timepoints. Present only when experiments_down > 0.")
+        down_max_log2fc: float | None = Field(default=None, description="Most negative log2FC across significant_down timepoints. Present only when experiments_down > 0.")
+
+    class GeneResponseProfileResult(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0370')")
+        gene_name: str | None = Field(description="Gene name (e.g. 'cynA'). Null if unannotated.")
+        product: str | None = Field(description="Gene product description (e.g. 'cyanate transporter')")
+        gene_category: str | None = Field(description="Functional category (e.g. 'Inorganic ion transport')")
+        groups_responded: list[str] = Field(description="Groups where gene is significant in at least one timepoint")
+        groups_not_responded: list[str] = Field(description="Groups where expression edges exist but none significant")
+        groups_not_known: list[str] = Field(description="Groups with no expression edge for this gene")
+        response_summary: dict[str, GeneResponseGroupSummary] = Field(description="Per-group detail. Keys are treatment types or experiment IDs depending on group_by.")
+
+    class GeneResponseProfileResponse(BaseModel):
+        organism_name: str | None = Field(description="Resolved organism name")
+        genes_queried: int = Field(description="Count of input locus_tags (e.g. 17)")
+        genes_with_response: int = Field(description="Genes with at least one significant expression edge (e.g. 15)")
+        not_found: list[str] = Field(default_factory=list, description="Input locus_tags not found in KG")
+        no_expression: list[str] = Field(default_factory=list, description="Gene exists but has zero expression edges")
+        returned: int = Field(description="Genes in results after pagination (e.g. 15)")
+        offset: int = Field(description="Offset into paginated gene list (e.g. 0)")
+        truncated: bool = Field(description="True if more genes available beyond returned + offset")
+        results: list[GeneResponseProfileResult] = Field(default_factory=list)
+
+    @mcp.tool(
+        tags={"expression", "gene"},
+        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
+    )
+    async def gene_response_profile(
+        ctx: Context,
+        locus_tags: Annotated[list[str], Field(description="Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview.")],
+        organism: Annotated[str | None, Field(description="Organism name for validation (optional). Inferred from genes. Fuzzy word-based matching.")] = None,
+        treatment_types: Annotated[list[str] | None, Field(description="Filter to specific treatment types.")] = None,
+        experiment_ids: Annotated[list[str] | None, Field(description="Restrict to specific experiments. Get these from list_experiments.")] = None,
+        group_by: Annotated[Literal["treatment_type", "experiment"], Field(description="Group response summary by treatment_type (aggregates across experiments) or experiment (one entry per experiment).")] = "treatment_type",
+        limit: Annotated[int, Field(description="Max genes returned.", ge=1)] = 50,
+        offset: Annotated[int, Field(description="Skip N genes for pagination.", ge=0)] = 0,
+    ) -> GeneResponseProfileResponse:
+        """Cross-experiment gene response profile.
+
+        Summarizes how each gene responds across all experiments. One result
+        per gene with response_summary showing per-treatment (or per-experiment)
+        statistics: how many experiments/timepoints the gene was tested in,
+        how many it responded in (up/down), and rank/log2fc stats for
+        significant responses.
+
+        Results sorted by response breadth: genes responding to most groups
+        first, then by experiment count, then by timepoint count.
+
+        Use differential_expression_by_gene to drill into temporal patterns
+        within a specific experiment.
+        """
+        await ctx.info(f"gene_response_profile locus_tags={locus_tags} group_by={group_by} limit={limit}")
+        try:
+            conn = _conn(ctx)
+            data = api.gene_response_profile(
+                locus_tags=locus_tags, organism=organism,
+                treatment_types=treatment_types, experiment_ids=experiment_ids,
+                group_by=group_by, limit=limit, offset=offset, conn=conn,
+            )
+            data["results"] = [
+                GeneResponseProfileResult(
+                    **{
+                        **{k: v for k, v in r.items() if k != "response_summary"},
+                        "response_summary": {
+                            gk: GeneResponseGroupSummary(**gv)
+                            for gk, gv in r["response_summary"].items()
+                        },
+                    }
+                )
+                for r in data["results"]
+            ]
+            response = GeneResponseProfileResponse(**data)
+            await ctx.info(f"Returning {response.returned} of {response.genes_queried} genes ({response.genes_with_response} with response)")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"gene_response_profile error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"gene_response_profile unexpected error: {e}")
+            raise ToolError(f"Error in gene_response_profile: {e}")
