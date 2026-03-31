@@ -2,7 +2,13 @@
 
 import pytest
 
-from multiomics_explorer.analysis import gene_set_compare, response_matrix
+from multiomics_explorer.analysis import (
+    gene_set_compare,
+    response_matrix,
+    to_dataframe,
+    profile_summary_to_dataframe,
+    experiments_to_dataframe,
+)
 from multiomics_explorer.api import functions as api
 
 KNOWN_GENE = "PMM0001"
@@ -101,3 +107,102 @@ class TestGeneResponseProfileTestedNotResponded:
             assert gk in gene["response_summary"], (
                 f"Group {gk} in groups_not_responded but not in response_summary"
             )
+
+
+@pytest.mark.kg
+class TestToDataFrameIntegration:
+    """Round-trip: API call → to_dataframe → verify CSV-safe."""
+
+    def _assert_csv_safe(self, df):
+        """Verify no column contains list or dict values."""
+        for col in df.columns:
+            for val in df[col].dropna():
+                assert not isinstance(val, (list, dict)), (
+                    f"Column '{col}' has non-scalar value: {type(val).__name__}"
+                )
+
+    def test_resolve_gene(self, conn):
+        result = api.resolve_gene("PMM0370", conn=conn)
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+
+    def test_genes_by_function(self, conn):
+        result = api.genes_by_function("nitrogen", conn=conn)
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+
+    def test_gene_overview(self, conn):
+        result = api.gene_overview(locus_tags=["PMM0370", "PMM0920"], conn=conn)
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+
+    def test_list_organisms(self, conn):
+        result = api.list_organisms(conn=conn)
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+
+    def test_list_publications(self, conn):
+        result = api.list_publications(conn=conn)
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+
+    def test_list_experiments(self, conn):
+        result = api.list_experiments(conn=conn)
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+
+    def test_gene_response_profile(self, conn):
+        result = api.gene_response_profile(
+            locus_tags=["PMM0370", "PMM0920"], conn=conn,
+        )
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+        assert "response_summary" not in df.columns
+
+    def test_differential_expression_by_gene(self, conn):
+        result = api.differential_expression_by_gene(
+            organism="MED4", conn=conn,
+        )
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+
+    def test_search_ontology(self, conn):
+        result = api.search_ontology("nitrogen", ontology="go_bp", conn=conn)
+        df = to_dataframe(result)
+        assert len(df) >= 1
+        self._assert_csv_safe(df)
+
+
+@pytest.mark.kg
+class TestProfileSummaryIntegration:
+    def test_round_trip(self, conn):
+        result = api.gene_response_profile(
+            locus_tags=["PMM0370", "PMM0920"], conn=conn,
+        )
+        df = profile_summary_to_dataframe(result)
+        assert len(df) >= 1
+        assert "group" in df.columns
+        assert "experiments_up" in df.columns
+        for col in df.columns:
+            for val in df[col].dropna():
+                assert not isinstance(val, (list, dict))
+
+
+@pytest.mark.kg
+class TestExperimentsToDataFrameIntegration:
+    def test_round_trip(self, conn):
+        result = api.list_experiments(conn=conn)
+        df = experiments_to_dataframe(result)
+        assert len(df) >= 1
+        assert "experiment_id" in df.columns
+        for col in df.columns:
+            for val in df[col].dropna():
+                assert not isinstance(val, (list, dict))
