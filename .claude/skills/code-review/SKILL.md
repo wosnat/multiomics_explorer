@@ -47,3 +47,4 @@ Before diving into the full checklist, verify these common issues:
 - [ ] `pytest tests/unit/test_about_content.py` passes (expected-keys match Pydantic models)?
 - [ ] Diagnostic builder calls forward ALL filter params (direction, significant_only)?
 - [ ] Appended WHERE conditions use `AND` (not a second `WHERE`) when query already has a WHERE clause?
+- [ ] Analysis reference docs (`references/analysis/`) updated if `analysis/expression.py` changed?

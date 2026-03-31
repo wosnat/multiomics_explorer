@@ -48,3 +48,10 @@ Per-tool about content auto-generated from Pydantic models + input
 YAML (`inputs/tools/{name}.yaml`) via `scripts/build_about_content.py`.
 Served at `docs://tools/{tool-name}`. Update YAML when tool behavior
 changes, then rebuild. Sync via `scripts/sync_skills.sh`.
+
+## Analysis utilities (`analysis/expression.py`)
+
+Compose API results into DataFrames. Reference docs live in
+`skills/multiomics-kg-guide/references/analysis/`. When function
+signatures, return shapes, or behavior change → update corresponding
+reference doc. Served at `docs://analysis/{name}`.
