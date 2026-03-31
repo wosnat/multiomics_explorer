@@ -67,6 +67,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_ortholog_diagnostics,
     build_gene_response_profile_envelope,
     build_gene_response_profile,
+    build_list_gene_clusters,
+    build_list_gene_clusters_summary,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -2038,3 +2040,117 @@ def gene_response_profile(
         "truncated": truncated,
         "results": results,
     }
+
+
+def list_gene_clusters(
+    search_text: str | None = None,
+    organism: str | None = None,
+    cluster_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    omics_type: str | None = None,
+    publication_doi: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Browse, search, and filter gene clusters.
+
+    Returns dict with keys: total_entries, total_matching,
+    by_organism, by_cluster_type, by_treatment_type, by_omics_type,
+    by_publication, returned, offset, truncated, results.
+    When search_text provided: adds score_max, score_median.
+    Per result (compact): cluster_id, name, organism_name, cluster_type,
+    treatment_type, member_count, source_paper, score (when searching).
+    Per result (verbose): adds functional_description, behavioral_description,
+    cluster_method, treatment, light_condition, experimental_context,
+    peak_time_hours, period_hours, pub_doi.
+
+    summary=True: results=[], summary fields only.
+    """
+    if search_text is not None and not search_text.strip():
+        raise ValueError("search_text must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    filter_kwargs = dict(
+        organism=organism, cluster_type=cluster_type,
+        treatment_type=treatment_type, omics_type=omics_type,
+        publication_doi=publication_doi,
+    )
+
+    effective_text = search_text
+
+    # Summary query — always runs
+    try:
+        sum_cypher, sum_params = build_list_gene_clusters_summary(
+            search_text=effective_text, **filter_kwargs)
+        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+    except Neo4jClientError:
+        if search_text is not None:
+            logger.debug("list_gene_clusters: Lucene parse error, retrying")
+            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            sum_cypher, sum_params = build_list_gene_clusters_summary(
+                search_text=effective_text, **filter_kwargs)
+            raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+        else:
+            raise
+
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_entries": raw_summary["total_entries"],
+        "total_matching": total_matching,
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
+        "by_cluster_type": _rename_freq(
+            raw_summary["by_cluster_type"], "cluster_type"),
+        "by_treatment_type": _rename_freq(
+            raw_summary["by_treatment_type"], "treatment_type"),
+        "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
+        "by_publication": _rename_freq(
+            raw_summary["by_publication"], "publication_doi"),
+    }
+
+    if search_text is not None:
+        envelope["score_max"] = raw_summary.get("score_max")
+        envelope["score_median"] = raw_summary.get("score_median")
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["offset"] = offset
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    try:
+        det_cypher, det_params = build_list_gene_clusters(
+            search_text=effective_text, **filter_kwargs,
+            verbose=verbose, limit=limit, offset=offset)
+        results = conn.execute_query(det_cypher, **det_params)
+    except Neo4jClientError:
+        if search_text is not None and effective_text == search_text:
+            logger.debug("list_gene_clusters detail: Lucene parse error, retrying")
+            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            det_cypher, det_params = build_list_gene_clusters(
+                search_text=effective_text, **filter_kwargs,
+                verbose=verbose, limit=limit, offset=offset)
+            results = conn.execute_query(det_cypher, **det_params)
+        else:
+            raise
+
+    envelope["returned"] = len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
+    envelope["results"] = results
+    return envelope
