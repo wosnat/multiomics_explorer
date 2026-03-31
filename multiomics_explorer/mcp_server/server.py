@@ -43,7 +43,9 @@ mcp = FastMCP(
     instructions=(
         "Multi-omics knowledge graph for Prochlorococcus and Alteromonas. "
         "For detailed usage guides on any tool, read the resource at "
-        "docs://tools/{tool_name} (e.g. docs://tools/list_publications)."
+        "docs://tools/{tool_name} (e.g. docs://tools/list_publications). "
+        "For analysis utility guides, read docs://analysis/{name} "
+        "(e.g. docs://analysis/response_matrix)."
     ),
     lifespan=lifespan,
 )
@@ -66,6 +68,21 @@ def tool_docs(tool_name: str) -> str:
     path = _TOOLS_DOCS_DIR / f"{tool_name}.md"
     if not path.exists():
         return f"No documentation found for tool '{tool_name}'."
+    return path.read_text()
+
+
+_ANALYSIS_DOCS_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "skills" / "multiomics-kg-guide" / "references" / "analysis"
+)
+
+
+@mcp.resource("docs://analysis/{name}")
+def analysis_docs(name: str) -> str:
+    """Usage guide for an analysis utility: parameters, response format, examples, chaining patterns."""
+    path = _ANALYSIS_DOCS_DIR / f"{name}.md"
+    if not path.exists():
+        return f"No documentation found for analysis function '{name}'."
     return path.read_text()
 
 
