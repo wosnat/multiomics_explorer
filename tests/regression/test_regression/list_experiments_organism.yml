@@ -198,33 +198,27 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (RNASEQ)
-  gene_count: 3698
-  is_time_course: 'true'
+  gene_count: 1849
+  is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 640
-  significant_up_count: 602
+  significant_down_count: 472
+  significant_up_count: 405
   table_scope: all_detected_genes
   table_scope_detail: ''
-  time_point_count: 2
+  time_point_count: 1
   time_point_hours:
-  - '-1.0'
   - '336.0'
   time_point_labels:
   - day 14
-  - days 60+89
   time_point_orders:
   - '1'
-  - '2'
   time_point_significant_down:
-  - '168'
   - '472'
   time_point_significant_up:
-  - '197'
   - '405'
   time_point_totals:
-  - '1849'
   - '1849'
   treatment_type: nitrogen_stress
 - coculture_partner: null

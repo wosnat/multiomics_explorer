@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_significant
-row_count: 29
+row_count: 28
 rows:
 - coculture_partner: null
   consensus_gene_name: psbB
@@ -182,20 +182,6 @@ rows:
   timepoint: day 14
   timepoint_hours: 336.0
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  not_significant: 0
-  organism_name: Prochlorococcus MED4
-  significant_down: 1
-  significant_up: 0
-  timepoint: days 60+89
-  timepoint_hours: null
-  timepoint_order: 2
   treatment_type: nitrogen_stress
 - coculture_partner: null
   consensus_gene_name: psbB

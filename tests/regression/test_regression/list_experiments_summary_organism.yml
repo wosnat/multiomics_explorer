@@ -34,5 +34,5 @@ rows:
   - '{''count'': 4, ''item'': ''carbon_stress''}'
   - '{''count'': 8, ''item'': ''light_stress''}'
   - '{''count'': 8, ''item'': ''nitrogen_stress''}'
-  time_course_count: 13
+  time_course_count: 12
   total_matching: 31

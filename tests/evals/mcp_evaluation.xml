@@ -1,0 +1,51 @@
+<evaluation>
+  <qa_pair>
+    <question>A Prochlorococcus MED4 gene shows the most extreme transcriptional upregulation in the entire knowledge graph under nutrient limitation conditions. This gene's log2 fold change exceeds 160. What is the EC number assigned to this gene? Respond in the format X.X.X.X (e.g., 1.2.3.4).</question>
+    <answer>3.1.3.1</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>Among the Prochlorococcus strains in the knowledge graph, genome sizes vary considerably between high-light and low-light adapted ecotypes. Which Prochlorococcus strain has the largest number of genes? Respond with the strain name only (e.g., MED4).</question>
+    <answer>MIT9313</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>Prochlorococcus strains are classified into light-adaptation clades (HLI, HLII, LLII, LLIV). The strain with the most differential expression experiments in the knowledge graph belongs to one of these clades. What is its clade designation? Respond with the clade abbreviation only.</question>
+    <answer>HLI</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>A landmark 2007 study published in Nature examined genome-wide expression dynamics during cyanophage infection of a marine cyanobacterium, revealing features of host-virus co-evolution. Who is the first author of this publication? Respond with their last name only.</question>
+    <answer>Lindell</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>The gene rbcL encodes the large subunit of the key carbon-fixing enzyme in cyanobacteria. In Prochlorococcus MED4 (locus tag PMM0550), this gene is annotated with a GO cellular component term indicating the subcellular structure where carbon fixation occurs. What is the name of this cellular compartment? Respond with the GO term name.</question>
+    <answer>carboxysome</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>One experiment in the knowledge graph has far more differential expression edges (Changes_expression_of relationships) than any other, with nearly 27,000 edges. This experiment studies a dark-tolerant co-culture phenotype. What is the full organism name profiled in this experiment? Respond with the complete organism name as it appears in the KG.</question>
+    <answer>Alteromonas macleodii MIT1002</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>Catalase is a critical enzyme for degrading hydrogen peroxide. In the knowledge graph, genes functionally annotated as "catalase" are found exclusively in organisms of one bacterial genus — none of the picocyanobacteria encode this enzyme. What is that genus? Respond with the genus name only.</question>
+    <answer>Alteromonas</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>The Cyanorak curated ortholog group for the ribulose bisphosphate carboxylase large subunit (rbcL) contains members across picocyanobacterial genomes. Using differential expression data framed by this ortholog group, how many distinct experiments have expression measurements for its members? Respond with the number only.</question>
+    <answer>26</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>An experiment studying Prochlorococcus MIT9313's transcriptomic response to viral dissolved organic matter (vDOM) is a time-course study that spans from sub-hour to multi-day intervals. How many distinct timepoints were measured in this experiment? Respond with the number only.</question>
+    <answer>9</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>The gene petB is found in both cyanobacteria and heterotrophic bacteria in the knowledge graph. In Prochlorococcus, its product is annotated as "cytochrome b6", but in Alteromonas the annotation differs. What is the exact product name for petB in Alteromonas? Respond with the product name exactly as it appears in the KG.</question>
+    <answer>cytochrome b</answer>
+  </qa_pair>
+</evaluation>

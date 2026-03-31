@@ -1,5 +1,5 @@
 case_id: de_by_gene_single_gene
-row_count: 28
+row_count: 27
 rows:
 - experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   expression_status: not_significant
@@ -8,6 +8,8 @@ rows:
   log2fc: -2.8863
   padj: 0.0311
   rank: 581
+  rank_down: null
+  rank_up: null
   timepoint: 20h
   timepoint_hours: 20.0
   timepoint_order: 1
@@ -19,6 +21,8 @@ rows:
   log2fc: 2.23
   padj: 0.0
   rank: 75
+  rank_down: null
+  rank_up: 50
   timepoint: 3h
   timepoint_hours: 3.0
   timepoint_order: 1
@@ -30,6 +34,8 @@ rows:
   log2fc: 1.885
   padj: 0.0
   rank: 459
+  rank_down: null
+  rank_up: 188
   timepoint: day 14
   timepoint_hours: 336.0
   timepoint_order: 1
@@ -41,6 +47,8 @@ rows:
   log2fc: 1.1985
   padj: 1.0
   rank: 362
+  rank_down: null
+  rank_up: null
   timepoint: 48h
   timepoint_hours: 48.0
   timepoint_order: 6
@@ -52,6 +60,8 @@ rows:
   log2fc: 1.1005
   padj: 0.0007
   rank: 213
+  rank_down: null
+  rank_up: 84
   timepoint: day 31
   timepoint_hours: 744.0
   timepoint_order: 2
@@ -63,6 +73,8 @@ rows:
   log2fc: 1.008
   padj: 1.0
   rank: 462
+  rank_down: null
+  rank_up: null
   timepoint: 12h
   timepoint_hours: 12.0
   timepoint_order: 4
@@ -74,6 +86,8 @@ rows:
   log2fc: 0.89
   padj: 0.54
   rank: 467
+  rank_down: null
+  rank_up: null
   timepoint: 12h
   timepoint_hours: 12.0
   timepoint_order: 2
@@ -85,6 +99,8 @@ rows:
   log2fc: 0.87
   padj: 0.49
   rank: 493
+  rank_down: null
+  rank_up: null
   timepoint: 24h
   timepoint_hours: 24.0
   timepoint_order: 3
@@ -96,6 +112,8 @@ rows:
   log2fc: 0.8628
   padj: 1.0
   rank: 467
+  rank_down: null
+  rank_up: null
   timepoint: 24h
   timepoint_hours: 24.0
   timepoint_order: 5
@@ -107,6 +125,8 @@ rows:
   log2fc: 0.7135
   padj: 0.036
   rank: 211
+  rank_down: null
+  rank_up: null
   timepoint: day 18
   timepoint_hours: 432.0
   timepoint_order: 1
@@ -118,21 +138,12 @@ rows:
   log2fc: 0.7087
   padj: 0.2466
   rank: 248
+  rank_down: null
+  rank_up: null
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
   treatment_type: coculture
-- experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
-  expression_status: not_significant
-  gene_name: dnaN
-  locus_tag: PMM0001
-  log2fc: 0.6293
-  padj: 0.0641
-  rank: 834
-  timepoint: days 60+89
-  timepoint_hours: null
-  timepoint_order: 2
-  treatment_type: nitrogen_stress
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -140,6 +151,8 @@ rows:
   log2fc: 0.6172
   padj: 0.028
   rank: 574
+  rank_down: null
+  rank_up: null
   timepoint: day 89
   timepoint_hours: 2136.0
   timepoint_order: 4
@@ -151,6 +164,8 @@ rows:
   log2fc: 0.5893
   padj: 0.0135
   rank: 549
+  rank_down: null
+  rank_up: null
   timepoint: days 60+89
   timepoint_hours: null
   timepoint_order: 5
@@ -162,6 +177,8 @@ rows:
   log2fc: 0.5614
   padj: 0.0484
   rank: 570
+  rank_down: null
+  rank_up: null
   timepoint: day 60
   timepoint_hours: 1440.0
   timepoint_order: 3
@@ -173,6 +190,8 @@ rows:
   log2fc: 0.5111
   padj: 1.0
   rank: 722
+  rank_down: null
+  rank_up: null
   timepoint: 6h
   timepoint_hours: 6.0
   timepoint_order: 3
@@ -184,6 +203,8 @@ rows:
   log2fc: 0.3774
   padj: 0.191
   rank: 717
+  rank_down: null
+  rank_up: null
   timepoint: day 14
   timepoint_hours: 336.0
   timepoint_order: 1
@@ -195,6 +216,8 @@ rows:
   log2fc: 0.334
   padj: 1.0
   rank: 694
+  rank_down: null
+  rank_up: null
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
@@ -206,6 +229,8 @@ rows:
   log2fc: 0.2121
   padj: 1.0
   rank: 937
+  rank_down: null
+  rank_up: null
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
@@ -217,6 +242,8 @@ rows:
   log2fc: 0.1577
   padj: 1.0
   rank: 1299
+  rank_down: null
+  rank_up: null
   timepoint: 0h
   timepoint_hours: 0.0
   timepoint_order: 1
@@ -228,6 +255,8 @@ rows:
   log2fc: 0.1564
   padj: 1.0
   rank: 1276
+  rank_down: null
+  rank_up: null
   timepoint: 3h
   timepoint_hours: 3.0
   timepoint_order: 2
@@ -239,6 +268,8 @@ rows:
   log2fc: -0.1452
   padj: 0.7754
   rank: 1578
+  rank_down: null
+  rank_up: null
   timepoint: day 60
   timepoint_hours: 1440.0
   timepoint_order: 3
@@ -250,6 +281,8 @@ rows:
   log2fc: -0.1271
   padj: 0.8007
   rank: 1630
+  rank_down: null
+  rank_up: null
   timepoint: day 31
   timepoint_hours: 744.0
   timepoint_order: 2
@@ -261,6 +294,8 @@ rows:
   log2fc: 0.1087
   padj: 0.6459
   rank: 1316
+  rank_down: null
+  rank_up: null
   timepoint: day 31
   timepoint_hours: 744.0
   timepoint_order: 2
@@ -272,6 +307,8 @@ rows:
   log2fc: 0.1035
   padj: 0.665
   rank: 1323
+  rank_down: null
+  rank_up: null
   timepoint: day 89
   timepoint_hours: 2136.0
   timepoint_order: 3
@@ -283,6 +320,8 @@ rows:
   log2fc: -0.0794
   padj: 0.8653
   rank: 1670
+  rank_down: null
+  rank_up: null
   timepoint: days 60+89
   timepoint_hours: null
   timepoint_order: 5
@@ -294,6 +333,8 @@ rows:
   log2fc: -0.0714
   padj: 0.9335
   rank: 1616
+  rank_down: null
+  rank_up: null
   timepoint: day 18
   timepoint_hours: 432.0
   timepoint_order: 1
@@ -305,6 +346,8 @@ rows:
   log2fc: -0.0161
   padj: 0.9762
   rank: 1823
+  rank_down: null
+  rank_up: null
   timepoint: day 89
   timepoint_hours: 2136.0
   timepoint_order: 4

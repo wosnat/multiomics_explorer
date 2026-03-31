@@ -59,7 +59,7 @@ rows:
   - Synechococcus
   closest_ortholog_group_size: 9
   end: 1331
-  expression_edge_count: 28
+  expression_edge_count: 27
   function_description: Confers DNA tethering and processivity to DNA polymerases
     and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
     by the clamp-loading complex) which diffuses in an ATP-independent manner freely

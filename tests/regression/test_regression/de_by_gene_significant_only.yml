@@ -8,6 +8,8 @@ rows:
   log2fc: 2.23
   padj: 0.0
   rank: 75
+  rank_down: null
+  rank_up: 50
   timepoint: 3h
   timepoint_hours: 3.0
   timepoint_order: 1
@@ -19,6 +21,8 @@ rows:
   log2fc: 1.885
   padj: 0.0
   rank: 459
+  rank_down: null
+  rank_up: 188
   timepoint: day 14
   timepoint_hours: 336.0
   timepoint_order: 1
@@ -30,6 +34,8 @@ rows:
   log2fc: 1.1005
   padj: 0.0007
   rank: 213
+  rank_down: null
+  rank_up: 84
   timepoint: day 31
   timepoint_hours: 744.0
   timepoint_order: 2

@@ -57,5 +57,5 @@ rows:
   - '{''count'': 5, ''item'': ''darkness''}'
   - '{''count'': 5, ''item'': ''iron_stress''}'
   - '{''count'': 8, ''item'': ''light_stress''}'
-  time_course_count: 29
+  time_course_count: 28
   total_matching: 76

@@ -112,23 +112,6 @@ rows:
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Regulatory functions > DNA interactions; Transcription
   genera:
-  - Prochlorococcus
-  group_id: eggnog:1MMKX@1212
-  group_name: 1MMKX@1212
-  has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
-  score: 4.9143
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- consensus_gene_name: glnB
-  consensus_product: nitrogen regulatory protein P-II
-  description: Belongs to the P(II) protein family
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Regulatory functions > DNA interactions; Transcription
-  genera:
   - Synechococcus
   group_id: eggnog:1H0HR@1129
   group_name: 1H0HR@1129
@@ -139,6 +122,23 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
+- consensus_gene_name: glnB
+  consensus_product: nitrogen regulatory protein P-II
+  description: Belongs to the P(II) protein family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Regulatory functions > DNA interactions; Transcription
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MMKX@1212
+  group_name: 1MMKX@1212
+  has_cross_genus_members: single_genus
+  member_count: 8
+  organism_count: 8
+  score: 4.9143
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
 - consensus_gene_name: ntrX
   consensus_product: nitrogen assimilation regulatory protein
   description: null
@@ -300,15 +300,14 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: glnG
-  consensus_product: nitrogen regulation protein NR(I)
-  description: COG2204 Response regulator containing CheY-like receiver, AAA-type
-    ATPase, and DNA-binding domains
-  functional_description: Signal transduction mechanisms
+- consensus_gene_name: glnB
+  consensus_product: P-II family nitrogen regulator
+  description: Belongs to the P(II) protein family
+  functional_description: Transcription
   genera:
   - Alteromonas
-  group_id: eggnog:463YY@72275
-  group_name: 463YY@72275
+  group_id: eggnog:4679F@72275
+  group_name: 4679F@72275
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
@@ -331,6 +330,22 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
+- consensus_gene_name: glnG
+  consensus_product: nitrogen regulation protein NR(I)
+  description: COG2204 Response regulator containing CheY-like receiver, AAA-type
+    ATPase, and DNA-binding domains
+  functional_description: Signal transduction mechanisms
+  genera:
+  - Alteromonas
+  group_id: eggnog:463YY@72275
+  group_name: 463YY@72275
+  has_cross_genus_members: single_genus
+  member_count: 3
+  organism_count: 3
+  score: 2.8366
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
 - consensus_gene_name: glnK
   consensus_product: P-II family nitrogen regulator
   description: Belongs to the P(II) protein family
@@ -339,21 +354,6 @@ rows:
   - Alteromonas
   group_id: eggnog:467D0@72275
   group_name: 467D0@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.8366
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- consensus_gene_name: glnB
-  consensus_product: P-II family nitrogen regulator
-  description: Belongs to the P(II) protein family
-  functional_description: Transcription
-  genera:
-  - Alteromonas
-  group_id: eggnog:4679F@72275
-  group_name: 4679F@72275
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
@@ -455,21 +455,6 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: narM
-  consensus_product: nitrate reductase associated protein
-  description: Conserved nitrate reductase-associated protein (Nitr_red_assoc)
-  functional_description: Central intermediary metabolism > Nitrogen metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1H027@1129
-  group_name: 1H027@1129
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 2.4615
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
 - consensus_gene_name: cynH
   consensus_product: cyanate hydratase
   description: null
@@ -481,6 +466,21 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
+  score: 2.4615
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- consensus_gene_name: narM
+  consensus_product: nitrate reductase associated protein
+  description: Conserved nitrate reductase-associated protein (Nitr_red_assoc)
+  functional_description: Central intermediary metabolism > Nitrogen metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1H027@1129
+  group_name: 1H027@1129
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
   score: 2.4615
   source: eggnog
   specificity_rank: 1
@@ -595,21 +595,20 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: speB
-  consensus_product: agmatinase
+- consensus_gene_name: pncA
+  consensus_product: isochorismatase-like hydrolase superfamily
   description: hydrolase activity, acting on carbon-nitrogen (but not peptide) bonds,
-    in linear amidines
-  functional_description: Energy metabolism > Amino acids and amines (catabolism);
-    Amino acid transport and metabolism
+    in linear amides
+  functional_description: Secondary metabolites biosynthesis, transport and catabolism
   genera:
   - Alteromonas
   - Prochlorococcus
   - Synechococcus
-  group_id: eggnog:COG0010@2
-  group_name: COG0010@2
+  group_id: eggnog:COG1335@2
+  group_name: COG1335@2
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 13
+  member_count: 18
+  organism_count: 12
   score: 2.2345
   source: eggnog
   specificity_rank: 3
@@ -632,24 +631,42 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: pncA
-  consensus_product: isochorismatase-like hydrolase superfamily
+- consensus_gene_name: speB
+  consensus_product: agmatinase
   description: hydrolase activity, acting on carbon-nitrogen (but not peptide) bonds,
-    in linear amides
-  functional_description: Secondary metabolites biosynthesis, transport and catabolism
+    in linear amidines
+  functional_description: Energy metabolism > Amino acids and amines (catabolism);
+    Amino acid transport and metabolism
   genera:
   - Alteromonas
   - Prochlorococcus
   - Synechococcus
-  group_id: eggnog:COG1335@2
-  group_name: COG1335@2
+  group_id: eggnog:COG0010@2
+  group_name: COG0010@2
   has_cross_genus_members: cross_genus
-  member_count: 18
-  organism_count: 12
+  member_count: 16
+  organism_count: 13
   score: 2.2345
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
+- consensus_gene_name: PMN2A_RS05525
+  consensus_product: nitroreductase family protein
+  description: null
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Energy production and conversion
+  genera:
+  - Prochlorococcus
+  group_id: cyanorak:CK_00040200
+  group_name: CK_00040200
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 2.126
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
 - consensus_gene_name: narB
   consensus_product: nitrate reductase
   description: null
@@ -687,38 +704,21 @@ rows:
   taxonomic_level: curated
 - consensus_gene_name: PMN2A_RS05525
   consensus_product: nitroreductase family protein
-  description: null
+  description: Nitroreductase family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Energy production and conversion
   genera:
   - Prochlorococcus
-  group_id: cyanorak:CK_00040200
-  group_name: CK_00040200
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 2.126
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: nirA
-  consensus_product: ferredoxin--nitrite reductase
-  description: Belongs to the nitrite and sulfite reductase 4Fe-4S domain family
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Energy production and conversion
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GZSX@1129
-  group_name: 1GZSX@1129
+  group_id: eggnog:1MNFH@1212
+  group_name: 1MNFH@1212
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
   score: 2.126
   source: eggnog
   specificity_rank: 1
-  taxonomic_level: Synechococcus
+  taxonomic_level: Prochloraceae
 - consensus_gene_name: narB
   consensus_product: nitrate reductase
   description: Belongs to the prokaryotic molybdopterin-containing oxidoreductase
@@ -737,23 +737,23 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: PMN2A_RS05525
-  consensus_product: nitroreductase family protein
-  description: Nitroreductase family
+- consensus_gene_name: nirA
+  consensus_product: ferredoxin--nitrite reductase
+  description: Belongs to the nitrite and sulfite reductase 4Fe-4S domain family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Energy production and conversion
   genera:
-  - Prochlorococcus
-  group_id: eggnog:1MNFH@1212
-  group_name: 1MNFH@1212
+  - Synechococcus
+  group_id: eggnog:1GZSX@1129
+  group_name: 1GZSX@1129
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
   score: 2.126
   source: eggnog
   specificity_rank: 1
-  taxonomic_level: Prochloraceae
+  taxonomic_level: Synechococcus
 - consensus_gene_name: nirA
   consensus_product: ferredoxin--nitrite reductase
   description: Belongs to the nitrite and sulfite reductase 4Fe-4S domain family
@@ -771,6 +771,24 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
+- consensus_gene_name: glsF
+  consensus_product: ferredoxin-dependent glutamate synthase
+  description: null
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Amino acid transport and metabolism
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  group_id: cyanorak:CK_00000134
+  group_name: CK_00000134
+  has_cross_genus_members: cross_genus
+  member_count: 9
+  organism_count: 9
+  score: 2.0777
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
 - consensus_gene_name: ureC
   consensus_product: urease alpha subunit
   description: null
@@ -807,24 +825,6 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: glsF
-  consensus_product: ferredoxin-dependent glutamate synthase
-  description: null
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Amino acid transport and metabolism
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  group_id: cyanorak:CK_00000134
-  group_name: CK_00000134
-  has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 2.0777
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
 - consensus_gene_name: ureA
   consensus_product: urease gamma subunit
   description: null
@@ -843,24 +843,23 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureC
-  consensus_product: urease alpha subunit
-  description: Belongs to the metallo-dependent hydrolases superfamily. Urease alpha
-    subunit family
+- consensus_gene_name: glsF
+  consensus_product: ferredoxin-dependent glutamate synthase
+  description: glutamate synthase
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Amino acid transport and metabolism
   genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKBK@1212
-  group_name: 1MKBK@1212
+  - Synechococcus
+  group_id: eggnog:1GZS6@1129
+  group_name: 1GZS6@1129
   has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
+  member_count: 2
+  organism_count: 2
   score: 2.0777
   source: eggnog
   specificity_rank: 1
-  taxonomic_level: Prochloraceae
+  taxonomic_level: Synechococcus
 - consensus_gene_name: glsF
   consensus_product: ferredoxin-dependent glutamate synthase
   description: Ferredoxin-dependent glutamate synthase
@@ -871,40 +870,6 @@ rows:
   - Prochlorococcus
   group_id: eggnog:1MKFG@1212
   group_name: 1MKFG@1212
-  has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
-  score: 2.0777
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- consensus_gene_name: ureB
-  consensus_product: urease beta subunit
-  description: Belongs to the urease beta subunit family
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Amino acid transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MMUZ@1212
-  group_name: 1MMUZ@1212
-  has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
-  score: 2.0777
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- consensus_gene_name: ureA
-  consensus_product: urease gamma subunit
-  description: Belongs to the urease gamma subunit family
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Amino acid transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MMK2@1212
-  group_name: 1MMK2@1212
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
@@ -964,23 +929,77 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: glsF
-  consensus_product: ferredoxin-dependent glutamate synthase
-  description: glutamate synthase
+- consensus_gene_name: ureC
+  consensus_product: urease alpha subunit
+  description: Belongs to the metallo-dependent hydrolases superfamily. Urease alpha
+    subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Amino acid transport and metabolism
   genera:
-  - Synechococcus
-  group_id: eggnog:1GZS6@1129
-  group_name: 1GZS6@1129
+  - Prochlorococcus
+  group_id: eggnog:1MKBK@1212
+  group_name: 1MKBK@1212
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
+  member_count: 8
+  organism_count: 8
   score: 2.0777
   source: eggnog
   specificity_rank: 1
-  taxonomic_level: Synechococcus
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: ureB
+  consensus_product: urease beta subunit
+  description: Belongs to the urease beta subunit family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Amino acid transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MMUZ@1212
+  group_name: 1MMUZ@1212
+  has_cross_genus_members: single_genus
+  member_count: 8
+  organism_count: 8
+  score: 2.0777
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: ureA
+  consensus_product: urease gamma subunit
+  description: Belongs to the urease gamma subunit family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Amino acid transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MMK2@1212
+  group_name: 1MMK2@1212
+  has_cross_genus_members: single_genus
+  member_count: 8
+  organism_count: 8
+  score: 2.0777
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: glsF
+  consensus_product: ferredoxin-dependent glutamate synthase
+  description: L-glutamate biosynthetic process
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Amino acid transport and metabolism
+  genera:
+  - Alteromonas
+  - Prochlorococcus
+  - Synechococcus
+  group_id: eggnog:COG0070@2
+  group_name: COG0070@2
+  has_cross_genus_members: cross_genus
+  member_count: 13
+  organism_count: 13
+  score: 2.0777
+  source: eggnog
+  specificity_rank: 3
+  taxonomic_level: Bacteria
 - consensus_gene_name: ureC
   consensus_product: urease alpha subunit
   description: Belongs to the metallo-dependent hydrolases superfamily. Urease alpha
@@ -1014,25 +1033,6 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 2.0777
-  source: eggnog
-  specificity_rank: 3
-  taxonomic_level: Bacteria
-- consensus_gene_name: glsF
-  consensus_product: ferredoxin-dependent glutamate synthase
-  description: L-glutamate biosynthetic process
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Amino acid transport and metabolism
-  genera:
-  - Alteromonas
-  - Prochlorococcus
-  - Synechococcus
-  group_id: eggnog:COG0070@2
-  group_name: COG0070@2
-  has_cross_genus_members: cross_genus
-  member_count: 13
-  organism_count: 13
   score: 2.0777
   source: eggnog
   specificity_rank: 3
@@ -1160,6 +1160,23 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
+- consensus_gene_name: cynS
+  consensus_product: cyanate hydratase
+  description: null
+  functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
+    ion transport and metabolism
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  group_id: cyanorak:CK_00001552
+  group_name: CK_00001552
+  has_cross_genus_members: cross_genus
+  member_count: 5
+  organism_count: 5
+  score: 1.9396
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
 - consensus_gene_name: cynB
   consensus_product: cyanate ABC transporter, permease protein
   description: null
@@ -1190,23 +1207,6 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.9396
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: cynS
-  consensus_product: cyanate hydratase
-  description: null
-  functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
-    ion transport and metabolism
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  group_id: cyanorak:CK_00001552
-  group_name: CK_00001552
-  has_cross_genus_members: cross_genus
-  member_count: 5
-  organism_count: 5
   score: 1.9396
   source: cyanorak
   specificity_rank: 0
@@ -1279,6 +1279,25 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
+- consensus_gene_name: ureF
+  consensus_product: urease accessory protein UreF
+  description: null
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
+    intermediary metabolism > Nitrogen metabolism; Post-translational modification,
+    protein turnover, chaperones
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  group_id: cyanorak:CK_00001363
+  group_name: CK_00001363
+  has_cross_genus_members: cross_genus
+  member_count: 9
+  organism_count: 9
+  score: 1.9047
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
 - consensus_gene_name: glnN1
   consensus_product: glutamine synthetase, type III
   description: null
@@ -1292,6 +1311,24 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
+  score: 1.9047
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: urtD
+  consensus_product: ABC-type urea transporter, ATP-binding component UrtD
+  description: null
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  group_id: cyanorak:CK_00001367
+  group_name: CK_00001367
+  has_cross_genus_members: cross_genus
+  member_count: 9
+  organism_count: 9
   score: 1.9047
   source: cyanorak
   specificity_rank: 0
@@ -1336,54 +1373,19 @@ rows:
   taxonomic_level: curated
 - consensus_gene_name: ureF
   consensus_product: urease accessory protein UreF
-  description: null
+  description: Required for maturation of urease via the functional incorporation
+    of the urease nickel metallocenter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
     intermediary metabolism > Nitrogen metabolism; Post-translational modification,
     protein turnover, chaperones
   genera:
   - Prochlorococcus
-  - Synechococcus
-  group_id: cyanorak:CK_00001363
-  group_name: CK_00001363
-  has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.9047
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: urtD
-  consensus_product: ABC-type urea transporter, ATP-binding component UrtD
-  description: null
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  group_id: cyanorak:CK_00001367
-  group_name: CK_00001367
-  has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.9047
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: urtD
-  consensus_product: ABC-type urea transporter, ATP-binding component UrtD
-  description: Alternative locus ID
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MM0F@1212
-  group_name: 1MM0F@1212
+  group_id: eggnog:1MMP4@1212
+  group_name: 1MMP4@1212
   has_cross_genus_members: single_genus
-  member_count: 7
-  organism_count: 7
+  member_count: 8
+  organism_count: 8
   score: 1.9047
   source: eggnog
   specificity_rank: 1
@@ -1460,6 +1462,23 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
+- consensus_gene_name: urtD
+  consensus_product: ABC-type urea transporter, ATP-binding component UrtD
+  description: Alternative locus ID
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MM0F@1212
+  group_name: 1MM0F@1212
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.9047
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
 - consensus_gene_name: ureD
   consensus_product: urease accessory protein UreD
   description: Required for maturation of urease via the functional incorporation
@@ -1479,21 +1498,21 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ureF
-  consensus_product: urease accessory protein UreF
-  description: Required for maturation of urease via the functional incorporation
-    of the urease nickel metallocenter
+- consensus_gene_name: ureE
+  consensus_product: urease accessory protein UreE
+  description: Involved in urease metallocenter assembly. Binds nickel. Probably functions
+    as a nickel donor during metallocenter assembly
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
     intermediary metabolism > Nitrogen metabolism; Post-translational modification,
     protein turnover, chaperones
   genera:
   - Prochlorococcus
-  group_id: eggnog:1MMP4@1212
-  group_name: 1MMP4@1212
+  group_id: eggnog:1MMWD@1212
+  group_name: 1MMWD@1212
   has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
+  member_count: 2
+  organism_count: 2
   score: 1.9047
   source: eggnog
   specificity_rank: 1
@@ -1544,25 +1563,6 @@ rows:
     protein turnover, chaperones
   genera:
   - Prochlorococcus
-  group_id: eggnog:1MMWD@1212
-  group_name: 1MMWD@1212
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.9047
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- consensus_gene_name: ureE
-  consensus_product: urease accessory protein UreE
-  description: Involved in urease metallocenter assembly. Binds nickel. Probably functions
-    as a nickel donor during metallocenter assembly
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
-    intermediary metabolism > Nitrogen metabolism; Post-translational modification,
-    protein turnover, chaperones
-  genera:
-  - Prochlorococcus
   group_id: eggnog:1G6TF@1117
   group_name: 1G6TF@1117
   has_cross_genus_members: single_genus
@@ -1572,17 +1572,18 @@ rows:
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
-- consensus_gene_name: urtD
-  consensus_product: ABC-type urea transporter, ATP-binding component UrtD
-  description: Branched-chain amino acid ATP-binding cassette transporter
+- consensus_gene_name: ureF
+  consensus_product: urease accessory protein UreF
+  description: nickel cation binding
   functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines
+    conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
+    intermediary metabolism > Nitrogen metabolism; Post-translational modification,
+    protein turnover, chaperones
   genera:
   - Prochlorococcus
   - Synechococcus
-  group_id: eggnog:COG4674@2
-  group_name: COG4674@2
+  group_id: eggnog:COG0830@2
+  group_name: COG0830@2
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
@@ -1607,37 +1608,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: ureE
-  consensus_product: urease accessory protein UreE
-  description: enzyme active site formation
+- consensus_gene_name: urtD
+  consensus_product: ABC-type urea transporter, ATP-binding component UrtD
+  description: Branched-chain amino acid ATP-binding cassette transporter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
-    intermediary metabolism > Nitrogen metabolism; Post-translational modification,
-    protein turnover, chaperones
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines
   genera:
   - Prochlorococcus
   - Synechococcus
-  group_id: eggnog:COG2371@2
-  group_name: COG2371@2
-  has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.9047
-  source: eggnog
-  specificity_rank: 3
-  taxonomic_level: Bacteria
-- consensus_gene_name: ureF
-  consensus_product: urease accessory protein UreF
-  description: nickel cation binding
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
-    intermediary metabolism > Nitrogen metabolism; Post-translational modification,
-    protein turnover, chaperones
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  group_id: eggnog:COG0830@2
-  group_name: COG0830@2
+  group_id: eggnog:COG4674@2
+  group_name: COG4674@2
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
@@ -1664,39 +1645,25 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: rutC
-  consensus_product: pyrimidine utilization protein C
-  description: May reduce aminoacrylate peracid to aminoacrylate. Required to remove
-    a toxic intermediate produce by the pyrimidine nitrogen degradation
-  functional_description: Translation, ribosomal structure and biogenesis
-  genera:
-  - Alteromonas
-  group_id: eggnog:46B00@72275
-  group_name: 46B00@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.8759
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- consensus_gene_name: nadE
-  consensus_product: NAD+ synthase (glutamine-hydrolysing)
-  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
-    L-glutamine as a nitrogen source
-  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
-    > Pyridine nucleotides (NAD, NADP); Coenzyme transport and metabolism
+- consensus_gene_name: ureE
+  consensus_product: urease accessory protein UreE
+  description: enzyme active site formation
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
+    intermediary metabolism > Nitrogen metabolism; Post-translational modification,
+    protein turnover, chaperones
   genera:
   - Prochlorococcus
-  group_id: eggnog:1MM58@1212
-  group_name: 1MM58@1212
-  has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
-  score: 1.8759
+  - Synechococcus
+  group_id: eggnog:COG2371@2
+  group_name: COG2371@2
+  has_cross_genus_members: cross_genus
+  member_count: 9
+  organism_count: 9
+  score: 1.9047
   source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
+  specificity_rank: 3
+  taxonomic_level: Bacteria
 - consensus_gene_name: nadE
   consensus_product: NAD+ synthase (glutamine-hydrolysing)
   description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
@@ -1714,6 +1681,39 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
+- consensus_gene_name: nadE
+  consensus_product: NAD+ synthase (glutamine-hydrolysing)
+  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
+    L-glutamine as a nitrogen source
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Pyridine nucleotides (NAD, NADP); Coenzyme transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MM58@1212
+  group_name: 1MM58@1212
+  has_cross_genus_members: single_genus
+  member_count: 8
+  organism_count: 8
+  score: 1.8759
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: rutC
+  consensus_product: pyrimidine utilization protein C
+  description: May reduce aminoacrylate peracid to aminoacrylate. Required to remove
+    a toxic intermediate produce by the pyrimidine nitrogen degradation
+  functional_description: Translation, ribosomal structure and biogenesis
+  genera:
+  - Alteromonas
+  group_id: eggnog:46B00@72275
+  group_name: 46B00@72275
+  has_cross_genus_members: single_genus
+  member_count: 3
+  organism_count: 3
+  score: 1.8759
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
 - consensus_gene_name: null
   consensus_product: hypothetical protein
   description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
@@ -1787,21 +1787,22 @@ rows:
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
 - consensus_gene_name: glmS
-  consensus_product: glutamine--fructose-6-phosphate transaminase (isomerizing)
+  consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
   description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
     into glucosamine-6P using glutamine as a nitrogen source
-  functional_description: Cell wall/membrane/envelope biogenesis
+  functional_description: Amino acid biosynthesis; Central intermediary metabolism
+    > Amino sugars; Cell wall/membrane/envelope biogenesis
   genera:
-  - Alteromonas
-  group_id: eggnog:464V8@72275
-  group_name: 464V8@72275
+  - Synechococcus
+  group_id: eggnog:1GZCN@1129
+  group_name: 1GZCN@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
+  member_count: 2
+  organism_count: 2
   score: 1.8176
   source: eggnog
   specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
+  taxonomic_level: Synechococcus
 - consensus_gene_name: glmS
   consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
   description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
@@ -1820,25 +1821,24 @@ rows:
   specificity_rank: 1
   taxonomic_level: Prochloraceae
 - consensus_gene_name: glmS
-  consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
+  consensus_product: glutamine--fructose-6-phosphate transaminase (isomerizing)
   description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
     into glucosamine-6P using glutamine as a nitrogen source
-  functional_description: Amino acid biosynthesis; Central intermediary metabolism
-    > Amino sugars; Cell wall/membrane/envelope biogenesis
+  functional_description: Cell wall/membrane/envelope biogenesis
   genera:
-  - Synechococcus
-  group_id: eggnog:1GZCN@1129
-  group_name: 1GZCN@1129
+  - Alteromonas
+  group_id: eggnog:464V8@72275
+  group_name: 464V8@72275
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
+  member_count: 3
+  organism_count: 3
   score: 1.8176
   source: eggnog
   specificity_rank: 1
-  taxonomic_level: Synechococcus
-- consensus_gene_name: moaD
-  consensus_product: molydbenum cofactor biosynthesis protein D (molybdopterin converting
-    factor small subunit)
+  taxonomic_level: Alteromonadaceae
+- consensus_gene_name: moaE
+  consensus_product: molybdenum cofactor biosynthesis protein E (molydbopterin converting
+    factor large subunit)
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1846,8 +1846,26 @@ rows:
     Coenzyme transport and metabolism
   genera:
   - Synechococcus
-  group_id: cyanorak:CK_00001749
-  group_name: CK_00001749
+  group_id: cyanorak:CK_00001671
+  group_name: CK_00001671
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.7927
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: moaA
+  consensus_product: molybdenum cofactor biosynthesis protein A
+  description: null
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: cyanorak:CK_00001678
+  group_name: CK_00001678
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
@@ -1873,8 +1891,8 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moaA
-  consensus_product: molybdenum cofactor biosynthesis protein A
+- consensus_gene_name: moeA
+  consensus_product: molybdopterin biosynthesis protein MoeA
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1882,8 +1900,27 @@ rows:
     Coenzyme transport and metabolism
   genera:
   - Synechococcus
-  group_id: cyanorak:CK_00001678
-  group_name: CK_00001678
+  group_id: cyanorak:CK_00001672
+  group_name: CK_00001672
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.7927
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: moaD
+  consensus_product: molydbenum cofactor biosynthesis protein D (molybdopterin converting
+    factor small subunit)
+  description: null
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: cyanorak:CK_00001749
+  group_name: CK_00001749
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
@@ -1910,54 +1947,18 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moaE
-  consensus_product: molybdenum cofactor biosynthesis protein E (molydbopterin converting
-    factor large subunit)
-  description: null
+- consensus_gene_name: moaD
+  consensus_product: molydbenum cofactor biosynthesis protein D (molybdopterin converting
+    factor small subunit)
+  description: Molybdopterin converting factor small subunit
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
     and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
     Coenzyme transport and metabolism
   genera:
   - Synechococcus
-  group_id: cyanorak:CK_00001671
-  group_name: CK_00001671
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7927
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: moeA
-  consensus_product: molybdopterin biosynthesis protein MoeA
-  description: null
-  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
-    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
-    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
-    Coenzyme transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: cyanorak:CK_00001672
-  group_name: CK_00001672
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7927
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: moeA
-  consensus_product: molybdopterin biosynthesis protein MoeA
-  description: Molybdopterin biosynthesis
-  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
-    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
-    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
-    Coenzyme transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GYHD@1129
-  group_name: 1GYHD@1129
+  group_id: eggnog:1H1FR@1129
+  group_name: 1H1FR@1129
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
@@ -1984,18 +1985,36 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: moaD
-  consensus_product: molydbenum cofactor biosynthesis protein D (molybdopterin converting
-    factor small subunit)
-  description: Molybdopterin converting factor small subunit
+- consensus_gene_name: moaA
+  consensus_product: molybdenum cofactor biosynthesis protein A
+  description: Catalyzes the cyclization of GTP to (8S)-3^,8-cyclo-7,8- dihydroguanosine
+    5^-triphosphate
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
     and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
     Coenzyme transport and metabolism
   genera:
   - Synechococcus
-  group_id: eggnog:1H1FR@1129
-  group_name: 1H1FR@1129
+  group_id: eggnog:1GZFP@1129
+  group_name: 1GZFP@1129
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.7927
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- consensus_gene_name: moeA
+  consensus_product: molybdopterin biosynthesis protein MoeA
+  description: Molybdopterin biosynthesis
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYHD@1129
+  group_name: 1GYHD@1129
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
@@ -2021,25 +2040,6 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: moaA
-  consensus_product: molybdenum cofactor biosynthesis protein A
-  description: Catalyzes the cyclization of GTP to (8S)-3^,8-cyclo-7,8- dihydroguanosine
-    5^-triphosphate
-  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
-    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
-    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
-    Coenzyme transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GZFP@1129
-  group_name: 1GZFP@1129
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7927
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
 - consensus_gene_name: moaC
   consensus_product: molybdenum cofactor biosynthesis protein C
   description: Catalyzes the conversion of (8S)-3^,8-cyclo-7,8- dihydroguanosine 5^-triphosphate
@@ -2059,8 +2059,8 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: urtE
-  consensus_product: ABC-type urea transporter, ATPase component UrtE
+- consensus_gene_name: urtC
+  consensus_product: ABC-type urea transporter, membrane component
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2069,8 +2069,8 @@ rows:
   genera:
   - Prochlorococcus
   - Synechococcus
-  group_id: cyanorak:CK_00008074
-  group_name: CK_00008074
+  group_id: cyanorak:CK_00001366
+  group_name: CK_00001366
   has_cross_genus_members: cross_genus
   member_count: 9
   organism_count: 9
@@ -2116,8 +2116,8 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: urtC
-  consensus_product: ABC-type urea transporter, membrane component
+- consensus_gene_name: urtE
+  consensus_product: ABC-type urea transporter, ATPase component UrtE
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2126,8 +2126,8 @@ rows:
   genera:
   - Prochlorococcus
   - Synechococcus
-  group_id: cyanorak:CK_00001366
-  group_name: CK_00001366
+  group_id: cyanorak:CK_00008074
+  group_name: CK_00008074
   has_cross_genus_members: cross_genus
   member_count: 9
   organism_count: 9
@@ -2135,6 +2135,117 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- consensus_gene_name: urtA
+  consensus_product: ABC-type urea transporter, substrate binding component
+  description: ABC transporter
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
+    Amino acid transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYF7@1129
+  group_name: 1GYF7@1129
+  has_cross_genus_members: single_genus
+  member_count: 3
+  organism_count: 2
+  score: 1.7251
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- consensus_gene_name: urtA
+  consensus_product: ABC-type urea transporter, substrate binding component
+  description: substrate binding protein
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
+    Amino acid transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MKCA@1212
+  group_name: 1MKCA@1212
+  has_cross_genus_members: single_genus
+  member_count: 8
+  organism_count: 8
+  score: 1.7251
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: urtB
+  consensus_product: ABC-type urea transporter, permease component
+  description: Belongs to the binding-protein-dependent transport system permease
+    family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
+    Amino acid transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MKIY@1212
+  group_name: 1MKIY@1212
+  has_cross_genus_members: single_genus
+  member_count: 8
+  organism_count: 8
+  score: 1.7251
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: urtC
+  consensus_product: ABC-type urea transporter, membrane component
+  description: Belongs to the binding-protein-dependent transport system permease
+    family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
+    Amino acid transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MKTH@1212
+  group_name: 1MKTH@1212
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.7251
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: urtE
+  consensus_product: ABC-type urea transporter, ATPase component UrtE
+  description: ABC transporter, ATP-binding protein
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
+    Amino acid transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYQZ@1129
+  group_name: 1GYQZ@1129
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.7251
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- consensus_gene_name: urtC
+  consensus_product: ABC-type urea transporter, membrane component
+  description: Belongs to the binding-protein-dependent transport system permease
+    family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
+    Inorganic ion transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYNB@1129
+  group_name: 1GYNB@1129
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.7251
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - consensus_gene_name: urtB
   consensus_product: ABC-type urea transporter, permease component
   description: Belongs to the binding-protein-dependent transport system permease
@@ -2172,136 +2283,6 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: urtC
-  consensus_product: ABC-type urea transporter, membrane component
-  description: Belongs to the binding-protein-dependent transport system permease
-    family
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
-    Inorganic ion transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GYNB@1129
-  group_name: 1GYNB@1129
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7251
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- consensus_gene_name: urtE
-  consensus_product: ABC-type urea transporter, ATPase component UrtE
-  description: ABC transporter, ATP-binding protein
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
-    Amino acid transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GYQZ@1129
-  group_name: 1GYQZ@1129
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7251
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- consensus_gene_name: urtA
-  consensus_product: ABC-type urea transporter, substrate binding component
-  description: ABC transporter
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
-    Amino acid transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GYF7@1129
-  group_name: 1GYF7@1129
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 2
-  score: 1.7251
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- consensus_gene_name: urtB
-  consensus_product: ABC-type urea transporter, permease component
-  description: Belongs to the binding-protein-dependent transport system permease
-    family
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
-    Amino acid transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKIY@1212
-  group_name: 1MKIY@1212
-  has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
-  score: 1.7251
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- consensus_gene_name: urtA
-  consensus_product: ABC-type urea transporter, substrate binding component
-  description: substrate binding protein
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
-    Amino acid transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKCA@1212
-  group_name: 1MKCA@1212
-  has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
-  score: 1.7251
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- consensus_gene_name: urtC
-  consensus_product: ABC-type urea transporter, membrane component
-  description: Belongs to the binding-protein-dependent transport system permease
-    family
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
-    Amino acid transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKTH@1212
-  group_name: 1MKTH@1212
-  has_cross_genus_members: single_genus
-  member_count: 7
-  organism_count: 7
-  score: 1.7251
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- consensus_gene_name: urtE
-  consensus_product: ABC-type urea transporter, ATPase component UrtE
-  description: branched-chain amino acid transmembrane transporter activity
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
-    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
-    Amino acid transport and metabolism
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  group_id: eggnog:COG0410@2
-  group_name: COG0410@2
-  has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.7251
-  source: eggnog
-  specificity_rank: 3
-  taxonomic_level: Bacteria
 - consensus_gene_name: urtB
   consensus_product: ABC-type urea transporter, permease component
   description: leucine import across plasma membrane
@@ -2333,6 +2314,25 @@ rows:
   - Synechococcus
   group_id: eggnog:COG4177@2
   group_name: COG4177@2
+  has_cross_genus_members: cross_genus
+  member_count: 10
+  organism_count: 10
+  score: 1.7251
+  source: eggnog
+  specificity_rank: 3
+  taxonomic_level: Bacteria
+- consensus_gene_name: urtE
+  consensus_product: ABC-type urea transporter, ATPase component UrtE
+  description: branched-chain amino acid transmembrane transporter activity
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Transport and binding proteins > Amino acids, peptides and amines;
+    Amino acid transport and metabolism
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  group_id: eggnog:COG0410@2
+  group_name: COG0410@2
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
@@ -2573,23 +2573,6 @@ rows:
   taxonomic_level: Synechococcus
 - consensus_gene_name: carA
   consensus_product: carbamoyl-phosphate synthase small subunit
-  description: Belongs to the CarA family
-  functional_description: Central intermediary metabolism > Nitrogen metabolism; Purines,
-    pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide biosynthesis;
-    Nucleotide transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKUE@1212
-  group_name: 1MKUE@1212
-  has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
-  score: 1.4957
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- consensus_gene_name: carA
-  consensus_product: carbamoyl-phosphate synthase small subunit
   description: Carbamoyl-phosphate synthetase glutamine chain
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Purines,
     pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide biosynthesis;
@@ -2605,6 +2588,23 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
+- consensus_gene_name: carA
+  consensus_product: carbamoyl-phosphate synthase small subunit
+  description: Belongs to the CarA family
+  functional_description: Central intermediary metabolism > Nitrogen metabolism; Purines,
+    pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide biosynthesis;
+    Nucleotide transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MKUE@1212
+  group_name: 1MKUE@1212
+  has_cross_genus_members: single_genus
+  member_count: 8
+  organism_count: 8
+  score: 1.4957
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
 - consensus_gene_name: carA
   consensus_product: carbamoyl-phosphate synthase small subunit
   description: carbamoyl-phosphate synthase (glutamine-hydrolyzing) activity
@@ -2680,21 +2680,21 @@ rows:
   taxonomic_level: curated
 - consensus_gene_name: glnA
   consensus_product: glutamine synthetase, type I
-  description: glutamine synthetase
+  description: Glutamine synthetase
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Central intermediary metabolism > Nitrogen metabolism; Coenzyme transport
     and metabolism
   genera:
-  - Synechococcus
-  group_id: eggnog:1GYJX@1129
-  group_name: 1GYJX@1129
+  - Prochlorococcus
+  group_id: eggnog:1MKS0@1212
+  group_name: 1MKS0@1212
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
+  member_count: 8
+  organism_count: 8
   score: 1.4483
   source: eggnog
   specificity_rank: 1
-  taxonomic_level: Synechococcus
+  taxonomic_level: Prochloraceae
 - consensus_gene_name: cysK
   consensus_product: O-acetylserine sulfhydrylase A
   description: Belongs to the cysteine synthase cystathionine beta- synthase family
@@ -2714,21 +2714,21 @@ rows:
   taxonomic_level: Prochloraceae
 - consensus_gene_name: glnA
   consensus_product: glutamine synthetase, type I
-  description: Glutamine synthetase
+  description: glutamine synthetase
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Central intermediary metabolism > Nitrogen metabolism; Coenzyme transport
     and metabolism
   genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKS0@1212
-  group_name: 1MKS0@1212
+  - Synechococcus
+  group_id: eggnog:1GYJX@1129
+  group_name: 1GYJX@1129
   has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
+  member_count: 2
+  organism_count: 2
   score: 1.4483
   source: eggnog
   specificity_rank: 1
-  taxonomic_level: Prochloraceae
+  taxonomic_level: Synechococcus
 - consensus_gene_name: glnA
   consensus_product: glutamine synthetase, type I
   description: glutamine synthetase
@@ -2776,23 +2776,6 @@ rows:
   description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
     of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
     to form an ureido ring
-  functional_description: Coenzyme transport and metabolism
-  genera:
-  - Alteromonas
-  group_id: eggnog:466IJ@72275
-  group_name: 466IJ@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.4202
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- consensus_gene_name: bioD
-  consensus_product: dethiobiotin synthase
-  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
-    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
-    to form an ureido ring
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Vitamins > Biotin (b7); Coenzyme transport and metabolism
   genera:
@@ -2806,6 +2789,23 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
+- consensus_gene_name: bioD
+  consensus_product: dethiobiotin synthase
+  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
+    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
+    to form an ureido ring
+  functional_description: Coenzyme transport and metabolism
+  genera:
+  - Alteromonas
+  group_id: eggnog:466IJ@72275
+  group_name: 466IJ@72275
+  has_cross_genus_members: single_genus
+  member_count: 3
+  organism_count: 3
+  score: 1.4202
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
 - consensus_gene_name: bioD
   consensus_product: dethiobiotin synthase
   description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
@@ -2897,23 +2897,6 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: cynA
-  consensus_product: cyanate ABC transporter, substrate-binding protein
-  description: NMT1-like family
-  functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
-    and binding proteins > Amino acids, peptides and amines; Inorganic ion transport
-    and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1H41C@1129
-  group_name: 1H41C@1129
-  has_cross_genus_members: single_genus
-  member_count: 1
-  organism_count: 1
-  score: 1.4039
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
 - consensus_gene_name: amt1
   consensus_product: ammonium transporter
   description: Ammonium Transporter
@@ -2927,6 +2910,23 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
+  score: 1.4039
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- consensus_gene_name: cynA
+  consensus_product: cyanate ABC transporter, substrate-binding protein
+  description: NMT1-like family
+  functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
+    and binding proteins > Amino acids, peptides and amines; Inorganic ion transport
+    and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1H41C@1129
+  group_name: 1H41C@1129
+  has_cross_genus_members: single_genus
+  member_count: 1
+  organism_count: 1
   score: 1.4039
   source: eggnog
   specificity_rank: 1
@@ -3056,40 +3056,6 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: null
-  consensus_product: O-succinylhomoserine(thiol)-lyase, MetB-like protein
-  description: COG0626 Cystathionine beta-lyases cystathionine gamma-synthases
-  functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
-    Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
-    transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GZ2F@1129
-  group_name: 1GZ2F@1129
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.3227
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- consensus_gene_name: PMN2A_RS02170
-  consensus_product: O-succinylhomoserine(thiol)-lyase, MetB-like protein
-  description: Alternative locus ID
-  functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
-    Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
-    transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKHQ@1212
-  group_name: 1MKHQ@1212
-  has_cross_genus_members: single_genus
-  member_count: 8
-  organism_count: 8
-  score: 1.3227
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
 - consensus_gene_name: metB
   consensus_product: O-succinylhomoserine(thiol)-lyase
   description: Alternative locus ID
@@ -3107,6 +3073,40 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
+- consensus_gene_name: PMN2A_RS02170
+  consensus_product: O-succinylhomoserine(thiol)-lyase, MetB-like protein
+  description: Alternative locus ID
+  functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
+    Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
+    transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MKHQ@1212
+  group_name: 1MKHQ@1212
+  has_cross_genus_members: single_genus
+  member_count: 8
+  organism_count: 8
+  score: 1.3227
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- consensus_gene_name: null
+  consensus_product: O-succinylhomoserine(thiol)-lyase, MetB-like protein
+  description: COG0626 Cystathionine beta-lyases cystathionine gamma-synthases
+  functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
+    Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
+    transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZ2F@1129
+  group_name: 1GZ2F@1129
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.3227
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - consensus_gene_name: metB
   consensus_product: O-succinylhomoserine(thiol)-lyase
   description: COG0626 Cystathionine beta-lyases cystathionine gamma-synthases
@@ -3204,23 +3204,6 @@ rows:
   taxonomic_level: curated
 - consensus_gene_name: metY
   consensus_product: O-acetylhomoserine aminocarboxypropyltransferase
-  description: O-acetylhomoserine
-  functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
-    Lys, Met, Thr); Amino acid biosynthesis > Serine family (Ser, Gly, Cys); Central
-    intermediary metabolism > Nitrogen metabolism; Amino acid transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GZNU@1129
-  group_name: 1GZNU@1129
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.0742
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- consensus_gene_name: metY
-  consensus_product: O-acetylhomoserine aminocarboxypropyltransferase
   description: Alternative locus ID
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Amino acid biosynthesis > Serine family (Ser, Gly, Cys); Central
@@ -3236,6 +3219,23 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
+- consensus_gene_name: metY
+  consensus_product: O-acetylhomoserine aminocarboxypropyltransferase
+  description: O-acetylhomoserine
+  functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
+    Lys, Met, Thr); Amino acid biosynthesis > Serine family (Ser, Gly, Cys); Central
+    intermediary metabolism > Nitrogen metabolism; Amino acid transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZNU@1129
+  group_name: 1GZNU@1129
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.0742
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - consensus_gene_name: metY
   consensus_product: O-acetylhomoserine aminocarboxypropyltransferase
   description: o-acetylhomoserine
@@ -3311,42 +3311,6 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: metC
-  consensus_product: cystathionine beta-lyase family aluminum resistance protein
-  description: Cystathionine beta-lyase family protein (Involved in aluminum resistance)
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Trace metals; Central intermediary metabolism
-    > Nitrogen metabolism; Transport and binding proteins > Cations and iron carrying
-    compounds; Inorganic ion transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GYMJ@1129
-  group_name: 1GYMJ@1129
-  has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.0496
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- consensus_gene_name: focA
-  consensus_product: nitrite transporter, FNT family
-  description: COG2116 Formate nitrite family of transporters
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Iron; Cellular processes > Adaptation/acclimation
-    to atypical conditions and detoxification > Nitrogen; Transport and binding proteins
-    > Anions; Inorganic ion transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GZJ1@1129
-  group_name: 1GZJ1@1129
-  has_cross_genus_members: single_genus
-  member_count: 1
-  organism_count: 1
-  score: 1.0496
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
 - consensus_gene_name: focA
   consensus_product: nitrite transporter, FNT family
   description: Formate nitrite family
@@ -3365,6 +3329,42 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
+- consensus_gene_name: focA
+  consensus_product: nitrite transporter, FNT family
+  description: COG2116 Formate nitrite family of transporters
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Iron; Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen; Transport and binding proteins
+    > Anions; Inorganic ion transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZJ1@1129
+  group_name: 1GZJ1@1129
+  has_cross_genus_members: single_genus
+  member_count: 1
+  organism_count: 1
+  score: 1.0496
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- consensus_gene_name: metC
+  consensus_product: cystathionine beta-lyase family aluminum resistance protein
+  description: Cystathionine beta-lyase family protein (Involved in aluminum resistance)
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Trace metals; Central intermediary metabolism
+    > Nitrogen metabolism; Transport and binding proteins > Cations and iron carrying
+    compounds; Inorganic ion transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYMJ@1129
+  group_name: 1GYMJ@1129
+  has_cross_genus_members: single_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.0496
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - consensus_gene_name: metC
   consensus_product: cystathionine beta-lyase family aluminum resistance protein
   description: CystaTHIonine beta-lyase family protein involved in aluminum resistance

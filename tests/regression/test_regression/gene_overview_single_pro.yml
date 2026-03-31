@@ -11,7 +11,7 @@ rows:
   - Prochlorococcus
   - Synechococcus
   closest_ortholog_group_size: 9
-  expression_edge_count: 36
+  expression_edge_count: 35
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM1428
