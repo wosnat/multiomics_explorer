@@ -12,6 +12,7 @@ Object-typed columns are processed automatically:
 
 from __future__ import annotations
 
+import math
 import warnings
 from typing import Any
 
@@ -150,8 +151,6 @@ def _process_object_column(df: pd.DataFrame, col: str) -> pd.DataFrame:
 def _is_scalar_nan(value: Any) -> bool:
     """Return True if *value* is a float NaN (but not a list/dict)."""
     if isinstance(value, float):
-        import math
-
         return math.isnan(value)
     return False
 
