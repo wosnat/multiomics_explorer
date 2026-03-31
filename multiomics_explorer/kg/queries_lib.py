@@ -1597,9 +1597,9 @@ def build_differential_expression_by_gene(
 ) -> tuple[str, dict]:
     """Build detail Cypher for differential_expression_by_gene.
 
-    RETURN keys (compact — 11): locus_tag, gene_name,
+    RETURN keys (compact — 13): locus_tag, gene_name,
     experiment_id, treatment_type, timepoint, timepoint_hours, timepoint_order,
-    log2fc, padj, rank, expression_status.
+    log2fc, padj, rank, rank_up, rank_down, expression_status.
     RETURN keys (verbose): adds product, experiment_name, treatment,
     gene_category, omics_type, coculture_partner, table_scope,
     table_scope_detail.
@@ -1647,6 +1647,8 @@ def build_differential_expression_by_gene(
         "       r.log2_fold_change AS log2fc,\n"
         "       r.adjusted_p_value AS padj,\n"
         "       r.rank_by_effect AS rank,\n"
+        "       r.rank_up AS rank_up,\n"
+        "       r.rank_down AS rank_down,\n"
         "       r.expression_status AS expression_status"
         f"{verbose_cols}\n"
         "ORDER BY ABS(r.log2_fold_change) DESC, g.locus_tag ASC,"

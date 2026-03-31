@@ -1891,6 +1891,12 @@ class TestBuildDifferentialExpressionByGene:
         assert "SKIP" not in cypher
         assert "offset" not in params
 
+    def test_returns_rank_up_rank_down(self):
+        """Detail query includes directional rank columns."""
+        cypher, _ = build_differential_expression_by_gene()
+        assert "rank_up" in cypher
+        assert "rank_down" in cypher
+
 
 class TestBuildSearchHomologGroups:
     """Tests for build_search_homolog_groups."""

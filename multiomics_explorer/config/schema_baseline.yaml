@@ -1,5 +1,5 @@
 version: 1
-captured_at: '2026-03-29T08:45:34.334676+00:00'
+captured_at: '2026-03-31T04:56:43.143770+00:00'
 schema:
   nodes:
     AnatomicalEntity:
@@ -10,10 +10,15 @@ schema:
     BiologicalEntity:
       properties:
         annotation_score: float
+        catalytic_activities: list
         cofactor_names: list
+        ec_numbers: list
         eggnog_ids: string
         gene_names: list
+        gene_symbol: string
         go_biological_processes: list
+        go_cellular_components: list
+        go_molecular_functions: list
         id: string
         is_reviewed: string
         keyword_ids: list
@@ -27,7 +32,7 @@ schema:
         proteome_ids: list
         refseq_ids: list
         sequence_length: int
-        string_ids: string
+        signal_peptide: string
         transmembrane_regions: list
     BiologicalProcess:
       properties:
@@ -66,10 +71,31 @@ schema:
         preferred_id: string
     Entity:
       properties:
-        code: string
+        annotation_score: float
+        catalytic_activities: list
+        cofactor_names: list
+        ec_numbers: list
+        eggnog_ids: string
+        gene_names: list
+        gene_symbol: string
+        go_biological_processes: list
+        go_cellular_components: list
+        go_molecular_functions: list
         id: string
-        name: string
+        is_reviewed: string
+        keyword_ids: list
+        keywords: list
+        locus_tag: string
+        molecular_mass: int
+        pfam_ids: list
         preferred_id: string
+        protein_family: string
+        protein_synonyms: string
+        proteome_ids: list
+        refseq_ids: list
+        sequence_length: int
+        signal_peptide: string
+        transmembrane_regions: list
     Experiment:
       properties:
         coculture_partner: string
@@ -106,7 +132,7 @@ schema:
         alternate_functional_descriptions: list
         annotation_quality: int
         annotation_types: list
-        cazy_ids: list
+        catalytic_activities: list
         closest_ortholog_genera: list
         closest_ortholog_group_size: int
         end: int
@@ -209,10 +235,31 @@ schema:
         preferred_id: string
     NamedThing:
       properties:
-        code: string
+        annotation_score: float
+        catalytic_activities: list
+        cofactor_names: list
+        ec_numbers: list
+        eggnog_ids: string
+        gene_names: list
+        gene_symbol: string
+        go_biological_processes: list
+        go_cellular_components: list
+        go_molecular_functions: list
         id: string
-        name: string
+        is_reviewed: string
+        keyword_ids: list
+        keywords: list
+        locus_tag: string
+        molecular_mass: int
+        pfam_ids: list
         preferred_id: string
+        protein_family: string
+        protein_synonyms: string
+        proteome_ids: list
+        refseq_ids: list
+        sequence_length: int
+        signal_peptide: string
+        transmembrane_regions: list
     OrganismTaxon:
       properties:
         clade: string
@@ -272,10 +319,15 @@ schema:
     Polypeptide:
       properties:
         annotation_score: float
+        catalytic_activities: list
         cofactor_names: list
+        ec_numbers: list
         eggnog_ids: string
         gene_names: list
+        gene_symbol: string
         go_biological_processes: list
+        go_cellular_components: list
+        go_molecular_functions: list
         id: string
         is_reviewed: string
         keyword_ids: list
@@ -289,15 +341,20 @@ schema:
         proteome_ids: list
         refseq_ids: list
         sequence_length: int
-        string_ids: string
+        signal_peptide: string
         transmembrane_regions: list
     Protein:
       properties:
         annotation_score: float
+        catalytic_activities: list
         cofactor_names: list
+        ec_numbers: list
         eggnog_ids: string
         gene_names: list
+        gene_symbol: string
         go_biological_processes: list
+        go_cellular_components: list
+        go_molecular_functions: list
         id: string
         is_reviewed: string
         keyword_ids: list
@@ -311,7 +368,7 @@ schema:
         proteome_ids: list
         refseq_ids: list
         sequence_length: int
-        string_ids: string
+        signal_peptide: string
         transmembrane_regions: list
     Publication:
       properties:
