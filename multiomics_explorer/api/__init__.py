@@ -19,6 +19,7 @@ from multiomics_explorer.api.functions import (
     search_ontology,
     differential_expression_by_gene,
     differential_expression_by_ortholog,
+    gene_response_profile,
 )
 
 __all__ = [
@@ -40,4 +41,5 @@ __all__ = [
     "search_ontology",
     "differential_expression_by_gene",
     "differential_expression_by_ortholog",
+    "gene_response_profile",
 ]

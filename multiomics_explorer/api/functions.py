@@ -65,6 +65,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_ortholog_results,
     build_differential_expression_by_ortholog_membership_counts,
     build_differential_expression_by_ortholog_diagnostics,
+    build_gene_response_profile_envelope,
+    build_gene_response_profile,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -1855,3 +1857,170 @@ def differential_expression_by_ortholog(
         "results": results,
     }
     return envelope
+
+
+def gene_response_profile(
+    locus_tags: list[str],
+    organism: str | None = None,
+    treatment_types: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    group_by: str = "treatment_type",
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Cross-experiment gene-level response profile.
+
+    Returns one result per gene summarizing its expression response
+    across all experiments, grouped by treatment_type or experiment.
+
+    Raises:
+        ValueError: if locus_tags is empty, group_by is invalid,
+            or organism validation fails.
+
+    Returns:
+        dict with keys: organism_name, genes_queried, genes_with_response,
+        not_found, no_expression, returned, offset, truncated, results.
+        Each result has: locus_tag, gene_name, product, gene_category,
+        groups_responded, groups_not_responded, groups_not_known,
+        response_summary.
+    """
+    if not locus_tags:
+        raise ValueError(
+            "locus_tags must not be empty. "
+            "Use resolve_gene or gene_overview to find locus_tags."
+        )
+    if group_by not in ("treatment_type", "experiment"):
+        raise ValueError(
+            f"group_by must be 'treatment_type' or 'experiment', got '{group_by}'"
+        )
+
+    conn = _default_conn(conn)
+
+    # Resolve organism upfront — validates single-organism constraint
+    organism_name = _validate_organism_inputs(
+        organism=organism,
+        locus_tags=locus_tags,
+        experiment_ids=experiment_ids,
+        conn=conn,
+    )
+
+    # Q1: Envelope — gene existence, expression flags, group totals
+    env_cypher, env_params = build_gene_response_profile_envelope(
+        locus_tags=locus_tags,
+        organism_name=organism_name,
+        treatment_types=treatment_types,
+        experiment_ids=experiment_ids,
+        group_by=group_by,
+    )
+    env_row = conn.execute_query(env_cypher, **env_params)[0]
+
+    found_genes = env_row["found_genes"]
+    has_expression = set(env_row["has_expression"])
+    has_significant = set(env_row["has_significant"])
+    group_totals = {
+        gt["group_key"]: {
+            "experiments": gt["experiments"],
+            "timepoints": gt["timepoints"],
+        }
+        for gt in env_row["group_totals"]
+        if gt["group_key"] is not None
+    }
+
+    not_found = [lt for lt in locus_tags if lt not in found_genes]
+    no_expression = [lt for lt in found_genes if lt not in has_expression]
+    genes_with_response = len(has_significant)
+
+    # Q2: Aggregation — per gene x group detail (paginated)
+    genes_with_expr = [lt for lt in found_genes if lt in has_expression]
+    if genes_with_expr:
+        agg_cypher, agg_params = build_gene_response_profile(
+            locus_tags=genes_with_expr,
+            organism_name=organism_name,
+            treatment_types=treatment_types,
+            experiment_ids=experiment_ids,
+            group_by=group_by,
+            limit=limit,
+            offset=offset,
+        )
+        agg_rows = conn.execute_query(agg_cypher, **agg_params)
+    else:
+        agg_rows = []
+
+    # Pivot flat rows into per-gene nested structure
+    genes_dict: dict[str, dict] = {}
+    for row in agg_rows:
+        lt = row["locus_tag"]
+        if lt not in genes_dict:
+            genes_dict[lt] = {
+                "locus_tag": lt,
+                "gene_name": row["gene_name"],
+                "product": row["product"],
+                "gene_category": row["gene_category"],
+                "response_summary": {},
+            }
+        group_key = row["group_key"]
+        totals = group_totals.get(group_key, {"experiments": 0, "timepoints": 0})
+
+        entry: dict = {
+            "experiments_total": totals["experiments"],
+            "experiments_tested": row["experiments_tested"],
+            "experiments_up": row["experiments_up"],
+            "experiments_down": row["experiments_down"],
+            "timepoints_total": totals["timepoints"],
+            "timepoints_tested": row["timepoints_tested"],
+            "timepoints_up": row["timepoints_up"],
+            "timepoints_down": row["timepoints_down"],
+        }
+
+        # Directional rank/log2fc — only when experiments in that direction
+        rank_ups = [r for r in row["rank_ups"] if r is not None]
+        if rank_ups:
+            entry["up_best_rank"] = min(rank_ups)
+            entry["up_median_rank"] = statistics.median(rank_ups)
+            entry["up_max_log2fc"] = max(row["log2fcs_up"])
+
+        rank_downs = [r for r in row["rank_downs"] if r is not None]
+        if rank_downs:
+            entry["down_best_rank"] = min(rank_downs)
+            entry["down_median_rank"] = statistics.median(rank_downs)
+            entry["down_max_log2fc"] = min(row["log2fcs_down"])
+
+        genes_dict[lt]["response_summary"][group_key] = entry
+
+    # Build triage lists per gene
+    results = []
+    for gene in genes_dict.values():
+        rs = gene["response_summary"]
+        gene["groups_responded"] = [
+            gk for gk, v in rs.items()
+            if v["experiments_up"] > 0 or v["experiments_down"] > 0
+        ]
+        gene["groups_not_responded"] = [
+            gk for gk, v in rs.items()
+            if v["experiments_up"] == 0 and v["experiments_down"] == 0
+        ]
+        gene["groups_not_known"] = [
+            gk for gk in group_totals if gk not in rs
+        ]
+        results.append(gene)
+
+    # Determine truncation
+    truncated = (
+        len(results) + offset < len(genes_with_expr)
+        if limit is not None
+        else False
+    )
+
+    return {
+        "organism_name": organism_name,
+        "genes_queried": len(locus_tags),
+        "genes_with_response": genes_with_response,
+        "not_found": not_found,
+        "no_expression": no_expression,
+        "returned": len(results),
+        "offset": offset,
+        "truncated": truncated,
+        "results": results,
+    }

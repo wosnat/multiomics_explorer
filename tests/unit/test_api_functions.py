@@ -21,6 +21,7 @@ class TestTopLevelImports:
             gene_homologs,
             gene_ontology_terms,
             gene_overview,
+            gene_response_profile,
             genes_by_function,
             genes_by_ontology,
             gene_details,
@@ -2598,3 +2599,171 @@ class TestRunCypherLimitEdgeCases:
             api.run_cypher("MATCH (n) RETURN n limit 5", limit=10, conn=mock_conn)
         called_query = mock_conn.execute_query.call_args[0][0]
         assert called_query.count("limit") + called_query.count("LIMIT") == 1
+
+
+# ---------------------------------------------------------------------------
+# gene_response_profile
+# ---------------------------------------------------------------------------
+class TestGeneResponseProfile:
+    _ORGANISM = "Prochlorococcus marinus subsp. pastoris str. CCMP1986"
+
+    def _make_envelope_result(self, found=None, has_expression=None, has_significant=None, group_totals=None):
+        return [{
+            "found_genes": found or ["PMM0370"],
+            "has_expression": has_expression or ["PMM0370"],
+            "has_significant": has_significant or ["PMM0370"],
+            "group_totals": group_totals or [
+                {"group_key": "nitrogen_stress", "experiments": 4, "timepoints": 14},
+                {"group_key": "coculture", "experiments": 2, "timepoints": 6},
+            ],
+        }]
+
+    def _make_agg_rows(self):
+        return [
+            {
+                "locus_tag": "PMM0370", "gene_name": "cynA",
+                "product": "cyanate transporter", "gene_category": "Inorganic ion transport",
+                "group_key": "nitrogen_stress", "experiments_tested": 3,
+                "timepoints_tested": 8, "timepoints_up": 8, "timepoints_down": 0,
+                "rank_ups": [3, 5, 8, 10, 12, 7, 6, 9], "rank_downs": [],
+                "log2fcs_up": [5.7, 4.2, 3.1, 2.8, 2.5, 3.5, 3.8, 2.9], "log2fcs_down": [],
+                "experiments_up": 3, "experiments_down": 0,
+            },
+            {
+                "locus_tag": "PMM0370", "gene_name": "cynA",
+                "product": "cyanate transporter", "gene_category": "Inorganic ion transport",
+                "group_key": "coculture", "experiments_tested": 2,
+                "timepoints_tested": 5, "timepoints_up": 0, "timepoints_down": 5,
+                "rank_ups": [], "rank_downs": [12, 15, 14, 16, 18],
+                "log2fcs_up": [], "log2fcs_down": [-13.0, -10.2, -8.5, -7.1, -6.0],
+                "experiments_up": 0, "experiments_down": 2,
+            },
+        ]
+
+    def test_returns_dict_with_results(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(),
+            self._make_agg_rows(),
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        assert isinstance(result, dict)
+        for key in ["results", "genes_queried", "genes_with_response", "returned",
+                     "truncated", "not_found", "no_expression", "organism_name", "offset"]:
+            assert key in result
+
+    def test_not_found(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(found=["PMM0370"]),
+            self._make_agg_rows(),
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370", "FAKE999"], conn=mock_conn)
+        assert "FAKE999" in result["not_found"]
+
+    def test_no_expression(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(found=["PMM0370", "PMM1234"], has_expression=["PMM0370"]),
+            self._make_agg_rows(),
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370", "PMM1234"], conn=mock_conn)
+        assert "PMM1234" in result["no_expression"]
+
+    def test_response_summary_structure(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(),
+            self._make_agg_rows(),
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        gene = result["results"][0]
+        ns = gene["response_summary"]["nitrogen_stress"]
+        assert ns["experiments_total"] == 4
+        assert ns["experiments_tested"] == 3
+        assert ns["experiments_up"] == 3
+        assert ns["experiments_down"] == 0
+        assert ns["timepoints_total"] == 14
+        assert ns["timepoints_tested"] == 8
+        assert ns["timepoints_up"] == 8
+        assert ns["timepoints_down"] == 0
+
+    def test_directional_fields_present_when_up(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(),
+            self._make_agg_rows(),
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        ns = result["results"][0]["response_summary"]["nitrogen_stress"]
+        assert "up_best_rank" in ns
+        assert "up_median_rank" in ns
+        assert "up_max_log2fc" in ns
+        assert ns["up_best_rank"] == 3
+        assert ns["up_max_log2fc"] == 5.7
+
+    def test_directional_fields_absent_when_no_up(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(),
+            self._make_agg_rows(),
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        cc = result["results"][0]["response_summary"]["coculture"]
+        assert "up_best_rank" not in cc
+        assert "up_median_rank" not in cc
+        assert "up_max_log2fc" not in cc
+        assert "down_best_rank" in cc
+        assert cc["down_best_rank"] == 12
+
+    def test_triage_lists(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(),
+            self._make_agg_rows(),
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        gene = result["results"][0]
+        assert "nitrogen_stress" in gene["groups_responded"]
+        assert "coculture" in gene["groups_responded"]
+        assert gene["groups_not_responded"] == []
+        assert gene["groups_not_known"] == []
+
+    def test_groups_not_known(self, mock_conn):
+        agg_rows = [self._make_agg_rows()[0]]  # only nitrogen_stress
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(),
+            agg_rows,
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        gene = result["results"][0]
+        assert "coculture" in gene["groups_not_known"]
+
+    def test_pagination(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(
+                found=["PMM0001", "PMM0002", "PMM0003"],
+                has_significant=["PMM0001", "PMM0002", "PMM0003"],
+                has_expression=["PMM0001", "PMM0002", "PMM0003"],
+            ),
+            [
+                {**self._make_agg_rows()[0], "locus_tag": "PMM0001"},
+                {**self._make_agg_rows()[0], "locus_tag": "PMM0002"},
+            ],
+        ]
+        result = api.gene_response_profile(
+            locus_tags=["PMM0001", "PMM0002", "PMM0003"], limit=2, conn=mock_conn,
+        )
+        assert result["returned"] == 2
+        assert result["truncated"] is True
+        assert result["genes_queried"] == 3
+
+    def test_empty_locus_tags_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="locus_tags"):
+            api.gene_response_profile(locus_tags=[], conn=mock_conn)
+
+    def test_invalid_group_by_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="group_by"):
+            api.gene_response_profile(locus_tags=["PMM0370"], group_by="bad", conn=mock_conn)
