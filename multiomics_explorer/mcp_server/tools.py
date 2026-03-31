@@ -2394,3 +2394,149 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"gene_response_profile unexpected error: {e}")
             raise ToolError(f"Error in gene_response_profile: {e}")
+
+    # -----------------------------------------------------------------
+    # list_gene_clusters
+    # -----------------------------------------------------------------
+
+    class GeneClusterOrganismBreakdown(BaseModel):
+        organism_name: str
+        count: int
+
+    class GeneClusterTypeBreakdown(BaseModel):
+        cluster_type: str
+        count: int
+
+    class GeneClusterTreatmentBreakdown(BaseModel):
+        treatment_type: str
+        count: int
+
+    class GeneClusterOmicsBreakdown(BaseModel):
+        omics_type: str
+        count: int
+
+    class GeneClusterPublicationBreakdown(BaseModel):
+        publication_doi: str
+        count: int
+
+    class ListGeneClustersResult(BaseModel):
+        cluster_id: str
+        name: str
+        organism_name: str
+        cluster_type: str
+        treatment_type: list[str]
+        member_count: int
+        source_paper: str
+        score: float | None = None
+        # verbose-only
+        functional_description: str | None = None
+        behavioral_description: str | None = None
+        cluster_method: str | None = None
+        treatment: str | None = None
+        light_condition: str | None = None
+        experimental_context: str | None = None
+        peak_time_hours: float | None = None
+        period_hours: float | None = None
+        pub_doi: str | None = None
+
+    class ListGeneClustersResponse(BaseModel):
+        total_entries: int
+        total_matching: int
+        by_organism: list["GeneClusterOrganismBreakdown"]
+        by_cluster_type: list["GeneClusterTypeBreakdown"]
+        by_treatment_type: list["GeneClusterTreatmentBreakdown"]
+        by_omics_type: list["GeneClusterOmicsBreakdown"]
+        by_publication: list["GeneClusterPublicationBreakdown"]
+        score_max: float | None = None
+        score_median: float | None = None
+        returned: int
+        offset: int = 0
+        truncated: bool
+        results: list["ListGeneClustersResult"]
+
+    @mcp.tool(
+        tags={"clusters", "search"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def list_gene_clusters(
+        ctx: Context,
+        search_text: Annotated[str | None, Field(
+            description="Lucene full-text query over name, functional_description, "
+            "behavioral_description, experimental_context. Results ranked by score.",
+        )] = None,
+        organism: Annotated[str | None, Field(
+            description="Filter by organism (case-insensitive partial match).",
+        )] = None,
+        cluster_type: Annotated[str | None, Field(
+            description="Filter: 'diel_periodicity', 'stress_response', or 'expression_level'.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Filter by treatment type(s). E.g. ['nitrogen_stress'].",
+        )] = None,
+        omics_type: Annotated[str | None, Field(
+            description="Filter: 'MICROARRAY', 'RNASEQ', or 'PROTEOMICS'.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Filter by publication DOI(s).",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include functional_description, behavioral_description, "
+            "cluster_method, treatment, light_condition, experimental_context, "
+            "peak_time_hours, period_hours, pub_doi.",
+        )] = False,
+        limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0)] = 0,
+    ) -> ListGeneClustersResponse:
+        """Browse, search, and filter gene clusters.
+
+        Search across cluster names, functional descriptions, behavioral
+        descriptions, and experimental context. Filter by organism, cluster
+        type, treatment type, omics type, or publication.
+
+        Returns cluster IDs for use with genes_in_cluster.
+        """
+        await ctx.info(f"list_gene_clusters search_text={search_text!r} "
+                       f"organism={organism} limit={limit}")
+        try:
+            conn = _conn(ctx)
+            data = api.list_gene_clusters(
+                search_text=search_text, organism=organism,
+                cluster_type=cluster_type, treatment_type=treatment_type,
+                omics_type=omics_type, publication_doi=publication_doi,
+                summary=summary, verbose=verbose, limit=limit, offset=offset,
+                conn=conn,
+            )
+            by_organism = [GeneClusterOrganismBreakdown(**b) for b in data["by_organism"]]
+            by_cluster_type = [GeneClusterTypeBreakdown(**b) for b in data["by_cluster_type"]]
+            by_treatment_type = [GeneClusterTreatmentBreakdown(**b) for b in data["by_treatment_type"]]
+            by_omics_type = [GeneClusterOmicsBreakdown(**b) for b in data["by_omics_type"]]
+            by_publication = [GeneClusterPublicationBreakdown(**b) for b in data["by_publication"]]
+            results = [ListGeneClustersResult(**r) for r in data["results"]]
+            response = ListGeneClustersResponse(
+                total_entries=data["total_entries"],
+                total_matching=data["total_matching"],
+                by_organism=by_organism,
+                by_cluster_type=by_cluster_type,
+                by_treatment_type=by_treatment_type,
+                by_omics_type=by_omics_type,
+                by_publication=by_publication,
+                score_max=data.get("score_max"),
+                score_median=data.get("score_median"),
+                returned=data["returned"],
+                offset=data.get("offset", 0),
+                truncated=data["truncated"],
+                results=results,
+            )
+            await ctx.info(f"Returning {response.returned} of {response.total_matching} clusters")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"list_gene_clusters error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"list_gene_clusters unexpected error: {e}")
+            raise ToolError(f"Error in list_gene_clusters: {e}")
