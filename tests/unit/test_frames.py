@@ -129,3 +129,68 @@ class TestToDataFrameDictColumns:
             df = to_dataframe(result)
         assert "profile" not in df.columns
         assert any(issubclass(w.category, UserWarning) for w in caught)
+
+
+class TestToDataFrameWarnings:
+    """Dropped columns produce meaningful UserWarning messages."""
+
+    def test_mixed_list_and_scalar_dropped(self):
+        result = {
+            "results": [
+                {"gene": "MIT9313_0001", "data": ["iron", "stress"]},
+                {"gene": "MIT9313_0002", "data": "photosynthesis"},
+            ]
+        }
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            df = to_dataframe(result)
+        assert "data" not in df.columns
+        assert any(issubclass(w.category, UserWarning) for w in caught)
+
+    def test_response_summary_suggests_dedicated_function(self):
+        result = {
+            "results": [
+                {
+                    "gene": "MIT9313_0001",
+                    "response_summary": {"responded": 3, "details": [1, 2, 3]},
+                },
+            ]
+        }
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            df = to_dataframe(result)
+        assert "response_summary" not in df.columns
+        messages = [str(w.message) for w in caught if issubclass(w.category, UserWarning)]
+        assert any("profile_summary_to_dataframe()" in m for m in messages)
+
+    def test_timepoints_suggests_dedicated_function(self):
+        result = {
+            "results": [
+                {
+                    "gene": "MIT9313_0001",
+                    "timepoints": [{"t": 0, "val": 1.0}, {"t": 30, "val": 2.0}],
+                },
+            ]
+        }
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            df = to_dataframe(result)
+        assert "timepoints" not in df.columns
+        messages = [str(w.message) for w in caught if issubclass(w.category, UserWarning)]
+        assert any("experiments_to_dataframe()" in m for m in messages)
+
+    def test_unknown_nested_generic_warning(self):
+        result = {
+            "results": [
+                {
+                    "gene": "MIT9313_0001",
+                    "unknown_complex": {"nested": {"deep": 1}},
+                },
+            ]
+        }
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            df = to_dataframe(result)
+        assert "unknown_complex" not in df.columns
+        messages = [str(w.message) for w in caught if issubclass(w.category, UserWarning)]
+        assert any("file an issue" in m for m in messages)
