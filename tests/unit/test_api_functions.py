@@ -2885,3 +2885,73 @@ class TestListGeneClusters:
     def test_empty_search_text_raises(self, mock_conn):
         with pytest.raises(ValueError, match="search_text must not be empty"):
             api.list_gene_clusters(search_text="", conn=mock_conn)
+
+
+# ---------------------------------------------------------------------------
+# gene_clusters_by_gene
+# ---------------------------------------------------------------------------
+class TestGeneClustersByGene:
+    """Tests for gene_clusters_by_gene API function."""
+
+    _SUMMARY_RESULT = {
+        "total_matching": 2, "total_clusters": 2,
+        "genes_with_clusters": 2, "genes_without_clusters": 0,
+        "not_found": [], "not_matched": [],
+        "by_cluster_type": [{"item": "stress_response", "count": 2}],
+        "by_treatment_type": [{"item": "nitrogen_stress", "count": 2}],
+        "by_publication": [{"item": "10.1038/msb4100087", "count": 2}],
+    }
+
+    _DETAIL_ROW = {
+        "locus_tag": "PMM0370",
+        "gene_name": "cynA",
+        "cluster_id": "cluster:msb4100087:med4:up_n_transport",
+        "cluster_name": "MED4 cluster 1 (up, N transport)",
+        "cluster_type": "stress_response",
+        "membership_score": None,
+        "member_count": 5,
+    }
+
+    def test_returns_envelope(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            # organism validation
+            [{"organisms": ["Prochlorococcus MED4"]}],
+            # summary
+            [self._SUMMARY_RESULT],
+            # detail
+            [self._DETAIL_ROW],
+        ]
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"], conn=mock_conn)
+        assert result["total_matching"] == 2
+        assert result["total_clusters"] == 2
+        assert result["genes_with_clusters"] == 2
+        assert len(result["results"]) == 1
+
+    def test_empty_locus_tags_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="locus_tags must not be empty"):
+            api.gene_clusters_by_gene(locus_tags=[], conn=mock_conn)
+
+    def test_summary_mode(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],
+            [self._SUMMARY_RESULT],
+        ]
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"], summary=True, conn=mock_conn)
+        assert result["returned"] == 0
+        assert result["results"] == []
+
+    def test_not_found_always_in_envelope(self, mock_conn):
+        summary_with_nf = {
+            **self._SUMMARY_RESULT,
+            "not_found": ["FAKE001"],
+            "genes_without_clusters": 0,
+        }
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],
+            [summary_with_nf],
+        ]
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370", "FAKE001"], summary=True, conn=mock_conn)
+        assert "FAKE001" in result["not_found"]

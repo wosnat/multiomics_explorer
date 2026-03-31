@@ -21,6 +21,7 @@ from multiomics_explorer.api.functions import (
     differential_expression_by_gene,
     differential_expression_by_ortholog,
     gene_response_profile,
+    gene_clusters_by_gene,
 )
 
 __all__ = [
@@ -44,4 +45,5 @@ __all__ = [
     "differential_expression_by_gene",
     "differential_expression_by_ortholog",
     "gene_response_profile",
+    "gene_clusters_by_gene",
 ]

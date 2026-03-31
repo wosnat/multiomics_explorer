@@ -69,6 +69,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_response_profile,
     build_list_gene_clusters,
     build_list_gene_clusters_summary,
+    build_gene_clusters_by_gene,
+    build_gene_clusters_by_gene_summary,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -2148,6 +2150,102 @@ def list_gene_clusters(
             results = conn.execute_query(det_cypher, **det_params)
         else:
             raise
+
+    envelope["returned"] = len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
+    envelope["results"] = results
+    return envelope
+
+
+def gene_clusters_by_gene(
+    locus_tags: list[str],
+    organism: str | None = None,
+    cluster_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Gene-centric cluster lookup. Single organism enforced.
+
+    Returns dict with keys: total_matching, total_clusters,
+    genes_with_clusters, genes_without_clusters,
+    not_found, not_matched,
+    by_cluster_type, by_treatment_type, by_publication,
+    returned, offset, truncated, results.
+    Per result (compact): locus_tag, gene_name, cluster_id, cluster_name,
+    cluster_type, membership_score, member_count.
+    Per result (verbose): adds functional_description, behavioral_description,
+    treatment_type, treatment, source_paper, p_value.
+
+    summary=True: results=[], summary fields only.
+
+    Raises:
+        ValueError: if locus_tags is empty or spans multiple organisms.
+    """
+    if not locus_tags:
+        raise ValueError("locus_tags must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # Single-organism enforcement
+    _validate_organism_inputs(
+        organism=organism, locus_tags=locus_tags,
+        experiment_ids=None, conn=conn,
+    )
+
+    filter_kwargs = dict(
+        cluster_type=cluster_type, treatment_type=treatment_type,
+        publication_doi=publication_doi,
+    )
+
+    # Summary query — always runs
+    sum_cypher, sum_params = build_gene_clusters_by_gene_summary(
+        locus_tags=locus_tags, **filter_kwargs)
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_matching": total_matching,
+        "total_clusters": raw_summary["total_clusters"],
+        "genes_with_clusters": raw_summary["genes_with_clusters"],
+        "genes_without_clusters": raw_summary["genes_without_clusters"],
+        "not_found": raw_summary["not_found"],
+        "not_matched": raw_summary["not_matched"],
+        "by_cluster_type": _rename_freq(
+            raw_summary["by_cluster_type"], "cluster_type"),
+        "by_treatment_type": _rename_freq(
+            raw_summary["by_treatment_type"], "treatment_type"),
+        "by_publication": _rename_freq(
+            raw_summary["by_publication"], "publication_doi"),
+    }
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["offset"] = offset
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    det_cypher, det_params = build_gene_clusters_by_gene(
+        locus_tags=locus_tags, **filter_kwargs,
+        verbose=verbose, limit=limit, offset=offset)
+    results = conn.execute_query(det_cypher, **det_params)
 
     envelope["returned"] = len(results)
     envelope["offset"] = offset
