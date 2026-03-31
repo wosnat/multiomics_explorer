@@ -10,18 +10,10 @@
       "Edit(/.claude/skills/add-or-update-tool/**)",
       "Read(//home/osnat/github/multiomics_biocypher_kg/docs/kg-changes/**)",
       "Read(//home/osnat/github/multiomics_biocypher_kg/scripts/**)",
-      "Bash(python -m pytest tests/unit/test_query_builders.py -v -k \"DifferentialExpression or ResolveOrganism\")",
-      "Bash(python -m pytest tests/unit/test_api_functions.py -v -k \"DifferentialExpression\")",
-      "Bash(python -m pytest tests/unit/test_tool_wrappers.py -v -k \"DifferentialExpression or test_all_tools_registered or test_no_extra_tools\")",
-      "Bash(python -m pytest tests/integration/test_mcp_tools.py::TestDifferentialExpressionByGene -v --tb=short)",
-      "Bash(python -m pytest tests/integration/test_mcp_tools.py::TestDifferentialExpressionByGene tests/integration/test_api_contract.py::TestDifferentialExpressionByGeneContract -v --tb=short)",
-      "Bash(python -m pytest tests/evals/ -v -k \"de_by_gene\" --tb=short)",
-      "Bash(python -m pytest tests/regression/ -v -k \"de_by_gene\" --force-regen -m kg --tb=short)",
-      "Bash(python -m pytest tests/regression/ -v -k \"de_by_gene\" -m kg --tb=short)",
-      "Bash(python -m pytest tests/unit/test_about_content.py -v -k \"differential\" --tb=short)",
-      "Bash(python -m pytest tests/unit/ tests/integration/test_mcp_tools.py::TestDifferentialExpressionByGene tests/integration/test_api_contract.py::TestDifferentialExpressionByGeneContract tests/evals/ -k \"de_by_gene or DifferentialExpression or ResolveOrganism or test_all_tools_registered or test_about\" -v --tb=short)",
-      "mcp__multiomics-kg__differential_expression_by_gene",
-      "Bash(python -m pytest tests/unit/ tests/integration/ -m \"not kg or kg\" -v --tb=short)"
+      "Bash(pytest:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(uv run python -m pytest:*)",
+      "mcp__multiomics-kg__differential_expression_by_gene"
     ]
   },
   "enabledPlugins": {
