@@ -660,9 +660,8 @@ def register_tools(mcp: FastMCP):
             "A LIMIT clause is added automatically if absent.",
         )],
         limit: Annotated[int, Field(
-            description="Max results (default 25, max 200).",
+            description="Max results.",
             ge=1,
-            le=200,
         )] = 25,
     ) -> RunCypherResponse:
         """Execute a raw Cypher query against the knowledge graph (read-only).
@@ -2198,7 +2197,7 @@ def register_tools(mcp: FastMCP):
             "table_scope, table_scope_detail to each row.",
         )] = False,
         limit: Annotated[int, Field(
-            description="Max result rows.", ge=1, le=200,
+            description="Max result rows.", ge=1,
         )] = 5,
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0,
