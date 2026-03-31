@@ -59,6 +59,7 @@ EXPECTED_TOOLS = [
     "gene_response_profile",
     "list_gene_clusters",
     "gene_clusters_by_gene",
+    "genes_in_cluster",
 ]
 
 
@@ -2935,3 +2936,53 @@ class TestGeneClustersByGeneWrapper:
             with pytest.raises(ToolError):
                 await tool_fns["gene_clusters_by_gene"](
                     mock_ctx, locus_tags=[])
+
+
+class TestGenesInClusterWrapper:
+    """Tests for genes_in_cluster MCP wrapper."""
+
+    _SAMPLE_API_RETURN = {
+        "total_matching": 5,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 5}],
+        "by_cluster": [{"cluster_id": "cluster:msb4100087:med4:up_n_transport",
+                         "cluster_name": "MED4 cluster 1", "count": 5}],
+        "top_categories": [{"category": "N-metabolism", "count": 3}],
+        "genes_per_cluster_max": 5,
+        "genes_per_cluster_median": 5.0,
+        "not_found_clusters": [],
+        "not_matched_clusters": [],
+        "not_matched_organism": None,
+        "returned": 1, "offset": 0, "truncated": True,
+        "results": [
+            {"locus_tag": "PMM0370", "gene_name": "cynA",
+             "product": "cyanate ABC transporter",
+             "gene_category": "N-metabolism",
+             "organism_name": "Prochlorococcus MED4",
+             "cluster_id": "cluster:msb4100087:med4:up_n_transport",
+             "cluster_name": "MED4 cluster 1 (up, N transport)",
+             "membership_score": None},
+        ],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_in_cluster",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_in_cluster"](
+                mock_ctx,
+                cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+        assert result.total_matching == 5
+        assert result.genes_per_cluster_max == 5
+        assert len(result.results) == 1
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_in_cluster",
+            side_effect=ValueError("cluster_ids must not be empty"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["genes_in_cluster"](
+                    mock_ctx, cluster_ids=[])

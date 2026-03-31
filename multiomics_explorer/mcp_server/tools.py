@@ -2682,3 +2682,144 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"gene_clusters_by_gene unexpected error: {e}")
             raise ToolError(f"Error in gene_clusters_by_gene: {e}")
+
+    # ── genes_in_cluster ───────────────────────────────────────────────
+
+    class GenesInClusterResult(BaseModel):
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0370')")
+        gene_name: str | None = Field(default=None,
+            description="Gene name (e.g. 'cynA')")
+        product: str | None = Field(default=None,
+            description="Gene product (e.g. 'cyanate ABC transporter')")
+        gene_category: str | None = Field(default=None,
+            description="Functional category (e.g. 'N-metabolism')")
+        organism_name: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MED4')")
+        cluster_id: str = Field(
+            description="Cluster node ID")
+        cluster_name: str = Field(
+            description="Cluster name")
+        membership_score: float | None = Field(default=None,
+            description="Fuzzy membership score (null for K-means)")
+        # verbose-only
+        function_description: str | None = Field(default=None,
+            description="Gene functional description (gene-level)")
+        gene_summary: str | None = Field(default=None,
+            description="Gene summary text (gene-level)")
+        p_value: float | None = Field(default=None,
+            description="Assignment p-value (edge-level)")
+        functional_description: str | None = Field(default=None,
+            description="What the cluster genes ARE (cluster-level)")
+        behavioral_description: str | None = Field(default=None,
+            description="What the cluster genes DO together (cluster-level)")
+
+    class GenesInClusterClusterBreakdown(BaseModel):
+        cluster_id: str = Field(description="Cluster node ID")
+        cluster_name: str = Field(description="Cluster name")
+        count: int = Field(description="Member genes in this cluster")
+
+    class GenesInClusterCategoryBreakdown(BaseModel):
+        category: str = Field(description="Gene category")
+        count: int = Field(description="Genes in this category")
+
+    class GenesInClusterResponse(BaseModel):
+        total_matching: int = Field(
+            description="Gene × cluster rows")
+        by_organism: list[GeneClusterOrganismBreakdown] = Field(
+            description="Members per organism")
+        by_cluster: list[GenesInClusterClusterBreakdown] = Field(
+            description="Members per cluster")
+        top_categories: list[GenesInClusterCategoryBreakdown] = Field(
+            description="Top 5 gene categories by count")
+        genes_per_cluster_max: int = Field(
+            description="Largest cluster's gene count")
+        genes_per_cluster_median: float = Field(
+            description="Median gene count across clusters")
+        not_found_clusters: list[str] = Field(default_factory=list,
+            description="Cluster IDs not found in KG")
+        not_matched_clusters: list[str] = Field(default_factory=list,
+            description="Clusters found but no members after organism filter")
+        not_matched_organism: str | None = Field(default=None,
+            description="Organism that didn't match any cluster's organism")
+        returned: int = Field(description="Results in this response")
+        offset: int = Field(default=0, description="Offset into result set")
+        truncated: bool = Field(
+            description="True if total_matching > offset + returned")
+        results: list[GenesInClusterResult] = Field(
+            default_factory=list, description="One row per gene × cluster")
+
+    @mcp.tool(
+        tags={"clusters", "genes"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                      "idempotentHint": True, "openWorldHint": False},
+    )
+    async def genes_in_cluster(
+        ctx: Context,
+        cluster_ids: Annotated[list[str], Field(
+            description="GeneCluster node IDs (from list_gene_clusters "
+            "or gene_clusters_by_gene).",
+        )],
+        organism: Annotated[str | None, Field(
+            description="Filter by organism (case-insensitive partial match). "
+            "Single organism enforced.",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include function_description, gene_summary (gene-level), "
+            "p_value (edge-level), functional_description, "
+            "behavioral_description (cluster-level).",
+        )] = False,
+        limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0)] = 0,
+    ) -> GenesInClusterResponse:
+        """Get member genes of gene clusters.
+
+        Takes cluster IDs from list_gene_clusters or gene_clusters_by_gene
+        and returns their member genes. One row per gene × cluster.
+
+        For cluster discovery by text, use list_gene_clusters first.
+        For gene → cluster direction, use gene_clusters_by_gene.
+        """
+        await ctx.info(f"genes_in_cluster cluster_ids={cluster_ids} "
+                       f"organism={organism}")
+        try:
+            conn = _conn(ctx)
+            data = api.genes_in_cluster(
+                cluster_ids, organism=organism,
+                summary=summary, verbose=verbose, limit=limit, offset=offset,
+                conn=conn,
+            )
+            by_organism = [GeneClusterOrganismBreakdown(**b)
+                           for b in data["by_organism"]]
+            by_cluster = [GenesInClusterClusterBreakdown(**b)
+                          for b in data["by_cluster"]]
+            top_categories = [GenesInClusterCategoryBreakdown(**b)
+                              for b in data["top_categories"]]
+            results = [GenesInClusterResult(**r) for r in data["results"]]
+            response = GenesInClusterResponse(
+                total_matching=data["total_matching"],
+                by_organism=by_organism,
+                by_cluster=by_cluster,
+                top_categories=top_categories,
+                genes_per_cluster_max=data["genes_per_cluster_max"],
+                genes_per_cluster_median=data["genes_per_cluster_median"],
+                not_found_clusters=data["not_found_clusters"],
+                not_matched_clusters=data["not_matched_clusters"],
+                not_matched_organism=data.get("not_matched_organism"),
+                returned=data["returned"],
+                offset=data.get("offset", 0),
+                truncated=data["truncated"],
+                results=results,
+            )
+            await ctx.info(f"Returning {response.returned} of "
+                           f"{response.total_matching} gene×cluster rows")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"genes_in_cluster error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"genes_in_cluster unexpected error: {e}")
+            raise ToolError(f"Error in genes_in_cluster: {e}")
