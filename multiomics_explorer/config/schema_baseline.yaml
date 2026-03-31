@@ -510,6 +510,8 @@ schema:
         id: string
         log2_fold_change: float
         rank_by_effect: int
+        rank_down: int
+        rank_up: int
         significant: string
         time_point: string
         time_point_hours: float
