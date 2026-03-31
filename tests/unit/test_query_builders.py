@@ -2476,6 +2476,12 @@ class TestBuildGeneResponseProfileEnvelope:
                 group_by="invalid",
             )
 
+    def test_group_totals_include_table_scopes(self):
+        cypher, _ = build_gene_response_profile_envelope(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+        )
+        assert "table_scopes" in cypher
+
 
 class TestBuildGeneResponseProfile:
     def test_basic(self):

@@ -2380,7 +2380,7 @@ def build_gene_response_profile_envelope(
     organism_name is required (resolved by API before calling).
 
     RETURN keys: found_genes (list), has_expression (list), has_significant (list),
-    group_totals (list of {group_key, experiments, timepoints}).
+    group_totals (list of {group_key, experiments, timepoints, table_scopes}).
     """
     gk = _group_key_expr(group_by)
     gk2 = _group_key_expr(group_by, alias="e2")
@@ -2420,7 +2420,9 @@ def build_gene_response_profile_envelope(
         "     collect({group_key: group_key,"
         " experiments: size(group_experiments),"
         " timepoints: reduce(s = 0, exp IN group_experiments |"
-        " s + COALESCE(exp.time_point_count, 1))}) AS group_totals\n"
+        " s + COALESCE(exp.time_point_count, 1)),"
+        " table_scopes: apoc.coll.toSet([exp IN group_experiments |"
+        " exp.table_scope])}) AS group_totals\n"
         "RETURN found_genes,"
         " has_expression, has_significant, group_totals"
     )
