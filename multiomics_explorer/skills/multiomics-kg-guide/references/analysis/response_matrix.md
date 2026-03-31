@@ -36,7 +36,7 @@ Empty DataFrame (with `index.name="locus_tag"`) when no results found.
 | `"up"` | Only upregulated experiments in this group |
 | `"down"` | Only downregulated experiments |
 | `"mixed"` | Both up and down experiments |
-| `"not_responded"` | Expression edges exist but none significant |
+| `"not_responded"` | Expression edges exist but none significant, OR gene inferred as tested via full-coverage scope (`groups_tested_not_responded`) |
 | `"not_known"` | No expression data for this gene in this group |
 
 ## Few-shot examples
@@ -123,4 +123,15 @@ Using response_matrix for a single gene
 ```correction
 response_matrix is designed for gene sets. For a single gene, call
 gene_response_profile directly — it returns richer per-group statistics.
+```
+
+```mistake
+Assuming "not_responded" always means expression edges exist
+```
+
+```correction
+"not_responded" can also mean the gene was inferred as tested via
+groups_tested_not_responded (experiments with significant_only or
+significant_any_timepoint scope). Use gene_response_profile directly
+to distinguish between edge-based and inference-based non-response.
 ```

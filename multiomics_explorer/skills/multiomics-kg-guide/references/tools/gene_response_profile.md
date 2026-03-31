@@ -57,7 +57,8 @@ organism_name, genes_queried, genes_with_response, not_found, no_expression, ret
 | gene_category | string \| None | Functional category (e.g. 'Inorganic ion transport') |
 | groups_responded | list[string] | Groups where gene is significant in at least one timepoint |
 | groups_not_responded | list[string] | Groups where expression edges exist but none significant |
-| groups_not_known | list[string] | Groups with no expression edge for this gene |
+| groups_tested_not_responded | list[string] | Groups where all experiments use full-coverage scope but gene has no expression edge — inferred as tested, not significant |
+| groups_not_known | list[string] | Groups with no expression edge and scope does not confirm coverage |
 | response_summary | object | Per-group detail. Keys are treatment types or experiment IDs depending on group_by. |
 
 ## Few-shot examples
@@ -113,7 +114,7 @@ Assuming groups_not_known means 'gene does not respond to this treatment'
 ```
 
 ```correction
-groups_not_known means no expression data exists — the gene was not profiled or not reported for that treatment. Check experiments_total in the response_summary for coverage.
+groups_not_known means absence is uninformative — the gene may not have been profiled, or the experiment scope doesn't confirm coverage. Check groups_tested_not_responded for groups where full-coverage scope (significant_only / significant_any_timepoint) implies the gene was measured but not significant.
 ```
 
 ```mistake
@@ -131,6 +132,8 @@ Using this tool to see time course dynamics
 ```correction
 This tool aggregates across timepoints. Use differential_expression_by_gene with a specific experiment to see temporal patterns.
 ```
+
+- `groups_tested_not_responded` is an inference based on experiment table_scope. Experiments with `significant_only` or `significant_any_timepoint` scope on full-genome platforms imply absent genes were measured but not significant. This holds for microarray and standard RNA-seq. If the KG later includes targeted panels with these scopes, this field may need revision.
 
 - Results are sorted by response breadth — genes responding to more treatments appear first
 
