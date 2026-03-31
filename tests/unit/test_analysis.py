@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from multiomics_explorer.analysis import response_matrix
+from multiomics_explorer.analysis import response_matrix, gene_set_compare
 
 
 # ---------------------------------------------------------------------------
@@ -236,3 +236,104 @@ class TestResponseMatrix:
 
         assert df.empty
         assert df.index.name == "locus_tag"
+
+
+# ---------------------------------------------------------------------------
+# TestGeneSetCompare
+# ---------------------------------------------------------------------------
+
+class TestGeneSetCompare:
+    def test_partitioning(self):
+        """Verify overlap/only_a/only_b partitioning is correct."""
+        api_result = _make_api_result([GENE_UP_ONLY, GENE_DOWN_ONLY, GENE_MIXED])
+
+        with patch(
+            "multiomics_explorer.analysis.expression.api.gene_response_profile",
+            return_value=api_result,
+        ):
+            result = gene_set_compare(
+                set_a=["GENE_A", "GENE_C"],
+                set_b=["GENE_B", "GENE_C"],
+            )
+
+        overlap = result["overlap"]
+        only_a = result["only_a"]
+        only_b = result["only_b"]
+
+        assert list(overlap.index) == ["GENE_C"]
+        assert list(only_a.index) == ["GENE_A"]
+        assert list(only_b.index) == ["GENE_B"]
+
+    def test_summary_per_group(self):
+        """Verify summary_per_group columns and counts for nitrogen_stress."""
+        api_result = _make_api_result([GENE_UP_ONLY, GENE_DOWN_ONLY, GENE_MIXED])
+
+        with patch(
+            "multiomics_explorer.analysis.expression.api.gene_response_profile",
+            return_value=api_result,
+        ):
+            result = gene_set_compare(
+                set_a=["GENE_A", "GENE_C"],
+                set_b=["GENE_B", "GENE_C"],
+                set_a_name="early",
+                set_b_name="late",
+            )
+
+        summary = result["summary_per_group"]
+
+        # Verify column names reflect set names
+        assert "early" in summary.columns
+        assert "late" in summary.columns
+        assert "overlap" in summary.columns
+        assert "shared" in summary.columns
+
+        # nitrogen_stress: early=GENE_A(up)+GENE_C(mixed)=2, late=GENE_B(down)+GENE_C(mixed)=2
+        # overlap=GENE_C in both sets and responding=1, shared=True
+        row = summary.loc["nitrogen_stress"]
+        assert row["early"] == 2
+        assert row["late"] == 2
+        assert row["overlap"] == 1
+        assert row["shared"] == True  # noqa: E712 — np.True_ != True with `is`
+
+    def test_shared_groups(self):
+        """Verify shared_groups contains groups where both sets have responding genes."""
+        api_result = _make_api_result([GENE_UP_ONLY, GENE_DOWN_ONLY])
+
+        with patch(
+            "multiomics_explorer.analysis.expression.api.gene_response_profile",
+            return_value=api_result,
+        ):
+            result = gene_set_compare(
+                set_a=["GENE_A"],
+                set_b=["GENE_B"],
+            )
+
+        shared_groups = result["shared_groups"]
+        divergent_groups = result["divergent_groups"]
+
+        # nitrogen_stress: GENE_A=up (set_a responds), GENE_B=down (set_b responds) → shared
+        assert "nitrogen_stress" in shared_groups
+
+        # light_stress: GENE_A=not_responded, GENE_B=not_known → neither responds → not shared
+        assert "light_stress" not in shared_groups
+        assert "light_stress" not in divergent_groups
+
+    def test_passes_params_through(self):
+        """Verify organism and experiment_ids are forwarded to the API via response_matrix."""
+        api_result = _make_api_result([GENE_UP_ONLY])
+
+        with patch(
+            "multiomics_explorer.analysis.expression.api.gene_response_profile",
+            return_value=api_result,
+        ) as mock_fn:
+            gene_set_compare(
+                set_a=["GENE_A"],
+                set_b=["GENE_A"],
+                organism="MED4",
+                experiment_ids=["exp_1"],
+            )
+
+        mock_fn.assert_called_once()
+        call_kwargs = mock_fn.call_args.kwargs
+        assert call_kwargs["organism"] == "MED4"
+        assert call_kwargs["experiment_ids"] == ["exp_1"]

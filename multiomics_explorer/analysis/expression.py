@@ -171,8 +171,11 @@ def response_matrix(
 
 
 # ---------------------------------------------------------------------------
-# gene_set_compare (stub)
+# gene_set_compare
 # ---------------------------------------------------------------------------
+
+_RESPONDING_VALUES = {"up", "down", "mixed"}
+
 
 def gene_set_compare(
     set_a: list[str],
@@ -186,6 +189,87 @@ def gene_set_compare(
 ) -> dict[str, pd.DataFrame | list[str]]:
     """Compare expression response profiles for two gene sets.
 
-    Not yet implemented — will be added in Task 4.
+    Computes a union of set_a and set_b, fetches the response matrix for all
+    genes in a single API call, then partitions rows into overlap/only_a/only_b
+    and produces a per-group summary with responding-gene counts for each set.
+
+    Args:
+        set_a:          First gene locus tag list.
+        set_b:          Second gene locus tag list.
+        organism:       Optional organism filter forwarded to response_matrix.
+        set_a_name:     Label for set_a in summary_per_group columns.
+        set_b_name:     Label for set_b in summary_per_group columns.
+        experiment_ids: Optional experiment ID filter (ignored when group_map is set).
+        group_map:      Optional experiment_id → group label mapping.
+        conn:           Optional Neo4j connection.
+
+    Returns:
+        Dict with keys:
+            overlap         — DataFrame of genes in both sets
+            only_a          — DataFrame of genes only in set_a
+            only_b          — DataFrame of genes only in set_b
+            shared_groups   — list[str] of group names where both sets respond
+            divergent_groups — list[str] of group names where exactly one set responds
+            summary_per_group — DataFrame indexed by group with columns:
+                                {set_a_name}, {set_b_name}, overlap, shared
     """
-    raise NotImplementedError("gene_set_compare will be implemented in Task 4")
+    set_a_set = set(set_a)
+    set_b_set = set(set_b)
+    union = list(dict.fromkeys(list(set_a) + [g for g in set_b if g not in set_a_set]))
+
+    matrix = response_matrix(
+        genes=union,
+        organism=organism,
+        experiment_ids=experiment_ids,
+        group_map=group_map,
+        conn=conn,
+    )
+
+    # Partition rows into overlap / only_a / only_b
+    overlap_mask = matrix.index.isin(set_a_set) & matrix.index.isin(set_b_set)
+    only_a_mask = matrix.index.isin(set_a_set) & ~matrix.index.isin(set_b_set)
+    only_b_mask = ~matrix.index.isin(set_a_set) & matrix.index.isin(set_b_set)
+
+    overlap_df = matrix[overlap_mask]
+    only_a_df = matrix[only_a_mask]
+    only_b_df = matrix[only_b_mask]
+
+    # Identify group columns (all except metadata)
+    group_cols = [c for c in matrix.columns if c not in _METADATA_COLS]
+
+    # Build per-group summary
+    summary_records = []
+    for group in group_cols:
+        col = matrix[group]
+
+        a_count = int(col[matrix.index.isin(set_a_set)].isin(_RESPONDING_VALUES).sum())
+        b_count = int(col[matrix.index.isin(set_b_set)].isin(_RESPONDING_VALUES).sum())
+        overlap_count = int(col[overlap_mask].isin(_RESPONDING_VALUES).sum())
+        is_shared = a_count >= 1 and b_count >= 1
+
+        summary_records.append({
+            "group": group,
+            set_a_name: a_count,
+            set_b_name: b_count,
+            "overlap": overlap_count,
+            "shared": is_shared,
+        })
+
+    summary_df = pd.DataFrame(summary_records).set_index("group")
+
+    # Derive shared and divergent group lists
+    shared_groups = list(summary_df.index[summary_df["shared"]])
+    divergent_groups = list(
+        summary_df.index[
+            (summary_df[set_a_name] >= 1) != (summary_df[set_b_name] >= 1)
+        ]
+    )
+
+    return {
+        "overlap": overlap_df,
+        "only_a": only_a_df,
+        "only_b": only_b_df,
+        "shared_groups": shared_groups,
+        "divergent_groups": divergent_groups,
+        "summary_per_group": summary_df,
+    }
