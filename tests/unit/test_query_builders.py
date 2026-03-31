@@ -2779,3 +2779,61 @@ class TestBuildGeneClustersByGene:
         from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
         cypher, _ = build_gene_clusters_by_gene(locus_tags=["PMM0370"])
         assert "ORDER BY" in cypher
+
+
+class TestBuildGenesInClusterSummary:
+    """Tests for build_genes_in_cluster_summary."""
+
+    def test_basic_structure(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_in_cluster_summary
+        cypher, params = build_genes_in_cluster_summary(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+        assert "Gene_in_gene_cluster" in cypher
+        assert "total_matching" in cypher
+        assert "not_found_clusters" in cypher or "nf" in cypher
+        assert params["cluster_ids"] == ["cluster:msb4100087:med4:up_n_transport"]
+
+    def test_with_organism_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_in_cluster_summary
+        cypher, params = build_genes_in_cluster_summary(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            organism="MED4")
+        assert "organism" in cypher.lower()
+        assert params["organism"] == "MED4"
+
+
+class TestBuildGenesInCluster:
+    """Tests for build_genes_in_cluster (detail builder)."""
+
+    def test_returns_expected_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_in_cluster
+        cypher, _ = build_genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+        for col in ["locus_tag", "gene_name", "product", "gene_category",
+                     "organism_name", "cluster_id", "cluster_name",
+                     "membership_score"]:
+            assert f"AS {col}" in cypher
+
+    def test_verbose_adds_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_in_cluster
+        cypher, _ = build_genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            verbose=True)
+        for col in ["function_description", "gene_summary",
+                     "p_value", "functional_description",
+                     "behavioral_description"]:
+            assert f"AS {col}" in cypher
+
+    def test_has_order_by(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_in_cluster
+        cypher, _ = build_genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+        assert "ORDER BY" in cypher
+
+    def test_offset_emits_skip(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_in_cluster
+        cypher, params = build_genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5

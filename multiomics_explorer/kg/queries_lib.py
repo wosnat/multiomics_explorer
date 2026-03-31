@@ -2884,3 +2884,115 @@ def build_gene_clusters_by_gene(
         f"ORDER BY g.locus_tag, gc.id{skip_clause}{limit_clause}"
     )
     return cypher, params
+
+
+def build_genes_in_cluster_summary(
+    *,
+    cluster_ids: list[str],
+    organism: str | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for genes_in_cluster.
+
+    RETURN keys: total_matching, by_organism, by_cluster,
+    by_category_raw, not_found_clusters, not_matched_clusters.
+    """
+    params: dict = {"cluster_ids": cluster_ids, "organism": organism}
+
+    organism_filter = (
+        "AND ALL(word IN split(toLower($organism), ' ')"
+        " WHERE toLower(g.organism_name) CONTAINS word)\n"
+        if organism is not None else ""
+    )
+
+    cypher = (
+        "UNWIND $cluster_ids AS cid\n"
+        "OPTIONAL MATCH (gc:GeneCluster {id: cid})\n"
+        "OPTIONAL MATCH (gc)-[r:Gene_in_gene_cluster]->(g:Gene)\n"
+        f"WHERE g IS NOT NULL {organism_filter}"
+        "WITH cid, gc, g\n"
+        "WITH collect(DISTINCT CASE WHEN gc IS NULL THEN cid END) AS nf_raw,\n"
+        "     collect(DISTINCT CASE WHEN gc IS NOT NULL AND g IS NULL\n"
+        "             THEN cid END) AS nm_raw,\n"
+        "     collect(CASE WHEN g IS NOT NULL THEN\n"
+        "       {lt: g.locus_tag, org: g.organism_name,\n"
+        "        cat: coalesce(g.gene_category, 'Unknown'),\n"
+        "        cid: cid, cname: gc.name} END) AS rows\n"
+        "WITH [x IN nf_raw WHERE x IS NOT NULL] AS not_found_clusters,\n"
+        "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched_clusters,\n"
+        "     rows\n"
+        "WITH not_found_clusters, not_matched_clusters,\n"
+        "     size(rows) AS total_matching,\n"
+        "     apoc.coll.frequencies([r IN rows | r.org]) AS by_organism,\n"
+        "     apoc.coll.frequencies([r IN rows | r.cat]) AS by_category_raw,\n"
+        "     [cid IN apoc.coll.toSet([r IN rows | r.cid]) |\n"
+        "       {cluster_id: cid,\n"
+        "        cluster_name: head([r IN rows WHERE r.cid = cid | r.cname]),\n"
+        "        count: size([r IN rows WHERE r.cid = cid])}] AS by_cluster\n"
+        "RETURN total_matching, by_organism, by_cluster, by_category_raw,\n"
+        "       not_found_clusters, not_matched_clusters"
+    )
+    return cypher, params
+
+
+def build_genes_in_cluster(
+    *,
+    cluster_ids: list[str],
+    organism: str | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for genes_in_cluster.
+
+    RETURN keys (compact): locus_tag, gene_name, product, gene_category,
+    organism_name, cluster_id, cluster_name, membership_score.
+    RETURN keys (verbose): adds function_description, gene_summary,
+    p_value, functional_description, behavioral_description.
+    """
+    params: dict = {"cluster_ids": cluster_ids}
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       g.function_description AS function_description"
+            ",\n       g.gene_summary AS gene_summary"
+            ",\n       r.p_value AS p_value"
+            ",\n       gc.functional_description AS functional_description"
+            ",\n       gc.behavioral_description AS behavioral_description"
+        )
+
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    # Conditional WHERE for organism filter
+    if organism is not None:
+        params["organism"] = organism
+        cypher = (
+            "UNWIND $cluster_ids AS cid\n"
+            "MATCH (gc:GeneCluster {id: cid})-[r:Gene_in_gene_cluster]->(g:Gene)\n"
+            "WHERE ALL(word IN split(toLower($organism), ' ')"
+            " WHERE toLower(g.organism_name) CONTAINS word)\n"
+        )
+    else:
+        cypher = (
+            "UNWIND $cluster_ids AS cid\n"
+            "MATCH (gc:GeneCluster {id: cid})-[r:Gene_in_gene_cluster]->(g:Gene)\n"
+        )
+
+    cypher += (
+        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       g.product AS product, g.gene_category AS gene_category,\n"
+        "       g.organism_name AS organism_name,\n"
+        "       gc.id AS cluster_id, gc.name AS cluster_name,\n"
+        f"       r.membership_score AS membership_score{verbose_cols}\n"
+        f"ORDER BY gc.id, g.organism_name, g.locus_tag{skip_clause}{limit_clause}"
+    )
+    return cypher, params
