@@ -26,6 +26,8 @@ dependencies = [
     # MCP server
     "fastmcp>=3.0",
     "cyver>=2.0.2",
+    # Analysis utilities
+    "pandas>=2.0",
 ]
 
 [dependency-groups]
