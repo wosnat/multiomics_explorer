@@ -2955,3 +2955,65 @@ class TestGeneClustersByGene:
         result = api.gene_clusters_by_gene(
             locus_tags=["PMM0370", "FAKE001"], summary=True, conn=mock_conn)
         assert "FAKE001" in result["not_found"]
+
+
+class TestGenesInCluster:
+    """Tests for genes_in_cluster API function."""
+
+    _SUMMARY_RESULT = {
+        "total_matching": 5,
+        "by_organism": [{"item": "Prochlorococcus MED4", "count": 5}],
+        "by_cluster": [{"cluster_id": "cluster:msb4100087:med4:up_n_transport",
+                         "cluster_name": "MED4 cluster 1", "count": 5}],
+        "by_category_raw": [{"item": "N-metabolism", "count": 3}],
+        "not_found_clusters": [],
+        "not_matched_clusters": [],
+    }
+
+    _DETAIL_ROW = {
+        "locus_tag": "PMM0370",
+        "gene_name": "cynA",
+        "product": "cyanate ABC transporter",
+        "gene_category": "N-metabolism",
+        "organism_name": "Prochlorococcus MED4",
+        "cluster_id": "cluster:msb4100087:med4:up_n_transport",
+        "cluster_name": "MED4 cluster 1 (up, N transport)",
+        "membership_score": None,
+    }
+
+    def test_returns_envelope(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_RESULT],
+            [self._DETAIL_ROW],
+        ]
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            conn=mock_conn)
+        assert result["total_matching"] == 5
+        assert len(result["results"]) == 1
+
+    def test_empty_cluster_ids_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="cluster_ids must not be empty"):
+            api.genes_in_cluster(cluster_ids=[], conn=mock_conn)
+
+    def test_summary_mode(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_RESULT],
+        ]
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            summary=True, conn=mock_conn)
+        assert result["returned"] == 0
+        assert result["results"] == []
+
+    def test_not_found_clusters_in_envelope(self, mock_conn):
+        summary_nf = {
+            **self._SUMMARY_RESULT,
+            "not_found_clusters": ["cluster:fake:id"],
+        }
+        mock_conn.execute_query.side_effect = [
+            [summary_nf],
+        ]
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:fake:id"], summary=True, conn=mock_conn)
+        assert "cluster:fake:id" in result["not_found_clusters"]

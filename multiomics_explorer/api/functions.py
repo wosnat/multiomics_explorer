@@ -71,6 +71,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_gene_clusters_summary,
     build_gene_clusters_by_gene,
     build_gene_clusters_by_gene_summary,
+    build_genes_in_cluster,
+    build_genes_in_cluster_summary,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -2244,6 +2246,95 @@ def gene_clusters_by_gene(
 
     det_cypher, det_params = build_gene_clusters_by_gene(
         locus_tags=locus_tags, **filter_kwargs,
+        verbose=verbose, limit=limit, offset=offset)
+    results = conn.execute_query(det_cypher, **det_params)
+
+    envelope["returned"] = len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
+    envelope["results"] = results
+    return envelope
+
+
+def genes_in_cluster(
+    cluster_ids: list[str],
+    organism: str | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Cluster IDs → member genes.
+
+    Returns dict with keys: total_matching, by_organism, by_cluster,
+    top_categories, genes_per_cluster_max, genes_per_cluster_median,
+    not_found_clusters, not_matched_clusters, not_matched_organism,
+    returned, offset, truncated, results.
+    Per result (compact): locus_tag, gene_name, product, gene_category,
+    organism_name, cluster_id, cluster_name, membership_score.
+    Per result (verbose): adds function_description, gene_summary,
+    p_value, functional_description, behavioral_description.
+
+    summary=True: results=[], summary fields only.
+
+    Raises:
+        ValueError: if cluster_ids is empty.
+    """
+    if not cluster_ids:
+        raise ValueError("cluster_ids must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # Summary query — always runs
+    sum_cypher, sum_params = build_genes_in_cluster_summary(
+        cluster_ids=cluster_ids, organism=organism)
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    by_cluster = raw_summary["by_cluster"]
+    cluster_counts = [c["count"] for c in by_cluster]
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_matching": total_matching,
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
+        "by_cluster": by_cluster,
+        "top_categories": _rename_freq(
+            raw_summary["by_category_raw"], "category")[:5],
+        "genes_per_cluster_max": max(cluster_counts) if cluster_counts else 0,
+        "genes_per_cluster_median": (
+            statistics.median(cluster_counts) if cluster_counts else 0
+        ),
+        "not_found_clusters": raw_summary["not_found_clusters"],
+        "not_matched_clusters": raw_summary["not_matched_clusters"],
+    }
+
+    # Check organism match
+    if organism is not None and total_matching == 0 and not raw_summary["not_found_clusters"]:
+        envelope["not_matched_organism"] = organism
+    else:
+        envelope["not_matched_organism"] = None
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["offset"] = offset
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    det_cypher, det_params = build_genes_in_cluster(
+        cluster_ids=cluster_ids, organism=organism,
         verbose=verbose, limit=limit, offset=offset)
     results = conn.execute_query(det_cypher, **det_params)
 
