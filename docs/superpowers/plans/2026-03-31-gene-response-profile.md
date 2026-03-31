@@ -19,16 +19,23 @@
 - Modify: `multiomics_explorer/kg/queries_lib.py`
 - Test: `tests/unit/test_query_builders.py`
 
-- [ ] **Step 1: Add rank_up/rank_down to schema baseline**
+- [ ] **Step 1: Regenerate schema baseline from live KG**
 
-In `multiomics_explorer/config/schema_baseline.yaml`, add two properties to `Changes_expression_of`:
+The KG already has `rank_up`/`rank_down` on edges. Regenerate the baseline to pick them up:
 
-```yaml
-        rank_up: int
-        rank_down: int
+```bash
+uv run python -c "
+from multiomics_explorer.kg.connection import GraphConnection
+from multiomics_explorer.kg.schema import load_schema_from_neo4j, save_baseline
+conn = GraphConnection()
+schema = load_schema_from_neo4j(conn)
+path = save_baseline(schema)
+print(f'Saved to {path}')
+conn.close()
+"
 ```
 
-Add them after `rank_by_effect: int` (alphabetical within the properties block).
+Verify `rank_up` and `rank_down` appear in `multiomics_explorer/config/schema_baseline.yaml` under `Changes_expression_of.properties`.
 
 - [ ] **Step 2: Write failing test for rank fields in DE by gene query builder**
 
@@ -399,9 +406,10 @@ class TestBuildGeneResponseProfile:
         )
         for col in [
             "locus_tag", "gene_name", "product", "gene_category",
-            "group_key", "experiments_tested",
-            "timepoints_tested", "timepoints_up", "timepoints_down",
-            "rank_ups", "rank_downs", "log2fcs_up", "log2fcs_down",
+            "group_key", "experiments_tested", "experiments_up",
+            "experiments_down", "timepoints_tested", "timepoints_up",
+            "timepoints_down", "rank_ups", "rank_downs",
+            "log2fcs_up", "log2fcs_down",
         ]:
             assert col in cypher
 
@@ -494,13 +502,16 @@ def build_gene_response_profile(
 
     Pass 1: compute per-gene sort keys (breadth/depth/timepoints),
     sort and paginate on the gene axis.
-    Pass 2: expand per-group detail for the paginated genes only.
+    Pass 2: group by experiment first (to compute experiments_up/down),
+    then flatten edges for rank/log2fc lists.
+
+    Verified against live KG 2026-03-31.
 
     RETURN keys: locus_tag, gene_name, product, gene_category,
-    group_key, experiments_tested, timepoints_tested,
-    timepoints_up, timepoints_down, rank_ups (list), rank_downs (list),
-    log2fcs_up (list), log2fcs_down (list), experiments_up_ids (list),
-    experiments_down_ids (list).
+    group_key, experiments_tested, experiments_up, experiments_down,
+    timepoints_tested, timepoints_up, timepoints_down,
+    rank_ups (list), rank_downs (list),
+    log2fcs_up (list), log2fcs_down (list).
     """
     gk = _group_key_expr(group_by)
 
@@ -512,6 +523,16 @@ def build_gene_response_profile(
 
     conditions.append("g.locus_tag IN $locus_tags")
     where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    # Pass 2 WHERE: same filters minus locus_tags (already scoped by WITH g)
+    pass2_conditions, _ = _gene_response_profile_where(
+        organism=organism, treatment_types=treatment_types,
+        experiment_ids=experiment_ids,
+    )
+    pass2_where = (
+        "WHERE " + " AND ".join(pass2_conditions) + "\n"
+        if pass2_conditions else ""
+    )
 
     pagination = ""
     if offset:
@@ -541,50 +562,55 @@ def build_gene_response_profile(
         " g.locus_tag ASC"
         f"{pagination}\n"
         "\n"
-        # Pass 2: expand per-group detail
+        # Pass 2: group by experiment first, then aggregate per group
         "WITH g\n"
         "MATCH (e:Experiment)-[r:Changes_expression_of]->(g)\n"
-        f"{where_block.replace('g.locus_tag IN $locus_tags', 'TRUE')}"
-        f"WITH g, {gk} AS group_key,\n"
-        "     collect(DISTINCT e.id) AS experiment_ids,\n"
-        "     collect(r) AS edges\n"
+        f"{pass2_where}"
+        # Intermediate: per gene x group x experiment
+        f"WITH g, {gk} AS group_key, e.id AS eid,"
+        " collect(r) AS exp_edges\n"
+        # Aggregate: per gene x group
+        "WITH g, group_key,\n"
+        "     count(eid) AS experiments_tested,\n"
+        "     count(CASE WHEN ANY(x IN exp_edges"
+        " WHERE x.expression_status = 'significant_up')"
+        " THEN 1 END) AS experiments_up,\n"
+        "     count(CASE WHEN ANY(x IN exp_edges"
+        " WHERE x.expression_status = 'significant_down')"
+        " THEN 1 END) AS experiments_down,\n"
+        "     reduce(acc = [], edges IN collect(exp_edges)"
+        " | acc + edges) AS all_edges\n"
         "RETURN g.locus_tag AS locus_tag,\n"
         "       g.gene_name AS gene_name,\n"
         "       g.product AS product,\n"
         "       g.gene_category AS gene_category,\n"
         "       group_key,\n"
-        "       size(experiment_ids) AS experiments_tested,\n"
-        "       size(edges) AS timepoints_tested,\n"
-        "       size([e IN edges"
-        " WHERE e.expression_status = 'significant_up'])"
+        "       experiments_tested,\n"
+        "       experiments_up,\n"
+        "       experiments_down,\n"
+        "       size(all_edges) AS timepoints_tested,\n"
+        "       size([x IN all_edges"
+        " WHERE x.expression_status = 'significant_up'])"
         " AS timepoints_up,\n"
-        "       size([e IN edges"
-        " WHERE e.expression_status = 'significant_down'])"
+        "       size([x IN all_edges"
+        " WHERE x.expression_status = 'significant_down'])"
         " AS timepoints_down,\n"
-        "       [e IN edges"
-        " WHERE e.expression_status = 'significant_up'"
-        " | e.rank_up] AS rank_ups,\n"
-        "       [e IN edges"
-        " WHERE e.expression_status = 'significant_down'"
-        " | e.rank_down] AS rank_downs,\n"
-        "       [e IN edges"
-        " WHERE e.expression_status = 'significant_up'"
-        " | e.log2_fold_change] AS log2fcs_up,\n"
-        "       [e IN edges"
-        " WHERE e.expression_status = 'significant_down'"
-        " | e.log2_fold_change] AS log2fcs_down,\n"
-        "       [eid IN experiment_ids WHERE"
-        " ANY(e IN edges WHERE e.expression_status = 'significant_up'"
-        " AND e.id STARTS WITH eid)] AS experiments_up_ids,\n"
-        "       [eid IN experiment_ids WHERE"
-        " ANY(e IN edges WHERE e.expression_status = 'significant_down'"
-        " AND e.id STARTS WITH eid)] AS experiments_down_ids\n"
-        "ORDER BY g.locus_tag ASC, group_key ASC"
+        "       [x IN all_edges"
+        " WHERE x.expression_status = 'significant_up'"
+        " | x.rank_up] AS rank_ups,\n"
+        "       [x IN all_edges"
+        " WHERE x.expression_status = 'significant_down'"
+        " | x.rank_down] AS rank_downs,\n"
+        "       [x IN all_edges"
+        " WHERE x.expression_status = 'significant_up'"
+        " | x.log2_fold_change] AS log2fcs_up,\n"
+        "       [x IN all_edges"
+        " WHERE x.expression_status = 'significant_down'"
+        " | x.log2_fold_change] AS log2fcs_down\n"
+        "ORDER BY locus_tag ASC, group_key ASC"
     )
     return cypher, params
 ```
-
-**Note on experiments_up/down:** The query collects distinct experiment IDs, then filters by checking if any edge in that experiment is significant in the given direction. This uses the edge's `id` property which starts with the experiment ID. If this pattern doesn't work against the live KG, the API layer can compute experiments_up/down from the edges list instead. The important thing is `rank_ups`, `rank_downs`, `log2fcs_up`, `log2fcs_down` are collected as lists — the API computes min/median/max from these.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
@@ -653,8 +679,8 @@ class TestGeneResponseProfile:
                 "rank_downs": [],
                 "log2fcs_up": [5.7, 4.2, 3.1, 2.8, 2.5, 3.5, 3.8, 2.9],
                 "log2fcs_down": [],
-                "experiments_up_ids": ["exp1", "exp2", "exp3"],
-                "experiments_down_ids": [],
+                "experiments_up": 3,
+                "experiments_down": 0,
             },
             {
                 "locus_tag": "PMM0370",
@@ -670,8 +696,8 @@ class TestGeneResponseProfile:
                 "rank_downs": [12, 15, 14, 16, 18],
                 "log2fcs_up": [],
                 "log2fcs_down": [-13.0, -10.2, -8.5, -7.1, -6.0],
-                "experiments_up_ids": [],
-                "experiments_down_ids": ["exp4", "exp5"],
+                "experiments_up": 0,
+                "experiments_down": 2,
             },
         ]
 
@@ -942,8 +968,8 @@ def gene_response_profile(
         entry: dict = {
             "experiments_total": totals["experiments"],
             "experiments_tested": row["experiments_tested"],
-            "experiments_up": len(row["experiments_up_ids"]),
-            "experiments_down": len(row["experiments_down_ids"]),
+            "experiments_up": row["experiments_up"],
+            "experiments_down": row["experiments_down"],
             "timepoints_total": totals["timepoints"],
             "timepoints_tested": row["timepoints_tested"],
             "timepoints_up": row["timepoints_up"],
@@ -1096,8 +1122,8 @@ class TestGeneResponseProfileWrapper:
                 "rank_downs": [],
                 "log2fcs_up": [5.7, 4.2, 3.1],
                 "log2fcs_down": [],
-                "experiments_up_ids": ["e1", "e2", "e3"],
-                "experiments_down_ids": [],
+                "experiments_up": 3,
+                "experiments_down": 0,
             }],
         ]
         result = await tool_fns["gene_response_profile"](
