@@ -1,0 +1,28 @@
+examples:
+  - title: Search for photosynthesis-related clusters
+    call: list_gene_clusters(search_text="photosynthesis")
+  - title: Browse all MED4 clusters
+    call: list_gene_clusters(organism="MED4", limit=20)
+  - title: Filter by treatment type
+    call: list_gene_clusters(treatment_type=["nitrogen_stress"], verbose=True)
+  - title: Find clusters then get member genes
+    steps: |
+      Step 1: list_gene_clusters(search_text="N transport")
+              → extract cluster_id values from results
+      Step 2: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+              → see member genes
+verbose_fields:
+  - functional_description
+  - behavioral_description
+  - cluster_method
+  - treatment
+  - light_condition
+  - experimental_context
+  - peak_time_hours
+  - period_hours
+  - pub_doi
+chaining:
+  - "list_gene_clusters → genes_in_cluster → differential_expression_by_gene"
+  - "list_gene_clusters → gene_clusters_by_gene (reverse lookup)"
+mistakes:
+  - "Cluster IDs are not in the fulltext index — use search_text for text queries, cluster_ids with genes_in_cluster."

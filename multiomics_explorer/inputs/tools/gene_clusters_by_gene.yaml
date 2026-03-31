@@ -1,0 +1,19 @@
+examples:
+  - title: Check cluster membership for N-transport genes
+    call: gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM0958"])
+  - title: Summary only — which genes have clusters?
+    call: gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0001"], summary=True)
+  - title: Filter to stress response clusters
+    call: gene_clusters_by_gene(locus_tags=["PMM0370"], cluster_type="stress_response", verbose=True)
+verbose_fields:
+  - functional_description
+  - behavioral_description
+  - treatment_type
+  - treatment
+  - source_paper
+  - p_value
+chaining:
+  - "resolve_gene → gene_clusters_by_gene → genes_in_cluster"
+  - "gene_clusters_by_gene → genes_in_cluster (see all cluster members)"
+mistakes:
+  - "Single organism enforced — don't mix PMM (MED4) and PMT (MIT9313) locus tags in one call."

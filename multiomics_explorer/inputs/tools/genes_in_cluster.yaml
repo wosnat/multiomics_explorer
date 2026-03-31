@@ -1,0 +1,18 @@
+examples:
+  - title: Get members of an N-transport cluster
+    call: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+  - title: Drill into multiple clusters at once
+    call: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport", "cluster:msb4100087:med4:down_translation"], limit=20)
+  - title: Verbose view with cluster context
+    call: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"], verbose=True)
+verbose_fields:
+  - function_description
+  - gene_summary
+  - p_value
+  - functional_description
+  - behavioral_description
+chaining:
+  - "list_gene_clusters → genes_in_cluster → gene_overview"
+  - "gene_clusters_by_gene → genes_in_cluster → differential_expression_by_gene"
+mistakes:
+  - "Cluster IDs come from list_gene_clusters or gene_clusters_by_gene results — they are not gene locus tags."
