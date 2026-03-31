@@ -85,5 +85,68 @@ def _flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _process_object_column(df: pd.DataFrame, col: str) -> pd.DataFrame:
-    """Process a single object-typed column — stub (no-op) for Task 1."""
+    """Process a single object-typed column.
+
+    - All non-null values are lists → join with :data:`_LIST_DELIMITER`.
+    - All non-null values are dicts → expand into ``{col}_{key}`` columns.
+    - Mixed or nested complex values → drop with :class:`UserWarning`.
+    """
+    series = df[col]
+    non_null = [v for v in series if v is not None and not _is_scalar_nan(v)]
+
+    if not non_null:
+        # All nulls — nothing to do.
+        return df
+
+    if all(isinstance(v, list) for v in non_null):
+        # Check for nested items (list of dicts/lists)
+        has_nested_items = any(
+            isinstance(item, (dict, list))
+            for v in non_null
+            for item in v
+            if item is not None
+        )
+        if has_nested_items:
+            _drop_with_warning(df, col)
+            return df
+        # Join list values with delimiter; preserve None as NaN, [] as "".
+        df[col] = series.apply(
+            lambda v: _LIST_DELIMITER.join(str(x) for x in v)
+            if isinstance(v, list)
+            else v
+        )
+        return df
+
     return df
+
+
+# ---------------------------------------------------------------------------
+# Private utilities
+# ---------------------------------------------------------------------------
+
+
+def _is_scalar_nan(value: Any) -> bool:
+    """Return True if *value* is a float NaN (but not a list/dict)."""
+    if isinstance(value, float):
+        import math
+
+        return math.isnan(value)
+    return False
+
+
+def _drop_with_warning(df: pd.DataFrame, col: str) -> None:
+    """Warn and drop *col* from *df* in-place."""
+    dedicated = _DEDICATED_FUNCTIONS.get(col)
+    if dedicated:
+        suggestion = (
+            f"Column '{col}' contains nested data. "
+            f"Use {dedicated} to convert this column instead."
+        )
+    else:
+        suggestion = (
+            f"Column '{col}' contains nested data that cannot be flattened "
+            "automatically. The column has been dropped. "
+            "If you need this data, please file an issue."
+        )
+    warnings.warn(suggestion, UserWarning, stacklevel=4)
+    df.drop(columns=[col], inplace=True)

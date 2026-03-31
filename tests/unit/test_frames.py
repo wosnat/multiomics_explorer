@@ -34,3 +34,39 @@ class TestToDataFrameFlat:
     def test_missing_results_key(self):
         with pytest.raises(ValueError, match="results"):
             to_dataframe({"data": []})
+
+
+class TestToDataFrameListColumns:
+    """List values in result dicts are joined with ' | '."""
+
+    def test_list_columns_joined(self):
+        result = {
+            "results": [
+                {"gene": "MIT9313_0001", "tags": ["iron", "stress"]},
+                {"gene": "MIT9313_0002", "tags": ["photosynthesis"]},
+            ]
+        }
+        df = to_dataframe(result)
+        assert df["tags"].tolist() == ["iron | stress", "photosynthesis"]
+
+    def test_list_column_with_none(self):
+        result = {
+            "results": [
+                {"gene": "MIT9313_0001", "tags": ["iron", "stress"]},
+                {"gene": "MIT9313_0002", "tags": None},
+            ]
+        }
+        df = to_dataframe(result)
+        assert df["tags"].iloc[0] == "iron | stress"
+        assert pd.isna(df["tags"].iloc[1])
+
+    def test_empty_list_becomes_empty_string(self):
+        result = {
+            "results": [
+                {"gene": "MIT9313_0001", "tags": []},
+                {"gene": "MIT9313_0002", "tags": ["photosynthesis"]},
+            ]
+        }
+        df = to_dataframe(result)
+        assert df["tags"].iloc[0] == ""
+        assert df["tags"].iloc[1] == "photosynthesis"
