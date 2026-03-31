@@ -49,6 +49,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_organism_for_organism,
     build_resolve_organism_for_locus_tags,
     build_resolve_organism_for_experiments,
+    build_gene_response_profile_envelope,
+    build_gene_response_profile,
 )
 
 
@@ -2413,3 +2415,147 @@ class TestBuildDifferentialExpressionByOrthologDiagnostics:
         assert result is not None
         cypher, _ = result[0]
         assert "r.expression_status <> 'not_significant'" in cypher
+
+
+class TestBuildGeneResponseProfileEnvelope:
+    def test_basic(self):
+        cypher, params = build_gene_response_profile_envelope(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+        )
+        assert "MATCH" in cypher
+        assert params["locus_tags"] == ["PMM0370"]
+        assert params["organism_name"] == "Prochlorococcus MED4"
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_gene_response_profile_envelope(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+        )
+        for col in ["found_genes", "has_expression", "has_significant"]:
+            assert col in cypher
+
+    def test_organism_exact_match(self):
+        cypher, params = build_gene_response_profile_envelope(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+        )
+        assert "$organism_name" in cypher
+
+    def test_treatment_types_filter(self):
+        cypher, params = build_gene_response_profile_envelope(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            treatment_types=["nitrogen_stress"],
+        )
+        assert "$treatment_types" in cypher
+        assert params["treatment_types"] == ["nitrogen_stress"]
+
+    def test_experiment_ids_filter(self):
+        cypher, params = build_gene_response_profile_envelope(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            experiment_ids=["exp1"],
+        )
+        assert "$experiment_ids" in cypher
+        assert params["experiment_ids"] == ["exp1"]
+
+    def test_group_by_treatment_type(self):
+        cypher, _ = build_gene_response_profile_envelope(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            group_by="treatment_type",
+        )
+        assert "treatment_type" in cypher
+
+    def test_group_by_experiment(self):
+        cypher, _ = build_gene_response_profile_envelope(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            group_by="experiment",
+        )
+        assert ".id" in cypher
+
+    def test_invalid_group_by_raises(self):
+        with pytest.raises(ValueError, match="group_by"):
+            build_gene_response_profile_envelope(
+                locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+                group_by="invalid",
+            )
+
+
+class TestBuildGeneResponseProfile:
+    def test_basic(self):
+        cypher, params = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+        )
+        assert "MATCH" in cypher
+        assert params["locus_tags"] == ["PMM0370"]
+        assert params["organism_name"] == "Prochlorococcus MED4"
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+        )
+        for col in [
+            "locus_tag", "gene_name", "product", "gene_category",
+            "group_key", "experiments_tested", "experiments_up",
+            "experiments_down", "timepoints_tested", "timepoints_up",
+            "timepoints_down", "rank_ups", "rank_downs",
+            "log2fcs_up", "log2fcs_down",
+        ]:
+            assert col in cypher
+
+    def test_order_by(self):
+        cypher, _ = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+        )
+        assert "ORDER BY" in cypher
+        assert "groups_responded DESC" in cypher
+
+    def test_skip_limit(self):
+        cypher, params = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            limit=10, offset=5,
+        )
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["offset"] == 5
+        assert params["limit"] == 10
+
+    def test_group_by_treatment_type(self):
+        cypher, _ = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            group_by="treatment_type",
+        )
+        assert "treatment_type" in cypher
+
+    def test_group_by_experiment(self):
+        cypher, _ = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            group_by="experiment",
+        )
+        assert ".id AS group_key" in cypher or ".id" in cypher
+
+    def test_treatment_types_filter(self):
+        cypher, params = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            treatment_types=["nitrogen_stress"],
+        )
+        assert "$treatment_types" in cypher
+        assert params["treatment_types"] == ["nitrogen_stress"]
+
+    def test_experiment_ids_filter(self):
+        cypher, params = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+            experiment_ids=["exp1"],
+        )
+        assert "$experiment_ids" in cypher
+        assert params["experiment_ids"] == ["exp1"]
+
+    def test_invalid_group_by_raises(self):
+        with pytest.raises(ValueError, match="group_by"):
+            build_gene_response_profile(
+                locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+                group_by="invalid",
+            )
+
+    def test_no_limit_no_skip(self):
+        cypher, params = build_gene_response_profile(
+            locus_tags=["PMM0370"], organism_name="Prochlorococcus MED4",
+        )
+        assert "SKIP" not in cypher
+        assert "LIMIT" not in cypher

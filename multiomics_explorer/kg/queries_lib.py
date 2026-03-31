@@ -2329,3 +2329,212 @@ def build_differential_expression_by_ortholog_diagnostics(
             significant_only=significant_only,
         ))
     return queries
+
+
+# ---------------------------------------------------------------------------
+# gene_response_profile helpers
+# ---------------------------------------------------------------------------
+
+def _gene_response_profile_where(
+    *,
+    organism_name: str | None = None,
+    treatment_types: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    experiment_alias: str = "e",
+) -> tuple[list[str], dict]:
+    """Build WHERE conditions + params shared by gene_response_profile builders."""
+    conditions: list[str] = []
+    params: dict = {}
+    if organism_name:
+        conditions.append(f"{experiment_alias}.organism_name = $organism_name")
+        params["organism_name"] = organism_name
+    if treatment_types:
+        conditions.append(f"toLower({experiment_alias}.treatment_type) IN $treatment_types")
+        params["treatment_types"] = [t.lower() for t in treatment_types]
+    if experiment_ids:
+        conditions.append(f"{experiment_alias}.id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+    return conditions, params
+
+
+def _group_key_expr(group_by: str, alias: str = "e") -> str:
+    """Return the Cypher expression for the group key."""
+    if group_by == "treatment_type":
+        return f"{alias}.treatment_type"
+    elif group_by == "experiment":
+        return f"{alias}.id"
+    else:
+        raise ValueError(f"group_by must be 'treatment_type' or 'experiment', got '{group_by}'")
+
+
+def build_gene_response_profile_envelope(
+    *,
+    locus_tags: list[str],
+    organism_name: str,
+    treatment_types: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    group_by: str = "treatment_type",
+) -> tuple[str, dict]:
+    """Build envelope query for gene_response_profile.
+
+    organism_name is required (resolved by API before calling).
+
+    RETURN keys: found_genes (list), has_expression (list), has_significant (list),
+    group_totals (list of {group_key, experiments, timepoints}).
+    """
+    gk = _group_key_expr(group_by)
+    gk2 = _group_key_expr(group_by, alias="e2")
+
+    conditions_e, params = _gene_response_profile_where(
+        organism_name=organism_name, treatment_types=treatment_types,
+        experiment_ids=experiment_ids, experiment_alias="e",
+    )
+    params["locus_tags"] = locus_tags
+    where_e = " AND " + " AND ".join(conditions_e) if conditions_e else ""
+
+    conditions_e2, _ = _gene_response_profile_where(
+        organism_name=organism_name, treatment_types=treatment_types,
+        experiment_ids=experiment_ids, experiment_alias="e2",
+    )
+    where_e2 = "WHERE " + " AND ".join(conditions_e2)
+
+    cypher = (
+        "MATCH (g:Gene)\n"
+        "WHERE g.locus_tag IN $locus_tags\n"
+        "WITH collect(g.locus_tag) AS found_genes\n"
+        "\n"
+        "OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g2:Gene)\n"
+        f"WHERE g2.locus_tag IN found_genes{where_e}\n"
+        "WITH found_genes,\n"
+        "     collect(DISTINCT g2.locus_tag) AS has_expression,\n"
+        "     collect(DISTINCT CASE WHEN r.expression_status IN"
+        " ['significant_up', 'significant_down']"
+        " THEN g2.locus_tag END) AS has_significant\n"
+        "\n"
+        "OPTIONAL MATCH (e2:Experiment)-[:Changes_expression_of]->(:Gene)\n"
+        f"{where_e2}\n"
+        f"WITH found_genes, has_expression, has_significant,\n"
+        f"     {gk2} AS group_key,\n"
+        "     collect(DISTINCT e2) AS group_experiments\n"
+        "WITH found_genes, has_expression, has_significant,\n"
+        "     collect({group_key: group_key,"
+        " experiments: size(group_experiments),"
+        " timepoints: reduce(s = 0, exp IN group_experiments |"
+        " s + COALESCE(exp.time_point_count, 1))}) AS group_totals\n"
+        "RETURN found_genes,"
+        " has_expression, has_significant, group_totals"
+    )
+    return cypher, params
+
+
+def build_gene_response_profile(
+    *,
+    locus_tags: list[str],
+    organism_name: str,
+    treatment_types: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    group_by: str = "treatment_type",
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build two-pass aggregation query for gene_response_profile.
+
+    Pass 1: compute per-gene sort keys (breadth/depth/timepoints), sort and paginate.
+    Pass 2: group by experiment first (experiments_up/down), then flatten for rank/log2fc.
+
+    RETURN keys: locus_tag, gene_name, product, gene_category, group_key,
+    experiments_tested, experiments_up, experiments_down, timepoints_tested,
+    timepoints_up, timepoints_down, rank_ups (list), rank_downs (list),
+    log2fcs_up (list), log2fcs_down (list).
+    """
+    gk = _group_key_expr(group_by)
+
+    conditions, params = _gene_response_profile_where(
+        organism_name=organism_name, treatment_types=treatment_types,
+        experiment_ids=experiment_ids,
+    )
+    params["locus_tags"] = locus_tags
+    conditions.append("g.locus_tag IN $locus_tags")
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    pass2_conditions, _ = _gene_response_profile_where(
+        organism_name=organism_name, treatment_types=treatment_types,
+        experiment_ids=experiment_ids,
+    )
+    pass2_where = (
+        "WHERE " + " AND ".join(pass2_conditions) + "\n"
+        if pass2_conditions else ""
+    )
+
+    pagination = ""
+    if offset:
+        pagination += "\nSKIP $offset"
+        params["offset"] = offset
+    if limit is not None:
+        pagination += "\nLIMIT $limit"
+        params["limit"] = limit
+
+    cypher = (
+        "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
+        f"{where_block}"
+        "WITH g,\n"
+        "     count(DISTINCT CASE"
+        " WHEN r.expression_status IN ['significant_up', 'significant_down']"
+        f" THEN {gk} END) AS groups_responded,\n"
+        "     count(DISTINCT CASE"
+        " WHEN r.expression_status IN ['significant_up', 'significant_down']"
+        " THEN e.id END) AS experiments_responded,\n"
+        "     sum(CASE"
+        " WHEN r.expression_status IN ['significant_up', 'significant_down']"
+        " THEN 1 ELSE 0 END) AS timepoints_responded\n"
+        "ORDER BY groups_responded DESC,"
+        " experiments_responded DESC,"
+        " timepoints_responded DESC,"
+        " g.locus_tag ASC"
+        f"{pagination}\n"
+        "\n"
+        "WITH g\n"
+        "MATCH (e:Experiment)-[r:Changes_expression_of]->(g)\n"
+        f"{pass2_where}"
+        f"WITH g, {gk} AS group_key, e.id AS eid,"
+        " collect(r) AS exp_edges\n"
+        "WITH g, group_key,\n"
+        "     count(eid) AS experiments_tested,\n"
+        "     count(CASE WHEN ANY(x IN exp_edges"
+        " WHERE x.expression_status = 'significant_up')"
+        " THEN 1 END) AS experiments_up,\n"
+        "     count(CASE WHEN ANY(x IN exp_edges"
+        " WHERE x.expression_status = 'significant_down')"
+        " THEN 1 END) AS experiments_down,\n"
+        "     reduce(acc = [], edges IN collect(exp_edges)"
+        " | acc + edges) AS all_edges\n"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.gene_name AS gene_name,\n"
+        "       g.product AS product,\n"
+        "       g.gene_category AS gene_category,\n"
+        "       group_key,\n"
+        "       experiments_tested,\n"
+        "       experiments_up,\n"
+        "       experiments_down,\n"
+        "       size(all_edges) AS timepoints_tested,\n"
+        "       size([x IN all_edges"
+        " WHERE x.expression_status = 'significant_up'])"
+        " AS timepoints_up,\n"
+        "       size([x IN all_edges"
+        " WHERE x.expression_status = 'significant_down'])"
+        " AS timepoints_down,\n"
+        "       [x IN all_edges"
+        " WHERE x.expression_status = 'significant_up'"
+        " | x.rank_up] AS rank_ups,\n"
+        "       [x IN all_edges"
+        " WHERE x.expression_status = 'significant_down'"
+        " | x.rank_down] AS rank_downs,\n"
+        "       [x IN all_edges"
+        " WHERE x.expression_status = 'significant_up'"
+        " | x.log2_fold_change] AS log2fcs_up,\n"
+        "       [x IN all_edges"
+        " WHERE x.expression_status = 'significant_down'"
+        " | x.log2_fold_change] AS log2fcs_down\n"
+        "ORDER BY locus_tag ASC, group_key ASC"
+    )
+    return cypher, params
