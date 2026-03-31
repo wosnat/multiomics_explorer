@@ -117,6 +117,28 @@ def _process_object_column(df: pd.DataFrame, col: str) -> pd.DataFrame:
         )
         return df
 
+    if all(isinstance(v, dict) for v in non_null):
+        # Check for nested dict/list values inside the dicts
+        has_nested_values = any(
+            isinstance(inner_val, (dict, list))
+            for v in non_null
+            for inner_val in v.values()
+        )
+        if has_nested_values:
+            _drop_with_warning(df, col)
+            return df
+        # Expand flat dicts into {col}_{key} columns, inserted at original position.
+        col_pos = df.columns.get_loc(col)
+        expanded = series.apply(lambda v: v if isinstance(v, dict) else {})
+        expanded_df = pd.DataFrame(expanded.tolist(), index=df.index)
+        expanded_df.columns = [f"{col}_{k}" for k in expanded_df.columns]
+        df = df.drop(columns=[col])
+        for i, new_col in enumerate(expanded_df.columns):
+            df.insert(col_pos + i, new_col, expanded_df[new_col])
+        return df
+
+    # Mixed types — drop with warning.
+    _drop_with_warning(df, col)
     return df
 
 
