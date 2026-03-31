@@ -1859,6 +1859,9 @@ def differential_expression_by_ortholog(
     return envelope
 
 
+_FULL_COVERAGE_SCOPES = {"significant_only", "significant_any_timepoint"}
+
+
 def gene_response_profile(
     locus_tags: list[str],
     organism: str | None = None,
@@ -1883,8 +1886,12 @@ def gene_response_profile(
         dict with keys: organism_name, genes_queried, genes_with_response,
         not_found, no_expression, returned, offset, truncated, results.
         Each result has: locus_tag, gene_name, product, gene_category,
-        groups_responded, groups_not_responded, groups_not_known,
-        response_summary.
+        groups_responded, groups_not_responded, groups_tested_not_responded,
+        groups_not_known, response_summary.
+        groups_tested_not_responded: groups where the gene has no expression
+        edges but all experiments in the group have full-coverage scopes
+        (significant_only or significant_any_timepoint), implying the gene
+        was measured but did not respond significantly.
     """
     if not locus_tags:
         raise ValueError(
@@ -1923,6 +1930,7 @@ def gene_response_profile(
         gt["group_key"]: {
             "experiments": gt["experiments"],
             "timepoints": gt["timepoints"],
+            "table_scopes": gt.get("table_scopes", []),
         }
         for gt in env_row["group_totals"]
         if gt["group_key"] is not None
@@ -2001,8 +2009,14 @@ def gene_response_profile(
             gk for gk, v in rs.items()
             if v["experiments_up"] == 0 and v["experiments_down"] == 0
         ]
+        missing_groups = [gk for gk in group_totals if gk not in rs]
+        gene["groups_tested_not_responded"] = [
+            gk for gk in missing_groups
+            if set(group_totals[gk]["table_scopes"]) <= _FULL_COVERAGE_SCOPES
+        ]
         gene["groups_not_known"] = [
-            gk for gk in group_totals if gk not in rs
+            gk for gk in missing_groups
+            if gk not in gene["groups_tested_not_responded"]
         ]
         results.append(gene)
 

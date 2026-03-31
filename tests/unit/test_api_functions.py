@@ -2613,8 +2613,8 @@ class TestGeneResponseProfile:
             "has_expression": has_expression or ["PMM0370"],
             "has_significant": has_significant or ["PMM0370"],
             "group_totals": group_totals or [
-                {"group_key": "nitrogen_stress", "experiments": 4, "timepoints": 14},
-                {"group_key": "coculture", "experiments": 2, "timepoints": 6},
+                {"group_key": "nitrogen_stress", "experiments": 4, "timepoints": 14, "table_scopes": ["all_detected_genes"]},
+                {"group_key": "coculture", "experiments": 2, "timepoints": 6, "table_scopes": ["significant_only"]},
             ],
         }]
 
@@ -2738,7 +2738,58 @@ class TestGeneResponseProfile:
         ]
         result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
         gene = result["results"][0]
-        assert "coculture" in gene["groups_not_known"]
+        # coculture has significant_only scope → tested_not_responded, not not_known
+        assert "coculture" in gene["groups_tested_not_responded"]
+        assert "coculture" not in gene["groups_not_known"]
+
+    def test_groups_tested_not_responded(self, mock_conn):
+        """Gene with no edges in a significant_only group → groups_tested_not_responded."""
+        agg_rows = [self._make_agg_rows()[0]]  # only nitrogen_stress
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            self._make_envelope_result(),
+            agg_rows,
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        gene = result["results"][0]
+        # coculture has table_scopes=["significant_only"] and gene has no edges → tested_not_responded
+        assert "coculture" in gene["groups_tested_not_responded"]
+        assert "coculture" not in gene["groups_not_known"]
+
+    def test_groups_not_known_with_mixed_scopes(self, mock_conn):
+        """Gene with no edges in a mixed-scope group stays in groups_not_known."""
+        agg_rows = [self._make_agg_rows()[0]]  # only nitrogen_stress
+        env = self._make_envelope_result(group_totals=[
+            {"group_key": "nitrogen_stress", "experiments": 4, "timepoints": 14, "table_scopes": ["all_detected_genes"]},
+            {"group_key": "iron_stress", "experiments": 3, "timepoints": 9, "table_scopes": ["significant_only", "filtered_subset"]},
+        ])
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            env,
+            agg_rows,
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        gene = result["results"][0]
+        # iron_stress has mixed scopes (includes filtered_subset) → stays not_known
+        assert "iron_stress" in gene["groups_not_known"]
+        assert "iron_stress" not in gene.get("groups_tested_not_responded", [])
+
+    def test_groups_tested_not_responded_all_scopes_full_coverage(self, mock_conn):
+        """Group with both significant_only and significant_any_timepoint → tested_not_responded."""
+        agg_rows = [self._make_agg_rows()[0]]  # only nitrogen_stress
+        env = self._make_envelope_result(group_totals=[
+            {"group_key": "nitrogen_stress", "experiments": 4, "timepoints": 14, "table_scopes": ["all_detected_genes"]},
+            {"group_key": "light_stress", "experiments": 3, "timepoints": 9, "table_scopes": ["significant_only", "significant_any_timepoint"]},
+        ])
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": [self._ORGANISM]}],
+            env,
+            agg_rows,
+        ]
+        result = api.gene_response_profile(locus_tags=["PMM0370"], conn=mock_conn)
+        gene = result["results"][0]
+        assert "light_stress" in gene["groups_tested_not_responded"]
+        assert "light_stress" not in gene["groups_not_known"]
 
     def test_pagination(self, mock_conn):
         mock_conn.execute_query.side_effect = [
