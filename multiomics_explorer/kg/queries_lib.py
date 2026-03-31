@@ -2737,3 +2737,150 @@ def build_list_gene_clusters(
         f"ORDER BY {order_prefix}gc.organism_name, gc.name{skip_clause}{limit_clause}"
     )
     return cypher, params
+
+def build_gene_clusters_by_gene_summary(
+    *,
+    locus_tags: list[str],
+    cluster_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for gene_clusters_by_gene.
+
+    RETURN keys: total_matching, total_clusters,
+    genes_with_clusters, genes_without_clusters,
+    not_found, not_matched,
+    by_cluster_type, by_treatment_type, by_publication.
+    """
+    params: dict = {"locus_tags": locus_tags}
+
+    gc_conditions: list[str] = []
+    if cluster_type is not None:
+        gc_conditions.append("gc.cluster_type = $cluster_type")
+        params["cluster_type"] = cluster_type
+    if treatment_type is not None:
+        gc_conditions.append(
+            "ANY(tt IN gc.treatment_type WHERE tt IN $treatment_type)")
+        params["treatment_type"] = treatment_type
+
+    pub_match = ""
+    if publication_doi is not None:
+        pub_match = "MATCH (pub:Publication)-[:Publication_has_gene_cluster]->(gc)\n"
+        gc_conditions.append("pub.doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+
+    gc_where = "WHERE " + " AND ".join(gc_conditions) + "\n" if gc_conditions else ""
+
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
+        "OPTIONAL MATCH (gc:GeneCluster)-[:Gene_in_gene_cluster]->(g)\n"
+        f"{pub_match}"
+        f"{gc_where}"
+        "WITH lt, g, gc\n"
+        "WITH collect(DISTINCT CASE WHEN g IS NULL THEN lt END) AS nf_raw,\n"
+        "     collect(DISTINCT CASE WHEN g IS NOT NULL AND gc IS NULL\n"
+        "             THEN lt END) AS nm_raw,\n"
+        "     collect(CASE WHEN gc IS NOT NULL THEN\n"
+        "       {lt: lt, cid: gc.id, ct: gc.cluster_type,\n"
+        "        tt: gc.treatment_type} END) AS rows\n"
+        "WITH [x IN nf_raw WHERE x IS NOT NULL] AS not_found,\n"
+        "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched,\n"
+        "     rows\n"
+        "OPTIONAL MATCH (pub2:Publication)-[:Publication_has_gene_cluster]->(gc2:GeneCluster)\n"
+        "WHERE gc2.id IN [r IN rows | r.cid]\n"
+        "WITH not_found, not_matched, rows,\n"
+        "     collect(DISTINCT {doi: pub2.doi, cid: gc2.id}) AS pub_rows\n"
+        "WITH not_found, not_matched,\n"
+        "     size(rows) AS total_matching,\n"
+        "     size(apoc.coll.toSet([r IN rows | r.cid])) AS total_clusters,\n"
+        "     size(apoc.coll.toSet([r IN rows | r.lt])) AS genes_with_clusters,\n"
+        "     size($locus_tags) - size(apoc.coll.toSet([r IN rows | r.lt]))\n"
+        "       - size([x IN not_found WHERE x IS NOT NULL]) AS genes_without_clusters,\n"
+        "     apoc.coll.frequencies([r IN rows | r.ct]) AS by_cluster_type,\n"
+        "     apoc.coll.frequencies(\n"
+        "       apoc.coll.flatten([r IN rows | r.tt])) AS by_treatment_type,\n"
+        "     apoc.coll.frequencies(\n"
+        "       [p IN pub_rows WHERE p.doi IS NOT NULL | p.doi]) AS by_publication,\n"
+        "     not_found, not_matched\n"
+        "RETURN total_matching, total_clusters,\n"
+        "       genes_with_clusters, genes_without_clusters,\n"
+        "       not_found, not_matched,\n"
+        "       by_cluster_type, by_treatment_type, by_publication"
+    )
+    return cypher, params
+
+
+def build_gene_clusters_by_gene(
+    *,
+    locus_tags: list[str],
+    cluster_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for gene_clusters_by_gene.
+
+    RETURN keys (compact): locus_tag, gene_name, cluster_id, cluster_name,
+    cluster_type, membership_score, member_count.
+    RETURN keys (verbose): adds functional_description, behavioral_description,
+    treatment_type, treatment, source_paper, p_value.
+    """
+    params: dict = {"locus_tags": locus_tags}
+
+    gc_conditions: list[str] = []
+    if cluster_type is not None:
+        gc_conditions.append("gc.cluster_type = $cluster_type")
+        params["cluster_type"] = cluster_type
+    if treatment_type is not None:
+        gc_conditions.append(
+            "ANY(tt IN gc.treatment_type WHERE tt IN $treatment_type)")
+        params["treatment_type"] = treatment_type
+
+    pub_match = ""
+    if publication_doi is not None:
+        pub_match = "MATCH (pub:Publication)-[:Publication_has_gene_cluster]->(gc)\n"
+        gc_conditions.append("pub.doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+
+    gc_where = ""
+    if gc_conditions:
+        gc_where = "WHERE " + " AND ".join(gc_conditions) + "\n"
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       gc.functional_description AS functional_description"
+            ",\n       gc.behavioral_description AS behavioral_description"
+            ",\n       gc.treatment_type AS treatment_type"
+            ",\n       gc.treatment AS treatment"
+            ",\n       gc.source_paper AS source_paper"
+            ",\n       r.p_value AS p_value"
+        )
+
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (gc:GeneCluster)-[r:Gene_in_gene_cluster]->(g:Gene {locus_tag: lt})\n"
+        f"{pub_match}"
+        f"{gc_where}"
+        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       gc.id AS cluster_id, gc.name AS cluster_name,\n"
+        "       gc.cluster_type AS cluster_type,\n"
+        "       r.membership_score AS membership_score,\n"
+        f"       gc.member_count AS member_count{verbose_cols}\n"
+        f"ORDER BY g.locus_tag, gc.id{skip_clause}{limit_clause}"
+    )
+    return cypher, params

@@ -2706,3 +2706,76 @@ class TestBuildListGeneClusters:
         from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
         cypher, _ = build_list_gene_clusters()
         assert "ORDER BY" in cypher
+
+
+# ---------------------------------------------------------------------------
+# gene_clusters_by_gene
+# ---------------------------------------------------------------------------
+class TestBuildGeneClustersByGeneSummary:
+    """Tests for build_gene_clusters_by_gene_summary."""
+
+    def test_basic_structure(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
+        cypher, params = build_gene_clusters_by_gene_summary(
+            locus_tags=["PMM0370", "PMM0920"])
+        assert "Gene_in_gene_cluster" in cypher
+        assert "GeneCluster" in cypher
+        assert "total_matching" in cypher
+        assert "total_clusters" in cypher
+        assert "not_found" in cypher or "nf" in cypher
+        assert params["locus_tags"] == ["PMM0370", "PMM0920"]
+
+    def test_with_cluster_type_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
+        cypher, params = build_gene_clusters_by_gene_summary(
+            locus_tags=["PMM0370"], cluster_type="stress_response")
+        assert "$cluster_type" in cypher
+        assert params["cluster_type"] == "stress_response"
+
+    def test_with_publication_doi_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
+        cypher, params = build_gene_clusters_by_gene_summary(
+            locus_tags=["PMM0370"],
+            publication_doi=["10.1038/msb4100087"])
+        assert "Publication_has_gene_cluster" in cypher
+        assert params["publication_doi"] == ["10.1038/msb4100087"]
+
+
+class TestBuildGeneClustersByGene:
+    """Tests for build_gene_clusters_by_gene (detail builder)."""
+
+    def test_returns_expected_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, params = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"])
+        for col in ["locus_tag", "gene_name", "cluster_id",
+                     "cluster_name", "cluster_type",
+                     "membership_score", "member_count"]:
+            assert f"AS {col}" in cypher
+
+    def test_verbose_adds_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, _ = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"], verbose=True)
+        for col in ["functional_description", "behavioral_description",
+                     "treatment_type", "treatment", "source_paper", "p_value"]:
+            assert f"AS {col}" in cypher
+
+    def test_verbose_false_omits_verbose_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, _ = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"], verbose=False)
+        assert "functional_description" not in cypher
+        assert "behavioral_description" not in cypher
+
+    def test_offset_emits_skip(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, params = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"], limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+
+    def test_has_order_by(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, _ = build_gene_clusters_by_gene(locus_tags=["PMM0370"])
+        assert "ORDER BY" in cypher
