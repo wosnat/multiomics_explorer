@@ -995,14 +995,14 @@ def build_search_ontology(
             "  RETURN t.id AS id, t.name AS name, score\n"
             "}\n"
             "RETURN id, name, score\n"
-            "ORDER BY score DESC" + skip_clause + limit_clause
+            "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     else:
         cypher = (
             f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "YIELD node AS t, score\n"
             "RETURN t.id AS id, t.name AS name, score\n"
-            "ORDER BY score DESC" + skip_clause + limit_clause
+            "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     return cypher, params
 
@@ -1751,7 +1751,7 @@ def build_search_homolog_groups(
         "       og.specificity_rank AS specificity_rank,\n"
         "       og.member_count AS member_count, og.organism_count AS organism_count,\n"
         f"       score{verbose_cols}\n"
-        f"ORDER BY score DESC, og.specificity_rank, og.source{skip_clause}{limit_clause}"
+        f"ORDER BY score DESC, og.specificity_rank, og.source, og.id{skip_clause}{limit_clause}"
     )
     return cypher, params
 
