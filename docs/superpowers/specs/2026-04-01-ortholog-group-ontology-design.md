@@ -34,8 +34,8 @@ Groups without annotations return empty lists.
 
 **Summary builder additions:**
 
-- `by_cyanorak_role` — frequency breakdown of CyanorakRole annotations across matching groups
-- `by_cog_category` — frequency breakdown of CogFunctionalCategory annotations across matching groups
+- `top_cyanorak_roles` — top 5 CyanorakRole annotations by frequency across matching groups (`{id, name, count}`)
+- `top_cog_categories` — top 5 CogFunctionalCategory annotations by frequency across matching groups (`{id, name, count}`)
 
 ### 2. `gene_homologs`
 
@@ -46,8 +46,8 @@ Groups without annotations return empty lists.
 
 **Summary builder additions:**
 
-- `by_cyanorak_role` — frequency breakdown across groups in the result set
-- `by_cog_category` — frequency breakdown across groups in the result set
+- `top_cyanorak_roles` — top 5 CyanorakRole annotations by frequency (`{id, name, count}`)
+- `top_cog_categories` — top 5 CogFunctionalCategory annotations by frequency (`{id, name, count}`)
 
 ## Layer Changes
 
@@ -73,11 +73,11 @@ WITH og, score,
      [x IN collect(DISTINCT {id: cc.id, name: cc.name}) WHERE x.id IS NOT NULL] AS cog_categories
 ```
 
-**`build_search_homolog_groups_summary`** — Add frequency collections for `by_cyanorak_role` and `by_cog_category`. Requires OPTIONAL MATCH before the aggregation.
+**`build_search_homolog_groups_summary`** — Add `top_cyanorak_roles` and `top_cog_categories` (top 5 by count). Requires OPTIONAL MATCH before the aggregation, then sort + slice `[0..5]`.
 
 **`build_gene_homologs`** — Same OPTIONAL MATCH + collect pattern in verbose mode.
 
-**`build_gene_homologs_summary`** — Add frequency breakdowns for both ontology types.
+**`build_gene_homologs_summary`** — Add `top_cyanorak_roles` and `top_cog_categories` (top 5 by count).
 
 ### functions.py
 
