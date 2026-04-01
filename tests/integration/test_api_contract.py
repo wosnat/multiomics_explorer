@@ -736,3 +736,116 @@ class TestGeneResponseProfileContract:
                          "timepoints_total", "timepoints_tested",
                          "timepoints_up", "timepoints_down"):
                 assert key in entry
+
+
+# ---------------------------------------------------------------------------
+# list_gene_clusters
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestListGeneClustersContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.list_gene_clusters(conn=conn)
+        expected_keys = {
+            "total_entries", "total_matching",
+            "by_organism", "by_cluster_type", "by_treatment_type",
+            "by_omics_type", "by_publication",
+            "returned", "offset", "truncated", "results",
+        }
+        assert expected_keys <= set(result.keys())
+        assert result["total_entries"] >= 16
+
+    def test_search_text(self, conn):
+        result = api.list_gene_clusters(
+            search_text="transport", conn=conn)
+        assert result["total_matching"] >= 1
+        assert "score_max" in result
+
+    def test_organism_filter(self, conn):
+        result = api.list_gene_clusters(
+            organism="MED4", conn=conn)
+        assert result["total_matching"] >= 9
+
+    def test_result_keys_compact(self, conn):
+        result = api.list_gene_clusters(limit=1, conn=conn)
+        if result["results"]:
+            expected = {"cluster_id", "name", "organism_name",
+                        "cluster_type", "treatment_type",
+                        "member_count", "source_paper"}
+            assert expected <= set(result["results"][0].keys())
+
+    def test_result_keys_verbose(self, conn):
+        result = api.list_gene_clusters(
+            verbose=True, limit=1, conn=conn)
+        if result["results"]:
+            for key in ("functional_description", "behavioral_description",
+                        "cluster_method"):
+                assert key in result["results"][0]
+
+
+# ---------------------------------------------------------------------------
+# gene_clusters_by_gene
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGeneClustersByGeneContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"], conn=conn)
+        expected_keys = {
+            "total_matching", "total_clusters",
+            "genes_with_clusters", "genes_without_clusters",
+            "not_found", "not_matched",
+            "by_cluster_type", "by_treatment_type", "by_publication",
+            "returned", "offset", "truncated", "results",
+        }
+        assert expected_keys <= set(result.keys())
+
+    def test_known_gene_has_cluster(self, conn):
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"], conn=conn)
+        assert result["genes_with_clusters"] >= 1
+        assert result["total_clusters"] >= 1
+
+    def test_unknown_gene_in_not_found(self, conn):
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370", "FAKE_GENE_XYZ"],
+            conn=conn)
+        assert "FAKE_GENE_XYZ" in result["not_found"]
+
+
+# ---------------------------------------------------------------------------
+# genes_in_cluster
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGenesInClusterContract:
+    def test_returns_dict_envelope(self, conn):
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            conn=conn)
+        expected_keys = {
+            "total_matching", "by_organism", "by_cluster",
+            "top_categories", "genes_per_cluster_max",
+            "genes_per_cluster_median",
+            "not_found_clusters", "not_matched_clusters",
+            "returned", "offset", "truncated", "results",
+        }
+        assert expected_keys <= set(result.keys())
+
+    def test_known_cluster_has_members(self, conn):
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            conn=conn)
+        assert result["total_matching"] == 5
+
+    def test_result_keys_compact(self, conn):
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            limit=1, conn=conn)
+        expected = {"locus_tag", "gene_name", "product", "gene_category",
+                    "organism_name", "cluster_id", "cluster_name",
+                    "membership_score"}
+        assert expected <= set(result["results"][0].keys())
+
+    def test_unknown_cluster_in_not_found(self, conn):
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:fake:id"], conn=conn)
+        assert "cluster:fake:id" in result["not_found_clusters"]

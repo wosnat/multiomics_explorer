@@ -55,6 +55,9 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `differential_expression_by_gene` | Gene-centric differential expression. One row per gene × experiment × timepoint. Summary stats always returned; detail rows sorted by |log2FC|. Filters: organism, locus_tags, experiment_ids, direction, significant_only. Single organism enforced. |
 | `differential_expression_by_ortholog` | Differential expression framed by ortholog groups. Cross-organism. Results at group × experiment × timepoint granularity (gene counts, not individual genes). Rich summary fields (by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments). Supports verbose, limit. Batch: not_found/not_matched for groups, organisms, experiments. Filterable by organisms, experiment_ids, direction, significant_only. |
 | `gene_response_profile` | Cross-experiment gene-level summary: how each gene responds across treatments/experiments. One result per gene with response breadth, rank stats, log2FC stats. Sorted by response breadth. |
+| `list_gene_clusters` | Browse, search, and filter gene clusters. Optional Lucene search over functional/behavioral descriptions. Filterable by organism, cluster_type, treatment_type, omics_type, publication_doi. Rich summary breakdowns. |
+| `gene_clusters_by_gene` | Batch gene-centric cluster lookup. Locus tags → cluster memberships. Single organism enforced. Reports genes_with/without_clusters, not_found, not_matched. |
+| `genes_in_cluster` | Cluster IDs → member genes. Drill-down tool. Summary with top_categories, genes_per_cluster stats. Verbose includes both gene-level and cluster-level descriptions. |
 | `run_cypher` | Raw Cypher escape hatch (read-only). Write operations blocked; syntax and schema validated via CyVer before execution. Returns `{returned, truncated, warnings, results}`. |
 
 ### Claude Code Configuration

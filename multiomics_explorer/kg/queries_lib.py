@@ -2603,6 +2603,7 @@ def build_list_gene_clusters_summary(
             "CALL db.index.fulltext.queryNodes('geneClusterFullText', $search_text)\n"
             "YIELD node AS gc, score\n"
         )
+        pub_with_score = "WITH gc, score, collect(DISTINCT pub2.doi) AS pub_dois\n"
         score_cols = (
             ",\n     max(score) AS score_max"
             ",\n     percentileDisc(score, 0.5) AS score_median"
@@ -2610,6 +2611,7 @@ def build_list_gene_clusters_summary(
         score_return = ", score_max, score_median"
     else:
         match_block = "MATCH (gc:GeneCluster)\n"
+        pub_with_score = "WITH gc, collect(DISTINCT pub2.doi) AS pub_dois\n"
         score_cols = ""
         score_return = ""
 
@@ -2624,7 +2626,7 @@ def build_list_gene_clusters_summary(
         f"{match_block}"
         f"{where_block}"
         "OPTIONAL MATCH (pub2:Publication)-[:Publication_has_gene_cluster]->(gc)\n"
-        "WITH gc, collect(DISTINCT pub2.doi) AS pub_dois\n"
+        f"{pub_with_score}"
         "WITH collect(gc.organism_name) AS organisms,\n"
         "     collect(gc.cluster_type) AS cluster_types,\n"
         "     apoc.coll.flatten(collect(gc.treatment_type)) AS treatment_types,\n"
@@ -2801,8 +2803,7 @@ def build_gene_clusters_by_gene_summary(
         "     apoc.coll.frequencies(\n"
         "       apoc.coll.flatten([r IN rows | r.tt])) AS by_treatment_type,\n"
         "     apoc.coll.frequencies(\n"
-        "       [p IN pub_rows WHERE p.doi IS NOT NULL | p.doi]) AS by_publication,\n"
-        "     not_found, not_matched\n"
+        "       [p IN pub_rows WHERE p.doi IS NOT NULL | p.doi]) AS by_publication\n"
         "RETURN total_matching, total_clusters,\n"
         "       genes_with_clusters, genes_without_clusters,\n"
         "       not_found, not_matched,\n"
