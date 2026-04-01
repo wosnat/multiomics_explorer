@@ -53,37 +53,37 @@ mcp = FastMCP(
 register_tools(mcp)
 
 
-# --- About-mode resources: per-tool documentation ---
+# --- Documentation resources: per-tool and per-analysis guides ---
 from pathlib import Path
 
-_TOOLS_DOCS_DIR = (
+from fastmcp.resources.function_resource import FunctionResource
+
+_SKILLS_DIR = (
     Path(__file__).resolve().parent.parent
-    / "skills" / "multiomics-kg-guide" / "references" / "tools"
+    / "skills" / "multiomics-kg-guide" / "references"
 )
 
+_DOC_DIRS = {
+    "docs://tools": (_SKILLS_DIR / "tools", "Usage guide for the {stem} tool"),
+    "docs://analysis": (_SKILLS_DIR / "analysis", "Usage guide for the {stem} analysis utility"),
+}
 
-@mcp.resource("docs://tools/{tool_name}")
-def tool_docs(tool_name: str) -> str:
-    """Usage guide for a specific tool: parameters, response format, examples, chaining patterns."""
-    path = _TOOLS_DOCS_DIR / f"{tool_name}.md"
-    if not path.exists():
-        return f"No documentation found for tool '{tool_name}'."
-    return path.read_text()
+for uri_prefix, (doc_dir, desc_template) in _DOC_DIRS.items():
+    for md_file in sorted(doc_dir.glob("*.md")):
+        stem = md_file.stem
+        uri = f"{uri_prefix}/{stem}"
 
+        def _make_reader(path: Path):
+            return lambda: path.read_text()
 
-_ANALYSIS_DOCS_DIR = (
-    Path(__file__).resolve().parent.parent
-    / "skills" / "multiomics-kg-guide" / "references" / "analysis"
-)
-
-
-@mcp.resource("docs://analysis/{name}")
-def analysis_docs(name: str) -> str:
-    """Usage guide for an analysis utility: parameters, response format, examples, chaining patterns."""
-    path = _ANALYSIS_DOCS_DIR / f"{name}.md"
-    if not path.exists():
-        return f"No documentation found for analysis function '{name}'."
-    return path.read_text()
+        resource = FunctionResource.from_function(
+            fn=_make_reader(md_file),
+            uri=uri,
+            name=stem,
+            description=desc_template.format(stem=stem),
+            mime_type="text/plain",
+        )
+        mcp.add_resource(resource)
 
 
 def main():
