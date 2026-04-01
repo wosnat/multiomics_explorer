@@ -96,7 +96,7 @@ list_publications(treatment_type="coculture")
 Step 1: list_publications(organism="MED4")
         → find papers studying MED4
 
-Step 2: list_experiments(doi=result["doi"])
+Step 2: list_experiments(publication_doi=[result["doi"]])
         → drill into experiments from a specific paper
 
 Step 3: genes_by_function(search_text="photosystem", organism="MED4")
@@ -106,8 +106,24 @@ Step 3: genes_by_function(search_text="photosystem", organism="MED4")
 ## Chaining patterns
 
 ```
-list_publications → list_experiments → query_expression
+list_publications → list_experiments → differential_expression_by_gene
 list_publications → genes_by_function
+```
+
+## Common mistakes
+
+- treatment_type is a string filter, not a list — use treatment_type='coculture' not treatment_type=['coculture']
+
+- Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only
+
+- experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types
+
+```mistake
+list_experiments(publication='Biller 2018')
+```
+
+```correction
+list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])
 ```
 
 ## Package import equivalent

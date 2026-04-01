@@ -131,7 +131,7 @@ Step 1: list_publications(search_text="Biller")
 Step 2: list_experiments(publication_doi=["10.1038/ismej.2016.70"])
         → browse experiments, pick experiment_id
 
-Step 3: query_expression(experiment_id="...")
+Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
         → get gene-level results
 ```
 
@@ -144,7 +144,7 @@ Step 1: list_experiments(summary=True)
 Step 2: list_experiments(organism="MED4", treatment_type=["coculture"])
         → browse the MED4 coculture experiments
 
-Step 3: query_expression(experiment_id="...")
+Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
         → get gene-level results
 ```
 
@@ -154,7 +154,7 @@ Step 3: query_expression(experiment_id="...")
 list_organisms → list_experiments
 list_publications → list_experiments
 list_filter_values → list_experiments
-list_experiments → query_expression
+list_experiments → differential_expression_by_gene
 ```
 
 ## Common mistakes

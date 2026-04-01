@@ -77,22 +77,30 @@ total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, 
 
 ## Few-shot examples
 
-### Example 1: Search for photosynthesis-related clusters
+### Example 1: Orient — what clusters exist?
+
+```example-call
+list_gene_clusters(summary=True)
+```
+
+```example-response
+{"total_entries": 16, "total_matching": 16, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 9}, {"organism_name": "Prochlorococcus MIT9313", "count": 7}], "by_cluster_type": [{"cluster_type": "stress_response", "count": 16}], "by_treatment_type": [{"treatment_type": "nitrogen_stress", "count": 16}], "by_omics_type": [{"omics_type": "MICROARRAY", "count": 16}], "by_publication": [{"publication_doi": "10.1038/msb4100087", "count": 16}], "score_max": null, "score_median": null, "returned": 0, "truncated": true, "offset": 0, "results": []}
+```
+
+### Example 2: Search for photosynthesis-related clusters
 
 ```example-call
 list_gene_clusters(search_text="photosynthesis")
 ```
 
-### Example 2: Browse all MED4 clusters
+```example-response
+{"total_entries": 16, "total_matching": 3, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}, {"organism_name": "Prochlorococcus MIT9313", "count": 1}], "by_cluster_type": [{"cluster_type": "stress_response", "count": 3}], "score_max": 1.82, "score_median": 1.58, "returned": 3, "truncated": false, "offset": 0, "results": [{"cluster_id": "cluster:msb4100087:mit9313:down_photosynthesis", "name": "MIT9313 cluster 6 (down, photosynthesis)", "organism_name": "Prochlorococcus MIT9313", "cluster_type": "stress_response", "treatment_type": ["nitrogen_stress"], "member_count": 74, "source_paper": "Tolonen 2006", "score": 1.82}]}
+```
+
+### Example 3: Browse all MED4 clusters
 
 ```example-call
 list_gene_clusters(organism="MED4", limit=20)
-```
-
-### Example 3: Filter by treatment type
-
-```example-call
-list_gene_clusters(treatment_type=["nitrogen_stress"], verbose=True)
 ```
 
 ### Example 4: Find clusters then get member genes
@@ -100,20 +108,45 @@ list_gene_clusters(treatment_type=["nitrogen_stress"], verbose=True)
 ```
 Step 1: list_gene_clusters(search_text="N transport")
         → extract cluster_id values from results
+
 Step 2: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
         → see member genes
+
+Step 3: gene_overview(locus_tags=["PMM0370", "PMM0920", ...])
+        → check data availability for cluster members
 ```
 
 ## Chaining patterns
 
 ```
+list_gene_clusters → genes_in_cluster → gene_overview
 list_gene_clusters → genes_in_cluster → differential_expression_by_gene
 list_gene_clusters → gene_clusters_by_gene (reverse lookup)
 ```
 
-## Good to know
+## Common mistakes
 
-- Cluster IDs are not in the fulltext index — use search_text for text queries, cluster_ids with genes_in_cluster.
+- Cluster IDs are not in the fulltext index — use search_text for text queries, cluster_ids with genes_in_cluster
+
+- score_max/score_median are null when no search_text is given (browsing mode)
+
+- All clusters currently come from a single publication (Tolonen 2006) — use publication_doi filter if more sources are added
+
+```mistake
+genes_in_cluster(cluster_ids=['photosynthesis'])  # passing text, not IDs
+```
+
+```correction
+list_gene_clusters(search_text='photosynthesis')  # search first, then use cluster_ids
+```
+
+```mistake
+len(results)  # actual count
+```
+
+```correction
+response['total_matching']  # use total, not len — results may be truncated
+```
 
 ## Package import equivalent
 

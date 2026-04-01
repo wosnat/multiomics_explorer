@@ -78,10 +78,18 @@ total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not
 gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM0958"])
 ```
 
+```example-response
+{"total_matching": 3, "total_clusters": 1, "genes_with_clusters": 3, "genes_without_clusters": 0, "not_found": [], "not_matched": [], "by_cluster_type": [{"cluster_type": "stress_response", "count": 3}], "by_treatment_type": [{"treatment_type": "nitrogen_stress", "count": 3}], "by_publication": [{"publication_doi": "10.1038/msb4100087", "count": 1}], "returned": 3, "truncated": false, "offset": 0, "results": [{"locus_tag": "PMM0370", "gene_name": "cynA", "cluster_id": "cluster:msb4100087:med4:up_n_transport", "cluster_name": "MED4 cluster 1 (up, N transport)", "cluster_type": "stress_response", "membership_score": null, "member_count": 5}, {"locus_tag": "PMM0920", "gene_name": "glnA", "cluster_id": "cluster:msb4100087:med4:up_n_transport", "cluster_name": "MED4 cluster 1 (up, N transport)", "cluster_type": "stress_response", "membership_score": null, "member_count": 5}]}
+```
+
 ### Example 2: Summary only — which genes have clusters?
 
 ```example-call
 gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0001"], summary=True)
+```
+
+```example-response
+{"total_matching": 1, "total_clusters": 1, "genes_with_clusters": 1, "genes_without_clusters": 1, "not_found": [], "not_matched": ["PMM0001"], "by_cluster_type": [{"cluster_type": "stress_response", "count": 1}], "returned": 0, "truncated": true, "offset": 0, "results": []}
 ```
 
 ### Example 3: Filter to stress response clusters
@@ -90,16 +98,43 @@ gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0001"], summary=True)
 gene_clusters_by_gene(locus_tags=["PMM0370"], cluster_type="stress_response", verbose=True)
 ```
 
+### Example 4: From gene search to cluster context
+
+```
+Step 1: genes_by_function(search_text="nitrogen transport", organism="MED4")
+        → collect locus_tags from results
+
+Step 2: gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", ...])
+        → see which clusters these genes belong to
+
+Step 3: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+        → discover other genes in the same cluster
+```
+
 ## Chaining patterns
 
 ```
 resolve_gene → gene_clusters_by_gene → genes_in_cluster
+genes_by_function → gene_clusters_by_gene → genes_in_cluster
 gene_clusters_by_gene → genes_in_cluster (see all cluster members)
+gene_clusters_by_gene → differential_expression_by_gene (check expression for cluster genes)
 ```
 
-## Good to know
+## Common mistakes
 
-- Single organism enforced — don't mix PMM (MED4) and PMT (MIT9313) locus tags in one call.
+- Single organism enforced — don't mix PMM (MED4) and PMT (MIT9313) locus tags in one call
+
+- not_matched means the gene exists but has no cluster membership — it is NOT the same as not_found (gene doesn't exist in KG)
+
+- Results are gene × cluster rows — a gene in 2 clusters appears twice. Use genes_with_clusters for the deduplicated count.
+
+```mistake
+gene_clusters_by_gene(locus_tags='PMM0370')
+```
+
+```correction
+gene_clusters_by_gene(locus_tags=['PMM0370']) — always a list
+```
 
 ## Package import equivalent
 

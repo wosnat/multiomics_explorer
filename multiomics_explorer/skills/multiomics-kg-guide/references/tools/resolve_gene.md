@@ -98,7 +98,7 @@ resolve_gene(identifier="dnaN", organism="MED4")
 Step 1: resolve_gene(identifier="psbA")
         → collect locus_tags from results
 
-Step 2: gene_overview(gene_ids=["PMM1070", "PMT9312_1073", ...])
+Step 2: gene_overview(locus_tags=["PMM1070", "PMT9312_1073", ...])
         → compare function and data availability across organisms
 ```
 
