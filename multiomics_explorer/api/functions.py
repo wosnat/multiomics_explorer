@@ -2128,6 +2128,9 @@ def list_gene_clusters(
     if search_text is not None:
         envelope["score_max"] = raw_summary.get("score_max")
         envelope["score_median"] = raw_summary.get("score_median")
+    else:
+        envelope["score_max"] = None
+        envelope["score_median"] = None
 
     # Detail query — skip when limit=0
     if limit == 0:
