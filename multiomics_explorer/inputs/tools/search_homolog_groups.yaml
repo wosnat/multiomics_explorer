@@ -11,6 +11,9 @@ examples:
   - title: Filter to curated Cyanorak groups
     call: search_homolog_groups(search_text="kinase", source="cyanorak", max_specificity_rank=0)
 
+  - title: Filter by CyanorakRole
+    call: search_homolog_groups(search_text="transport", cyanorak_roles=["cyanorak.role:D.1.5"])
+
   - title: Find groups then get member genes
     steps: |
       Step 1: search_homolog_groups(search_text="nitrogen regulatory")
@@ -24,6 +27,8 @@ verbose_fields:
   - functional_description
   - genera
   - has_cross_genus_members
+  - cyanorak_roles
+  - cog_categories
 
 chaining:
   - "search_homolog_groups → genes_by_homolog_group → differential_expression_by_ortholog"

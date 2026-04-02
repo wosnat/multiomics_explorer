@@ -13,7 +13,7 @@ correctness before execution — warnings are returned in the response.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | query | string | — | Cypher query string. Write operations are blocked. A LIMIT clause is added automatically if absent. |
-| limit | int | 25 | Max results (default 25, max 200). |
+| limit | int | 25 | Max results. |
 
 ## Response format
 

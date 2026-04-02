@@ -66,8 +66,8 @@ total_matching, by_organism, by_source, returned, offset, truncated, not_found, 
 | has_cross_genus_members | string \| None (optional) | 'cross_genus' or 'single_genus' |
 | description | string \| None (optional) | Group description text |
 | functional_description | string \| None (optional) | Functional annotation text |
-| cyanorak_roles | list[dict] \| None (optional) | Consensus Cyanorak roles [{id, name}]. Verbose only. |
-| cog_categories | list[dict] \| None (optional) | Consensus COG categories [{id, name}]. Verbose only. |
+| cyanorak_roles | list[object] \| None (optional) | Consensus Cyanorak roles [{id, name}]. Verbose only. |
+| cog_categories | list[object] \| None (optional) | Consensus COG categories [{id, name}]. Verbose only. |
 
 ## Few-shot examples
 
@@ -151,7 +151,7 @@ gene_homologs(locus_tags=['PMM0001']) — always a list
 from multiomics_explorer import gene_homologs
 
 result = gene_homologs(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_source, offset, not_found, no_groups, results
+# returns dict with keys: total_matching, by_organism, by_source, offset, not_found, no_groups, top_cyanorak_roles, top_cog_categories, results
 ```
 
 Use package import for bulk data extraction in scripts.

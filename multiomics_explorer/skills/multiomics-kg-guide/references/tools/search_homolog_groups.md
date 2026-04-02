@@ -66,8 +66,8 @@ total_entries, total_matching, by_source, by_level, score_max, score_median, top
 | functional_description | string \| None (optional) | Derived from member gene roles (e.g. 'Photosynthesis and respiration > Photosystem II') |
 | genera | list[string] \| None (optional) | Genera represented (e.g. ['Prochlorococcus', 'Synechococcus']) |
 | has_cross_genus_members | string \| None (optional) | 'cross_genus' or 'single_genus' |
-| cyanorak_roles | list[dict] \| None (optional) | Consensus Cyanorak roles [{id, name}]. Verbose only. |
-| cog_categories | list[dict] \| None (optional) | Consensus COG categories [{id, name}]. Verbose only. |
+| cyanorak_roles | list[object] \| None (optional) | Consensus Cyanorak roles [{id, name}]. Verbose only. |
+| cog_categories | list[object] \| None (optional) | Consensus COG categories [{id, name}]. Verbose only. |
 
 ## Few-shot examples
 
@@ -87,7 +87,13 @@ search_homolog_groups(search_text="photosynthesis")
 search_homolog_groups(search_text="kinase", source="cyanorak", max_specificity_rank=0)
 ```
 
-### Example 3: Find groups then get member genes
+### Example 3: Filter by CyanorakRole
+
+```example-call
+search_homolog_groups(search_text="transport", cyanorak_roles=["cyanorak.role:D.1.5"])
+```
+
+### Example 4: Find groups then get member genes
 
 ```
 Step 1: search_homolog_groups(search_text="nitrogen regulatory")
@@ -124,7 +130,7 @@ response['total_matching']  # use total, not len
 from multiomics_explorer import search_homolog_groups
 
 result = search_homolog_groups(search_text=...)
-# returns dict with keys: total_entries, total_matching, by_source, by_level, score_max, score_median, offset, results
+# returns dict with keys: total_entries, total_matching, by_source, by_level, score_max, score_median, top_cyanorak_roles, top_cog_categories, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -45,6 +45,8 @@ verbose_fields:
   - has_cross_genus_members
   - description
   - functional_description
+  - cyanorak_roles
+  - cog_categories
 
 chaining:
   - "resolve_gene → gene_homologs → genes_by_homolog_group"
