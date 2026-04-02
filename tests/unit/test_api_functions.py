@@ -1529,6 +1529,7 @@ class TestListExperiments:
             "time_course_count": time_course_count,
             "by_organism": [{"item": "Prochlorococcus MED4", "count": 30}],
             "by_treatment_type": [{"item": "coculture", "count": 16}],
+            "by_background_factors": [{"item": "pro99_medium", "count": 30}],
             "by_omics_type": [{"item": "RNASEQ", "count": 48}],
             "by_publication": [{"item": "10.1038/ismej.2016.70", "count": 5}],
             "by_table_scope": [{"item": "gene_level", "count": 40}],
@@ -2882,6 +2883,7 @@ class TestListGeneClusters:
         "by_organism": [{"item": "Prochlorococcus MED4", "count": 9}],
         "by_cluster_type": [{"item": "stress_response", "count": 9}],
         "by_treatment_type": [{"item": "nitrogen_stress", "count": 9}],
+        "by_background_factors": [{"item": "pro99_medium", "count": 9}],
         "by_omics_type": [{"item": "MICROARRAY", "count": 9}],
         "by_publication": [{"item": "10.1038/msb4100087", "count": 9}],
     }

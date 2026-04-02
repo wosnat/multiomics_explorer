@@ -551,6 +551,7 @@ def list_organisms(
 def list_publications(
     organism: str | None = None,
     treatment_type: str | None = None,
+    background_factors: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
     verbose: bool = False,
@@ -562,15 +563,16 @@ def list_publications(
     """List publications with expression data.
 
     Returns dict with keys: total_entries, total_matching, returned, truncated,
-    by_organism, by_treatment_type, by_omics_type, results.
+    by_organism, by_treatment_type, by_background_factors, by_omics_type, results.
     Per result: doi, title, authors, year, journal, study_type, organisms,
-    experiment_count, treatment_types, omics_types.
+    experiment_count, treatment_types, background_factors, omics_types.
     When verbose=True, also includes abstract, description.
     When search_text is provided, also includes score.
     """
     conn = _default_conn(conn)
     filter_kwargs = dict(
         organism=organism, treatment_type=treatment_type,
+        background_factors=background_factors,
         search_text=search_text, author=author,
     )
 
@@ -599,12 +601,15 @@ def list_publications(
     # Compute breakdowns from all matching publications
     org_counts: dict[str, int] = {}
     tt_counts: dict[str, int] = {}
+    bf_counts: dict[str, int] = {}
     omics_counts: dict[str, int] = {}
     for pub in all_results:
         for org in pub.get("organisms", []):
             org_counts[org] = org_counts.get(org, 0) + 1
         for tt in pub.get("treatment_types", []):
             tt_counts[tt] = tt_counts.get(tt, 0) + 1
+        for bf in pub.get("background_factors", []):
+            bf_counts[bf] = bf_counts.get(bf, 0) + 1
         for ot in pub.get("omics_types", []):
             omics_counts[ot] = omics_counts.get(ot, 0) + 1
 
@@ -622,6 +627,7 @@ def list_publications(
         "total_matching": summary["total_matching"],
         "by_organism": _sorted_breakdown(org_counts, "organism_name"),
         "by_treatment_type": _sorted_breakdown(tt_counts, "treatment_type"),
+        "by_background_factors": _sorted_breakdown(bf_counts, "background_factor"),
         "by_omics_type": _sorted_breakdown(omics_counts, "omics_type"),
         "returned": len(results),
         "offset": offset,
@@ -633,6 +639,7 @@ def list_publications(
 def list_experiments(
     organism: str | None = None,
     treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     omics_type: list[str] | None = None,
     publication_doi: list[str] | None = None,
     coculture_partner: str | None = None,
@@ -649,15 +656,16 @@ def list_experiments(
     """List experiments with gene count statistics.
 
     Always returns: total_entries, total_matching, by_organism,
-    by_treatment_type, by_omics_type, by_publication, by_table_scope,
+    by_treatment_type, by_background_factors, by_omics_type,
+    by_publication, by_table_scope,
     time_course_count, returned, truncated, results.
 
     summary=True is sugar for limit=0: results is empty list,
     returned=0, truncated=True.
     When summary=False (default): results populated with experiments.
     Per result: experiment_id, experiment_name, publication_doi,
-    organism_name, treatment_type, coculture_partner, omics_type,
-    is_time_course (bool), table_scope, table_scope_detail,
+    organism_name, treatment_type, background_factors, coculture_partner,
+    omics_type, is_time_course (bool), table_scope, table_scope_detail,
     gene_count, genes_by_status (dict),
     timepoints (list, omitted if not time-course).
     When verbose=True, also includes: publication_title, treatment,
@@ -671,6 +679,7 @@ def list_experiments(
     conn = _default_conn(conn)
     filter_kwargs = dict(
         organism=organism, treatment_type=treatment_type,
+        background_factors=background_factors,
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
@@ -719,6 +728,7 @@ def list_experiments(
         "total_matching": raw_summary["total_matching"],
         "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
         "by_treatment_type": _rename_freq(raw_summary["by_treatment_type"], "treatment_type"),
+        "by_background_factors": _rename_freq(raw_summary["by_background_factors"], "background_factor"),
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
         "by_publication": _rename_freq(raw_summary["by_publication"], "publication_doi"),
         "by_table_scope": _rename_freq(raw_summary["by_table_scope"], "table_scope"),
@@ -2063,6 +2073,7 @@ def list_gene_clusters(
     organism: str | None = None,
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     omics_type: str | None = None,
     publication_doi: list[str] | None = None,
     summary: bool = False,
@@ -2075,8 +2086,8 @@ def list_gene_clusters(
     """Browse, search, and filter gene clusters.
 
     Returns dict with keys: total_entries, total_matching,
-    by_organism, by_cluster_type, by_treatment_type, by_omics_type,
-    by_publication, returned, offset, truncated, results.
+    by_organism, by_cluster_type, by_treatment_type, by_background_factors,
+    by_omics_type, by_publication, returned, offset, truncated, results.
     When search_text provided: adds score_max, score_median.
     Per result (compact): cluster_id, name, organism_name, cluster_type,
     treatment_type, member_count, source_paper, score (when searching).
@@ -2095,8 +2106,8 @@ def list_gene_clusters(
 
     filter_kwargs = dict(
         organism=organism, cluster_type=cluster_type,
-        treatment_type=treatment_type, omics_type=omics_type,
-        publication_doi=publication_doi,
+        treatment_type=treatment_type, background_factors=background_factors,
+        omics_type=omics_type, publication_doi=publication_doi,
     )
 
     effective_text = search_text
@@ -2132,6 +2143,8 @@ def list_gene_clusters(
             raw_summary["by_cluster_type"], "cluster_type"),
         "by_treatment_type": _rename_freq(
             raw_summary["by_treatment_type"], "treatment_type"),
+        "by_background_factors": _rename_freq(
+            raw_summary["by_background_factors"], "background_factor"),
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
         "by_publication": _rename_freq(
             raw_summary["by_publication"], "publication_doi"),
