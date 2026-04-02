@@ -402,6 +402,7 @@ def gene_homologs(
     """Get ortholog group memberships for genes.
 
     Returns dict with keys: total_matching, by_organism, by_source,
+    top_cyanorak_roles, top_cog_categories,
     returned, truncated, not_found, no_groups, results.
     Per result (compact): locus_tag, organism_name, group_id,
     consensus_gene_name, consensus_product, taxonomic_level, source,
@@ -464,6 +465,8 @@ def gene_homologs(
         "by_source": _sorted_breakdown(raw_summary["by_source"], "source"),
         "not_found": raw_summary["not_found"],
         "no_groups": raw_summary["no_groups"],
+        "top_cyanorak_roles": raw_summary["top_cyanorak_roles"],
+        "top_cog_categories": raw_summary["top_cog_categories"],
     }
 
     # Detail query — skip when limit=0
@@ -890,6 +893,8 @@ def search_homolog_groups(
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
+    cyanorak_roles: list[str] | None = None,
+    cog_categories: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -900,7 +905,11 @@ def search_homolog_groups(
     """Search ortholog groups by text (Lucene fulltext).
 
     Returns dict with keys: total_entries, total_matching, by_source,
-    by_level, score_max, score_median, returned, truncated, results.
+    by_level, top_cyanorak_roles, top_cog_categories,
+    score_max, score_median, returned, truncated, results.
+
+    cyanorak_roles: filter to groups linked to these Cyanorak role IDs.
+    cog_categories: filter to groups linked to these COG category IDs.
     Per result (compact): group_id, group_name, consensus_gene_name,
     consensus_product, source, taxonomic_level, specificity_rank,
     member_count, organism_count, score.
@@ -937,6 +946,7 @@ def search_homolog_groups(
     filter_kwargs = dict(
         source=source, taxonomic_level=taxonomic_level,
         max_specificity_rank=max_specificity_rank,
+        cyanorak_roles=cyanorak_roles, cog_categories=cog_categories,
     )
 
     effective_text = search_text
@@ -966,6 +976,8 @@ def search_homolog_groups(
         "total_matching": total_matching,
         "by_source": _rename_freq(raw_summary["by_source"], "source"),
         "by_level": _rename_freq(raw_summary["by_level"], "taxonomic_level"),
+        "top_cyanorak_roles": raw_summary["top_cyanorak_roles"],
+        "top_cog_categories": raw_summary["top_cog_categories"],
         "score_max": raw_summary["score_max"],
         "score_median": raw_summary["score_median"],
     }

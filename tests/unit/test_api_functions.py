@@ -537,6 +537,8 @@ class TestGeneHomologs:
             "by_source": [{"item": "cyanorak", "count": 2}],
             "not_found": not_found or [],
             "no_groups": no_groups or [],
+            "top_cyanorak_roles": [],
+            "top_cog_categories": [],
         }]
 
     def _detail_rows(self):
@@ -649,6 +651,7 @@ class TestGeneHomologs:
                     "total_matching": 0,
                     "by_organism": [], "by_source": [],
                     "not_found": [], "no_groups": [],
+                    "top_cyanorak_roles": [], "top_cog_categories": [],
                 }],
             ]
             result = api.gene_homologs(["PMM0001"], summary=True)
@@ -678,6 +681,20 @@ class TestGeneHomologs:
         ]
         result = api.gene_homologs(["PMM0001"], offset=5, conn=mock_conn)
         assert result["offset"] == 5
+
+    def test_summary_includes_top_ontology(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 3,
+              "by_organism": [{"item": "Prochlorococcus MED4", "count": 3}],
+              "by_source": [{"item": "cyanorak", "count": 2}],
+              "not_found": [], "no_groups": [],
+              "top_cyanorak_roles": [{"id": "cyanorak.role:G.3", "name": "Energy", "count": 2}],
+              "top_cog_categories": []}],
+        ]
+        result = api.gene_homologs(["PMM0845"], summary=True, conn=mock_conn)
+        assert "top_cyanorak_roles" in result
+        assert len(result["top_cyanorak_roles"]) == 1
+        assert "top_cog_categories" in result
 
 
 # ---------------------------------------------------------------------------
@@ -2141,7 +2158,8 @@ class TestSearchHomologGroups:
             [{"total_entries": 21122, "total_matching": 5,
               "score_max": 3.5, "score_median": 2.0,
               "by_source": [{"item": "cyanorak", "count": 3}],
-              "by_level": [{"item": "curated", "count": 3}]}],
+              "by_level": [{"item": "curated", "count": 3}],
+              "top_cyanorak_roles": [], "top_cog_categories": []}],
             [{"group_id": "cyanorak:CK_1", "group_name": "CK_1",
               "consensus_gene_name": "psbB", "consensus_product": "photosystem II",
               "source": "cyanorak", "taxonomic_level": "curated",
@@ -2162,7 +2180,8 @@ class TestSearchHomologGroups:
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 21122, "total_matching": 884,
               "score_max": 6.1, "score_median": 1.0,
-              "by_source": [], "by_level": []}],
+              "by_source": [], "by_level": [],
+              "top_cyanorak_roles": [], "top_cog_categories": []}],
         ]
         result = api.search_homolog_groups("photosynthesis", summary=True, conn=mock_conn)
         assert result["returned"] == 0
@@ -2175,7 +2194,8 @@ class TestSearchHomologGroups:
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 21122, "total_matching": 0,
               "score_max": None, "score_median": None,
-              "by_source": [], "by_level": []}],
+              "by_source": [], "by_level": [],
+              "top_cyanorak_roles": [], "top_cog_categories": []}],
         ]
         result = api.search_homolog_groups("xyznonexistent", summary=True, conn=mock_conn)
         assert result["total_matching"] == 0
@@ -2198,7 +2218,8 @@ class TestSearchHomologGroups:
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 21122, "total_matching": 0,
               "score_max": None, "score_median": None,
-              "by_source": [], "by_level": []}],
+              "by_source": [], "by_level": [],
+              "top_cyanorak_roles": [], "top_cog_categories": []}],
         ]
         api.search_homolog_groups(
             "test", source="cyanorak", taxonomic_level="curated",
@@ -2217,7 +2238,8 @@ class TestSearchHomologGroups:
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 21122, "total_matching": 5,
               "score_max": 3.5, "score_median": 2.0,
-              "by_source": [], "by_level": []}],
+              "by_source": [], "by_level": [],
+              "top_cyanorak_roles": [], "top_cog_categories": []}],
             [{"group_id": "cyanorak:CK_1", "group_name": "CK_1",
               "consensus_gene_name": "psbB", "consensus_product": "photosystem II",
               "source": "cyanorak", "taxonomic_level": "curated",
@@ -2233,7 +2255,8 @@ class TestSearchHomologGroups:
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 21122, "total_matching": 5,
               "score_max": 3.5, "score_median": 2.0,
-              "by_source": [], "by_level": []}],
+              "by_source": [], "by_level": [],
+              "top_cyanorak_roles": [], "top_cog_categories": []}],
             [{"group_id": "cyanorak:CK_1", "group_name": "CK_1",
               "consensus_gene_name": "psbB", "consensus_product": "photosystem II",
               "source": "cyanorak", "taxonomic_level": "curated",
@@ -2242,6 +2265,34 @@ class TestSearchHomologGroups:
         ]
         result = api.search_homolog_groups("photosynthesis", offset=5, conn=mock_conn)
         assert result["offset"] == 5
+
+    def test_passes_ontology_filters(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21122, "total_matching": 0,
+              "score_max": None, "score_median": None,
+              "by_source": [], "by_level": [],
+              "top_cyanorak_roles": [], "top_cog_categories": []}],
+        ]
+        api.search_homolog_groups(
+            "test", cyanorak_roles=["cyanorak.role:G.3"],
+            cog_categories=["cog.category:J"], summary=True, conn=mock_conn)
+        call_args = mock_conn.execute_query.call_args
+        cypher = call_args[0][0]
+        assert "Og_has_cyanorak_role" in cypher
+        assert "Og_in_cog_category" in cypher
+
+    def test_summary_includes_top_ontology(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21122, "total_matching": 5,
+              "score_max": 3.5, "score_median": 2.0,
+              "by_source": [], "by_level": [],
+              "top_cyanorak_roles": [{"id": "cyanorak.role:G.3", "name": "Energy", "count": 3}],
+              "top_cog_categories": [{"id": "cog.category:C", "name": "Energy prod", "count": 2}]}],
+        ]
+        result = api.search_homolog_groups("test", summary=True, conn=mock_conn)
+        assert len(result["top_cyanorak_roles"]) == 1
+        assert result["top_cyanorak_roles"][0]["id"] == "cyanorak.role:G.3"
+        assert len(result["top_cog_categories"]) == 1
 
 
 class TestGenesByHomologGroup:
