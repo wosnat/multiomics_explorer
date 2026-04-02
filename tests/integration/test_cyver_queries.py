@@ -115,6 +115,7 @@ _KNOWN_MAP_KEYS = {
     "org", "cat", "lt", "cnt", "terms", "srcs", "gid",
     "org_input", "tt", "ts", "eid", "status", "log2fc", "m",
     "tpo", "tph", "tp", "nf_raw", "ng_raw", "nm_raw",
+    "cr_id", "cr_name", "cc_id", "cc_name", "og_ids", "src", "lvl",
 }
 
 # Regex to extract property name from CyVer description:
@@ -203,6 +204,19 @@ _BUILDERS: list[tuple[str, ...]] = [
     # --- homolog group search ---
     ("search_homolog_groups_summary", build_search_homolog_groups_summary, {"search_text": "photosystem"}),
     ("search_homolog_groups", build_search_homolog_groups, {"search_text": "photosystem"}),
+    # --- homologs with ontology filters ---
+    ("gene_homologs_summary_ont", build_gene_homologs_summary,
+     {"locus_tags": _LOCUS, "cyanorak_roles": ["cyanorak.role:G.3"]}),
+    ("gene_homologs_ont", build_gene_homologs,
+     {"locus_tags": _LOCUS, "cyanorak_roles": ["cyanorak.role:G.3"]}),
+    ("gene_homologs_verbose", build_gene_homologs,
+     {"locus_tags": _LOCUS, "verbose": True}),
+    ("search_homolog_groups_summary_ont", build_search_homolog_groups_summary,
+     {"search_text": "photosystem", "cog_categories": ["cog.category:C"]}),
+    ("search_homolog_groups_ont", build_search_homolog_groups,
+     {"search_text": "photosystem", "cyanorak_roles": ["cyanorak.role:G.3"]}),
+    ("search_homolog_groups_verbose", build_search_homolog_groups,
+     {"search_text": "photosystem", "verbose": True}),
     # --- genes by homolog group ---
     ("genes_by_homolog_group_summary", build_genes_by_homolog_group_summary, {"group_ids": _GROUPS}),
     ("genes_by_homolog_group_diagnostics", build_genes_by_homolog_group_diagnostics, {"group_ids": _GROUPS}),

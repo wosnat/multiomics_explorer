@@ -144,7 +144,8 @@ class TestGeneHomologsContract:
         result = api.gene_homologs([KNOWN_GENE], conn=conn)
         assert isinstance(result, dict)
         for key in ("total_matching", "by_organism", "by_source",
-                     "returned", "truncated", "offset", "not_found", "no_groups", "results"):
+                     "returned", "truncated", "offset", "not_found", "no_groups",
+                     "top_cyanorak_roles", "top_cog_categories", "results"):
             assert key in result
 
     def test_result_keys_compact(self, conn):
@@ -161,6 +162,23 @@ class TestGeneHomologsContract:
         result = api.gene_homologs(["NONEXISTENT_GENE_XYZ"], conn=conn)
         assert "NONEXISTENT_GENE_XYZ" in result["not_found"]
         assert result["total_matching"] == 0
+
+    def test_summary_has_ontology_keys(self, conn):
+        result = api.gene_homologs([KNOWN_GENE], summary=True, conn=conn)
+        assert "top_cyanorak_roles" in result
+        assert "top_cog_categories" in result
+        for item in result["top_cyanorak_roles"]:
+            assert "id" in item
+            assert "name" in item
+            assert "count" in item
+
+    def test_verbose_has_ontology_columns(self, conn):
+        result = api.gene_homologs([KNOWN_GENE], verbose=True, limit=1, conn=conn)
+        row = result["results"][0]
+        assert "cyanorak_roles" in row
+        assert "cog_categories" in row
+        assert isinstance(row["cyanorak_roles"], list)
+        assert isinstance(row["cog_categories"], list)
 
 
 # ---------------------------------------------------------------------------
@@ -602,6 +620,7 @@ class TestSearchHomologGroupsContract:
         expected_keys = {
             "total_entries", "total_matching", "by_source", "by_level",
             "score_max", "score_median",
+            "top_cyanorak_roles", "top_cog_categories",
             "returned", "truncated", "offset", "results",
         }
         assert set(result.keys()) == expected_keys
@@ -636,6 +655,25 @@ class TestSearchHomologGroupsContract:
         for b in result["by_level"]:
             assert "taxonomic_level" in b
             assert "count" in b
+
+    def test_summary_has_ontology_keys(self, conn):
+        result = api.search_homolog_groups("photosynthesis", summary=True, conn=conn)
+        assert "top_cyanorak_roles" in result
+        assert "top_cog_categories" in result
+
+    def test_verbose_has_ontology_columns(self, conn):
+        result = api.search_homolog_groups(
+            "photosynthesis", verbose=True, limit=1, conn=conn)
+        row = result["results"][0]
+        assert "cyanorak_roles" in row
+        assert "cog_categories" in row
+        assert isinstance(row["cyanorak_roles"], list)
+
+    def test_ontology_filter(self, conn):
+        result = api.search_homolog_groups(
+            "photosystem", cyanorak_roles=["cyanorak.role:J.8"],
+            summary=True, conn=conn)
+        assert result["total_matching"] >= 1
 
 
 # ---------------------------------------------------------------------------
