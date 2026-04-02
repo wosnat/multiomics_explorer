@@ -540,6 +540,7 @@ def _list_publications_where(
     *,
     organism: str | None = None,
     treatment_type: str | None = None,
+    background_factors: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
 ) -> tuple[str, dict]:
@@ -565,6 +566,13 @@ def _list_publications_where(
         )
         params["treatment_type"] = treatment_type
 
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(p.background_factors, [])"
+            " WHERE toLower(bf) = toLower($background_factors))"
+        )
+        params["background_factors"] = background_factors
+
     if author:
         conditions.append(
             "ANY(a IN p.authors WHERE toLower(a) CONTAINS toLower($author))"
@@ -579,6 +587,7 @@ def build_list_publications(
     *,
     organism: str | None = None,
     treatment_type: str | None = None,
+    background_factors: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
     verbose: bool = False,
@@ -587,12 +596,13 @@ def build_list_publications(
     """Build Cypher for listing publications with experiment summaries.
 
     RETURN keys (compact): doi, title, authors, year, journal, study_type,
-    organisms, experiment_count, treatment_types, omics_types.
+    organisms, experiment_count, treatment_types, background_factors, omics_types.
     When search_text is provided, also: score.
     RETURN keys (verbose): adds abstract, description.
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
+        background_factors=background_factors,
         search_text=search_text, author=author,
     )
 
@@ -620,6 +630,7 @@ def build_list_publications(
             "       p.organisms AS organisms,\n"
             "       p.experiment_count AS experiment_count,\n"
             "       p.treatment_types AS treatment_types,\n"
+            "       coalesce(p.background_factors, []) AS background_factors,\n"
             "       p.omics_types AS omics_types,\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
@@ -638,6 +649,7 @@ def build_list_publications(
             "       p.organisms AS organisms,\n"
             "       p.experiment_count AS experiment_count,\n"
             "       p.treatment_types AS treatment_types,\n"
+            "       coalesce(p.background_factors, []) AS background_factors,\n"
             f"       p.omics_types AS omics_types{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, p.title\n"
             f"{limit_clause}"
@@ -650,6 +662,7 @@ def build_list_publications_summary(
     *,
     organism: str | None = None,
     treatment_type: str | None = None,
+    background_factors: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
 ) -> tuple[str, dict]:
@@ -661,6 +674,7 @@ def build_list_publications_summary(
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
+        background_factors=background_factors,
         search_text=search_text, author=author,
     )
 
@@ -703,7 +717,7 @@ def build_list_organisms(
 
     RETURN keys (compact): organism_name, genus, species, strain, clade,
     ncbi_taxon_id, gene_count, publication_count, experiment_count,
-    treatment_types, omics_types.
+    treatment_types, background_factors, omics_types.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage.
     """
@@ -730,6 +744,7 @@ def build_list_organisms(
         "       o.publication_count AS publication_count,\n"
         "       o.experiment_count AS experiment_count,\n"
         "       o.treatment_types AS treatment_types,\n"
+        "       coalesce(o.background_factors, []) AS background_factors,\n"
         "       o.omics_types AS omics_types"
         f"{verbose_cols}\n"
         "ORDER BY o.genus, o.preferred_name"
@@ -747,6 +762,7 @@ def _list_experiments_where(
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for experiment queries.
 
@@ -775,6 +791,13 @@ def _list_experiments_where(
             "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
         )
         params["treatment_types"] = [t.lower() for t in treatment_type]
+
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(e.background_factors, [])"
+            " WHERE toLower(bf) IN $background_factors)"
+        )
+        params["background_factors"] = [bf.lower() for bf in background_factors]
 
     if omics_type:
         conditions.append("toUpper(e.omics_type) IN $omics_types")
@@ -811,6 +834,7 @@ def build_list_experiments(
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
+    background_factors: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -833,6 +857,7 @@ def build_list_experiments(
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
+        background_factors=background_factors,
     )
 
     verbose_cols = (
@@ -865,6 +890,7 @@ def build_list_experiments(
         "       p.doi AS publication_doi,\n"
         "       e.organism_name AS organism_name,\n"
         "       e.treatment_type AS treatment_type,\n"
+        "       coalesce(e.background_factors, []) AS background_factors,\n"
         "       e.coculture_partner AS coculture_partner,\n"
         "       e.omics_type AS omics_type,\n"
         "       e.is_time_course AS is_time_course,\n"
@@ -915,14 +941,16 @@ def build_list_experiments_summary(
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_experiments.
 
     Returns breakdowns by organism, treatment type, omics type,
-    publication, and table_scope using apoc.coll.frequencies.
+    publication, table_scope, and background_factors using apoc.coll.frequencies.
 
     RETURN keys: total_matching, time_course_count, by_organism,
-    by_treatment_type, by_omics_type, by_publication, by_table_scope.
+    by_treatment_type, by_background_factors, by_omics_type, by_publication,
+    by_table_scope.
     RETURN keys (search_text): adds score_max, score_median.
     """
     where_block, params = _list_experiments_where(
@@ -930,11 +958,13 @@ def build_list_experiments_summary(
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
+        background_factors=background_factors,
     )
 
     collect_cols = (
         "collect(e.organism_name) AS orgs,\n"
         "     apoc.coll.flatten(collect(coalesce(e.treatment_type, []))) AS tts,\n"
+        "     apoc.coll.flatten(collect(coalesce(e.background_factors, []))) AS bfs,\n"
         "     collect(e.omics_type) AS omics,\n"
         "     collect(p.doi) AS dois,\n"
         "     collect(e.is_time_course) AS tc,\n"
@@ -946,6 +976,7 @@ def build_list_experiments_summary(
         "       size([x IN tc WHERE x = 'true']) AS time_course_count,\n"
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
         "       apoc.coll.frequencies(tts) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(bfs) AS by_background_factors,\n"
         "       apoc.coll.frequencies(omics) AS by_omics_type,\n"
         "       apoc.coll.frequencies(dois) AS by_publication,\n"
         "       apoc.coll.frequencies(scopes) AS by_table_scope"
@@ -1548,6 +1579,7 @@ def build_differential_expression_by_gene_summary_by_experiment(
         "WITH collect({experiment_id: e.id, experiment_name: e.name,\n"
         "              treatment_type: e.treatment_type,"
         " omics_type: e.omics_type,\n"
+        "              background_factors: coalesce(e.background_factors, []),\n"
         "              coculture_partner: e.coculture_partner,\n"
         "              is_time_course: e.is_time_course,\n"
         "              table_scope: e.table_scope,\n"
@@ -1685,6 +1717,7 @@ def build_differential_expression_by_gene(
         ",\n       e.coculture_partner AS coculture_partner"
         ",\n       e.table_scope AS table_scope"
         ",\n       e.table_scope_detail AS table_scope_detail"
+        ",\n       coalesce(e.background_factors, []) AS background_factors"
         if verbose else ""
     )
 
@@ -2183,6 +2216,7 @@ def build_differential_expression_by_ortholog_top_experiments(
         "RETURN collect({\n"
         "  experiment_id: e.id,\n"
         "  treatment_type: e.treatment_type,\n"
+        "  background_factors: coalesce(e.background_factors, []),\n"
         "  organism_name: e.organism_name,\n"
         "  significant_genes: significant_genes\n"
         "}) AS top_experiments"
@@ -2253,6 +2287,7 @@ def build_differential_expression_by_ortholog_results(
         "       og.consensus_product AS consensus_product,\n"
         "       e.id AS experiment_id,\n"
         "       e.treatment_type AS treatment_type,\n"
+        "       coalesce(e.background_factors, []) AS background_factors,\n"
         "       e.organism_name AS organism_name,\n"
         "       e.coculture_partner AS coculture_partner,\n"
         "       tp AS timepoint,\n"
@@ -2676,6 +2711,7 @@ def _gene_cluster_where(
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Build GeneCluster filter conditions + params shared by gene cluster builders."""
     conditions: list[str] = []
@@ -2697,6 +2733,12 @@ def _gene_cluster_where(
     if omics_type is not None:
         conditions.append("gc.omics_type = $omics_type")
         params["omics_type"] = omics_type
+    if background_factors is not None:
+        conditions.append(
+            "ANY(bf IN coalesce(gc.background_factors, [])"
+            " WHERE bf IN $background_factors)"
+        )
+        params["background_factors"] = background_factors
     return conditions, params
 
 
@@ -2707,17 +2749,20 @@ def build_list_gene_clusters_summary(
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
+    background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for list_gene_clusters.
 
     RETURN keys: total_entries, total_matching, by_organism,
-    by_cluster_type, by_treatment_type, by_omics_type, by_publication.
+    by_cluster_type, by_treatment_type, by_background_factors,
+    by_omics_type, by_publication.
     When search_text: adds score_max, score_median.
     """
     conditions, params = _gene_cluster_where(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, omics_type=omics_type,
+        background_factors=background_factors,
     )
 
     if search_text is not None:
@@ -2753,6 +2798,7 @@ def build_list_gene_clusters_summary(
         "WITH collect(gc.organism_name) AS organisms,\n"
         "     collect(gc.cluster_type) AS cluster_types,\n"
         "     apoc.coll.flatten(collect(gc.treatment_type)) AS treatment_types,\n"
+        "     apoc.coll.flatten(collect(coalesce(gc.background_factors, []))) AS background_factors_flat,\n"
         "     collect(gc.omics_type) AS omics_types,\n"
         "     apoc.coll.flatten(collect(pub_dois)) AS pub_doi_list,\n"
         f"     count(gc) AS total_matching{score_cols}\n"
@@ -2761,6 +2807,7 @@ def build_list_gene_clusters_summary(
         "       apoc.coll.frequencies(organisms) AS by_organism,\n"
         "       apoc.coll.frequencies(cluster_types) AS by_cluster_type,\n"
         "       apoc.coll.frequencies(treatment_types) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(background_factors_flat) AS by_background_factors,\n"
         "       apoc.coll.frequencies(omics_types) AS by_omics_type,\n"
         f"       apoc.coll.frequencies(pub_doi_list) AS by_publication{score_return}"
     )
@@ -2774,6 +2821,7 @@ def build_list_gene_clusters(
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
+    background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
@@ -2782,7 +2830,7 @@ def build_list_gene_clusters(
     """Build detail Cypher for list_gene_clusters.
 
     RETURN keys (compact): cluster_id, name, organism_name, cluster_type,
-    treatment_type, member_count, source_paper.
+    treatment_type, background_factors, member_count, source_paper.
     When search_text: adds score.
     RETURN keys (verbose): adds functional_description, behavioral_description,
     cluster_method, treatment, light_condition, experimental_context,
@@ -2791,6 +2839,7 @@ def build_list_gene_clusters(
     conditions, params = _gene_cluster_where(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, omics_type=omics_type,
+        background_factors=background_factors,
     )
 
     if search_text is not None:
@@ -2857,6 +2906,7 @@ def build_list_gene_clusters(
         "       gc.organism_name AS organism_name,\n"
         "       gc.cluster_type AS cluster_type,\n"
         "       gc.treatment_type AS treatment_type,\n"
+        "       coalesce(gc.background_factors, []) AS background_factors,\n"
         "       gc.member_count AS member_count,\n"
         f"       gc.source_paper AS source_paper{score_col}{verbose_cols}\n"
         f"ORDER BY {order_prefix}gc.organism_name, gc.name{skip_clause}{limit_clause}"

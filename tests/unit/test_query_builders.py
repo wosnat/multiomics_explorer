@@ -3032,3 +3032,66 @@ class TestTreatmentTypeArrayFilter:
         )
         assert "UNWIND" in cypher
         assert "_tt AS group_key" in cypher
+
+
+class TestBackgroundFactors:
+    """Tests for background_factors filter, return, and aggregation across builders."""
+
+    def test_list_experiments_returns_background_factors(self):
+        cypher, _ = build_list_experiments()
+        assert "background_factors" in cypher
+
+    def test_list_experiments_filter(self):
+        cypher, params = build_list_experiments(background_factors=["axenic"])
+        assert "ANY(bf IN coalesce(e.background_factors, []) WHERE toLower(bf) IN $background_factors)" in cypher
+        assert params["background_factors"] == ["axenic"]
+
+    def test_list_experiments_summary_has_by_background_factors(self):
+        cypher, _ = build_list_experiments_summary()
+        assert "by_background_factors" in cypher
+
+    def test_list_organisms_returns_background_factors(self):
+        cypher, _ = build_list_organisms()
+        assert "background_factors" in cypher
+
+    def test_list_publications_returns_background_factors(self):
+        cypher, _ = build_list_publications()
+        assert "background_factors" in cypher
+
+    def test_list_publications_search_returns_background_factors(self):
+        cypher, _ = build_list_publications(search_text="light")
+        assert "background_factors" in cypher
+
+    def test_list_gene_clusters_returns_background_factors(self):
+        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
+        cypher, _ = build_list_gene_clusters()
+        assert "background_factors" in cypher
+
+    def test_list_gene_clusters_summary_has_by_background_factors(self):
+        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters_summary
+        cypher, _ = build_list_gene_clusters_summary()
+        assert "by_background_factors" in cypher
+
+    def test_differential_expression_by_gene_verbose_has_background_factors(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=True)
+        assert "background_factors" in cypher
+
+    def test_differential_expression_by_gene_compact_no_background_factors(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=False)
+        assert "background_factors" not in cypher
+
+    def test_differential_expression_by_gene_summary_by_experiment_has_background_factors(self):
+        cypher, _ = build_differential_expression_by_gene_summary_by_experiment()
+        assert "background_factors" in cypher
+
+    def test_differential_expression_by_ortholog_top_experiments_has_background_factors(self):
+        cypher, _ = build_differential_expression_by_ortholog_top_experiments(
+            group_ids=["OG_1"]
+        )
+        assert "background_factors" in cypher
+
+    def test_differential_expression_by_ortholog_results_has_background_factors(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["OG_1"]
+        )
+        assert "background_factors" in cypher
