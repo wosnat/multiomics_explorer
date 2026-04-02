@@ -515,6 +515,13 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"gene_details unexpected error: {e}")
             raise ToolError(f"Error in gene_details: {e}")
 
+    # --- shared models ---
+
+    class OntologyBreakdown(BaseModel):
+        id: str = Field(description="Ontology term ID (e.g. 'cyanorak.role:G.3')")
+        name: str = Field(description="Ontology term name (e.g. 'Energy metabolism > Electron transport')")
+        count: int = Field(description="Groups with this annotation (e.g. 42)")
+
     # --- gene_homologs ---
 
     class GeneHomologResult(BaseModel):
@@ -1705,6 +1712,10 @@ def register_tools(mcp: FastMCP):
             description="Genera represented (e.g. ['Prochlorococcus', 'Synechococcus'])")
         has_cross_genus_members: str | None = Field(default=None,
             description="'cross_genus' or 'single_genus'")
+        cyanorak_roles: list[dict] | None = Field(default=None,
+            description="Consensus Cyanorak roles [{id, name}]. Verbose only.")
+        cog_categories: list[dict] | None = Field(default=None,
+            description="Consensus COG categories [{id, name}]. Verbose only.")
 
     class SearchHomologGroupsSourceBreakdown(BaseModel):
         source: str = Field(description="OG source (e.g. 'cyanorak')")
@@ -1725,6 +1736,12 @@ def register_tools(mcp: FastMCP):
             description="Highest Lucene score (null if 0 matches, e.g. 6.13)")
         score_median: float | None = Field(default=None,
             description="Median Lucene score (null if 0 matches, e.g. 1.06)")
+        top_cyanorak_roles: list[OntologyBreakdown] = Field(
+            default_factory=list,
+            description="Top 5 CyanorakRole annotations by frequency")
+        top_cog_categories: list[OntologyBreakdown] = Field(
+            default_factory=list,
+            description="Top 5 CogFunctionalCategory annotations by frequency")
         returned: int = Field(description="Results in this response (0 when summary=true)")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
@@ -1752,6 +1769,14 @@ def register_tools(mcp: FastMCP):
             description="Cap group breadth. 0=curated only, 1=+family, "
             "2=+order, 3=+domain (all).",
             ge=0, le=3,
+        )] = None,
+        cyanorak_roles: Annotated[list[str] | None, Field(
+            description="Filter by CyanorakRole term IDs. OR within list. "
+            "E.g. ['cyanorak.role:G.3', 'cyanorak.role:J.8'].",
+        )] = None,
+        cog_categories: Annotated[list[str] | None, Field(
+            description="Filter by CogFunctionalCategory term IDs. OR within list. "
+            "E.g. ['cog.category:C', 'cog.category:J'].",
         )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
@@ -1781,10 +1806,14 @@ def register_tools(mcp: FastMCP):
                 search_text, source=source,
                 taxonomic_level=taxonomic_level,
                 max_specificity_rank=max_specificity_rank,
+                cyanorak_roles=cyanorak_roles,
+                cog_categories=cog_categories,
                 summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             by_source = [SearchHomologGroupsSourceBreakdown(**b) for b in data["by_source"]]
             by_level = [SearchHomologGroupsLevelBreakdown(**b) for b in data["by_level"]]
+            top_cr = [OntologyBreakdown(**b) for b in data.get("top_cyanorak_roles", [])]
+            top_cc = [OntologyBreakdown(**b) for b in data.get("top_cog_categories", [])]
             results = [SearchHomologGroupsResult(**r) for r in data["results"]]
             response = SearchHomologGroupsResponse(
                 total_entries=data["total_entries"],
@@ -1793,6 +1822,8 @@ def register_tools(mcp: FastMCP):
                 by_level=by_level,
                 score_max=data["score_max"],
                 score_median=data["score_median"],
+                top_cyanorak_roles=top_cr,
+                top_cog_categories=top_cc,
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],

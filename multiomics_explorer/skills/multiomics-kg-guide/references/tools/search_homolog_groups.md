@@ -16,6 +16,8 @@ and functional_description fields.
 | source | string \| None | None | Filter by OG source: 'cyanorak' or 'eggnog'. |
 | taxonomic_level | string \| None | None | Filter by taxonomic level. E.g. 'curated', 'Prochloraceae', 'Bacteria'. |
 | max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |
+| cyanorak_roles | list[string] \| None | None | Filter by CyanorakRole term IDs. OR within list. E.g. ['cyanorak.role:G.3', 'cyanorak.role:J.8']. |
+| cog_categories | list[string] \| None | None | Filter by CogFunctionalCategory term IDs. OR within list. E.g. ['cog.category:C', 'cog.category:J']. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include description, functional_description, genera, has_cross_genus_members in results. |
 | limit | int | 5 | Max results. |
@@ -26,7 +28,7 @@ and functional_description fields.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_source, by_level, score_max, score_median, returned, offset, truncated, results
+total_entries, total_matching, by_source, by_level, score_max, score_median, top_cyanorak_roles, top_cog_categories, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total OrthologGroup nodes in KG (e.g. 21122)
@@ -35,6 +37,8 @@ total_entries, total_matching, by_source, by_level, score_max, score_median, ret
 - **by_level** (list[SearchHomologGroupsLevelBreakdown]): Groups per taxonomic level, sorted by count desc
 - **score_max** (float | None): Highest Lucene score (null if 0 matches, e.g. 6.13)
 - **score_median** (float | None): Median Lucene score (null if 0 matches, e.g. 1.06)
+- **top_cyanorak_roles** (list[OntologyBreakdown]): Top 5 CyanorakRole annotations by frequency
+- **top_cog_categories** (list[OntologyBreakdown]): Top 5 CogFunctionalCategory annotations by frequency
 - **returned** (int): Results in this response (0 when summary=true)
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
@@ -62,6 +66,8 @@ total_entries, total_matching, by_source, by_level, score_max, score_median, ret
 | functional_description | string \| None (optional) | Derived from member gene roles (e.g. 'Photosynthesis and respiration > Photosystem II') |
 | genera | list[string] \| None (optional) | Genera represented (e.g. ['Prochlorococcus', 'Synechococcus']) |
 | has_cross_genus_members | string \| None (optional) | 'cross_genus' or 'single_genus' |
+| cyanorak_roles | list[dict] \| None (optional) | Consensus Cyanorak roles [{id, name}]. Verbose only. |
+| cog_categories | list[dict] \| None (optional) | Consensus COG categories [{id, name}]. Verbose only. |
 
 ## Few-shot examples
 

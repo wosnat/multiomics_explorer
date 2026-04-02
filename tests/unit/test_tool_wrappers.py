@@ -2361,6 +2361,8 @@ class TestSearchHomologGroupsWrapper:
         "by_level": [{"taxonomic_level": "Bacteria", "count": 218}, {"taxonomic_level": "curated", "count": 237}],
         "score_max": 6.128,
         "score_median": 1.057,
+        "top_cyanorak_roles": [],
+        "top_cog_categories": [],
         "returned": 2,
         "truncated": True,
         "results": [
@@ -2482,6 +2484,44 @@ class TestSearchHomologGroupsWrapper:
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
+
+    @pytest.mark.asyncio
+    async def test_ontology_filters_forwarded(self, tool_fns, mock_ctx):
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "top_cyanorak_roles": [{"id": "cyanorak.role:G.3", "name": "Energy", "count": 3}],
+            "top_cog_categories": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value=api_return,
+        ) as mock_api:
+            await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="photosynthesis",
+                cyanorak_roles=["cyanorak.role:G.3"],
+                cog_categories=["cog.category:J"],
+            )
+        call_kwargs = mock_api.call_args.kwargs
+        assert call_kwargs["cyanorak_roles"] == ["cyanorak.role:G.3"]
+        assert call_kwargs["cog_categories"] == ["cog.category:J"]
+
+    @pytest.mark.asyncio
+    async def test_ontology_summary_in_response(self, tool_fns, mock_ctx):
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "top_cyanorak_roles": [{"id": "cyanorak.role:G.3", "name": "Energy", "count": 3}],
+            "top_cog_categories": [{"id": "cog.category:C", "name": "Energy prod", "count": 2}],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.search_homolog_groups",
+            return_value=api_return,
+        ):
+            result = await tool_fns["search_homolog_groups"](
+                mock_ctx, search_text="photosynthesis",
+            )
+        assert len(result.top_cyanorak_roles) == 1
+        assert result.top_cyanorak_roles[0].id == "cyanorak.role:G.3"
+        assert len(result.top_cog_categories) == 1
 
 
 # ---------------------------------------------------------------------------
