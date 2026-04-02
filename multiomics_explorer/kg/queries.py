@@ -92,8 +92,9 @@ ORDER BY abs(r.log2_fold_change) DESC
 """
 
 GENES_UPREGULATED_BY_COCULTURE = """
-MATCH (e:Experiment {treatment_type: 'coculture'})-[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)
-WHERE e.coculture_partner CONTAINS $coculture_genus
+MATCH (e:Experiment)-[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)
+WHERE 'coculture' IN e.treatment_type
+  AND e.coculture_partner CONTAINS $coculture_genus
   AND e.organism_name CONTAINS $target_strain
 RETURN g.locus_tag AS locus_tag, g.product AS product,
        r.log2_fold_change AS log2fc, r.adjusted_p_value AS padj,
@@ -104,7 +105,7 @@ LIMIT 50
 
 GENES_AFFECTED_BY_STRESS = """
 MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)
-WHERE e.treatment_type = $treatment_type
+WHERE $treatment_type IN e.treatment_type
   AND e.organism_name CONTAINS $strain
 RETURN g.locus_tag AS locus_tag, g.product AS product,
        r.expression_direction AS direction,
@@ -159,9 +160,10 @@ FEW_SHOT_EXAMPLES = [
     {
         "question": "Which genes are upregulated in MED4 during coculture with Alteromonas?",
         "cypher": (
-            "MATCH (e:Experiment {treatment_type: 'coculture'})\n"
+            "MATCH (e:Experiment)\n"
             "      -[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)\n"
-            "WHERE e.coculture_partner CONTAINS 'Alteromonas'\n"
+            "WHERE 'coculture' IN e.treatment_type\n"
+            "  AND e.coculture_partner CONTAINS 'Alteromonas'\n"
             "  AND e.organism_name CONTAINS 'MED4'\n"
             "RETURN g.locus_tag, g.product, r.log2_fold_change, e.name\n"
             "ORDER BY r.log2_fold_change DESC\n"
@@ -169,16 +171,16 @@ FEW_SHOT_EXAMPLES = [
         ),
         "explanation": (
             "Expression uses Changes_expression_of (Experiment → Gene). "
-            "Coculture experiments have treatment_type='coculture' and coculture_partner "
-            "containing the partner organism name. e.organism_name is the target organism "
-            "whose genes are affected."
+            "Coculture experiments have 'coculture' in their treatment_type array "
+            "and coculture_partner containing the partner organism name. "
+            "e.organism_name is the target organism whose genes are affected."
         ),
     },
     {
         "question": "Which genes are affected by nitrogen stress in MED4?",
         "cypher": (
             "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
-            "WHERE e.treatment_type = 'nutrient_stress'\n"
+            "WHERE 'nutrient_stress' IN e.treatment_type\n"
             "  AND e.organism_name CONTAINS 'MED4'\n"
             "  AND e.treatment CONTAINS 'nitrogen'\n"
             "RETURN g.locus_tag, g.product, r.expression_direction, r.log2_fold_change\n"
@@ -186,17 +188,20 @@ FEW_SHOT_EXAMPLES = [
             "LIMIT 50"
         ),
         "explanation": (
-            "Experiment nodes have treatment_type (e.g. 'nutrient_stress', 'light_stress', "
-            "'coculture') and treatment (text describing the specific treatment). "
-            "Filter by treatment_type and use CONTAINS on treatment for specifics."
+            "Experiment.treatment_type is an array (e.g. ['nitrogen_stress']). "
+            "Use 'value' IN e.treatment_type to filter. "
+            "background_factors (also array, may be null) describes context like "
+            "'axenic', 'diel_cycle'. "
+            "e.treatment (text) describes the specific treatment — use CONTAINS for specifics."
         ),
     },
     {
         "question": "What biological processes are enriched among genes upregulated by Alteromonas coculture?",
         "cypher": (
-            "MATCH (e:Experiment {treatment_type: 'coculture'})\n"
+            "MATCH (e:Experiment)\n"
             "      -[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)\n"
-            "WHERE e.coculture_partner CONTAINS 'Alteromonas'\n"
+            "WHERE 'coculture' IN e.treatment_type\n"
+            "  AND e.coculture_partner CONTAINS 'Alteromonas'\n"
             "MATCH (g)-[:Gene_involved_in_biological_process]->(bp:BiologicalProcess)\n"
             "RETURN bp.name AS process, collect(DISTINCT g.locus_tag) AS genes, "
             "count(DISTINCT g) AS gene_count\n"
@@ -211,9 +216,10 @@ FEW_SHOT_EXAMPLES = [
     {
         "question": "Show gene expression over time for PMM0001 in coculture",
         "cypher": (
-            "MATCH (e:Experiment {treatment_type: 'coculture'})\n"
+            "MATCH (e:Experiment)\n"
             "      -[r:Changes_expression_of]->(g:Gene {locus_tag: 'PMM0001'})\n"
-            "WHERE r.time_point IS NOT NULL\n"
+            "WHERE 'coculture' IN e.treatment_type\n"
+            "  AND r.time_point IS NOT NULL\n"
             "RETURN e.name, r.time_point, r.time_point_hours, r.log2_fold_change,\n"
             "       r.expression_direction\n"
             "ORDER BY r.time_point_hours"
@@ -227,7 +233,7 @@ FEW_SHOT_EXAMPLES = [
         "question": "Which KEGG pathways are enriched among genes downregulated by nitrogen stress?",
         "cypher": (
             "MATCH (e:Experiment)-[r:Changes_expression_of {expression_direction: 'down'}]->(g:Gene)\n"
-            "WHERE e.treatment_type = 'nutrient_stress'\n"
+            "WHERE 'nutrient_stress' IN e.treatment_type\n"
             "  AND e.treatment CONTAINS 'nitrogen'\n"
             "MATCH (g)-[:Gene_has_kegg_ko]->(ko:KeggTerm {level: 'ko'})"
             "-[:Kegg_term_is_a_kegg_term]->(pw:KeggTerm {level: 'pathway'})\n"
@@ -238,6 +244,23 @@ FEW_SHOT_EXAMPLES = [
         "explanation": (
             "Multi-hop: expression edge → gene → KEGG KO → pathway via KeggTerm hierarchy. "
             "Use Gene_has_kegg_ko → Kegg_term_is_a_kegg_term chain for pathway enrichment."
+        ),
+    },
+    {
+        "question": "Which genes respond to nitrogen stress under diel cycle conditions?",
+        "cypher": (
+            "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
+            "WHERE 'nitrogen_stress' IN e.treatment_type\n"
+            "  AND 'diel_cycle' IN coalesce(e.background_factors, [])\n"
+            "  AND r.expression_status <> 'not_significant'\n"
+            "RETURN g.locus_tag, g.product, r.log2_fold_change, e.name\n"
+            "ORDER BY abs(r.log2_fold_change) DESC\n"
+            "LIMIT 50"
+        ),
+        "explanation": (
+            "Experiment.treatment_type is an array — use 'value' IN e.treatment_type. "
+            "background_factors (also array, may be null) captures experimental context "
+            "like 'axenic', 'diel_cycle', 'continuous_light'. Use coalesce for null safety."
         ),
     },
 ]
