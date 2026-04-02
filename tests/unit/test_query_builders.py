@@ -1403,9 +1403,9 @@ class TestBuildListExperiments:
         assert params["organism"] == "MED4"
 
     def test_treatment_type_filter(self):
-        """Treatment type filter uses toLower IN with list param."""
+        """Treatment type filter uses ANY() for array property."""
         cypher, params = build_list_experiments(treatment_type=["coculture", "nitrogen_stress"])
-        assert "toLower(e.treatment_type) IN $treatment_types" in cypher
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
         assert params["treatment_types"] == ["coculture", "nitrogen_stress"]
 
     def test_treatment_type_case_insensitive(self):
@@ -1614,11 +1614,11 @@ class TestBuildListExperimentsSummary:
         assert "score_median" not in cypher
 
     def test_shares_where_clause(self):
-        """Same filter logic as detail builder — treatment_type list works."""
+        """Same filter logic as detail builder — treatment_type array filter."""
         cypher, params = build_list_experiments_summary(
             treatment_type=["coculture", "nitrogen_stress"]
         )
-        assert "toLower(e.treatment_type) IN $treatment_types" in cypher
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
         assert params["treatment_types"] == ["coculture", "nitrogen_stress"]
 
     def test_returns_aggregation_keys(self):
