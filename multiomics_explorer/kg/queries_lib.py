@@ -447,7 +447,8 @@ def build_gene_homologs(
     consensus_gene_name, consensus_product, taxonomic_level, source,
     specificity_rank.
     RETURN keys (verbose): adds member_count, organism_count, genera,
-    has_cross_genus_members, description, functional_description.
+    has_cross_genus_members, description, functional_description,
+    cyanorak_roles, cog_categories.
     """
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
@@ -458,16 +459,6 @@ def build_gene_homologs(
     params["locus_tags"] = locus_tags
 
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
-
-    verbose_cols = (
-        ",\n       og.member_count AS member_count"
-        ",\n       og.organism_count AS organism_count"
-        ",\n       og.genera AS genera"
-        ",\n       og.has_cross_genus_members AS has_cross_genus_members"
-        ",\n       og.description AS description"
-        ",\n       og.functional_description AS functional_description"
-        if verbose else ""
-    )
 
     if offset:
         skip_clause = "\nSKIP $offset"
@@ -480,18 +471,44 @@ def build_gene_homologs(
     else:
         limit_clause = ""
 
-    cypher = (
-        "UNWIND $locus_tags AS lt\n"
-        "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
-        f"{where_block}"
-        "RETURN g.locus_tag AS locus_tag, g.organism_name AS organism_name,\n"
-        "       og.id AS group_id,\n"
-        "       og.consensus_gene_name AS consensus_gene_name,\n"
-        "       og.consensus_product AS consensus_product,\n"
-        "       og.taxonomic_level AS taxonomic_level, og.source AS source,\n"
-        f"       og.specificity_rank AS specificity_rank{verbose_cols}\n"
-        f"ORDER BY g.locus_tag, og.specificity_rank, og.source{skip_clause}{limit_clause}"
-    )
+    if verbose:
+        cypher = (
+            "UNWIND $locus_tags AS lt\n"
+            "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+            f"{where_block}"
+            "OPTIONAL MATCH (og)-[:Og_has_cyanorak_role]->(cr:CyanorakRole)\n"
+            "OPTIONAL MATCH (og)-[:Og_in_cog_category]->(cc:CogFunctionalCategory)\n"
+            "WITH g, og,\n"
+            "     [x IN collect(DISTINCT {id: cr.id, name: cr.name}) WHERE x.id IS NOT NULL] AS cyanorak_roles,\n"
+            "     [x IN collect(DISTINCT {id: cc.id, name: cc.name}) WHERE x.id IS NOT NULL] AS cog_categories\n"
+            "RETURN g.locus_tag AS locus_tag, g.organism_name AS organism_name,\n"
+            "       og.id AS group_id,\n"
+            "       og.consensus_gene_name AS consensus_gene_name,\n"
+            "       og.consensus_product AS consensus_product,\n"
+            "       og.taxonomic_level AS taxonomic_level, og.source AS source,\n"
+            "       og.specificity_rank AS specificity_rank,\n"
+            "       og.member_count AS member_count,\n"
+            "       og.organism_count AS organism_count,\n"
+            "       og.genera AS genera,\n"
+            "       og.has_cross_genus_members AS has_cross_genus_members,\n"
+            "       og.description AS description,\n"
+            "       og.functional_description AS functional_description,\n"
+            "       cyanorak_roles, cog_categories\n"
+            f"ORDER BY g.locus_tag, og.specificity_rank, og.source{skip_clause}{limit_clause}"
+        )
+    else:
+        cypher = (
+            "UNWIND $locus_tags AS lt\n"
+            "MATCH (g:Gene {locus_tag: lt})-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
+            f"{where_block}"
+            "RETURN g.locus_tag AS locus_tag, g.organism_name AS organism_name,\n"
+            "       og.id AS group_id,\n"
+            "       og.consensus_gene_name AS consensus_gene_name,\n"
+            "       og.consensus_product AS consensus_product,\n"
+            "       og.taxonomic_level AS taxonomic_level, og.source AS source,\n"
+            f"       og.specificity_rank AS specificity_rank\n"
+            f"ORDER BY g.locus_tag, og.specificity_rank, og.source{skip_clause}{limit_clause}"
+        )
     return cypher, params
 
 
@@ -1739,7 +1756,7 @@ def build_search_homolog_groups(
     consensus_product, source, taxonomic_level, specificity_rank,
     member_count, organism_count, score.
     RETURN keys (verbose): adds description, functional_description,
-    genera, has_cross_genus_members.
+    genera, has_cross_genus_members, cyanorak_roles, cog_categories.
     """
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
@@ -1750,14 +1767,6 @@ def build_search_homolog_groups(
     params["search_text"] = search_text
 
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
-
-    verbose_cols = (
-        ",\n       og.description AS description"
-        ",\n       og.functional_description AS functional_description"
-        ",\n       og.genera AS genera"
-        ",\n       og.has_cross_genus_members AS has_cross_genus_members"
-        if verbose else ""
-    )
 
     if offset:
         skip_clause = "\nSKIP $offset"
@@ -1770,19 +1779,44 @@ def build_search_homolog_groups(
     else:
         limit_clause = ""
 
-    cypher = (
-        "CALL db.index.fulltext.queryNodes('orthologGroupFullText', $search_text)\n"
-        "YIELD node AS og, score\n"
-        f"{where_block}"
-        "RETURN og.id AS group_id, og.name AS group_name,\n"
-        "       og.consensus_gene_name AS consensus_gene_name,\n"
-        "       og.consensus_product AS consensus_product,\n"
-        "       og.source AS source, og.taxonomic_level AS taxonomic_level,\n"
-        "       og.specificity_rank AS specificity_rank,\n"
-        "       og.member_count AS member_count, og.organism_count AS organism_count,\n"
-        f"       score{verbose_cols}\n"
-        f"ORDER BY score DESC, og.specificity_rank, og.source, og.id{skip_clause}{limit_clause}"
-    )
+    if verbose:
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('orthologGroupFullText', $search_text)\n"
+            "YIELD node AS og, score\n"
+            f"{where_block}"
+            "OPTIONAL MATCH (og)-[:Og_has_cyanorak_role]->(cr:CyanorakRole)\n"
+            "OPTIONAL MATCH (og)-[:Og_in_cog_category]->(cc:CogFunctionalCategory)\n"
+            "WITH og, score,\n"
+            "     [x IN collect(DISTINCT {id: cr.id, name: cr.name}) WHERE x.id IS NOT NULL] AS cyanorak_roles,\n"
+            "     [x IN collect(DISTINCT {id: cc.id, name: cc.name}) WHERE x.id IS NOT NULL] AS cog_categories\n"
+            "RETURN og.id AS group_id, og.name AS group_name,\n"
+            "       og.consensus_gene_name AS consensus_gene_name,\n"
+            "       og.consensus_product AS consensus_product,\n"
+            "       og.source AS source, og.taxonomic_level AS taxonomic_level,\n"
+            "       og.specificity_rank AS specificity_rank,\n"
+            "       og.member_count AS member_count, og.organism_count AS organism_count,\n"
+            "       score,\n"
+            "       og.description AS description,\n"
+            "       og.functional_description AS functional_description,\n"
+            "       og.genera AS genera,\n"
+            "       og.has_cross_genus_members AS has_cross_genus_members,\n"
+            "       cyanorak_roles, cog_categories\n"
+            f"ORDER BY score DESC, og.specificity_rank, og.source, og.id{skip_clause}{limit_clause}"
+        )
+    else:
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('orthologGroupFullText', $search_text)\n"
+            "YIELD node AS og, score\n"
+            f"{where_block}"
+            "RETURN og.id AS group_id, og.name AS group_name,\n"
+            "       og.consensus_gene_name AS consensus_gene_name,\n"
+            "       og.consensus_product AS consensus_product,\n"
+            "       og.source AS source, og.taxonomic_level AS taxonomic_level,\n"
+            "       og.specificity_rank AS specificity_rank,\n"
+            "       og.member_count AS member_count, og.organism_count AS organism_count,\n"
+            f"       score\n"
+            f"ORDER BY score DESC, og.specificity_rank, og.source, og.id{skip_clause}{limit_clause}"
+        )
     return cypher, params
 
 

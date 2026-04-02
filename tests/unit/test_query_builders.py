@@ -555,6 +555,19 @@ class TestBuildGeneHomologs:
         assert "cyanorak_roles" not in params
         assert "cog_categories" not in params
 
+    def test_verbose_includes_ontology_columns(self):
+        cypher, _ = build_gene_homologs(locus_tags=["PMM0845"], verbose=True)
+        assert "cyanorak_roles" in cypher
+        assert "cog_categories" in cypher
+        assert "Og_has_cyanorak_role" in cypher
+        assert "Og_in_cog_category" in cypher
+        assert "OPTIONAL MATCH" in cypher
+
+    def test_verbose_false_excludes_ontology_columns(self):
+        cypher, _ = build_gene_homologs(locus_tags=["PMM0845"], verbose=False)
+        assert "cyanorak_roles" not in cypher
+        assert "cog_categories" not in cypher
+
 
 class TestBuildGeneHomologsSummary:
     def test_returns_summary_columns(self):
@@ -2048,6 +2061,18 @@ class TestBuildSearchHomologGroups:
         cypher, params = build_search_homolog_groups(search_text="test")
         assert "Og_has_cyanorak_role" not in cypher
         assert "Og_in_cog_category" not in cypher
+
+    def test_verbose_includes_ontology_columns(self):
+        cypher, _ = build_search_homolog_groups(search_text="test", verbose=True)
+        assert "cyanorak_roles" in cypher
+        assert "cog_categories" in cypher
+        assert "Og_has_cyanorak_role" in cypher
+        assert "Og_in_cog_category" in cypher
+
+    def test_verbose_false_excludes_ontology_columns(self):
+        cypher, _ = build_search_homolog_groups(search_text="test", verbose=False)
+        assert "cyanorak_roles" not in cypher
+        assert "cog_categories" not in cypher
 
 
 class TestBuildSearchHomologGroupsSummary:
