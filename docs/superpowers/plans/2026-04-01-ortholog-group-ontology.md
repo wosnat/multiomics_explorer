@@ -894,7 +894,7 @@ Expected: FAIL — `TypeError: unexpected keyword argument 'cyanorak_roles'`
 
 - [ ] **Step 3: Add Pydantic models and update wrapper**
 
-In `multiomics_explorer/mcp_server/tools.py`, add a new breakdown model near line 1715 (after `SearchHomologGroupsLevelBreakdown`):
+In `multiomics_explorer/mcp_server/tools.py`, add a new shared breakdown model near the top of `register_tools()`, before both tool sections (e.g., near line ~520 alongside other shared models like `HomologOrganismBreakdown`):
 
 ```python
     class OntologyBreakdown(BaseModel):
@@ -972,14 +972,9 @@ Update the response construction (line ~1789) to include the new fields:
 
 Update the tool docstring to mention the new filter and verbose capabilities.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [ ] **Step 4: Update `_SAMPLE_API_RETURN` in existing tests**
 
-Run: `pytest tests/unit/test_tool_wrappers.py::TestSearchHomologGroupsWrapper -v`
-Expected: ALL PASS
-
-- [ ] **Step 5: Update `_SAMPLE_API_RETURN` in existing tests**
-
-The existing `_SAMPLE_API_RETURN` dict at line 2357 needs the new keys to avoid failures in other tests:
+The existing `_SAMPLE_API_RETURN` dict at line 2357 needs the new keys to avoid failures in existing tests:
 
 Add to the dict:
 ```python
@@ -987,12 +982,12 @@ Add to the dict:
         "top_cog_categories": [],
 ```
 
-- [ ] **Step 6: Run full test class to verify no regressions**
+- [ ] **Step 5: Run full test class to verify all pass**
 
 Run: `pytest tests/unit/test_tool_wrappers.py::TestSearchHomologGroupsWrapper -v`
-Expected: ALL PASS
+Expected: ALL PASS (new tests + existing tests with updated fixtures)
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add multiomics_explorer/mcp_server/tools.py tests/unit/test_tool_wrappers.py
