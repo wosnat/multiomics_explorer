@@ -2953,3 +2953,33 @@ class TestBuildGenesInCluster:
             limit=10, offset=5)
         assert "SKIP $offset" in cypher
         assert params["offset"] == 5
+
+
+class TestTreatmentTypeArrayFilter:
+    """treatment_type is now an array property — filters must use ANY()."""
+
+    def test_list_experiments_uses_any_for_treatment_type(self):
+        """treatment_type is now an array — filter must use ANY()."""
+        cypher, params = build_list_experiments(
+            treatment_type=["coculture", "nitrogen_stress"]
+        )
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
+        assert "toLower(e.treatment_type) IN" not in cypher
+        assert params["treatment_types"] == ["coculture", "nitrogen_stress"]
+
+    def test_list_experiments_summary_uses_any_for_treatment_type(self):
+        cypher, params = build_list_experiments_summary(
+            treatment_type=["coculture"]
+        )
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
+        assert params["treatment_types"] == ["coculture"]
+
+    def test_gene_response_profile_uses_any_for_treatment_types(self):
+        """gene_response_profile filter must also use ANY() for array treatment_type."""
+        cypher, params = build_gene_response_profile(
+            locus_tags=["PMM0001"],
+            organism_name="Prochlorococcus MED4",
+            treatment_types=["nitrogen_stress"],
+        )
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
+        assert params["treatment_types"] == ["nitrogen_stress"]

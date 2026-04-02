@@ -771,7 +771,9 @@ def _list_experiments_where(
         params["organism"] = organism
 
     if treatment_type:
-        conditions.append("toLower(e.treatment_type) IN $treatment_types")
+        conditions.append(
+            "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
+        )
         params["treatment_types"] = [t.lower() for t in treatment_type]
 
     if omics_type:
@@ -2454,7 +2456,10 @@ def _gene_response_profile_where(
         conditions.append(f"{experiment_alias}.organism_name = $organism_name")
         params["organism_name"] = organism_name
     if treatment_types:
-        conditions.append(f"toLower({experiment_alias}.treatment_type) IN $treatment_types")
+        conditions.append(
+            f"ANY(t IN {experiment_alias}.treatment_type"
+            f" WHERE toLower(t) IN $treatment_types)"
+        )
         params["treatment_types"] = [t.lower() for t in treatment_types]
     if experiment_ids:
         conditions.append(f"{experiment_alias}.id IN $experiment_ids")
