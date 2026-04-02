@@ -392,7 +392,8 @@ def build_gene_homologs_summary(
 ) -> tuple[str, dict]:
     """Build summary + not_found/no_groups for gene_homologs.
 
-    RETURN keys: total_matching, by_organism, by_source, not_found, no_groups.
+    RETURN keys: total_matching, by_organism, by_source, not_found, no_groups,
+    top_cyanorak_roles, top_cog_categories.
     """
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
@@ -414,17 +415,40 @@ def build_gene_homologs_summary(
         "  collect(CASE WHEN g IS NULL THEN lt END) AS nf_raw,\n"
         "  collect(CASE WHEN g IS NOT NULL AND size(groups) = 0 THEN lt END) AS ng_raw,\n"
         "  [row IN collect({org: CASE WHEN size(groups) > 0 THEN g.organism_name END,\n"
-        "                    srcs: [x IN groups | x.source]})\n"
+        "                    srcs: [x IN groups | x.source],\n"
+        "                    og_ids: [x IN groups | x.id]})\n"
         "   WHERE row.org IS NOT NULL] AS matched\n"
         "UNWIND CASE WHEN size(matched) = 0 THEN [null] ELSE matched END AS m\n"
         "WITH nf_raw, ng_raw,\n"
         "     [x IN collect(m.org) WHERE x IS NOT NULL] AS orgs,\n"
-        "     apoc.coll.flatten([x IN collect(m.srcs) WHERE x IS NOT NULL]) AS sources\n"
+        "     apoc.coll.flatten([x IN collect(m.srcs) WHERE x IS NOT NULL]) AS sources,\n"
+        "     apoc.coll.toSet(apoc.coll.flatten(\n"
+        "       [x IN collect(m.og_ids) WHERE x IS NOT NULL])) AS all_og_ids\n"
+        "UNWIND CASE WHEN size(all_og_ids) = 0 THEN [null] ELSE all_og_ids END AS og_id\n"
+        "OPTIONAL MATCH (og_node:OrthologGroup {id: og_id})-[:Og_has_cyanorak_role]->(cr:CyanorakRole)\n"
+        "OPTIONAL MATCH (og_node)-[:Og_in_cog_category]->(cc:CogFunctionalCategory)\n"
+        "WITH nf_raw, ng_raw, orgs, sources,\n"
+        "     collect(DISTINCT {id: cr.id, name: cr.name}) AS cr_pairs,\n"
+        "     collect(DISTINCT {id: cc.id, name: cc.name}) AS cc_pairs\n"
+        "WITH nf_raw, ng_raw, orgs, sources,\n"
+        "     [p IN cr_pairs WHERE p.id IS NOT NULL | p.id + ' | ' + p.name] AS cr_items,\n"
+        "     [p IN cc_pairs WHERE p.id IS NOT NULL | p.id + ' | ' + p.name] AS cc_items\n"
+        "WITH *,\n"
+        "     apoc.coll.frequencies(cr_items) AS cr_freq,\n"
+        "     apoc.coll.frequencies(cc_items) AS cc_freq\n"
         "RETURN size(sources) AS total_matching,\n"
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
         "       apoc.coll.frequencies(sources) AS by_source,\n"
         "       [x IN nf_raw WHERE x IS NOT NULL] AS not_found,\n"
-        "       [x IN ng_raw WHERE x IS NOT NULL] AS no_groups"
+        "       [x IN ng_raw WHERE x IS NOT NULL] AS no_groups,\n"
+        "       [x IN cr_freq | {id: split(x.item, ' | ')[0],\n"
+        "                         name: split(x.item, ' | ')[1],\n"
+        "                         count: x.count}]\n"
+        "         [0..5] AS top_cyanorak_roles,\n"
+        "       [x IN cc_freq | {id: split(x.item, ' | ')[0],\n"
+        "                         name: split(x.item, ' | ')[1],\n"
+        "                         count: x.count}]\n"
+        "         [0..5] AS top_cog_categories"
     )
     return cypher, params
 
@@ -1709,7 +1733,7 @@ def build_search_homolog_groups_summary(
     """Build summary Cypher for search_homolog_groups.
 
     RETURN keys: total_entries, total_matching, score_max, score_median,
-    by_source, by_level.
+    by_source, by_level, top_cyanorak_roles, top_cog_categories.
     """
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
@@ -1725,15 +1749,32 @@ def build_search_homolog_groups_summary(
         "CALL db.index.fulltext.queryNodes('orthologGroupFullText', $search_text)\n"
         "YIELD node AS og, score\n"
         f"{where_block}"
-        "WITH collect(og.source) AS sources,\n"
-        "     collect(og.taxonomic_level) AS levels,\n"
-        "     count(og) AS total_matching,\n"
+        "OPTIONAL MATCH (og)-[:Og_has_cyanorak_role]->(cr:CyanorakRole)\n"
+        "OPTIONAL MATCH (og)-[:Og_in_cog_category]->(cc:CogFunctionalCategory)\n"
+        "WITH collect({src: og.source, lvl: og.taxonomic_level,\n"
+        "              cr_id: cr.id, cr_name: cr.name,\n"
+        "              cc_id: cc.id, cc_name: cc.name}) AS rows,\n"
+        "     count(DISTINCT og) AS total_matching,\n"
         "     max(score) AS score_max,\n"
         "     percentileDisc(score, 0.5) AS score_median\n"
         "CALL { MATCH (all_og:OrthologGroup) RETURN count(all_og) AS total_entries }\n"
+        "WITH *, [r IN rows | r.src] AS sources,\n"
+        "        [r IN rows | r.lvl] AS levels,\n"
+        "        [r IN rows WHERE r.cr_id IS NOT NULL | r.cr_id + ' | ' + r.cr_name] AS cr_items,\n"
+        "        [r IN rows WHERE r.cc_id IS NOT NULL | r.cc_id + ' | ' + r.cc_name] AS cc_items\n"
+        "WITH total_entries, total_matching, score_max, score_median,\n"
+        "     apoc.coll.frequencies(sources) AS by_source,\n"
+        "     apoc.coll.frequencies(levels) AS by_level,\n"
+        "     apoc.coll.frequencies(cr_items) AS cr_freq,\n"
+        "     apoc.coll.frequencies(cc_items) AS cc_freq\n"
         "RETURN total_entries, total_matching, score_max, score_median,\n"
-        "       apoc.coll.frequencies(sources) AS by_source,\n"
-        "       apoc.coll.frequencies(levels) AS by_level"
+        "       by_source, by_level,\n"
+        "       [x IN cr_freq | {id: split(x.item, ' | ')[0],\n"
+        "                         name: split(x.item, ' | ')[1],\n"
+        "                         count: x.count}][0..5] AS top_cyanorak_roles,\n"
+        "       [x IN cc_freq | {id: split(x.item, ' | ')[0],\n"
+        "                         name: split(x.item, ' | ')[1],\n"
+        "                         count: x.count}][0..5] AS top_cog_categories"
     )
     return cypher, params
 

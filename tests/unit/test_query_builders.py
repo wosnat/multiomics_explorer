@@ -636,6 +636,13 @@ class TestBuildGeneHomologsSummary:
         assert "og.taxonomic_level = $level" in cypher
         assert "og.specificity_rank <= $max_rank" in cypher
 
+    def test_summary_includes_top_ontology_breakdowns(self):
+        cypher, _ = build_gene_homologs_summary(locus_tags=["PMM0845"])
+        assert "top_cyanorak_roles" in cypher
+        assert "top_cog_categories" in cypher
+        assert "Og_has_cyanorak_role" in cypher
+        assert "Og_in_cog_category" in cypher
+
 
 class TestBuildGetHomologsOldRemoved:
     def test_old_build_get_homologs_no_longer_exists(self):
@@ -2114,6 +2121,13 @@ class TestBuildSearchHomologGroupsSummary:
             search_text="test", cog_categories=["cog.category:J"])
         assert "Og_in_cog_category" in cypher
         assert params["cog_categories"] == ["cog.category:J"]
+
+    def test_summary_includes_top_ontology_breakdowns(self):
+        cypher, _ = build_search_homolog_groups_summary(search_text="test")
+        assert "top_cyanorak_roles" in cypher
+        assert "top_cog_categories" in cypher
+        assert "Og_has_cyanorak_role" in cypher
+        assert "Og_in_cog_category" in cypher
 
 
 class TestBuildGenesByHomologGroup:
