@@ -3,15 +3,34 @@ row_count: 1
 rows:
 - by_level:
   - '{''count'': 1, ''item'': ''Alteromonadaceae''}'
-  - '{''count'': 208, ''item'': ''Synechococcus''}'
-  - '{''count'': 211, ''item'': ''Prochloraceae''}'
-  - '{''count'': 218, ''item'': ''Bacteria''}'
-  - '{''count'': 237, ''item'': ''curated''}'
-  - '{''count'': 9, ''item'': ''Cyanobacteria''}'
+  - '{''count'': 15, ''item'': ''Cyanobacteria''}'
+  - '{''count'': 361, ''item'': ''Synechococcus''}'
+  - '{''count'': 364, ''item'': ''Bacteria''}'
+  - '{''count'': 378, ''item'': ''Prochloraceae''}'
+  - '{''count'': 416, ''item'': ''curated''}'
   by_source:
-  - '{''count'': 237, ''item'': ''cyanorak''}'
-  - '{''count'': 647, ''item'': ''eggnog''}'
+  - '{''count'': 1119, ''item'': ''eggnog''}'
+  - '{''count'': 416, ''item'': ''cyanorak''}'
   score_max: 6.1279
-  score_median: 1.0569
+  score_median: 1.0171
+  top_cog_categories:
+  - '{''id'': ''cog.category:C'', ''count'': 529, ''name'': ''Energy production and
+    conversion''}'
+  - '{''id'': ''cog.category:K'', ''count'': 21, ''name'': ''Transcription''}'
+  - '{''id'': ''cog.category:N'', ''count'': 7, ''name'': ''Cell motility''}'
+  - '{''id'': ''cog.category:S'', ''count'': 558, ''name'': ''Function unknown''}'
+  - '{''id'': ''cog.category:U'', ''count'': 50, ''name'': ''Intracellular trafficking,
+    secretion, and vesicular transport''}'
+  top_cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 163, ''name'': ''Cellular processes
+    > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
+  - '{''id'': ''cyanorak.role:J.5.1'', ''count'': 17, ''name'': ''Photosynthesis and
+    respiration > Light-harvesting-Phycobilisomes > Allophycocyanin''}'
+  - '{''id'': ''cyanorak.role:J.7'', ''count'': 91, ''name'': ''Photosynthesis and
+    respiration > Photosystem I''}'
+  - '{''id'': ''cyanorak.role:J.8'', ''count'': 180, ''name'': ''Photosynthesis and
+    respiration > Photosystem II''}'
+  - '{''id'': ''cyanorak.role:L.3'', ''count'': 20, ''name'': ''Protein fate > Protein
+    folding and stabilization''}'
   total_entries: 21122
   total_matching: 884

@@ -1,8 +1,11 @@
 case_id: search_homolog_groups_verbose
 row_count: 193
 rows:
-- consensus_gene_name: glnL
+- cog_categories:
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  consensus_gene_name: glnL
   consensus_product: nitrogen regulation protein NR(II)
+  cyanorak_roles: []
   description: Signal transduction histidine kinase, nitrogen specific
   functional_description: Signal transduction mechanisms
   genera:
@@ -16,8 +19,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: merR
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: merR
   consensus_product: aliphatic nitrilase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.1.9'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Other''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Carbon-nitrogen hydrolase
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Adaptation/acclimation
@@ -34,8 +46,16 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ntcA
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: ntcA
   consensus_product: global nitrogen regulatory protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N.5'', ''name'': ''Regulatory functions > Other''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -52,8 +72,16 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ntcA
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: ntcA
   consensus_product: global nitrogen regulatory protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N.5'', ''name'': ''Regulatory functions > Other''}'
   description: COG0664 cAMP-binding proteins - catabolite gene activator and regulatory
     subunit of cAMP-dependent protein kinases
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -70,8 +98,16 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ntcA
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: ntcA
   consensus_product: global nitrogen regulatory protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N.5'', ''name'': ''Regulatory functions > Other''}'
   description: CRP family of transcriptional regulators
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -87,8 +123,16 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: glnB
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: glnB
   consensus_product: nitrogen regulatory protein P-II
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N.1'', ''name'': ''Regulatory functions > DNA interactions''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -105,8 +149,16 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: glnB
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: glnB
   consensus_product: nitrogen regulatory protein P-II
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N.1'', ''name'': ''Regulatory functions > DNA interactions''}'
   description: Belongs to the P(II) protein family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -122,8 +174,16 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: glnB
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: glnB
   consensus_product: nitrogen regulatory protein P-II
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N.1'', ''name'': ''Regulatory functions > DNA interactions''}'
   description: Belongs to the P(II) protein family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -139,8 +199,20 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ntrX
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  consensus_gene_name: ntrX
   consensus_product: nitrogen assimilation regulatory protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.1'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Iron''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N'', ''name'': ''Regulatory functions''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Iron; Cellular processes > Adaptation/acclimation
@@ -159,8 +231,20 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ntrX
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  consensus_gene_name: ntrX
   consensus_product: nitrogen assimilation regulatory protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.1'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Iron''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N'', ''name'': ''Regulatory functions''}'
   description: Transcriptional regulators containing an AAA-type ATPase domain and
     a DNA-binding domain
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -179,8 +263,20 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ntrX
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  consensus_gene_name: ntrX
   consensus_product: nitrogen assimilation regulatory protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.1'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Iron''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N'', ''name'': ''Regulatory functions''}'
   description: 4Fe-4S binding domain
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Iron; Cellular processes > Adaptation/acclimation
@@ -198,8 +294,20 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ntrX
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  consensus_gene_name: ntrX
   consensus_product: nitrogen assimilation regulatory protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.1'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Iron''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N'', ''name'': ''Regulatory functions''}'
   description: Transcriptional regulators containing an AAA-type ATPase domain and
     a DNA-binding domain
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -219,8 +327,13 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: dppB
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: dppB
   consensus_product: oligopeptide ABC transporter, membrane component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: nitrogen compound transport
   functional_description: Transport and binding proteins > Amino acids, peptides and
     amines; Inorganic ion transport and metabolism
@@ -237,8 +350,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: aguB
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: aguB
   consensus_product: carbon-nitrogen hydrolase
+  cyanorak_roles: []
   description: amidohydrolase
   functional_description: null
   genera:
@@ -252,8 +368,12 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: PMN2A_RS05970
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: PMN2A_RS05970
   consensus_product: nif11-like leader peptide domain protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:R.2'', ''name'': ''Other > Conserved hypothetical proteins''}'
   description: PFAM Nitrogen fixation protein of
   functional_description: null
   genera:
@@ -267,8 +387,11 @@ rows:
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
-- consensus_gene_name: ntcA
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: ntcA
   consensus_product: global nitrogen regulatory protein
+  cyanorak_roles: []
   description: cyclic nucleotide binding
   functional_description: Transcription
   genera:
@@ -284,8 +407,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: chlH
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: chlH
   consensus_product: protoporphyrin IX Mg-chelatase, subunit ChlH
+  cyanorak_roles: []
   description: ligase activity, forming nitrogen-metal bonds
   functional_description: Coenzyme transport and metabolism
   genera:
@@ -300,8 +426,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: glnG
+- cog_categories:
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  consensus_gene_name: glnG
   consensus_product: nitrogen regulation protein NR(I)
+  cyanorak_roles: []
   description: COG2204 Response regulator containing CheY-like receiver, AAA-type
     ATPase, and DNA-binding domains
   functional_description: Signal transduction mechanisms
@@ -316,8 +445,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: ramA
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: ramA
   consensus_product: carbon-nitrogen hydrolase family protein
+  cyanorak_roles: []
   description: amidohydrolase
   functional_description: null
   genera:
@@ -331,8 +463,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: glnB
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: glnB
   consensus_product: P-II family nitrogen regulator
+  cyanorak_roles: []
   description: Belongs to the P(II) protein family
   functional_description: Transcription
   genera:
@@ -346,8 +481,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: glnK
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: glnK
   consensus_product: P-II family nitrogen regulator
+  cyanorak_roles: []
   description: Belongs to the P(II) protein family
   functional_description: Transcription
   genera:
@@ -361,8 +499,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: glnB
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: glnB
   consensus_product: nitrogen regulatory protein P-II
+  cyanorak_roles: []
   description: Belongs to the P(II) protein family
   functional_description: Transcription
   genera:
@@ -378,8 +519,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: glnL
+- cog_categories:
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  consensus_gene_name: glnL
   consensus_product: nitrogen regulation protein NR(II)
+  cyanorak_roles: []
   description: phosphorelay sensor kinase activity
   functional_description: Signal transduction mechanisms
   genera:
@@ -393,8 +537,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: nadE
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: nadE
   consensus_product: deaminated glutathione amidase
+  cyanorak_roles: []
   description: hydrolase activity, acting on carbon-nitrogen (but not peptide) bonds
   functional_description: null
   genera:
@@ -410,8 +557,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: lporfX
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: lporfX
   consensus_product: GatB/YqeY domain-containing protein
+  cyanorak_roles: []
   description: carbon-nitrogen ligase activity, with glutamine as amido-N-donor
   functional_description: null
   genera:
@@ -425,8 +575,13 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: narM
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: narM
   consensus_product: nitrate reductase associated protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism
   genera:
@@ -440,8 +595,12 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: cynH
+- cog_categories: []
+  consensus_gene_name: cynH
   consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism
   genera:
@@ -455,8 +614,13 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: narM
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: narM
   consensus_product: nitrate reductase associated protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Conserved nitrate reductase-associated protein (Nitr_red_assoc)
   functional_description: Central intermediary metabolism > Nitrogen metabolism
   genera:
@@ -470,8 +634,12 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: cynH
+- cog_categories: []
+  consensus_gene_name: cynH
   consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism
   genera:
@@ -485,8 +653,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: narM
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: narM
   consensus_product: nitrate reductase associated protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Pfam Conserved nitrate reductase-associated protein (Nitr_red_assoc)
   functional_description: Central intermediary metabolism > Nitrogen metabolism
   genera:
@@ -500,8 +673,12 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: cynH
+- cog_categories: []
+  consensus_gene_name: cynH
   consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism
   genera:
@@ -515,8 +692,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: ptsN
+- cog_categories:
+  - '{''id'': ''cog.category:G'', ''name'': ''Carbohydrate transport and metabolism''}'
+  consensus_gene_name: ptsN
   consensus_product: PTS IIA-like nitrogen regulatory protein PtsN
+  cyanorak_roles: []
   description: COG1762 Phosphotransferase system mannitol fructose-specific IIA domain
     (Ntr-type)
   functional_description: Carbohydrate transport and metabolism
@@ -531,8 +711,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: ptsN
+- cog_categories:
+  - '{''id'': ''cog.category:G'', ''name'': ''Carbohydrate transport and metabolism''}'
+  consensus_gene_name: ptsN
   consensus_product: PTS IIA-like nitrogen regulatory protein PtsN
+  cyanorak_roles: []
   description: phosphoenolpyruvate-dependent sugar phosphotransferase system
   functional_description: Carbohydrate transport and metabolism
   genera:
@@ -546,9 +729,13 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: putA
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: putA
   consensus_product: bifunctional proline dehydrogenase/L-glutamate gamma-semialdehyde
     dehydrogenase PutA
+  cyanorak_roles: []
   description: Oxidizes proline to glutamate for use as a carbon and nitrogen source
   functional_description: Energy production and conversion; Amino acid transport and
     metabolism
@@ -563,8 +750,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: null
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: null
   consensus_product: CopG family ribbon-helix-helix protein
+  cyanorak_roles: []
   description: .,Oxidizes proline to glutamate for use as a carbon and nitrogen source
   functional_description: Transcription
   genera:
@@ -578,9 +768,13 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: putA
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: putA
   consensus_product: bifunctional proline dehydrogenase/L-glutamate gamma-semialdehyde
     dehydrogenase PutA
+  cyanorak_roles: []
   description: .,Oxidizes proline to glutamate for use as a carbon and nitrogen source
   functional_description: Energy production and conversion; Amino acid transport and
     metabolism
@@ -595,8 +789,13 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: speB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: speB
   consensus_product: agmatinase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:G.1'', ''name'': ''Energy metabolism > Amino acids and
+    amines (catabolism)''}'
   description: hydrolase activity, acting on carbon-nitrogen (but not peptide) bonds,
     in linear amidines
   functional_description: Energy metabolism > Amino acids and amines (catabolism);
@@ -614,8 +813,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: pyrC
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrC
   consensus_product: putative dihydroorotase
+  cyanorak_roles: []
   description: hydrolase activity, acting on carbon-nitrogen (but not peptide) bonds,
     in cyclic amides
   functional_description: Nucleotide transport and metabolism
@@ -632,8 +834,12 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: pncA
+- cog_categories:
+  - '{''id'': ''cog.category:Q'', ''name'': ''Secondary metabolites biosynthesis,
+    transport and catabolism''}'
+  consensus_gene_name: pncA
   consensus_product: isochorismatase-like hydrolase superfamily
+  cyanorak_roles: []
   description: hydrolase activity, acting on carbon-nitrogen (but not peptide) bonds,
     in linear amides
   functional_description: Secondary metabolites biosynthesis, transport and catabolism
@@ -650,8 +856,15 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: nirA
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: nirA
   consensus_product: ferredoxin--nitrite reductase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -668,8 +881,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: narB
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: narB
   consensus_product: nitrate reductase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -685,8 +905,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: PMN2A_RS05525
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: PMN2A_RS05525
   consensus_product: nitroreductase family protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -702,8 +929,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: narB
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: narB
   consensus_product: nitrate reductase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the prokaryotic molybdopterin-containing oxidoreductase
     family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -720,8 +954,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: nirA
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: nirA
   consensus_product: ferredoxin--nitrite reductase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the nitrite and sulfite reductase 4Fe-4S domain family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -737,8 +978,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: nirA
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: nirA
   consensus_product: ferredoxin--nitrite reductase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the nitrite and sulfite reductase 4Fe-4S domain family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -754,8 +1002,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: PMN2A_RS05525
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: PMN2A_RS05525
   consensus_product: nitroreductase family protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Nitroreductase family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -771,8 +1026,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: glsF
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: glsF
   consensus_product: ferredoxin-dependent glutamate synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -789,8 +1051,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureC
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureC
   consensus_product: urease alpha subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -807,8 +1076,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureB
   consensus_product: urease beta subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -825,8 +1101,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureA
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureA
   consensus_product: urease gamma subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -843,8 +1126,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureC
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureC
   consensus_product: urease alpha subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the metallo-dependent hydrolases superfamily. Urease alpha
     subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -861,8 +1151,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: glsF
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: glsF
   consensus_product: ferredoxin-dependent glutamate synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: glutamate synthase
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -878,8 +1175,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ureB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureB
   consensus_product: urease beta subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the urease beta subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -895,8 +1199,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ureA
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureA
   consensus_product: urease gamma subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the urease gamma subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -912,8 +1223,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ureC
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureC
   consensus_product: urease alpha subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the metallo-dependent hydrolases superfamily. Urease alpha
     subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -930,8 +1248,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: glsF
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: glsF
   consensus_product: ferredoxin-dependent glutamate synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Ferredoxin-dependent glutamate synthase
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -947,8 +1272,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ureA
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureA
   consensus_product: urease gamma subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the urease gamma subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -964,8 +1296,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ureB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureB
   consensus_product: urease beta subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the urease beta subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -981,8 +1320,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: glsF
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: glsF
   consensus_product: ferredoxin-dependent glutamate synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: L-glutamate biosynthetic process
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -1000,8 +1346,15 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: ureC
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureC
   consensus_product: urease alpha subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the metallo-dependent hydrolases superfamily. Urease alpha
     subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1019,8 +1372,15 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: ureA
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureA
   consensus_product: urease gamma subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: urea catabolic process
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -1037,8 +1397,15 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: ureB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: ureB
   consensus_product: urease beta subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the urease beta subunit family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -1055,8 +1422,13 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: cynS
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: cynS
   consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Catalyzes the reaction of cyanate with bicarbonate to produce ammonia
     and carbon dioxide
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Coenzyme
@@ -1072,8 +1444,16 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ureG
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: ureG
   consensus_product: urease accessory protein UreG
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
@@ -1090,8 +1470,16 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureG
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: ureG
   consensus_product: urease accessory protein UreG
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Facilitates the functional incorporation of the urease nickel metallocenter.
     This process requires GTP hydrolysis, probably effectuated by UreG
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1108,8 +1496,16 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ureG
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: ureG
   consensus_product: urease accessory protein UreG
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: nickel cation binding
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
@@ -1127,8 +1523,16 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: moaB
+- cog_categories: []
+  consensus_gene_name: moaB
   consensus_product: molybdenum cofactor biosynthesis protein B
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1144,9 +1548,12 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: yhcX
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: yhcX
   consensus_product: bifunctional GNAT family N-acetyltransferase/carbon-nitrogen
     hydrolase family protein
+  cyanorak_roles: []
   description: COG0454 Histone acetyltransferase HPA2 and related acetyltransferases
   functional_description: Transcription
   genera:
@@ -1160,8 +1567,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: cynD
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: cynD
   consensus_product: cyanate ABC transporter ATP-binding protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
     ion transport and metabolism
@@ -1177,8 +1589,13 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: cynS
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: cynS
   consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
     ion transport and metabolism
@@ -1194,8 +1611,13 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: cynB
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: cynB
   consensus_product: cyanate ABC transporter, permease protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
     ion transport and metabolism
@@ -1211,8 +1633,13 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: cynB
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: cynB
   consensus_product: cyanate ABC transporter, permease protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Permease protein
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
     ion transport and metabolism
@@ -1227,8 +1654,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: cynS
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: cynS
   consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Catalyzes the reaction of cyanate with bicarbonate to produce ammonia
     and carbon dioxide
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
@@ -1244,8 +1676,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: cynS
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: cynS
   consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Catalyzes the reaction of cyanate with bicarbonate to produce ammonia
     and carbon dioxide
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
@@ -1263,8 +1700,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: nadE
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: nadE
   consensus_product: ammonia-dependent NAD(+) synthetase
+  cyanorak_roles: []
   description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
     ammonia as a nitrogen source
   functional_description: Coenzyme transport and metabolism
@@ -1279,8 +1719,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: ureD
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureD
   consensus_product: urease accessory protein UreD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
@@ -1298,8 +1747,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureE
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureE
   consensus_product: urease accessory protein UreE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
@@ -1317,8 +1775,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureF
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureF
   consensus_product: urease accessory protein UreF
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
@@ -1336,8 +1803,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: urtD
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: urtD
   consensus_product: ABC-type urea transporter, ATP-binding component UrtD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -1354,8 +1830,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: glnN1
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: glnN1
   consensus_product: glutamine synthetase, type III
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.3'', ''name'': ''Amino acid biosynthesis > Glutamate
+    family (Arg, Gln, Glu, Pro)''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Cellular processes > Adaptation/acclimation to atypical conditions and detoxification
@@ -1371,8 +1856,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: glnN1
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: glnN1
   consensus_product: glutamine synthetase, type III
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.3'', ''name'': ''Amino acid biosynthesis > Glutamate
+    family (Arg, Gln, Glu, Pro)''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: glutamine synthetase
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Cellular processes > Adaptation/acclimation to atypical conditions and detoxification
@@ -1388,8 +1882,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: urtD
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: urtD
   consensus_product: ABC-type urea transporter, ATP-binding component UrtD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: ABC transporter, ATP-binding protein
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -1405,8 +1908,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ureD
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureD
   consensus_product: urease accessory protein UreD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Required for maturation of urease via the functional incorporation
     of the urease nickel metallocenter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1424,8 +1936,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ureF
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureF
   consensus_product: urease accessory protein UreF
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Required for maturation of urease via the functional incorporation
     of the urease nickel metallocenter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1443,8 +1964,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: ureE
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureE
   consensus_product: urease accessory protein UreE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Involved in urease metallocenter assembly. Binds nickel. Probably functions
     as a nickel donor during metallocenter assembly
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1462,8 +1992,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: urtD
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: urtD
   consensus_product: ABC-type urea transporter, ATP-binding component UrtD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Alternative locus ID
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -1479,8 +2018,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ureD
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureD
   consensus_product: urease accessory protein UreD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Required for maturation of urease via the functional incorporation
     of the urease nickel metallocenter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1498,8 +2046,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ureF
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureF
   consensus_product: urease accessory protein UreF
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Required for maturation of urease via the functional incorporation
     of the urease nickel metallocenter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1517,8 +2074,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ureE
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureE
   consensus_product: urease accessory protein UreE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Involved in urease metallocenter assembly. Binds nickel. Probably functions
     as a nickel donor during metallocenter assembly
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1536,8 +2102,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: urtD
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: urtD
   consensus_product: ABC-type urea transporter, ATP-binding component UrtD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Branched-chain amino acid ATP-binding cassette transporter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -1553,8 +2128,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: ureE
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureE
   consensus_product: urease accessory protein UreE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Involved in urease metallocenter assembly. Binds nickel. Probably functions
     as a nickel donor during metallocenter assembly
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1572,8 +2156,17 @@ rows:
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
-- consensus_gene_name: ureD
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureD
   consensus_product: urease accessory protein UreD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: nickel cation binding
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
@@ -1591,8 +2184,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: ureF
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureF
   consensus_product: urease accessory protein UreF
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: nickel cation binding
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
@@ -1610,8 +2212,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: ureE
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureE
   consensus_product: urease accessory protein UreE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: enzyme active site formation
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
@@ -1629,8 +2240,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: glnN1
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: glnN1
   consensus_product: glutamine synthetase, type III
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.3'', ''name'': ''Amino acid biosynthesis > Glutamate
+    family (Arg, Gln, Glu, Pro)''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: glutamine synthetase
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Cellular processes > Adaptation/acclimation to atypical conditions and detoxification
@@ -1646,8 +2266,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: urtD
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: urtD
   consensus_product: ABC-type urea transporter, ATP-binding component UrtD
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Branched-chain amino acid ATP-binding cassette transporter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -1664,8 +2293,13 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: nadE
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: nadE
   consensus_product: NAD+ synthase (glutamine-hydrolysing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.6'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Pyridine nucleotides (NAD, NADP)''}'
   description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
     L-glutamine as a nitrogen source
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
@@ -1681,8 +2315,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: nadE
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: nadE
   consensus_product: NAD+ synthase (glutamine-hydrolysing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.6'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Pyridine nucleotides (NAD, NADP)''}'
   description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
     L-glutamine as a nitrogen source
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
@@ -1698,8 +2337,12 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: rutC
+- cog_categories:
+  - '{''id'': ''cog.category:J'', ''name'': ''Translation, ribosomal structure and
+    biogenesis''}'
+  consensus_gene_name: rutC
   consensus_product: pyrimidine utilization protein C
+  cyanorak_roles: []
   description: May reduce aminoacrylate peracid to aminoacrylate. Required to remove
     a toxic intermediate produce by the pyrimidine nitrogen degradation
   functional_description: Translation, ribosomal structure and biogenesis
@@ -1714,8 +2357,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: null
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: null
   consensus_product: hypothetical protein
+  cyanorak_roles: []
   description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
     L-glutamine as a nitrogen source
   functional_description: null
@@ -1730,8 +2376,17 @@ rows:
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Gammaproteobacteria
-- consensus_gene_name: merR
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: merR
   consensus_product: aliphatic nitrilase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.1.9'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Other''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Adaptation/acclimation
@@ -1749,8 +2404,18 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: ureG
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureG
   consensus_product: urease accessory protein UreG
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Facilitates the functional incorporation of the urease nickel metallocenter.
     This process requires GTP hydrolysis, probably effectuated by UreG
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -1768,8 +2433,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: merR
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: merR
   consensus_product: aliphatic nitrilase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.1.9'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Other''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: nitrilase
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Adaptation/acclimation
@@ -1786,8 +2460,14 @@ rows:
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
-- consensus_gene_name: glmS
+- cog_categories:
+  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
+  consensus_gene_name: glmS
   consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A'', ''name'': ''Amino acid biosynthesis''}'
+  - '{''id'': ''cyanorak.role:E.1'', ''name'': ''Central intermediary metabolism >
+    Amino sugars''}'
   description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
     into glucosamine-6P using glutamine as a nitrogen source
   functional_description: Amino acid biosynthesis; Central intermediary metabolism
@@ -1803,8 +2483,14 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: glmS
+- cog_categories:
+  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
+  consensus_gene_name: glmS
   consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A'', ''name'': ''Amino acid biosynthesis''}'
+  - '{''id'': ''cyanorak.role:E.1'', ''name'': ''Central intermediary metabolism >
+    Amino sugars''}'
   description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
     into glucosamine-6P using glutamine as a nitrogen source
   functional_description: Amino acid biosynthesis; Central intermediary metabolism
@@ -1820,8 +2506,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: glmS
+- cog_categories:
+  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
+  consensus_gene_name: glmS
   consensus_product: glutamine--fructose-6-phosphate transaminase (isomerizing)
+  cyanorak_roles: []
   description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
     into glucosamine-6P using glutamine as a nitrogen source
   functional_description: Cell wall/membrane/envelope biogenesis
@@ -1836,8 +2525,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: moeB
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moeB
   consensus_product: molybdopterin biosynthesis protein MoeB
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1855,9 +2553,18 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moaE
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaE
   consensus_product: molybdenum cofactor biosynthesis protein E (molydbopterin converting
     factor large subunit)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1874,8 +2581,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moeA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moeA
   consensus_product: molybdopterin biosynthesis protein MoeA
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1892,8 +2608,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moaC
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaC
   consensus_product: molybdenum cofactor biosynthesis protein C
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1910,8 +2635,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moaA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaA
   consensus_product: molybdenum cofactor biosynthesis protein A
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1928,9 +2662,18 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moaD
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaD
   consensus_product: molydbenum cofactor biosynthesis protein D (molybdopterin converting
     factor small subunit)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1947,8 +2690,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moeA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moeA
   consensus_product: molybdopterin biosynthesis protein MoeA
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Molybdopterin biosynthesis
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -1965,8 +2717,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: moaA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaA
   consensus_product: molybdenum cofactor biosynthesis protein A
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Catalyzes the cyclization of GTP to (8S)-3^,8-cyclo-7,8- dihydroguanosine
     5^-triphosphate
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
@@ -1984,8 +2745,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: moaC
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaC
   consensus_product: molybdenum cofactor biosynthesis protein C
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Catalyzes the conversion of (8S)-3^,8-cyclo-7,8- dihydroguanosine 5^-triphosphate
     to cyclic pyranopterin monophosphate (cPMP)
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
@@ -2003,9 +2773,18 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: moaE
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaE
   consensus_product: molybdenum cofactor biosynthesis protein E (molydbopterin converting
     factor large subunit)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Molybdopterin converting factor
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -2022,9 +2801,18 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: moaD
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaD
   consensus_product: molydbenum cofactor biosynthesis protein D (molybdopterin converting
     factor small subunit)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Molybdopterin converting factor small subunit
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -2041,8 +2829,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: moeB
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moeB
   consensus_product: molybdopterin biosynthesis protein MoeB
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Alternative locus ID
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
@@ -2059,8 +2856,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: urtA
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtA
   consensus_product: ABC-type urea transporter, substrate binding component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2078,8 +2884,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: urtB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtB
   consensus_product: ABC-type urea transporter, permease component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2097,8 +2912,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: urtC
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtC
   consensus_product: ABC-type urea transporter, membrane component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2116,8 +2940,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: urtE
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtE
   consensus_product: ABC-type urea transporter, ATPase component UrtE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2135,8 +2968,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: urtA
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtA
   consensus_product: ABC-type urea transporter, substrate binding component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: ABC transporter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2153,8 +2995,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: urtC
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: urtC
   consensus_product: ABC-type urea transporter, membrane component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Belongs to the binding-protein-dependent transport system permease
     family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -2172,8 +3023,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: urtE
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtE
   consensus_product: ABC-type urea transporter, ATPase component UrtE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: ABC transporter, ATP-binding protein
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2190,8 +3050,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: urtB
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: urtB
   consensus_product: ABC-type urea transporter, permease component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Belongs to the binding-protein-dependent transport system permease
     family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -2209,8 +3078,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: urtA
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtA
   consensus_product: ABC-type urea transporter, substrate binding component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: substrate binding protein
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2227,8 +3105,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: urtB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtB
   consensus_product: ABC-type urea transporter, permease component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Belongs to the binding-protein-dependent transport system permease
     family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -2246,8 +3133,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: urtC
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtC
   consensus_product: ABC-type urea transporter, membrane component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Belongs to the binding-protein-dependent transport system permease
     family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -2265,8 +3161,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: urtE
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtE
   consensus_product: ABC-type urea transporter, ATPase component UrtE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Alternative locus ID
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2283,8 +3188,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: urtE
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtE
   consensus_product: ABC-type urea transporter, ATPase component UrtE
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: branched-chain amino acid transmembrane transporter activity
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2302,8 +3216,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: urtB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtB
   consensus_product: ABC-type urea transporter, permease component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: leucine import across plasma membrane
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2321,8 +3244,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: urtC
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: urtC
   consensus_product: ABC-type urea transporter, membrane component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: L-phenylalanine transmembrane transporter activity
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2340,8 +3272,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: add
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: add
   consensus_product: adenosine deaminase
+  cyanorak_roles: []
   description: Catalyzes the hydrolytic deamination of adenine to hypoxanthine. Plays
     an important role in the purine salvage pathway and in nitrogen catabolism
   functional_description: Nucleotide transport and metabolism
@@ -2356,8 +3291,18 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: nrtP
+- cog_categories: []
+  consensus_gene_name: nrtP
   consensus_product: nitrate transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.1.9'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Other''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.2'', ''name'': ''Transport and binding proteins >
+    Anions''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Adaptation/acclimation
@@ -2374,8 +3319,18 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: urtC
+- cog_categories:
+  - '{''id'': ''cog.category:U'', ''name'': ''Intracellular trafficking, secretion,
+    and vesicular transport''}'
+  consensus_gene_name: urtC
   consensus_product: ABC-type urea transporter, membrane component
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: Belongs to the binding-protein-dependent transport system permease
     family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
@@ -2393,8 +3348,19 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: null
+- cog_categories:
+  - '{''id'': ''cog.category:D'', ''name'': ''Cell cycle control, cell division, chromosome
+    partitioning''}'
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  - '{''id'': ''cog.category:Z'', ''name'': ''Cytoskeleton''}'
+  consensus_gene_name: null
   consensus_product: putative urea transporter, UT family
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2411,8 +3377,19 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: null
+- cog_categories:
+  - '{''id'': ''cog.category:D'', ''name'': ''Cell cycle control, cell division, chromosome
+    partitioning''}'
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  - '{''id'': ''cog.category:T'', ''name'': ''Signal transduction mechanisms''}'
+  - '{''id'': ''cog.category:Z'', ''name'': ''Cytoskeleton''}'
+  consensus_gene_name: null
   consensus_product: putative urea transporter, UT family
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Urea transporter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
@@ -2429,8 +3406,14 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: amt2
+- cog_categories: []
+  consensus_gene_name: amt2
   consensus_product: ammonium transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
     and binding proteins > Cations and iron carrying compounds
@@ -2445,8 +3428,18 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: moeB
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: moeB
   consensus_product: molybdopterin biosynthesis protein MoeB
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: COG0476 Dinucleotide-utilizing enzymes involved in molybdopterin and
     thiamine biosynthesis family 2
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
@@ -2464,8 +3457,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: null
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: null
   consensus_product: conserved hypothetical protein
+  cyanorak_roles: []
   description: Catalyzes the catabolism of the allantoin degradation intermediate
     (S)-ureidoglycolate, generating urea and glyoxylate. Involved in the utilization
     of allantoin as nitrogen source
@@ -2481,8 +3477,11 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: rutD
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: rutD
   consensus_product: pyrimidine utilization protein D
+  cyanorak_roles: []
   description: May increase the rate of spontaneous hydrolysis of aminoacrylate to
     malonic semialdehyde. Required to remove a toxic intermediate produce in the pyrimidine
     nitrogen degradation
@@ -2498,8 +3497,19 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: nrtP
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: nrtP
   consensus_product: nitrate transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.1.9'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Other''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.2'', ''name'': ''Transport and binding proteins >
+    Anions''}'
   description: Nitrate nitrite transporter
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Nitrogen; Cellular processes > Adaptation/acclimation
@@ -2517,8 +3527,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: carA
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: carA
   consensus_product: carbamoyl-phosphate synthase small subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Purines,
     pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide biosynthesis;
@@ -2535,8 +3552,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: mobA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: mobA
   consensus_product: molybdenum cofactor guanylyltransferase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
     > Molybdopterin; Central intermediary metabolism > Nitrogen metabolism; Coenzyme
@@ -2552,8 +3576,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: carA
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: carA
   consensus_product: carbamoyl-phosphate synthase small subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
   description: Carbamoyl-phosphate synthetase glutamine chain
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Purines,
     pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide biosynthesis;
@@ -2569,8 +3600,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: mobA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: mobA
   consensus_product: molybdenum cofactor guanylyltransferase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Transfers a GMP moiety from GTP to Mo-molybdopterin (Mo- MPT) cofactor
     (Moco or molybdenum cofactor) to form Mo- molybdopterin guanine dinucleotide (Mo-MGD)
     cofactor
@@ -2588,8 +3626,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: carA
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: carA
   consensus_product: carbamoyl-phosphate synthase small subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
   description: Belongs to the CarA family
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Purines,
     pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide biosynthesis;
@@ -2605,8 +3650,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: carA
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: carA
   consensus_product: carbamoyl-phosphate synthase small subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
   description: carbamoyl-phosphate synthase (glutamine-hydrolyzing) activity
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Purines,
     pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide biosynthesis;
@@ -2624,8 +3676,13 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: cobB
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: cobB
   consensus_product: hydrogenobyrinic acid a,c-diamide synthase (glutamine-hydrolysing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.2'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Cobalamin (b12)''}'
   description: Catalyzes the ATP-dependent amidation of the two carboxylate groups
     at positions a and c of cobyrinate, using either L-glutamine or ammonia as the
     nitrogen source
@@ -2642,8 +3699,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: glnA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: glnA
   consensus_product: glutamine synthetase, type I
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.3'', ''name'': ''Amino acid biosynthesis > Glutamate
+    family (Arg, Gln, Glu, Pro)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Central intermediary metabolism > Nitrogen metabolism; Coenzyme transport
@@ -2660,8 +3724,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: cysK
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: cysK
   consensus_product: O-acetylserine sulfhydrylase A
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.6'', ''name'': ''Amino acid biosynthesis > Serine
+    family (Ser, Gly, Cys)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Amino acid biosynthesis > Serine family (Ser, Gly, Cys);
     Central intermediary metabolism > Nitrogen metabolism; Amino acid transport and
@@ -2678,8 +3749,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: glnA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: glnA
   consensus_product: glutamine synthetase, type I
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.3'', ''name'': ''Amino acid biosynthesis > Glutamate
+    family (Arg, Gln, Glu, Pro)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: glutamine synthetase
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Central intermediary metabolism > Nitrogen metabolism; Coenzyme transport
@@ -2695,8 +3773,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: cysK
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: cysK
   consensus_product: O-acetylserine sulfhydrylase A
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.6'', ''name'': ''Amino acid biosynthesis > Serine
+    family (Ser, Gly, Cys)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Belongs to the cysteine synthase cystathionine beta- synthase family
   functional_description: Amino acid biosynthesis > Serine family (Ser, Gly, Cys);
     Central intermediary metabolism > Nitrogen metabolism; Amino acid transport and
@@ -2712,8 +3797,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: glnA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: glnA
   consensus_product: glutamine synthetase, type I
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.3'', ''name'': ''Amino acid biosynthesis > Glutamate
+    family (Arg, Gln, Glu, Pro)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Glutamine synthetase
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Central intermediary metabolism > Nitrogen metabolism; Coenzyme transport
@@ -2729,8 +3821,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: glnA
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: glnA
   consensus_product: glutamine synthetase, type I
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.3'', ''name'': ''Amino acid biosynthesis > Glutamate
+    family (Arg, Gln, Glu, Pro)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: glutamine synthetase
   functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
     Pro); Central intermediary metabolism > Nitrogen metabolism; Coenzyme transport
@@ -2748,9 +3847,12 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: glnE
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: glnE
   consensus_product: bifunctional [glutamate--ammonia ligase]-adenylyl-L-tyrosine
     phosphorylase/[glutamate--ammonia-ligase] adenylyltransferase
+  cyanorak_roles: []
   description: Involved in the regulation of glutamine synthetase GlnA, a key enzyme
     in the process to assimilate ammonia. When cellular nitrogen levels are high,
     the C-terminal adenylyl transferase (AT) inactivates GlnA by covalent transfer
@@ -2771,8 +3873,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: bioD
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
   consensus_product: dethiobiotin synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.1'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Biotin (b7)''}'
   description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
     of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
     to form an ureido ring
@@ -2789,8 +3896,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: bioD
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
   consensus_product: dethiobiotin synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.1'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Biotin (b7)''}'
   description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
     of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
     to form an ureido ring
@@ -2807,8 +3919,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: bioD
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
   consensus_product: dethiobiotin synthase
+  cyanorak_roles: []
   description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
     of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
     to form an ureido ring
@@ -2824,8 +3939,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: bioD
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
   consensus_product: dethiobiotin synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.1'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Biotin (b7)''}'
   description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
     of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
     to form an ureido ring
@@ -2844,8 +3964,15 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: amt1
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: amt1
   consensus_product: ammonium transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
     and binding proteins > Cations and iron carrying compounds; Inorganic ion transport
@@ -2862,8 +3989,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: cynA
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: cynA
   consensus_product: cyanate ABC transporter, substrate-binding protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: null
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
     and binding proteins > Amino acids, peptides and amines; Inorganic ion transport
@@ -2880,8 +4014,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: amt1
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: amt1
   consensus_product: ammonium transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: Ammonium Transporter
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
     and binding proteins > Cations and iron carrying compounds; Inorganic ion transport
@@ -2897,8 +4038,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: cynA
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: cynA
   consensus_product: cyanate ABC transporter, substrate-binding protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.1'', ''name'': ''Transport and binding proteins >
+    Amino acids, peptides and amines''}'
   description: NMT1-like family
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
     and binding proteins > Amino acids, peptides and amines; Inorganic ion transport
@@ -2914,8 +4062,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: amt1
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: amt1
   consensus_product: ammonium transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: Ammonium transporter
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
     and binding proteins > Cations and iron carrying compounds; Inorganic ion transport
@@ -2931,8 +4086,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: amt1
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: amt1
   consensus_product: ammonium transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: ammonium transporteR
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
     and binding proteins > Cations and iron carrying compounds; Inorganic ion transport
@@ -2950,8 +4112,16 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: amt1
+- cog_categories:
+  - '{''id'': ''cog.category:U'', ''name'': ''Intracellular trafficking, secretion,
+    and vesicular transport''}'
+  consensus_gene_name: amt1
   consensus_product: ammonium transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: Ammonium transporter
   functional_description: Central intermediary metabolism > Nitrogen metabolism; Transport
     and binding proteins > Cations and iron carrying compounds; Intracellular trafficking,
@@ -2967,8 +4137,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: pyrG
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrG
   consensus_product: CTP synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
   description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
     or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
     interactions with the four ribonucleotide triphosphates
@@ -2985,8 +4160,13 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: pyrG
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrG
   consensus_product: CTP synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
   description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
     or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
     interactions with the four ribonucleotide triphosphates
@@ -3003,8 +4183,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: pyrG
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrG
   consensus_product: CTP synthase
+  cyanorak_roles: []
   description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
     or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
     interactions with the four ribonucleotide triphosphates
@@ -3020,8 +4203,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: metB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: metB
   consensus_product: O-succinylhomoserine(thiol)-lyase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
@@ -3038,8 +4228,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: PMN2A_RS02170
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: PMN2A_RS02170
   consensus_product: O-succinylhomoserine(thiol)-lyase, MetB-like protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
@@ -3056,8 +4253,15 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: null
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: null
   consensus_product: O-succinylhomoserine(thiol)-lyase, MetB-like protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: COG0626 Cystathionine beta-lyases cystathionine gamma-synthases
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
@@ -3073,8 +4277,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: metB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: metB
   consensus_product: O-succinylhomoserine(thiol)-lyase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: COG0626 Cystathionine beta-lyases cystathionine gamma-synthases
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
@@ -3090,8 +4301,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: PMN2A_RS02170
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: PMN2A_RS02170
   consensus_product: O-succinylhomoserine(thiol)-lyase, MetB-like protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Alternative locus ID
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
@@ -3107,8 +4325,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: metB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: metB
   consensus_product: O-succinylhomoserine(thiol)-lyase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Alternative locus ID
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
@@ -3124,8 +4349,15 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: metB
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: metB
   consensus_product: O-succinylhomoserine(thiol)-lyase, MetB-like protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: cystathionine gamma-synthase activity
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
@@ -3142,8 +4374,12 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: glnD
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: glnD
   consensus_product: '[protein-PII] uridylyltransferase'
+  cyanorak_roles: []
   description: Modifies, by uridylylation and deuridylylation, the PII regulatory
     proteins (GlnB and homologs), in response to the nitrogen status of the cell that
     GlnD senses through the glutamine level. Under low glutamine levels, catalyzes
@@ -3163,8 +4399,12 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: glnD
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: glnD
   consensus_product: '[protein-PII] uridylyltransferase'
+  cyanorak_roles: []
   description: Modifies, by uridylylation and deuridylylation, the PII regulatory
     proteins (GlnB and homologs), in response to the nitrogen status of the cell that
     GlnD senses through the glutamine level. Under low glutamine levels, catalyzes
@@ -3184,8 +4424,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: metY
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: metY
   consensus_product: O-acetylhomoserine aminocarboxypropyltransferase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:A.6'', ''name'': ''Amino acid biosynthesis > Serine
+    family (Ser, Gly, Cys)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: null
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Amino acid biosynthesis > Serine family (Ser, Gly, Cys); Central
@@ -3202,8 +4451,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: metY
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: metY
   consensus_product: O-acetylhomoserine aminocarboxypropyltransferase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:A.6'', ''name'': ''Amino acid biosynthesis > Serine
+    family (Ser, Gly, Cys)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: O-acetylhomoserine
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Amino acid biosynthesis > Serine family (Ser, Gly, Cys); Central
@@ -3219,8 +4477,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: metY
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: metY
   consensus_product: O-acetylhomoserine aminocarboxypropyltransferase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:A.6'', ''name'': ''Amino acid biosynthesis > Serine
+    family (Ser, Gly, Cys)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: Alternative locus ID
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Amino acid biosynthesis > Serine family (Ser, Gly, Cys); Central
@@ -3236,8 +4503,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: metY
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: metY
   consensus_product: O-acetylhomoserine aminocarboxypropyltransferase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.2'', ''name'': ''Amino acid biosynthesis > Aspartate
+    family (Asp, Asn, Ile, Lys, Met, Thr)''}'
+  - '{''id'': ''cyanorak.role:A.6'', ''name'': ''Amino acid biosynthesis > Serine
+    family (Ser, Gly, Cys)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
   description: o-acetylhomoserine
   functional_description: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile,
     Lys, Met, Thr); Amino acid biosynthesis > Serine family (Ser, Gly, Cys); Central
@@ -3255,8 +4531,17 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: metC
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: metC
   consensus_product: cystathionine beta-lyase family aluminum resistance protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.7'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Trace metals''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Trace metals; Central intermediary metabolism
@@ -3274,8 +4559,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: focA
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: focA
   consensus_product: nitrite transporter, FNT family
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.1'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Iron''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:Q.2'', ''name'': ''Transport and binding proteins >
+    Anions''}'
   description: null
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Iron; Cellular processes > Adaptation/acclimation
@@ -3293,8 +4587,17 @@ rows:
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- consensus_gene_name: metC
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: metC
   consensus_product: cystathionine beta-lyase family aluminum resistance protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.7'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Trace metals''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: Cystathionine beta-lyase family protein (Involved in aluminum resistance)
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Trace metals; Central intermediary metabolism
@@ -3311,8 +4614,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: focA
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: focA
   consensus_product: nitrite transporter, FNT family
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.1'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Iron''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:Q.2'', ''name'': ''Transport and binding proteins >
+    Anions''}'
   description: COG2116 Formate nitrite family of transporters
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Iron; Cellular processes > Adaptation/acclimation
@@ -3329,8 +4641,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
-- consensus_gene_name: metC
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: metC
   consensus_product: cystathionine beta-lyase family aluminum resistance protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.7'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Trace metals''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: Alternative locus ID
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Trace metals; Central intermediary metabolism
@@ -3347,8 +4668,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: focA
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: focA
   consensus_product: nitrite transporter, FNT family
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.1'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Iron''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:Q.2'', ''name'': ''Transport and binding proteins >
+    Anions''}'
   description: Formate nitrite family
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Iron; Cellular processes > Adaptation/acclimation
@@ -3365,8 +4695,17 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- consensus_gene_name: metC
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: metC
   consensus_product: cystathionine beta-lyase family aluminum resistance protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.7'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Trace metals''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
   description: CystaTHIonine beta-lyase family protein involved in aluminum resistance
   functional_description: Cellular processes > Adaptation/acclimation to atypical
     conditions and detoxification > Trace metals; Central intermediary metabolism
@@ -3384,8 +4723,12 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- consensus_gene_name: rutB
+- cog_categories:
+  - '{''id'': ''cog.category:Q'', ''name'': ''Secondary metabolites biosynthesis,
+    transport and catabolism''}'
+  consensus_gene_name: rutB
   consensus_product: pyrimidine utilization protein B
+  cyanorak_roles: []
   description: In vivo, quickly hydrolyzes the ureidoacrylate peracid to avoid toxicity,
     but can also hydrolyzes ureidoacrylate that is formed spontaneously from ureidoacrylate
     peracid. One of the products of hydrolysis, carbamate, hydrolyzes spontaneously,
@@ -3403,8 +4746,11 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
-- consensus_gene_name: hmpA
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: hmpA
   consensus_product: NO-inducible flavohemoprotein
+  cyanorak_roles: []
   description: Is involved in NO detoxification in an aerobic process, termed nitric
     oxide dioxygenase (NOD) reaction that utilizes O(2) and NAD(P)H to convert NO
     to nitrate, which protects the bacterium from various noxious nitrogen compounds.
