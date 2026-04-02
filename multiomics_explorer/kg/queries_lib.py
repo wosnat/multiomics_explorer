@@ -351,6 +351,8 @@ def _gene_homologs_og_where(
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
+    cyanorak_roles: list[str] | None = None,
+    cog_categories: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Build OG filter conditions + params shared by gene_homologs builders."""
     conditions: list[str] = []
@@ -364,6 +366,18 @@ def _gene_homologs_og_where(
     if max_specificity_rank is not None:
         conditions.append("og.specificity_rank <= $max_rank")
         params["max_rank"] = max_specificity_rank
+    if cyanorak_roles is not None:
+        conditions.append(
+            "EXISTS { (og)-[:Og_has_cyanorak_role]->(cr:CyanorakRole)"
+            " WHERE cr.id IN $cyanorak_roles }"
+        )
+        params["cyanorak_roles"] = cyanorak_roles
+    if cog_categories is not None:
+        conditions.append(
+            "EXISTS { (og)-[:Og_in_cog_category]->(cc:CogFunctionalCategory)"
+            " WHERE cc.id IN $cog_categories }"
+        )
+        params["cog_categories"] = cog_categories
     return conditions, params
 
 
@@ -373,6 +387,8 @@ def build_gene_homologs_summary(
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
+    cyanorak_roles: list[str] | None = None,
+    cog_categories: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary + not_found/no_groups for gene_homologs.
 
@@ -381,6 +397,8 @@ def build_gene_homologs_summary(
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
         max_specificity_rank=max_specificity_rank,
+        cyanorak_roles=cyanorak_roles,
+        cog_categories=cog_categories,
     )
     params["locus_tags"] = locus_tags
 
@@ -417,6 +435,8 @@ def build_gene_homologs(
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
+    cyanorak_roles: list[str] | None = None,
+    cog_categories: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -432,6 +452,8 @@ def build_gene_homologs(
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
         max_specificity_rank=max_specificity_rank,
+        cyanorak_roles=cyanorak_roles,
+        cog_categories=cog_categories,
     )
     params["locus_tags"] = locus_tags
 
@@ -1664,6 +1686,8 @@ def build_search_homolog_groups_summary(
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
+    cyanorak_roles: list[str] | None = None,
+    cog_categories: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for search_homolog_groups.
 
@@ -1673,6 +1697,8 @@ def build_search_homolog_groups_summary(
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
         max_specificity_rank=max_specificity_rank,
+        cyanorak_roles=cyanorak_roles,
+        cog_categories=cog_categories,
     )
     params["search_text"] = search_text
 
@@ -1701,6 +1727,8 @@ def build_search_homolog_groups(
     source: str | None = None,
     taxonomic_level: str | None = None,
     max_specificity_rank: int | None = None,
+    cyanorak_roles: list[str] | None = None,
+    cog_categories: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -1716,6 +1744,8 @@ def build_search_homolog_groups(
     conditions, params = _gene_homologs_og_where(
         source=source, taxonomic_level=taxonomic_level,
         max_specificity_rank=max_specificity_rank,
+        cyanorak_roles=cyanorak_roles,
+        cog_categories=cog_categories,
     )
     params["search_text"] = search_text
 

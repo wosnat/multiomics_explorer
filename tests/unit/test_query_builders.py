@@ -521,6 +521,40 @@ class TestBuildGeneHomologs:
         assert "SKIP" not in cypher
         assert "offset" not in params
 
+    def test_cyanorak_roles_filter(self):
+        cypher, params = build_gene_homologs(
+            locus_tags=["PMM0845"], cyanorak_roles=["cyanorak.role:G.3"])
+        assert "Og_has_cyanorak_role" in cypher
+        assert "CyanorakRole" in cypher
+        assert "$cyanorak_roles" in cypher
+        assert params["cyanorak_roles"] == ["cyanorak.role:G.3"]
+
+    def test_cog_categories_filter(self):
+        cypher, params = build_gene_homologs(
+            locus_tags=["PMM0845"], cog_categories=["cog.category:J"])
+        assert "Og_in_cog_category" in cypher
+        assert "CogFunctionalCategory" in cypher
+        assert "$cog_categories" in cypher
+        assert params["cog_categories"] == ["cog.category:J"]
+
+    def test_both_ontology_filters(self):
+        cypher, params = build_gene_homologs(
+            locus_tags=["PMM0845"],
+            cyanorak_roles=["cyanorak.role:G.3"],
+            cog_categories=["cog.category:J"],
+        )
+        assert "Og_has_cyanorak_role" in cypher
+        assert "Og_in_cog_category" in cypher
+        assert params["cyanorak_roles"] == ["cyanorak.role:G.3"]
+        assert params["cog_categories"] == ["cog.category:J"]
+
+    def test_ontology_filter_none_no_clause(self):
+        cypher, params = build_gene_homologs(locus_tags=["PMM0845"])
+        assert "Og_has_cyanorak_role" not in cypher
+        assert "Og_in_cog_category" not in cypher
+        assert "cyanorak_roles" not in params
+        assert "cog_categories" not in params
+
 
 class TestBuildGeneHomologsSummary:
     def test_returns_summary_columns(self):
@@ -566,6 +600,18 @@ class TestBuildGeneHomologsSummary:
         assert "og.taxonomic_level" not in cypher
         assert "og.specificity_rank" not in cypher
         assert params == {"locus_tags": ["x"]}
+
+    def test_cyanorak_roles_filter_forwarded(self):
+        cypher, params = build_gene_homologs_summary(
+            locus_tags=["x"], cyanorak_roles=["cyanorak.role:G.3"])
+        assert "Og_has_cyanorak_role" in cypher
+        assert params["cyanorak_roles"] == ["cyanorak.role:G.3"]
+
+    def test_cog_categories_filter_forwarded(self):
+        cypher, params = build_gene_homologs_summary(
+            locus_tags=["x"], cog_categories=["cog.category:J"])
+        assert "Og_in_cog_category" in cypher
+        assert params["cog_categories"] == ["cog.category:J"]
 
     def test_combined_filters(self):
         """All three filters appear in WHERE."""
@@ -1984,6 +2030,25 @@ class TestBuildSearchHomologGroups:
         assert "SKIP" not in cypher
         assert "offset" not in params
 
+    def test_cyanorak_roles_filter(self):
+        cypher, params = build_search_homolog_groups(
+            search_text="test", cyanorak_roles=["cyanorak.role:G.3"])
+        assert "Og_has_cyanorak_role" in cypher
+        assert "$cyanorak_roles" in cypher
+        assert params["cyanorak_roles"] == ["cyanorak.role:G.3"]
+
+    def test_cog_categories_filter(self):
+        cypher, params = build_search_homolog_groups(
+            search_text="test", cog_categories=["cog.category:J"])
+        assert "Og_in_cog_category" in cypher
+        assert "$cog_categories" in cypher
+        assert params["cog_categories"] == ["cog.category:J"]
+
+    def test_ontology_filter_none_no_clause(self):
+        cypher, params = build_search_homolog_groups(search_text="test")
+        assert "Og_has_cyanorak_role" not in cypher
+        assert "Og_in_cog_category" not in cypher
+
 
 class TestBuildSearchHomologGroupsSummary:
     """Tests for build_search_homolog_groups_summary."""
@@ -2012,6 +2077,18 @@ class TestBuildSearchHomologGroupsSummary:
         # Same filter params (detail has extra verbose/limit keys)
         assert sum_params["source"] == det_params["source"]
         assert sum_params["max_rank"] == det_params["max_rank"]
+
+    def test_cyanorak_roles_filter_forwarded(self):
+        cypher, params = build_search_homolog_groups_summary(
+            search_text="test", cyanorak_roles=["cyanorak.role:G.3"])
+        assert "Og_has_cyanorak_role" in cypher
+        assert params["cyanorak_roles"] == ["cyanorak.role:G.3"]
+
+    def test_cog_categories_filter_forwarded(self):
+        cypher, params = build_search_homolog_groups_summary(
+            search_text="test", cog_categories=["cog.category:J"])
+        assert "Og_in_cog_category" in cypher
+        assert params["cog_categories"] == ["cog.category:J"]
 
 
 class TestBuildGenesByHomologGroup:
