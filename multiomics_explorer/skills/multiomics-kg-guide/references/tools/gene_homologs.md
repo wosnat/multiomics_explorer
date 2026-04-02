@@ -29,7 +29,7 @@ For text search on group names, use search_homolog_groups.
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, results
+total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, results
 ```
 
 - **total_matching** (int): Total gene×group rows matching filters
@@ -40,6 +40,8 @@ total_matching, by_organism, by_source, returned, offset, truncated, not_found, 
 - **truncated** (bool): True if total_matching > returned
 - **not_found** (list[string]): Input locus_tags not in KG
 - **no_groups** (list[string]): Genes that exist but have zero matching ortholog groups
+- **top_cyanorak_roles** (list[OntologyBreakdown]): Top 5 CyanorakRole annotations by frequency
+- **top_cog_categories** (list[OntologyBreakdown]): Top 5 CogFunctionalCategory annotations by frequency
 
 ### Per-result fields
 
@@ -64,6 +66,8 @@ total_matching, by_organism, by_source, returned, offset, truncated, not_found, 
 | has_cross_genus_members | string \| None (optional) | 'cross_genus' or 'single_genus' |
 | description | string \| None (optional) | Group description text |
 | functional_description | string \| None (optional) | Functional annotation text |
+| cyanorak_roles | list[dict] \| None (optional) | Consensus Cyanorak roles [{id, name}]. Verbose only. |
+| cog_categories | list[dict] \| None (optional) | Consensus COG categories [{id, name}]. Verbose only. |
 
 ## Few-shot examples
 

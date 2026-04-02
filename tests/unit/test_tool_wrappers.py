@@ -819,6 +819,8 @@ class TestGeneHomologsWrapper:
         "truncated": False,
         "not_found": [],
         "no_groups": [],
+        "top_cyanorak_roles": [],
+        "top_cog_categories": [],
         "results": [
             {"locus_tag": "PMM0001", "organism_name": "Prochlorococcus MED4",
              "group_id": "cyanorak:CK_00000364", "consensus_gene_name": "dnaN",
@@ -966,6 +968,30 @@ class TestGeneHomologsWrapper:
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
+
+    @pytest.mark.asyncio
+    async def test_ontology_summary_in_response(self, tool_fns, mock_ctx):
+        api_return = {
+            "total_matching": 3,
+            "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 3}],
+            "by_source": [{"source": "cyanorak", "count": 2}],
+            "returned": 0,
+            "truncated": True,
+            "not_found": [],
+            "no_groups": [],
+            "top_cyanorak_roles": [{"id": "cyanorak.role:G.3", "name": "Energy", "count": 2}],
+            "top_cog_categories": [],
+            "results": [],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.gene_homologs",
+            return_value=api_return,
+        ):
+            result = await tool_fns["gene_homologs"](
+                mock_ctx, locus_tags=["PMM0845"], summary=True,
+            )
+        assert len(result.top_cyanorak_roles) == 1
+        assert result.top_cyanorak_roles[0].id == "cyanorak.role:G.3"
 
 
 # ---------------------------------------------------------------------------

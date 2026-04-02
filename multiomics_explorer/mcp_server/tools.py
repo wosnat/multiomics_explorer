@@ -540,6 +540,10 @@ def register_tools(mcp: FastMCP):
         has_cross_genus_members: str | None = Field(default=None, description="'cross_genus' or 'single_genus'")
         description: str | None = Field(default=None, description="Group description text")
         functional_description: str | None = Field(default=None, description="Functional annotation text")
+        cyanorak_roles: list[dict] | None = Field(default=None,
+            description="Consensus Cyanorak roles [{id, name}]. Verbose only.")
+        cog_categories: list[dict] | None = Field(default=None,
+            description="Consensus COG categories [{id, name}]. Verbose only.")
 
     class HomologOrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
@@ -558,6 +562,12 @@ def register_tools(mcp: FastMCP):
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
         no_groups: list[str] = Field(default_factory=list, description="Genes that exist but have zero matching ortholog groups")
+        top_cyanorak_roles: list[OntologyBreakdown] = Field(
+            default_factory=list,
+            description="Top 5 CyanorakRole annotations by frequency")
+        top_cog_categories: list[OntologyBreakdown] = Field(
+            default_factory=list,
+            description="Top 5 CogFunctionalCategory annotations by frequency")
         results: list[GeneHomologResult] = Field(default_factory=list, description="One row per gene × ortholog group")
 
     @mcp.tool(
@@ -618,6 +628,8 @@ def register_tools(mcp: FastMCP):
             )
             by_organism = [HomologOrganismBreakdown(**b) for b in data["by_organism"]]
             by_source = [HomologSourceBreakdown(**b) for b in data["by_source"]]
+            top_cr = [OntologyBreakdown(**b) for b in data.get("top_cyanorak_roles", [])]
+            top_cc = [OntologyBreakdown(**b) for b in data.get("top_cog_categories", [])]
             results = [GeneHomologResult(**r) for r in data["results"]]
             response = GeneHomologsResponse(
                 total_matching=data["total_matching"],
@@ -628,6 +640,8 @@ def register_tools(mcp: FastMCP):
                 truncated=data["truncated"],
                 not_found=data["not_found"],
                 no_groups=data["no_groups"],
+                top_cyanorak_roles=top_cr,
+                top_cog_categories=top_cc,
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "
