@@ -529,7 +529,143 @@ git commit -m "feat: add top_cyanorak_roles/top_cog_categories to summary builde
 
 ---
 
-### Task 4: API layer — `search_homolog_groups`
+### Task 4: Verify Cypher against live KG
+
+**Prerequisite:** KG must be running at localhost:7687.
+
+Run each modified builder against the live graph and verify output shape. This catches Cypher bugs before building the API/MCP layers on top.
+
+- [ ] **Step 1: Verify filter builders**
+
+```bash
+uv run python -c "
+from multiomics_explorer.kg.connection import GraphConnection
+from multiomics_explorer.kg.queries_lib import (
+    build_gene_homologs, build_search_homolog_groups,
+)
+conn = GraphConnection()
+
+# EXISTS filter on search_homolog_groups
+cypher, params = build_search_homolog_groups(
+    search_text='photosystem', cyanorak_roles=['cyanorak.role:J.8'])
+r = conn.execute_query(cypher, **params)
+assert len(r) > 0, 'Expected results for photosystem + J.8 filter'
+print(f'search filter: {len(r)} rows, first={r[0][\"group_id\"]}')
+
+# EXISTS filter on gene_homologs
+cypher, params = build_gene_homologs(
+    locus_tags=['PMM0532'], cyanorak_roles=['cyanorak.role:H.2'])
+r = conn.execute_query(cypher, **params)
+assert len(r) > 0, 'Expected results for PMM0532 + H.2 filter'
+print(f'gene_homologs filter: {len(r)} rows')
+
+# Both filters (AND)
+cypher, params = build_search_homolog_groups(
+    search_text='photosystem',
+    cyanorak_roles=['cyanorak.role:J.8'],
+    cog_categories=['cog.category:S'])
+r = conn.execute_query(cypher, **params)
+print(f'both filters AND: {len(r)} rows')
+
+print('PASS: all filter queries executed successfully')
+"
+```
+
+Expected: All queries return results, no errors.
+
+- [ ] **Step 2: Verify verbose builders**
+
+```bash
+uv run python -c "
+from multiomics_explorer.kg.connection import GraphConnection
+from multiomics_explorer.kg.queries_lib import (
+    build_gene_homologs, build_search_homolog_groups,
+)
+conn = GraphConnection()
+
+# Verbose search_homolog_groups
+cypher, params = build_search_homolog_groups(
+    search_text='photosystem', verbose=True, limit=3)
+r = conn.execute_query(cypher, **params)
+assert len(r) > 0
+row = r[0]
+assert 'cyanorak_roles' in row, f'Missing cyanorak_roles, keys={row.keys()}'
+assert 'cog_categories' in row, f'Missing cog_categories, keys={row.keys()}'
+assert isinstance(row['cyanorak_roles'], list)
+print(f'search verbose: roles={row[\"cyanorak_roles\"]}, cogs={row[\"cog_categories\"]}')
+
+# Verbose gene_homologs
+cypher, params = build_gene_homologs(
+    locus_tags=['PMM0532'], verbose=True)
+r = conn.execute_query(cypher, **params)
+assert len(r) > 0
+row = r[0]
+assert 'cyanorak_roles' in row
+assert isinstance(row['cyanorak_roles'], list)
+print(f'gene_homologs verbose: roles={row[\"cyanorak_roles\"]}, cogs={row[\"cog_categories\"]}')
+
+# Empty list for unannotated group
+cypher, params = build_search_homolog_groups(
+    search_text='hypothetical', verbose=True, limit=20)
+r = conn.execute_query(cypher, **params)
+empty = [x for x in r if len(x['cyanorak_roles']) == 0]
+assert len(empty) > 0, 'Expected at least one group with empty roles'
+print(f'empty roles confirmed: {len(empty)} groups with no annotations')
+
+print('PASS: all verbose queries return correct structure')
+"
+```
+
+Expected: `{id, name}` dicts in lists; empty `[]` for unannotated groups.
+
+- [ ] **Step 3: Verify summary builders**
+
+```bash
+uv run python -c "
+from multiomics_explorer.kg.connection import GraphConnection
+from multiomics_explorer.kg.queries_lib import (
+    build_gene_homologs_summary, build_search_homolog_groups_summary,
+)
+conn = GraphConnection()
+
+# search_homolog_groups summary
+cypher, params = build_search_homolog_groups_summary(search_text='photosystem')
+r = conn.execute_query(cypher, **params)[0]
+assert 'top_cyanorak_roles' in r, f'Missing key, got {r.keys()}'
+assert 'top_cog_categories' in r
+assert isinstance(r['top_cyanorak_roles'], list)
+assert len(r['top_cyanorak_roles']) <= 5
+if r['top_cyanorak_roles']:
+    item = r['top_cyanorak_roles'][0]
+    assert 'id' in item and 'name' in item and 'count' in item, f'Bad shape: {item}'
+print(f'search summary: {len(r[\"top_cyanorak_roles\"])} roles, {len(r[\"top_cog_categories\"])} cogs')
+print(f'  roles: {r[\"top_cyanorak_roles\"]}')
+
+# gene_homologs summary
+cypher, params = build_gene_homologs_summary(locus_tags=['PMM0532', 'PMM0150', 'PMM1425'])
+r = conn.execute_query(cypher, **params)[0]
+assert 'top_cyanorak_roles' in r
+assert 'top_cog_categories' in r
+print(f'gene_homologs summary: {len(r[\"top_cyanorak_roles\"])} roles, {len(r[\"top_cog_categories\"])} cogs')
+print(f'  roles: {r[\"top_cyanorak_roles\"]}')
+
+print('PASS: all summary queries return correct top-5 shape')
+"
+```
+
+Expected: Each returns `top_cyanorak_roles` and `top_cog_categories` as lists of `{id, name, count}` dicts, max 5 items.
+
+- [ ] **Step 4: Fix any Cypher issues found, re-run unit tests, commit fixes**
+
+If any verification step fails, fix the Cypher in queries_lib.py, re-run unit tests, then re-verify.
+
+```bash
+pytest tests/unit/test_query_builders.py -v
+```
+
+---
+
+### Task 5: API layer — `search_homolog_groups`
 
 **Files:**
 - Modify: `multiomics_explorer/api/functions.py:888-1001`
@@ -636,7 +772,7 @@ git commit -m "feat: add ontology filters and summary fields to search_homolog_g
 
 ---
 
-### Task 5: API layer — `gene_homologs`
+### Task 6: API layer — `gene_homologs`
 
 **Files:**
 - Modify: `multiomics_explorer/api/functions.py:390-487`
@@ -701,7 +837,7 @@ git commit -m "feat: add top_cyanorak_roles/top_cog_categories to gene_homologs 
 
 ---
 
-### Task 6: MCP layer — `search_homolog_groups`
+### Task 7: MCP layer — `search_homolog_groups`
 
 **Files:**
 - Modify: `multiomics_explorer/mcp_server/tools.py:1686-1808`
@@ -865,7 +1001,7 @@ git commit -m "feat: add ontology filters and summary to search_homolog_groups M
 
 ---
 
-### Task 7: MCP layer — `gene_homologs`
+### Task 8: MCP layer — `gene_homologs`
 
 **Files:**
 - Modify: `multiomics_explorer/mcp_server/tools.py:520-635`
@@ -917,7 +1053,7 @@ In `multiomics_explorer/mcp_server/tools.py`, add ontology columns to `GeneHomol
             description="Consensus COG categories [{id, name}]. Verbose only.")
 ```
 
-Reuse the `OntologyBreakdown` model (defined in Task 6) for summary fields. Add to `GeneHomologsResponse` (after `no_groups`, line ~553):
+Reuse the `OntologyBreakdown` model (defined in Task 7) for summary fields. Add to `GeneHomologsResponse` (after `no_groups`, line ~553):
 
 ```python
         top_cyanorak_roles: list[OntologyBreakdown] = Field(
@@ -928,7 +1064,7 @@ Reuse the `OntologyBreakdown` model (defined in Task 6) for summary fields. Add 
             description="Top 5 CogFunctionalCategory annotations by frequency")
 ```
 
-Note: `OntologyBreakdown` was defined in Task 6 — it will be in scope since all models are nested in the `register_tools` function.
+Note: `OntologyBreakdown` was defined in Task 7 — it will be in scope since all models are nested in the `register_tools` function.
 
 Update the response construction in the `gene_homologs` wrapper (line ~615):
 
@@ -975,7 +1111,7 @@ git commit -m "feat: add ontology summary and verbose columns to gene_homologs M
 
 ---
 
-### Task 8: Integration tests — CyVer + API contracts
+### Task 9: Integration tests — CyVer + API contracts
 
 **Files:**
 - Modify: `tests/integration/test_cyver_queries.py:187-205`
@@ -1087,7 +1223,7 @@ git commit -m "test: add integration tests for ontology on ortholog groups"
 
 ---
 
-### Task 9: Update YAML tool definitions and re-export
+### Task 10: Update YAML tool definitions and re-export
 
 **Files:**
 - Modify: `multiomics_explorer/inputs/tools/search_homolog_groups.yaml`
@@ -1150,7 +1286,7 @@ git commit -m "docs: update tool YAMLs and about content for ontology on ortholo
 
 ---
 
-### Task 10: Run full test suite and verify
+### Task 11: Run full test suite and verify
 
 - [ ] **Step 1: Run unit tests**
 
