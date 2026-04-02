@@ -2467,14 +2467,24 @@ def _gene_response_profile_where(
     return conditions, params
 
 
-def _group_key_expr(group_by: str, alias: str = "e") -> str:
-    """Return the Cypher expression for the group key."""
+def _group_key_expr(group_by: str, alias: str = "e") -> tuple[str, str]:
+    """Return (unwind_clause, group_key_expr) for the group key.
+
+    When group_by='treatment_type', returns an UNWIND clause because
+    treatment_type is an array property. The UNWIND must be inserted
+    after the MATCH that introduces the experiment alias.
+    """
     if group_by == "treatment_type":
-        return f"{alias}.treatment_type"
+        return (
+            f"UNWIND coalesce({alias}.treatment_type, ['unknown']) AS _tt\n",
+            "_tt",
+        )
     elif group_by == "experiment":
-        return f"{alias}.id"
+        return ("", f"{alias}.id")
     else:
-        raise ValueError(f"group_by must be 'treatment_type' or 'experiment', got '{group_by}'")
+        raise ValueError(
+            f"group_by must be 'treatment_type' or 'experiment', got '{group_by}'"
+        )
 
 
 def build_gene_response_profile_envelope(
@@ -2492,8 +2502,8 @@ def build_gene_response_profile_envelope(
     RETURN keys: found_genes (list), has_expression (list), has_significant (list),
     group_totals (list of {group_key, experiments, timepoints, table_scopes}).
     """
-    gk = _group_key_expr(group_by)
-    gk2 = _group_key_expr(group_by, alias="e2")
+    _, gk = _group_key_expr(group_by)
+    unwind2, gk2 = _group_key_expr(group_by, alias="e2")
 
     conditions_e, params = _gene_response_profile_where(
         organism_name=organism_name, treatment_types=treatment_types,
@@ -2523,6 +2533,7 @@ def build_gene_response_profile_envelope(
         "\n"
         "OPTIONAL MATCH (e2:Experiment)-[:Changes_expression_of]->(:Gene)\n"
         f"{where_e2}\n"
+        f"{unwind2}"
         f"WITH found_genes, has_expression, has_significant,\n"
         f"     {gk2} AS group_key,\n"
         "     collect(DISTINCT e2) AS group_experiments\n"
@@ -2559,7 +2570,7 @@ def build_gene_response_profile(
     timepoints_up, timepoints_down, rank_ups (list), rank_downs (list),
     log2fcs_up (list), log2fcs_down (list).
     """
-    gk = _group_key_expr(group_by)
+    unwind, gk = _group_key_expr(group_by)
 
     conditions, params = _gene_response_profile_where(
         organism_name=organism_name, treatment_types=treatment_types,
@@ -2589,6 +2600,7 @@ def build_gene_response_profile(
     cypher = (
         "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
         f"{where_block}"
+        f"{unwind}"
         "WITH g,\n"
         "     count(DISTINCT CASE"
         " WHEN r.expression_status IN ['significant_up', 'significant_down']"
@@ -2608,6 +2620,7 @@ def build_gene_response_profile(
         "WITH g\n"
         "MATCH (e:Experiment)-[r:Changes_expression_of]->(g)\n"
         f"{pass2_where}"
+        f"{unwind}"
         f"WITH g, {gk} AS group_key, e.id AS eid,"
         " collect(r) AS exp_edges\n"
         "WITH g, group_key,\n"

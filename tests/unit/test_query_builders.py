@@ -3002,3 +3002,33 @@ class TestTreatmentTypeArrayFilter:
         )
         assert "apoc.coll.flatten(" in cypher
         assert "rows_by_treatment_type" in cypher
+
+    def test_gene_response_profile_group_by_treatment_type_unwinds(self):
+        """group_by=treatment_type must UNWIND array to produce one row per value."""
+        cypher, _ = build_gene_response_profile(
+            locus_tags=["PMM0001"],
+            organism_name="Prochlorococcus MED4",
+            group_by="treatment_type",
+        )
+        assert "UNWIND" in cypher
+        assert "_tt AS group_key" in cypher
+
+    def test_gene_response_profile_group_by_experiment_no_unwind(self):
+        """group_by=experiment should NOT add UNWIND."""
+        cypher, _ = build_gene_response_profile(
+            locus_tags=["PMM0001"],
+            organism_name="Prochlorococcus MED4",
+            group_by="experiment",
+        )
+        assert "UNWIND" not in cypher
+        assert "e.id AS group_key" in cypher
+
+    def test_gene_response_profile_envelope_unwinds_for_treatment_type(self):
+        """Envelope query should UNWIND for treatment_type group_by."""
+        cypher, _ = build_gene_response_profile_envelope(
+            locus_tags=["PMM0001"],
+            organism_name="Prochlorococcus MED4",
+            group_by="treatment_type",
+        )
+        assert "UNWIND" in cypher
+        assert "_tt AS group_key" in cypher
