@@ -934,7 +934,7 @@ def build_list_experiments_summary(
 
     collect_cols = (
         "collect(e.organism_name) AS orgs,\n"
-        "     collect(e.treatment_type) AS tts,\n"
+        "     apoc.coll.flatten(collect(coalesce(e.treatment_type, []))) AS tts,\n"
         "     collect(e.omics_type) AS omics,\n"
         "     collect(p.doi) AS dois,\n"
         "     collect(e.is_time_course) AS tc,\n"
@@ -1494,7 +1494,7 @@ def build_differential_expression_by_gene_summary_global(
         "RETURN count(*) AS total_matching,\n"
         "       count(DISTINCT g.locus_tag) AS matching_genes,\n"
         "       apoc.coll.frequencies(collect(r.expression_status)) AS rows_by_status,\n"
-        "       apoc.coll.frequencies(collect(e.treatment_type)) AS rows_by_treatment_type,\n"
+        "       apoc.coll.frequencies(apoc.coll.flatten(collect(coalesce(e.treatment_type, [])))) AS rows_by_treatment_type,\n"
         "       apoc.coll.frequencies(collect(e.table_scope)) AS by_table_scope,\n"
         "       percentileCont(\n"
         "           CASE WHEN r.expression_status <> 'not_significant'\n"
@@ -2097,7 +2097,7 @@ def build_differential_expression_by_ortholog_summary_global(
         "       size(apoc.coll.toSet([r IN rows | r.eid])) AS experiment_count,\n"
         "       apoc.coll.frequencies([r IN rows | r.org]) AS by_organism,\n"
         "       apoc.coll.frequencies([r IN rows | r.status]) AS rows_by_status,\n"
-        "       apoc.coll.frequencies([r IN rows | r.tt]) AS rows_by_treatment_type,\n"
+        "       apoc.coll.frequencies(apoc.coll.flatten([r IN rows | coalesce(r.tt, [])])) AS rows_by_treatment_type,\n"
         "       apoc.coll.frequencies([r IN rows | r.ts]) AS by_table_scope,\n"
         "       apoc.coll.toSet([r IN rows | r.gid]) AS matched_group_ids,\n"
         "       [r IN rows WHERE r.status <> 'not_significant' | abs(r.log2fc)]"

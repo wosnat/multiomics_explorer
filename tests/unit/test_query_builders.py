@@ -2983,3 +2983,22 @@ class TestTreatmentTypeArrayFilter:
         )
         assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
         assert params["treatment_types"] == ["nitrogen_stress"]
+
+    def test_list_experiments_summary_flattens_treatment_type(self):
+        """Summary must flatten array treatment_type before frequencies."""
+        cypher, _ = build_list_experiments_summary()
+        assert "apoc.coll.flatten(collect(coalesce(e.treatment_type, [])))" in cypher
+        assert "collect(e.treatment_type) AS tts" not in cypher
+
+    def test_de_by_gene_summary_flattens_treatment_type(self):
+        """DE summary must flatten array treatment_type."""
+        cypher, _ = build_differential_expression_by_gene_summary_global()
+        assert "apoc.coll.flatten(collect(coalesce(e.treatment_type, [])))" in cypher
+
+    def test_de_by_ortholog_summary_flattens_treatment_type(self):
+        """DE by ortholog summary must flatten array treatment_type."""
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["OG_test"],
+        )
+        assert "apoc.coll.flatten(" in cypher
+        assert "rows_by_treatment_type" in cypher
