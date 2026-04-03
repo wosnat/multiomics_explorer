@@ -1,5 +1,5 @@
 case_id: find_genes_tigr_role
-row_count: 79
+row_count: 98
 rows:
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
@@ -120,6 +120,61 @@ rows:
   gene_name: acnB
   locus_tag: P9301_18911
   organism_name: Prochlorococcus MIT9301
+  product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
+- gene_category: Carbohydrate metabolism
+  gene_name: sdhC
+  locus_tag: P9303_01681
+  organism_name: Prochlorococcus MIT9303
+  product: succinate dehydrogenase/fumarate reductase, transmembrane subunit
+- gene_category: Stress response and adaptation
+  gene_name: sdhA
+  locus_tag: P9303_01691
+  organism_name: Prochlorococcus MIT9303
+  product: succinate dehydrogenase/fumarate reductase, flavoprotein subunit
+- gene_category: Stress response and adaptation
+  gene_name: sdhB
+  locus_tag: P9303_01701
+  organism_name: Prochlorococcus MIT9303
+  product: succinate dehydrogenase/fumarate reductase, Fe-S protein subunit
+- gene_category: Amino acid metabolism
+  gene_name: fumC
+  locus_tag: P9303_04621
+  organism_name: Prochlorococcus MIT9303
+  product: fumarate hydratase, class II
+- gene_category: Carbohydrate metabolism
+  gene_name: phdB
+  locus_tag: P9303_16211
+  organism_name: Prochlorococcus MIT9303
+  product: pyruvate dehydrogenase E1 component beta subunit
+- gene_category: Amino acid metabolism
+  gene_name: lpdA
+  locus_tag: P9303_19781
+  organism_name: Prochlorococcus MIT9303
+  product: dihydrolipoamide dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
+  locus_tag: P9303_20971
+  organism_name: Prochlorococcus MIT9303
+  product: malate:quinone oxidoreductase
+- gene_category: Carbohydrate metabolism
+  gene_name: pdhC
+  locus_tag: P9303_21291
+  organism_name: Prochlorococcus MIT9303
+  product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
+  locus_tag: P9303_25761
+  organism_name: Prochlorococcus MIT9303
+  product: isocitrate dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: gltA
+  locus_tag: P9303_26921
+  organism_name: Prochlorococcus MIT9303
+  product: citrate synthase
+- gene_category: Carbohydrate metabolism
+  gene_name: acnB
+  locus_tag: P9303_29981
+  organism_name: Prochlorococcus MIT9303
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: gltA
@@ -350,6 +405,46 @@ rows:
   gene_name: acnB
   locus_tag: SYNW2500
   organism_name: Synechococcus WH8102
+  product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
+  locus_tag: SynWH7803_0217
+  organism_name: Synechococcus WH7803
+  product: isocitrate dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: pdhC
+  locus_tag: SynWH7803_0582
+  organism_name: Synechococcus WH7803
+  product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
+  locus_tag: SynWH7803_0602
+  organism_name: Synechococcus WH7803
+  product: malate:quinone oxidoreductase
+- gene_category: Carbohydrate metabolism
+  gene_name: phdB
+  locus_tag: SynWH7803_1363
+  organism_name: Synechococcus WH7803
+  product: pyruvate dehydrogenase E1 component beta subunit
+- gene_category: Amino acid metabolism
+  gene_name: lpdA
+  locus_tag: SynWH7803_1744
+  organism_name: Synechococcus WH7803
+  product: dihydrolipoamide dehydrogenase
+- gene_category: Amino acid metabolism
+  gene_name: fumC
+  locus_tag: SynWH7803_2039
+  organism_name: Synechococcus WH7803
+  product: fumarate hydratase, class II
+- gene_category: Carbohydrate metabolism
+  gene_name: gltA
+  locus_tag: SynWH7803_2292
+  organism_name: Synechococcus WH7803
+  product: citrate synthase
+- gene_category: Carbohydrate metabolism
+  gene_name: acnB
+  locus_tag: SynWH7803_2505
+  organism_name: Synechococcus WH7803
   product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
 - gene_category: Carbohydrate metabolism
   gene_name: icd

@@ -1,5 +1,5 @@
 case_id: list_experiments_time_course
-row_count: 28
+row_count: 32
 rows:
 - background_factors:
   - axenic
@@ -1489,3 +1489,103 @@ rows:
   - '34'
   treatment_type:
   - phosphorus_stress
+- background_factors:
+  - continuous_light
+  coculture_partner: Synechococcus WH7803
+  experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_asw
+  experiment_name: R. pomeroyi DSS-3 exoproteome time course in ASW coculture with
+    Synechococcus WH7803
+  gene_count: 0
+  is_time_course: 'true'
+  omics_type: EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1111/1462-2920.14012
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: All R. pomeroyi DSS-3 proteins detected in ASW exoproteome across
+    all timepoints
+  time_point_count: 0
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Synechococcus WH7803
+  experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_sw
+  experiment_name: R. pomeroyi DSS-3 exoproteome time course in SW coculture with
+    Synechococcus WH7803
+  gene_count: 0
+  is_time_course: 'true'
+  omics_type: EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1111/1462-2920.14012
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: All R. pomeroyi DSS-3 proteins detected in SW exoproteome across
+    all timepoints
+  time_point_count: 0
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Ruegeria pomeroyi DSS-3
+  experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_asw
+  experiment_name: Synechococcus WH7803 exoproteome time course in ASW coculture with
+    R. pomeroyi DSS-3
+  gene_count: 0
+  is_time_course: 'true'
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH7803
+  publication_doi: 10.1111/1462-2920.14012
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: All Synechococcus WH7803 proteins detected in ASW exoproteome
+    across all timepoints
+  time_point_count: 0
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Ruegeria pomeroyi DSS-3
+  experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_sw
+  experiment_name: Synechococcus WH7803 exoproteome time course in SW coculture with
+    R. pomeroyi DSS-3
+  gene_count: 0
+  is_time_course: 'true'
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH7803
+  publication_doi: 10.1111/1462-2920.14012
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: All Synechococcus WH7803 proteins detected in SW exoproteome
+    across all timepoints
+  time_point_count: 0
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - coculture

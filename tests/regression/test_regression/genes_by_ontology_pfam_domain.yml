@@ -1,5 +1,5 @@
 case_id: genes_by_ontology_pfam_domain
-row_count: 13
+row_count: 17
 rows:
 - gene_category: Replication and repair
   gene_name: dnaN
@@ -38,6 +38,11 @@ rows:
   product: DNA polymerase III, beta subunit
 - gene_category: Replication and repair
   gene_name: dnaN
+  locus_tag: P9303_00001
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase III, beta subunit
+- gene_category: Replication and repair
+  gene_name: dnaN
   locus_tag: PMM0001
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, beta subunit
@@ -56,6 +61,11 @@ rows:
   locus_tag: PMT9312_0001
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, beta subunit
+- gene_category: Unknown
+  gene_name: dnaN
+  locus_tag: SPO0150
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: DNA polymerase III subunit beta
 - gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: SYNW0001
@@ -63,6 +73,16 @@ rows:
   product: DNA polymerase III, beta subunit
 - gene_category: Replication and repair
   gene_name: dnaN
+  locus_tag: SynWH7803_0001
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase III, beta subunit
+- gene_category: Replication and repair
+  gene_name: dnaN
   locus_tag: sync_0001
   organism_name: Synechococcus CC9311
   product: DNA polymerase III, beta subunit
+- gene_category: Unknown
+  gene_name: dnaN
+  locus_tag: tll2349
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: DNA polymerase III subunit beta

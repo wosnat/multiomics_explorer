@@ -1,5 +1,5 @@
 case_id: list_publications_treatment_type
-row_count: 4
+row_count: 11
 rows:
 - authors:
   - Daniel Sher
@@ -26,6 +26,31 @@ rows:
   - nitrogen_stress
   year: 2025
 - authors:
+  - Andreas Kremling
+  - Chen Meng
+  - Franziska Kratzl
+  - Jagroop Pandhal
+  - Karin Kleigrewe
+  - Katharina Pflüger-Grau
+  - Marlene Urban
+  - Mengxun Shi
+  background_factors: []
+  doi: 10.1038/s42003-024-06098-5
+  experiment_count: 4
+  journal: Communications Biology
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organisms:
+  - Pseudomonas putida KT2440
+  - Synechococcus elongatus PCC 7942
+  study_type: multi-omics (transcriptomics, proteomics, metabolomics); synthetic co-culture
+  title: Pseudomonas putida as saviour for troubled Synechococcus elongatus in a synthetic
+    co-culture – interaction studies based on a multi-OMICs approach
+  treatment_types:
+  - coculture
+  year: 2024
+- authors:
   - J. Jeffrey Morris
   - Marcelo Malisano Barreto Filho
   - Melissa Walker
@@ -50,6 +75,104 @@ rows:
   - carbon_stress
   - coculture
   year: 2022
+- authors:
+  - Jiajia Ma
+  - Lei Chen
+  - Meijin Ren
+  - Taohong Guo
+  - Weiwen Zhang
+  - Xinyu Song
+  background_factors:
+  - continuous_light
+  doi: 10.1186/s13068-022-02163-5
+  experiment_count: 2
+  journal: Biotechnology for Biofuels and Bioproducts
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organisms:
+  - Escherichia coli
+  - Synechococcus elongatus UTEX 2973
+  study_type: Transcriptomics|Proteomics|Metabolomics
+  title: Cross-feeding between cyanobacterium Synechococcus and Escherichia coli in
+    an artificial autotrophic–heterotrophic coculture system revealed by integrated
+    omics analysis
+  treatment_types:
+  - coculture
+  year: 2022
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
+  - continuous_light
+  doi: 10.1111/1462-2920.14012
+  experiment_count: 4
+  journal: Environmental Microbiology
+  omics_types:
+  - EXOPROTEOMICS
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Synechococcus WH7803
+  study_type: Exoproteomics
+  title: '100 Days of marine Synechococcus–Ruegeria pomeroyi interaction: A detailed
+    analysis of the exoproteome'
+  treatment_types:
+  - coculture
+  year: 2018
+- authors:
+  - Alexander S. Beliaev
+  - Donald A. Bryant
+  - Eric A. Hill
+  - Hans C. Bernstein
+  - Janet K. Jansson
+  - Jim K. Fredrickson
+  - Margaret F. Romine
+  - Natalie C. Sadler
+  - Ryan S. McClure
+  - Vera Thiel
+  - William B. Chrisler
+  - Young-Mo Kim
+  background_factors: []
+  doi: 10.1128/mSystems.00181-16
+  experiment_count: 1
+  journal: mSystems
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Meiothermus ruber
+  - Thermosynechococcus vestitus BP-1
+  study_type: Transcriptomics
+  title: 'Indirect Interspecies Regulation: Transcriptional and Physiological Responses
+    of a Cyanobacterium to Heterotrophic Partnership'
+  treatment_types:
+  - coculture
+  - light_stress
+  year: 2017
+- authors:
+  - David J. Scanlan
+  - Despoina Sousoni
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Matthew Lloyd
+  background_factors:
+  - continuous_light
+  doi: 10.1038/nmicrobiol.2017.100
+  experiment_count: 3
+  journal: Nature Microbiology
+  omics_types:
+  - EXOPROTEOMICS
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Synechococcus WH7803
+  study_type: Proteomics|Long-term co-culture experiments
+  title: Nutrient recycling facilitates long-term stability of marine microbial phototroph
+    –heterotroph interactions
+  treatment_types:
+  - coculture
+  year: 2017
 - authors:
   - Allison Coe
   - Sallie W Chisholm
@@ -90,3 +213,57 @@ rows:
   treatment_types:
   - coculture
   year: 2016
+- authors:
+  - Alexander S Beliaev
+  - Allan Konopka
+  - Bryan E Linggi
+  - Donald A Bryant
+  - Eric A Hill
+  - Grigoriy E Pinchuk
+  - H Steven Wiley
+  - Hans C Bernstein
+  - Jim K Fredrickson
+  - Leo A Kucek
+  - Lye M Markillie
+  - Margie F Romine
+  - Margrethe Serres
+  - Nancy G Isern
+  - William B Chrisler
+  background_factors:
+  - continuous_light
+  doi: 10.1038/ismej.2014.69
+  experiment_count: 6
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Shewanella sp. W3-18-1
+  - Synechococcus PCC 7002
+  study_type: Transcriptomics
+  title: Inference of interactions in cyanobacterial–heterotrophic co-cultures via
+    transcriptome sequencing
+  treatment_types:
+  - carbon
+  - coculture
+  year: 2014
+- authors:
+  - Brian Palenik
+  - D. Aaron Johnson
+  - Ian T. Paulsen
+  - Katherine Phillippy
+  - Vera Tai
+  background_factors:
+  - continuous_light
+  doi: 10.1111/j.1462-2920.2009.01997.x
+  experiment_count: 1
+  journal: Environmental Microbiology
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Synechococcus WH8102
+  - Vibrio parahaemolyticus
+  study_type: Microarray
+  title: Whole-genome microarray analyses of Synechococcus–Vibrio interaction
+  treatment_types:
+  - coculture
+  year: 2009

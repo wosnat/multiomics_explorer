@@ -1,5 +1,5 @@
 case_id: list_publications_author
-row_count: 12
+row_count: 14
 rows:
 - authors:
   - James I. Mullet
@@ -54,6 +54,42 @@ rows:
   treatment_types:
   - darkness
   year: 2024
+- authors:
+  - Alessandro Mongero
+  - Alexis Yelton
+  - Elaina Thomas
+  - Elizabeth B. Kujawinska
+  - Giovanna Capovilla
+  - Gregory P. Fournier
+  - Gretchen Swarr
+  - Jack G. Payette
+  - Jacob R. Waldbauer
+  - Julia Schwartzman
+  - Krista Longnecker
+  - Kurt G. Castro
+  - Melissa C. Kido-Soule
+  - Otto X. Cordero
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  - Thomas Hackl
+  - Xinda Lu
+  background_factors:
+  - axenic
+  - continuous_light
+  doi: 10.1073/pnas.2213271120
+  experiment_count: 2
+  journal: Proceedings of the National Academy of Sciences
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9313
+  study_type: Comparative genomics and enzymatic assays
+  title: Chitin utilization by marine picocyanobacteria and the evolution of a planktonic
+    lifestyle
+  treatment_types:
+  - carbon
+  year: 2023
 - authors:
   - Allison Coe
   - Sallie W. Chisholm
@@ -185,6 +221,35 @@ rows:
   treatment_types:
   - iron_stress
   year: 2011
+- authors:
+  - Claudia Steglich
+  - Debbie Lindell
+  - Erik R. Zinser
+  - Luke R. Thompson
+  - Matthew A. Wright
+  - Matthias E. Futschik
+  - Maureen L. Coleman
+  - Nathan McNulty
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  - Zackary I. Johnson
+  background_factors:
+  - axenic
+  - diel_cycle
+  doi: 10.1371/journal.pone.0005135
+  experiment_count: 1
+  journal: PLOS ONE
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Transcriptomics
+  title: Choreography of the Transcriptome, Photophysiology, and Cell Cycle of a Minimal
+    Photoautotroph, Prochlorococcus
+  treatment_types:
+  - diel_cycle
+  year: 2009
 - authors:
   - Debbie Lindell
   - George M. Church

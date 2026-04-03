@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_basic
-row_count: 57
+row_count: 60
 rows:
 - background_factors:
   - axenic
@@ -1022,3 +1022,54 @@ rows:
   timepoint_order: 3
   treatment_type:
   - darkness
+- background_factors:
+  - continuous_light
+  coculture_partner: Ruegeria pomeroyi DSS-3
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Synechococcus WH7803
+  significant_down: 0
+  significant_up: 1
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Ruegeria pomeroyi DSS-3
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1038/nmicrobiol.2017.100_late_coculture_syn_wh7803_proteomics
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 1
+  organism_name: Synechococcus WH7803
+  significant_down: 0
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Vibrio parahaemolyticus
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1111/j.1462-2920.2009.01997.x_vibrio_coculture_wh8102_microarray
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Synechococcus WH8102
+  significant_down: 1
+  significant_up: 0
+  timepoint: null
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - coculture

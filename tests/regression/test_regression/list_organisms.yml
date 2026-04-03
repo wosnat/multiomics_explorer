@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 15
+row_count: 27
 rows:
 - background_factors: []
   clade: null
@@ -70,6 +70,37 @@ rows:
   - coculture
   - darkness
 - background_factors:
+  - continuous_light
+  clade: null
+  experiment_count: 2
+  gene_count: 0
+  genus: Escherichia
+  ncbi_taxon_id: 562
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organism_name: Escherichia coli
+  publication_count: 1
+  species: null
+  strain: null
+  treatment_types:
+  - coculture
+- background_factors: []
+  clade: null
+  experiment_count: 1
+  gene_count: 0
+  genus: Deinococcus
+  ncbi_taxon_id: 1299
+  omics_types:
+  - RNASEQ
+  organism_name: Meiothermus ruber
+  publication_count: 1
+  species: null
+  strain: null
+  treatment_types:
+  - coculture
+  - light_stress
+- background_factors:
   - axenic
   - continuous_light
   - darkness
@@ -111,9 +142,10 @@ rows:
   - coculture
   - continuous_light
   - darkness
+  - diel_cycle
   - viral
   clade: HLI
-  experiment_count: 46
+  experiment_count: 48
   gene_count: 1976
   genus: Prochlorococcus
   ncbi_taxon_id: 59919
@@ -122,34 +154,54 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus MED4
-  publication_count: 11
+  publication_count: 13
   species: Prochlorococcus marinus
   strain: MED4
   treatment_types:
   - carbon_stress
   - coculture
+  - diel_cycle
   - iron_stress
   - light_stress
   - nitrogen_stress
+  - none
   - phosphorus_stress
   - salt_stress
   - viral
 - background_factors:
   - axenic
   - continuous_light
+  - diel_cycle
   clade: HLII
-  experiment_count: 1
+  experiment_count: 2
   gene_count: 1935
   genus: Prochlorococcus
   ncbi_taxon_id: 167546
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
-  publication_count: 1
+  publication_count: 2
   species: Prochlorococcus marinus
   strain: MIT9301
   treatment_types:
   - growth_state
+  - temperature
+- background_factors:
+  - axenic
+  - continuous_light
+  clade: LLIV
+  experiment_count: 2
+  gene_count: 3114
+  genus: Prochlorococcus
+  ncbi_taxon_id: 59922
+  omics_types:
+  - RNASEQ
+  organism_name: Prochlorococcus MIT9303
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9303
+  treatment_types:
+  - carbon
 - background_factors:
   - axenic
   - coculture
@@ -174,7 +226,7 @@ rows:
   - axenic
   - continuous_light
   clade: LLIV
-  experiment_count: 19
+  experiment_count: 21
   gene_count: 2948
   genus: Prochlorococcus
   ncbi_taxon_id: 74547
@@ -182,10 +234,11 @@ rows:
   - MICROARRAY
   - RNASEQ
   organism_name: Prochlorococcus MIT9313
-  publication_count: 5
+  publication_count: 6
   species: Prochlorococcus marinus
   strain: MIT9313
   treatment_types:
+  - carbon
   - coculture
   - iron_stress
   - nitrogen_stress
@@ -241,6 +294,52 @@ rows:
   species: null
   strain: RSP50
   treatment_types: []
+- background_factors: []
+  clade: null
+  experiment_count: 4
+  gene_count: 5487
+  genus: Pseudomonas
+  ncbi_taxon_id: 160488
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organism_name: Pseudomonas putida KT2440
+  publication_count: 1
+  species: Pseudomonas putida
+  strain: KT2440
+  treatment_types:
+  - coculture
+- background_factors:
+  - continuous_light
+  clade: null
+  experiment_count: 7
+  gene_count: 4368
+  genus: Ruegeria
+  ncbi_taxon_id: 89184
+  omics_types:
+  - EXOPROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_count: 2
+  species: Ruegeria pomeroyi
+  strain: DSS-3
+  treatment_types:
+  - coculture
+- background_factors:
+  - continuous_light
+  clade: null
+  experiment_count: 6
+  gene_count: 4058
+  genus: Shewanella
+  ncbi_taxon_id: 351745
+  omics_types:
+  - RNASEQ
+  organism_name: Shewanella sp. W3-18-1
+  publication_count: 1
+  species: Shewanella sp.
+  strain: W3-18-1
+  treatment_types:
+  - carbon
+  - coculture
 - background_factors:
   - axenic
   - coculture
@@ -259,19 +358,113 @@ rows:
   - carbon_stress
   - coculture
 - background_factors:
+  - continuous_light
+  clade: null
+  experiment_count: 6
+  gene_count: 3207
+  genus: Picosynechococcus
+  ncbi_taxon_id: 32049
+  omics_types:
+  - RNASEQ
+  organism_name: Synechococcus PCC 7002
+  publication_count: 1
+  species: null
+  strain: PCC7002
+  treatment_types:
+  - carbon
+  - coculture
+- background_factors:
+  - continuous_light
+  clade: null
+  experiment_count: 7
+  gene_count: 2621
+  genus: Synechococcus
+  ncbi_taxon_id: 32051
+  omics_types:
+  - EXOPROTEOMICS
+  organism_name: Synechococcus WH7803
+  publication_count: 2
+  species: null
+  strain: WH7803
+  treatment_types:
+  - coculture
+- background_factors:
   - axenic
   - coculture
+  - continuous_light
   clade: null
-  experiment_count: 10
+  experiment_count: 11
   gene_count: 2881
   genus: Parasynechococcus
   ncbi_taxon_id: 84588
   omics_types:
+  - MICROARRAY
   - RNASEQ
   organism_name: Synechococcus WH8102
-  publication_count: 1
+  publication_count: 2
   species: Parasynechococcus marenigrum
   strain: WH8102
   treatment_types:
   - carbon_stress
+  - coculture
+- background_factors: []
+  clade: null
+  experiment_count: 4
+  gene_count: 2711
+  genus: Synechococcus
+  ncbi_taxon_id: 1140
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organism_name: Synechococcus elongatus PCC 7942
+  publication_count: 1
+  species: Synechococcus elongatus
+  strain: PCC7942
+  treatment_types:
+  - coculture
+- background_factors:
+  - continuous_light
+  clade: null
+  experiment_count: 2
+  gene_count: 2714
+  genus: Synechococcus
+  ncbi_taxon_id: 1350461
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organism_name: Synechococcus elongatus UTEX 2973
+  publication_count: 1
+  species: Synechococcus elongatus
+  strain: UTEX2973
+  treatment_types:
+  - coculture
+- background_factors: []
+  clade: null
+  experiment_count: 1
+  gene_count: 2449
+  genus: Thermosynechococcus
+  ncbi_taxon_id: 197221
+  omics_types:
+  - RNASEQ
+  organism_name: Thermosynechococcus vestitus BP-1
+  publication_count: 1
+  species: Thermosynechococcus vestitus
+  strain: BP1
+  treatment_types:
+  - coculture
+  - light_stress
+- background_factors:
+  - continuous_light
+  clade: null
+  experiment_count: 1
+  gene_count: 0
+  genus: Vibrio
+  ncbi_taxon_id: 670
+  omics_types:
+  - MICROARRAY
+  organism_name: Vibrio parahaemolyticus
+  publication_count: 1
+  species: null
+  strain: null
+  treatment_types:
   - coculture

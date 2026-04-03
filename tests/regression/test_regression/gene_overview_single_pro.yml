@@ -10,7 +10,7 @@ rows:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 9
+  closest_ortholog_group_size: 11
   expression_edge_count: 35
   gene_category: Unknown
   gene_name: null

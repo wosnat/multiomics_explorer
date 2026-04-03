@@ -11,15 +11,15 @@ rows:
   by_source:
   - '{''count'': 1119, ''item'': ''eggnog''}'
   - '{''count'': 416, ''item'': ''cyanorak''}'
-  score_max: 6.1279
-  score_median: 1.0171
+  score_max: 6.1269
+  score_median: 1.0154
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 529, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 525, ''name'': ''Energy production and
     conversion''}'
   - '{''id'': ''cog.category:K'', ''count'': 21, ''name'': ''Transcription''}'
   - '{''id'': ''cog.category:N'', ''count'': 7, ''name'': ''Cell motility''}'
-  - '{''id'': ''cog.category:S'', ''count'': 558, ''name'': ''Function unknown''}'
-  - '{''id'': ''cog.category:U'', ''count'': 50, ''name'': ''Intracellular trafficking,
+  - '{''id'': ''cog.category:S'', ''count'': 548, ''name'': ''Function unknown''}'
+  - '{''id'': ''cog.category:U'', ''count'': 49, ''name'': ''Intracellular trafficking,
     secretion, and vesicular transport''}'
   top_cyanorak_roles:
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 163, ''name'': ''Cellular processes
@@ -32,5 +32,5 @@ rows:
     respiration > Photosystem II''}'
   - '{''id'': ''cyanorak.role:L.3'', ''count'': 20, ''name'': ''Protein fate > Protein
     folding and stabilization''}'
-  total_entries: 21122
-  total_matching: 884
+  total_entries: 21814
+  total_matching: 885

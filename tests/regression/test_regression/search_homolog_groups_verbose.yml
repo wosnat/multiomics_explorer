@@ -15,7 +15,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 5.8875
+  score: 5.8929
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -42,7 +42,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 5.483
+  score: 5.4798
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -66,9 +66,9 @@ rows:
   group_id: cyanorak:CK_00000468
   group_name: CK_00000468
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 5.2509
+  member_count: 11
+  organism_count: 11
+  score: 5.2549
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -94,7 +94,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 5.2509
+  score: 5.2549
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -119,7 +119,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 5.2509
+  score: 5.2549
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -143,9 +143,9 @@ rows:
   group_id: cyanorak:CK_00000186
   group_name: CK_00000186
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 4.9143
+  member_count: 11
+  organism_count: 11
+  score: 4.9167
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -170,7 +170,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 4.9143
+  score: 4.9167
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -195,7 +195,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 4.9143
+  score: 4.9167
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -225,9 +225,9 @@ rows:
   group_id: cyanorak:CK_00001961
   group_name: CK_00001961
   has_cross_genus_members: cross_genus
-  member_count: 2
-  organism_count: 2
-  score: 4.6747
+  member_count: 3
+  organism_count: 3
+  score: 4.6784
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -259,7 +259,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 4.6747
+  score: 4.6784
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -290,7 +290,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 4.6747
+  score: 4.6784
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -323,7 +323,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 4.6747
+  score: 4.6784
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -364,7 +364,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 3.4784
+  score: 3.4876
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -403,7 +403,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 44
   organism_count: 13
-  score: 3.1249
+  score: 3.1319
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -441,7 +441,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.8366
+  score: 2.8421
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -459,7 +459,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.8366
+  score: 2.8421
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -477,7 +477,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.8366
+  score: 2.8421
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -495,7 +495,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.8366
+  score: 2.8421
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -515,7 +515,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 24
   organism_count: 13
-  score: 2.8366
+  score: 2.8421
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -533,7 +533,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 4
   organism_count: 3
-  score: 2.8366
+  score: 2.8421
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -575,6 +575,26 @@ rows:
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
+- cog_categories: []
+  consensus_gene_name: cynS
+  consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: null
+  functional_description: Central intermediary metabolism > Nitrogen metabolism
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  group_id: cyanorak:CK_00001552
+  group_name: CK_00001552
+  has_cross_genus_members: cross_genus
+  member_count: 6
+  organism_count: 6
+  score: 2.4599
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
 - cog_categories:
   - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
   consensus_gene_name: narM
@@ -589,9 +609,9 @@ rows:
   group_id: cyanorak:CK_00001674
   group_name: CK_00001674
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 2.4615
+  member_count: 3
+  organism_count: 3
+  score: 2.4599
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -608,9 +628,9 @@ rows:
   group_id: cyanorak:CK_00003051
   group_name: CK_00003051
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 2
-  score: 2.4615
+  member_count: 4
+  organism_count: 3
+  score: 2.4599
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -630,7 +650,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.4615
+  score: 2.4599
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -649,7 +669,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.4615
+  score: 2.4599
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -669,7 +689,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.4615
+  score: 2.4599
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -688,7 +708,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.4615
+  score: 2.4599
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -707,7 +727,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.3948
+  score: 2.3982
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -725,7 +745,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.3948
+  score: 2.3982
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -875,9 +895,9 @@ rows:
   group_id: cyanorak:CK_00001355
   group_name: CK_00001355
   has_cross_genus_members: cross_genus
-  member_count: 5
-  organism_count: 5
-  score: 2.126
+  member_count: 7
+  organism_count: 7
+  score: 2.123
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -899,9 +919,9 @@ rows:
   group_id: cyanorak:CK_00001675
   group_name: CK_00001675
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 2.126
+  member_count: 3
+  organism_count: 3
+  score: 2.123
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -925,7 +945,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.126
+  score: 2.123
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -950,7 +970,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.126
+  score: 2.123
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -974,7 +994,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.126
+  score: 2.123
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -998,7 +1018,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 4
   organism_count: 3
-  score: 2.126
+  score: 2.123
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1022,7 +1042,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.126
+  score: 2.123
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1045,9 +1065,9 @@ rows:
   group_id: cyanorak:CK_00000134
   group_name: CK_00000134
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 2.0777
+  member_count: 11
+  organism_count: 11
+  score: 2.0747
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1070,9 +1090,9 @@ rows:
   group_id: cyanorak:CK_00001358
   group_name: CK_00001358
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 2.0777
+  member_count: 10
+  organism_count: 10
+  score: 2.0747
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1095,9 +1115,9 @@ rows:
   group_id: cyanorak:CK_00001359
   group_name: CK_00001359
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 2.0777
+  member_count: 10
+  organism_count: 10
+  score: 2.0747
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1120,9 +1140,9 @@ rows:
   group_id: cyanorak:CK_00001360
   group_name: CK_00001360
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 2.0777
+  member_count: 10
+  organism_count: 10
+  score: 2.0747
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1147,7 +1167,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1171,7 +1191,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1195,7 +1215,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1219,7 +1239,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1244,7 +1264,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1268,7 +1288,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1292,7 +1312,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1316,7 +1336,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1342,7 +1362,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 13
   organism_count: 13
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1368,7 +1388,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1393,7 +1413,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1418,7 +1438,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 2.0777
+  score: 2.0747
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1440,7 +1460,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.0255
+  score: 2.023
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1464,9 +1484,9 @@ rows:
   group_id: cyanorak:CK_00001364
   group_name: CK_00001364
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.9874
+  member_count: 10
+  organism_count: 10
+  score: 1.9843
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1492,7 +1512,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.9874
+  score: 1.9843
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1519,10 +1539,29 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 15
   organism_count: 13
-  score: 1.9874
+  score: 1.9843
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: yhcX
+  consensus_product: bifunctional GNAT family N-acetyltransferase/carbon-nitrogen
+    hydrolase family protein
+  cyanorak_roles: []
+  description: COG0454 Histone acetyltransferase HPA2 and related acetyltransferases
+  functional_description: Transcription
+  genera:
+  - Alteromonas
+  group_id: eggnog:4648Q@72275
+  group_name: 4648Q@72275
+  has_cross_genus_members: single_genus
+  member_count: 3
+  organism_count: 3
+  score: 1.943
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
 - cog_categories: []
   consensus_gene_name: moaB
   consensus_product: molybdenum cofactor biosynthesis protein B
@@ -1542,28 +1581,28 @@ rows:
   group_id: cyanorak:CK_00001670
   group_name: CK_00001670
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.9452
+  member_count: 3
+  organism_count: 3
+  score: 1.942
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
 - cog_categories:
-  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
-  consensus_gene_name: yhcX
-  consensus_product: bifunctional GNAT family N-acetyltransferase/carbon-nitrogen
-    hydrolase family protein
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: nadE
+  consensus_product: ammonia-dependent NAD(+) synthetase
   cyanorak_roles: []
-  description: COG0454 Histone acetyltransferase HPA2 and related acetyltransferases
-  functional_description: Transcription
+  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
+    ammonia as a nitrogen source
+  functional_description: Coenzyme transport and metabolism
   genera:
   - Alteromonas
-  group_id: eggnog:4648Q@72275
-  group_name: 4648Q@72275
+  group_id: eggnog:463ZH@72275
+  group_name: 463ZH@72275
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 1.9413
+  score: 1.9381
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -1585,29 +1624,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.9396
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- cog_categories:
-  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
-  consensus_gene_name: cynS
-  consensus_product: cyanate hydratase
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
-    Nitrogen metabolism''}'
-  description: null
-  functional_description: Central intermediary metabolism > Nitrogen metabolism; Inorganic
-    ion transport and metabolism
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  group_id: cyanorak:CK_00001552
-  group_name: CK_00001552
-  has_cross_genus_members: cross_genus
-  member_count: 5
-  organism_count: 5
-  score: 1.9396
+  score: 1.937
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1629,7 +1646,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.9396
+  score: 1.937
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1650,7 +1667,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.9396
+  score: 1.937
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1672,7 +1689,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 1.9396
+  score: 1.937
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1696,29 +1713,10 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 8
   organism_count: 8
-  score: 1.9396
+  score: 1.937
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: nadE
-  consensus_product: ammonia-dependent NAD(+) synthetase
-  cyanorak_roles: []
-  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
-    ammonia as a nitrogen source
-  functional_description: Coenzyme transport and metabolism
-  genera:
-  - Alteromonas
-  group_id: eggnog:463ZH@72275
-  group_name: 463ZH@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.9381
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
 - cog_categories:
   - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
     turnover, chaperones''}'
@@ -1741,9 +1739,9 @@ rows:
   group_id: cyanorak:CK_00001361
   group_name: CK_00001361
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.9047
+  member_count: 10
+  organism_count: 10
+  score: 1.9015
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1769,9 +1767,9 @@ rows:
   group_id: cyanorak:CK_00001362
   group_name: CK_00001362
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.9047
+  member_count: 10
+  organism_count: 10
+  score: 1.9015
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1797,9 +1795,9 @@ rows:
   group_id: cyanorak:CK_00001363
   group_name: CK_00001363
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.9047
+  member_count: 10
+  organism_count: 10
+  score: 1.9015
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1824,14 +1822,13 @@ rows:
   group_id: cyanorak:CK_00001367
   group_name: CK_00001367
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.9047
+  member_count: 10
+  organism_count: 10
+  score: 1.9015
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
-- cog_categories:
-  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+- cog_categories: []
   consensus_gene_name: glnN1
   consensus_product: glutamine synthetase, type III
   cyanorak_roles:
@@ -1850,9 +1847,9 @@ rows:
   group_id: cyanorak:CK_00002090
   group_name: CK_00002090
   has_cross_genus_members: single_genus
-  member_count: 1
-  organism_count: 1
-  score: 1.9047
+  member_count: 2
+  organism_count: 2
+  score: 1.9015
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1878,7 +1875,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1904,7 +1901,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1932,7 +1929,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1960,7 +1957,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1988,7 +1985,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2014,7 +2011,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 7
   organism_count: 7
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2042,7 +2039,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2070,7 +2067,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2098,7 +2095,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2124,7 +2121,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2152,7 +2149,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 5
   organism_count: 5
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2180,7 +2177,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -2208,7 +2205,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -2236,7 +2233,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 9
   organism_count: 9
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -2262,7 +2259,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -2289,7 +2286,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 1.9047
+  score: 1.9015
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -2400,7 +2397,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.8658
+  score: 1.8626
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2429,7 +2426,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.8658
+  score: 1.8626
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2456,7 +2453,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.8658
+  score: 1.8626
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2547,9 +2544,9 @@ rows:
   group_id: cyanorak:CK_00000545
   group_name: CK_00000545
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.7927
+  member_count: 11
+  organism_count: 11
+  score: 1.7895
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2575,9 +2572,9 @@ rows:
   group_id: cyanorak:CK_00001671
   group_name: CK_00001671
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7927
+  member_count: 3
+  organism_count: 3
+  score: 1.7895
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2602,9 +2599,9 @@ rows:
   group_id: cyanorak:CK_00001672
   group_name: CK_00001672
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7927
+  member_count: 3
+  organism_count: 3
+  score: 1.7895
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2629,9 +2626,9 @@ rows:
   group_id: cyanorak:CK_00001673
   group_name: CK_00001673
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7927
+  member_count: 3
+  organism_count: 3
+  score: 1.7895
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2656,9 +2653,9 @@ rows:
   group_id: cyanorak:CK_00001678
   group_name: CK_00001678
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7927
+  member_count: 3
+  organism_count: 3
+  score: 1.7895
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2684,9 +2681,9 @@ rows:
   group_id: cyanorak:CK_00001749
   group_name: CK_00001749
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.7927
+  member_count: 3
+  organism_count: 3
+  score: 1.7895
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2713,7 +2710,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.7927
+  score: 1.7895
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2741,7 +2738,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.7927
+  score: 1.7895
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2769,7 +2766,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.7927
+  score: 1.7895
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2797,7 +2794,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.7927
+  score: 1.7895
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2825,7 +2822,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.7927
+  score: 1.7895
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2852,7 +2849,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.7927
+  score: 1.7895
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2878,9 +2875,9 @@ rows:
   group_id: cyanorak:CK_00000076
   group_name: CK_00000076
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 9
-  score: 1.7251
+  member_count: 12
+  organism_count: 11
+  score: 1.7219
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2906,9 +2903,9 @@ rows:
   group_id: cyanorak:CK_00001365
   group_name: CK_00001365
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.7251
+  member_count: 10
+  organism_count: 10
+  score: 1.7219
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2934,9 +2931,9 @@ rows:
   group_id: cyanorak:CK_00001366
   group_name: CK_00001366
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.7251
+  member_count: 10
+  organism_count: 10
+  score: 1.7219
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2962,9 +2959,9 @@ rows:
   group_id: cyanorak:CK_00008074
   group_name: CK_00008074
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.7251
+  member_count: 10
+  organism_count: 10
+  score: 1.7219
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2991,7 +2988,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 2
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3019,7 +3016,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3046,7 +3043,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3074,7 +3071,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3101,7 +3098,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3129,7 +3126,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3157,7 +3154,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 7
   organism_count: 7
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3184,7 +3181,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3212,7 +3209,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -3240,7 +3237,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -3268,7 +3265,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 1.7251
+  score: 1.7219
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -3313,9 +3310,9 @@ rows:
   group_id: cyanorak:CK_00001676
   group_name: CK_00001676
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 2
-  score: 1.6932
+  member_count: 4
+  organism_count: 3
+  score: 1.6899
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3344,7 +3341,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.6932
+  score: 1.6899
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3373,7 +3370,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.6624
+  score: 1.6592
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3402,7 +3399,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.6624
+  score: 1.6592
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3424,7 +3421,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.6584
+  score: 1.6555
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3453,7 +3450,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.6327
+  score: 1.6295
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3523,7 +3520,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.5498
+  score: 1.5465
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3546,9 +3543,9 @@ rows:
   group_id: cyanorak:CK_00000783
   group_name: CK_00000783
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.4957
+  member_count: 11
+  organism_count: 11
+  score: 1.4928
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3570,9 +3567,9 @@ rows:
   group_id: cyanorak:CK_00001677
   group_name: CK_00001677
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.4957
+  member_count: 3
+  organism_count: 3
+  score: 1.4928
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3596,7 +3593,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.4957
+  score: 1.4928
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3622,7 +3619,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.4957
+  score: 1.4928
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3646,7 +3643,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.4957
+  score: 1.4928
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3672,7 +3669,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 13
   organism_count: 13
-  score: 1.4957
+  score: 1.4928
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -3718,9 +3715,9 @@ rows:
   group_id: cyanorak:CK_00000103
   group_name: CK_00000103
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.4483
+  member_count: 11
+  organism_count: 11
+  score: 1.4455
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3743,9 +3740,9 @@ rows:
   group_id: cyanorak:CK_00008104
   group_name: CK_00008104
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.4483
+  member_count: 11
+  organism_count: 11
+  score: 1.4455
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3769,7 +3766,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.4483
+  score: 1.4455
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3793,7 +3790,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.4483
+  score: 1.4455
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3817,7 +3814,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.4483
+  score: 1.4455
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3843,7 +3840,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 14
   organism_count: 13
-  score: 1.4483
+  score: 1.4455
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -3983,9 +3980,9 @@ rows:
   group_id: cyanorak:CK_00000244
   group_name: CK_00000244
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.4039
+  member_count: 11
+  organism_count: 11
+  score: 1.401
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4010,7 +4007,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.4039
+  score: 1.401
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4034,7 +4031,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.4039
+  score: 1.401
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4058,7 +4055,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.4039
+  score: 1.401
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4082,7 +4079,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 7
   organism_count: 7
-  score: 1.4039
+  score: 1.401
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4108,7 +4105,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 13
   organism_count: 13
-  score: 1.4039
+  score: 1.401
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -4133,7 +4130,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.3621
+  score: 1.3592
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4222,9 +4219,9 @@ rows:
   group_id: cyanorak:CK_00001508
   group_name: CK_00001508
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.3227
+  member_count: 11
+  organism_count: 11
+  score: 1.3199
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4247,9 +4244,9 @@ rows:
   group_id: cyanorak:CK_00001509
   group_name: CK_00001509
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.3227
+  member_count: 11
+  organism_count: 11
+  score: 1.3199
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4273,7 +4270,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.3227
+  score: 1.3199
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4297,7 +4294,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.3227
+  score: 1.3199
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4321,7 +4318,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.3227
+  score: 1.3199
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4345,7 +4342,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.3227
+  score: 1.3199
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4370,7 +4367,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 20
   organism_count: 10
-  score: 1.3227
+  score: 1.3199
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -4445,9 +4442,9 @@ rows:
   group_id: cyanorak:CK_00001284
   group_name: CK_00001284
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.0742
+  member_count: 11
+  organism_count: 11
+  score: 1.0716
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4473,7 +4470,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.0742
+  score: 1.0716
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4499,7 +4496,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.0742
+  score: 1.0716
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4527,7 +4524,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 16
   organism_count: 13
-  score: 1.0742
+  score: 1.0716
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -4553,9 +4550,9 @@ rows:
   group_id: cyanorak:CK_00000408
   group_name: CK_00000408
   has_cross_genus_members: cross_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.0496
+  member_count: 11
+  organism_count: 11
+  score: 1.0469
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4581,9 +4578,9 @@ rows:
   group_id: cyanorak:CK_00001669
   group_name: CK_00001669
   has_cross_genus_members: cross_genus
-  member_count: 4
-  organism_count: 4
-  score: 1.0496
+  member_count: 6
+  organism_count: 6
+  score: 1.0469
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4610,7 +4607,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.0496
+  score: 1.0469
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4637,7 +4634,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.0496
+  score: 1.0469
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4664,7 +4661,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.0496
+  score: 1.0469
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4691,7 +4688,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 1.0496
+  score: 1.0469
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4719,7 +4716,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 1.0496
+  score: 1.0469
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria

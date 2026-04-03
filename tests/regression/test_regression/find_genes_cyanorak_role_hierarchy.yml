@@ -1,5 +1,5 @@
 case_id: find_genes_cyanorak_role_hierarchy
-row_count: 621
+row_count: 768
 rows:
 - gene_category: Replication and repair
   gene_name: dnaN
@@ -981,6 +981,366 @@ rows:
   gene_name: recN
   locus_tag: P9301_19031
   organism_name: Prochlorococcus MIT9301
+  product: ATP-dependent DNA repair protein RecN
+- gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: P9303_00001
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase III, beta subunit
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_00041
+  organism_name: Prochlorococcus MIT9303
+  product: DNA gyrase/topoisomerase IV, subunit A family protein
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_00361
+  organism_name: Prochlorococcus MIT9303
+  product: HNH endonuclease family protein
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_00371
+  organism_name: Prochlorococcus MIT9303
+  product: ATP-dependent DNA/RNA helicase
+- gene_category: Replication and repair
+  gene_name: dnaX
+  locus_tag: P9303_00641
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase III, gamma and tau subunits
+- gene_category: Replication and repair
+  gene_name: uvrB
+  locus_tag: P9303_00791
+  organism_name: Prochlorococcus MIT9303
+  product: excinuclease UvrABC complex, helicase subunit
+- gene_category: Replication and repair
+  gene_name: holA
+  locus_tag: P9303_00831
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase III, delta subunit
+- gene_category: Replication and repair
+  gene_name: mutS
+  locus_tag: P9303_00881
+  organism_name: Prochlorococcus MIT9303
+  product: DNA mismatch repair protein MutS
+- gene_category: Replication and repair
+  gene_name: gyrB
+  locus_tag: P9303_01571
+  organism_name: Prochlorococcus MIT9303
+  product: DNA gyrase, B subunit
+- gene_category: Replication and repair
+  gene_name: mutY
+  locus_tag: P9303_01721
+  organism_name: Prochlorococcus MIT9303
+  product: A/G-specific DNA glycosylase
+- gene_category: Replication and repair
+  gene_name: ssb
+  locus_tag: P9303_01781
+  organism_name: Prochlorococcus MIT9303
+  product: single-stranded DNA-binding protein
+- gene_category: Replication and repair
+  gene_name: ruvB
+  locus_tag: P9303_01931
+  organism_name: Prochlorococcus MIT9303
+  product: holliday junction ATP-dependent DNA helicase RuvB
+- gene_category: Replication and repair
+  gene_name: xseB
+  locus_tag: P9303_02371
+  organism_name: Prochlorococcus MIT9303
+  product: exodeoxyribonuclease VII, small subunit
+- gene_category: Replication and repair
+  gene_name: xseA
+  locus_tag: P9303_02381
+  organism_name: Prochlorococcus MIT9303
+  product: exodeoxyribonuclease VII, large subunit
+- gene_category: Replication and repair
+  gene_name: rarA
+  locus_tag: P9303_02651
+  organism_name: Prochlorococcus MIT9303
+  product: recombination factor
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_03631
+  organism_name: Prochlorococcus MIT9303
+  product: putative nuclease
+- gene_category: Replication and repair
+  gene_name: mutS2
+  locus_tag: P9303_03891
+  organism_name: Prochlorococcus MIT9303
+  product: DNA mismatch repair protein, MutS family
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_04601
+  organism_name: Prochlorococcus MIT9303
+  product: ATP-dependent DNA/RNA helicase, superfamily 1/2
+- gene_category: Replication and repair
+  gene_name: topA
+  locus_tag: P9303_06301
+  organism_name: Prochlorococcus MIT9303
+  product: DNA topoisomerase I, omega subunit
+- gene_category: Stress response and adaptation
+  gene_name: xthA
+  locus_tag: P9303_06981
+  organism_name: Prochlorococcus MIT9303
+  product: exodeoxyribonuclease III
+- gene_category: Replication and repair
+  gene_name: priA
+  locus_tag: P9303_07311
+  organism_name: Prochlorococcus MIT9303
+  product: primosomal protein N^
+- gene_category: Replication and repair
+  gene_name: dnaA
+  locus_tag: P9303_08301
+  organism_name: Prochlorococcus MIT9303
+  product: chromosomal replication initiator protein
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_08571
+  organism_name: Prochlorococcus MIT9303
+  product: ATP-dependent DNA helicase
+- gene_category: Replication and repair
+  gene_name: polA
+  locus_tag: P9303_08691
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase I
+- gene_category: Replication and repair
+  gene_name: ruvC
+  locus_tag: P9303_08941
+  organism_name: Prochlorococcus MIT9303
+  product: crossover junction endodeoxyribonuclease RuvC
+- gene_category: Replication and repair
+  gene_name: gyrA
+  locus_tag: P9303_09151
+  organism_name: Prochlorococcus MIT9303
+  product: DNA gyrase, A subunit
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_09351
+  organism_name: Prochlorococcus MIT9303
+  product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
+- gene_category: Replication and repair
+  gene_name: recC
+  locus_tag: P9303_09591
+  organism_name: Prochlorococcus MIT9303
+  product: exodeoxyribonuclease V (RecBCD complex), gamma subunit
+- gene_category: Replication and repair
+  gene_name: recB
+  locus_tag: P9303_09621
+  organism_name: Prochlorococcus MIT9303
+  product: exodeoxyribonuclease V (RecBCD complex), beta subunit
+- gene_category: Replication and repair
+  gene_name: recD
+  locus_tag: P9303_09631
+  organism_name: Prochlorococcus MIT9303
+  product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
+- gene_category: Replication and repair
+  gene_name: recR
+  locus_tag: P9303_09731
+  organism_name: Prochlorococcus MIT9303
+  product: recombination protein RecR
+- gene_category: Stress response and adaptation
+  gene_name: null
+  locus_tag: P9303_10531
+  organism_name: Prochlorococcus MIT9303
+  product: NUDIX hydrolase superfamily
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_12771
+  organism_name: Prochlorococcus MIT9303
+  product: phage integrase
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_12991
+  organism_name: Prochlorococcus MIT9303
+  product: phage integrase
+- gene_category: Replication and repair
+  gene_name: alkB
+  locus_tag: P9303_13141
+  organism_name: Prochlorococcus MIT9303
+  product: alpha-ketoglutarate-dependent dioxygenase, AlkB-like superfamily
+- gene_category: Coenzyme metabolism
+  gene_name: nrdJ
+  locus_tag: P9303_14171
+  organism_name: Prochlorococcus MIT9303
+  product: ribonucleoside-diphosphate reductase
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_14331
+  organism_name: Prochlorococcus MIT9303
+  product: uracil-DNA glycosylase
+- gene_category: Replication and repair
+  gene_name: mfd
+  locus_tag: P9303_14371
+  organism_name: Prochlorococcus MIT9303
+  product: transcription-repair coupling factor
+- gene_category: Replication and repair
+  gene_name: tldD
+  locus_tag: P9303_14421
+  organism_name: Prochlorococcus MIT9303
+  product: modulator of DNA gyrase
+- gene_category: Replication and repair
+  gene_name: recJ
+  locus_tag: P9303_14521
+  organism_name: Prochlorococcus MIT9303
+  product: single-stranded DNA-specific exonuclease
+- gene_category: Replication and repair
+  gene_name: uvrC
+  locus_tag: P9303_14941
+  organism_name: Prochlorococcus MIT9303
+  product: excinuclease UvrABC complex, endonuclease subunit
+- gene_category: Replication and repair
+  gene_name: dnaE
+  locus_tag: P9303_15831
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase III, alpha subunit
+- gene_category: Replication and repair
+  gene_name: ruvA
+  locus_tag: P9303_15861
+  organism_name: Prochlorococcus MIT9303
+  product: holliday junction ATP-dependent DNA helicase RuvA
+- gene_category: Replication and repair
+  gene_name: dnaG
+  locus_tag: P9303_15911
+  organism_name: Prochlorococcus MIT9303
+  product: DNA primase
+- gene_category: Replication and repair
+  gene_name: umuC
+  locus_tag: P9303_15961
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase V, subunit C
+- gene_category: Replication and repair
+  gene_name: umuD
+  locus_tag: P9303_16001
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase V, subunit D
+- gene_category: Replication and repair
+  gene_name: recG
+  locus_tag: P9303_16671
+  organism_name: Prochlorococcus MIT9303
+  product: ATP-dependent DNA helicase
+- gene_category: Replication and repair
+  gene_name: nth
+  locus_tag: P9303_17641
+  organism_name: Prochlorococcus MIT9303
+  product: endonuclease III
+- gene_category: Replication and repair
+  gene_name: yedK
+  locus_tag: P9303_19201
+  organism_name: Prochlorococcus MIT9303
+  product: putative SOS response associated peptidase
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_20261
+  organism_name: Prochlorococcus MIT9303
+  product: site-specific recombinase
+- gene_category: Replication and repair
+  gene_name: ybaZ
+  locus_tag: P9303_20691
+  organism_name: Prochlorococcus MIT9303
+  product: 6-O-alkylguanine DNA alkyltransferase-like protein
+- gene_category: Replication and repair
+  gene_name: recO
+  locus_tag: P9303_21431
+  organism_name: Prochlorococcus MIT9303
+  product: gap repair protein RecO
+- gene_category: Replication and repair
+  gene_name: recQ
+  locus_tag: P9303_21731
+  organism_name: Prochlorococcus MIT9303
+  product: ATP-dependent DNA helicase
+- gene_category: Replication and repair
+  gene_name: mutM
+  locus_tag: P9303_21761
+  organism_name: Prochlorococcus MIT9303
+  product: formamidopyrimidine-DNA glycolase
+- gene_category: Cellular processes
+  gene_name: dprA
+  locus_tag: P9303_22061
+  organism_name: Prochlorococcus MIT9303
+  product: DNA recombination-mediator protein A
+- gene_category: Replication and repair
+  gene_name: recF
+  locus_tag: P9303_22781
+  organism_name: Prochlorococcus MIT9303
+  product: DNA replication and repair protein recF
+- gene_category: Replication and repair
+  gene_name: dinG
+  locus_tag: P9303_22951
+  organism_name: Prochlorococcus MIT9303
+  product: ATP-dependent helicase C-terminal domain-containing protein
+- gene_category: Replication and repair
+  gene_name: recA
+  locus_tag: P9303_22971
+  organism_name: Prochlorococcus MIT9303
+  product: recombinase A
+- gene_category: Replication and repair
+  gene_name: mpg
+  locus_tag: P9303_23941
+  organism_name: Prochlorococcus MIT9303
+  product: DNA-3-methyladenine glycosylase
+- gene_category: Replication and repair
+  gene_name: mpg
+  locus_tag: P9303_24181
+  organism_name: Prochlorococcus MIT9303
+  product: DNA-3-methyladenine glycosylase
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_24581
+  organism_name: Prochlorococcus MIT9303
+  product: polynucleotidyl transferase, ribonuclease H fold superfamily
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_24981
+  organism_name: Prochlorococcus MIT9303
+  product: recB nuclease, TM0106 family domain protein
+- gene_category: Replication and repair
+  gene_name: uvrD
+  locus_tag: P9303_25591
+  organism_name: Prochlorococcus MIT9303
+  product: DNA-dependent ATPase I and helicase II
+- gene_category: Replication and repair
+  gene_name: holB
+  locus_tag: P9303_26481
+  organism_name: Prochlorococcus MIT9303
+  product: DNA polymerase III, delta^ subunit
+- gene_category: Replication and repair
+  gene_name: radA
+  locus_tag: P9303_26521
+  organism_name: Prochlorococcus MIT9303
+  product: DNA repair protein Sms/RadA
+- gene_category: Replication and repair
+  gene_name: hepA
+  locus_tag: P9303_28381
+  organism_name: Prochlorococcus MIT9303
+  product: superfamily II DNA/RNA helicases, SNF2 family
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_28561
+  organism_name: Prochlorococcus MIT9303
+  product: phage integrase
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: P9303_28731
+  organism_name: Prochlorococcus MIT9303
+  product: site-specific recombinase
+- gene_category: Replication and repair
+  gene_name: dnaB
+  locus_tag: P9303_28971
+  organism_name: Prochlorococcus MIT9303
+  product: replicative DNA helicase
+- gene_category: Stress response and adaptation
+  gene_name: ligA
+  locus_tag: P9303_29061
+  organism_name: Prochlorococcus MIT9303
+  product: DNA ligase, NAD-dependent
+- gene_category: Replication and repair
+  gene_name: uvrA
+  locus_tag: P9303_30191
+  organism_name: Prochlorococcus MIT9303
+  product: excinuclease UvrABC complex, ATPase subunit
+- gene_category: Stress response and adaptation
+  gene_name: recN
+  locus_tag: P9303_30201
+  organism_name: Prochlorococcus MIT9303
   product: ATP-dependent DNA repair protein RecN
 - gene_category: Replication and repair
   gene_name: dnaN
@@ -2734,6 +3094,381 @@ rows:
   gene_name: recN
   locus_tag: SYNW2523
   organism_name: Synechococcus WH8102
+  product: ATP-dependent DNA repair protein RecN
+- gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: SynWH7803_0001
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase III, beta subunit
+- gene_category: Replication and repair
+  gene_name: gyrA
+  locus_tag: SynWH7803_0005
+  organism_name: Synechococcus WH7803
+  product: DNA gyrase/topoisomerase IV, subunit A family protein
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_0038
+  organism_name: Synechococcus WH7803
+  product: HNH endonuclease family protein
+- gene_category: Replication and repair
+  gene_name: hepA
+  locus_tag: SynWH7803_0039
+  organism_name: Synechococcus WH7803
+  product: ATP-dependent DNA/RNA helicase
+- gene_category: Replication and repair
+  gene_name: dnaX
+  locus_tag: SynWH7803_0062
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase III, gamma and tau subunits
+- gene_category: Replication and repair
+  gene_name: uvrB
+  locus_tag: SynWH7803_0080
+  organism_name: Synechococcus WH7803
+  product: excinuclease UvrABC complex, helicase subunit
+- gene_category: Replication and repair
+  gene_name: holA
+  locus_tag: SynWH7803_0082
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase III, delta subunit
+- gene_category: Replication and repair
+  gene_name: mutS
+  locus_tag: SynWH7803_0084
+  organism_name: Synechococcus WH7803
+  product: DNA mismatch repair protein MutS
+- gene_category: Replication and repair
+  gene_name: gyrB
+  locus_tag: SynWH7803_0147
+  organism_name: Synechococcus WH7803
+  product: DNA gyrase, B subunit
+- gene_category: Replication and repair
+  gene_name: mutY
+  locus_tag: SynWH7803_0163
+  organism_name: Synechococcus WH7803
+  product: A/G-specific DNA glycosylase
+- gene_category: Replication and repair
+  gene_name: ssb
+  locus_tag: SynWH7803_0171
+  organism_name: Synechococcus WH7803
+  product: single-stranded DNA-binding protein
+- gene_category: Replication and repair
+  gene_name: ruvB
+  locus_tag: SynWH7803_0185
+  organism_name: Synechococcus WH7803
+  product: holliday junction ATP-dependent DNA helicase RuvB
+- gene_category: Replication and repair
+  gene_name: uvrD
+  locus_tag: SynWH7803_0240
+  organism_name: Synechococcus WH7803
+  product: DNA-dependent ATPase I and helicase II
+- gene_category: Stress response and adaptation
+  gene_name: phrA
+  locus_tag: SynWH7803_0262
+  organism_name: Synechococcus WH7803
+  product: deoxyribodipyrimidine photolyase (DNA photolyase) (photoreactivating enzyme)
+- gene_category: Stress response and adaptation
+  gene_name: null
+  locus_tag: SynWH7803_0266
+  organism_name: Synechococcus WH7803
+  product: DNA photolyase domain of deoxyribodipyrimidine photolyase
+- gene_category: Stress response and adaptation
+  gene_name: null
+  locus_tag: SynWH7803_0267
+  organism_name: Synechococcus WH7803
+  product: FAD-binding domain of DNA photolyase
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_0279
+  organism_name: Synechococcus WH7803
+  product: recB nuclease, TM0106 family domain protein
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_0317
+  organism_name: Synechococcus WH7803
+  product: polynucleotidyl transferase, ribonuclease H fold superfamily
+- gene_category: Replication and repair
+  gene_name: mpg
+  locus_tag: SynWH7803_0343
+  organism_name: Synechococcus WH7803
+  product: DNA-3-methyladenine glycosylase
+- gene_category: Replication and repair
+  gene_name: recA
+  locus_tag: SynWH7803_0439
+  organism_name: Synechococcus WH7803
+  product: recombinase A
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_0442
+  organism_name: Synechococcus WH7803
+  product: ATP-dependent helicase C-terminal domain-containing protein
+- gene_category: Replication and repair
+  gene_name: recF
+  locus_tag: SynWH7803_0452
+  organism_name: Synechococcus WH7803
+  product: DNA replication and repair protein recF
+- gene_category: Cellular processes
+  gene_name: dprA
+  locus_tag: SynWH7803_0523
+  organism_name: Synechococcus WH7803
+  product: DNA recombination-mediator protein A
+- gene_category: Replication and repair
+  gene_name: mutM
+  locus_tag: SynWH7803_0539
+  organism_name: Synechococcus WH7803
+  product: formamidopyrimidine-DNA glycolase
+- gene_category: Replication and repair
+  gene_name: recQ
+  locus_tag: SynWH7803_0542
+  organism_name: Synechococcus WH7803
+  product: ATP-dependent DNA helicase
+- gene_category: Replication and repair
+  gene_name: recO
+  locus_tag: SynWH7803_0576
+  organism_name: Synechococcus WH7803
+  product: gap repair protein RecO
+- gene_category: Replication and repair
+  gene_name: priA
+  locus_tag: SynWH7803_0612
+  organism_name: Synechococcus WH7803
+  product: primosomal protein N^
+- gene_category: Stress response and adaptation
+  gene_name: cry2
+  locus_tag: SynWH7803_0636
+  organism_name: Synechococcus WH7803
+  product: possible cryptochrome
+- gene_category: Replication and repair
+  gene_name: dnaA
+  locus_tag: SynWH7803_0702
+  organism_name: Synechococcus WH7803
+  product: chromosomal replication initiator protein
+- gene_category: Replication and repair
+  gene_name: nth
+  locus_tag: SynWH7803_0798
+  organism_name: Synechococcus WH7803
+  product: endonuclease III
+- gene_category: Replication and repair
+  gene_name: yedK
+  locus_tag: SynWH7803_0828
+  organism_name: Synechococcus WH7803
+  product: putative SOS response associated peptidase
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_0901
+  organism_name: Synechococcus WH7803
+  product: putative nuclease
+- gene_category: Replication and repair
+  gene_name: dnaE
+  locus_tag: SynWH7803_1067
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase III, alpha subunit
+- gene_category: Replication and repair
+  gene_name: ruvA
+  locus_tag: SynWH7803_1070
+  organism_name: Synechococcus WH7803
+  product: holliday junction ATP-dependent DNA helicase RuvA
+- gene_category: Replication and repair
+  gene_name: dnaG
+  locus_tag: SynWH7803_1073
+  organism_name: Synechococcus WH7803
+  product: DNA primase
+- gene_category: Replication and repair
+  gene_name: umuC
+  locus_tag: SynWH7803_1080
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase V, subunit C
+- gene_category: Replication and repair
+  gene_name: umuD
+  locus_tag: SynWH7803_1081
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase V, subunit D
+- gene_category: Replication and repair
+  gene_name: tldD
+  locus_tag: SynWH7803_1101
+  organism_name: Synechococcus WH7803
+  product: modulator of DNA gyrase
+- gene_category: Replication and repair
+  gene_name: recJ
+  locus_tag: SynWH7803_1111
+  organism_name: Synechococcus WH7803
+  product: single-stranded DNA-specific exonuclease
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_1171
+  organism_name: Synechococcus WH7803
+  product: metallophosphoesterase, DNA ligase-associated
+- gene_category: Stress response and adaptation
+  gene_name: null
+  locus_tag: SynWH7803_1181
+  organism_name: Synechococcus WH7803
+  product: NUDIX hydrolase superfamily
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_1188
+  organism_name: Synechococcus WH7803
+  product: ATP-dependent Lhr-N-terminus-like helicase
+- gene_category: Replication and repair
+  gene_name: uvrC
+  locus_tag: SynWH7803_1269
+  organism_name: Synechococcus WH7803
+  product: excinuclease UvrABC complex, endonuclease subunit
+- gene_category: Stress response and adaptation
+  gene_name: null
+  locus_tag: SynWH7803_1271
+  organism_name: Synechococcus WH7803
+  product: deoxyribodipyrimidine photolyase-like, FAD-domain containing protein
+- gene_category: Replication and repair
+  gene_name: recG
+  locus_tag: SynWH7803_1321
+  organism_name: Synechococcus WH7803
+  product: ATP-dependent DNA helicase
+- gene_category: Replication and repair
+  gene_name: alkB
+  locus_tag: SynWH7803_1411
+  organism_name: Synechococcus WH7803
+  product: alpha-ketoglutarate-dependent dioxygenase, AlkB-like superfamily
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_1456
+  organism_name: Synechococcus WH7803
+  product: putative nuclease
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_1474
+  organism_name: Synechococcus WH7803
+  product: uracil-DNA glycosylase
+- gene_category: Replication and repair
+  gene_name: mfd
+  locus_tag: SynWH7803_1480
+  organism_name: Synechococcus WH7803
+  product: transcription-repair coupling factor
+- gene_category: Coenzyme metabolism
+  gene_name: nrdJ
+  locus_tag: SynWH7803_1496
+  organism_name: Synechococcus WH7803
+  product: ribonucleoside-diphosphate reductase
+- gene_category: Replication and repair
+  gene_name: recC
+  locus_tag: SynWH7803_1507
+  organism_name: Synechococcus WH7803
+  product: exodeoxyribonuclease V (RecBCD complex), gamma subunit
+- gene_category: Replication and repair
+  gene_name: recB
+  locus_tag: SynWH7803_1508
+  organism_name: Synechococcus WH7803
+  product: exodeoxyribonuclease V (RecBCD complex), beta subunit
+- gene_category: Replication and repair
+  gene_name: recD
+  locus_tag: SynWH7803_1509
+  organism_name: Synechococcus WH7803
+  product: exodeoxyribonuclease V (RecBCD complex), alpha subunit
+- gene_category: Replication and repair
+  gene_name: recR
+  locus_tag: SynWH7803_1525
+  organism_name: Synechococcus WH7803
+  product: recombination protein RecR
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_1567
+  organism_name: Synechococcus WH7803
+  product: UvrD-like P-loop containing nucleoside triphosphate hydrolase
+- gene_category: Replication and repair
+  gene_name: gyrA
+  locus_tag: SynWH7803_1589
+  organism_name: Synechococcus WH7803
+  product: DNA gyrase, A subunit
+- gene_category: Replication and repair
+  gene_name: ruvC
+  locus_tag: SynWH7803_1601
+  organism_name: Synechococcus WH7803
+  product: crossover junction endodeoxyribonuclease RuvC
+- gene_category: Replication and repair
+  gene_name: polA
+  locus_tag: SynWH7803_1617
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase I
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_1632
+  organism_name: Synechococcus WH7803
+  product: ATP-dependent DNA helicase
+- gene_category: Replication and repair
+  gene_name: ybaZ
+  locus_tag: SynWH7803_1780
+  organism_name: Synechococcus WH7803
+  product: 6-O-alkylguanine DNA alkyltransferase-like protein
+- gene_category: Stress response and adaptation
+  gene_name: xthA
+  locus_tag: SynWH7803_1819
+  organism_name: Synechococcus WH7803
+  product: exodeoxyribonuclease III
+- gene_category: Replication and repair
+  gene_name: topA
+  locus_tag: SynWH7803_1883
+  organism_name: Synechococcus WH7803
+  product: DNA topoisomerase I, omega subunit
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_2040
+  organism_name: Synechococcus WH7803
+  product: ATP-dependent DNA/RNA helicase, superfamily 1/2
+- gene_category: Replication and repair
+  gene_name: mutS2
+  locus_tag: SynWH7803_2097
+  organism_name: Synechococcus WH7803
+  product: DNA mismatch repair protein, MutS family
+- gene_category: Replication and repair
+  gene_name: null
+  locus_tag: SynWH7803_2114
+  organism_name: Synechococcus WH7803
+  product: putative nuclease
+- gene_category: Replication and repair
+  gene_name: rarA
+  locus_tag: SynWH7803_2168
+  organism_name: Synechococcus WH7803
+  product: recombination factor
+- gene_category: Replication and repair
+  gene_name: xseA
+  locus_tag: SynWH7803_2193
+  organism_name: Synechococcus WH7803
+  product: exodeoxyribonuclease VII, large subunit
+- gene_category: Replication and repair
+  gene_name: xseB
+  locus_tag: SynWH7803_2194
+  organism_name: Synechococcus WH7803
+  product: exodeoxyribonuclease VII, small subunit
+- gene_category: Replication and repair
+  gene_name: holB
+  locus_tag: SynWH7803_2243
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase III, delta^ subunit
+- gene_category: Replication and repair
+  gene_name: radA
+  locus_tag: SynWH7803_2247
+  organism_name: Synechococcus WH7803
+  product: DNA repair protein Sms/RadA
+- gene_category: Replication and repair
+  gene_name: hepA
+  locus_tag: SynWH7803_2400
+  organism_name: Synechococcus WH7803
+  product: superfamily II DNA/RNA helicases, SNF2 family
+- gene_category: Replication and repair
+  gene_name: dnaB
+  locus_tag: SynWH7803_2419
+  organism_name: Synechococcus WH7803
+  product: replicative DNA helicase
+- gene_category: Stress response and adaptation
+  gene_name: ligA
+  locus_tag: SynWH7803_2428
+  organism_name: Synechococcus WH7803
+  product: DNA ligase, NAD-dependent
+- gene_category: Replication and repair
+  gene_name: uvrA
+  locus_tag: SynWH7803_2529
+  organism_name: Synechococcus WH7803
+  product: excinuclease UvrABC complex, ATPase subunit
+- gene_category: Stress response and adaptation
+  gene_name: recN
+  locus_tag: SynWH7803_2530
+  organism_name: Synechococcus WH7803
   product: ATP-dependent DNA repair protein RecN
 - gene_category: Replication and repair
   gene_name: null

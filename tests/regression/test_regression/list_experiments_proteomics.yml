@@ -1,5 +1,5 @@
 case_id: list_experiments_proteomics
-row_count: 4
+row_count: 7
 rows:
 - background_factors:
   - coculture
@@ -191,3 +191,92 @@ rows:
   - '1424'
   treatment_type:
   - nitrogen_stress
+- background_factors: []
+  coculture_partner: Synechococcus elongatus PCC 7942
+  experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_proteomics
+  experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
+    putida cscRABY (proteomics)
+  gene_count: 228
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Pseudomonas putida KT2440
+  publication_doi: 10.1038/s42003-024-06098-5
+  significant_down_count: 21
+  significant_up_count: 70
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '21'
+  time_point_significant_up:
+  - '70'
+  time_point_totals:
+  - '228'
+  treatment_type:
+  - coculture
+- background_factors: []
+  coculture_partner: Pseudomonas putida KT2440
+  experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
+  experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
+    elongatus cscB (proteomics)
+  gene_count: 524
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Synechococcus elongatus PCC 7942
+  publication_doi: 10.1038/s42003-024-06098-5
+  significant_down_count: 81
+  significant_up_count: 70
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '81'
+  time_point_significant_up:
+  - '70'
+  time_point_totals:
+  - '524'
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Escherichia coli
+  experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_proteomics
+  experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
+    (proteomics)
+  gene_count: 34
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Synechococcus elongatus UTEX 2973
+  publication_doi: 10.1186/s13068-022-02163-5
+  significant_down_count: 0
+  significant_up_count: 24
+  table_scope: significant_only
+  table_scope_detail: Table S4 lists selected DE proteins (fold change > 1.2, P <
+    0.05 by t-test of 9 pairwise comparisons)
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '24'
+  time_point_totals:
+  - '34'
+  treatment_type:
+  - coculture

@@ -1,5 +1,5 @@
 case_id: list_publications_organism
-row_count: 11
+row_count: 13
 rows:
 - authors:
   - Daniel Sher
@@ -134,6 +134,30 @@ rows:
   - carbon_stress
   year: 2015
 - authors:
+  - Bang Wang
+  - Chaoguang Tian
+  - GeQu
+  - Hexin Lv
+  - Huifeng Jiang
+  - Lina Lu
+  - Yanhe Ma
+  background_factors:
+  - axenic
+  - continuous_light
+  doi: 10.1186/1471-2180-14-11
+  experiment_count: 1
+  journal: BMC Microbiology
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MED4
+  study_type: RNA-Seq, Transcriptomics
+  title: The transcriptome landscape of Prochlorococcus MED4 and the factors for stabilizing
+    the core genome
+  treatment_types:
+  - none
+  year: 2014
+- authors:
   - Anne W Thompson
   - Katherine Huang
   - Mak A Saito
@@ -155,6 +179,35 @@ rows:
   treatment_types:
   - iron_stress
   year: 2011
+- authors:
+  - Claudia Steglich
+  - Debbie Lindell
+  - Erik R. Zinser
+  - Luke R. Thompson
+  - Matthew A. Wright
+  - Matthias E. Futschik
+  - Maureen L. Coleman
+  - Nathan McNulty
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  - Zackary I. Johnson
+  background_factors:
+  - axenic
+  - diel_cycle
+  doi: 10.1371/journal.pone.0005135
+  experiment_count: 1
+  journal: PLOS ONE
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Transcriptomics
+  title: Choreography of the Transcriptome, Photophysiology, and Cell Cycle of a Minimal
+    Photoautotroph, Prochlorococcus
+  treatment_types:
+  - diel_cycle
+  year: 2009
 - authors:
   - Debbie Lindell
   - George M. Church

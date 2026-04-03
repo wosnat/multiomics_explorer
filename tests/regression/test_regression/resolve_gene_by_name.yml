@@ -1,5 +1,5 @@
 case_id: resolve_gene_by_name
-row_count: 13
+row_count: 22
 rows:
 - gene_name: dnaN
   locus_tag: A9601_00001
@@ -18,6 +18,10 @@ rows:
   organism_name: Alteromonas macleodii EZ55
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
+  locus_tag: M744_03100
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
   locus_tag: MIT1002_00002
   organism_name: Alteromonas macleodii MIT1002
   product: DNA polymerase III subunit beta
@@ -28,6 +32,10 @@ rows:
 - gene_name: dnaN
   locus_tag: P9301_00001
   organism_name: Prochlorococcus MIT9301
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: P9303_00001
+  organism_name: Prochlorococcus MIT9303
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: PMM0001
@@ -46,10 +54,38 @@ rows:
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
+  locus_tag: PP_0011
+  organism_name: Pseudomonas putida KT2440
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: SPO0150
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: SYNPCC7002_A1263
+  organism_name: Synechococcus PCC 7002
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
   locus_tag: SYNW0001
   organism_name: Synechococcus WH8102
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
+  locus_tag: Sputw3181_0002
+  organism_name: Shewanella sp. W3-18-1
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: SynWH7803_0001
+  organism_name: Synechococcus WH7803
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: Synpcc7942_0001
+  organism_name: Synechococcus elongatus PCC 7942
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
   locus_tag: sync_0001
   organism_name: Synechococcus CC9311
   product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: tll2349
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: DNA polymerase III subunit beta

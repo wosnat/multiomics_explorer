@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 21
+row_count: 32
 rows:
 - authors:
   - James I. Mullet
@@ -79,6 +79,90 @@ rows:
   - darkness
   year: 2024
 - authors:
+  - Andreas Kremling
+  - Chen Meng
+  - Franziska Kratzl
+  - Jagroop Pandhal
+  - Karin Kleigrewe
+  - Katharina Pflüger-Grau
+  - Marlene Urban
+  - Mengxun Shi
+  background_factors: []
+  doi: 10.1038/s42003-024-06098-5
+  experiment_count: 4
+  journal: Communications Biology
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organisms:
+  - Pseudomonas putida KT2440
+  - Synechococcus elongatus PCC 7942
+  study_type: multi-omics (transcriptomics, proteomics, metabolomics); synthetic co-culture
+  title: Pseudomonas putida as saviour for troubled Synechococcus elongatus in a synthetic
+    co-culture – interaction studies based on a multi-OMICs approach
+  treatment_types:
+  - coculture
+  year: 2024
+- authors:
+  - Alessandro Mongero
+  - Alexis Yelton
+  - Elaina Thomas
+  - Elizabeth B. Kujawinska
+  - Giovanna Capovilla
+  - Gregory P. Fournier
+  - Gretchen Swarr
+  - Jack G. Payette
+  - Jacob R. Waldbauer
+  - Julia Schwartzman
+  - Krista Longnecker
+  - Kurt G. Castro
+  - Melissa C. Kido-Soule
+  - Otto X. Cordero
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  - Thomas Hackl
+  - Xinda Lu
+  background_factors:
+  - axenic
+  - continuous_light
+  doi: 10.1073/pnas.2213271120
+  experiment_count: 2
+  journal: Proceedings of the National Academy of Sciences
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9313
+  study_type: Comparative genomics and enzymatic assays
+  title: Chitin utilization by marine picocyanobacteria and the evolution of a planktonic
+    lifestyle
+  treatment_types:
+  - carbon
+  year: 2023
+- authors:
+  - ' Ana M. Cabello'
+  - ' Antonio S. Palacio'
+  - ' José M. González'
+  - ' Laura Alonso-Sáez'
+  - ' Laurence Garczarek'
+  - ' Semidán Robaina-Estévez'
+  - ' Ángel López-Urrutia'
+  background_factors:
+  - axenic
+  - diel_cycle
+  doi: 10.1128/mbio.03425-22
+  experiment_count: 1
+  journal: mBio
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MIT9301
+  study_type: RNA-Seq, Transcriptomics
+  title: Transcriptional Mechanisms of Thermal Acclimation in Prochlorococcus
+  treatment_types:
+  - temperature
+  year: 2023
+- authors:
   - Huan Liu
   - Junde Dong
   - Lijuan Long
@@ -123,6 +207,31 @@ rows:
     Alteromonas in co-culture with picocyanobacteria
   treatment_types:
   - carbon_stress
+  - coculture
+  year: 2022
+- authors:
+  - Jiajia Ma
+  - Lei Chen
+  - Meijin Ren
+  - Taohong Guo
+  - Weiwen Zhang
+  - Xinyu Song
+  background_factors:
+  - continuous_light
+  doi: 10.1186/s13068-022-02163-5
+  experiment_count: 2
+  journal: Biotechnology for Biofuels and Bioproducts
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organisms:
+  - Escherichia coli
+  - Synechococcus elongatus UTEX 2973
+  study_type: Transcriptomics|Proteomics|Metabolomics
+  title: Cross-feeding between cyanobacterium Synechococcus and Escherichia coli in
+    an artificial autotrophic–heterotrophic coculture system revealed by integrated
+    omics analysis
+  treatment_types:
   - coculture
   year: 2022
 - authors:
@@ -179,6 +288,28 @@ rows:
   - viral
   year: 2019
 - authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
+  - continuous_light
+  doi: 10.1111/1462-2920.14012
+  experiment_count: 4
+  journal: Environmental Microbiology
+  omics_types:
+  - EXOPROTEOMICS
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Synechococcus WH7803
+  study_type: Exoproteomics
+  title: '100 Days of marine Synechococcus–Ruegeria pomeroyi interaction: A detailed
+    analysis of the exoproteome'
+  treatment_types:
+  - coculture
+  year: 2018
+- authors:
   - Allison Coe
   - Sallie W. Chisholm
   - Sara E. Roggensack
@@ -229,6 +360,35 @@ rows:
   - carbon_stress
   year: 2018
 - authors:
+  - Alexander S. Beliaev
+  - Donald A. Bryant
+  - Eric A. Hill
+  - Hans C. Bernstein
+  - Janet K. Jansson
+  - Jim K. Fredrickson
+  - Margaret F. Romine
+  - Natalie C. Sadler
+  - Ryan S. McClure
+  - Vera Thiel
+  - William B. Chrisler
+  - Young-Mo Kim
+  background_factors: []
+  doi: 10.1128/mSystems.00181-16
+  experiment_count: 1
+  journal: mSystems
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Meiothermus ruber
+  - Thermosynechococcus vestitus BP-1
+  study_type: Transcriptomics
+  title: 'Indirect Interspecies Regulation: Transcriptional and Physiological Responses
+    of a Cyanobacterium to Heterotrophic Partnership'
+  treatment_types:
+  - coculture
+  - light_stress
+  year: 2017
+- authors:
   - Andres Cubillos-Ruiz
   - Iva Neveux
   - Joseph J Grzymski
@@ -251,6 +411,28 @@ rows:
     of N-deprived Prochlorococcus cells
   treatment_types:
   - nitrogen_stress
+  year: 2017
+- authors:
+  - David J. Scanlan
+  - Despoina Sousoni
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Matthew Lloyd
+  background_factors:
+  - continuous_light
+  doi: 10.1038/nmicrobiol.2017.100
+  experiment_count: 3
+  journal: Nature Microbiology
+  omics_types:
+  - EXOPROTEOMICS
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Synechococcus WH7803
+  study_type: Proteomics|Long-term co-culture experiments
+  title: Nutrient recycling facilitates long-term stability of marine microbial phototroph
+    –heterotroph interactions
+  treatment_types:
+  - coculture
   year: 2017
 - authors:
   - Luke R. Thompson
@@ -376,6 +558,63 @@ rows:
   - phosphorus_stress
   year: 2015
 - authors:
+  - Alexander S Beliaev
+  - Allan Konopka
+  - Bryan E Linggi
+  - Donald A Bryant
+  - Eric A Hill
+  - Grigoriy E Pinchuk
+  - H Steven Wiley
+  - Hans C Bernstein
+  - Jim K Fredrickson
+  - Leo A Kucek
+  - Lye M Markillie
+  - Margie F Romine
+  - Margrethe Serres
+  - Nancy G Isern
+  - William B Chrisler
+  background_factors:
+  - continuous_light
+  doi: 10.1038/ismej.2014.69
+  experiment_count: 6
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Shewanella sp. W3-18-1
+  - Synechococcus PCC 7002
+  study_type: Transcriptomics
+  title: Inference of interactions in cyanobacterial–heterotrophic co-cultures via
+    transcriptome sequencing
+  treatment_types:
+  - carbon
+  - coculture
+  year: 2014
+- authors:
+  - Bang Wang
+  - Chaoguang Tian
+  - GeQu
+  - Hexin Lv
+  - Huifeng Jiang
+  - Lina Lu
+  - Yanhe Ma
+  background_factors:
+  - axenic
+  - continuous_light
+  doi: 10.1186/1471-2180-14-11
+  experiment_count: 1
+  journal: BMC Microbiology
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Prochlorococcus MED4
+  study_type: RNA-Seq, Transcriptomics
+  title: The transcriptome landscape of Prochlorococcus MED4 and the factors for stabilizing
+    the core genome
+  treatment_types:
+  - none
+  year: 2014
+- authors:
   - Anne W Thompson
   - Katherine Huang
   - Mak A Saito
@@ -397,6 +636,56 @@ rows:
   treatment_types:
   - iron_stress
   year: 2011
+- authors:
+  - Claudia Steglich
+  - Debbie Lindell
+  - Erik R. Zinser
+  - Luke R. Thompson
+  - Matthew A. Wright
+  - Matthias E. Futschik
+  - Maureen L. Coleman
+  - Nathan McNulty
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  - Zackary I. Johnson
+  background_factors:
+  - axenic
+  - diel_cycle
+  doi: 10.1371/journal.pone.0005135
+  experiment_count: 1
+  journal: PLOS ONE
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Transcriptomics
+  title: Choreography of the Transcriptome, Photophysiology, and Cell Cycle of a Minimal
+    Photoautotroph, Prochlorococcus
+  treatment_types:
+  - diel_cycle
+  year: 2009
+- authors:
+  - Brian Palenik
+  - D. Aaron Johnson
+  - Ian T. Paulsen
+  - Katherine Phillippy
+  - Vera Tai
+  background_factors:
+  - continuous_light
+  doi: 10.1111/j.1462-2920.2009.01997.x
+  experiment_count: 1
+  journal: Environmental Microbiology
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Synechococcus WH8102
+  - Vibrio parahaemolyticus
+  study_type: Microarray
+  title: Whole-genome microarray analyses of Synechococcus–Vibrio interaction
+  treatment_types:
+  - coculture
+  year: 2009
 - authors:
   - Debbie Lindell
   - George M. Church

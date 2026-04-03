@@ -780,47 +780,67 @@ class TestGeneResponseProfileContract:
 
 
 # ---------------------------------------------------------------------------
-# list_gene_clusters
+# list_clustering_analyses
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
-class TestListGeneClustersContract:
+class TestListClusteringAnalysesContract:
     def test_returns_dict_envelope(self, conn):
-        result = api.list_gene_clusters(conn=conn)
+        result = api.list_clustering_analyses(conn=conn)
         expected_keys = {
             "total_entries", "total_matching",
             "by_organism", "by_cluster_type", "by_treatment_type",
-            "by_omics_type", "by_publication",
+            "by_background_factors", "by_omics_type",
+            "score_max", "score_median",
             "returned", "offset", "truncated", "results",
         }
         assert expected_keys <= set(result.keys())
-        assert result["total_entries"] >= 16
+        assert result["total_entries"] >= 2
 
     def test_search_text(self, conn):
-        result = api.list_gene_clusters(
-            search_text="transport", conn=conn)
+        result = api.list_clustering_analyses(
+            search_text="starvation", conn=conn)
         assert result["total_matching"] >= 1
-        assert "score_max" in result
+        assert result["score_max"] is not None
 
     def test_organism_filter(self, conn):
-        result = api.list_gene_clusters(
+        result = api.list_clustering_analyses(
             organism="MED4", conn=conn)
-        assert result["total_matching"] >= 9
+        assert result["total_matching"] >= 1
 
     def test_result_keys_compact(self, conn):
-        result = api.list_gene_clusters(limit=1, conn=conn)
+        result = api.list_clustering_analyses(limit=1, conn=conn)
         if result["results"]:
-            expected = {"cluster_id", "name", "organism_name",
-                        "cluster_type", "treatment_type",
-                        "member_count", "source_paper"}
+            expected = {
+                "analysis_id", "name", "organism_name",
+                "cluster_method", "cluster_type", "cluster_count",
+                "total_gene_count", "treatment_type",
+                "background_factors", "omics_type",
+                "experiment_ids", "clusters",
+            }
             assert expected <= set(result["results"][0].keys())
 
     def test_result_keys_verbose(self, conn):
-        result = api.list_gene_clusters(
+        result = api.list_clustering_analyses(
             verbose=True, limit=1, conn=conn)
         if result["results"]:
-            for key in ("functional_description", "behavioral_description",
-                        "cluster_method"):
+            for key in ("treatment", "light_condition",
+                        "experimental_context"):
                 assert key in result["results"][0]
+
+    def test_inline_clusters_present(self, conn):
+        result = api.list_clustering_analyses(limit=1, conn=conn)
+        if result["results"]:
+            clusters = result["results"][0]["clusters"]
+            assert isinstance(clusters, list)
+            if clusters:
+                expected_cluster_keys = {"cluster_id", "name", "member_count"}
+                assert expected_cluster_keys <= set(clusters[0].keys())
+
+    def test_summary_mode(self, conn):
+        result = api.list_clustering_analyses(summary=True, conn=conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] >= 2
 
 
 # ---------------------------------------------------------------------------
@@ -835,7 +855,8 @@ class TestGeneClustersByGeneContract:
             "total_matching", "total_clusters",
             "genes_with_clusters", "genes_without_clusters",
             "not_found", "not_matched",
-            "by_cluster_type", "by_treatment_type", "by_publication",
+            "by_cluster_type", "by_treatment_type",
+            "by_background_factors", "by_analysis",
             "returned", "offset", "truncated", "results",
         }
         assert expected_keys <= set(result.keys())
@@ -845,6 +866,33 @@ class TestGeneClustersByGeneContract:
             locus_tags=["PMM0370"], conn=conn)
         assert result["genes_with_clusters"] >= 1
         assert result["total_clusters"] >= 1
+
+    def test_result_keys_compact(self, conn):
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"], conn=conn)
+        if result["results"]:
+            expected = {
+                "locus_tag", "gene_name", "cluster_id", "cluster_name",
+                "cluster_type", "membership_score",
+                "analysis_id", "analysis_name",
+                "treatment_type", "background_factors",
+            }
+            assert expected <= set(result["results"][0].keys())
+
+    def test_result_keys_verbose(self, conn):
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"], verbose=True, conn=conn)
+        if result["results"]:
+            for key in ("cluster_functional_description",
+                        "cluster_behavioral_description",
+                        "cluster_method", "member_count"):
+                assert key in result["results"][0]
+
+    def test_by_analysis_in_envelope(self, conn):
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"], conn=conn)
+        assert "by_analysis" in result
+        assert isinstance(result["by_analysis"], list)
 
     def test_unknown_gene_in_not_found(self, conn):
         result = api.gene_clusters_by_gene(
@@ -885,6 +933,23 @@ class TestGenesInClusterContract:
                     "organism_name", "cluster_id", "cluster_name",
                     "membership_score"}
         assert expected <= set(result["results"][0].keys())
+
+    def test_analysis_id_mode(self, conn):
+        result = api.genes_in_cluster(
+            analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation",
+            conn=conn)
+        assert result["total_matching"] >= 1
+        assert "analysis_name" in result
+
+    def test_verbose_keys(self, conn):
+        result = api.genes_in_cluster(
+            cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8"],
+            verbose=True, limit=1, conn=conn)
+        if result["results"]:
+            for key in ("gene_function_description",
+                        "cluster_functional_description",
+                        "cluster_behavioral_description"):
+                assert key in result["results"][0]
 
     def test_unknown_cluster_in_not_found(self, conn):
         result = api.genes_in_cluster(

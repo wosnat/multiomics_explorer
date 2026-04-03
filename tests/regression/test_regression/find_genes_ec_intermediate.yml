@@ -1,5 +1,5 @@
 case_id: find_genes_ec_intermediate
-row_count: 510
+row_count: 860
 rows:
 - gene_category: Coenzyme metabolism
   gene_name: pdxA
@@ -1015,6 +1015,112 @@ rows:
   locus_tag: EZ55_04286
   organism_name: Alteromonas macleodii EZ55
   product: NAD(P)-dependent alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: ribD
+  locus_tag: M744_02040
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
+    reductase RibD
+- gene_category: Unknown
+  gene_name: gndA
+  locus_tag: M744_02905
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: NADP-dependent phosphogluconate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_03610
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_03885
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_04305
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: zwf
+  locus_tag: M744_04605
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: rfbD
+  locus_tag: M744_05885
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: dTDP-4-dehydrorhamnose reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_05930
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: homoserine dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_07165
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_07520
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: PQQ-dependent sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_08220
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: glycerol dehydrogenase
+- gene_category: Unknown
+  gene_name: serA
+  locus_tag: M744_08505
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: phosphoglycerate dehydrogenase
+- gene_category: Unknown
+  gene_name: leuB
+  locus_tag: M744_08525
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_08570
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: M744_08600
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: ilvC
+  locus_tag: M744_08755
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: ketol-acid reductoisomerase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_08910
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: glucose 1-dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_09880
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_10140
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: NAD(P)-dependent malic enzyme
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: M744_11230
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: NAD-dependent epimerase/dehydratase family protein
+- gene_category: Unknown
+  gene_name: fabG
+  locus_tag: M744_13375
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: 3-oxoacyl-[acyl-carrier-protein] reductase
 - gene_category: Amino acid metabolism
   gene_name: aroE
   locus_tag: MIT1002_00029
@@ -1650,6 +1756,152 @@ rows:
   product: shikimate 5-dehydrogenase
 - gene_category: Coenzyme metabolism
   gene_name: pdxA
+  locus_tag: P9303_00321
+  organism_name: Prochlorococcus MIT9303
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
+  locus_tag: P9303_00961
+  organism_name: Prochlorococcus MIT9303
+  product: dTDP-4-dehydrorhamnose reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: P9303_01421
+  organism_name: Prochlorococcus MIT9303
+  product: dehydrogenases with different specificities
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: P9303_01461
+  organism_name: Prochlorococcus MIT9303
+  product: hypothetical protein
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
+  locus_tag: P9303_02071
+  organism_name: Prochlorococcus MIT9303
+  product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
+- gene_category: Amino acid metabolism
+  gene_name: hisD
+  locus_tag: P9303_04331
+  organism_name: Prochlorococcus MIT9303
+  product: histidinol dehydrogenase
+- gene_category: Amino acid metabolism
+  gene_name: serA
+  locus_tag: P9303_05241
+  organism_name: Prochlorococcus MIT9303
+  product: D-3-phosphoglycerate dehydrogenase (PGDH)
+- gene_category: Lipid metabolism
+  gene_name: fabG
+  locus_tag: P9303_06521
+  organism_name: Prochlorococcus MIT9303
+  product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD1
+  locus_tag: P9303_06971
+  organism_name: Prochlorococcus MIT9303
+  product: glycolate oxidase
+- gene_category: Lipid metabolism
+  gene_name: null
+  locus_tag: P9303_07591
+  organism_name: Prochlorococcus MIT9303
+  product: short-chain dehydrogenase/reductase (SDR) superfamily
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
+  locus_tag: P9303_08651
+  organism_name: Prochlorococcus MIT9303
+  product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
+- gene_category: Amino acid metabolism
+  gene_name: thrA
+  locus_tag: P9303_08881
+  organism_name: Prochlorococcus MIT9303
+  product: homoserine dehydrogenase
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
+  locus_tag: P9303_09131
+  organism_name: Prochlorococcus MIT9303
+  product: inositol-5-monophosphate dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
+  locus_tag: P9303_09401
+  organism_name: Prochlorococcus MIT9303
+  product: glucose-6-phosphate 1-dehydrogenase
+- gene_category: Lipid metabolism
+  gene_name: gldA
+  locus_tag: P9303_09901
+  organism_name: Prochlorococcus MIT9303
+  product: glycerol dehydrogenase
+- gene_category: Stress response and adaptation
+  gene_name: ptxD
+  locus_tag: P9303_11271
+  organism_name: Prochlorococcus MIT9303
+  product: phosphonate dehydrogenase
+- gene_category: Stress response and adaptation
+  gene_name: gnd
+  locus_tag: P9303_16871
+  organism_name: Prochlorococcus MIT9303
+  product: 6-phosphogluconate dehydrogenase
+- gene_category: Amino acid metabolism
+  gene_name: leuB
+  locus_tag: P9303_17341
+  organism_name: Prochlorococcus MIT9303
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: P9303_18351
+  organism_name: Prochlorococcus MIT9303
+  product: short chain dehydrogenase family protein
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
+  locus_tag: P9303_19231
+  organism_name: Prochlorococcus MIT9303
+  product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
+    reductase
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
+  locus_tag: P9303_19871
+  organism_name: Prochlorococcus MIT9303
+  product: alternative glycolate dehydrogenase GlcD2
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
+  locus_tag: P9303_20051
+  organism_name: Prochlorococcus MIT9303
+  product: ketol-acid reductoisomerase
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
+  locus_tag: P9303_20971
+  organism_name: Prochlorococcus MIT9303
+  product: malate:quinone oxidoreductase
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
+  locus_tag: P9303_25391
+  organism_name: Prochlorococcus MIT9303
+  product: UDP-glucose 6-dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
+  locus_tag: P9303_25761
+  organism_name: Prochlorococcus MIT9303
+  product: isocitrate dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: glcF
+  locus_tag: P9303_25781
+  organism_name: Prochlorococcus MIT9303
+  product: glycolate oxidase iron-sulfur subunit
+- gene_category: Carbohydrate metabolism
+  gene_name: glcE
+  locus_tag: P9303_25811
+  organism_name: Prochlorococcus MIT9303
+  product: glycolate oxidase subunit GlcE
+- gene_category: Unknown
+  gene_name: mmsB
+  locus_tag: P9303_27951
+  organism_name: Prochlorococcus MIT9303
+  product: NAD binding domain of 6-phosphogluconate dehydrogenase family protein
+- gene_category: Amino acid metabolism
+  gene_name: aroE
+  locus_tag: P9303_30051
+  organism_name: Prochlorococcus MIT9303
+  product: shikimate 5-dehydrogenase
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
   locus_tag: PMM0028
   organism_name: Prochlorococcus MED4
   product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
@@ -2222,6 +2474,929 @@ rows:
   locus_tag: PMT_1937
   organism_name: Prochlorococcus MIT9313
   product: glycolate oxidase iron-sulfur subunit
+- gene_category: Unknown
+  gene_name: aroE
+  locus_tag: PP_0074
+  organism_name: Pseudomonas putida KT2440
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_0302
+  organism_name: Pseudomonas putida KT2440
+  product: L-carnitine dehydrogenase
+- gene_category: Unknown
+  gene_name: pdxA
+  locus_tag: PP_0402
+  organism_name: Pseudomonas putida KT2440
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_0429
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_0488
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_0500
+  organism_name: Pseudomonas putida KT2440
+  product: sugar nucleotide-binding protein
+- gene_category: Unknown
+  gene_name: ribD
+  locus_tag: PP_0514
+  organism_name: Pseudomonas putida KT2440
+  product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
+    reductase RibD
+- gene_category: Unknown
+  gene_name: acoA
+  locus_tag: PP_0555
+  organism_name: Pseudomonas putida KT2440
+  product: thiamine pyrophosphate-dependent dehydrogenase E1 component subunit alpha
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_0581
+  organism_name: Pseudomonas putida KT2440
+  product: 3-oxoacyl-ACP reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_0664
+  organism_name: Pseudomonas putida KT2440
+  product: homoserine dehydrogenase
+- gene_category: Unknown
+  gene_name: mqo
+  locus_tag: PP_0751
+  organism_name: Pseudomonas putida KT2440
+  product: malate dehydrogenase (quinone)
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_0918
+  organism_name: Pseudomonas putida KT2440
+  product: NAD-dependent epimerase/dehydratase family protein
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: PP_0966
+  organism_name: Pseudomonas putida KT2440
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: zwfA
+  locus_tag: PP_1022
+  organism_name: Pseudomonas putida KT2440
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: guaB
+  locus_tag: PP_1031
+  organism_name: Pseudomonas putida KT2440
+  product: IMP dehydrogenase
+- gene_category: Unknown
+  gene_name: glpD
+  locus_tag: PP_1073
+  organism_name: Pseudomonas putida KT2440
+  product: glycerol-3-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_1143
+  organism_name: Pseudomonas putida KT2440
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_1171
+  organism_name: Pseudomonas putida KT2440
+  product: NAD-dependent epimerase/dehydratase family protein
+- gene_category: Unknown
+  gene_name: mqo
+  locus_tag: PP_1251
+  organism_name: Pseudomonas putida KT2440
+  product: malate dehydrogenase (quinone)
+- gene_category: Unknown
+  gene_name: ghrB
+  locus_tag: PP_1261
+  organism_name: Pseudomonas putida KT2440
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: panE
+  locus_tag: PP_1351
+  organism_name: Pseudomonas putida KT2440
+  product: putative 2-dehydropantoate 2-reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_1392
+  organism_name: Pseudomonas putida KT2440
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: gcd
+  locus_tag: PP_1444
+  organism_name: Pseudomonas putida KT2440
+  product: glucose/quinate/shikimate family membrane-bound PQQ-dependent dehydrogenase
+- gene_category: Unknown
+  gene_name: hom
+  locus_tag: PP_1470
+  organism_name: Pseudomonas putida KT2440
+  product: homoserine dehydrogenase
+- gene_category: Unknown
+  gene_name: ispC
+  locus_tag: PP_1597
+  organism_name: Pseudomonas putida KT2440
+  product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_1649
+  organism_name: Pseudomonas putida KT2440
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: rfbD
+  locus_tag: PP_1784
+  organism_name: Pseudomonas putida KT2440
+  product: dTDP-4-dehydrorhamnose reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_1852
+  organism_name: Pseudomonas putida KT2440
+  product: 3-oxoacyl-ACP reductase family protein
+- gene_category: Unknown
+  gene_name: fabG
+  locus_tag: PP_1914
+  organism_name: Pseudomonas putida KT2440
+  product: 3-oxoacyl-ACP reductase FabG
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_1946
+  organism_name: Pseudomonas putida KT2440
+  product: glucose 1-dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_1951
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_1953
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: leuB
+  locus_tag: PP_1988
+  organism_name: Pseudomonas putida KT2440
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Unknown
+  gene_name: mtlD
+  locus_tag: PP_2052
+  organism_name: Pseudomonas putida KT2440
+  product: bifunctional mannitol-1-phosphate dehydrogenase/phosphatase
+- gene_category: Unknown
+  gene_name: pdxB
+  locus_tag: PP_2117
+  organism_name: Pseudomonas putida KT2440
+  product: 4-phosphoerythronate dehydrogenase PdxB
+- gene_category: Unknown
+  gene_name: yliI
+  locus_tag: PP_2198
+  organism_name: Pseudomonas putida KT2440
+  product: PQQ-dependent sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: fadBA
+  locus_tag: PP_2214
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2325
+  organism_name: Pseudomonas putida KT2440
+  product: putative 2-dehydropantoate 2-reductase
+- gene_category: Unknown
+  gene_name: dkgB
+  locus_tag: PP_2368
+  organism_name: Pseudomonas putida KT2440
+  product: 2,5-didehydrogluconate reductase DkgB
+- gene_category: Unknown
+  gene_name: aroE
+  locus_tag: PP_2406
+  organism_name: Pseudomonas putida KT2440
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: calA
+  locus_tag: PP_2426
+  organism_name: Pseudomonas putida KT2440
+  product: vanillin reductase
+- gene_category: Unknown
+  gene_name: yqhD
+  locus_tag: PP_2492
+  organism_name: Pseudomonas putida KT2440
+  product: iron-containing alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2503
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2507
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: ligC
+  locus_tag: PP_2602
+  organism_name: Pseudomonas putida KT2440
+  product: Gfo/Idh/MocA family protein
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2608
+  organism_name: Pseudomonas putida KT2440
+  product: shikimate dehydrogenase family protein
+- gene_category: Unknown
+  gene_name: gbd
+  locus_tag: PP_2650
+  organism_name: Pseudomonas putida KT2440
+  product: iron-containing alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: exaA
+  locus_tag: PP_2674
+  organism_name: Pseudomonas putida KT2440
+  product: quinoprotein ethanol dehydrogenase
+- gene_category: Unknown
+  gene_name: yiaY
+  locus_tag: PP_2682
+  organism_name: Pseudomonas putida KT2440
+  product: alcohol dehydrogenase-like regulatory protein ErcA
+- gene_category: Unknown
+  gene_name: yhdF
+  locus_tag: PP_2723
+  organism_name: Pseudomonas putida KT2440
+  product: glucose 1-dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2737
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2783
+  organism_name: Pseudomonas putida KT2440
+  product: 3-oxoacyl-ACP reductase family protein
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2784
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2794
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2798
+  organism_name: Pseudomonas putida KT2440
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2803
+  organism_name: Pseudomonas putida KT2440
+  product: iron-containing alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: lhgO
+  locus_tag: PP_2910
+  organism_name: Pseudomonas putida KT2440
+  product: L-2-hydroxyglutarate oxidase
+- gene_category: Unknown
+  gene_name: mqo
+  locus_tag: PP_2925
+  organism_name: Pseudomonas putida KT2440
+  product: malate dehydrogenase (quinone)
+- gene_category: Unknown
+  gene_name: udg
+  locus_tag: PP_2926
+  organism_name: Pseudomonas putida KT2440
+  product: UDP-glucose dehydrogenase family protein
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2989
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_2998
+  organism_name: Pseudomonas putida KT2440
+  product: ketopantoate reductase family protein
+- gene_category: Unknown
+  gene_name: aroE
+  locus_tag: PP_3002
+  organism_name: Pseudomonas putida KT2440
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: hbdH
+  locus_tag: PP_3073
+  organism_name: Pseudomonas putida KT2440
+  product: 3-hydroxybutyrate dehydrogenase
+- gene_category: Unknown
+  gene_name: paaH
+  locus_tag: PP_3282
+  organism_name: Pseudomonas putida KT2440
+  product: 3-hydroxyacyl-CoA dehydrogenase PaaH
+- gene_category: Unknown
+  gene_name: yajO
+  locus_tag: PP_3370
+  organism_name: Pseudomonas putida KT2440
+  product: aldo/keto reductase
+- gene_category: Unknown
+  gene_name: ptxD
+  locus_tag: PP_3376
+  organism_name: Pseudomonas putida KT2440
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: kguE
+  locus_tag: PP_3379
+  organism_name: Pseudomonas putida KT2440
+  product: xylose isomerase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_3383
+  organism_name: Pseudomonas putida KT2440
+  product: GMC family oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_3384
+  organism_name: Pseudomonas putida KT2440
+  product: gluconate 2-dehydrogenase subunit 3 family protein
+- gene_category: Unknown
+  gene_name: quiA
+  locus_tag: PP_3569
+  organism_name: Pseudomonas putida KT2440
+  product: glucose/quinate/shikimate family membrane-bound PQQ-dependent dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_3613
+  organism_name: Pseudomonas putida KT2440
+  product: PQQ-dependent sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: glcD
+  locus_tag: PP_3745
+  organism_name: Pseudomonas putida KT2440
+  product: glycolate oxidase subunit GlcD
+- gene_category: Unknown
+  gene_name: glcE
+  locus_tag: PP_3746
+  organism_name: Pseudomonas putida KT2440
+  product: glycolate oxidase subunit GlcE
+- gene_category: Unknown
+  gene_name: glcF
+  locus_tag: PP_3747
+  organism_name: Pseudomonas putida KT2440
+  product: glycolate oxidase subunit GlcF
+- gene_category: Unknown
+  gene_name: hbd
+  locus_tag: PP_3755
+  organism_name: Pseudomonas putida KT2440
+  product: 3-hydroxybutyryl-CoA dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_3768
+  organism_name: Pseudomonas putida KT2440
+  product: shikimate 5-dehydrogenase
+- gene_category: Unknown
+  gene_name: adhP
+  locus_tag: PP_3839
+  organism_name: Pseudomonas putida KT2440
+  product: alcohol dehydrogenase AdhP
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_3926
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family oxidoreductase
+- gene_category: Unknown
+  gene_name: ybdR
+  locus_tag: PP_3970
+  organism_name: Pseudomonas putida KT2440
+  product: zinc-dependent alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: icd
+  locus_tag: PP_4011
+  organism_name: Pseudomonas putida KT2440
+  product: NADP-dependent isocitrate dehydrogenase
+- gene_category: Unknown
+  gene_name: idh
+  locus_tag: PP_4012
+  organism_name: Pseudomonas putida KT2440
+  product: NADP-dependent isocitrate dehydrogenase
+- gene_category: Unknown
+  gene_name: zwfB
+  locus_tag: PP_4042
+  organism_name: Pseudomonas putida KT2440
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: gntZ
+  locus_tag: PP_4043
+  organism_name: Pseudomonas putida KT2440
+  product: phosphogluconate dehydrogenase (NAD(+)-dependent, decarboxylating)
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_4169
+  organism_name: Pseudomonas putida KT2440
+  product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: glxR
+  locus_tag: PP_4299
+  organism_name: Pseudomonas putida KT2440
+  product: 2-hydroxy-3-oxopropionate reductase
+- gene_category: Unknown
+  gene_name: ttuD
+  locus_tag: PP_4300
+  organism_name: Pseudomonas putida KT2440
+  product: glycerate kinase type-2 family protein
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_4493
+  organism_name: Pseudomonas putida KT2440
+  product: D-2-hydroxyglutarate dehydrogenase YdiJ
+- gene_category: Unknown
+  gene_name: mmsB
+  locus_tag: PP_4666
+  organism_name: Pseudomonas putida KT2440
+  product: 3-hydroxyisobutyrate dehydrogenase
+- gene_category: Unknown
+  gene_name: ilvC
+  locus_tag: PP_4678
+  organism_name: Pseudomonas putida KT2440
+  product: ketol-acid reductoisomerase
+- gene_category: Unknown
+  gene_name: dld2
+  locus_tag: PP_4737
+  organism_name: Pseudomonas putida KT2440
+  product: FAD-binding and (Fe-S)-binding domain-containing protein
+- gene_category: Unknown
+  gene_name: ydfG
+  locus_tag: PP_4862
+  organism_name: Pseudomonas putida KT2440
+  product: SDR family oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: PP_4932
+  organism_name: Pseudomonas putida KT2440
+  product: aldo/keto reductase
+- gene_category: Unknown
+  gene_name: betA
+  locus_tag: PP_5064
+  organism_name: Pseudomonas putida KT2440
+  product: choline dehydrogenase
+- gene_category: Unknown
+  gene_name: maeB
+  locus_tag: PP_5085
+  organism_name: Pseudomonas putida KT2440
+  product: malic enzyme-like NAD(P)-binding protein
+- gene_category: Unknown
+  gene_name: serA
+  locus_tag: PP_5155
+  organism_name: Pseudomonas putida KT2440
+  product: phosphoglycerate dehydrogenase
+- gene_category: Unknown
+  gene_name: zwf
+  locus_tag: PP_5351
+  organism_name: Pseudomonas putida KT2440
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0012
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: NADP-dependent malic enzyme
+- gene_category: Unknown
+  gene_name: leuB
+  locus_tag: SPO0210
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Unknown
+  gene_name: phbB
+  locus_tag: SPO0325
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: acetoacetyl-CoA reductase
+- gene_category: Unknown
+  gene_name: mdh
+  locus_tag: SPO0349
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: malate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0415
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0527
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0556
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: nucleotide sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: SPO0594
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0595
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0596
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: zinc-dependent alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0632
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0634
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: FAD-binding oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0717
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 3-hydroxybutyryl-CoA dehydrogenase
+- gene_category: Unknown
+  gene_name: glpD
+  locus_tag: SPO0732
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: glycerol-3-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0792
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0795
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0913
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO0966
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 2-dehydropantoate 2-reductase
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: SPO0981
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1015
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 3-hydroxybutyrate dehydrogenase
+- gene_category: Unknown
+  gene_name: betA
+  locus_tag: SPO1088
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: choline dehydrogenase
+- gene_category: Unknown
+  gene_name: ilvC
+  locus_tag: SPO1366
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: ketol-acid reductoisomerase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1433
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: aldo/keto reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1436
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: carnitine 3-dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1445
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1467
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 3-hydroxybutyryl-CoA dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1480
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1570
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1601
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: ketopantoate reductase family protein
+- gene_category: Unknown
+  gene_name: dxr
+  locus_tag: SPO1667
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1724
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: mannitol dehydrogenase family protein
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1734
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: homoserine dehydrogenase
+- gene_category: Unknown
+  gene_name: ribD
+  locus_tag: SPO1754
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
+    reductase RibD
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO1940
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: PQQ-dependent sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: guaB
+  locus_tag: SPO2039
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: IMP dehydrogenase
+- gene_category: Unknown
+  gene_name: zwf
+  locus_tag: SPO2048
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO2065
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 3-hydroxybutyrate dehydrogenase
+- gene_category: Unknown
+  gene_name: mmsB
+  locus_tag: SPO2213
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 3-hydroxyisobutyrate dehydrogenase
+- gene_category: Unknown
+  gene_name: fabG
+  locus_tag: SPO2275
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 3-oxoacyl-ACP reductase FabG
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO2416
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO2417
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family oxidoreductase
+- gene_category: Unknown
+  gene_name: denD
+  locus_tag: SPO2421
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: D-erythronate dehydrogenase
+- gene_category: Unknown
+  gene_name: aroE
+  locus_tag: SPO2425
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO2428
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: pdxA
+  locus_tag: SPO2457
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_category: Unknown
+  gene_name: ltnD
+  locus_tag: SPO2560
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: L-threonate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO2679
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO2823
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO2859
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: zwf
+  locus_tag: SPO3033
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO3097
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: serA
+  locus_tag: SPO3355
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: phosphoglycerate dehydrogenase
+- gene_category: Unknown
+  gene_name: tdh
+  locus_tag: SPO3359
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: L-threonine 3-dehydrogenase
+- gene_category: Unknown
+  gene_name: glcF
+  locus_tag: SPO3480
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: glycolate oxidase subunit GlcF
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPO3654
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: gpsA
+  locus_tag: SPO3855
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: aroE
+  locus_tag: SPO3891
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPOA0126
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPOA0163
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: hydroxymethylglutaryl-CoA reductase, degradative
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: SPOA0202
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPOA0246
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPOA0272
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: S-(hydroxymethyl)glutathione dehydrogenase/class III alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPOA0315
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: NADP-dependent isocitrate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPOA0345
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: aldo/keto reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPOA0386
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: GMC family oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SPOA0406
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: gnd
+  locus_tag: SYNPCC7002_A0221
+  organism_name: Synechococcus PCC 7002
+  product: decarboxylating NADP(+)-dependent phosphogluconate dehydrogenase
+- gene_category: Unknown
+  gene_name: dxr
+  locus_tag: SYNPCC7002_A0818
+  organism_name: Synechococcus PCC 7002
+  product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A0838
+  organism_name: Synechococcus PCC 7002
+  product: NADP-dependent isocitrate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A0917
+  organism_name: Synechococcus PCC 7002
+  product: SDR family oxidoreductase
+- gene_category: Unknown
+  gene_name: serA
+  locus_tag: SYNPCC7002_A1246
+  organism_name: Synechococcus PCC 7002
+  product: phosphoglycerate dehydrogenase
+- gene_category: Unknown
+  gene_name: ilvC
+  locus_tag: SYNPCC7002_A1278
+  organism_name: Synechococcus PCC 7002
+  product: ketol-acid reductoisomerase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A1410
+  organism_name: Synechococcus PCC 7002
+  product: PQQ-dependent sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: zwf
+  locus_tag: SYNPCC7002_A1459
+  organism_name: Synechococcus PCC 7002
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: ribD
+  locus_tag: SYNPCC7002_A1465
+  organism_name: Synechococcus PCC 7002
+  product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
+    reductase RibD
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A1558
+  organism_name: Synechococcus PCC 7002
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A1730
+  organism_name: Synechococcus PCC 7002
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: SYNPCC7002_A2049
+  organism_name: Synechococcus PCC 7002
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: mdh
+  locus_tag: SYNPCC7002_A2093
+  organism_name: Synechococcus PCC 7002
+  product: malate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A2131
+  organism_name: Synechococcus PCC 7002
+  product: homoserine dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A2340
+  organism_name: Synechococcus PCC 7002
+  product: UDP-glucose/GDP-mannose dehydrogenase family protein
+- gene_category: Unknown
+  gene_name: leuB
+  locus_tag: SYNPCC7002_A2354
+  organism_name: Synechococcus PCC 7002
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Unknown
+  gene_name: fabG
+  locus_tag: SYNPCC7002_A2367
+  organism_name: Synechococcus PCC 7002
+  product: 3-oxoacyl-[acyl-carrier-protein] reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A2814
+  organism_name: Synechococcus PCC 7002
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: glpD
+  locus_tag: SYNPCC7002_A2852
+  organism_name: Synechococcus PCC 7002
+  product: glycerol-3-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_A2853
+  organism_name: Synechococcus PCC 7002
+  product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: glcD
+  locus_tag: SYNPCC7002_A2858
+  organism_name: Synechococcus PCC 7002
+  product: glycolate oxidase subunit GlcD
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: SYNPCC7002_G0164
+  organism_name: Synechococcus PCC 7002
+  product: 2-hydroxyacid dehydrogenase
 - gene_category: Coenzyme metabolism
   gene_name: pdxA
   locus_tag: SYNW0035
@@ -2383,6 +3558,469 @@ rows:
   locus_tag: SYNW2509
   organism_name: Synechococcus WH8102
   product: shikimate 5-dehydrogenase
+- gene_category: Unknown
+  gene_name: aroE
+  locus_tag: Sputw3181_0032
+  organism_name: Shewanella sp. W3-18-1
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: tdh
+  locus_tag: Sputw3181_0049
+  organism_name: Shewanella sp. W3-18-1
+  product: L-threonine 3-dehydrogenase
+- gene_category: Unknown
+  gene_name: leuB
+  locus_tag: Sputw3181_0375
+  organism_name: Shewanella sp. W3-18-1
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_0417
+  organism_name: Shewanella sp. W3-18-1
+  product: 1-propanol dehydrogenase PduQ
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_0720
+  organism_name: Shewanella sp. W3-18-1
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: mdh
+  locus_tag: Sputw3181_0722
+  organism_name: Shewanella sp. W3-18-1
+  product: malate dehydrogenase
+- gene_category: Unknown
+  gene_name: serA
+  locus_tag: Sputw3181_0804
+  organism_name: Shewanella sp. W3-18-1
+  product: phosphoglycerate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_0890
+  organism_name: Shewanella sp. W3-18-1
+  product: glycerol-3-phosphate dehydrogenase/oxidase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_0997
+  organism_name: Shewanella sp. W3-18-1
+  product: glycerol dehydrogenase
+- gene_category: Unknown
+  gene_name: ribD
+  locus_tag: Sputw3181_1234
+  organism_name: Shewanella sp. W3-18-1
+  product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
+    reductase RibD
+- gene_category: Unknown
+  gene_name: thrA
+  locus_tag: Sputw3181_1277
+  organism_name: Shewanella sp. W3-18-1
+  product: bifunctional aspartate kinase/homoserine dehydrogenase I
+- gene_category: Unknown
+  gene_name: guaB
+  locus_tag: Sputw3181_1361
+  organism_name: Shewanella sp. W3-18-1
+  product: IMP dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_1385
+  organism_name: Shewanella sp. W3-18-1
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: rfbD
+  locus_tag: Sputw3181_1465
+  organism_name: Shewanella sp. W3-18-1
+  product: dTDP-4-dehydrorhamnose reductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_1564
+  organism_name: Shewanella sp. W3-18-1
+  product: 4-phosphoerythronate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_1779
+  organism_name: Shewanella sp. W3-18-1
+  product: NADP-dependent isocitrate dehydrogenase
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: Sputw3181_1830
+  organism_name: Shewanella sp. W3-18-1
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_1951
+  organism_name: Shewanella sp. W3-18-1
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: zwf
+  locus_tag: Sputw3181_2142
+  organism_name: Shewanella sp. W3-18-1
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: adhE
+  locus_tag: Sputw3181_2214
+  organism_name: Shewanella sp. W3-18-1
+  product: bifunctional acetaldehyde-CoA/alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_2298
+  organism_name: Shewanella sp. W3-18-1
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: gndA
+  locus_tag: Sputw3181_2302
+  organism_name: Shewanella sp. W3-18-1
+  product: NADP-dependent phosphogluconate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_2318
+  organism_name: Shewanella sp. W3-18-1
+  product: PQQ-dependent sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_2435
+  organism_name: Shewanella sp. W3-18-1
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: fabG
+  locus_tag: Sputw3181_2440
+  organism_name: Shewanella sp. W3-18-1
+  product: 3-oxoacyl-ACP reductase FabG
+- gene_category: Unknown
+  gene_name: oleD
+  locus_tag: Sputw3181_2651
+  organism_name: Shewanella sp. W3-18-1
+  product: 2-alkyl-3-oxoalkanoate reductase
+- gene_category: Unknown
+  gene_name: mmsB
+  locus_tag: Sputw3181_2699
+  organism_name: Shewanella sp. W3-18-1
+  product: 3-hydroxyisobutyrate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_2708
+  organism_name: Shewanella sp. W3-18-1
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: ispC
+  locus_tag: Sputw3181_2749
+  organism_name: Shewanella sp. W3-18-1
+  product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_2820
+  organism_name: Shewanella sp. W3-18-1
+  product: isocitrate dehydrogenase
+- gene_category: Unknown
+  gene_name: yiaY
+  locus_tag: Sputw3181_2860
+  organism_name: Shewanella sp. W3-18-1
+  product: L-threonine dehydrogenase
+- gene_category: Unknown
+  gene_name: pdxA
+  locus_tag: Sputw3181_3177
+  organism_name: Shewanella sp. W3-18-1
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_3268
+  organism_name: Shewanella sp. W3-18-1
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_3391
+  organism_name: Shewanella sp. W3-18-1
+  product: NAD-dependent malic enzyme
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Sputw3181_3401
+  organism_name: Shewanella sp. W3-18-1
+  product: PQQ-dependent sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: ilvC
+  locus_tag: Sputw3181_3755
+  organism_name: Shewanella sp. W3-18-1
+  product: ketol-acid reductoisomerase
+- gene_category: Unknown
+  gene_name: gpsA
+  locus_tag: Sputw3181_4035
+  organism_name: Shewanella sp. W3-18-1
+  product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
+- gene_category: Coenzyme metabolism
+  gene_name: pdxA
+  locus_tag: SynWH7803_0034
+  organism_name: Synechococcus WH7803
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_category: Cell wall and membrane
+  gene_name: rfbD
+  locus_tag: SynWH7803_0104
+  organism_name: Synechococcus WH7803
+  product: dTDP-4-dehydrorhamnose reductase
+- gene_category: Central intermediary metabolism
+  gene_name: wcaG
+  locus_tag: SynWH7803_0113
+  organism_name: Synechococcus WH7803
+  product: GDP-L-fucose synthase
+- gene_category: Carbohydrate metabolism
+  gene_name: glcE
+  locus_tag: SynWH7803_0214
+  organism_name: Synechococcus WH7803
+  product: glycolate oxidase subunit GlcE
+- gene_category: Carbohydrate metabolism
+  gene_name: glcF
+  locus_tag: SynWH7803_0216
+  organism_name: Synechococcus WH7803
+  product: glycolate oxidase iron-sulfur subunit
+- gene_category: Carbohydrate metabolism
+  gene_name: icd
+  locus_tag: SynWH7803_0217
+  organism_name: Synechococcus WH7803
+  product: isocitrate dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: ugd
+  locus_tag: SynWH7803_0244
+  organism_name: Synechococcus WH7803
+  product: UDP-glucose 6-dehydrogenase
+- gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynWH7803_0470
+  organism_name: Synechococcus WH7803
+  product: pyridoxine 4-dehydrogenase
+- gene_category: Lipid metabolism
+  gene_name: glpA
+  locus_tag: SynWH7803_0546
+  organism_name: Synechococcus WH7803
+  product: FAD-dependent glycerol-3-phosphate dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: mqoA
+  locus_tag: SynWH7803_0602
+  organism_name: Synechococcus WH7803
+  product: malate:quinone oxidoreductase
+- gene_category: Carbohydrate metabolism
+  gene_name: gdh
+  locus_tag: SynWH7803_0725
+  organism_name: Synechococcus WH7803
+  product: glucose 1-dehydrogenase
+- gene_category: Amino acid metabolism
+  gene_name: mmsB
+  locus_tag: SynWH7803_0822
+  organism_name: Synechococcus WH7803
+  product: 3-hydroxyisobutyrate dehydrogenase
+- gene_category: Amino acid metabolism
+  gene_name: tdh
+  locus_tag: SynWH7803_0871
+  organism_name: Synechococcus WH7803
+  product: L-threonine dehydrogenase
+- gene_category: Stress response and adaptation
+  gene_name: adhC
+  locus_tag: SynWH7803_0877
+  organism_name: Synechococcus WH7803
+  product: S-(hydroxymethyl)glutathione dehydrogenase/class III alcohol dehydrogenase
+- gene_category: Amino acid metabolism
+  gene_name: leuB
+  locus_tag: SynWH7803_1152
+  organism_name: Synechococcus WH7803
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Stress response and adaptation
+  gene_name: gnd
+  locus_tag: SynWH7803_1297
+  organism_name: Synechococcus WH7803
+  product: 6-phosphogluconate dehydrogenase
+- gene_category: Lipid metabolism
+  gene_name: gldA
+  locus_tag: SynWH7803_1536
+  organism_name: Synechococcus WH7803
+  product: glycerol dehydrogenase
+- gene_category: Carbohydrate metabolism
+  gene_name: zwf
+  locus_tag: SynWH7803_1561
+  organism_name: Synechococcus WH7803
+  product: glucose-6-phosphate 1-dehydrogenase
+- gene_category: Nucleotide metabolism
+  gene_name: guaB
+  locus_tag: SynWH7803_1591
+  organism_name: Synechococcus WH7803
+  product: inositol-5-monophosphate dehydrogenase
+- gene_category: Amino acid metabolism
+  gene_name: thrA
+  locus_tag: SynWH7803_1606
+  organism_name: Synechococcus WH7803
+  product: homoserine dehydrogenase
+- gene_category: Coenzyme metabolism
+  gene_name: dxr
+  locus_tag: SynWH7803_1622
+  organism_name: Synechococcus WH7803
+  product: 1-deoxy-D-xylulose 5-phosphate reductoisomerase
+- gene_category: Coenzyme metabolism
+  gene_name: ribD
+  locus_tag: SynWH7803_1692
+  organism_name: Synechococcus WH7803
+  product: diaminohydroxyphosphoribosylaminopyrimidine deaminase / 5-amino-6-(5-phosphoribosylamino)uracil
+    reductase
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD2
+  locus_tag: SynWH7803_1750
+  organism_name: Synechococcus WH7803
+  product: alternative glycolate dehydrogenase GlcD2
+- gene_category: Amino acid metabolism
+  gene_name: ilvC
+  locus_tag: SynWH7803_1765
+  organism_name: Synechococcus WH7803
+  product: ketol-acid reductoisomerase
+- gene_category: Carbohydrate metabolism
+  gene_name: glcD1
+  locus_tag: SynWH7803_1820
+  organism_name: Synechococcus WH7803
+  product: glycolate oxidase
+- gene_category: Lipid metabolism
+  gene_name: fabG
+  locus_tag: SynWH7803_1861
+  organism_name: Synechococcus WH7803
+  product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
+- gene_category: Amino acid metabolism
+  gene_name: serA
+  locus_tag: SynWH7803_1981
+  organism_name: Synechococcus WH7803
+  product: D-3-phosphoglycerate dehydrogenase (PGDH)
+- gene_category: Amino acid metabolism
+  gene_name: hisD
+  locus_tag: SynWH7803_2065
+  organism_name: Synechococcus WH7803
+  product: histidinol dehydrogenase
+- gene_category: Coenzyme metabolism
+  gene_name: ribD2
+  locus_tag: SynWH7803_2211
+  organism_name: Synechococcus WH7803
+  product: 5-amino-6-(5-phosphoribosylamino)uracil reductase
+- gene_category: Amino acid metabolism
+  gene_name: aroE
+  locus_tag: SynWH7803_2515
+  organism_name: Synechococcus WH7803
+  product: shikimate 5-dehydrogenase
+- gene_category: Unknown
+  gene_name: gndA
+  locus_tag: Synpcc7942_0039
+  organism_name: Synechococcus elongatus PCC 7942
+  product: NADP-dependent phosphogluconate dehydrogenase
+- gene_category: Unknown
+  gene_name: ribD
+  locus_tag: Synpcc7942_0203
+  organism_name: Synechococcus elongatus PCC 7942
+  product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
+    reductase RibD
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_0459
+  organism_name: Synechococcus elongatus PCC 7942
+  product: S-(hydroxymethyl)glutathione dehydrogenase/class III alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: fabG
+  locus_tag: Synpcc7942_0684
+  organism_name: Synechococcus elongatus PCC 7942
+  product: 3-oxoacyl-[acyl-carrier-protein] reductase
+- gene_category: Unknown
+  gene_name: pdxA
+  locus_tag: Synpcc7942_0804
+  organism_name: Synechococcus elongatus PCC 7942
+  product: 4-hydroxythreonine-4-phosphate dehydrogenase PdxA
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_1087
+  organism_name: Synechococcus elongatus PCC 7942
+  product: NAD-dependent epimerase/dehydratase family protein
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_1297
+  organism_name: Synechococcus elongatus PCC 7942
+  product: NAD(P)-dependent malic enzyme
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_1347
+  organism_name: Synechococcus elongatus PCC 7942
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: serA
+  locus_tag: Synpcc7942_1501
+  organism_name: Synechococcus elongatus PCC 7942
+  product: phosphoglycerate dehydrogenase
+- gene_category: Unknown
+  gene_name: leuB
+  locus_tag: Synpcc7942_1505
+  organism_name: Synechococcus elongatus PCC 7942
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_1513
+  organism_name: Synechococcus elongatus PCC 7942
+  product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: Synpcc7942_1519
+  organism_name: Synechococcus elongatus PCC 7942
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: ilvC
+  locus_tag: Synpcc7942_1552
+  organism_name: Synechococcus elongatus PCC 7942
+  product: ketol-acid reductoisomerase
+- gene_category: Unknown
+  gene_name: dhg2
+  locus_tag: Synpcc7942_1573
+  organism_name: Synechococcus elongatus PCC 7942
+  product: glucose 1-dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_1653
+  organism_name: Synechococcus elongatus PCC 7942
+  product: glycerol dehydrogenase
+- gene_category: Unknown
+  gene_name: fcl
+  locus_tag: Synpcc7942_1700
+  organism_name: Synechococcus elongatus PCC 7942
+  product: GDP-L-fucose synthase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_1719
+  organism_name: Synechococcus elongatus PCC 7942
+  product: NADP-dependent isocitrate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_1791
+  organism_name: Synechococcus elongatus PCC 7942
+  product: PQQ-dependent sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_1857
+  organism_name: Synechococcus elongatus PCC 7942
+  product: NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_2090
+  organism_name: Synechococcus elongatus PCC 7942
+  product: homoserine dehydrogenase
+- gene_category: Unknown
+  gene_name: rfbD
+  locus_tag: Synpcc7942_2099
+  organism_name: Synechococcus elongatus PCC 7942
+  product: dTDP-4-dehydrorhamnose reductase
+- gene_category: Unknown
+  gene_name: zwf
+  locus_tag: Synpcc7942_2334
+  organism_name: Synechococcus elongatus PCC 7942
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_2391
+  organism_name: Synechococcus elongatus PCC 7942
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: aroE
+  locus_tag: Synpcc7942_2467
+  organism_name: Synechococcus elongatus PCC 7942
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: Synpcc7942_2522
+  organism_name: Synechococcus elongatus PCC 7942
+  product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
 - gene_category: Coenzyme metabolism
   gene_name: pdxA
   locus_tag: sync_0034
@@ -2564,3 +4202,124 @@ rows:
   locus_tag: sync_2924
   organism_name: Synechococcus CC9311
   product: shikimate 5-dehydrogenase
+- gene_category: Unknown
+  gene_name: thrA
+  locus_tag: tll0277
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: homoserine dehydrogenase
+- gene_category: Unknown
+  gene_name: zwf
+  locus_tag: tll0540
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: glucose-6-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tll0590
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: shikimate dehydrogenase
+- gene_category: Unknown
+  gene_name: fcl
+  locus_tag: tll0633
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: GDP-L-fucose synthase family protein
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tll0664
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: UDP-glucose dehydrogenase family protein
+- gene_category: Unknown
+  gene_name: fabG
+  locus_tag: tll0931
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: 3-oxoacyl-ACP reductase FabG
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tll0970
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: zinc-dependent alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tll1201
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: nucleotide sugar dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tll1663
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: (Fe-S)-binding protein
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tll1891
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: SDR family NAD(P)-dependent oxidoreductase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tll2111
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: NAD(P)H-dependent glycerol-3-phosphate dehydrogenase
+- gene_category: Unknown
+  gene_name: hisD
+  locus_tag: tll2252
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: histidinol dehydrogenase
+- gene_category: Unknown
+  gene_name: ilvC
+  locus_tag: tll2254
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: ketol-acid reductoisomerase
+- gene_category: Unknown
+  gene_name: adhE
+  locus_tag: tlr0227
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: bifunctional acetaldehyde-CoA/alcohol dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tlr0302
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: isocitrate/isopropylmalate dehydrogenase family protein
+- gene_category: Unknown
+  gene_name: serA
+  locus_tag: tlr0325
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: phosphoglycerate dehydrogenase
+- gene_category: Unknown
+  gene_name: gndA
+  locus_tag: tlr0576
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: NADP-dependent phosphogluconate dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tlr0711
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: 2-hydroxyacid dehydrogenase
+- gene_category: Unknown
+  gene_name: null
+  locus_tag: tlr0742
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: NAD-dependent epimerase/dehydratase family protein
+- gene_category: Unknown
+  gene_name: rfbD
+  locus_tag: tlr0951
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: dTDP-4-dehydrorhamnose reductase
+- gene_category: Unknown
+  gene_name: dxr
+  locus_tag: tlr1040
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: 1-deoxy-D-xylulose-5-phosphate reductoisomerase
+- gene_category: Unknown
+  gene_name: fabG
+  locus_tag: tlr1502
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: 3-oxoacyl-[acyl-carrier-protein] reductase
+- gene_category: Unknown
+  gene_name: leuB
+  locus_tag: tlr1600
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: 3-isopropylmalate dehydrogenase
+- gene_category: Unknown
+  gene_name: ribD
+  locus_tag: tlr2152
+  organism_name: Thermosynechococcus vestitus BP-1
+  product: bifunctional diaminohydroxyphosphoribosylaminopyrimidine deaminase/5-amino-6-(5-phosphoribosylamino)uracil
+    reductase RibD

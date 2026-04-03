@@ -45,9 +45,9 @@ rows:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 9
+  closest_ortholog_group_size: 11
   end: 304589
-  expression_edge_count: 0
+  expression_edge_count: 1
   function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
     for both cytoplasmic and membrane proteins. Plays a role in the quality control
     of integral membrane proteins
@@ -67,7 +67,7 @@ rows:
   product: cell division protein FtsH1
   protein_family: AAA ATPase family; Peptidase M41 family; AAA ATPase family
   protein_id: WP_011127179.1
-  significant_down_count: 0
+  significant_down_count: 1
   significant_up_count: 0
   start: 302742
   strand: +

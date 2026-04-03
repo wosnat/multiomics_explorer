@@ -57,7 +57,7 @@ rows:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 9
+  closest_ortholog_group_size: 11
   end: 1331
   expression_edge_count: 27
   function_description: Confers DNA tethering and processivity to DNA polymerases

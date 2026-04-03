@@ -63,6 +63,12 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_organism_for_experiments,
     build_resolve_organism_for_locus_tags,
     build_resolve_organism_for_organism,
+    build_gene_clusters_by_gene,
+    build_gene_clusters_by_gene_summary,
+    build_genes_in_cluster,
+    build_genes_in_cluster_summary,
+    build_list_clustering_analyses,
+    build_list_clustering_analyses_summary,
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
     build_search_ontology,
@@ -111,11 +117,16 @@ def _substitute_params(cypher: str, params: dict) -> str:
 # Map projection keys used across query builders.  PropertiesValidator
 # cannot distinguish {org: g.organism_name} from g.org, so it reports
 # these as missing node properties.  We filter them out.
+# Also includes sparse/future-proofed properties that exist in the schema
+# but are not yet populated on all nodes (e.g. peak_time_hours on GeneCluster).
 _KNOWN_MAP_KEYS = {
     "org", "cat", "lt", "cnt", "terms", "srcs", "gid",
     "org_input", "tt", "bfs", "ts", "eid", "status", "log2fc", "m",
     "tpo", "tph", "tp", "nf_raw", "ng_raw", "nm_raw",
     "cr_id", "cr_name", "cc_id", "cc_name", "og_ids", "src", "lvl",
+    "cid", "cname",
+    # Sparse cluster properties — valid in schema, not populated on all nodes
+    "peak_time_hours", "period_hours", "p_value",
 }
 
 # Regex to extract property name from CyVer description:
@@ -245,6 +256,20 @@ _BUILDERS: list[tuple[str, ...]] = [
      {"locus_tags": _LOCUS, "organism_name": _ORGANISM}),
     ("gene_response_profile_by_experiment", build_gene_response_profile,
      {"locus_tags": _LOCUS, "organism_name": _ORGANISM, "group_by": "experiment"}),
+    # --- clustering analyses ---
+    ("list_clustering_analyses_summary", build_list_clustering_analyses_summary, {}),
+    ("list_clustering_analyses", build_list_clustering_analyses, {}),
+    ("list_clustering_analyses_verbose", build_list_clustering_analyses, {"verbose": True}),
+    ("list_clustering_analyses_search", build_list_clustering_analyses_summary, {"search_text": "nitrogen"}),
+    # --- gene_clusters_by_gene ---
+    ("gene_clusters_by_gene_summary", build_gene_clusters_by_gene_summary, {"locus_tags": _LOCUS}),
+    ("gene_clusters_by_gene", build_gene_clusters_by_gene, {"locus_tags": _LOCUS}),
+    ("gene_clusters_by_gene_verbose", build_gene_clusters_by_gene, {"locus_tags": _LOCUS, "verbose": True}),
+    # --- genes_in_cluster ---
+    ("genes_in_cluster_summary", build_genes_in_cluster_summary, {"cluster_ids": ["cluster:test"]}),
+    ("genes_in_cluster", build_genes_in_cluster, {"cluster_ids": ["cluster:test"]}),
+    ("genes_in_cluster_verbose", build_genes_in_cluster, {"cluster_ids": ["cluster:test"], "verbose": True}),
+    ("genes_in_cluster_by_analysis", build_genes_in_cluster, {"analysis_id": "clustering_analysis:test"}),
 ]
 
 # Ontology-dependent builders: expand for each ontology key.

@@ -2374,8 +2374,9 @@ def genes_in_cluster(
         "not_matched_clusters": raw_summary["not_matched_clusters"],
     }
 
-    if analysis_id is not None:
-        envelope["analysis_name"] = raw_summary.get("analysis_name")
+    envelope["analysis_name"] = (
+        raw_summary.get("analysis_name") if analysis_id is not None else None
+    )
 
     # Check organism match
     if organism is not None and total_matching == 0 and not raw_summary["not_found_clusters"]:

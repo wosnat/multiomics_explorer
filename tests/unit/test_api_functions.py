@@ -3148,7 +3148,7 @@ class TestGenesInCluster:
             summary=True, conn=mock_conn)
         assert result["returned"] == 0
         assert result["results"] == []
-        assert "analysis_name" not in result
+        assert result["analysis_name"] is None
 
     def test_not_found_clusters_in_envelope(self, mock_conn):
         summary_nf = {
