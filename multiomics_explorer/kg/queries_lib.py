@@ -3181,58 +3181,63 @@ def build_gene_clusters_by_gene_summary(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
+    analysis_ids: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for gene_clusters_by_gene.
+
+    Joins through ClusteringAnalysis for analysis fields and filters.
 
     RETURN keys: total_matching, total_clusters,
     genes_with_clusters, genes_without_clusters,
     not_found, not_matched,
-    by_cluster_type, by_treatment_type, by_background_factors, by_publication.
+    by_cluster_type, by_treatment_type, by_background_factors,
+    by_analysis, by_publication.
     """
     params: dict = {"locus_tags": locus_tags}
 
-    gc_conditions: list[str] = []
+    ca_conditions: list[str] = []
     if cluster_type is not None:
-        gc_conditions.append("gc.cluster_type = $cluster_type")
+        ca_conditions.append("ca.cluster_type = $cluster_type")
         params["cluster_type"] = cluster_type
     if treatment_type is not None:
-        gc_conditions.append(
-            "ANY(tt IN gc.treatment_type WHERE tt IN $treatment_type)")
+        ca_conditions.append(
+            "ANY(tt IN ca.treatment_type WHERE tt IN $treatment_type)")
         params["treatment_type"] = treatment_type
     if background_factors is not None:
-        gc_conditions.append(
-            "ANY(bf IN coalesce(gc.background_factors, [])"
+        ca_conditions.append(
+            "ANY(bf IN coalesce(ca.background_factors, [])"
             " WHERE bf IN $background_factors)")
         params["background_factors"] = background_factors
+    if analysis_ids is not None:
+        ca_conditions.append("ca.id IN $analysis_ids")
+        params["analysis_ids"] = analysis_ids
 
     pub_match = ""
     if publication_doi is not None:
-        pub_match = "MATCH (pub:Publication)-[:Publication_has_gene_cluster]->(gc)\n"
-        gc_conditions.append("pub.doi IN $publication_doi")
+        pub_match = "MATCH (pub:Publication)-[:PublicationHasClusteringAnalysis]->(ca)\n"
+        ca_conditions.append("pub.doi IN $publication_doi")
         params["publication_doi"] = publication_doi
 
-    gc_where = "WHERE " + " AND ".join(gc_conditions) + "\n" if gc_conditions else ""
+    ca_where = "WHERE " + " AND ".join(ca_conditions) + "\n" if ca_conditions else ""
 
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
-        "OPTIONAL MATCH (gc:GeneCluster)-[:Gene_in_gene_cluster]->(g)\n"
+        "OPTIONAL MATCH (ca:ClusteringAnalysis)-[:ClusteringAnalysisHasGeneCluster]->"
+        "(gc:GeneCluster)-[:Gene_in_gene_cluster]->(g)\n"
         f"{pub_match}"
-        f"{gc_where}"
-        "WITH lt, g, gc\n"
+        f"{ca_where}"
+        "WITH lt, g, gc, ca\n"
         "WITH collect(DISTINCT CASE WHEN g IS NULL THEN lt END) AS nf_raw,\n"
         "     collect(DISTINCT CASE WHEN g IS NOT NULL AND gc IS NULL\n"
         "             THEN lt END) AS nm_raw,\n"
         "     collect(CASE WHEN gc IS NOT NULL THEN\n"
-        "       {lt: lt, cid: gc.id, ct: gc.cluster_type,\n"
-        "        tt: gc.treatment_type, bfs: gc.background_factors} END) AS rows\n"
+        "       {lt: lt, cid: gc.id, ct: ca.cluster_type,\n"
+        "        tt: ca.treatment_type, bfs: ca.background_factors,\n"
+        "        aid: ca.id, aname: ca.name} END) AS rows\n"
         "WITH [x IN nf_raw WHERE x IS NOT NULL] AS not_found,\n"
         "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched,\n"
         "     rows\n"
-        "OPTIONAL MATCH (pub2:Publication)-[:Publication_has_gene_cluster]->(gc2:GeneCluster)\n"
-        "WHERE gc2.id IN [r IN rows | r.cid]\n"
-        "WITH not_found, not_matched, rows,\n"
-        "     collect(DISTINCT {doi: pub2.doi, cid: gc2.id}) AS pub_rows\n"
         "WITH not_found, not_matched,\n"
         "     size(rows) AS total_matching,\n"
         "     size(apoc.coll.toSet([r IN rows | r.cid])) AS total_clusters,\n"
@@ -3241,16 +3246,15 @@ def build_gene_clusters_by_gene_summary(
         "       - size([x IN not_found WHERE x IS NOT NULL]) AS genes_without_clusters,\n"
         "     apoc.coll.frequencies([r IN rows | r.ct]) AS by_cluster_type,\n"
         "     apoc.coll.frequencies(\n"
-        "       apoc.coll.flatten([r IN rows | r.tt])) AS by_treatment_type,\n"
+        "       apoc.coll.flatten([r IN rows | coalesce(r.tt, [])])) AS by_treatment_type,\n"
         "     apoc.coll.frequencies(\n"
         "       apoc.coll.flatten([r IN rows | coalesce(r.bfs, [])])) AS by_background_factors,\n"
-        "     apoc.coll.frequencies(\n"
-        "       [p IN pub_rows WHERE p.doi IS NOT NULL | p.doi]) AS by_publication\n"
+        "     apoc.coll.frequencies([r IN rows | r.aid]) AS by_analysis\n"
         "RETURN total_matching, total_clusters,\n"
         "       genes_with_clusters, genes_without_clusters,\n"
         "       not_found, not_matched,\n"
         "       by_cluster_type, by_treatment_type, by_background_factors,\n"
-        "       by_publication"
+        "       by_analysis"
     )
     return cypher, params
 
@@ -3262,52 +3266,65 @@ def build_gene_clusters_by_gene(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
+    analysis_ids: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_clusters_by_gene.
 
+    Joins through ClusteringAnalysis for analysis fields and filters.
+
     RETURN keys (compact): locus_tag, gene_name, cluster_id, cluster_name,
-    cluster_type, membership_score, member_count.
-    RETURN keys (verbose): adds functional_description, behavioral_description,
-    treatment_type, treatment, source_paper, p_value.
+    cluster_type, membership_score, analysis_id, analysis_name,
+    treatment_type, background_factors.
+    RETURN keys (verbose): adds cluster_method, member_count,
+    cluster_functional_description, cluster_behavioral_description,
+    treatment, light_condition, experimental_context,
+    p_value, peak_time_hours, period_hours.
     """
     params: dict = {"locus_tags": locus_tags}
 
-    gc_conditions: list[str] = []
+    ca_conditions: list[str] = []
     if cluster_type is not None:
-        gc_conditions.append("gc.cluster_type = $cluster_type")
+        ca_conditions.append("ca.cluster_type = $cluster_type")
         params["cluster_type"] = cluster_type
     if treatment_type is not None:
-        gc_conditions.append(
-            "ANY(tt IN gc.treatment_type WHERE tt IN $treatment_type)")
+        ca_conditions.append(
+            "ANY(tt IN ca.treatment_type WHERE tt IN $treatment_type)")
         params["treatment_type"] = treatment_type
     if background_factors is not None:
-        gc_conditions.append(
-            "ANY(bf IN coalesce(gc.background_factors, [])"
+        ca_conditions.append(
+            "ANY(bf IN coalesce(ca.background_factors, [])"
             " WHERE bf IN $background_factors)")
         params["background_factors"] = background_factors
+    if analysis_ids is not None:
+        ca_conditions.append("ca.id IN $analysis_ids")
+        params["analysis_ids"] = analysis_ids
 
     pub_match = ""
     if publication_doi is not None:
-        pub_match = "MATCH (pub:Publication)-[:Publication_has_gene_cluster]->(gc)\n"
-        gc_conditions.append("pub.doi IN $publication_doi")
+        pub_match = "MATCH (pub:Publication)-[:PublicationHasClusteringAnalysis]->(ca)\n"
+        ca_conditions.append("pub.doi IN $publication_doi")
         params["publication_doi"] = publication_doi
 
-    gc_where = ""
-    if gc_conditions:
-        gc_where = "WHERE " + " AND ".join(gc_conditions) + "\n"
+    ca_where = ""
+    if ca_conditions:
+        ca_where = "WHERE " + " AND ".join(ca_conditions) + "\n"
 
     verbose_cols = ""
     if verbose:
         verbose_cols = (
-            ",\n       gc.functional_description AS functional_description"
-            ",\n       gc.behavioral_description AS behavioral_description"
-            ",\n       gc.treatment_type AS treatment_type"
-            ",\n       gc.treatment AS treatment"
-            ",\n       gc.source_paper AS source_paper"
+            ",\n       ca.cluster_method AS cluster_method"
+            ",\n       gc.member_count AS member_count"
+            ",\n       gc.functional_description AS cluster_functional_description"
+            ",\n       gc.behavioral_description AS cluster_behavioral_description"
+            ",\n       ca.treatment AS treatment"
+            ",\n       ca.light_condition AS light_condition"
+            ",\n       ca.experimental_context AS experimental_context"
             ",\n       r.p_value AS p_value"
+            ",\n       gc.peak_time_hours AS peak_time_hours"
+            ",\n       gc.period_hours AS period_hours"
         )
 
     if offset:
@@ -3323,14 +3340,17 @@ def build_gene_clusters_by_gene(
 
     cypher = (
         "UNWIND $locus_tags AS lt\n"
-        "MATCH (gc:GeneCluster)-[r:Gene_in_gene_cluster]->(g:Gene {locus_tag: lt})\n"
+        "MATCH (ca:ClusteringAnalysis)-[:ClusteringAnalysisHasGeneCluster]->"
+        "(gc:GeneCluster)-[r:Gene_in_gene_cluster]->(g:Gene {locus_tag: lt})\n"
         f"{pub_match}"
-        f"{gc_where}"
+        f"{ca_where}"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       gc.id AS cluster_id, gc.name AS cluster_name,\n"
-        "       gc.cluster_type AS cluster_type,\n"
+        "       ca.cluster_type AS cluster_type,\n"
         "       r.membership_score AS membership_score,\n"
-        f"       gc.member_count AS member_count{verbose_cols}\n"
+        "       ca.id AS analysis_id, ca.name AS analysis_name,\n"
+        "       ca.treatment_type AS treatment_type,\n"
+        f"       coalesce(ca.background_factors, []) AS background_factors{verbose_cols}\n"
         f"ORDER BY g.locus_tag, gc.id{skip_clause}{limit_clause}"
     )
     return cypher, params
@@ -3338,15 +3358,21 @@ def build_gene_clusters_by_gene(
 
 def build_genes_in_cluster_summary(
     *,
-    cluster_ids: list[str],
+    cluster_ids: list[str] | None = None,
+    analysis_id: str | None = None,
     organism: str | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for genes_in_cluster.
 
+    Two entry modes:
+    - cluster_ids: UNWIND specific cluster IDs (original mode)
+    - analysis_id: match all clusters belonging to a ClusteringAnalysis
+
     RETURN keys: total_matching, by_organism, by_cluster,
     by_category_raw, not_found_clusters, not_matched_clusters.
+    When analysis_id: also returns analysis_name.
     """
-    params: dict = {"cluster_ids": cluster_ids, "organism": organism}
+    params: dict = {"organism": organism}
 
     organism_filter = (
         "AND ALL(word IN split(toLower($organism), ' ')"
@@ -3354,22 +3380,57 @@ def build_genes_in_cluster_summary(
         if organism is not None else ""
     )
 
+    if analysis_id is not None:
+        params["analysis_id"] = analysis_id
+        match_block = (
+            "MATCH (ca:ClusteringAnalysis {id: $analysis_id})"
+            "-[:ClusteringAnalysisHasGeneCluster]->(gc:GeneCluster)\n"
+            "WITH gc, gc.id AS cid, ca.name AS analysis_name\n"
+            "OPTIONAL MATCH (gc)-[r:Gene_in_gene_cluster]->(g:Gene)\n"
+            f"WHERE g IS NOT NULL {organism_filter}"
+            "WITH cid, gc, g, analysis_name\n"
+        )
+        nf_nm_block = (
+            "WITH collect(CASE WHEN g IS NOT NULL THEN\n"
+            "       {lt: g.locus_tag, org: g.organism_name,\n"
+            "        cat: coalesce(g.gene_category, 'Unknown'),\n"
+            "        cid: cid, cname: gc.name} END) AS rows,\n"
+            "     head(collect(DISTINCT analysis_name)) AS analysis_name\n"
+        )
+        return_suffix = ",\n       analysis_name"
+        not_found_block = (
+            "WITH rows, analysis_name,\n"
+            "     [] AS not_found_clusters, [] AS not_matched_clusters\n"
+        )
+    else:
+        params["cluster_ids"] = cluster_ids
+        match_block = (
+            "UNWIND $cluster_ids AS cid\n"
+            "OPTIONAL MATCH (gc:GeneCluster {id: cid})\n"
+            "OPTIONAL MATCH (gc)-[r:Gene_in_gene_cluster]->(g:Gene)\n"
+            f"WHERE g IS NOT NULL {organism_filter}"
+            "WITH cid, gc, g\n"
+        )
+        nf_nm_block = (
+            "WITH collect(DISTINCT CASE WHEN gc IS NULL THEN cid END) AS nf_raw,\n"
+            "     collect(DISTINCT CASE WHEN gc IS NOT NULL AND g IS NULL\n"
+            "             THEN cid END) AS nm_raw,\n"
+            "     collect(CASE WHEN g IS NOT NULL THEN\n"
+            "       {lt: g.locus_tag, org: g.organism_name,\n"
+            "        cat: coalesce(g.gene_category, 'Unknown'),\n"
+            "        cid: cid, cname: gc.name} END) AS rows\n"
+        )
+        return_suffix = ""
+        not_found_block = (
+            "WITH [x IN nf_raw WHERE x IS NOT NULL] AS not_found_clusters,\n"
+            "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched_clusters,\n"
+            "     rows\n"
+        )
+
     cypher = (
-        "UNWIND $cluster_ids AS cid\n"
-        "OPTIONAL MATCH (gc:GeneCluster {id: cid})\n"
-        "OPTIONAL MATCH (gc)-[r:Gene_in_gene_cluster]->(g:Gene)\n"
-        f"WHERE g IS NOT NULL {organism_filter}"
-        "WITH cid, gc, g\n"
-        "WITH collect(DISTINCT CASE WHEN gc IS NULL THEN cid END) AS nf_raw,\n"
-        "     collect(DISTINCT CASE WHEN gc IS NOT NULL AND g IS NULL\n"
-        "             THEN cid END) AS nm_raw,\n"
-        "     collect(CASE WHEN g IS NOT NULL THEN\n"
-        "       {lt: g.locus_tag, org: g.organism_name,\n"
-        "        cat: coalesce(g.gene_category, 'Unknown'),\n"
-        "        cid: cid, cname: gc.name} END) AS rows\n"
-        "WITH [x IN nf_raw WHERE x IS NOT NULL] AS not_found_clusters,\n"
-        "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched_clusters,\n"
-        "     rows\n"
+        f"{match_block}"
+        f"{nf_nm_block}"
+        f"{not_found_block}"
         "WITH not_found_clusters, not_matched_clusters,\n"
         "     size(rows) AS total_matching,\n"
         "     apoc.coll.frequencies([r IN rows | r.org]) AS by_organism,\n"
@@ -3377,16 +3438,18 @@ def build_genes_in_cluster_summary(
         "     [cid IN apoc.coll.toSet([r IN rows | r.cid]) |\n"
         "       {cluster_id: cid,\n"
         "        cluster_name: head([r IN rows WHERE r.cid = cid | r.cname]),\n"
-        "        count: size([r IN rows WHERE r.cid = cid])}] AS by_cluster\n"
-        "RETURN total_matching, by_organism, by_cluster, by_category_raw,\n"
-        "       not_found_clusters, not_matched_clusters"
+        "        count: size([r IN rows WHERE r.cid = cid])}] AS by_cluster"
+        + (f",\n     analysis_name\n" if analysis_id is not None else "\n")
+        + "RETURN total_matching, by_organism, by_cluster, by_category_raw,\n"
+        f"       not_found_clusters, not_matched_clusters{return_suffix}"
     )
     return cypher, params
 
 
 def build_genes_in_cluster(
     *,
-    cluster_ids: list[str],
+    cluster_ids: list[str] | None = None,
+    analysis_id: str | None = None,
     organism: str | None = None,
     verbose: bool = False,
     limit: int | None = None,
@@ -3394,21 +3457,25 @@ def build_genes_in_cluster(
 ) -> tuple[str, dict]:
     """Build detail Cypher for genes_in_cluster.
 
+    Two entry modes:
+    - cluster_ids: UNWIND specific cluster IDs (original mode)
+    - analysis_id: match through CA → GC → Gene
+
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
     organism_name, cluster_id, cluster_name, membership_score.
-    RETURN keys (verbose): adds function_description, gene_summary,
-    p_value, functional_description, behavioral_description.
+    RETURN keys (verbose): adds gene_function_description, gene_summary,
+    p_value, cluster_functional_description, cluster_behavioral_description.
     """
-    params: dict = {"cluster_ids": cluster_ids}
+    params: dict = {}
 
     verbose_cols = ""
     if verbose:
         verbose_cols = (
-            ",\n       g.function_description AS function_description"
+            ",\n       g.function_description AS gene_function_description"
             ",\n       g.gene_summary AS gene_summary"
             ",\n       r.p_value AS p_value"
-            ",\n       gc.functional_description AS functional_description"
-            ",\n       gc.behavioral_description AS behavioral_description"
+            ",\n       gc.functional_description AS cluster_functional_description"
+            ",\n       gc.behavioral_description AS cluster_behavioral_description"
         )
 
     if offset:
@@ -3422,20 +3489,31 @@ def build_genes_in_cluster(
     else:
         limit_clause = ""
 
+    # Build match block based on entry mode
+    if analysis_id is not None:
+        params["analysis_id"] = analysis_id
+        match_base = (
+            "MATCH (ca:ClusteringAnalysis {id: $analysis_id})"
+            "-[:ClusteringAnalysisHasGeneCluster]->"
+            "(gc:GeneCluster)-[r:Gene_in_gene_cluster]->(g:Gene)\n"
+        )
+    else:
+        params["cluster_ids"] = cluster_ids
+        match_base = (
+            "UNWIND $cluster_ids AS cid\n"
+            "MATCH (gc:GeneCluster {id: cid})-[r:Gene_in_gene_cluster]->(g:Gene)\n"
+        )
+
     # Conditional WHERE for organism filter
     if organism is not None:
         params["organism"] = organism
         cypher = (
-            "UNWIND $cluster_ids AS cid\n"
-            "MATCH (gc:GeneCluster {id: cid})-[r:Gene_in_gene_cluster]->(g:Gene)\n"
+            f"{match_base}"
             "WHERE ALL(word IN split(toLower($organism), ' ')"
             " WHERE toLower(g.organism_name) CONTAINS word)\n"
         )
     else:
-        cypher = (
-            "UNWIND $cluster_ids AS cid\n"
-            "MATCH (gc:GeneCluster {id: cid})-[r:Gene_in_gene_cluster]->(g:Gene)\n"
-        )
+        cypher = match_base
 
     cypher += (
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"

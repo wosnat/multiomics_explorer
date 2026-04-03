@@ -3018,7 +3018,7 @@ class TestBuildListClusteringAnalyses:
 
 
 # ---------------------------------------------------------------------------
-# gene_clusters_by_gene
+# gene_clusters_by_gene (via ClusteringAnalysis)
 # ---------------------------------------------------------------------------
 class TestBuildGeneClustersByGeneSummary:
     """Tests for build_gene_clusters_by_gene_summary."""
@@ -3029,53 +3029,131 @@ class TestBuildGeneClustersByGeneSummary:
             locus_tags=["PMM0370", "PMM0920"])
         assert "Gene_in_gene_cluster" in cypher
         assert "GeneCluster" in cypher
+        assert "ClusteringAnalysisHasGeneCluster" in cypher
+        assert "ClusteringAnalysis" in cypher
         assert "total_matching" in cypher
         assert "total_clusters" in cypher
         assert "not_found" in cypher or "nf" in cypher
+        assert "by_analysis" in cypher
         assert params["locus_tags"] == ["PMM0370", "PMM0920"]
 
-    def test_with_cluster_type_filter(self):
+    def test_no_publication_has_gene_cluster(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
+        cypher, _ = build_gene_clusters_by_gene_summary(
+            locus_tags=["PMM0370"])
+        assert "Publication_has_gene_cluster" not in cypher
+
+    def test_with_cluster_type_filter_on_ca(self):
         from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
         cypher, params = build_gene_clusters_by_gene_summary(
             locus_tags=["PMM0370"], cluster_type="stress_response")
         assert "$cluster_type" in cypher
+        assert "ca.cluster_type" in cypher
         assert params["cluster_type"] == "stress_response"
 
-    def test_with_publication_doi_filter(self):
+    def test_with_treatment_type_filter_on_ca(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
+        cypher, params = build_gene_clusters_by_gene_summary(
+            locus_tags=["PMM0370"], treatment_type=["nitrogen_stress"])
+        assert "$treatment_type" in cypher
+        assert "ca.treatment_type" in cypher
+        assert params["treatment_type"] == ["nitrogen_stress"]
+
+    def test_with_background_factors_filter_on_ca(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
+        cypher, params = build_gene_clusters_by_gene_summary(
+            locus_tags=["PMM0370"], background_factors=["axenic"])
+        assert "$background_factors" in cypher
+        assert "ca.background_factors" in cypher
+        assert params["background_factors"] == ["axenic"]
+
+    def test_with_analysis_ids_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
+        cypher, params = build_gene_clusters_by_gene_summary(
+            locus_tags=["PMM0370"],
+            analysis_ids=["clustering_analysis:msb4100087:med4_kmeans"])
+        assert "$analysis_ids" in cypher
+        assert "ca.id IN $analysis_ids" in cypher
+        assert params["analysis_ids"] == ["clustering_analysis:msb4100087:med4_kmeans"]
+
+    def test_with_publication_doi_filter_via_ca(self):
         from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
         cypher, params = build_gene_clusters_by_gene_summary(
             locus_tags=["PMM0370"],
             publication_doi=["10.1038/msb4100087"])
-        assert "Publication_has_gene_cluster" in cypher
+        assert "PublicationHasClusteringAnalysis" in cypher
+        assert "Publication_has_gene_cluster" not in cypher
         assert params["publication_doi"] == ["10.1038/msb4100087"]
 
 
 class TestBuildGeneClustersByGene:
     """Tests for build_gene_clusters_by_gene (detail builder)."""
 
-    def test_returns_expected_columns(self):
+    def test_returns_expected_compact_columns(self):
         from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
         cypher, params = build_gene_clusters_by_gene(
             locus_tags=["PMM0370"])
         for col in ["locus_tag", "gene_name", "cluster_id",
                      "cluster_name", "cluster_type",
-                     "membership_score", "member_count"]:
-            assert f"AS {col}" in cypher
+                     "membership_score", "analysis_id", "analysis_name",
+                     "treatment_type", "background_factors"]:
+            assert f"AS {col}" in cypher, f"Missing compact column: {col}"
+
+    def test_compact_cluster_type_from_ca(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, _ = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"])
+        assert "ca.cluster_type AS cluster_type" in cypher
+
+    def test_no_source_paper(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, _ = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"], verbose=True)
+        assert "source_paper" not in cypher
+
+    def test_uses_clustering_analysis_join(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, _ = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"])
+        assert "ClusteringAnalysisHasGeneCluster" in cypher
+        assert "Publication_has_gene_cluster" not in cypher
 
     def test_verbose_adds_columns(self):
         from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
         cypher, _ = build_gene_clusters_by_gene(
             locus_tags=["PMM0370"], verbose=True)
-        for col in ["functional_description", "behavioral_description",
-                     "treatment_type", "treatment", "source_paper", "p_value"]:
-            assert f"AS {col}" in cypher
+        for col in ["cluster_functional_description",
+                     "cluster_behavioral_description",
+                     "cluster_method", "member_count",
+                     "treatment", "light_condition",
+                     "experimental_context", "p_value",
+                     "peak_time_hours", "period_hours"]:
+            assert f"AS {col}" in cypher, f"Missing verbose column: {col}"
 
     def test_verbose_false_omits_verbose_columns(self):
         from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
         cypher, _ = build_gene_clusters_by_gene(
             locus_tags=["PMM0370"], verbose=False)
-        assert "functional_description" not in cypher
-        assert "behavioral_description" not in cypher
+        assert "cluster_functional_description" not in cypher
+        assert "cluster_behavioral_description" not in cypher
+        assert "cluster_method" not in cypher
+
+    def test_analysis_ids_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, params = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"],
+            analysis_ids=["clustering_analysis:msb4100087:med4_kmeans"])
+        assert "ca.id IN $analysis_ids" in cypher
+        assert params["analysis_ids"] == ["clustering_analysis:msb4100087:med4_kmeans"]
+
+    def test_publication_doi_filter_via_ca(self):
+        from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
+        cypher, params = build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"],
+            publication_doi=["10.1038/msb4100087"])
+        assert "PublicationHasClusteringAnalysis" in cypher
+        assert "Publication_has_gene_cluster" not in cypher
+        assert params["publication_doi"] == ["10.1038/msb4100087"]
 
     def test_offset_emits_skip(self):
         from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene
@@ -3090,10 +3168,13 @@ class TestBuildGeneClustersByGene:
         assert "ORDER BY" in cypher
 
 
+# ---------------------------------------------------------------------------
+# genes_in_cluster (with analysis_id support)
+# ---------------------------------------------------------------------------
 class TestBuildGenesInClusterSummary:
     """Tests for build_genes_in_cluster_summary."""
 
-    def test_basic_structure(self):
+    def test_basic_structure_cluster_ids(self):
         from multiomics_explorer.kg.queries_lib import build_genes_in_cluster_summary
         cypher, params = build_genes_in_cluster_summary(
             cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
@@ -3110,6 +3191,16 @@ class TestBuildGenesInClusterSummary:
         assert "organism" in cypher.lower()
         assert params["organism"] == "MED4"
 
+    def test_analysis_id_mode(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_in_cluster_summary
+        cypher, params = build_genes_in_cluster_summary(
+            analysis_id="clustering_analysis:msb4100087:med4_kmeans")
+        assert "ClusteringAnalysis" in cypher
+        assert "ClusteringAnalysisHasGeneCluster" in cypher
+        assert "$analysis_id" in cypher
+        assert "analysis_name" in cypher
+        assert params["analysis_id"] == "clustering_analysis:msb4100087:med4_kmeans"
+
 
 class TestBuildGenesInCluster:
     """Tests for build_genes_in_cluster (detail builder)."""
@@ -3123,15 +3214,30 @@ class TestBuildGenesInCluster:
                      "membership_score"]:
             assert f"AS {col}" in cypher
 
-    def test_verbose_adds_columns(self):
+    def test_verbose_renamed_columns(self):
         from multiomics_explorer.kg.queries_lib import build_genes_in_cluster
         cypher, _ = build_genes_in_cluster(
             cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
             verbose=True)
-        for col in ["function_description", "gene_summary",
-                     "p_value", "functional_description",
-                     "behavioral_description"]:
-            assert f"AS {col}" in cypher
+        for col in ["gene_function_description", "gene_summary",
+                     "p_value", "cluster_functional_description",
+                     "cluster_behavioral_description"]:
+            assert f"AS {col}" in cypher, f"Missing verbose column: {col}"
+        # Old column names must NOT appear
+        assert "AS function_description" not in cypher
+        assert "AS functional_description" not in cypher.replace(
+            "cluster_functional_description", "")
+        assert "AS behavioral_description" not in cypher.replace(
+            "cluster_behavioral_description", "")
+
+    def test_analysis_id_mode(self):
+        from multiomics_explorer.kg.queries_lib import build_genes_in_cluster
+        cypher, params = build_genes_in_cluster(
+            analysis_id="clustering_analysis:msb4100087:med4_kmeans")
+        assert "ClusteringAnalysis" in cypher
+        assert "ClusteringAnalysisHasGeneCluster" in cypher
+        assert "$analysis_id" in cypher
+        assert params["analysis_id"] == "clustering_analysis:msb4100087:med4_kmeans"
 
     def test_has_order_by(self):
         from multiomics_explorer.kg.queries_lib import build_genes_in_cluster
