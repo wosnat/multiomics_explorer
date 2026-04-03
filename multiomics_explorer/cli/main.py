@@ -226,5 +226,198 @@ def stats():
         console.print(table)
 
 
+@app.command("list-clustering-analyses")
+def list_clustering_analyses_cmd(
+    search_text: str = typer.Option(None, "--search", "-s", help="Full-text search"),
+    organism: str = typer.Option(None, "--organism", "-o", help="Filter by organism"),
+    cluster_type: str = typer.Option(None, "--cluster-type", help="Filter by cluster type"),
+    treatment_type: list[str] = typer.Option(None, "--treatment-type", help="Filter by treatment type"),
+    summary: bool = typer.Option(False, "--summary", help="Summary only"),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Include verbose fields"),
+    limit: int = typer.Option(10, "--limit", help="Max results"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+):
+    """List clustering analyses, with optional search and filters."""
+    from multiomics_explorer.api.functions import list_clustering_analyses
+    from multiomics_explorer.kg.connection import GraphConnection
+
+    with GraphConnection() as conn:
+        if not conn.verify_connectivity():
+            console.print("[red]Cannot connect to Neo4j. Is it running?[/red]")
+            raise typer.Exit(1)
+
+        try:
+            result = list_clustering_analyses(
+                search_text=search_text,
+                organism=organism,
+                cluster_type=cluster_type,
+                treatment_type=treatment_type or None,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                conn=conn,
+            )
+        except ValueError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            raise typer.Exit(1)
+        except Exception as e:
+            console.print(f"[red]Query error: {e}[/red]")
+            raise typer.Exit(1)
+
+        if json_output:
+            console.print(json.dumps(result, indent=2, default=str))
+        else:
+            console.print(f"[bold]Total entries:[/bold] {result.get('total_entries', 'N/A')}")
+            console.print(f"[bold]Total matching:[/bold] {result.get('total_matching', 'N/A')}")
+            if result.get("by_organism"):
+                console.print("[bold]By organism:[/bold]")
+                for item in result["by_organism"]:
+                    console.print(f"  {item['organism_name']}: {item['count']}")
+            if result.get("by_cluster_type"):
+                console.print("[bold]By cluster type:[/bold]")
+                for item in result["by_cluster_type"]:
+                    console.print(f"  {item['cluster_type']}: {item['count']}")
+            results = result.get("results", [])
+            if results:
+                table = Table(show_lines=True)
+                keys = list(results[0].keys())
+                for k in keys:
+                    table.add_column(k)
+                for row in results:
+                    table.add_row(*[str(row.get(k, "")) for k in keys])
+                console.print(table)
+            elif not summary:
+                console.print("[yellow]No results.[/yellow]")
+            if result.get("truncated"):
+                console.print(f"[dim]Showing {result['returned']} results (increase --limit for more)[/dim]")
+
+
+@app.command("gene-clusters-by-gene")
+def gene_clusters_by_gene_cmd(
+    locus_tags: list[str] = typer.Argument(help="Gene locus tags"),
+    summary: bool = typer.Option(False, "--summary", help="Summary only"),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Include verbose fields"),
+    limit: int = typer.Option(20, "--limit", help="Max results"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+):
+    """Look up gene cluster memberships for one or more genes."""
+    from multiomics_explorer.api.functions import gene_clusters_by_gene
+    from multiomics_explorer.kg.connection import GraphConnection
+
+    with GraphConnection() as conn:
+        if not conn.verify_connectivity():
+            console.print("[red]Cannot connect to Neo4j. Is it running?[/red]")
+            raise typer.Exit(1)
+
+        try:
+            result = gene_clusters_by_gene(
+                locus_tags=locus_tags,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                conn=conn,
+            )
+        except ValueError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            raise typer.Exit(1)
+        except Exception as e:
+            console.print(f"[red]Query error: {e}[/red]")
+            raise typer.Exit(1)
+
+        if json_output:
+            console.print(json.dumps(result, indent=2, default=str))
+        else:
+            console.print(f"[bold]Genes with clusters:[/bold] {result.get('genes_with_clusters', 'N/A')}")
+            console.print(f"[bold]Genes without clusters:[/bold] {result.get('genes_without_clusters', 'N/A')}")
+            console.print(f"[bold]Total matching:[/bold] {result.get('total_matching', 'N/A')}")
+            if result.get("not_found"):
+                console.print(f"[yellow]Not found:[/yellow] {', '.join(result['not_found'])}")
+            if result.get("not_matched"):
+                console.print(f"[yellow]Not matched:[/yellow] {', '.join(result['not_matched'])}")
+            if result.get("by_cluster_type"):
+                console.print("[bold]By cluster type:[/bold]")
+                for item in result["by_cluster_type"]:
+                    console.print(f"  {item['cluster_type']}: {item['count']}")
+            results = result.get("results", [])
+            if results:
+                table = Table(show_lines=True)
+                keys = list(results[0].keys())
+                for k in keys:
+                    table.add_column(k)
+                for row in results:
+                    table.add_row(*[str(row.get(k, "")) for k in keys])
+                console.print(table)
+            elif not summary:
+                console.print("[yellow]No results.[/yellow]")
+            if result.get("truncated"):
+                console.print(f"[dim]Showing {result['returned']} results (increase --limit for more)[/dim]")
+
+
+@app.command("genes-in-cluster")
+def genes_in_cluster_cmd(
+    cluster_ids: list[str] = typer.Argument(None, help="GeneCluster node IDs"),
+    analysis_id: str = typer.Option(None, "--analysis-id", "-a",
+        help="ClusteringAnalysis ID (alternative to cluster_ids)"),
+    organism: str = typer.Option(None, "--organism", "-o", help="Filter by organism"),
+    summary: bool = typer.Option(False, "--summary", help="Summary only"),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Include verbose fields"),
+    limit: int = typer.Option(20, "--limit", help="Max results"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+):
+    """List genes belonging to one or more gene clusters."""
+    from multiomics_explorer.api.functions import genes_in_cluster
+    from multiomics_explorer.kg.connection import GraphConnection
+
+    with GraphConnection() as conn:
+        if not conn.verify_connectivity():
+            console.print("[red]Cannot connect to Neo4j. Is it running?[/red]")
+            raise typer.Exit(1)
+
+        try:
+            result = genes_in_cluster(
+                cluster_ids=cluster_ids or None,
+                analysis_id=analysis_id,
+                organism=organism,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                conn=conn,
+            )
+        except ValueError as e:
+            console.print(f"[red]Error: {e}[/red]")
+            raise typer.Exit(1)
+        except Exception as e:
+            console.print(f"[red]Query error: {e}[/red]")
+            raise typer.Exit(1)
+
+        if json_output:
+            console.print(json.dumps(result, indent=2, default=str))
+        else:
+            console.print(f"[bold]Total matching:[/bold] {result.get('total_matching', 'N/A')}")
+            if result.get("analysis_name"):
+                console.print(f"[bold]Analysis:[/bold] {result['analysis_name']}")
+            if result.get("by_organism"):
+                console.print("[bold]By organism:[/bold]")
+                for item in result["by_organism"]:
+                    console.print(f"  {item['organism_name']}: {item['count']}")
+            if result.get("not_found_clusters"):
+                console.print(f"[yellow]Not found:[/yellow] {', '.join(result['not_found_clusters'])}")
+            if result.get("not_matched_clusters"):
+                console.print(f"[yellow]Not matched:[/yellow] {', '.join(result['not_matched_clusters'])}")
+            results = result.get("results", [])
+            if results:
+                table = Table(show_lines=True)
+                keys = list(results[0].keys())
+                for k in keys:
+                    table.add_column(k)
+                for row in results:
+                    table.add_row(*[str(row.get(k, "")) for k in keys])
+                console.print(table)
+            elif not summary:
+                console.print("[yellow]No results.[/yellow]")
+            if result.get("truncated"):
+                console.print(f"[dim]Showing {result['returned']} results (increase --limit for more)[/dim]")
+
+
 if __name__ == "__main__":
     app()
