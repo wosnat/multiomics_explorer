@@ -78,8 +78,11 @@ Cypher `IN` matching. Normalize case in Python before passing to
 Cypher (`toLower`/`toUpper` as appropriate).
 
 ```python
+# treatment_type is an array property — use ANY()
 if treatment_type:
-    conditions.append("toLower(e.treatment_type) IN $treatment_types")
+    conditions.append(
+        "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
+    )
     params["treatment_types"] = [t.lower() for t in treatment_type]
 ```
 

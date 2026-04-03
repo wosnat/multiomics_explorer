@@ -6,7 +6,7 @@ Tools for exploring a Prochlorococcus/Alteromonas multi-omics knowledge graph (N
 
 The KG is built by the separate `multiomics_biocypher_kg` repo. This repo is **read-only** — it never writes to the graph.
 
-**Expression schema:** The KG uses `Experiment` nodes with `Changes_expression_of` edges to Gene. Expression query tools (`query_expression`, `compare_conditions`) have been removed and are being rebuilt with the new schema. Use `run_cypher` for expression queries in the meantime — see few-shot examples in `kg/queries.py`.
+**Expression schema:** The KG uses `Experiment` nodes with `Changes_expression_of` edges to Gene. `Experiment.treatment_type` is an array (`str[]`), and `background_factors` (`str[]`, may be null) describes experimental context. Use `'value' IN e.treatment_type` for filtering and `coalesce(e.background_factors, [])` for null safety. See few-shot examples in `kg/queries.py`.
 
 ## Build and Run
 
@@ -44,9 +44,9 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `gene_overview` | Batch gene routing: identity + data availability signals (annotation_types, expression counts, ortholog summary). Accepts locus_tags list. Rich summary fields (by_organism, by_category, by_annotation_type, expression/ortholog availability counts). |
 | `gene_homologs` | Batch: gene locus_tags → ortholog group memberships. Flat long format (one row per gene × group). Filterable by source/level/rank. |
 | `list_filter_values` | List valid values for categorical filters (gene categories) |
-| `list_organisms` | All organisms with taxonomy, gene/publication/experiment counts, treatment and omics types. Verbose adds full taxonomy hierarchy. |
-| `list_publications` | Publications with experiment summaries, filterable by organism/treatment/search/author |
-| `list_experiments` | Experiments with gene count stats. Use `summary=true` for breakdowns by organism/treatment/omics/table_scope, default returns individual experiments. Filterable by organism/treatment/omics/publication/search/table_scope. |
+| `list_organisms` | All organisms with taxonomy, gene/publication/experiment counts, treatment types, background factors, omics types. Verbose adds full taxonomy hierarchy. |
+| `list_publications` | Publications with experiment summaries, filterable by organism/treatment/background_factors/search/author |
+| `list_experiments` | Experiments with gene count stats. Use `summary=true` for breakdowns by organism/treatment/background_factors/omics/table_scope, default returns individual experiments. Filterable by organism/treatment/background_factors/omics/publication/search/table_scope. |
 | `search_ontology` | Browse ontology terms by text search (GO, KEGG, EC, COG, Cyanorak, TIGR, Pfam). Summary fields: total_entries, score stats. Returns term IDs for use with `genes_by_ontology`. |
 | `search_homolog_groups` | Search ortholog groups by text (Lucene). Searches consensus_product, consensus_gene_name, description, functional_description. Summary fields: by_source, by_level, score stats. Returns group IDs for use with `genes_by_homolog_group`. Filterable by source/taxonomic_level/max_specificity_rank. |
 | `genes_by_homolog_group` | Group IDs → member genes per organism. Summary fields (by_organism, top_categories, top_groups, total_categories, genes_per_group_max/median). Batch tool with not_found/not_matched for groups and organisms. Filterable by organisms. |
@@ -55,7 +55,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 | `differential_expression_by_gene` | Gene-centric differential expression. One row per gene × experiment × timepoint. Summary stats always returned; detail rows sorted by |log2FC|. Filters: organism, locus_tags, experiment_ids, direction, significant_only. Single organism enforced. |
 | `differential_expression_by_ortholog` | Differential expression framed by ortholog groups. Cross-organism. Results at group × experiment × timepoint granularity (gene counts, not individual genes). Rich summary fields (by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments). Supports verbose, limit. Batch: not_found/not_matched for groups, organisms, experiments. Filterable by organisms, experiment_ids, direction, significant_only. |
 | `gene_response_profile` | Cross-experiment gene-level summary: how each gene responds across treatments/experiments. One result per gene with response breadth, rank stats, log2FC stats. Sorted by response breadth. |
-| `list_gene_clusters` | Browse, search, and filter gene clusters. Optional Lucene search over functional/behavioral descriptions. Filterable by organism, cluster_type, treatment_type, omics_type, publication_doi. Rich summary breakdowns. |
+| `list_gene_clusters` | Browse, search, and filter gene clusters. Optional Lucene search over functional/behavioral descriptions. Filterable by organism, cluster_type, treatment_type, background_factors, omics_type, publication_doi. Rich summary breakdowns. |
 | `gene_clusters_by_gene` | Batch gene-centric cluster lookup. Locus tags → cluster memberships. Single organism enforced. Reports genes_with/without_clusters, not_found, not_matched. |
 | `genes_in_cluster` | Cluster IDs → member genes. Drill-down tool. Summary with top_categories, genes_per_cluster stats. Verbose includes both gene-level and cluster-level descriptions. |
 | `run_cypher` | Raw Cypher escape hatch (read-only). Write operations blocked; syntax and schema validated via CyVer before execution. Returns `{returned, truncated, warnings, results}`. |
