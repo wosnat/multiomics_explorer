@@ -27,15 +27,21 @@ class TestTopLevelImports:
             gene_details,
             kg_schema,
             list_filter_values,
+            list_clustering_analyses,
             list_organisms,
             resolve_gene,
             run_cypher,
             search_ontology,
+            gene_clusters_by_gene,
+            genes_in_cluster,
         )
         # Each should be the same object as in api.functions
         assert resolve_gene is api.resolve_gene
         assert gene_homologs is api.gene_homologs
         assert genes_by_function is api.genes_by_function
+        assert list_clustering_analyses is api.list_clustering_analyses
+        assert gene_clusters_by_gene is api.gene_clusters_by_gene
+        assert genes_in_cluster is api.genes_in_cluster
 
     def test_query_expression_removed(self):
         """query_expression is no longer exported (schema migration B1)."""
@@ -2883,17 +2889,16 @@ class TestGeneResponseProfile:
 # ---------------------------------------------------------------------------
 # list_gene_clusters
 # ---------------------------------------------------------------------------
-class TestListGeneClusters:
-    """Tests for list_gene_clusters API function."""
+class TestListClusteringAnalyses:
+    """Tests for list_clustering_analyses API function."""
 
     _SUMMARY_RESULT = {
-        "total_entries": 16, "total_matching": 9,
-        "by_organism": [{"item": "Prochlorococcus MED4", "count": 9}],
-        "by_cluster_type": [{"item": "stress_response", "count": 9}],
-        "by_treatment_type": [{"item": "nitrogen_stress", "count": 9}],
-        "by_background_factors": [{"item": "pro99_medium", "count": 9}],
-        "by_omics_type": [{"item": "MICROARRAY", "count": 9}],
-        "by_publication": [{"item": "10.1038/msb4100087", "count": 9}],
+        "total_entries": 4, "total_matching": 3,
+        "by_organism": [{"item": "Prochlorococcus MED4", "count": 3}],
+        "by_cluster_type": [{"item": "stress_response", "count": 3}],
+        "by_treatment_type": [{"item": "nitrogen_stress", "count": 3}],
+        "by_background_factors": [{"item": "pro99_medium", "count": 3}],
+        "by_omics_type": [{"item": "MICROARRAY", "count": 3}],
     }
 
     _SUMMARY_RESULT_WITH_SCORE = {
@@ -2902,50 +2907,68 @@ class TestListGeneClusters:
     }
 
     _DETAIL_ROW = {
-        "cluster_id": "cluster:msb4100087:med4:up_n_transport",
-        "name": "MED4 cluster 1 (up, N transport)",
+        "analysis_id": "ca:tolonen2006:med4:nitrogen",
+        "name": "MED4 nitrogen stress clustering",
         "organism_name": "Prochlorococcus MED4",
+        "cluster_method": "k-means",
         "cluster_type": "stress_response",
+        "cluster_count": 9,
+        "total_gene_count": 150,
         "treatment_type": ["nitrogen_stress"],
-        "member_count": 5,
-        "source_paper": "Tolonen 2006",
+        "background_factors": ["pro99_medium"],
+        "omics_type": "MICROARRAY",
+        "experiment_ids": ["exp:tolonen2006:1"],
+        "clusters": [{"cluster_id": "gc:1", "name": "cluster 1", "member_count": 5}],
     }
 
-    def test_returns_dict_with_envelope(self, mock_conn):
+    def test_summary_mode(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_RESULT],
+        ]
+        result = api.list_clustering_analyses(summary=True, conn=mock_conn)
+        assert result["returned"] == 0
+        assert result["results"] == []
+        assert result["total_entries"] == 4
+        assert result["total_matching"] == 3
+        assert mock_conn.execute_query.call_count == 1
+        # Verify envelope keys present
+        for key in ("by_organism", "by_cluster_type", "by_treatment_type",
+                     "by_background_factors", "by_omics_type"):
+            assert key in result
+
+    def test_detail_mode(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [self._SUMMARY_RESULT],
             [self._DETAIL_ROW],
         ]
-        result = api.list_gene_clusters(conn=mock_conn)
+        result = api.list_clustering_analyses(conn=mock_conn)
         assert isinstance(result, dict)
-        assert result["total_entries"] == 16
-        assert result["total_matching"] == 9
+        assert result["total_entries"] == 4
+        assert result["total_matching"] == 3
         assert result["returned"] == 1
         assert len(result["results"]) == 1
-        assert result["by_organism"][0]["organism_name"] == "Prochlorococcus MED4"
+        assert result["results"][0]["analysis_id"] == "ca:tolonen2006:med4:nitrogen"
 
-    def test_summary_mode_skips_detail(self, mock_conn):
+    def test_empty_search_text_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="search_text must not be empty"):
+            api.list_clustering_analyses(search_text="", conn=mock_conn)
+
+    def test_by_organism_rename(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [self._SUMMARY_RESULT],
         ]
-        result = api.list_gene_clusters(summary=True, conn=mock_conn)
-        assert result["returned"] == 0
-        assert result["results"] == []
-        assert mock_conn.execute_query.call_count == 1
+        result = api.list_clustering_analyses(summary=True, conn=mock_conn)
+        assert result["by_organism"][0]["organism_name"] == "Prochlorococcus MED4"
 
     def test_search_text_adds_score_fields(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [self._SUMMARY_RESULT_WITH_SCORE],
             [{**self._DETAIL_ROW, "score": 5.2}],
         ]
-        result = api.list_gene_clusters(
+        result = api.list_clustering_analyses(
             search_text="nitrogen", conn=mock_conn)
         assert result["score_max"] == 5.2
         assert result["score_median"] == 2.1
-
-    def test_empty_search_text_raises(self, mock_conn):
-        with pytest.raises(ValueError, match="search_text must not be empty"):
-            api.list_gene_clusters(search_text="", conn=mock_conn)
 
 
 # ---------------------------------------------------------------------------
@@ -2961,7 +2984,7 @@ class TestGeneClustersByGene:
         "by_cluster_type": [{"item": "stress_response", "count": 2}],
         "by_treatment_type": [{"item": "nitrogen_stress", "count": 2}],
         "by_background_factors": [],
-        "by_publication": [{"item": "10.1038/msb4100087", "count": 2}],
+        "by_analysis": [{"item": "ca:tolonen2006:med4:nitrogen", "count": 2}],
     }
 
     _DETAIL_ROW = {
@@ -2971,7 +2994,10 @@ class TestGeneClustersByGene:
         "cluster_name": "MED4 cluster 1 (up, N transport)",
         "cluster_type": "stress_response",
         "membership_score": None,
-        "member_count": 5,
+        "analysis_id": "ca:tolonen2006:med4:nitrogen",
+        "analysis_name": "MED4 nitrogen stress clustering",
+        "treatment_type": ["nitrogen_stress"],
+        "background_factors": [],
     }
 
     def test_returns_envelope(self, mock_conn):
@@ -2989,6 +3015,27 @@ class TestGeneClustersByGene:
         assert result["total_clusters"] == 2
         assert result["genes_with_clusters"] == 2
         assert len(result["results"]) == 1
+
+    def test_by_analysis_in_envelope(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],
+            [self._SUMMARY_RESULT],
+        ]
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"], summary=True, conn=mock_conn)
+        assert "by_analysis" in result
+        assert result["by_analysis"][0]["analysis_id"] == "ca:tolonen2006:med4:nitrogen"
+
+    def test_analysis_ids_parameter(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"organisms": ["Prochlorococcus MED4"]}],
+            [self._SUMMARY_RESULT],
+        ]
+        result = api.gene_clusters_by_gene(
+            locus_tags=["PMM0370"],
+            analysis_ids=["ca:tolonen2006:med4:nitrogen"],
+            summary=True, conn=mock_conn)
+        assert result["returned"] == 0
 
     def test_empty_locus_tags_raises(self, mock_conn):
         with pytest.raises(ValueError, match="locus_tags must not be empty"):
@@ -3043,7 +3090,7 @@ class TestGenesInCluster:
         "membership_score": None,
     }
 
-    def test_returns_envelope(self, mock_conn):
+    def test_returns_envelope_with_cluster_ids(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [self._SUMMARY_RESULT],
             [self._DETAIL_ROW],
@@ -3054,11 +3101,45 @@ class TestGenesInCluster:
         assert result["total_matching"] == 5
         assert len(result["results"]) == 1
 
-    def test_empty_cluster_ids_raises(self, mock_conn):
-        with pytest.raises(ValueError, match="cluster_ids must not be empty"):
-            api.genes_in_cluster(cluster_ids=[], conn=mock_conn)
+    def test_mutual_exclusion_both_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="Provide cluster_ids or analysis_id, not both"):
+            api.genes_in_cluster(
+                cluster_ids=["gc:1"], analysis_id="ca:1", conn=mock_conn)
 
-    def test_summary_mode(self, mock_conn):
+    def test_mutual_exclusion_neither_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="Must provide cluster_ids or analysis_id"):
+            api.genes_in_cluster(conn=mock_conn)
+
+    def test_analysis_id_mode(self, mock_conn):
+        summary_with_analysis = {
+            **self._SUMMARY_RESULT,
+            "analysis_name": "MED4 nitrogen stress clustering",
+        }
+        mock_conn.execute_query.side_effect = [
+            [summary_with_analysis],
+            [self._DETAIL_ROW],
+        ]
+        result = api.genes_in_cluster(
+            analysis_id="ca:tolonen2006:med4:nitrogen", conn=mock_conn)
+        assert result["analysis_name"] == "MED4 nitrogen stress clustering"
+        assert result["total_matching"] == 5
+
+    def test_analysis_id_summary_mode(self, mock_conn):
+        summary_with_analysis = {
+            **self._SUMMARY_RESULT,
+            "analysis_name": "MED4 nitrogen stress clustering",
+        }
+        mock_conn.execute_query.side_effect = [
+            [summary_with_analysis],
+        ]
+        result = api.genes_in_cluster(
+            analysis_id="ca:tolonen2006:med4:nitrogen",
+            summary=True, conn=mock_conn)
+        assert result["returned"] == 0
+        assert result["results"] == []
+        assert result["analysis_name"] == "MED4 nitrogen stress clustering"
+
+    def test_summary_mode_with_cluster_ids(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [self._SUMMARY_RESULT],
         ]
@@ -3067,6 +3148,7 @@ class TestGenesInCluster:
             summary=True, conn=mock_conn)
         assert result["returned"] == 0
         assert result["results"] == []
+        assert "analysis_name" not in result
 
     def test_not_found_clusters_in_envelope(self, mock_conn):
         summary_nf = {

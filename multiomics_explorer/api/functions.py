@@ -67,8 +67,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_ortholog_diagnostics,
     build_gene_response_profile_envelope,
     build_gene_response_profile,
-    build_list_gene_clusters,
-    build_list_gene_clusters_summary,
+    build_list_clustering_analyses,
+    build_list_clustering_analyses_summary,
     build_gene_clusters_by_gene,
     build_gene_clusters_by_gene_summary,
     build_genes_in_cluster,
@@ -2082,7 +2082,7 @@ def gene_response_profile(
     }
 
 
-def list_gene_clusters(
+def list_clustering_analyses(
     search_text: str | None = None,
     organism: str | None = None,
     cluster_type: str | None = None,
@@ -2090,6 +2090,8 @@ def list_gene_clusters(
     background_factors: list[str] | None = None,
     omics_type: str | None = None,
     publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    analysis_ids: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -2097,17 +2099,16 @@ def list_gene_clusters(
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Browse, search, and filter gene clusters.
+    """Browse, search, and filter clustering analyses.
 
     Returns dict with keys: total_entries, total_matching,
     by_organism, by_cluster_type, by_treatment_type, by_background_factors,
-    by_omics_type, by_publication, returned, offset, truncated, results.
+    by_omics_type, returned, offset, truncated, results.
     When search_text provided: adds score_max, score_median.
-    Per result (compact): cluster_id, name, organism_name, cluster_type,
-    treatment_type, member_count, source_paper, score (when searching).
-    Per result (verbose): adds functional_description, behavioral_description,
-    cluster_method, treatment, light_condition, experimental_context,
-    peak_time_hours, period_hours, pub_doi.
+    Per result (compact): analysis_id, name, organism_name, cluster_method,
+    cluster_type, cluster_count, total_gene_count, treatment_type,
+    background_factors, omics_type, experiment_ids, clusters, score (when searching).
+    Per result (verbose): adds treatment, light_condition, experimental_context.
 
     summary=True: results=[], summary fields only.
     """
@@ -2122,20 +2123,21 @@ def list_gene_clusters(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, background_factors=background_factors,
         omics_type=omics_type, publication_doi=publication_doi,
+        experiment_ids=experiment_ids, analysis_ids=analysis_ids,
     )
 
     effective_text = search_text
 
     # Summary query — always runs
     try:
-        sum_cypher, sum_params = build_list_gene_clusters_summary(
+        sum_cypher, sum_params = build_list_clustering_analyses_summary(
             search_text=effective_text, **filter_kwargs)
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
     except Neo4jClientError:
         if search_text is not None:
-            logger.debug("list_gene_clusters: Lucene parse error, retrying")
+            logger.debug("list_clustering_analyses: Lucene parse error, retrying")
             effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            sum_cypher, sum_params = build_list_gene_clusters_summary(
+            sum_cypher, sum_params = build_list_clustering_analyses_summary(
                 search_text=effective_text, **filter_kwargs)
             raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
         else:
@@ -2160,8 +2162,6 @@ def list_gene_clusters(
         "by_background_factors": _rename_freq(
             raw_summary["by_background_factors"], "background_factor"),
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
-        "by_publication": _rename_freq(
-            raw_summary["by_publication"], "publication_doi"),
     }
 
     if search_text is not None:
@@ -2180,15 +2180,15 @@ def list_gene_clusters(
         return envelope
 
     try:
-        det_cypher, det_params = build_list_gene_clusters(
+        det_cypher, det_params = build_list_clustering_analyses(
             search_text=effective_text, **filter_kwargs,
             verbose=verbose, limit=limit, offset=offset)
         results = conn.execute_query(det_cypher, **det_params)
     except Neo4jClientError:
         if search_text is not None and effective_text == search_text:
-            logger.debug("list_gene_clusters detail: Lucene parse error, retrying")
+            logger.debug("list_clustering_analyses detail: Lucene parse error, retrying")
             effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
-            det_cypher, det_params = build_list_gene_clusters(
+            det_cypher, det_params = build_list_clustering_analyses(
                 search_text=effective_text, **filter_kwargs,
                 verbose=verbose, limit=limit, offset=offset)
             results = conn.execute_query(det_cypher, **det_params)
@@ -2209,6 +2209,7 @@ def gene_clusters_by_gene(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
+    analysis_ids: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -2221,12 +2222,15 @@ def gene_clusters_by_gene(
     Returns dict with keys: total_matching, total_clusters,
     genes_with_clusters, genes_without_clusters,
     not_found, not_matched,
-    by_cluster_type, by_treatment_type, by_background_factors, by_publication,
+    by_cluster_type, by_treatment_type, by_background_factors, by_analysis,
     returned, offset, truncated, results.
     Per result (compact): locus_tag, gene_name, cluster_id, cluster_name,
-    cluster_type, membership_score, member_count.
-    Per result (verbose): adds functional_description, behavioral_description,
-    treatment_type, treatment, source_paper, p_value.
+    cluster_type, membership_score, analysis_id, analysis_name,
+    treatment_type, background_factors.
+    Per result (verbose): adds cluster_method, member_count,
+    cluster_functional_description, cluster_behavioral_description,
+    treatment, light_condition, experimental_context,
+    p_value, peak_time_hours, period_hours.
 
     summary=True: results=[], summary fields only.
 
@@ -2250,6 +2254,7 @@ def gene_clusters_by_gene(
         cluster_type=cluster_type, treatment_type=treatment_type,
         background_factors=background_factors,
         publication_doi=publication_doi,
+        analysis_ids=analysis_ids,
     )
 
     # Summary query — always runs
@@ -2278,8 +2283,8 @@ def gene_clusters_by_gene(
             raw_summary["by_treatment_type"], "treatment_type"),
         "by_background_factors": _rename_freq(
             raw_summary["by_background_factors"], "background_factor"),
-        "by_publication": _rename_freq(
-            raw_summary["by_publication"], "publication_doi"),
+        "by_analysis": _rename_freq(
+            raw_summary["by_analysis"], "analysis_id"),
     }
 
     # Detail query — skip when limit=0
@@ -2303,7 +2308,8 @@ def gene_clusters_by_gene(
 
 
 def genes_in_cluster(
-    cluster_ids: list[str],
+    cluster_ids: list[str] | None = None,
+    analysis_id: str | None = None,
     organism: str | None = None,
     summary: bool = False,
     verbose: bool = False,
@@ -2312,24 +2318,27 @@ def genes_in_cluster(
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Cluster IDs → member genes.
+    """Cluster IDs or analysis ID → member genes.
 
     Returns dict with keys: total_matching, by_organism, by_cluster,
     top_categories, genes_per_cluster_max, genes_per_cluster_median,
     not_found_clusters, not_matched_clusters, not_matched_organism,
     returned, offset, truncated, results.
+    When analysis_id: also returns analysis_name.
     Per result (compact): locus_tag, gene_name, product, gene_category,
     organism_name, cluster_id, cluster_name, membership_score.
-    Per result (verbose): adds function_description, gene_summary,
-    p_value, functional_description, behavioral_description.
+    Per result (verbose): adds gene_function_description, gene_summary,
+    p_value, cluster_functional_description, cluster_behavioral_description.
 
     summary=True: results=[], summary fields only.
 
     Raises:
-        ValueError: if cluster_ids is empty.
+        ValueError: if neither or both of cluster_ids and analysis_id provided.
     """
-    if not cluster_ids:
-        raise ValueError("cluster_ids must not be empty.")
+    if cluster_ids is not None and analysis_id is not None:
+        raise ValueError("Provide cluster_ids or analysis_id, not both.")
+    if cluster_ids is None and analysis_id is None:
+        raise ValueError("Must provide cluster_ids or analysis_id.")
     if summary:
         limit = 0
 
@@ -2337,7 +2346,7 @@ def genes_in_cluster(
 
     # Summary query — always runs
     sum_cypher, sum_params = build_genes_in_cluster_summary(
-        cluster_ids=cluster_ids, organism=organism)
+        cluster_ids=cluster_ids, analysis_id=analysis_id, organism=organism)
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
     def _rename_freq(freq_list, key_name):
@@ -2365,6 +2374,9 @@ def genes_in_cluster(
         "not_matched_clusters": raw_summary["not_matched_clusters"],
     }
 
+    if analysis_id is not None:
+        envelope["analysis_name"] = raw_summary.get("analysis_name")
+
     # Check organism match
     if organism is not None and total_matching == 0 and not raw_summary["not_found_clusters"]:
         envelope["not_matched_organism"] = organism
@@ -2380,7 +2392,7 @@ def genes_in_cluster(
         return envelope
 
     det_cypher, det_params = build_genes_in_cluster(
-        cluster_ids=cluster_ids, organism=organism,
+        cluster_ids=cluster_ids, analysis_id=analysis_id, organism=organism,
         verbose=verbose, limit=limit, offset=offset)
     results = conn.execute_query(det_cypher, **det_params)
 

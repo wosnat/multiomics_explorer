@@ -10,6 +10,7 @@ from multiomics_explorer.api.functions import (
     kg_schema,
     list_filter_values,
     list_experiments,
+    list_clustering_analyses,
     list_organisms,
     list_publications,
     resolve_gene,
@@ -20,6 +21,8 @@ from multiomics_explorer.api.functions import (
     differential_expression_by_gene,
     differential_expression_by_ortholog,
     gene_response_profile,
+    gene_clusters_by_gene,
+    genes_in_cluster,
 )
 
 __all__ = [
@@ -32,6 +35,7 @@ __all__ = [
     "kg_schema",
     "list_filter_values",
     "list_experiments",
+    "list_clustering_analyses",
     "list_organisms",
     "list_publications",
     "resolve_gene",
@@ -42,4 +46,6 @@ __all__ = [
     "differential_expression_by_gene",
     "differential_expression_by_ortholog",
     "gene_response_profile",
+    "gene_clusters_by_gene",
+    "genes_in_cluster",
 ]
