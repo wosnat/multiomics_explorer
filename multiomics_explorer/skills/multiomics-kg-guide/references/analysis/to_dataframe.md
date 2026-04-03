@@ -159,3 +159,63 @@ tp_df.to_csv("med4_timepoints.csv", index=False)
 |---------|-----|
 | Passing a `gene_response_profile` result | This function is for `list_experiments` only |
 | Using `to_dataframe()` when you want timepoint detail | `to_dataframe()` drops timepoints — use this function |
+
+---
+
+## `analyses_to_dataframe(result)` — analysis × cluster
+
+### What it does
+
+Expands each clustering analysis into one row per cluster. Analysis-level
+scalar fields repeat for every cluster row. The `clusters` list column is
+unwound — never appears raw in the output.
+
+Compact cluster columns (always present): `cluster_id`, `cluster_name`,
+`cluster_member_count`.
+
+Verbose cluster columns (present only when the result was fetched with
+`verbose=True`): `cluster_functional_description`,
+`cluster_behavioral_description`, `cluster_peak_time_hours`,
+`cluster_period_hours`.
+
+### Parameters
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| result | dict | required | Return value from `list_clustering_analyses()` |
+
+### Response format
+
+`pd.DataFrame` with all scalar analysis fields plus `cluster_id`,
+`cluster_name`, `cluster_member_count`. List columns (`treatment_type`,
+`background_factors`, `experiment_ids`) are joined with ` | `.
+
+### Few-shot examples
+
+**Compact — iterate over analyses and their clusters:**
+```python
+from multiomics_explorer import list_clustering_analyses
+from multiomics_explorer.analysis import analyses_to_dataframe
+
+result = list_clustering_analyses(organism="MED4")
+df = analyses_to_dataframe(result)
+df.to_csv("med4_clusters.csv", index=False)
+```
+
+**Verbose — include cluster descriptions:**
+```python
+from multiomics_explorer import list_clustering_analyses
+from multiomics_explorer.analysis import analyses_to_dataframe
+
+result = list_clustering_analyses(organism="MED4", verbose=True)
+df = analyses_to_dataframe(result)
+# Extra columns: cluster_functional_description, cluster_behavioral_description,
+#                cluster_peak_time_hours, cluster_period_hours
+```
+
+### Common mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Passing a `list_experiments` result | This function is for `list_clustering_analyses` only |
+| Using `to_dataframe()` when you want cluster detail | `to_dataframe()` drops the clusters list — use this function |

@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 
 from multiomics_explorer.analysis.frames import (
+    analyses_to_dataframe,
     experiments_to_dataframe,
     profile_summary_to_dataframe,
     to_dataframe,
@@ -392,3 +393,154 @@ class TestExperimentsToDataFrame:
     def test_missing_results_key(self):
         with pytest.raises(ValueError, match="results"):
             experiments_to_dataframe({"data": []})
+
+
+# ---------------------------------------------------------------------------
+# Fixtures for analyses_to_dataframe
+# ---------------------------------------------------------------------------
+
+_ANALYSES_RESULT_COMPACT = {
+    "total_entries": 2,
+    "total_matching": 2,
+    "returned": 2,
+    "results": [
+        {
+            "analysis_id": "ana1",
+            "name": "MED4 N-stress clusters",
+            "organism_name": "MED4",
+            "cluster_method": "kmeans",
+            "cluster_type": "transcriptomic",
+            "cluster_count": 2,
+            "total_gene_count": 100,
+            "treatment_type": ["nitrogen_stress"],
+            "background_factors": [],
+            "omics_type": "transcriptomics",
+            "experiment_ids": ["exp1"],
+            "clusters": [
+                {"cluster_id": "cl1", "name": "Cluster 1", "member_count": 60},
+                {"cluster_id": "cl2", "name": "Cluster 2", "member_count": 40},
+            ],
+        },
+        {
+            "analysis_id": "ana2",
+            "name": "MED4 light clusters",
+            "organism_name": "MED4",
+            "cluster_method": "kmeans",
+            "cluster_type": "transcriptomic",
+            "cluster_count": 1,
+            "total_gene_count": 80,
+            "treatment_type": ["light_stress"],
+            "background_factors": ["low_light"],
+            "omics_type": "transcriptomics",
+            "experiment_ids": ["exp2"],
+            "clusters": [
+                {"cluster_id": "cl3", "name": "Cluster 3", "member_count": 80},
+            ],
+        },
+    ],
+}
+
+_ANALYSES_RESULT_VERBOSE = {
+    "total_entries": 1,
+    "total_matching": 1,
+    "returned": 1,
+    "results": [
+        {
+            "analysis_id": "ana1",
+            "name": "MED4 N-stress clusters",
+            "organism_name": "MED4",
+            "cluster_method": "kmeans",
+            "cluster_type": "transcriptomic",
+            "cluster_count": 1,
+            "total_gene_count": 60,
+            "treatment_type": ["nitrogen_stress"],
+            "background_factors": [],
+            "omics_type": "transcriptomics",
+            "experiment_ids": ["exp1"],
+            "treatment": "N-deplete",
+            "light_condition": "HL",
+            "experimental_context": "lab",
+            "clusters": [
+                {
+                    "cluster_id": "cl1",
+                    "name": "Cluster 1",
+                    "member_count": 60,
+                    "functional_description": "ribosomal genes",
+                    "behavioral_description": "early induction",
+                    "peak_time_hours": 6.0,
+                    "period_hours": None,
+                },
+            ],
+        },
+    ],
+}
+
+
+class TestAnalysesToDataFrame:
+    """analyses_to_dataframe flattens analysis × cluster into one row per pair."""
+
+    def test_flattens_analysis_x_cluster(self):
+        """1 analysis with 2 clusters + 1 analysis with 1 cluster → 3 rows total."""
+        df = analyses_to_dataframe(_ANALYSES_RESULT_COMPACT)
+        assert len(df) == 3
+        assert "analysis_id" in df.columns
+        assert "cluster_id" in df.columns
+
+    def test_analysis_fields_repeat_per_cluster(self):
+        """Analysis-level scalar fields are repeated for each cluster row."""
+        df = analyses_to_dataframe(_ANALYSES_RESULT_COMPACT)
+        ana1_rows = df[df["analysis_id"] == "ana1"]
+        assert len(ana1_rows) == 2
+        assert set(ana1_rows["organism_name"].tolist()) == {"MED4"}
+        assert set(ana1_rows["cluster_count"].tolist()) == {2}
+
+    def test_compact_cluster_columns(self):
+        """Compact mode produces cluster_id, cluster_name, cluster_member_count."""
+        df = analyses_to_dataframe(_ANALYSES_RESULT_COMPACT)
+        assert "cluster_id" in df.columns
+        assert "cluster_name" in df.columns
+        assert "cluster_member_count" in df.columns
+
+    def test_cluster_values_correct(self):
+        """cluster_id / cluster_member_count values match the source data."""
+        df = analyses_to_dataframe(_ANALYSES_RESULT_COMPACT)
+        cl1_row = df[df["cluster_id"] == "cl1"].iloc[0]
+        assert cl1_row["cluster_member_count"] == 60
+        cl3_row = df[df["cluster_id"] == "cl3"].iloc[0]
+        assert cl3_row["cluster_member_count"] == 80
+
+    def test_empty_results(self):
+        """Empty results list → empty DataFrame."""
+        df = analyses_to_dataframe({"results": []})
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 0
+
+    def test_no_results_key_raises(self):
+        """Missing 'results' key → ValueError."""
+        with pytest.raises(ValueError, match="results"):
+            analyses_to_dataframe({"data": []})
+
+    def test_verbose_cluster_fields(self):
+        """Verbose fields present → columns for functional/behavioral/peak/period."""
+        df = analyses_to_dataframe(_ANALYSES_RESULT_VERBOSE)
+        assert "cluster_functional_description" in df.columns
+        assert "cluster_behavioral_description" in df.columns
+        assert "cluster_peak_time_hours" in df.columns
+        assert "cluster_period_hours" in df.columns
+        row = df.iloc[0]
+        assert row["cluster_functional_description"] == "ribosomal genes"
+        assert row["cluster_peak_time_hours"] == 6.0
+
+    def test_no_nested_columns(self):
+        """Output is CSV-safe — no list or dict values remain."""
+        df = analyses_to_dataframe(_ANALYSES_RESULT_COMPACT)
+        for col in df.columns:
+            for val in df[col]:
+                assert not isinstance(val, (list, dict)), (
+                    f"Column '{col}' contains a {type(val).__name__} value"
+                )
+
+    def test_clusters_column_absent_from_output(self):
+        """The raw 'clusters' column should not appear in the output."""
+        df = analyses_to_dataframe(_ANALYSES_RESULT_COMPACT)
+        assert "clusters" not in df.columns

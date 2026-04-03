@@ -5,6 +5,7 @@ from multiomics_explorer.analysis.expression import (
     response_matrix,
 )
 from multiomics_explorer.analysis.frames import (
+    analyses_to_dataframe,
     experiments_to_dataframe,
     profile_summary_to_dataframe,
     to_dataframe,
@@ -16,4 +17,5 @@ __all__ = [
     "to_dataframe",
     "profile_summary_to_dataframe",
     "experiments_to_dataframe",
+    "analyses_to_dataframe",
 ]

@@ -29,6 +29,7 @@ _LIST_DELIMITER = " | "
 _DEDICATED_FUNCTIONS: dict[str, str] = {
     "response_summary": "profile_summary_to_dataframe()",
     "timepoints": "experiments_to_dataframe()",
+    "clusters": "analyses_to_dataframe()",
 }
 
 
@@ -137,6 +138,66 @@ def experiments_to_dataframe(result: dict) -> pd.DataFrame:
             record["tp_significant_down"] = None
             record["tp_not_significant"] = None
             records.append(record)
+    df = pd.DataFrame(records)
+    if df.empty:
+        return df
+    return _flatten_columns(df)
+
+
+def analyses_to_dataframe(result: dict) -> pd.DataFrame:
+    """Convert a ``list_clustering_analyses`` result to an analysis × cluster DataFrame.
+
+    Parameters
+    ----------
+    result:
+        Raw dict returned by ``list_clustering_analyses()``.
+
+    Returns
+    -------
+    pd.DataFrame
+        One row per analysis × cluster. Analysis-level scalar fields repeat
+        for each cluster row. Compact cluster columns: ``cluster_id``,
+        ``cluster_name``, ``cluster_member_count``. Verbose cluster columns
+        (when present): ``cluster_functional_description``,
+        ``cluster_behavioral_description``, ``cluster_peak_time_hours``,
+        ``cluster_period_hours``.
+
+    Raises
+    ------
+    ValueError
+        If ``result`` does not contain a ``"results"`` key.
+    """
+    if "results" not in result:
+        raise ValueError(
+            "Expected a dict with a 'results' key. "
+            "Got keys: " + ", ".join(sorted(result.keys()))
+        )
+    rows_list = result["results"]
+    if not rows_list:
+        return pd.DataFrame()
+
+    # Verbose cluster field names (only present when verbose=True was used)
+    _VERBOSE_CLUSTER_FIELDS = (
+        "functional_description",
+        "behavioral_description",
+        "peak_time_hours",
+        "period_hours",
+    )
+
+    records = []
+    for analysis in rows_list:
+        base = {k: v for k, v in analysis.items() if k != "clusters"}
+        clusters = analysis.get("clusters") or []
+        for cl in clusters:
+            record = {**base}
+            record["cluster_id"] = cl.get("cluster_id")
+            record["cluster_name"] = cl.get("name")
+            record["cluster_member_count"] = cl.get("member_count")
+            for field in _VERBOSE_CLUSTER_FIELDS:
+                if field in cl:
+                    record[f"cluster_{field}"] = cl.get(field)
+            records.append(record)
+
     df = pd.DataFrame(records)
     if df.empty:
         return df
