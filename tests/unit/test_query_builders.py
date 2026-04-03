@@ -2683,147 +2683,6 @@ class TestBuildGeneResponseProfile:
         assert "LIMIT" not in cypher
 
 
-class TestGeneClusterWhere:
-    """Tests for _gene_cluster_where shared helper."""
-
-    def test_no_filters(self):
-        from multiomics_explorer.kg.queries_lib import _gene_cluster_where
-        conditions, params = _gene_cluster_where()
-        assert conditions == []
-        assert params == {}
-
-    def test_organism_filter(self):
-        from multiomics_explorer.kg.queries_lib import _gene_cluster_where
-        conditions, params = _gene_cluster_where(organism="MED4")
-        assert len(conditions) == 1
-        assert "organism_name" in conditions[0].lower() or "organism" in conditions[0].lower()
-        assert params["organism"] == "MED4"
-
-    def test_cluster_type_filter(self):
-        from multiomics_explorer.kg.queries_lib import _gene_cluster_where
-        conditions, params = _gene_cluster_where(cluster_type="stress_response")
-        assert len(conditions) == 1
-        assert "$cluster_type" in conditions[0]
-        assert params["cluster_type"] == "stress_response"
-
-    def test_treatment_type_filter(self):
-        from multiomics_explorer.kg.queries_lib import _gene_cluster_where
-        conditions, params = _gene_cluster_where(treatment_type=["nitrogen_stress"])
-        assert len(conditions) == 1
-        assert "$treatment_type" in conditions[0]
-        assert params["treatment_type"] == ["nitrogen_stress"]
-
-    def test_omics_type_filter(self):
-        from multiomics_explorer.kg.queries_lib import _gene_cluster_where
-        conditions, params = _gene_cluster_where(omics_type="MICROARRAY")
-        assert len(conditions) == 1
-        assert "$omics_type" in conditions[0]
-        assert params["omics_type"] == "MICROARRAY"
-
-    def test_combined_filters(self):
-        from multiomics_explorer.kg.queries_lib import _gene_cluster_where
-        conditions, params = _gene_cluster_where(
-            organism="MED4", cluster_type="stress_response",
-            treatment_type=["nitrogen_stress"], omics_type="MICROARRAY",
-        )
-        assert len(conditions) == 4
-        assert len(params) == 4
-
-
-class TestBuildListGeneClustersSummary:
-    """Tests for build_list_gene_clusters_summary."""
-
-    def test_no_search_no_filters(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters_summary
-        cypher, params = build_list_gene_clusters_summary()
-        assert "GeneCluster" in cypher
-        assert "total_entries" in cypher
-        assert "total_matching" in cypher
-        assert "by_organism" in cypher
-        assert "by_cluster_type" in cypher
-        assert "by_treatment_type" in cypher
-        assert "by_omics_type" in cypher
-        assert "WHERE" not in cypher
-
-    def test_with_search_text(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters_summary
-        cypher, params = build_list_gene_clusters_summary(search_text="photosynthesis")
-        assert "geneClusterFullText" in cypher
-        assert params["search_text"] == "photosynthesis"
-        assert "score_max" in cypher
-        assert "score_median" in cypher
-
-    def test_with_organism_filter(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters_summary
-        cypher, params = build_list_gene_clusters_summary(organism="MED4")
-        assert "WHERE" in cypher
-        assert params["organism"] == "MED4"
-
-    def test_with_publication_doi_filter(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters_summary
-        cypher, params = build_list_gene_clusters_summary(
-            publication_doi=["10.1038/msb4100087"])
-        assert "Publication_has_gene_cluster" in cypher
-        assert params["publication_doi"] == ["10.1038/msb4100087"]
-
-
-class TestBuildListGeneClusters:
-    """Tests for build_list_gene_clusters (detail builder)."""
-
-    def test_no_search_returns_expected_columns(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, params = build_list_gene_clusters()
-        for col in ["cluster_id", "name", "organism_name", "cluster_type",
-                     "treatment_type", "member_count", "source_paper"]:
-            assert f"AS {col}" in cypher
-        assert "score" not in cypher
-
-    def test_with_search_text(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, params = build_list_gene_clusters(search_text="nitrogen")
-        assert "geneClusterFullText" in cypher
-        assert "score" in cypher
-        assert params["search_text"] == "nitrogen"
-
-    def test_verbose_adds_columns(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, params = build_list_gene_clusters(verbose=True)
-        for col in ["functional_description", "behavioral_description",
-                     "cluster_method", "treatment", "light_condition",
-                     "experimental_context"]:
-            assert f"AS {col}" in cypher
-
-    def test_verbose_false_omits_columns(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, params = build_list_gene_clusters(verbose=False)
-        assert "functional_description" not in cypher
-        assert "behavioral_description" not in cypher
-
-    def test_offset_emits_skip(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, params = build_list_gene_clusters(limit=10, offset=5)
-        assert "SKIP $offset" in cypher
-        assert params["offset"] == 5
-
-    def test_offset_zero_no_skip(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, params = build_list_gene_clusters(limit=10, offset=0)
-        assert "SKIP" not in cypher
-        assert "offset" not in params
-
-    def test_publication_doi_filter(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, params = build_list_gene_clusters(
-            publication_doi=["10.1038/msb4100087"])
-        assert "Publication_has_gene_cluster" in cypher
-        assert params["publication_doi"] == ["10.1038/msb4100087"]
-
-    def test_has_order_by(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, _ = build_list_gene_clusters()
-        assert "ORDER BY" in cypher
-
-
 # ---------------------------------------------------------------------------
 # ClusteringAnalysis helpers
 # ---------------------------------------------------------------------------
@@ -3361,14 +3220,14 @@ class TestBackgroundFactors:
         cypher, _ = build_list_publications(search_text="light")
         assert "background_factors" in cypher
 
-    def test_list_gene_clusters_returns_background_factors(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
-        cypher, _ = build_list_gene_clusters()
+    def test_list_clustering_analyses_returns_background_factors(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, _ = build_list_clustering_analyses()
         assert "background_factors" in cypher
 
-    def test_list_gene_clusters_summary_has_by_background_factors(self):
-        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters_summary
-        cypher, _ = build_list_gene_clusters_summary()
+    def test_list_clustering_analyses_summary_has_by_background_factors(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
+        cypher, _ = build_list_clustering_analyses_summary()
         assert "by_background_factors" in cypher
 
     def test_differential_expression_by_gene_verbose_has_background_factors(self):
