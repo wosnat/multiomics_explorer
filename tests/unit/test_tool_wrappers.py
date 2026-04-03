@@ -57,7 +57,7 @@ EXPECTED_TOOLS = [
     "differential_expression_by_gene",
     "differential_expression_by_ortholog",
     "gene_response_profile",
-    "list_gene_clusters",
+    "list_clustering_analyses",
     "gene_clusters_by_gene",
     "genes_in_cluster",
 ]
@@ -2898,64 +2898,79 @@ class TestGeneResponseProfileWrapper:
 
 
 # ---------------------------------------------------------------------------
-# list_gene_clusters
+# list_clustering_analyses
 # ---------------------------------------------------------------------------
-class TestListGeneClustersWrapper:
-    """Tests for list_gene_clusters MCP wrapper."""
+class TestListClusteringAnalysesWrapper:
+    """Tests for list_clustering_analyses MCP wrapper."""
 
     _SAMPLE_API_RETURN = {
-        "total_entries": 16,
-        "total_matching": 9,
-        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 9}],
-        "by_cluster_type": [{"cluster_type": "stress_response", "count": 9}],
-        "by_treatment_type": [{"treatment_type": "nitrogen_stress", "count": 9}],
+        "total_entries": 4,
+        "total_matching": 2,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
+        "by_cluster_type": [{"cluster_type": "stress_response", "count": 2}],
+        "by_treatment_type": [{"treatment_type": "nitrogen_stress", "count": 2}],
         "by_background_factors": [],
-        "by_omics_type": [{"omics_type": "MICROARRAY", "count": 9}],
-        "by_publication": [{"publication_doi": "10.1038/msb4100087", "count": 9}],
+        "by_omics_type": [{"omics_type": "MICROARRAY", "count": 2}],
+        "score_max": None,
+        "score_median": None,
         "returned": 1,
         "offset": 0,
         "truncated": True,
         "results": [
-            {"cluster_id": "cluster:msb4100087:med4:up_n_transport",
-             "name": "MED4 cluster 1 (up, N transport)",
+            {"analysis_id": "ca:msb4100087:med4:nitrogen",
+             "name": "MED4 nitrogen stress response clustering",
              "organism_name": "Prochlorococcus MED4",
+             "cluster_method": "K-means",
              "cluster_type": "stress_response",
+             "cluster_count": 9,
+             "total_gene_count": 45,
              "treatment_type": ["nitrogen_stress"],
-             "member_count": 5,
-             "source_paper": "Tolonen 2006"},
+             "background_factors": [],
+             "omics_type": "MICROARRAY",
+             "experiment_ids": ["exp:msb4100087:1"],
+             "clusters": [
+                 {"cluster_id": "cluster:msb4100087:med4:up_n_transport",
+                  "name": "MED4 cluster 1 (up, N transport)",
+                  "member_count": 5},
+             ]},
         ],
     }
 
     @pytest.mark.asyncio
     async def test_returns_response_model(self, tool_fns, mock_ctx):
         with patch(
-            "multiomics_explorer.api.functions.list_gene_clusters",
+            "multiomics_explorer.api.functions.list_clustering_analyses",
             return_value=self._SAMPLE_API_RETURN,
         ):
-            result = await tool_fns["list_gene_clusters"](mock_ctx)
-        assert result.total_entries == 16
-        assert result.total_matching == 9
+            result = await tool_fns["list_clustering_analyses"](mock_ctx)
+        assert result.total_entries == 4
+        assert result.total_matching == 2
         assert result.returned == 1
         assert len(result.results) == 1
-        assert result.results[0].cluster_id == "cluster:msb4100087:med4:up_n_transport"
+        r = result.results[0]
+        assert r.analysis_id == "ca:msb4100087:med4:nitrogen"
+        assert r.cluster_count == 9
+        assert len(r.clusters) == 1
+        assert r.clusters[0].cluster_id == "cluster:msb4100087:med4:up_n_transport"
+        assert r.clusters[0].member_count == 5
 
     @pytest.mark.asyncio
     async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
         with patch(
-            "multiomics_explorer.api.functions.list_gene_clusters",
+            "multiomics_explorer.api.functions.list_clustering_analyses",
             side_effect=ValueError("search_text must not be empty"),
         ):
             with pytest.raises(ToolError, match="search_text must not be empty"):
-                await tool_fns["list_gene_clusters"](
+                await tool_fns["list_clustering_analyses"](
                     mock_ctx, search_text="")
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
         with patch(
-            "multiomics_explorer.api.functions.list_gene_clusters",
+            "multiomics_explorer.api.functions.list_clustering_analyses",
             return_value=self._SAMPLE_API_RETURN,
         ) as mock_api:
-            await tool_fns["list_gene_clusters"](
+            await tool_fns["list_clustering_analyses"](
                 mock_ctx, search_text="nitrogen",
                 organism="MED4", cluster_type="stress_response",
                 summary=True, verbose=True, limit=10,

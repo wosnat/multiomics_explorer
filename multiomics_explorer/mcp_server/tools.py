@@ -2503,7 +2503,7 @@ def register_tools(mcp: FastMCP):
             raise ToolError(f"Error in gene_response_profile: {e}")
 
     # -----------------------------------------------------------------
-    # list_gene_clusters
+    # list_clustering_analyses
     # -----------------------------------------------------------------
 
     class GeneClusterOrganismBreakdown(BaseModel):
@@ -2530,53 +2530,95 @@ def register_tools(mcp: FastMCP):
         publication_doi: str
         count: int
 
-    class ListGeneClustersResult(BaseModel):
-        cluster_id: str
-        name: str
-        organism_name: str
-        cluster_type: str
-        treatment_type: list[str]
-        background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'continuous_light'])")
-        member_count: int
-        source_paper: str
-        score: float | None = None
+    class InlineCluster(BaseModel):
+        cluster_id: str = Field(
+            description="GeneCluster node ID (e.g. 'cluster:msb4100087:med4:up_n_transport')")
+        name: str = Field(
+            description="Cluster name (e.g. 'MED4 cluster 1 (up, N transport)')")
+        member_count: int = Field(
+            description="Number of genes in this cluster")
         # verbose-only
-        functional_description: str | None = None
-        behavioral_description: str | None = None
-        cluster_method: str | None = None
-        treatment: str | None = None
-        light_condition: str | None = None
-        experimental_context: str | None = None
-        peak_time_hours: float | None = None
-        period_hours: float | None = None
-        pub_doi: str | None = None
+        functional_description: str | None = Field(default=None,
+            description="What the cluster genes ARE")
+        behavioral_description: str | None = Field(default=None,
+            description="What the cluster genes DO together")
+        peak_time_hours: float | None = Field(default=None,
+            description="Peak expression time in hours (diel clusters)")
+        period_hours: float | None = Field(default=None,
+            description="Expression period in hours (diel clusters)")
 
-    class ListGeneClustersResponse(BaseModel):
-        total_entries: int
-        total_matching: int
-        by_organism: list["GeneClusterOrganismBreakdown"]
-        by_cluster_type: list["GeneClusterTypeBreakdown"]
-        by_treatment_type: list["GeneClusterTreatmentBreakdown"]
-        by_background_factors: list["GeneClusterBackgroundFactorBreakdown"]
-        by_omics_type: list["GeneClusterOmicsBreakdown"]
-        by_publication: list["GeneClusterPublicationBreakdown"]
-        score_max: float | None = None
-        score_median: float | None = None
-        returned: int
-        offset: int = 0
-        truncated: bool
-        results: list["ListGeneClustersResult"]
+    class ListClusteringAnalysesResult(BaseModel):
+        analysis_id: str = Field(
+            description="ClusteringAnalysis node ID (e.g. 'ca:msb4100087:med4:nitrogen')")
+        name: str = Field(
+            description="Analysis name (e.g. 'MED4 nitrogen stress response clustering')")
+        organism_name: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MED4')")
+        cluster_method: str | None = Field(default=None,
+            description="Clustering method (e.g. 'K-means', 'fuzzy c-means')")
+        cluster_type: str = Field(
+            description="Cluster category (e.g. 'stress_response')")
+        cluster_count: int = Field(
+            description="Number of clusters in this analysis")
+        total_gene_count: int = Field(
+            description="Total genes across all clusters")
+        treatment_type: list[str] = Field(
+            description="Treatment types (e.g. ['nitrogen_stress'])")
+        background_factors: list[str] = Field(default_factory=list,
+            description="Background experimental factors (e.g. ['axenic', 'continuous_light'])")
+        omics_type: str | None = Field(default=None,
+            description="Omics data type (e.g. 'MICROARRAY')")
+        experiment_ids: list[str] = Field(default_factory=list,
+            description="Linked experiment IDs")
+        clusters: list["InlineCluster"] = Field(default_factory=list,
+            description="Clusters belonging to this analysis")
+        score: float | None = Field(default=None,
+            description="Lucene relevance score (only when search_text used)")
+        # verbose-only
+        treatment: str | None = Field(default=None,
+            description="Free-text condition description")
+        light_condition: str | None = Field(default=None,
+            description="Light regime (e.g. 'diel_cycle')")
+        experimental_context: str | None = Field(default=None,
+            description="Full experimental context description")
+
+    class ListClusteringAnalysesResponse(BaseModel):
+        total_entries: int = Field(
+            description="Total analyses in KG (before filters)")
+        total_matching: int = Field(
+            description="Analyses matching current filters")
+        by_organism: list["GeneClusterOrganismBreakdown"] = Field(
+            description="Analyses per organism")
+        by_cluster_type: list["GeneClusterTypeBreakdown"] = Field(
+            description="Analyses per cluster type")
+        by_treatment_type: list["GeneClusterTreatmentBreakdown"] = Field(
+            description="Analyses per treatment type")
+        by_background_factors: list["GeneClusterBackgroundFactorBreakdown"] = Field(
+            description="Analyses per background factor")
+        by_omics_type: list["GeneClusterOmicsBreakdown"] = Field(
+            description="Analyses per omics type")
+        score_max: float | None = Field(default=None,
+            description="Highest Lucene score (search only)")
+        score_median: float | None = Field(default=None,
+            description="Median Lucene score (search only)")
+        returned: int = Field(description="Results in this response")
+        offset: int = Field(default=0, description="Offset into result set")
+        truncated: bool = Field(
+            description="True if total_matching > offset + returned")
+        results: list["ListClusteringAnalysesResult"] = Field(
+            default_factory=list, description="One row per clustering analysis")
 
     @mcp.tool(
         tags={"clusters", "search"},
         annotations={"readOnlyHint": True, "destructiveHint": False,
                      "idempotentHint": True, "openWorldHint": False},
     )
-    async def list_gene_clusters(
+    async def list_clustering_analyses(
         ctx: Context,
         search_text: Annotated[str | None, Field(
-            description="Lucene full-text query over name, functional_description, "
-            "behavioral_description, experimental_context. Results ranked by score.",
+            description="Lucene full-text query over analysis name, cluster names, "
+            "functional/behavioral descriptions, experimental_context. "
+            "Results ranked by score.",
         )] = None,
         organism: Annotated[str | None, Field(
             description="Filter by organism (case-insensitive partial match).",
@@ -2597,46 +2639,61 @@ def register_tools(mcp: FastMCP):
         publication_doi: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s).",
         )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Filter by experiment IDs.",
+        )] = None,
+        analysis_ids: Annotated[list[str] | None, Field(
+            description="Filter by analysis IDs.",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include functional_description, behavioral_description, "
-            "cluster_method, treatment, light_condition, experimental_context, "
-            "peak_time_hours, period_hours, pub_doi.",
+            description="Include treatment, light_condition, experimental_context "
+            "on analyses; functional_description, behavioral_description, "
+            "peak_time_hours, period_hours on inline clusters.",
         )] = False,
         limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0)] = 0,
-    ) -> ListGeneClustersResponse:
-        """Browse, search, and filter gene clusters.
+    ) -> ListClusteringAnalysesResponse:
+        """Browse, search, and filter clustering analyses.
 
-        Search across cluster names, functional descriptions, behavioral
-        descriptions, and experimental context. Filter by organism, cluster
-        type, treatment type, omics type, or publication.
-
-        Returns cluster IDs for use with genes_in_cluster.
+        Each analysis groups related gene clusters from one study/organism.
+        Returns analysis IDs for use with genes_in_cluster(analysis_id=...).
+        Inline clusters included — use genes_in_cluster to drill into members.
         """
-        await ctx.info(f"list_gene_clusters search_text={search_text!r} "
+        await ctx.info(f"list_clustering_analyses search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
         try:
             conn = _conn(ctx)
-            data = api.list_gene_clusters(
+            data = api.list_clustering_analyses(
                 search_text=search_text, organism=organism,
                 cluster_type=cluster_type, treatment_type=treatment_type,
                 background_factors=background_factors,
                 omics_type=omics_type, publication_doi=publication_doi,
+                experiment_ids=experiment_ids, analysis_ids=analysis_ids,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 conn=conn,
             )
-            by_organism = [GeneClusterOrganismBreakdown(**b) for b in data["by_organism"]]
-            by_cluster_type = [GeneClusterTypeBreakdown(**b) for b in data["by_cluster_type"]]
-            by_treatment_type = [GeneClusterTreatmentBreakdown(**b) for b in data["by_treatment_type"]]
-            by_background_factors = [GeneClusterBackgroundFactorBreakdown(**b) for b in data["by_background_factors"]]
-            by_omics_type = [GeneClusterOmicsBreakdown(**b) for b in data["by_omics_type"]]
-            by_publication = [GeneClusterPublicationBreakdown(**b) for b in data["by_publication"]]
-            results = [ListGeneClustersResult(**r) for r in data["results"]]
-            response = ListGeneClustersResponse(
+            by_organism = [GeneClusterOrganismBreakdown(**b)
+                           for b in data["by_organism"]]
+            by_cluster_type = [GeneClusterTypeBreakdown(**b)
+                               for b in data["by_cluster_type"]]
+            by_treatment_type = [GeneClusterTreatmentBreakdown(**b)
+                                 for b in data["by_treatment_type"]]
+            by_background_factors = [GeneClusterBackgroundFactorBreakdown(**b)
+                                     for b in data["by_background_factors"]]
+            by_omics_type = [GeneClusterOmicsBreakdown(**b)
+                             for b in data["by_omics_type"]]
+            results = [
+                ListClusteringAnalysesResult(
+                    **{k: v for k, v in r.items() if k != "clusters"},
+                    clusters=[InlineCluster(**c) for c in r.get("clusters", [])],
+                )
+                for r in data["results"]
+            ]
+            response = ListClusteringAnalysesResponse(
                 total_entries=data["total_entries"],
                 total_matching=data["total_matching"],
                 by_organism=by_organism,
@@ -2644,7 +2701,6 @@ def register_tools(mcp: FastMCP):
                 by_treatment_type=by_treatment_type,
                 by_background_factors=by_background_factors,
                 by_omics_type=by_omics_type,
-                by_publication=by_publication,
                 score_max=data.get("score_max"),
                 score_median=data.get("score_median"),
                 returned=data["returned"],
@@ -2652,14 +2708,15 @@ def register_tools(mcp: FastMCP):
                 truncated=data["truncated"],
                 results=results,
             )
-            await ctx.info(f"Returning {response.returned} of {response.total_matching} clusters")
+            await ctx.info(f"Returning {response.returned} of "
+                           f"{response.total_matching} analyses")
             return response
         except ValueError as e:
-            await ctx.warning(f"list_gene_clusters error: {e}")
+            await ctx.warning(f"list_clustering_analyses error: {e}")
             raise ToolError(str(e))
         except Exception as e:
-            await ctx.error(f"list_gene_clusters unexpected error: {e}")
-            raise ToolError(f"Error in list_gene_clusters: {e}")
+            await ctx.error(f"list_clustering_analyses unexpected error: {e}")
+            raise ToolError(f"Error in list_clustering_analyses: {e}")
 
     # ── gene_clusters_by_gene ──────────────────────────────────────────
 
@@ -2762,7 +2819,7 @@ def register_tools(mcp: FastMCP):
         Gene-centric lookup: 'what clusters are these genes in?'
         Single organism enforced. One row per gene × cluster.
 
-        Use list_gene_clusters for discovery by text search.
+        Use list_clustering_analyses for discovery by text search.
         Use genes_in_cluster to drill into a cluster's full membership.
         """
         await ctx.info(f"gene_clusters_by_gene locus_tags={locus_tags} "
@@ -2885,7 +2942,7 @@ def register_tools(mcp: FastMCP):
     async def genes_in_cluster(
         ctx: Context,
         cluster_ids: Annotated[list[str], Field(
-            description="GeneCluster node IDs (from list_gene_clusters "
+            description="GeneCluster node IDs (from list_clustering_analyses "
             "or gene_clusters_by_gene).",
         )],
         organism: Annotated[str | None, Field(
@@ -2906,10 +2963,10 @@ def register_tools(mcp: FastMCP):
     ) -> GenesInClusterResponse:
         """Get member genes of gene clusters.
 
-        Takes cluster IDs from list_gene_clusters or gene_clusters_by_gene
+        Takes cluster IDs from list_clustering_analyses or gene_clusters_by_gene
         and returns their member genes. One row per gene × cluster.
 
-        For cluster discovery by text, use list_gene_clusters first.
+        For cluster discovery by text, use list_clustering_analyses first.
         For gene → cluster direction, use gene_clusters_by_gene.
         """
         await ctx.info(f"genes_in_cluster cluster_ids={cluster_ids} "
