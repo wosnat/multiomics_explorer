@@ -2526,10 +2526,6 @@ def register_tools(mcp: FastMCP):
         omics_type: str
         count: int
 
-    class GeneClusterPublicationBreakdown(BaseModel):
-        publication_doi: str
-        count: int
-
     class InlineCluster(BaseModel):
         cluster_id: str = Field(
             description="GeneCluster node ID (e.g. 'cluster:msb4100087:med4:up_n_transport')")
@@ -2720,6 +2716,10 @@ def register_tools(mcp: FastMCP):
 
     # ── gene_clusters_by_gene ──────────────────────────────────────────
 
+    class GeneClusterAnalysisBreakdown(BaseModel):
+        analysis_id: str = Field(description="Clustering analysis ID")
+        count: int = Field(description="Rows for this analysis")
+
     class GeneClustersByGeneResult(BaseModel):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0370')")
         gene_name: str | None = Field(default=None,
@@ -2732,19 +2732,33 @@ def register_tools(mcp: FastMCP):
             description="Cluster category (e.g. 'stress_response')")
         membership_score: float | None = Field(default=None,
             description="Fuzzy membership score (null for K-means)")
-        member_count: int = Field(
-            description="Total genes in this cluster (e.g. 5)")
-        # verbose-only
-        functional_description: str | None = Field(default=None,
-            description="What the cluster genes ARE (cluster-level)")
-        behavioral_description: str | None = Field(default=None,
-            description="What the cluster genes DO together (cluster-level)")
-        treatment_type: list[str] | None = Field(default=None,
+        analysis_id: str = Field(
+            description="Clustering analysis ID")
+        analysis_name: str = Field(
+            description="Clustering analysis name")
+        treatment_type: list[str] = Field(
             description="Treatment types for this cluster")
+        background_factors: list[str] = Field(default_factory=list,
+            description="Background experimental factors")
+        # verbose-only
+        cluster_method: str | None = Field(default=None,
+            description="Clustering method (e.g. 'K-means')")
+        member_count: int | None = Field(default=None,
+            description="Total genes in this cluster")
+        cluster_functional_description: str | None = Field(default=None,
+            description="What the cluster genes ARE (cluster-level)")
+        cluster_behavioral_description: str | None = Field(default=None,
+            description="What the cluster genes DO together (cluster-level)")
+        peak_time_hours: float | None = Field(default=None,
+            description="Peak expression time in hours (diel clusters)")
+        period_hours: float | None = Field(default=None,
+            description="Expression period in hours (diel clusters)")
         treatment: str | None = Field(default=None,
             description="Free-text condition description")
-        source_paper: str | None = Field(default=None,
-            description="Paper reference")
+        light_condition: str | None = Field(default=None,
+            description="Light regime")
+        experimental_context: str | None = Field(default=None,
+            description="Full experimental context description")
         p_value: float | None = Field(default=None,
             description="Assignment p-value (null for most methods)")
 
@@ -2767,8 +2781,8 @@ def register_tools(mcp: FastMCP):
             description="Rows per treatment type")
         by_background_factors: list["GeneClusterBackgroundFactorBreakdown"] = Field(
             description="Rows per background factor")
-        by_publication: list["GeneClusterPublicationBreakdown"] = Field(
-            description="Rows per publication")
+        by_analysis: list["GeneClusterAnalysisBreakdown"] = Field(
+            description="Rows per clustering analysis")
         returned: int = Field(description="Results in this response")
         offset: int = Field(default=0, description="Offset into result set")
         truncated: bool = Field(
@@ -2803,12 +2817,17 @@ def register_tools(mcp: FastMCP):
         publication_doi: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s).",
         )] = None,
+        analysis_ids: Annotated[list[str] | None, Field(
+            description="Filter by clustering analysis IDs.",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include functional_description, behavioral_description, "
-            "treatment_type, treatment, source_paper, p_value.",
+            description="Include cluster_method, member_count, "
+            "cluster_functional_description, cluster_behavioral_description, "
+            "peak_time_hours, period_hours, treatment, light_condition, "
+            "experimental_context, p_value.",
         )] = False,
         limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
         offset: Annotated[int, Field(
@@ -2831,6 +2850,7 @@ def register_tools(mcp: FastMCP):
                 cluster_type=cluster_type, treatment_type=treatment_type,
                 background_factors=background_factors,
                 publication_doi=publication_doi,
+                analysis_ids=analysis_ids,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 conn=conn,
             )
@@ -2840,8 +2860,8 @@ def register_tools(mcp: FastMCP):
                                  for b in data["by_treatment_type"]]
             by_background_factors = [GeneClusterBackgroundFactorBreakdown(**b)
                                      for b in data["by_background_factors"]]
-            by_publication = [GeneClusterPublicationBreakdown(**b)
-                              for b in data["by_publication"]]
+            by_analysis = [GeneClusterAnalysisBreakdown(**b)
+                           for b in data["by_analysis"]]
             results = [GeneClustersByGeneResult(**r) for r in data["results"]]
             response = GeneClustersByGeneResponse(
                 total_matching=data["total_matching"],
@@ -2853,7 +2873,7 @@ def register_tools(mcp: FastMCP):
                 by_cluster_type=by_cluster_type,
                 by_treatment_type=by_treatment_type,
                 by_background_factors=by_background_factors,
-                by_publication=by_publication,
+                by_analysis=by_analysis,
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -2888,15 +2908,15 @@ def register_tools(mcp: FastMCP):
         membership_score: float | None = Field(default=None,
             description="Fuzzy membership score (null for K-means)")
         # verbose-only
-        function_description: str | None = Field(default=None,
+        gene_function_description: str | None = Field(default=None,
             description="Gene functional description (gene-level)")
         gene_summary: str | None = Field(default=None,
             description="Gene summary text (gene-level)")
         p_value: float | None = Field(default=None,
             description="Assignment p-value (edge-level)")
-        functional_description: str | None = Field(default=None,
+        cluster_functional_description: str | None = Field(default=None,
             description="What the cluster genes ARE (cluster-level)")
-        behavioral_description: str | None = Field(default=None,
+        cluster_behavioral_description: str | None = Field(default=None,
             description="What the cluster genes DO together (cluster-level)")
 
     class GenesInClusterClusterBreakdown(BaseModel):
@@ -2911,6 +2931,8 @@ def register_tools(mcp: FastMCP):
     class GenesInClusterResponse(BaseModel):
         total_matching: int = Field(
             description="Gene × cluster rows")
+        analysis_name: str | None = Field(default=None,
+            description="Analysis name (when queried by analysis_id)")
         by_organism: list[GeneClusterOrganismBreakdown] = Field(
             description="Members per organism")
         by_cluster: list[GenesInClusterClusterBreakdown] = Field(
@@ -2941,10 +2963,14 @@ def register_tools(mcp: FastMCP):
     )
     async def genes_in_cluster(
         ctx: Context,
-        cluster_ids: Annotated[list[str], Field(
+        cluster_ids: Annotated[list[str] | None, Field(
             description="GeneCluster node IDs (from list_clustering_analyses "
-            "or gene_clusters_by_gene).",
-        )],
+            "or gene_clusters_by_gene). Provide this OR analysis_id.",
+        )] = None,
+        analysis_id: Annotated[str | None, Field(
+            description="ClusteringAnalysis node ID — returns all genes in "
+            "all clusters of this analysis. Provide this OR cluster_ids.",
+        )] = None,
         organism: Annotated[str | None, Field(
             description="Filter by organism (case-insensitive partial match). "
             "Single organism enforced.",
@@ -2953,9 +2979,9 @@ def register_tools(mcp: FastMCP):
             description="When true, return only summary fields (results=[]).",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include function_description, gene_summary (gene-level), "
-            "p_value (edge-level), functional_description, "
-            "behavioral_description (cluster-level).",
+            description="Include gene_function_description, gene_summary (gene-level), "
+            "p_value (edge-level), cluster_functional_description, "
+            "cluster_behavioral_description (cluster-level).",
         )] = False,
         limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
         offset: Annotated[int, Field(
@@ -2963,18 +2989,19 @@ def register_tools(mcp: FastMCP):
     ) -> GenesInClusterResponse:
         """Get member genes of gene clusters.
 
-        Takes cluster IDs from list_clustering_analyses or gene_clusters_by_gene
-        and returns their member genes. One row per gene × cluster.
+        Takes cluster IDs or an analysis ID and returns member genes.
+        One row per gene × cluster. Provide cluster_ids OR analysis_id (not both).
 
-        For cluster discovery by text, use list_clustering_analyses first.
+        For analysis discovery, use list_clustering_analyses first.
         For gene → cluster direction, use gene_clusters_by_gene.
         """
         await ctx.info(f"genes_in_cluster cluster_ids={cluster_ids} "
-                       f"organism={organism}")
+                       f"analysis_id={analysis_id} organism={organism}")
         try:
             conn = _conn(ctx)
             data = api.genes_in_cluster(
-                cluster_ids, organism=organism,
+                cluster_ids=cluster_ids, analysis_id=analysis_id,
+                organism=organism,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 conn=conn,
             )
@@ -2987,6 +3014,7 @@ def register_tools(mcp: FastMCP):
             results = [GenesInClusterResult(**r) for r in data["results"]]
             response = GenesInClusterResponse(
                 total_matching=data["total_matching"],
+                analysis_name=data.get("analysis_name"),
                 by_organism=by_organism,
                 by_cluster=by_cluster,
                 top_categories=top_categories,
