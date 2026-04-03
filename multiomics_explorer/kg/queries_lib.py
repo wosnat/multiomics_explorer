@@ -2983,7 +2983,7 @@ def build_gene_clusters_by_gene_summary(
     genes_with_clusters, genes_without_clusters,
     not_found, not_matched,
     by_cluster_type, by_treatment_type, by_background_factors,
-    by_analysis, by_publication.
+    by_analysis.
     """
     params: dict = {"locus_tags": locus_tags}
 
