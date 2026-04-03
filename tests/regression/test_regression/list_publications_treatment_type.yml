@@ -5,6 +5,10 @@ rows:
   - Daniel Sher
   - Dikla Aharonovich
   - Osnat Weissberg
+  background_factors:
+  - axenic
+  - coculture
+  - continuous_light
   doi: 10.1101/2025.11.24.690089
   experiment_count: 10
   journal: bioRxiv
@@ -26,6 +30,9 @@ rows:
   - Marcelo Malisano Barreto Filho
   - Melissa Walker
   - Zhiying Lu
+  background_factors:
+  - axenic
+  - coculture
   doi: 10.1038/s43705-022-00197-2
   experiment_count: 10
   journal: ISME Communications
@@ -47,6 +54,8 @@ rows:
   - Allison Coe
   - Sallie W Chisholm
   - Steven J Biller
+  background_factors:
+  - continuous_light
   doi: 10.1038/ismej.2016.82
   experiment_count: 3
   journal: The ISME Journal
@@ -64,6 +73,8 @@ rows:
 - authors:
   - Daniel Sher
   - Dikla Aharonovich
+  background_factors:
+  - continuous_light
   doi: 10.1038/ismej.2016.70
   experiment_count: 5
   journal: The ISME Journal

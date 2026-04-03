@@ -110,6 +110,7 @@ def register_tools(mcp: FastMCP):
         publication_count: int = Field(description="Number of publications studying this organism (e.g. 11)")
         experiment_count: int = Field(description="Total experiments across all publications (e.g. 46)")
         treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress'])")
+        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle'])")
         omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS'])")
         # verbose-only fields
         family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae')")
@@ -981,8 +982,10 @@ def register_tools(mcp: FastMCP):
         organisms: list[str] = Field(default=[], description="Organisms studied in this publication")
         experiment_count: int = Field(default=0, description="Number of experiments in KG from this publication")
         treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen_stress)")
+        background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle'])")
         omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS)")
         score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
+
         abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
         description: str | None = Field(default=None, description="Curated study description (only with verbose=True)")
 
@@ -998,11 +1001,16 @@ def register_tools(mcp: FastMCP):
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
         count: int = Field(description="Number of publications (e.g. 12)")
 
+    class PubBackgroundFactorBreakdown(BaseModel):
+        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle')")
+        count: int = Field(description="Number of publications (e.g. 5)")
+
     class ListPublicationsResponse(BaseModel):
         total_entries: int = Field(description="Total publications in KG (unfiltered)")
         total_matching: int = Field(description="Publications matching filters")
         by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted by count descending")
         by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted by count descending")
+        by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted by count descending")
         by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted by count descending")
         returned: int = Field(description="Publications in this response")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
@@ -1022,6 +1030,10 @@ def register_tools(mcp: FastMCP):
         treatment_type: Annotated[str | None, Field(
             description="Filter by experiment treatment type. "
             "Use list_filter_values for valid values.",
+        )] = None,
+        background_factors: Annotated[str | None, Field(
+            description="Filter by background factor (case-insensitive exact match). "
+            "E.g. 'axenic'.",
         )] = None,
         search_text: Annotated[str | None, Field(
             description="Free-text search on title, abstract, and description "
@@ -1054,18 +1066,21 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             result = api.list_publications(
                 organism=organism, treatment_type=treatment_type,
+                background_factors=background_factors,
                 search_text=search_text, author=author,
                 verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             results = [PublicationResult(**r) for r in result["results"]]
             by_organism = [PubOrganismBreakdown(**b) for b in result["by_organism"]]
             by_treatment_type = [PubTreatmentTypeBreakdown(**b) for b in result["by_treatment_type"]]
+            by_background_factors = [PubBackgroundFactorBreakdown(**b) for b in result["by_background_factors"]]
             by_omics_type = [PubOmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
             response = ListPublicationsResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
                 by_organism=by_organism,
                 by_treatment_type=by_treatment_type,
+                by_background_factors=by_background_factors,
                 by_omics_type=by_omics_type,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
@@ -1102,7 +1117,8 @@ def register_tools(mcp: FastMCP):
         experiment_name: str = Field(description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")
         publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
         organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4')")
-        treatment_type: str = Field(description="Treatment category (e.g. 'coculture', 'nitrogen_stress')")
+        treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture'])")
+        background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'continuous_light']). Empty list when none specified.")
         coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism (e.g. 'Alteromonas macleodii HOT1A3', 'Phage')")
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS')")
         is_time_course: bool = Field(description="Whether experiment has multiple time points")
@@ -1131,6 +1147,10 @@ def register_tools(mcp: FastMCP):
         treatment_type: str = Field(description="Treatment category (e.g. 'coculture')")
         count: int = Field(description="Number of experiments (e.g. 16)")
 
+    class BackgroundFactorBreakdown(BaseModel):
+        background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle')")
+        count: int = Field(description="Number of experiments (e.g. 14)")
+
     class OmicsTypeBreakdown(BaseModel):
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ')")
         count: int = Field(description="Number of experiments (e.g. 48)")
@@ -1151,6 +1171,7 @@ def register_tools(mcp: FastMCP):
         truncated: bool = Field(description="True if results were truncated by limit or summary=true")
         by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted by count descending")
         by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted by count descending")
+        by_background_factors: list[BackgroundFactorBreakdown] = Field(description="Experiment counts per background factor, sorted by count descending")
         by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted by count descending")
         by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted by count descending")
         by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted by count descending")
@@ -1174,6 +1195,11 @@ def register_tools(mcp: FastMCP):
             description="Filter by treatment type(s) (case-insensitive exact match). "
             "E.g. ['coculture', 'nitrogen_stress']. "
             "Use list_filter_values to see valid values.",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Filter by background experimental factors (case-insensitive exact match). "
+            "E.g. ['axenic', 'diel_cycle']. "
+            "Background factors describe experimental context beyond the primary treatment.",
         )] = None,
         omics_type: Annotated[list[str] | None, Field(
             description="Filter by omics platform(s) (case-insensitive). "
@@ -1239,6 +1265,7 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             result = api.list_experiments(
                 organism=organism, treatment_type=treatment_type,
+                background_factors=background_factors,
                 omics_type=omics_type, publication_doi=publication_doi,
                 coculture_partner=coculture_partner, search_text=search_text,
                 time_course_only=time_course_only, table_scope=table_scope,
@@ -1249,6 +1276,7 @@ def register_tools(mcp: FastMCP):
             # Build breakdown models
             by_organism = [OrganismBreakdown(**b) for b in result["by_organism"]]
             by_treatment_type = [TreatmentTypeBreakdown(**b) for b in result["by_treatment_type"]]
+            by_background_factors = [BackgroundFactorBreakdown(**b) for b in result["by_background_factors"]]
             by_omics_type = [OmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
             by_publication = [PublicationBreakdown(**b) for b in result["by_publication"]]
             by_table_scope = [TableScopeBreakdown(**b) for b in result["by_table_scope"]]
@@ -1277,6 +1305,7 @@ def register_tools(mcp: FastMCP):
                 truncated=result["truncated"],
                 by_organism=by_organism,
                 by_treatment_type=by_treatment_type,
+                by_background_factors=by_background_factors,
                 by_omics_type=by_omics_type,
                 by_publication=by_publication,
                 by_table_scope=by_table_scope,
@@ -1340,9 +1369,13 @@ def register_tools(mcp: FastMCP):
             description="Human-readable name"
             " (e.g. 'HOT1A3 PRO99-lowN nutrient starvation (RNASEQ)')",
         )
-        treatment_type: str = Field(
-            description="Treatment category"
-            " (e.g. 'nitrogen_stress', 'coculture')",
+        treatment_type: list[str] = Field(
+            description="Treatment categories"
+            " (e.g. ['nitrogen_stress'], ['nitrogen_stress', 'coculture'])",
+        )
+        background_factors: list[str] = Field(
+            default_factory=list,
+            description="Background experimental factors",
         )
         omics_type: str = Field(
             description="Omics type (e.g. 'RNASEQ', 'PROTEOMICS')",
@@ -1399,9 +1432,9 @@ def register_tools(mcp: FastMCP):
         experiment_id: str = Field(
             description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')",
         )
-        treatment_type: str = Field(
-            description="Treatment type from experiment"
-            " (e.g. 'nitrogen_stress')",
+        treatment_type: list[str] = Field(
+            description="Treatment types from experiment"
+            " (e.g. ['nitrogen_stress'])",
         )
         timepoint: str | None = Field(
             description="Timepoint label (e.g. 'days 60+89')."
@@ -1481,6 +1514,11 @@ def register_tools(mcp: FastMCP):
             description="Free-text clarification of table_scope."
             " Verbose only.",
         )
+        background_factors: list[str] = Field(
+            default_factory=list,
+            description="Background experimental factors."
+            " Verbose only.",
+        )
 
     class DifferentialExpressionByGeneResponse(BaseModel):
         organism_name: str = Field(
@@ -1511,6 +1549,10 @@ def register_tools(mcp: FastMCP):
         rows_by_treatment_type: dict[str, int] = Field(
             description="Row counts by treatment type"
             " (e.g. {'nitrogen_stress': 15})",
+        )
+        rows_by_background_factors: dict[str, int] = Field(
+            description="Row counts by background factor"
+            " (e.g. {'axenic': 10, 'diel_cycle': 5})",
         )
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope"
@@ -1673,6 +1715,7 @@ def register_tools(mcp: FastMCP):
                 experiment_count=data["experiment_count"],
                 offset=data.get("offset", 0),
                 rows_by_treatment_type=data["rows_by_treatment_type"],
+                rows_by_background_factors=data["rows_by_background_factors"],
                 by_table_scope=data["by_table_scope"],
                 top_categories=top_cat_models,
                 experiments=exp_models,
@@ -2026,9 +2069,13 @@ def register_tools(mcp: FastMCP):
         experiment_id: str = Field(
             description="Experiment ID",
         )
-        treatment_type: str = Field(
-            description="Treatment category"
-            " (e.g. 'nitrogen_limitation')",
+        treatment_type: list[str] = Field(
+            description="Treatment categories"
+            " (e.g. ['nitrogen_limitation'])",
+        )
+        background_factors: list[str] = Field(
+            default_factory=list,
+            description="Background experimental factors",
         )
         organism_name: str = Field(
             description="Organism (e.g. 'Prochlorococcus MED4')",
@@ -2107,8 +2154,12 @@ def register_tools(mcp: FastMCP):
         experiment_id: str = Field(
             description="Experiment ID",
         )
-        treatment_type: str = Field(
-            description="Treatment category",
+        treatment_type: list[str] = Field(
+            description="Treatment categories",
+        )
+        background_factors: list[str] = Field(
+            default_factory=list,
+            description="Background experimental factors",
         )
         organism_name: str = Field(
             description="Organism name",
@@ -2167,6 +2218,9 @@ def register_tools(mcp: FastMCP):
         )
         rows_by_treatment_type: dict[str, int] = Field(
             description="Row counts by treatment type",
+        )
+        rows_by_background_factors: dict[str, int] = Field(
+            description="Row counts by background factor",
         )
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope",
@@ -2313,6 +2367,7 @@ def register_tools(mcp: FastMCP):
                 by_organism=[DEByOrthologOrganismBreakdown(**b) for b in data["by_organism"]],
                 rows_by_status=data["rows_by_status"],
                 rows_by_treatment_type=data["rows_by_treatment_type"],
+                rows_by_background_factors=data["rows_by_background_factors"],
                 by_table_scope=data["by_table_scope"],
                 top_groups=top_groups,
                 top_experiments=top_experiments,
@@ -2391,6 +2446,11 @@ def register_tools(mcp: FastMCP):
         locus_tags: Annotated[list[str], Field(description="Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview.")],
         organism: Annotated[str | None, Field(description="Organism name for validation (optional). Inferred from genes. Fuzzy word-based matching.")] = None,
         treatment_types: Annotated[list[str] | None, Field(description="Filter to specific treatment types.")] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Filter by background experimental factors "
+            "(case-insensitive exact match). "
+            "E.g. ['axenic', 'diel_cycle'].",
+        )] = None,
         experiment_ids: Annotated[list[str] | None, Field(description="Restrict to specific experiments. Get these from list_experiments.")] = None,
         group_by: Annotated[Literal["treatment_type", "experiment"], Field(description="Group response summary by treatment_type (aggregates across experiments) or experiment (one entry per experiment).")] = "treatment_type",
         limit: Annotated[int, Field(description="Max genes returned.", ge=1)] = 50,
@@ -2415,7 +2475,9 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.gene_response_profile(
                 locus_tags=locus_tags, organism=organism,
-                treatment_types=treatment_types, experiment_ids=experiment_ids,
+                treatment_types=treatment_types,
+                background_factors=background_factors,
+                experiment_ids=experiment_ids,
                 group_by=group_by, limit=limit, offset=offset, conn=conn,
             )
             data["results"] = [
@@ -2456,6 +2518,10 @@ def register_tools(mcp: FastMCP):
         treatment_type: str
         count: int
 
+    class GeneClusterBackgroundFactorBreakdown(BaseModel):
+        background_factor: str
+        count: int
+
     class GeneClusterOmicsBreakdown(BaseModel):
         omics_type: str
         count: int
@@ -2470,6 +2536,7 @@ def register_tools(mcp: FastMCP):
         organism_name: str
         cluster_type: str
         treatment_type: list[str]
+        background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'continuous_light'])")
         member_count: int
         source_paper: str
         score: float | None = None
@@ -2490,6 +2557,7 @@ def register_tools(mcp: FastMCP):
         by_organism: list["GeneClusterOrganismBreakdown"]
         by_cluster_type: list["GeneClusterTypeBreakdown"]
         by_treatment_type: list["GeneClusterTreatmentBreakdown"]
+        by_background_factors: list["GeneClusterBackgroundFactorBreakdown"]
         by_omics_type: list["GeneClusterOmicsBreakdown"]
         by_publication: list["GeneClusterPublicationBreakdown"]
         score_max: float | None = None
@@ -2518,6 +2586,10 @@ def register_tools(mcp: FastMCP):
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s). E.g. ['nitrogen_stress'].",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Filter by background factors. "
+            "E.g. ['axenic', 'diel_cycle'].",
         )] = None,
         omics_type: Annotated[str | None, Field(
             description="Filter: 'MICROARRAY', 'RNASEQ', or 'PROTEOMICS'.",
@@ -2552,6 +2624,7 @@ def register_tools(mcp: FastMCP):
             data = api.list_gene_clusters(
                 search_text=search_text, organism=organism,
                 cluster_type=cluster_type, treatment_type=treatment_type,
+                background_factors=background_factors,
                 omics_type=omics_type, publication_doi=publication_doi,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 conn=conn,
@@ -2559,6 +2632,7 @@ def register_tools(mcp: FastMCP):
             by_organism = [GeneClusterOrganismBreakdown(**b) for b in data["by_organism"]]
             by_cluster_type = [GeneClusterTypeBreakdown(**b) for b in data["by_cluster_type"]]
             by_treatment_type = [GeneClusterTreatmentBreakdown(**b) for b in data["by_treatment_type"]]
+            by_background_factors = [GeneClusterBackgroundFactorBreakdown(**b) for b in data["by_background_factors"]]
             by_omics_type = [GeneClusterOmicsBreakdown(**b) for b in data["by_omics_type"]]
             by_publication = [GeneClusterPublicationBreakdown(**b) for b in data["by_publication"]]
             results = [ListGeneClustersResult(**r) for r in data["results"]]
@@ -2568,6 +2642,7 @@ def register_tools(mcp: FastMCP):
                 by_organism=by_organism,
                 by_cluster_type=by_cluster_type,
                 by_treatment_type=by_treatment_type,
+                by_background_factors=by_background_factors,
                 by_omics_type=by_omics_type,
                 by_publication=by_publication,
                 score_max=data.get("score_max"),
@@ -2633,6 +2708,8 @@ def register_tools(mcp: FastMCP):
             description="Rows per cluster type")
         by_treatment_type: list["GeneClusterTreatmentBreakdown"] = Field(
             description="Rows per treatment type")
+        by_background_factors: list["GeneClusterBackgroundFactorBreakdown"] = Field(
+            description="Rows per background factor")
         by_publication: list["GeneClusterPublicationBreakdown"] = Field(
             description="Rows per publication")
         returned: int = Field(description="Results in this response")
@@ -2663,6 +2740,9 @@ def register_tools(mcp: FastMCP):
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s).",
         )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Filter by background factors.",
+        )] = None,
         publication_doi: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s).",
         )] = None,
@@ -2692,6 +2772,7 @@ def register_tools(mcp: FastMCP):
             data = api.gene_clusters_by_gene(
                 locus_tags, organism=organism,
                 cluster_type=cluster_type, treatment_type=treatment_type,
+                background_factors=background_factors,
                 publication_doi=publication_doi,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 conn=conn,
@@ -2700,6 +2781,8 @@ def register_tools(mcp: FastMCP):
                                for b in data["by_cluster_type"]]
             by_treatment_type = [GeneClusterTreatmentBreakdown(**b)
                                  for b in data["by_treatment_type"]]
+            by_background_factors = [GeneClusterBackgroundFactorBreakdown(**b)
+                                     for b in data["by_background_factors"]]
             by_publication = [GeneClusterPublicationBreakdown(**b)
                               for b in data["by_publication"]]
             results = [GeneClustersByGeneResult(**r) for r in data["results"]]
@@ -2712,6 +2795,7 @@ def register_tools(mcp: FastMCP):
                 not_matched=data["not_matched"],
                 by_cluster_type=by_cluster_type,
                 by_treatment_type=by_treatment_type,
+                by_background_factors=by_background_factors,
                 by_publication=by_publication,
                 returned=data["returned"],
                 offset=data.get("offset", 0),

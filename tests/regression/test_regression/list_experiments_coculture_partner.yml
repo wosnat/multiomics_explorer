@@ -1,7 +1,8 @@
 case_id: list_experiments_coculture_partner
 row_count: 5
 rows:
-- coculture_partner: Alteromonas macleodii HOT1A3
+- background_factors: []
+  coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   gene_count: 1849
@@ -26,8 +27,11 @@ rows:
   - '59'
   time_point_totals:
   - '1849'
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
     (RNASEQ)
@@ -53,8 +57,11 @@ rows:
   - '24'
   time_point_totals:
   - '1714'
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
     conditions (RNASEQ)
@@ -80,8 +87,11 @@ rows:
   - '153'
   time_point_totals:
   - '2267'
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
     conditions (RNASEQ)
@@ -107,8 +117,11 @@ rows:
   - '96'
   time_point_totals:
   - '2268'
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii MIT1002
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii MIT1002
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
     Prochlorococcus NATL2A (RNASEQ)
@@ -170,4 +183,5 @@ rows:
   - '353'
   - '353'
   - '353'
-  treatment_type: coculture
+  treatment_type:
+  - coculture

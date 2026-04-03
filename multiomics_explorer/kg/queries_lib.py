@@ -540,6 +540,7 @@ def _list_publications_where(
     *,
     organism: str | None = None,
     treatment_type: str | None = None,
+    background_factors: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
 ) -> tuple[str, dict]:
@@ -565,6 +566,13 @@ def _list_publications_where(
         )
         params["treatment_type"] = treatment_type
 
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(p.background_factors, [])"
+            " WHERE toLower(bf) = toLower($background_factors))"
+        )
+        params["background_factors"] = background_factors
+
     if author:
         conditions.append(
             "ANY(a IN p.authors WHERE toLower(a) CONTAINS toLower($author))"
@@ -579,6 +587,7 @@ def build_list_publications(
     *,
     organism: str | None = None,
     treatment_type: str | None = None,
+    background_factors: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
     verbose: bool = False,
@@ -587,12 +596,13 @@ def build_list_publications(
     """Build Cypher for listing publications with experiment summaries.
 
     RETURN keys (compact): doi, title, authors, year, journal, study_type,
-    organisms, experiment_count, treatment_types, omics_types.
+    organisms, experiment_count, treatment_types, background_factors, omics_types.
     When search_text is provided, also: score.
     RETURN keys (verbose): adds abstract, description.
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
+        background_factors=background_factors,
         search_text=search_text, author=author,
     )
 
@@ -620,6 +630,7 @@ def build_list_publications(
             "       p.organisms AS organisms,\n"
             "       p.experiment_count AS experiment_count,\n"
             "       p.treatment_types AS treatment_types,\n"
+            "       coalesce(p.background_factors, []) AS background_factors,\n"
             "       p.omics_types AS omics_types,\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
@@ -638,6 +649,7 @@ def build_list_publications(
             "       p.organisms AS organisms,\n"
             "       p.experiment_count AS experiment_count,\n"
             "       p.treatment_types AS treatment_types,\n"
+            "       coalesce(p.background_factors, []) AS background_factors,\n"
             f"       p.omics_types AS omics_types{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, p.title\n"
             f"{limit_clause}"
@@ -650,6 +662,7 @@ def build_list_publications_summary(
     *,
     organism: str | None = None,
     treatment_type: str | None = None,
+    background_factors: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
 ) -> tuple[str, dict]:
@@ -661,6 +674,7 @@ def build_list_publications_summary(
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
+        background_factors=background_factors,
         search_text=search_text, author=author,
     )
 
@@ -703,7 +717,7 @@ def build_list_organisms(
 
     RETURN keys (compact): organism_name, genus, species, strain, clade,
     ncbi_taxon_id, gene_count, publication_count, experiment_count,
-    treatment_types, omics_types.
+    treatment_types, background_factors, omics_types.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage.
     """
@@ -730,6 +744,7 @@ def build_list_organisms(
         "       o.publication_count AS publication_count,\n"
         "       o.experiment_count AS experiment_count,\n"
         "       o.treatment_types AS treatment_types,\n"
+        "       coalesce(o.background_factors, []) AS background_factors,\n"
         "       o.omics_types AS omics_types"
         f"{verbose_cols}\n"
         "ORDER BY o.genus, o.preferred_name"
@@ -747,6 +762,7 @@ def _list_experiments_where(
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for experiment queries.
 
@@ -771,8 +787,17 @@ def _list_experiments_where(
         params["organism"] = organism
 
     if treatment_type:
-        conditions.append("toLower(e.treatment_type) IN $treatment_types")
+        conditions.append(
+            "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
+        )
         params["treatment_types"] = [t.lower() for t in treatment_type]
+
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(e.background_factors, [])"
+            " WHERE toLower(bf) IN $background_factors)"
+        )
+        params["background_factors"] = [bf.lower() for bf in background_factors]
 
     if omics_type:
         conditions.append("toUpper(e.omics_type) IN $omics_types")
@@ -809,6 +834,7 @@ def build_list_experiments(
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
+    background_factors: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -831,6 +857,7 @@ def build_list_experiments(
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
+        background_factors=background_factors,
     )
 
     verbose_cols = (
@@ -863,6 +890,7 @@ def build_list_experiments(
         "       p.doi AS publication_doi,\n"
         "       e.organism_name AS organism_name,\n"
         "       e.treatment_type AS treatment_type,\n"
+        "       coalesce(e.background_factors, []) AS background_factors,\n"
         "       e.coculture_partner AS coculture_partner,\n"
         "       e.omics_type AS omics_type,\n"
         "       e.is_time_course AS is_time_course,\n"
@@ -913,14 +941,16 @@ def build_list_experiments_summary(
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_experiments.
 
     Returns breakdowns by organism, treatment type, omics type,
-    publication, and table_scope using apoc.coll.frequencies.
+    publication, table_scope, and background_factors using apoc.coll.frequencies.
 
     RETURN keys: total_matching, time_course_count, by_organism,
-    by_treatment_type, by_omics_type, by_publication, by_table_scope.
+    by_treatment_type, by_background_factors, by_omics_type, by_publication,
+    by_table_scope.
     RETURN keys (search_text): adds score_max, score_median.
     """
     where_block, params = _list_experiments_where(
@@ -928,11 +958,13 @@ def build_list_experiments_summary(
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
+        background_factors=background_factors,
     )
 
     collect_cols = (
         "collect(e.organism_name) AS orgs,\n"
-        "     collect(e.treatment_type) AS tts,\n"
+        "     apoc.coll.flatten(collect(coalesce(e.treatment_type, []))) AS tts,\n"
+        "     apoc.coll.flatten(collect(coalesce(e.background_factors, []))) AS bfs,\n"
         "     collect(e.omics_type) AS omics,\n"
         "     collect(p.doi) AS dois,\n"
         "     collect(e.is_time_course) AS tc,\n"
@@ -944,6 +976,7 @@ def build_list_experiments_summary(
         "       size([x IN tc WHERE x = 'true']) AS time_course_count,\n"
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
         "       apoc.coll.frequencies(tts) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(bfs) AS by_background_factors,\n"
         "       apoc.coll.frequencies(omics) AS by_omics_type,\n"
         "       apoc.coll.frequencies(dois) AS by_publication,\n"
         "       apoc.coll.frequencies(scopes) AS by_table_scope"
@@ -1474,9 +1507,11 @@ def build_differential_expression_by_gene_summary_global(
     """Global aggregate stats for differential_expression_by_gene.
 
     RETURN keys: total_matching, matching_genes, rows_by_status,
-    rows_by_treatment_type, by_table_scope, median_abs_log2fc, max_abs_log2fc.
+    rows_by_treatment_type, rows_by_background_factors,
+    by_table_scope, median_abs_log2fc, max_abs_log2fc.
     rows_by_status = apoc list [{item, count}] — api/ converts to dict.
     rows_by_treatment_type = apoc list [{item, count}] — api/ converts to dict.
+    rows_by_background_factors = apoc list [{item, count}] — api/ converts to dict.
     by_table_scope = apoc list [{item, count}] — api/ converts to dict.
     """
     conditions, params = _differential_expression_where(
@@ -1492,7 +1527,8 @@ def build_differential_expression_by_gene_summary_global(
         "RETURN count(*) AS total_matching,\n"
         "       count(DISTINCT g.locus_tag) AS matching_genes,\n"
         "       apoc.coll.frequencies(collect(r.expression_status)) AS rows_by_status,\n"
-        "       apoc.coll.frequencies(collect(e.treatment_type)) AS rows_by_treatment_type,\n"
+        "       apoc.coll.frequencies(apoc.coll.flatten(collect(coalesce(e.treatment_type, [])))) AS rows_by_treatment_type,\n"
+        "       apoc.coll.frequencies(apoc.coll.flatten(collect(coalesce(e.background_factors, [])))) AS rows_by_background_factors,\n"
         "       apoc.coll.frequencies(collect(e.table_scope)) AS by_table_scope,\n"
         "       percentileCont(\n"
         "           CASE WHEN r.expression_status <> 'not_significant'\n"
@@ -1546,6 +1582,7 @@ def build_differential_expression_by_gene_summary_by_experiment(
         "WITH collect({experiment_id: e.id, experiment_name: e.name,\n"
         "              treatment_type: e.treatment_type,"
         " omics_type: e.omics_type,\n"
+        "              background_factors: coalesce(e.background_factors, []),\n"
         "              coculture_partner: e.coculture_partner,\n"
         "              is_time_course: e.is_time_course,\n"
         "              table_scope: e.table_scope,\n"
@@ -1683,6 +1720,7 @@ def build_differential_expression_by_gene(
         ",\n       e.coculture_partner AS coculture_partner"
         ",\n       e.table_scope AS table_scope"
         ",\n       e.table_scope_detail AS table_scope_detail"
+        ",\n       coalesce(e.background_factors, []) AS background_factors"
         if verbose else ""
     )
 
@@ -2066,7 +2104,7 @@ def build_differential_expression_by_ortholog_summary_global(
 
     RETURN keys: total_matching, matching_genes, matching_groups,
     experiment_count, by_organism, rows_by_status, rows_by_treatment_type,
-    by_table_scope, sig_log2fcs, matched_group_ids.
+    rows_by_background_factors, by_table_scope, sig_log2fcs, matched_group_ids.
     """
     conditions, params = _differential_expression_by_ortholog_where(
         organisms=organisms, experiment_ids=experiment_ids,
@@ -2084,10 +2122,10 @@ def build_differential_expression_by_ortholog_summary_global(
         f"{where_block}"
         "WITH gid, g.locus_tag AS lt, e.organism_name AS org,\n"
         "     r.expression_status AS status, e.treatment_type AS tt,\n"
-        "     e.table_scope AS ts, e.id AS eid,\n"
+        "     e.background_factors AS bfs, e.table_scope AS ts, e.id AS eid,\n"
         "     r.log2_fold_change AS log2fc\n"
         "WITH collect({gid: gid, lt: lt, org: org,\n"
-        "              status: status, tt: tt, ts: ts,\n"
+        "              status: status, tt: tt, bfs: bfs, ts: ts,\n"
         "              eid: eid, log2fc: log2fc}) AS rows\n"
         "RETURN size(rows) AS total_matching,\n"
         "       size(apoc.coll.toSet([r IN rows | r.lt])) AS matching_genes,\n"
@@ -2095,7 +2133,8 @@ def build_differential_expression_by_ortholog_summary_global(
         "       size(apoc.coll.toSet([r IN rows | r.eid])) AS experiment_count,\n"
         "       apoc.coll.frequencies([r IN rows | r.org]) AS by_organism,\n"
         "       apoc.coll.frequencies([r IN rows | r.status]) AS rows_by_status,\n"
-        "       apoc.coll.frequencies([r IN rows | r.tt]) AS rows_by_treatment_type,\n"
+        "       apoc.coll.frequencies(apoc.coll.flatten([r IN rows | coalesce(r.tt, [])])) AS rows_by_treatment_type,\n"
+        "       apoc.coll.frequencies(apoc.coll.flatten([r IN rows | coalesce(r.bfs, [])])) AS rows_by_background_factors,\n"
         "       apoc.coll.frequencies([r IN rows | r.ts]) AS by_table_scope,\n"
         "       apoc.coll.toSet([r IN rows | r.gid]) AS matched_group_ids,\n"
         "       [r IN rows WHERE r.status <> 'not_significant' | abs(r.log2fc)]"
@@ -2181,6 +2220,7 @@ def build_differential_expression_by_ortholog_top_experiments(
         "RETURN collect({\n"
         "  experiment_id: e.id,\n"
         "  treatment_type: e.treatment_type,\n"
+        "  background_factors: coalesce(e.background_factors, []),\n"
         "  organism_name: e.organism_name,\n"
         "  significant_genes: significant_genes\n"
         "}) AS top_experiments"
@@ -2251,6 +2291,7 @@ def build_differential_expression_by_ortholog_results(
         "       og.consensus_product AS consensus_product,\n"
         "       e.id AS experiment_id,\n"
         "       e.treatment_type AS treatment_type,\n"
+        "       coalesce(e.background_factors, []) AS background_factors,\n"
         "       e.organism_name AS organism_name,\n"
         "       e.coculture_partner AS coculture_partner,\n"
         "       tp AS timepoint,\n"
@@ -2444,6 +2485,7 @@ def _gene_response_profile_where(
     *,
     organism_name: str | None = None,
     treatment_types: list[str] | None = None,
+    background_factors: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     experiment_alias: str = "e",
 ) -> tuple[list[str], dict]:
@@ -2454,22 +2496,41 @@ def _gene_response_profile_where(
         conditions.append(f"{experiment_alias}.organism_name = $organism_name")
         params["organism_name"] = organism_name
     if treatment_types:
-        conditions.append(f"toLower({experiment_alias}.treatment_type) IN $treatment_types")
+        conditions.append(
+            f"ANY(t IN {experiment_alias}.treatment_type"
+            f" WHERE toLower(t) IN $treatment_types)"
+        )
         params["treatment_types"] = [t.lower() for t in treatment_types]
+    if background_factors:
+        conditions.append(
+            f"ANY(bf IN coalesce({experiment_alias}.background_factors, [])"
+            f" WHERE toLower(bf) IN $background_factors)"
+        )
+        params["background_factors"] = [bf.lower() for bf in background_factors]
     if experiment_ids:
         conditions.append(f"{experiment_alias}.id IN $experiment_ids")
         params["experiment_ids"] = experiment_ids
     return conditions, params
 
 
-def _group_key_expr(group_by: str, alias: str = "e") -> str:
-    """Return the Cypher expression for the group key."""
+def _group_key_expr(group_by: str, alias: str = "e") -> tuple[str, str]:
+    """Return (unwind_clause, group_key_expr) for the group key.
+
+    When group_by='treatment_type', returns an UNWIND clause because
+    treatment_type is an array property. The UNWIND must be inserted
+    after the MATCH that introduces the experiment alias.
+    """
     if group_by == "treatment_type":
-        return f"{alias}.treatment_type"
+        return (
+            f"UNWIND coalesce({alias}.treatment_type, ['unknown']) AS _tt\n",
+            "_tt",
+        )
     elif group_by == "experiment":
-        return f"{alias}.id"
+        return ("", f"{alias}.id")
     else:
-        raise ValueError(f"group_by must be 'treatment_type' or 'experiment', got '{group_by}'")
+        raise ValueError(
+            f"group_by must be 'treatment_type' or 'experiment', got '{group_by}'"
+        )
 
 
 def build_gene_response_profile_envelope(
@@ -2477,6 +2538,7 @@ def build_gene_response_profile_envelope(
     locus_tags: list[str],
     organism_name: str,
     treatment_types: list[str] | None = None,
+    background_factors: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     group_by: str = "treatment_type",
 ) -> tuple[str, dict]:
@@ -2487,11 +2549,12 @@ def build_gene_response_profile_envelope(
     RETURN keys: found_genes (list), has_expression (list), has_significant (list),
     group_totals (list of {group_key, experiments, timepoints, table_scopes}).
     """
-    gk = _group_key_expr(group_by)
-    gk2 = _group_key_expr(group_by, alias="e2")
+    _, gk = _group_key_expr(group_by)
+    unwind2, gk2 = _group_key_expr(group_by, alias="e2")
 
     conditions_e, params = _gene_response_profile_where(
         organism_name=organism_name, treatment_types=treatment_types,
+        background_factors=background_factors,
         experiment_ids=experiment_ids, experiment_alias="e",
     )
     params["locus_tags"] = locus_tags
@@ -2499,6 +2562,7 @@ def build_gene_response_profile_envelope(
 
     conditions_e2, _ = _gene_response_profile_where(
         organism_name=organism_name, treatment_types=treatment_types,
+        background_factors=background_factors,
         experiment_ids=experiment_ids, experiment_alias="e2",
     )
     where_e2 = "WHERE " + " AND ".join(conditions_e2)
@@ -2518,6 +2582,7 @@ def build_gene_response_profile_envelope(
         "\n"
         "OPTIONAL MATCH (e2:Experiment)-[:Changes_expression_of]->(:Gene)\n"
         f"{where_e2}\n"
+        f"{unwind2}"
         f"WITH found_genes, has_expression, has_significant,\n"
         f"     {gk2} AS group_key,\n"
         "     collect(DISTINCT e2) AS group_experiments\n"
@@ -2539,6 +2604,7 @@ def build_gene_response_profile(
     locus_tags: list[str],
     organism_name: str,
     treatment_types: list[str] | None = None,
+    background_factors: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     group_by: str = "treatment_type",
     limit: int | None = None,
@@ -2554,10 +2620,11 @@ def build_gene_response_profile(
     timepoints_up, timepoints_down, rank_ups (list), rank_downs (list),
     log2fcs_up (list), log2fcs_down (list).
     """
-    gk = _group_key_expr(group_by)
+    unwind, gk = _group_key_expr(group_by)
 
     conditions, params = _gene_response_profile_where(
         organism_name=organism_name, treatment_types=treatment_types,
+        background_factors=background_factors,
         experiment_ids=experiment_ids,
     )
     params["locus_tags"] = locus_tags
@@ -2566,6 +2633,7 @@ def build_gene_response_profile(
 
     pass2_conditions, _ = _gene_response_profile_where(
         organism_name=organism_name, treatment_types=treatment_types,
+        background_factors=background_factors,
         experiment_ids=experiment_ids,
     )
     pass2_where = (
@@ -2584,6 +2652,7 @@ def build_gene_response_profile(
     cypher = (
         "MATCH (e:Experiment)-[r:Changes_expression_of]->(g:Gene)\n"
         f"{where_block}"
+        f"{unwind}"
         "WITH g,\n"
         "     count(DISTINCT CASE"
         " WHEN r.expression_status IN ['significant_up', 'significant_down']"
@@ -2603,6 +2672,7 @@ def build_gene_response_profile(
         "WITH g\n"
         "MATCH (e:Experiment)-[r:Changes_expression_of]->(g)\n"
         f"{pass2_where}"
+        f"{unwind}"
         f"WITH g, {gk} AS group_key, e.id AS eid,"
         " collect(r) AS exp_edges\n"
         "WITH g, group_key,\n"
@@ -2658,6 +2728,7 @@ def _gene_cluster_where(
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
+    background_factors: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Build GeneCluster filter conditions + params shared by gene cluster builders."""
     conditions: list[str] = []
@@ -2679,6 +2750,12 @@ def _gene_cluster_where(
     if omics_type is not None:
         conditions.append("gc.omics_type = $omics_type")
         params["omics_type"] = omics_type
+    if background_factors is not None:
+        conditions.append(
+            "ANY(bf IN coalesce(gc.background_factors, [])"
+            " WHERE bf IN $background_factors)"
+        )
+        params["background_factors"] = background_factors
     return conditions, params
 
 
@@ -2689,17 +2766,20 @@ def build_list_gene_clusters_summary(
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
+    background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for list_gene_clusters.
 
     RETURN keys: total_entries, total_matching, by_organism,
-    by_cluster_type, by_treatment_type, by_omics_type, by_publication.
+    by_cluster_type, by_treatment_type, by_background_factors,
+    by_omics_type, by_publication.
     When search_text: adds score_max, score_median.
     """
     conditions, params = _gene_cluster_where(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, omics_type=omics_type,
+        background_factors=background_factors,
     )
 
     if search_text is not None:
@@ -2735,6 +2815,7 @@ def build_list_gene_clusters_summary(
         "WITH collect(gc.organism_name) AS organisms,\n"
         "     collect(gc.cluster_type) AS cluster_types,\n"
         "     apoc.coll.flatten(collect(gc.treatment_type)) AS treatment_types,\n"
+        "     apoc.coll.flatten(collect(coalesce(gc.background_factors, []))) AS background_factors_flat,\n"
         "     collect(gc.omics_type) AS omics_types,\n"
         "     apoc.coll.flatten(collect(pub_dois)) AS pub_doi_list,\n"
         f"     count(gc) AS total_matching{score_cols}\n"
@@ -2743,6 +2824,7 @@ def build_list_gene_clusters_summary(
         "       apoc.coll.frequencies(organisms) AS by_organism,\n"
         "       apoc.coll.frequencies(cluster_types) AS by_cluster_type,\n"
         "       apoc.coll.frequencies(treatment_types) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(background_factors_flat) AS by_background_factors,\n"
         "       apoc.coll.frequencies(omics_types) AS by_omics_type,\n"
         f"       apoc.coll.frequencies(pub_doi_list) AS by_publication{score_return}"
     )
@@ -2756,6 +2838,7 @@ def build_list_gene_clusters(
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
+    background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
@@ -2764,7 +2847,7 @@ def build_list_gene_clusters(
     """Build detail Cypher for list_gene_clusters.
 
     RETURN keys (compact): cluster_id, name, organism_name, cluster_type,
-    treatment_type, member_count, source_paper.
+    treatment_type, background_factors, member_count, source_paper.
     When search_text: adds score.
     RETURN keys (verbose): adds functional_description, behavioral_description,
     cluster_method, treatment, light_condition, experimental_context,
@@ -2773,6 +2856,7 @@ def build_list_gene_clusters(
     conditions, params = _gene_cluster_where(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, omics_type=omics_type,
+        background_factors=background_factors,
     )
 
     if search_text is not None:
@@ -2839,6 +2923,7 @@ def build_list_gene_clusters(
         "       gc.organism_name AS organism_name,\n"
         "       gc.cluster_type AS cluster_type,\n"
         "       gc.treatment_type AS treatment_type,\n"
+        "       coalesce(gc.background_factors, []) AS background_factors,\n"
         "       gc.member_count AS member_count,\n"
         f"       gc.source_paper AS source_paper{score_col}{verbose_cols}\n"
         f"ORDER BY {order_prefix}gc.organism_name, gc.name{skip_clause}{limit_clause}"
@@ -2850,6 +2935,7 @@ def build_gene_clusters_by_gene_summary(
     locus_tags: list[str],
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for gene_clusters_by_gene.
@@ -2857,7 +2943,7 @@ def build_gene_clusters_by_gene_summary(
     RETURN keys: total_matching, total_clusters,
     genes_with_clusters, genes_without_clusters,
     not_found, not_matched,
-    by_cluster_type, by_treatment_type, by_publication.
+    by_cluster_type, by_treatment_type, by_background_factors, by_publication.
     """
     params: dict = {"locus_tags": locus_tags}
 
@@ -2869,6 +2955,11 @@ def build_gene_clusters_by_gene_summary(
         gc_conditions.append(
             "ANY(tt IN gc.treatment_type WHERE tt IN $treatment_type)")
         params["treatment_type"] = treatment_type
+    if background_factors is not None:
+        gc_conditions.append(
+            "ANY(bf IN coalesce(gc.background_factors, [])"
+            " WHERE bf IN $background_factors)")
+        params["background_factors"] = background_factors
 
     pub_match = ""
     if publication_doi is not None:
@@ -2890,7 +2981,7 @@ def build_gene_clusters_by_gene_summary(
         "             THEN lt END) AS nm_raw,\n"
         "     collect(CASE WHEN gc IS NOT NULL THEN\n"
         "       {lt: lt, cid: gc.id, ct: gc.cluster_type,\n"
-        "        tt: gc.treatment_type} END) AS rows\n"
+        "        tt: gc.treatment_type, bfs: gc.background_factors} END) AS rows\n"
         "WITH [x IN nf_raw WHERE x IS NOT NULL] AS not_found,\n"
         "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched,\n"
         "     rows\n"
@@ -2908,11 +2999,14 @@ def build_gene_clusters_by_gene_summary(
         "     apoc.coll.frequencies(\n"
         "       apoc.coll.flatten([r IN rows | r.tt])) AS by_treatment_type,\n"
         "     apoc.coll.frequencies(\n"
+        "       apoc.coll.flatten([r IN rows | coalesce(r.bfs, [])])) AS by_background_factors,\n"
+        "     apoc.coll.frequencies(\n"
         "       [p IN pub_rows WHERE p.doi IS NOT NULL | p.doi]) AS by_publication\n"
         "RETURN total_matching, total_clusters,\n"
         "       genes_with_clusters, genes_without_clusters,\n"
         "       not_found, not_matched,\n"
-        "       by_cluster_type, by_treatment_type, by_publication"
+        "       by_cluster_type, by_treatment_type, by_background_factors,\n"
+        "       by_publication"
     )
     return cypher, params
 
@@ -2922,6 +3016,7 @@ def build_gene_clusters_by_gene(
     locus_tags: list[str],
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
@@ -2944,6 +3039,11 @@ def build_gene_clusters_by_gene(
         gc_conditions.append(
             "ANY(tt IN gc.treatment_type WHERE tt IN $treatment_type)")
         params["treatment_type"] = treatment_type
+    if background_factors is not None:
+        gc_conditions.append(
+            "ANY(bf IN coalesce(gc.background_factors, [])"
+            " WHERE bf IN $background_factors)")
+        params["background_factors"] = background_factors
 
     pub_match = ""
     if publication_doi is not None:

@@ -343,10 +343,20 @@ summary=False: breakdowns populated, results populated, `truncated` reflects lim
 For exact-match filters where multiple values make sense:
 
 ```python
-# Builder
+# Builder — treatment_type is an array property, use ANY()
 if treatment_type:
-    conditions.append("toLower(e.treatment_type) IN $treatment_types")
+    conditions.append(
+        "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)"
+    )
     params["treatment_types"] = [t.lower() for t in treatment_type]
+
+# For array properties that may be null (e.g. background_factors), use coalesce
+if background_factors:
+    conditions.append(
+        "ANY(bf IN coalesce(e.background_factors, [])"
+        " WHERE toLower(bf) IN $background_factors)"
+    )
+    params["background_factors"] = [bf.lower() for bf in background_factors]
 
 # MCP wrapper
 treatment_type: Annotated[list[str] | None, Field(

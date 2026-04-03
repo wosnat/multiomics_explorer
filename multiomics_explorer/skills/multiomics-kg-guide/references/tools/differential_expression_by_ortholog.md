@@ -40,7 +40,7 @@ For per-gene expression, use differential_expression_by_gene.
 ### Envelope
 
 ```expected-keys
-total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
 - **total_matching** (int): Gene x experiment x timepoint rows matching all filters
@@ -55,6 +55,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 - **by_organism** (list[DEByOrthologOrganismBreakdown]): Rows per organism, sorted by count desc
 - **rows_by_status** (object): {significant_up, significant_down, not_significant}
 - **rows_by_treatment_type** (object): Row counts by treatment type
+- **rows_by_background_factors** (object): Row counts by background factor
 - **by_table_scope** (object): Row counts by experiment table_scope
 - **top_groups** (list[DifferentialExpressionByOrthologTopGroup]): Top 5 groups by significant gene count
 - **top_experiments** (list[DifferentialExpressionByOrthologTopExperiment]): Top 5 experiments by significant gene count

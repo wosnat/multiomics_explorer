@@ -1403,9 +1403,9 @@ class TestBuildListExperiments:
         assert params["organism"] == "MED4"
 
     def test_treatment_type_filter(self):
-        """Treatment type filter uses toLower IN with list param."""
+        """Treatment type filter uses ANY() for array property."""
         cypher, params = build_list_experiments(treatment_type=["coculture", "nitrogen_stress"])
-        assert "toLower(e.treatment_type) IN $treatment_types" in cypher
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
         assert params["treatment_types"] == ["coculture", "nitrogen_stress"]
 
     def test_treatment_type_case_insensitive(self):
@@ -1614,11 +1614,11 @@ class TestBuildListExperimentsSummary:
         assert "score_median" not in cypher
 
     def test_shares_where_clause(self):
-        """Same filter logic as detail builder — treatment_type list works."""
+        """Same filter logic as detail builder — treatment_type array filter."""
         cypher, params = build_list_experiments_summary(
             treatment_type=["coculture", "nitrogen_stress"]
         )
-        assert "toLower(e.treatment_type) IN $treatment_types" in cypher
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
         assert params["treatment_types"] == ["coculture", "nitrogen_stress"]
 
     def test_returns_aggregation_keys(self):
@@ -2953,3 +2953,145 @@ class TestBuildGenesInCluster:
             limit=10, offset=5)
         assert "SKIP $offset" in cypher
         assert params["offset"] == 5
+
+
+class TestTreatmentTypeArrayFilter:
+    """treatment_type is now an array property — filters must use ANY()."""
+
+    def test_list_experiments_uses_any_for_treatment_type(self):
+        """treatment_type is now an array — filter must use ANY()."""
+        cypher, params = build_list_experiments(
+            treatment_type=["coculture", "nitrogen_stress"]
+        )
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
+        assert "toLower(e.treatment_type) IN" not in cypher
+        assert params["treatment_types"] == ["coculture", "nitrogen_stress"]
+
+    def test_list_experiments_summary_uses_any_for_treatment_type(self):
+        cypher, params = build_list_experiments_summary(
+            treatment_type=["coculture"]
+        )
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
+        assert params["treatment_types"] == ["coculture"]
+
+    def test_gene_response_profile_uses_any_for_treatment_types(self):
+        """gene_response_profile filter must also use ANY() for array treatment_type."""
+        cypher, params = build_gene_response_profile(
+            locus_tags=["PMM0001"],
+            organism_name="Prochlorococcus MED4",
+            treatment_types=["nitrogen_stress"],
+        )
+        assert "ANY(t IN e.treatment_type WHERE toLower(t) IN $treatment_types)" in cypher
+        assert params["treatment_types"] == ["nitrogen_stress"]
+
+    def test_list_experiments_summary_flattens_treatment_type(self):
+        """Summary must flatten array treatment_type before frequencies."""
+        cypher, _ = build_list_experiments_summary()
+        assert "apoc.coll.flatten(collect(coalesce(e.treatment_type, [])))" in cypher
+        assert "collect(e.treatment_type) AS tts" not in cypher
+
+    def test_de_by_gene_summary_flattens_treatment_type(self):
+        """DE summary must flatten array treatment_type."""
+        cypher, _ = build_differential_expression_by_gene_summary_global()
+        assert "apoc.coll.flatten(collect(coalesce(e.treatment_type, [])))" in cypher
+
+    def test_de_by_ortholog_summary_flattens_treatment_type(self):
+        """DE by ortholog summary must flatten array treatment_type."""
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["OG_test"],
+        )
+        assert "apoc.coll.flatten(" in cypher
+        assert "rows_by_treatment_type" in cypher
+
+    def test_gene_response_profile_group_by_treatment_type_unwinds(self):
+        """group_by=treatment_type must UNWIND array to produce one row per value."""
+        cypher, _ = build_gene_response_profile(
+            locus_tags=["PMM0001"],
+            organism_name="Prochlorococcus MED4",
+            group_by="treatment_type",
+        )
+        assert "UNWIND" in cypher
+        assert "_tt AS group_key" in cypher
+
+    def test_gene_response_profile_group_by_experiment_no_unwind(self):
+        """group_by=experiment should NOT add UNWIND."""
+        cypher, _ = build_gene_response_profile(
+            locus_tags=["PMM0001"],
+            organism_name="Prochlorococcus MED4",
+            group_by="experiment",
+        )
+        assert "UNWIND" not in cypher
+        assert "e.id AS group_key" in cypher
+
+    def test_gene_response_profile_envelope_unwinds_for_treatment_type(self):
+        """Envelope query should UNWIND for treatment_type group_by."""
+        cypher, _ = build_gene_response_profile_envelope(
+            locus_tags=["PMM0001"],
+            organism_name="Prochlorococcus MED4",
+            group_by="treatment_type",
+        )
+        assert "UNWIND" in cypher
+        assert "_tt AS group_key" in cypher
+
+
+class TestBackgroundFactors:
+    """Tests for background_factors filter, return, and aggregation across builders."""
+
+    def test_list_experiments_returns_background_factors(self):
+        cypher, _ = build_list_experiments()
+        assert "background_factors" in cypher
+
+    def test_list_experiments_filter(self):
+        cypher, params = build_list_experiments(background_factors=["axenic"])
+        assert "ANY(bf IN coalesce(e.background_factors, []) WHERE toLower(bf) IN $background_factors)" in cypher
+        assert params["background_factors"] == ["axenic"]
+
+    def test_list_experiments_summary_has_by_background_factors(self):
+        cypher, _ = build_list_experiments_summary()
+        assert "by_background_factors" in cypher
+
+    def test_list_organisms_returns_background_factors(self):
+        cypher, _ = build_list_organisms()
+        assert "background_factors" in cypher
+
+    def test_list_publications_returns_background_factors(self):
+        cypher, _ = build_list_publications()
+        assert "background_factors" in cypher
+
+    def test_list_publications_search_returns_background_factors(self):
+        cypher, _ = build_list_publications(search_text="light")
+        assert "background_factors" in cypher
+
+    def test_list_gene_clusters_returns_background_factors(self):
+        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters
+        cypher, _ = build_list_gene_clusters()
+        assert "background_factors" in cypher
+
+    def test_list_gene_clusters_summary_has_by_background_factors(self):
+        from multiomics_explorer.kg.queries_lib import build_list_gene_clusters_summary
+        cypher, _ = build_list_gene_clusters_summary()
+        assert "by_background_factors" in cypher
+
+    def test_differential_expression_by_gene_verbose_has_background_factors(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=True)
+        assert "background_factors" in cypher
+
+    def test_differential_expression_by_gene_compact_no_background_factors(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=False)
+        assert "background_factors" not in cypher
+
+    def test_differential_expression_by_gene_summary_by_experiment_has_background_factors(self):
+        cypher, _ = build_differential_expression_by_gene_summary_by_experiment()
+        assert "background_factors" in cypher
+
+    def test_differential_expression_by_ortholog_top_experiments_has_background_factors(self):
+        cypher, _ = build_differential_expression_by_ortholog_top_experiments(
+            group_ids=["OG_1"]
+        )
+        assert "background_factors" in cypher
+
+    def test_differential_expression_by_ortholog_results_has_background_factors(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["OG_1"]
+        )
+        assert "background_factors" in cypher

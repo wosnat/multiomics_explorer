@@ -18,6 +18,7 @@ Use genes_in_cluster to drill into a cluster's full membership.
 | organism | string \| None | None | Organism name (case-insensitive partial match); inferred from genes if omitted. Single organism enforced. |
 | cluster_type | string \| None | None | Filter: 'diel_periodicity', 'stress_response', or 'expression_level'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). |
+| background_factors | list[string] \| None | None | Filter by background factors. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include functional_description, behavioral_description, treatment_type, treatment, source_paper, p_value. |
@@ -31,7 +32,7 @@ Use genes_in_cluster to drill into a cluster's full membership.
 ### Envelope
 
 ```expected-keys
-total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_publication, returned, offset, truncated, results
+total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, results
 ```
 
 - **total_matching** (int): Gene × cluster rows matching filters
@@ -42,6 +43,7 @@ total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not
 - **not_matched** (list[string]): Locus tags in KG but no cluster memberships after filters
 - **by_cluster_type** (list[GeneClusterTypeBreakdown]): Rows per cluster type
 - **by_treatment_type** (list[GeneClusterTreatmentBreakdown]): Rows per treatment type
+- **by_background_factors** (list[GeneClusterBackgroundFactorBreakdown]): Rows per background factor
 - **by_publication** (list[GeneClusterPublicationBreakdown]): Rows per publication
 - **returned** (int): Results in this response
 - **offset** (int): Offset into result set

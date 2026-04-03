@@ -19,6 +19,7 @@ report all assayed genes (fair for cross-experiment comparison).
 |---|---|---|---|
 | organism | string \| None | None | Filter by organism name (case-insensitive partial match on profiled organism and coculture partner). E.g. 'MED4', 'Alteromonas'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s) (case-insensitive exact match). E.g. ['coculture', 'nitrogen_stress']. Use list_filter_values to see valid values. |
+| background_factors | list[string] \| None | None | Filter by background experimental factors (case-insensitive exact match). E.g. ['axenic', 'diel_cycle']. Background factors describe experimental context beyond the primary treatment. |
 | omics_type | list[string] \| None | None | Filter by omics platform(s) (case-insensitive). E.g. ['RNASEQ', 'PROTEOMICS']. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s) (case-insensitive exact match). Get DOIs from list_publications. E.g. ['10.1038/ismej.2016.70']. |
 | coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive partial match). Narrows coculture experiments. E.g. 'Alteromonas', 'HOT1A3'. |
@@ -37,7 +38,7 @@ report all assayed genes (fair for cross-experiment comparison).
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered)
@@ -47,6 +48,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **truncated** (bool): True if results were truncated by limit or summary=true
 - **by_organism** (list[OrganismBreakdown]): Experiment counts per organism, sorted by count descending
 - **by_treatment_type** (list[TreatmentTypeBreakdown]): Experiment counts per treatment type, sorted by count descending
+- **by_background_factors** (list[BackgroundFactorBreakdown]): Experiment counts per background factor, sorted by count descending
 - **by_omics_type** (list[OmicsTypeBreakdown]): Experiment counts per omics platform, sorted by count descending
 - **by_publication** (list[PublicationBreakdown]): Experiment counts per publication, sorted by count descending
 - **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted by count descending
@@ -62,7 +64,8 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | experiment_name | string | Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)') |
 | publication_doi | string | Publication DOI (e.g. '10.1038/ismej.2016.70') |
 | organism_name | string | Profiled organism (e.g. 'Prochlorococcus MED4') |
-| treatment_type | string | Treatment category (e.g. 'coculture', 'nitrogen_stress') |
+| treatment_type | list[string] | Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture']) |
+| background_factors | list[string] (optional) | Background experimental factors (e.g. ['axenic', 'continuous_light']). Empty list when none specified. |
 | coculture_partner | string \| None (optional) | Interacting organism — coculture partner or phage. Null when no interacting organism (e.g. 'Alteromonas macleodii HOT1A3', 'Phage') |
 | omics_type | string | Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS') |
 | is_time_course | bool | Whether experiment has multiple time points |
@@ -183,7 +186,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
+# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
 ```
 
 Use package import for bulk data extraction in scripts.

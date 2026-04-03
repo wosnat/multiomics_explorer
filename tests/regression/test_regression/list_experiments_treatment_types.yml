@@ -1,7 +1,8 @@
 case_id: list_experiments_treatment_types
 row_count: 31
 rows:
-- coculture_partner: Prochlorococcus MIT9312
+- background_factors: []
+  coculture_partner: Prochlorococcus MIT9312
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 400 ppm pCO2 vs
     Axenic at 400 ppm pCO2 (RNASEQ)
@@ -27,8 +28,10 @@ rows:
   - '308'
   time_point_totals:
   - '419'
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus MIT9312
+  treatment_type:
+  - coculture
+- background_factors: []
+  coculture_partner: Prochlorococcus MIT9312
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 800 ppm pCO2 vs
     Axenic at 800 ppm pCO2 (RNASEQ)
@@ -54,8 +57,10 @@ rows:
   - '104'
   time_point_totals:
   - '188'
-  treatment_type: coculture
-- coculture_partner: Synechococcus CC9311
+  treatment_type:
+  - coculture
+- background_factors: []
+  coculture_partner: Synechococcus CC9311
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 at 400 ppm pCO2 vs Axenic
     at 400 ppm pCO2 (RNASEQ)
@@ -81,8 +86,10 @@ rows:
   - '117'
   time_point_totals:
   - '293'
-  treatment_type: coculture
-- coculture_partner: Synechococcus CC9311
+  treatment_type:
+  - coculture
+- background_factors: []
+  coculture_partner: Synechococcus CC9311
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 at 800 ppm pCO2 vs Axenic
     at 800 ppm pCO2 (RNASEQ)
@@ -108,8 +115,10 @@ rows:
   - '31'
   time_point_totals:
   - '83'
-  treatment_type: coculture
-- coculture_partner: Synechococcus WH8102
+  treatment_type:
+  - coculture
+- background_factors: []
+  coculture_partner: Synechococcus WH8102
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 at 400 ppm pCO2 vs Axenic
     at 400 ppm pCO2 (RNASEQ)
@@ -135,8 +144,10 @@ rows:
   - '26'
   time_point_totals:
   - '136'
-  treatment_type: coculture
-- coculture_partner: Synechococcus WH8102
+  treatment_type:
+  - coculture
+- background_factors: []
+  coculture_partner: Synechococcus WH8102
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 at 800 ppm pCO2 vs Axenic
     at 800 ppm pCO2 (RNASEQ)
@@ -162,8 +173,10 @@ rows:
   - '27'
   time_point_totals:
   - '58'
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus MED4
+  treatment_type:
+  - coculture
+- background_factors: []
+  coculture_partner: Prochlorococcus MED4
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
   gene_count: 3950
@@ -188,8 +201,12 @@ rows:
   - '112'
   time_point_totals:
   - '3950'
-  treatment_type: coculture
-- coculture_partner: null
+  treatment_type:
+  - coculture
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -239,8 +256,12 @@ rows:
   - '2226'
   - '2226'
   - '2226'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -272,8 +293,12 @@ rows:
   time_point_totals:
   - '2226'
   - '2226'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (RNASEQ)
@@ -323,8 +348,12 @@ rows:
   - '3950'
   - '3950'
   - '3950'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (RNASEQ)
@@ -362,8 +391,11 @@ rows:
   - '3950'
   - '3950'
   - '3950'
-  treatment_type: nitrogen_stress
-- coculture_partner: Prochlorococcus MIT9313
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - continuous_light
+  coculture_partner: Prochlorococcus MIT9313
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
     inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
@@ -383,8 +415,11 @@ rows:
   time_point_significant_down: []
   time_point_significant_up: []
   time_point_totals: []
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus MIT9313
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Prochlorococcus MIT9313
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
     conditions (RNASEQ)
@@ -404,8 +439,11 @@ rows:
   time_point_significant_down: []
   time_point_significant_up: []
   time_point_totals: []
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus NATL2A
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Prochlorococcus NATL2A
   experiment_id: 10.1038/ismej.2016.82_coculture_24_hours_after_coculturing_mit1002_rnaseq
   experiment_name: MIT1002 24 hours after co-culturing with Prochlorococcus NATL2A
     vs Co-culture with Prochlorococcus NATL2A (RNASEQ)
@@ -431,8 +469,11 @@ rows:
   - '458'
   time_point_totals:
   - '740'
-  treatment_type: coculture
-- coculture_partner: Prochlorococcus NATL2A
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Prochlorococcus NATL2A
   experiment_id: 10.1038/ismej.2016.82_coculture_48_hours_after_coculturing_mit1002_rnaseq
   experiment_name: MIT1002 48 hours after co-culturing with Prochlorococcus NATL2A
     vs Co-culture with Prochlorococcus NATL2A (RNASEQ)
@@ -458,8 +499,10 @@ rows:
   - '455'
   time_point_totals:
   - '740'
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - coculture
+- background_factors: []
+  coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   gene_count: 1849
@@ -484,8 +527,12 @@ rows:
   - '59'
   time_point_totals:
   - '1849'
-  treatment_type: coculture
-- coculture_partner: null
+  treatment_type:
+  - coculture
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
@@ -535,8 +582,12 @@ rows:
   - '1424'
   - '1424'
   - '1424'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
@@ -574,8 +625,12 @@ rows:
   - '1424'
   - '1424'
   - '1424'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (RNASEQ)
@@ -625,8 +680,12 @@ rows:
   - '1849'
   - '1849'
   - '1849'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (RNASEQ)
@@ -652,8 +711,12 @@ rows:
   - '405'
   time_point_totals:
   - '1849'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   gene_count: 2534
@@ -690,8 +753,11 @@ rows:
   - '840'
   - '841'
   - '853'
-  treatment_type: nitrogen_stress
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
     (RNASEQ)
@@ -717,8 +783,12 @@ rows:
   - '24'
   time_point_totals:
   - '1714'
-  treatment_type: coculture
-- coculture_partner: null
+  treatment_type:
+  - coculture
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
@@ -744,8 +814,12 @@ rows:
   - '20'
   time_point_totals:
   - '1696'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
@@ -771,8 +845,12 @@ rows:
   - '18'
   time_point_totals:
   - '1696'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
@@ -828,8 +906,11 @@ rows:
   - '1696'
   - '1696'
   - '1696'
-  treatment_type: nitrogen_stress
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
     conditions (RNASEQ)
@@ -855,8 +936,11 @@ rows:
   - '153'
   time_point_totals:
   - '2267'
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
     conditions (RNASEQ)
@@ -882,8 +966,12 @@ rows:
   - '96'
   time_point_totals:
   - '2268'
-  treatment_type: coculture
-- coculture_partner: null
+  treatment_type:
+  - coculture
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
   experiment_name: MIT9313 Growth on nitrite as sole N source (MIT9313) vs N-replete
     Pro99 medium (MIT9313) (MICROARRAY)
@@ -909,8 +997,12 @@ rows:
   - '12'
   time_point_totals:
   - '2241'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
   experiment_name: MIT9313 Growth on urea as sole N source (MIT9313) vs N-replete
     Pro99 medium (MIT9313) (MICROARRAY)
@@ -936,8 +1028,12 @@ rows:
   - '49'
   time_point_totals:
   - '2241'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
   experiment_name: MIT9313 Nitrogen deprivation (MIT9313) vs N-replete Pro99 medium
     (MIT9313) (MICROARRAY)
@@ -993,8 +1089,11 @@ rows:
   - '2241'
   - '2241'
   - '2241'
-  treatment_type: nitrogen_stress
-- coculture_partner: Alteromonas macleodii MIT1002
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii MIT1002
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
     Prochlorococcus NATL2A (RNASEQ)
@@ -1056,4 +1155,5 @@ rows:
   - '353'
   - '353'
   - '353'
-  treatment_type: coculture
+  treatment_type:
+  - coculture

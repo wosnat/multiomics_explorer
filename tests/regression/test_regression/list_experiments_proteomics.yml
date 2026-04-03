@@ -1,7 +1,10 @@
 case_id: list_experiments_proteomics
 row_count: 4
 rows:
-- coculture_partner: null
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -51,8 +54,12 @@ rows:
   - '2226'
   - '2226'
   - '2226'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -84,8 +91,12 @@ rows:
   time_point_totals:
   - '2226'
   - '2226'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
@@ -135,8 +146,12 @@ rows:
   - '1424'
   - '1424'
   - '1424'
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
@@ -174,4 +189,5 @@ rows:
   - '1424'
   - '1424'
   - '1424'
-  treatment_type: nitrogen_stress
+  treatment_type:
+  - nitrogen_stress

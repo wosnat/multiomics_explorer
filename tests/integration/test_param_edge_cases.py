@@ -405,7 +405,7 @@ class TestListExperimentsEdgeCases:
             assert "MED4" in row["organism_name"] or (
                 row.get("coculture_partner") and "MED4" in row.get("coculture_partner", "")
             )
-            assert row["treatment_type"] == "coculture"
+            assert "coculture" in row["treatment_type"]
 
     def test_verbose_adds_treatment_details(self, conn):
         result = api.list_experiments(verbose=True, limit=1, conn=conn)

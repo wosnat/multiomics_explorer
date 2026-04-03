@@ -18,6 +18,7 @@ Returns cluster IDs for use with genes_in_cluster.
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). |
 | cluster_type | string \| None | None | Filter: 'diel_periodicity', 'stress_response', or 'expression_level'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen_stress']. |
+| background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel_cycle']. |
 | omics_type | string \| None | None | Filter: 'MICROARRAY', 'RNASEQ', or 'PROTEOMICS'. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
 | summary | bool | False | When true, return only summary fields (results=[]). |
@@ -32,7 +33,7 @@ Returns cluster IDs for use with genes_in_cluster.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_omics_type, by_publication, score_max, score_median, returned, offset, truncated, results
+total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, by_publication, score_max, score_median, returned, offset, truncated, results
 ```
 
 - **total_entries** (int)
@@ -40,6 +41,7 @@ total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, 
 - **by_organism** (list[GeneClusterOrganismBreakdown])
 - **by_cluster_type** (list[GeneClusterTypeBreakdown])
 - **by_treatment_type** (list[GeneClusterTreatmentBreakdown])
+- **by_background_factors** (list[GeneClusterBackgroundFactorBreakdown])
 - **by_omics_type** (list[GeneClusterOmicsBreakdown])
 - **by_publication** (list[GeneClusterPublicationBreakdown])
 - **score_max** (float | None)
@@ -57,6 +59,7 @@ total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, 
 | organism_name | string |  |
 | cluster_type | string |  |
 | treatment_type | list[string] |  |
+| background_factors | list[string] (optional) | Background experimental factors (e.g. ['axenic', 'continuous_light']) |
 | member_count | int |  |
 | source_paper | string |  |
 | score | float \| None (optional) |  |
@@ -154,7 +157,7 @@ response['total_matching']  # use total, not len — results may be truncated
 from multiomics_explorer import list_gene_clusters
 
 result = list_gene_clusters()
-# returns dict with keys: total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_omics_type, by_publication, score_max, score_median, offset, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, by_publication, score_max, score_median, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

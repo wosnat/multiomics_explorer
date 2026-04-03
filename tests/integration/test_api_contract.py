@@ -221,6 +221,7 @@ class TestListOrganismsContract:
             "organism_name", "genus", "species", "strain", "clade",
             "ncbi_taxon_id", "gene_count", "publication_count",
             "experiment_count", "treatment_types", "omics_types",
+            "background_factors",
         }
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -374,7 +375,8 @@ class TestDifferentialExpressionByGeneContract:
         expected_keys = {
             "organism_name", "matching_genes", "total_matching",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
-            "experiment_count", "rows_by_treatment_type", "by_table_scope",
+            "experiment_count", "rows_by_treatment_type",
+            "rows_by_background_factors", "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
             "returned", "truncated", "offset", "results",
         }
@@ -441,6 +443,7 @@ class TestDifferentialExpressionByOrthologContract:
             "experiment_count", "median_abs_log2fc", "max_abs_log2fc",
             "results", "returned", "truncated", "offset",
             "by_organism", "rows_by_status", "rows_by_treatment_type",
+            "rows_by_background_factors",
             "by_table_scope", "top_groups", "top_experiments",
             "not_found_groups", "not_matched_groups",
             "not_found_organisms", "not_matched_organisms",
@@ -501,7 +504,7 @@ class TestDifferentialExpressionByOrthologContract:
             te = result["top_experiments"][0]
             assert set(te.keys()) == {
                 "experiment_id", "treatment_type", "organism_name",
-                "significant_genes",
+                "significant_genes", "background_factors",
             }
 
     def test_by_organism_shape(self, conn):
@@ -857,7 +860,7 @@ class TestGeneClustersByGeneContract:
 class TestGenesInClusterContract:
     def test_returns_dict_envelope(self, conn):
         result = api.genes_in_cluster(
-            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8"],
             conn=conn)
         expected_keys = {
             "total_matching", "by_organism", "by_cluster",
@@ -870,13 +873,13 @@ class TestGenesInClusterContract:
 
     def test_known_cluster_has_members(self, conn):
         result = api.genes_in_cluster(
-            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8"],
             conn=conn)
-        assert result["total_matching"] == 5
+        assert result["total_matching"] == 37
 
     def test_result_keys_compact(self, conn):
         result = api.genes_in_cluster(
-            cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
+            cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8"],
             limit=1, conn=conn)
         expected = {"locus_tag", "gene_name", "product", "gene_category",
                     "organism_name", "cluster_id", "cluster_name",

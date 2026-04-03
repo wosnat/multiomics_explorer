@@ -14,6 +14,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 |---|---|---|---|
 | organism | string \| None | None | Filter by organism name (case-insensitive). E.g. 'MED4', 'HOT1A3'. |
 | treatment_type | string \| None | None | Filter by experiment treatment type. Use list_filter_values for valid values. |
+| background_factors | string \| None | None | Filter by background factor (case-insensitive exact match). E.g. 'axenic'. |
 | search_text | string \| None | None | Free-text search on title, abstract, and description (Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'. |
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
 | verbose | bool | False | Include abstract and description. Default compact for routing. |
@@ -27,13 +28,14 @@ specific experiments with list_experiments or genes with genes_by_function.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, returned, offset, truncated, results
+total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total publications in KG (unfiltered)
 - **total_matching** (int): Publications matching filters
 - **by_organism** (list[PubOrganismBreakdown]): Publication counts per organism, sorted by count descending
 - **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted by count descending
+- **by_background_factors** (list[PubBackgroundFactorBreakdown]): Publication counts per background factor, sorted by count descending
 - **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted by count descending
 - **returned** (int): Publications in this response
 - **offset** (int): Offset into full result set (e.g. 0)
@@ -52,6 +54,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, re
 | organisms | list[string] (optional) | Organisms studied in this publication |
 | experiment_count | int (optional) | Number of experiments in KG from this publication |
 | treatment_types | list[string] (optional) | Experiment treatment types (e.g. coculture, nitrogen_stress) |
+| background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle']) |
 | omics_types | list[string] (optional) | Omics data types (e.g. RNASEQ, PROTEOMICS) |
 | score | float \| None (optional) | Lucene relevance score (only with search_text) |
 
@@ -132,7 +135,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_omics_type, offset, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

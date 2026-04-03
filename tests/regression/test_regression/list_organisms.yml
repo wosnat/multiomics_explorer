@@ -1,7 +1,8 @@
 case_id: list_organisms
 row_count: 15
 rows:
-- clade: null
+- background_factors: []
+  clade: null
   experiment_count: 0
   gene_count: 0
   genus: Alteromonas
@@ -12,7 +13,11 @@ rows:
   species: null
   strain: null
   treatment_types: []
-- clade: null
+- background_factors:
+  - axenic
+  - coculture
+  - diel_cycle
+  clade: null
   experiment_count: 13
   gene_count: 4136
   genus: Alteromonas
@@ -26,7 +31,11 @@ rows:
   treatment_types:
   - carbon_stress
   - coculture
-- clade: null
+- background_factors:
+  - axenic
+  - coculture
+  - continuous_light
+  clade: null
   experiment_count: 15
   gene_count: 4031
   genus: Alteromonas
@@ -41,7 +50,12 @@ rows:
   treatment_types:
   - coculture
   - nitrogen_stress
-- clade: null
+- background_factors:
+  - axenic
+  - coculture
+  - continuous_light
+  - diel_cycle
+  clade: null
   experiment_count: 8
   gene_count: 4028
   genus: Alteromonas
@@ -55,7 +69,12 @@ rows:
   treatment_types:
   - coculture
   - darkness
-- clade: null
+- background_factors:
+  - axenic
+  - continuous_light
+  - darkness
+  - viral
+  clade: null
   experiment_count: 6
   gene_count: 0
   genus: null
@@ -70,7 +89,10 @@ rows:
   treatment_types:
   - light_stress
   - viral
-- clade: HLII
+- background_factors:
+  - axenic
+  - continuous_light
+  clade: HLII
   experiment_count: 1
   gene_count: 1951
   genus: Prochlorococcus
@@ -83,7 +105,14 @@ rows:
   strain: AS9601
   treatment_types:
   - salt_stress
-- clade: HLI
+- background_factors:
+  - axenic
+  - chemical_inhibitor
+  - coculture
+  - continuous_light
+  - darkness
+  - viral
+  clade: HLI
   experiment_count: 46
   gene_count: 1976
   genus: Prochlorococcus
@@ -105,7 +134,10 @@ rows:
   - phosphorus_stress
   - salt_stress
   - viral
-- clade: HLII
+- background_factors:
+  - axenic
+  - continuous_light
+  clade: HLII
   experiment_count: 1
   gene_count: 1935
   genus: Prochlorococcus
@@ -118,7 +150,12 @@ rows:
   strain: MIT9301
   treatment_types:
   - growth_state
-- clade: HLII
+- background_factors:
+  - axenic
+  - coculture
+  - continuous_light
+  - diel_cycle
+  clade: HLII
   experiment_count: 17
   gene_count: 1978
   genus: Prochlorococcus
@@ -133,7 +170,10 @@ rows:
   - carbon_stress
   - coculture
   - plastic_stress
-- clade: LLIV
+- background_factors:
+  - axenic
+  - continuous_light
+  clade: LLIV
   experiment_count: 19
   gene_count: 2948
   genus: Prochlorococcus
@@ -151,7 +191,10 @@ rows:
   - nitrogen_stress
   - phosphorus_stress
   - viral
-- clade: LLII
+- background_factors:
+  - axenic
+  - continuous_light
+  clade: LLII
   experiment_count: 2
   gene_count: 2226
   genus: Prochlorococcus
@@ -164,7 +207,13 @@ rows:
   strain: NATL1A
   treatment_types:
   - salt_stress
-- clade: LLII
+- background_factors:
+  - axenic
+  - coculture
+  - continuous_light
+  - diel_cycle
+  - viral
+  clade: LLII
   experiment_count: 14
   gene_count: 2214
   genus: Prochlorococcus
@@ -180,7 +229,8 @@ rows:
   - darkness
   - phosphorus_stress
   - plastic_stress
-- clade: HLI
+- background_factors: []
+  clade: HLI
   experiment_count: 0
   gene_count: 1870
   genus: Prochlorococcus
@@ -191,7 +241,10 @@ rows:
   species: null
   strain: RSP50
   treatment_types: []
-- clade: null
+- background_factors:
+  - axenic
+  - coculture
+  clade: null
   experiment_count: 10
   gene_count: 3052
   genus: Synechococcus
@@ -205,7 +258,10 @@ rows:
   treatment_types:
   - carbon_stress
   - coculture
-- clade: null
+- background_factors:
+  - axenic
+  - coculture
+  clade: null
   experiment_count: 10
   gene_count: 2881
   genus: Parasynechococcus

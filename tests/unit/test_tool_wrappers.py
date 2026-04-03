@@ -1726,6 +1726,7 @@ class TestListPublicationsWrapper:
                 "total_matching": 21,
                 "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
                 "by_treatment_type": [{"treatment_type": "coculture", "count": 1}],
+                "by_background_factors": [],
                 "by_omics_type": [{"omics_type": "RNASEQ", "count": 1}],
                 "returned": 1,
                 "truncated": True,
@@ -1747,7 +1748,7 @@ class TestListPublicationsWrapper:
             return_value={
                 "total_entries": 21,
                 "total_matching": 0,
-                "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                "by_organism": [], "by_treatment_type": [], "by_background_factors": [], "by_omics_type": [],
                 "returned": 0,
                 "truncated": False,
                 "results": [],
@@ -1763,7 +1764,7 @@ class TestListPublicationsWrapper:
         """All params passed through to api."""
         with patch(
             "multiomics_explorer.api.functions.list_publications",
-            return_value={"total_entries": 0, "total_matching": 0, "by_organism": [], "by_treatment_type": [], "by_omics_type": [], "returned": 0, "truncated": False, "results": []},
+            return_value={"total_entries": 0, "total_matching": 0, "by_organism": [], "by_treatment_type": [], "by_background_factors": [], "by_omics_type": [], "returned": 0, "truncated": False, "results": []},
         ) as mock_api:
             await tool_fns["list_publications"](
                 mock_ctx,
@@ -1792,7 +1793,7 @@ class TestListPublicationsWrapper:
             return_value={
                 "total_entries": 50,
                 "total_matching": 8,
-                "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                "by_organism": [], "by_treatment_type": [], "by_background_factors": [], "by_omics_type": [],
                 "returned": 8,
                 "truncated": False,
                 "results": pubs,
@@ -1821,7 +1822,7 @@ class TestListPublicationsWrapper:
             "multiomics_explorer.api.functions.list_publications",
             return_value={
                 "total_entries": 20, "total_matching": 10,
-                "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                "by_organism": [], "by_treatment_type": [], "by_background_factors": [], "by_omics_type": [],
                 "returned": 2, "truncated": True, "offset": 5, "results": [],
             },
         ) as mock_api:
@@ -1837,6 +1838,7 @@ class TestListExperimentsWrapper:
         "total_matching": 76,
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 30}],
         "by_treatment_type": [{"treatment_type": "coculture", "count": 16}],
+        "by_background_factors": [],
         "by_omics_type": [{"omics_type": "RNASEQ", "count": 48}],
         "by_publication": [{"publication_doi": "10.1038/ismej.2016.70", "count": 5}],
         "by_table_scope": [{"table_scope": "all_detected_genes", "count": 22}],
@@ -1853,7 +1855,8 @@ class TestListExperimentsWrapper:
         "experiment_name": "MED4 Coculture with Alteromonas HOT1A3 (RNASEQ)",
         "publication_doi": "10.1234/test",
         "organism_name": "Prochlorococcus MED4",
-        "treatment_type": "coculture",
+        "treatment_type": ["coculture"],
+        "background_factors": [],
         "coculture_partner": "Alteromonas macleodii HOT1A3",
         "omics_type": "RNASEQ",
         "is_time_course": False,
@@ -1936,7 +1939,7 @@ class TestListExperimentsWrapper:
         """Detail mode with no matches returns empty results."""
         empty = {**self._SAMPLE_SUMMARY,
                  "total_matching": 0, "returned": 0, "truncated": False,
-                 "by_organism": [], "by_treatment_type": [], "by_omics_type": [],
+                 "by_organism": [], "by_treatment_type": [], "by_background_factors": [], "by_omics_type": [],
                  "by_publication": [], "by_table_scope": [],
                  "time_course_count": 0, "results": []}
         with patch(
@@ -2152,6 +2155,7 @@ class TestDifferentialExpressionByGeneWrapper:
         "max_abs_log2fc": 3.591,
         "experiment_count": 1,
         "rows_by_treatment_type": {"nitrogen_stress": 15},
+        "rows_by_background_factors": {},
         "by_table_scope": {"all_detected_genes": 15},
         "top_categories": [
             {"category": "Signal transduction",
@@ -2161,7 +2165,8 @@ class TestDifferentialExpressionByGeneWrapper:
             {
                 "experiment_id": "exp1",
                 "experiment_name": "Test experiment",
-                "treatment_type": "nitrogen_stress",
+                "treatment_type": ["nitrogen_stress"],
+                "background_factors": [],
                 "omics_type": "RNASEQ",
                 "coculture_partner": None,
                 "is_time_course": "true",
@@ -2197,7 +2202,7 @@ class TestDifferentialExpressionByGeneWrapper:
                 "locus_tag": "PMM0001",
                 "gene_name": "dnaN",
                 "experiment_id": "exp1",
-                "treatment_type": "nitrogen_stress",
+                "treatment_type": ["nitrogen_stress"],
                 "timepoint": "day 18",
                 "timepoint_hours": 432.0,
                 "timepoint_order": 1,
@@ -2720,12 +2725,14 @@ class TestDifferentialExpressionByOrthologWrapper:
         "rows_by_status": {"significant_up": 5, "significant_down": 3,
                            "not_significant": 2},
         "rows_by_treatment_type": {"nitrogen_limitation": 10},
+        "rows_by_background_factors": {},
         "by_table_scope": {"all_detected_genes": 10},
         "top_groups": [{"group_id": "g1", "consensus_gene_name": "psbB",
                         "consensus_product": "CP47",
                         "significant_genes": 3, "total_genes": 5}],
         "top_experiments": [{"experiment_id": "EXP001",
-                             "treatment_type": "nitrogen_limitation",
+                             "treatment_type": ["nitrogen_limitation"],
+                             "background_factors": [],
                              "organism_name": "MED4",
                              "significant_genes": 3}],
         "not_found_groups": [],
@@ -2739,7 +2746,8 @@ class TestDifferentialExpressionByOrthologWrapper:
         "results": [
             {"group_id": "g1", "consensus_gene_name": "psbB",
              "consensus_product": "CP47", "experiment_id": "EXP001",
-             "treatment_type": "nitrogen_limitation",
+             "treatment_type": ["nitrogen_limitation"],
+             "background_factors": [],
              "organism_name": "MED4", "coculture_partner": None,
              "timepoint": "24h", "timepoint_hours": 24.0,
              "timepoint_order": 3, "genes_with_expression": 3,
@@ -2792,7 +2800,8 @@ class TestDifferentialExpressionByOrthologWrapper:
             "max_abs_log2fc": None, "results": [], "returned": 0,
             "truncated": False,
             "by_organism": [], "rows_by_status": {},
-            "rows_by_treatment_type": {}, "by_table_scope": {},
+            "rows_by_treatment_type": {}, "rows_by_background_factors": {},
+            "by_table_scope": {},
             "top_groups": [], "top_experiments": [],
             "not_found_groups": ["g1"], "not_matched_groups": [],
             "not_found_organisms": [], "not_matched_organisms": [],
@@ -2900,6 +2909,7 @@ class TestListGeneClustersWrapper:
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 9}],
         "by_cluster_type": [{"cluster_type": "stress_response", "count": 9}],
         "by_treatment_type": [{"treatment_type": "nitrogen_stress", "count": 9}],
+        "by_background_factors": [],
         "by_omics_type": [{"omics_type": "MICROARRAY", "count": 9}],
         "by_publication": [{"publication_doi": "10.1038/msb4100087", "count": 9}],
         "returned": 1,
@@ -2970,6 +2980,7 @@ class TestGeneClustersByGeneWrapper:
         "not_found": [], "not_matched": [],
         "by_cluster_type": [{"cluster_type": "stress_response", "count": 2}],
         "by_treatment_type": [{"treatment_type": "nitrogen_stress", "count": 2}],
+        "by_background_factors": [],
         "by_publication": [{"publication_doi": "10.1038/msb4100087", "count": 2}],
         "returned": 1, "offset": 0, "truncated": True,
         "results": [

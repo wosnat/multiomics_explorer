@@ -1,7 +1,15 @@
 case_id: list_experiments_summary_all
 row_count: 1
 rows:
-- by_omics_type:
+- by_background_factors:
+  - '{''count'': 1, ''item'': ''chemical_inhibitor''}'
+  - '{''count'': 1, ''item'': ''darkness''}'
+  - '{''count'': 10, ''item'': ''diel_cycle''}'
+  - '{''count'': 14, ''item'': ''coculture''}'
+  - '{''count'': 2, ''item'': ''viral''}'
+  - '{''count'': 44, ''item'': ''axenic''}'
+  - '{''count'': 45, ''item'': ''continuous_light''}'
+  by_omics_type:
   - '{''count'': 24, ''item'': ''MICROARRAY''}'
   - '{''count'': 4, ''item'': ''PROTEOMICS''}'
   - '{''count'': 48, ''item'': ''RNASEQ''}'
