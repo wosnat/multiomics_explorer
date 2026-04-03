@@ -3035,7 +3035,7 @@ def build_list_clustering_analyses_summary(
         f"{where_block}"
         "WITH collect(ca.organism_name) AS organisms,\n"
         "     collect(ca.cluster_type) AS cluster_types,\n"
-        "     apoc.coll.flatten(collect(ca.treatment_type)) AS treatment_types,\n"
+        "     apoc.coll.flatten(collect(coalesce(ca.treatment_type, []))) AS treatment_types,\n"
         "     apoc.coll.flatten(collect(coalesce(ca.background_factors, []))) AS background_factors_flat,\n"
         "     collect(ca.omics_type) AS omics_types,\n"
         f"     count(ca) AS total_matching{score_cols}\n"

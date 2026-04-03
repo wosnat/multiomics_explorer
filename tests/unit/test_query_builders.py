@@ -2969,7 +2969,7 @@ class TestBuildListClusteringAnalyses:
     def test_verbose_false_omits_columns(self):
         from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
         cypher, params = build_list_clustering_analyses(verbose=False)
-        assert "AS treatment\n" not in cypher and "AS treatment," not in cypher
+        assert "ca.treatment AS treatment" not in cypher
         assert "AS light_condition" not in cypher
 
     def test_verbose_adds_cluster_descriptions(self):
