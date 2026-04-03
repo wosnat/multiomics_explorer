@@ -1,7 +1,10 @@
 case_id: differential_expression_by_ortholog_basic
 row_count: 57
 rows:
-- coculture_partner: null
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1016/j.micres.2015.04.006_salt_stress_saltacclimated_5_salt_as9601_rnaseq
@@ -14,8 +17,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: salt_stress
-- coculture_partner: null
+  treatment_type:
+  - salt_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.36_carbon_stress_low_co2_0004_co2_med4_microarray
@@ -28,8 +35,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: carbon_stress
-- coculture_partner: null
+  treatment_type:
+  - carbon_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.36_carbon_stress_low_co2_and_no_med4_microarray
@@ -42,8 +53,11 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: carbon_stress
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - carbon_stress
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
@@ -56,8 +70,12 @@ rows:
   timepoint: 20h
   timepoint_hours: 20.0
   timepoint_order: 1
-  treatment_type: coculture
-- coculture_partner: null
+  treatment_type:
+  - coculture
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
@@ -70,8 +88,12 @@ rows:
   timepoint: 3h
   timepoint_hours: 3.0
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
@@ -84,8 +106,12 @@ rows:
   timepoint: 12h
   timepoint_hours: 12.0
   timepoint_order: 2
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
@@ -98,8 +124,12 @@ rows:
   timepoint: 24h
   timepoint_hours: 24.0
   timepoint_order: 3
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
@@ -112,8 +142,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
@@ -126,8 +160,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
@@ -140,8 +178,12 @@ rows:
   timepoint: 0h
   timepoint_hours: 0.0
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
@@ -154,8 +196,12 @@ rows:
   timepoint: 3h
   timepoint_hours: 3.0
   timepoint_order: 2
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
@@ -168,8 +214,12 @@ rows:
   timepoint: 6h
   timepoint_hours: 6.0
   timepoint_order: 3
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
@@ -182,8 +232,12 @@ rows:
   timepoint: 12h
   timepoint_hours: 12.0
   timepoint_order: 4
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
@@ -196,8 +250,12 @@ rows:
   timepoint: 24h
   timepoint_hours: 24.0
   timepoint_order: 5
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
@@ -210,8 +268,10 @@ rows:
   timepoint: 48h
   timepoint_hours: 48.0
   timepoint_order: 6
-  treatment_type: nitrogen_stress
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - nitrogen_stress
+- background_factors: []
+  coculture_partner: Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
@@ -224,8 +284,12 @@ rows:
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
-  treatment_type: coculture
-- coculture_partner: null
+  treatment_type:
+  - coculture
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
@@ -238,8 +302,12 @@ rows:
   timepoint: day 14
   timepoint_hours: 336.0
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
@@ -252,8 +320,12 @@ rows:
   timepoint: day 31
   timepoint_hours: 744.0
   timepoint_order: 2
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
@@ -266,8 +338,12 @@ rows:
   timepoint: day 89
   timepoint_hours: 2136.0
   timepoint_order: 3
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -280,8 +356,12 @@ rows:
   timepoint: day 18
   timepoint_hours: 432.0
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -294,8 +374,12 @@ rows:
   timepoint: day 31
   timepoint_hours: 744.0
   timepoint_order: 2
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -308,8 +392,12 @@ rows:
   timepoint: day 60
   timepoint_hours: 1440.0
   timepoint_order: 3
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -322,8 +410,12 @@ rows:
   timepoint: day 89
   timepoint_hours: 2136.0
   timepoint_order: 4
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -336,8 +428,12 @@ rows:
   timepoint: days 60+89
   timepoint_hours: null
   timepoint_order: 5
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
@@ -350,8 +446,12 @@ rows:
   timepoint: day 14
   timepoint_hours: 336.0
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
@@ -364,8 +464,12 @@ rows:
   timepoint: day 18
   timepoint_hours: 432.0
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
@@ -378,8 +482,12 @@ rows:
   timepoint: day 31
   timepoint_hours: 744.0
   timepoint_order: 2
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
@@ -392,8 +500,12 @@ rows:
   timepoint: day 60
   timepoint_hours: 1440.0
   timepoint_order: 3
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
@@ -406,8 +518,12 @@ rows:
   timepoint: day 89
   timepoint_hours: 2136.0
   timepoint_order: 4
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - coculture
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
@@ -420,8 +536,12 @@ rows:
   timepoint: days 60+89
   timepoint_hours: null
   timepoint_order: 5
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_hdpe_plastic_leachate_50_mit9312_rnaseq
@@ -434,8 +554,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: plastic_stress
-- coculture_partner: null
+  treatment_type:
+  - plastic_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_pvc_plastic_leachate_2_mit9312_rnaseq
@@ -448,8 +572,11 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: plastic_stress
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - plastic_stress
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
@@ -462,8 +589,11 @@ rows:
   timepoint: 20h
   timepoint_hours: 20.0
   timepoint_order: 1
-  treatment_type: coculture
-- coculture_partner: Alteromonas macleodii HOT1A3
+  treatment_type:
+  - coculture
+- background_factors:
+  - continuous_light
+  coculture_partner: Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
@@ -476,8 +606,12 @@ rows:
   timepoint: 20h
   timepoint_hours: 20.0
   timepoint_order: 1
-  treatment_type: coculture
-- coculture_partner: null
+  treatment_type:
+  - coculture
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
@@ -490,8 +624,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
@@ -504,8 +642,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -518,8 +660,12 @@ rows:
   timepoint: 0h
   timepoint_hours: 0.0
   timepoint_order: 1
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -532,8 +678,12 @@ rows:
   timepoint: 3h
   timepoint_hours: 3.0
   timepoint_order: 2
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -546,8 +696,12 @@ rows:
   timepoint: 6h
   timepoint_hours: 6.0
   timepoint_order: 3
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -560,8 +714,12 @@ rows:
   timepoint: 12h
   timepoint_hours: 12.0
   timepoint_order: 4
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -574,8 +732,12 @@ rows:
   timepoint: 24h
   timepoint_hours: 24.0
   timepoint_order: 5
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -588,8 +750,12 @@ rows:
   timepoint: 48h
   timepoint_hours: 48.0
   timepoint_order: 6
-  treatment_type: nitrogen_stress
-- coculture_partner: null
+  treatment_type:
+  - nitrogen_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_hdpe_plastic_leachate_50_natl2a_rnaseq
@@ -602,8 +768,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: plastic_stress
-- coculture_partner: null
+  treatment_type:
+  - plastic_stress
+- background_factors:
+  - axenic
+  - continuous_light
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/s42003-019-0410-x_plastic_stress_pvc_plastic_leachate_2_natl2a_rnaseq
@@ -616,8 +786,12 @@ rows:
   timepoint: null
   timepoint_hours: null
   timepoint_order: 1
-  treatment_type: plastic_stress
-- coculture_partner: null
+  treatment_type:
+  - plastic_stress
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -630,8 +804,12 @@ rows:
   timepoint: 0h
   timepoint_hours: 0.0
   timepoint_order: 1
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -644,8 +822,12 @@ rows:
   timepoint: 4h
   timepoint_hours: 4.0
   timepoint_order: 2
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -658,8 +840,12 @@ rows:
   timepoint: 8h
   timepoint_hours: 8.0
   timepoint_order: 3
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -672,8 +858,12 @@ rows:
   timepoint: 13h
   timepoint_hours: 13.0
   timepoint_order: 4
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -686,8 +876,12 @@ rows:
   timepoint: 16h
   timepoint_hours: 16.0
   timepoint_order: 5
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -700,8 +894,12 @@ rows:
   timepoint: 20h
   timepoint_hours: 20.0
   timepoint_order: 6
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -714,8 +912,12 @@ rows:
   timepoint: 24h
   timepoint_hours: 24.0
   timepoint_order: 7
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - axenic
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
@@ -728,8 +930,12 @@ rows:
   timepoint: 1h extended darkness (36h)
   timepoint_hours: 36.0
   timepoint_order: 1
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - axenic
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
@@ -742,8 +948,12 @@ rows:
   timepoint: 5h extended darkness (40h)
   timepoint_hours: 40.0
   timepoint_order: 2
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - axenic
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
@@ -756,8 +966,12 @@ rows:
   timepoint: 13h extended darkness (48h)
   timepoint_hours: 48.0
   timepoint_order: 3
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
@@ -770,8 +984,12 @@ rows:
   timepoint: 1h extended darkness (36h)
   timepoint_hours: 36.0
   timepoint_order: 1
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
@@ -784,8 +1002,12 @@ rows:
   timepoint: 5h extended darkness (40h)
   timepoint_hours: 40.0
   timepoint_order: 2
-  treatment_type: darkness
-- coculture_partner: null
+  treatment_type:
+  - darkness
+- background_factors:
+  - coculture
+  - diel_cycle
+  coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
@@ -798,4 +1020,5 @@ rows:
   timepoint: 13h extended darkness (48h)
   timepoint_hours: 48.0
   timepoint_order: 3
-  treatment_type: darkness
+  treatment_type:
+  - darkness

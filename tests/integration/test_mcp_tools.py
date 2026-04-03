@@ -308,7 +308,7 @@ class TestListExperiments:
         )
         assert result["total_matching"] >= 10
         for r in result["results"]:
-            assert r["treatment_type"] == "coculture"
+            assert "coculture" in r["treatment_type"]
 
     def test_detail_omics_type_filter(self, conn):
         """Omics type list filter works."""

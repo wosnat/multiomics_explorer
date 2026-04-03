@@ -137,7 +137,10 @@ def experiments_to_dataframe(result: dict) -> pd.DataFrame:
             record["tp_significant_down"] = None
             record["tp_not_significant"] = None
             records.append(record)
-    return pd.DataFrame(records)
+    df = pd.DataFrame(records)
+    if df.empty:
+        return df
+    return _flatten_columns(df)
 
 
 def to_dataframe(result: dict[str, Any]) -> pd.DataFrame:

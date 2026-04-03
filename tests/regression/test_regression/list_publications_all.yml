@@ -9,6 +9,9 @@ rows:
   - Nhi N. Vo
   - Sallie W. Chisholm
   - Sierra M. Parker
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.1101/2025.08.05.668435
   experiment_count: 1
   journal: bioRxiv
@@ -25,6 +28,10 @@ rows:
   - Daniel Sher
   - Dikla Aharonovich
   - Osnat Weissberg
+  background_factors:
+  - axenic
+  - coculture
+  - continuous_light
   doi: 10.1101/2025.11.24.690089
   experiment_count: 10
   journal: bioRxiv
@@ -54,6 +61,9 @@ rows:
   - Rogier Braakman
   - Sallie W. Chisholm
   - Steven J. Biller
+  background_factors:
+  - coculture
+  - diel_cycle
   doi: 10.1093/ismeco/ycae131
   experiment_count: 2
   journal: ISME Communications
@@ -74,6 +84,9 @@ rows:
   - Lijuan Long
   - Sijun Huang
   - Xiayu He
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.3389/fmicb.2022.1038136
   experiment_count: 2
   journal: Frontiers in Microbiology
@@ -92,6 +105,9 @@ rows:
   - Marcelo Malisano Barreto Filho
   - Melissa Walker
   - Zhiying Lu
+  background_factors:
+  - axenic
+  - coculture
   doi: 10.1038/s43705-022-00197-2
   experiment_count: 10
   journal: ISME Communications
@@ -117,6 +133,9 @@ rows:
   - Russell Pickford
   - Sasha G. Tetu
   - Verena Schrameyer
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.1038/s42003-019-0410-x
   experiment_count: 4
   journal: Communications Biology
@@ -143,6 +162,8 @@ rows:
   - Yaxin Liu
   - Yu-Zhong Zhang
   - Yue Chen
+  background_factors:
+  - continuous_light
   doi: 10.1111/1462-2920.14513
   experiment_count: 1
   journal: Environmental Microbiology
@@ -162,6 +183,10 @@ rows:
   - Sallie W. Chisholm
   - Sara E. Roggensack
   - Steven J. Biller
+  background_factors:
+  - axenic
+  - coculture
+  - diel_cycle
   doi: 10.1128/mSystems.00040-18
   experiment_count: 3
   journal: mSystems
@@ -185,6 +210,10 @@ rows:
   - Sheean T Haley
   - Sonya T Dyhrman
   - Terje Dokland
+  background_factors:
+  - axenic
+  - coculture
+  - diel_cycle
   doi: 10.1038/ismej.2017.189
   experiment_count: 3
   journal: The ISME Journal
@@ -207,6 +236,9 @@ rows:
   - Robert W Read
   - Sallie W Chisholm
   - Steven J Biller
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.1038/ismej.2017.88
   experiment_count: 1
   journal: The ISME Journal
@@ -224,6 +256,11 @@ rows:
   - Luke R. Thompson
   - Qinglu Zeng
   - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  - continuous_light
+  - darkness
+  - viral
   doi: 10.1371/journal.pone.0165375
   experiment_count: 4
   journal: PLOS ONE
@@ -243,6 +280,8 @@ rows:
   - Allison Coe
   - Sallie W Chisholm
   - Steven J Biller
+  background_factors:
+  - continuous_light
   doi: 10.1038/ismej.2016.82
   experiment_count: 3
   journal: The ISME Journal
@@ -260,6 +299,8 @@ rows:
 - authors:
   - Daniel Sher
   - Dikla Aharonovich
+  background_factors:
+  - continuous_light
   doi: 10.1038/ismej.2016.70
   experiment_count: 5
   journal: The ISME Journal
@@ -280,6 +321,9 @@ rows:
   - Lina F. Yousef
   - Mai M. Oudah
   - Sumaya Al-Hosani
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.1016/j.micres.2015.04.006
   experiment_count: 1
   journal: Microbiological Research
@@ -295,6 +339,9 @@ rows:
 - authors:
   - Sallie W Chisholm
   - Sarah C Bagby
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
   journal: ISME Journal
@@ -311,6 +358,10 @@ rows:
   - Huiming Ding
   - Qinglu Zeng
   - Xingqin Lin
+  background_factors:
+  - axenic
+  - diel_cycle
+  - viral
   doi: 10.1111/1462-2920.13104
   experiment_count: 2
   journal: Environmental Microbiology
@@ -329,6 +380,9 @@ rows:
   - Katherine Huang
   - Mak A Saito
   - Sallie W Chisholm
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
   journal: The ISME Journal
@@ -356,6 +410,8 @@ rows:
   - Sallie W. Chisholm
   - Trent Rector
   - Wolfgang R. Hess
+  background_factors:
+  - continuous_light
   doi: 10.1038/nature06130
   experiment_count: 1
   journal: Nature
@@ -376,6 +432,9 @@ rows:
   - Robert Steen
   - Sallie W. Chisholm
   - Trent Rector
+  background_factors:
+  - axenic
+  - chemical_inhibitor
   doi: 10.1128/JB.01097-06
   experiment_count: 6
   journal: Journal of Bacteriology
@@ -397,6 +456,9 @@ rows:
   - Sallie W Chisholm
   - Trent Rector
   - Zackary I Johnson
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.1038/msb4100087
   experiment_count: 6
   journal: Molecular Systems Biology
@@ -415,6 +477,9 @@ rows:
   - Adam C. Martiny
   - Maureen L. Coleman
   - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  - continuous_light
   doi: 10.1073/pnas.0601301103
   experiment_count: 2
   journal: PNAS
