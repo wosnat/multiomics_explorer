@@ -1550,6 +1550,10 @@ def register_tools(mcp: FastMCP):
             description="Row counts by treatment type"
             " (e.g. {'nitrogen_stress': 15})",
         )
+        rows_by_background_factors: dict[str, int] = Field(
+            description="Row counts by background factor"
+            " (e.g. {'axenic': 10, 'diel_cycle': 5})",
+        )
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope"
             " (e.g. {'all_detected_genes': 100, 'significant_only': 50})."
@@ -1711,6 +1715,7 @@ def register_tools(mcp: FastMCP):
                 experiment_count=data["experiment_count"],
                 offset=data.get("offset", 0),
                 rows_by_treatment_type=data["rows_by_treatment_type"],
+                rows_by_background_factors=data["rows_by_background_factors"],
                 by_table_scope=data["by_table_scope"],
                 top_categories=top_cat_models,
                 experiments=exp_models,
@@ -2214,6 +2219,9 @@ def register_tools(mcp: FastMCP):
         rows_by_treatment_type: dict[str, int] = Field(
             description="Row counts by treatment type",
         )
+        rows_by_background_factors: dict[str, int] = Field(
+            description="Row counts by background factor",
+        )
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope",
         )
@@ -2359,6 +2367,7 @@ def register_tools(mcp: FastMCP):
                 by_organism=[DEByOrthologOrganismBreakdown(**b) for b in data["by_organism"]],
                 rows_by_status=data["rows_by_status"],
                 rows_by_treatment_type=data["rows_by_treatment_type"],
+                rows_by_background_factors=data["rows_by_background_factors"],
                 by_table_scope=data["by_table_scope"],
                 top_groups=top_groups,
                 top_experiments=top_experiments,
@@ -2437,6 +2446,11 @@ def register_tools(mcp: FastMCP):
         locus_tags: Annotated[list[str], Field(description="Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview.")],
         organism: Annotated[str | None, Field(description="Organism name for validation (optional). Inferred from genes. Fuzzy word-based matching.")] = None,
         treatment_types: Annotated[list[str] | None, Field(description="Filter to specific treatment types.")] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Filter by background experimental factors "
+            "(case-insensitive exact match). "
+            "E.g. ['axenic', 'diel_cycle'].",
+        )] = None,
         experiment_ids: Annotated[list[str] | None, Field(description="Restrict to specific experiments. Get these from list_experiments.")] = None,
         group_by: Annotated[Literal["treatment_type", "experiment"], Field(description="Group response summary by treatment_type (aggregates across experiments) or experiment (one entry per experiment).")] = "treatment_type",
         limit: Annotated[int, Field(description="Max genes returned.", ge=1)] = 50,
@@ -2461,7 +2475,9 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.gene_response_profile(
                 locus_tags=locus_tags, organism=organism,
-                treatment_types=treatment_types, experiment_ids=experiment_ids,
+                treatment_types=treatment_types,
+                background_factors=background_factors,
+                experiment_ids=experiment_ids,
                 group_by=group_by, limit=limit, offset=offset, conn=conn,
             )
             data["results"] = [
@@ -2692,6 +2708,8 @@ def register_tools(mcp: FastMCP):
             description="Rows per cluster type")
         by_treatment_type: list["GeneClusterTreatmentBreakdown"] = Field(
             description="Rows per treatment type")
+        by_background_factors: list["GeneClusterBackgroundFactorBreakdown"] = Field(
+            description="Rows per background factor")
         by_publication: list["GeneClusterPublicationBreakdown"] = Field(
             description="Rows per publication")
         returned: int = Field(description="Results in this response")
@@ -2722,6 +2740,9 @@ def register_tools(mcp: FastMCP):
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s).",
         )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Filter by background factors.",
+        )] = None,
         publication_doi: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s).",
         )] = None,
@@ -2751,6 +2772,7 @@ def register_tools(mcp: FastMCP):
             data = api.gene_clusters_by_gene(
                 locus_tags, organism=organism,
                 cluster_type=cluster_type, treatment_type=treatment_type,
+                background_factors=background_factors,
                 publication_doi=publication_doi,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 conn=conn,
@@ -2759,6 +2781,8 @@ def register_tools(mcp: FastMCP):
                                for b in data["by_cluster_type"]]
             by_treatment_type = [GeneClusterTreatmentBreakdown(**b)
                                  for b in data["by_treatment_type"]]
+            by_background_factors = [GeneClusterBackgroundFactorBreakdown(**b)
+                                     for b in data["by_background_factors"]]
             by_publication = [GeneClusterPublicationBreakdown(**b)
                               for b in data["by_publication"]]
             results = [GeneClustersByGeneResult(**r) for r in data["results"]]
@@ -2771,6 +2795,7 @@ def register_tools(mcp: FastMCP):
                 not_matched=data["not_matched"],
                 by_cluster_type=by_cluster_type,
                 by_treatment_type=by_treatment_type,
+                by_background_factors=by_background_factors,
                 by_publication=by_publication,
                 returned=data["returned"],
                 offset=data.get("offset", 0),

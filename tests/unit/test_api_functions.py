@@ -1806,6 +1806,7 @@ class TestDifferentialExpressionByGene:
             "rows_by_treatment_type": [
                 {"item": "nitrogen_stress", "count": 15},
             ],
+            "rows_by_background_factors": [],
             "by_table_scope": [
                 {"item": "all_detected_genes", "count": 15},
             ],
@@ -1901,7 +1902,8 @@ class TestDifferentialExpressionByGene:
         for key in [
             "organism_name", "matching_genes", "total_matching",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
-            "experiment_count", "rows_by_treatment_type", "by_table_scope",
+            "experiment_count", "rows_by_treatment_type",
+            "rows_by_background_factors", "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
             "returned", "truncated", "results",
         ]:
@@ -2416,7 +2418,8 @@ class TestDifferentialExpressionByOrtholog:
             [{"not_found": []}],  # Q1a group check
             [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
               "experiment_count": 2, "by_organism": [], "rows_by_status": [],
-              "rows_by_treatment_type": [], "by_table_scope": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [],
               "sig_log2fcs": [1.5, 2.0],
               "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],  # Q2
@@ -2448,7 +2451,8 @@ class TestDifferentialExpressionByOrtholog:
             [{"not_found": []}],  # Q1a
             [{"total_matching": 5, "matching_genes": 2, "matching_groups": 1,
               "experiment_count": 1, "by_organism": [], "rows_by_status": [],
-              "rows_by_treatment_type": [], "by_table_scope": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [],
               "sig_log2fcs": [1.0, 2.0, 3.0],
               "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],
@@ -2482,7 +2486,8 @@ class TestDifferentialExpressionByOrtholog:
             [{"not_found": []}],  # Q1a
             [{"total_matching": 1, "matching_genes": 1, "matching_groups": 1,
               "experiment_count": 1, "by_organism": [], "rows_by_status": [],
-              "rows_by_treatment_type": [], "by_table_scope": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [],
               "sig_log2fcs": [],
               "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],
@@ -2504,7 +2509,8 @@ class TestDifferentialExpressionByOrtholog:
             [{"not_found": []}],  # Q1a group check
             [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
               "experiment_count": 2, "by_organism": [], "rows_by_status": [],
-              "rows_by_treatment_type": [], "by_table_scope": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [],
               "sig_log2fcs": [1.5, 2.0],
               "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],  # Q2 top_groups
@@ -2529,7 +2535,8 @@ class TestDifferentialExpressionByOrtholog:
             [{"not_found": []}],  # Q1a group check
             [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
               "experiment_count": 2, "by_organism": [], "rows_by_status": [],
-              "rows_by_treatment_type": [], "by_table_scope": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [],
               "sig_log2fcs": [1.5, 2.0],
               "matched_group_ids": ["g1"]}],  # Q1b
             [{"top_groups": []}],  # Q2
@@ -2548,7 +2555,8 @@ class TestDifferentialExpressionByOrtholog:
             [{"not_found": []}],
             [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
               "experiment_count": 2, "by_organism": [], "rows_by_status": [],
-              "rows_by_treatment_type": [], "by_table_scope": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [],
               "sig_log2fcs": [1.5, 2.0],
               "matched_group_ids": ["g1"]}],
             [{"top_groups": []}],
@@ -2952,6 +2960,7 @@ class TestGeneClustersByGene:
         "not_found": [], "not_matched": [],
         "by_cluster_type": [{"item": "stress_response", "count": 2}],
         "by_treatment_type": [{"item": "nitrogen_stress", "count": 2}],
+        "by_background_factors": [],
         "by_publication": [{"item": "10.1038/msb4100087", "count": 2}],
     }
 

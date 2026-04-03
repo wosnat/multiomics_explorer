@@ -23,6 +23,7 @@ within a specific experiment.
 | locus_tags | list[string] | — | Gene locus tags. E.g. ['PMM0370', 'PMM0920']. Get these from resolve_gene / gene_overview. |
 | organism | string \| None | None | Organism name for validation (optional). Inferred from genes. Fuzzy word-based matching. |
 | treatment_types | list[string] \| None | None | Filter to specific treatment types. |
+| background_factors | list[string] \| None | None | Filter by background experimental factors (case-insensitive exact match). E.g. ['axenic', 'diel_cycle']. |
 | experiment_ids | list[string] \| None | None | Restrict to specific experiments. Get these from list_experiments. |
 | group_by | string ('treatment_type', 'experiment') | treatment_type | Group response summary by treatment_type (aggregates across experiments) or experiment (one entry per experiment). |
 | limit | int | 50 | Max genes returned. |

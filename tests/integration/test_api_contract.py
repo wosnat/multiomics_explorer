@@ -375,7 +375,8 @@ class TestDifferentialExpressionByGeneContract:
         expected_keys = {
             "organism_name", "matching_genes", "total_matching",
             "rows_by_status", "median_abs_log2fc", "max_abs_log2fc",
-            "experiment_count", "rows_by_treatment_type", "by_table_scope",
+            "experiment_count", "rows_by_treatment_type",
+            "rows_by_background_factors", "by_table_scope",
             "top_categories", "experiments", "not_found", "no_expression",
             "returned", "truncated", "offset", "results",
         }
@@ -442,6 +443,7 @@ class TestDifferentialExpressionByOrthologContract:
             "experiment_count", "median_abs_log2fc", "max_abs_log2fc",
             "results", "returned", "truncated", "offset",
             "by_organism", "rows_by_status", "rows_by_treatment_type",
+            "rows_by_background_factors",
             "by_table_scope", "top_groups", "top_experiments",
             "not_found_groups", "not_matched_groups",
             "not_found_organisms", "not_matched_organisms",

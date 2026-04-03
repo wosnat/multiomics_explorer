@@ -42,7 +42,7 @@ differential_expression_by_ortholog.
 ### Envelope
 
 ```expected-keys
-organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, returned, offset, truncated, results
+organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, by_table_scope, top_categories, experiments, not_found, no_expression, returned, offset, truncated, results
 ```
 
 - **organism_name** (string): Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')
@@ -53,6 +53,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **max_abs_log2fc** (float | None): Max |log2FC| for significant rows only (e.g. 3.591). Null if no significant rows.
 - **experiment_count** (int): Number of experiments in results (e.g. 1)
 - **rows_by_treatment_type** (object): Row counts by treatment type (e.g. {'nitrogen_stress': 15})
+- **rows_by_background_factors** (object): Row counts by background factor (e.g. {'axenic': 10, 'diel_cycle': 5})
 - **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). Shows data completeness across experiments.
 - **top_categories** (list[ExpressionTopCategory]): Top gene categories by significant gene count, max 5
 - **experiments** (list[ExpressionByExperiment]): Per-experiment summary with nested timepoint breakdown, sorted by significant row count desc

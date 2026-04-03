@@ -2155,6 +2155,7 @@ class TestDifferentialExpressionByGeneWrapper:
         "max_abs_log2fc": 3.591,
         "experiment_count": 1,
         "rows_by_treatment_type": {"nitrogen_stress": 15},
+        "rows_by_background_factors": {},
         "by_table_scope": {"all_detected_genes": 15},
         "top_categories": [
             {"category": "Signal transduction",
@@ -2724,6 +2725,7 @@ class TestDifferentialExpressionByOrthologWrapper:
         "rows_by_status": {"significant_up": 5, "significant_down": 3,
                            "not_significant": 2},
         "rows_by_treatment_type": {"nitrogen_limitation": 10},
+        "rows_by_background_factors": {},
         "by_table_scope": {"all_detected_genes": 10},
         "top_groups": [{"group_id": "g1", "consensus_gene_name": "psbB",
                         "consensus_product": "CP47",
@@ -2798,7 +2800,8 @@ class TestDifferentialExpressionByOrthologWrapper:
             "max_abs_log2fc": None, "results": [], "returned": 0,
             "truncated": False,
             "by_organism": [], "rows_by_status": {},
-            "rows_by_treatment_type": {}, "by_table_scope": {},
+            "rows_by_treatment_type": {}, "rows_by_background_factors": {},
+            "by_table_scope": {},
             "top_groups": [], "top_experiments": [],
             "not_found_groups": ["g1"], "not_matched_groups": [],
             "not_found_organisms": [], "not_matched_organisms": [],
@@ -2977,6 +2980,7 @@ class TestGeneClustersByGeneWrapper:
         "not_found": [], "not_matched": [],
         "by_cluster_type": [{"cluster_type": "stress_response", "count": 2}],
         "by_treatment_type": [{"treatment_type": "nitrogen_stress", "count": 2}],
+        "by_background_factors": [],
         "by_publication": [{"publication_doi": "10.1038/msb4100087", "count": 2}],
         "returned": 1, "offset": 0, "truncated": True,
         "results": [

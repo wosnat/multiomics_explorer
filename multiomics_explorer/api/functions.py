@@ -1538,7 +1538,8 @@ def differential_expression_by_gene(
     Returns:
         dict with keys: organism_name, matching_genes, total_matching,
         rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
-        rows_by_treatment_type, by_table_scope, top_categories, experiments,
+        rows_by_treatment_type, rows_by_background_factors, by_table_scope,
+        top_categories, experiments,
         returned, truncated, not_found, no_expression, results.
     """
     conn = _default_conn(conn)
@@ -1585,6 +1586,9 @@ def differential_expression_by_gene(
     rows_by_status = _apoc_freq_to_dict(global_raw["rows_by_status"])
     rows_by_treatment_type = _apoc_freq_to_treatment_dict(
         global_raw["rows_by_treatment_type"]
+    )
+    rows_by_background_factors = _apoc_freq_to_treatment_dict(
+        global_raw["rows_by_background_factors"]
     )
     by_table_scope = _apoc_freq_to_treatment_dict(
         global_raw["by_table_scope"]
@@ -1661,6 +1665,7 @@ def differential_expression_by_gene(
         "max_abs_log2fc": global_raw["max_abs_log2fc"],
         "experiment_count": len(experiments),
         "rows_by_treatment_type": rows_by_treatment_type,
+        "rows_by_background_factors": rows_by_background_factors,
         "by_table_scope": by_table_scope,
         "top_categories": top_categories,
         "experiments": experiments,
@@ -1695,7 +1700,8 @@ def differential_expression_by_ortholog(
 
     Returns dict with keys: total_matching, matching_genes, matching_groups,
     experiment_count, median_abs_log2fc, max_abs_log2fc,
-    by_organism, rows_by_status, rows_by_treatment_type, by_table_scope,
+    by_organism, rows_by_status, rows_by_treatment_type,
+    rows_by_background_factors, by_table_scope,
     top_groups, top_experiments,
     not_found_groups, not_matched_groups,
     not_found_organisms, not_matched_organisms,
@@ -1751,7 +1757,8 @@ def differential_expression_by_ortholog(
         "total_matching": 0, "matching_genes": 0,
         "matching_groups": 0, "experiment_count": 0,
         "by_organism": [], "rows_by_status": [],
-        "rows_by_treatment_type": [], "by_table_scope": [],
+        "rows_by_treatment_type": [], "rows_by_background_factors": [],
+        "by_table_scope": [],
         "sig_log2fcs": [], "matched_group_ids": [],
     }
     if found_group_ids:
@@ -1773,6 +1780,9 @@ def differential_expression_by_ortholog(
     rows_by_status = _apoc_freq_to_dict(global_raw["rows_by_status"])
     rows_by_treatment_type = _apoc_freq_to_treatment_dict(
         global_raw["rows_by_treatment_type"]
+    )
+    rows_by_background_factors = _apoc_freq_to_treatment_dict(
+        global_raw["rows_by_background_factors"]
     )
     by_table_scope = _apoc_freq_to_treatment_dict(
         global_raw["by_table_scope"]
@@ -1866,6 +1876,7 @@ def differential_expression_by_ortholog(
         "by_organism": by_organism,
         "rows_by_status": rows_by_status,
         "rows_by_treatment_type": rows_by_treatment_type,
+        "rows_by_background_factors": rows_by_background_factors,
         "by_table_scope": by_table_scope,
         "top_groups": (
             top_groups_raw[0]["top_groups"] if top_groups_raw else []
@@ -1894,6 +1905,7 @@ def gene_response_profile(
     locus_tags: list[str],
     organism: str | None = None,
     treatment_types: list[str] | None = None,
+    background_factors: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     group_by: str = "treatment_type",
     limit: int | None = None,
@@ -1946,6 +1958,7 @@ def gene_response_profile(
         locus_tags=locus_tags,
         organism_name=organism_name,
         treatment_types=treatment_types,
+        background_factors=background_factors,
         experiment_ids=experiment_ids,
         group_by=group_by,
     )
@@ -1975,6 +1988,7 @@ def gene_response_profile(
             locus_tags=genes_with_expr,
             organism_name=organism_name,
             treatment_types=treatment_types,
+            background_factors=background_factors,
             experiment_ids=experiment_ids,
             group_by=group_by,
             limit=limit,
@@ -2193,6 +2207,7 @@ def gene_clusters_by_gene(
     organism: str | None = None,
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
     publication_doi: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
@@ -2206,7 +2221,7 @@ def gene_clusters_by_gene(
     Returns dict with keys: total_matching, total_clusters,
     genes_with_clusters, genes_without_clusters,
     not_found, not_matched,
-    by_cluster_type, by_treatment_type, by_publication,
+    by_cluster_type, by_treatment_type, by_background_factors, by_publication,
     returned, offset, truncated, results.
     Per result (compact): locus_tag, gene_name, cluster_id, cluster_name,
     cluster_type, membership_score, member_count.
@@ -2233,6 +2248,7 @@ def gene_clusters_by_gene(
 
     filter_kwargs = dict(
         cluster_type=cluster_type, treatment_type=treatment_type,
+        background_factors=background_factors,
         publication_doi=publication_doi,
     )
 
@@ -2260,6 +2276,8 @@ def gene_clusters_by_gene(
             raw_summary["by_cluster_type"], "cluster_type"),
         "by_treatment_type": _rename_freq(
             raw_summary["by_treatment_type"], "treatment_type"),
+        "by_background_factors": _rename_freq(
+            raw_summary["by_background_factors"], "background_factor"),
         "by_publication": _rename_freq(
             raw_summary["by_publication"], "publication_doi"),
     }
