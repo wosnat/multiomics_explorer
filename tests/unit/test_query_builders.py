@@ -2825,6 +2825,199 @@ class TestBuildListGeneClusters:
 
 
 # ---------------------------------------------------------------------------
+# ClusteringAnalysis helpers
+# ---------------------------------------------------------------------------
+
+
+class TestClusteringAnalysisWhere:
+    """Tests for _clustering_analysis_where shared helper."""
+
+    def test_no_filters(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where()
+        assert conditions == []
+        assert params == {}
+
+    def test_organism_filter(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(organism="MED4")
+        assert len(conditions) == 1
+        assert "organism_name" in conditions[0].lower()
+        assert params["organism"] == "MED4"
+
+    def test_cluster_type_filter(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(cluster_type="response_pattern")
+        assert len(conditions) == 1
+        assert "$cluster_type" in conditions[0]
+        assert params["cluster_type"] == "response_pattern"
+
+    def test_treatment_type_filter(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(treatment_type=["nitrogen_stress"])
+        assert len(conditions) == 1
+        assert "ANY(" in conditions[0]
+        assert "$treatment_type" in conditions[0]
+        assert params["treatment_type"] == ["nitrogen_stress"]
+
+    def test_omics_type_filter(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(omics_type="MICROARRAY")
+        assert len(conditions) == 1
+        assert "$omics_type" in conditions[0]
+        assert params["omics_type"] == "MICROARRAY"
+
+    def test_background_factors_filter(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(
+            background_factors=["axenic"])
+        assert len(conditions) == 1
+        assert "ANY(" in conditions[0]
+        assert "background_factors" in conditions[0]
+        assert params["background_factors"] == ["axenic"]
+
+    def test_combined_filters(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(
+            organism="MED4", cluster_type="response_pattern",
+            treatment_type=["nitrogen_stress"], omics_type="MICROARRAY",
+            background_factors=["axenic"],
+        )
+        assert len(conditions) == 5
+        assert len(params) == 5
+
+
+class TestBuildListClusteringAnalysesSummary:
+    """Tests for build_list_clustering_analyses_summary."""
+
+    def test_no_search_no_filters(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
+        cypher, params = build_list_clustering_analyses_summary()
+        assert "ClusteringAnalysis" in cypher
+        assert "total_entries" in cypher
+        assert "total_matching" in cypher
+        assert "by_organism" in cypher
+        assert "by_cluster_type" in cypher
+        assert "by_treatment_type" in cypher
+        assert "by_background_factors" in cypher
+        assert "by_omics_type" in cypher
+        assert "WHERE" not in cypher
+
+    def test_with_search_text(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
+        cypher, params = build_list_clustering_analyses_summary(search_text="nitrogen")
+        assert "clusteringAnalysisFullText" in cypher
+        assert params["search_text"] == "nitrogen"
+        assert "score_max" in cypher
+        assert "score_median" in cypher
+
+    def test_with_organism_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
+        cypher, params = build_list_clustering_analyses_summary(organism="MED4")
+        assert "WHERE" in cypher
+        assert params["organism"] == "MED4"
+
+    def test_with_publication_doi_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
+        cypher, params = build_list_clustering_analyses_summary(
+            publication_doi=["10.1038/msb4100087"])
+        assert "PublicationHasClusteringAnalysis" in cypher
+        assert params["publication_doi"] == ["10.1038/msb4100087"]
+
+    def test_with_experiment_ids_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
+        cypher, params = build_list_clustering_analyses_summary(
+            experiment_ids=["10.1038/msb4100087_n_starvation_med4"])
+        assert "ExperimentHasClusteringAnalysis" in cypher
+        assert params["experiment_ids"] == ["10.1038/msb4100087_n_starvation_med4"]
+
+    def test_with_analysis_ids_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
+        cypher, params = build_list_clustering_analyses_summary(
+            analysis_ids=["clustering_analysis:msb4100087:med4_kmeans_nstarvation"])
+        assert "$analysis_ids" in cypher
+        assert params["analysis_ids"] == ["clustering_analysis:msb4100087:med4_kmeans_nstarvation"]
+
+
+class TestBuildListClusteringAnalyses:
+    """Tests for build_list_clustering_analyses (detail builder)."""
+
+    def test_no_search_returns_expected_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses()
+        for col in ["analysis_id", "name", "organism_name", "cluster_method",
+                     "cluster_type", "cluster_count", "total_gene_count",
+                     "treatment_type", "background_factors", "omics_type"]:
+            assert f"AS {col}" in cypher, f"Missing column: {col}"
+        assert "score" not in cypher
+        # Inline clusters via subquery
+        assert "ClusteringAnalysisHasGeneCluster" in cypher
+
+    def test_with_search_text(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(search_text="nitrogen")
+        assert "clusteringAnalysisFullText" in cypher
+        assert "score" in cypher
+        assert params["search_text"] == "nitrogen"
+
+    def test_verbose_adds_analysis_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(verbose=True)
+        for col in ["treatment", "light_condition", "experimental_context"]:
+            assert f"AS {col}" in cypher, f"Missing verbose column: {col}"
+
+    def test_verbose_false_omits_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(verbose=False)
+        assert "AS treatment\n" not in cypher and "AS treatment," not in cypher
+        assert "AS light_condition" not in cypher
+
+    def test_verbose_adds_cluster_descriptions(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(verbose=True)
+        assert "functional_description" in cypher
+        assert "behavioral_description" in cypher
+
+    def test_inline_clusters_compact(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(verbose=False)
+        # Compact clusters: id, name, member_count
+        assert "cluster_id" in cypher or "gc.id" in cypher
+        assert "member_count" in cypher
+
+    def test_experiment_ids_optional_match(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses()
+        # Experiment IDs should be OPTIONAL MATCH (may not exist)
+        assert "OPTIONAL MATCH" in cypher
+        assert "ExperimentHasClusteringAnalysis" in cypher
+
+    def test_publication_doi_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(
+            publication_doi=["10.1038/msb4100087"])
+        assert "PublicationHasClusteringAnalysis" in cypher
+        assert params["publication_doi"] == ["10.1038/msb4100087"]
+
+    def test_offset_emits_skip(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert params["offset"] == 5
+
+    def test_offset_zero_no_skip(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(limit=10, offset=0)
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
+    def test_has_order_by(self):
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, _ = build_list_clustering_analyses()
+        assert "ORDER BY" in cypher
+
+
+# ---------------------------------------------------------------------------
 # gene_clusters_by_gene
 # ---------------------------------------------------------------------------
 class TestBuildGeneClustersByGeneSummary:

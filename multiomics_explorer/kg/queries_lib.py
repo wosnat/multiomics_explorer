@@ -2930,6 +2930,250 @@ def build_list_gene_clusters(
     )
     return cypher, params
 
+
+# ---------------------------------------------------------------------------
+# ClusteringAnalysis builders
+# ---------------------------------------------------------------------------
+
+
+def _clustering_analysis_where(
+    *,
+    organism: str | None = None,
+    cluster_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    omics_type: str | None = None,
+    background_factors: list[str] | None = None,
+) -> tuple[list[str], dict]:
+    """Build ClusteringAnalysis filter conditions + params."""
+    conditions: list[str] = []
+    params: dict = {}
+    if organism is not None:
+        conditions.append(
+            "ALL(word IN split(toLower($organism), ' ')"
+            " WHERE toLower(ca.organism_name) CONTAINS word)"
+        )
+        params["organism"] = organism
+    if cluster_type is not None:
+        conditions.append("ca.cluster_type = $cluster_type")
+        params["cluster_type"] = cluster_type
+    if treatment_type is not None:
+        conditions.append(
+            "ANY(tt IN ca.treatment_type WHERE tt IN $treatment_type)"
+        )
+        params["treatment_type"] = treatment_type
+    if omics_type is not None:
+        conditions.append("ca.omics_type = $omics_type")
+        params["omics_type"] = omics_type
+    if background_factors is not None:
+        conditions.append(
+            "ANY(bf IN coalesce(ca.background_factors, [])"
+            " WHERE bf IN $background_factors)"
+        )
+        params["background_factors"] = background_factors
+    return conditions, params
+
+
+def build_list_clustering_analyses_summary(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    cluster_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    omics_type: str | None = None,
+    background_factors: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    analysis_ids: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for list_clustering_analyses.
+
+    RETURN keys: total_entries, total_matching, by_organism,
+    by_cluster_type, by_treatment_type, by_background_factors,
+    by_omics_type.
+    When search_text: adds score_max, score_median.
+    """
+    conditions, params = _clustering_analysis_where(
+        organism=organism, cluster_type=cluster_type,
+        treatment_type=treatment_type, omics_type=omics_type,
+        background_factors=background_factors,
+    )
+
+    if search_text is not None:
+        params["search_text"] = search_text
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('clusteringAnalysisFullText', $search_text)\n"
+            "YIELD node AS ca, score\n"
+        )
+        score_cols = (
+            ",\n     max(score) AS score_max"
+            ",\n     percentileDisc(score, 0.5) AS score_median"
+        )
+        score_return = ", score_max, score_median"
+    else:
+        match_block = "MATCH (ca:ClusteringAnalysis)\n"
+        score_cols = ""
+        score_return = ""
+
+    if publication_doi is not None:
+        match_block += "MATCH (pub:Publication)-[:PublicationHasClusteringAnalysis]->(ca)\n"
+        conditions.append("pub.doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+
+    if experiment_ids is not None:
+        match_block += "MATCH (exp:Experiment)-[:ExperimentHasClusteringAnalysis]->(ca)\n"
+        conditions.append("exp.id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+
+    if analysis_ids is not None:
+        conditions.append("ca.id IN $analysis_ids")
+        params["analysis_ids"] = analysis_ids
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    cypher = (
+        f"{match_block}"
+        f"{where_block}"
+        "WITH collect(ca.organism_name) AS organisms,\n"
+        "     collect(ca.cluster_type) AS cluster_types,\n"
+        "     apoc.coll.flatten(collect(ca.treatment_type)) AS treatment_types,\n"
+        "     apoc.coll.flatten(collect(coalesce(ca.background_factors, []))) AS background_factors_flat,\n"
+        "     collect(ca.omics_type) AS omics_types,\n"
+        f"     count(ca) AS total_matching{score_cols}\n"
+        "CALL { MATCH (all_ca:ClusteringAnalysis) RETURN count(all_ca) AS total_entries }\n"
+        "RETURN total_entries, total_matching,\n"
+        "       apoc.coll.frequencies(organisms) AS by_organism,\n"
+        "       apoc.coll.frequencies(cluster_types) AS by_cluster_type,\n"
+        "       apoc.coll.frequencies(treatment_types) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(background_factors_flat) AS by_background_factors,\n"
+        f"       apoc.coll.frequencies(omics_types) AS by_omics_type{score_return}"
+    )
+    return cypher, params
+
+
+def build_list_clustering_analyses(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    cluster_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    omics_type: str | None = None,
+    background_factors: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    analysis_ids: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for list_clustering_analyses.
+
+    RETURN keys (compact): analysis_id, name, organism_name, cluster_method,
+    cluster_type, cluster_count, total_gene_count, treatment_type,
+    background_factors, omics_type, experiment_ids, clusters.
+    When search_text: adds score.
+    RETURN keys (verbose): adds treatment, light_condition, experimental_context.
+    Inline clusters (compact): cluster_id, name, member_count.
+    Inline clusters (verbose): adds functional_description, behavioral_description,
+    peak_time_hours, period_hours.
+    """
+    conditions, params = _clustering_analysis_where(
+        organism=organism, cluster_type=cluster_type,
+        treatment_type=treatment_type, omics_type=omics_type,
+        background_factors=background_factors,
+    )
+
+    if search_text is not None:
+        params["search_text"] = search_text
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('clusteringAnalysisFullText', $search_text)\n"
+            "YIELD node AS ca, score\n"
+        )
+        score_col = ",\n       score"
+        order_prefix = "score DESC, "
+    else:
+        match_block = "MATCH (ca:ClusteringAnalysis)\n"
+        score_col = ""
+        order_prefix = ""
+
+    if publication_doi is not None:
+        match_block += "MATCH (pub:Publication)-[:PublicationHasClusteringAnalysis]->(ca)\n"
+        conditions.append("pub.doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+
+    if experiment_ids is not None:
+        match_block += "MATCH (exp:Experiment)-[:ExperimentHasClusteringAnalysis]->(ca)\n"
+        conditions.append("exp.id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+
+    if analysis_ids is not None:
+        conditions.append("ca.id IN $analysis_ids")
+        params["analysis_ids"] = analysis_ids
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       ca.treatment AS treatment"
+            ",\n       ca.light_condition AS light_condition"
+            ",\n       ca.experimental_context AS experimental_context"
+        )
+
+    # Inline cluster subquery — compact or verbose
+    if verbose:
+        cluster_collect = (
+            "collect({cluster_id: gc.id, name: gc.name,"
+            " member_count: gc.member_count,"
+            " functional_description: gc.functional_description,"
+            " behavioral_description: gc.behavioral_description,"
+            " peak_time_hours: gc.peak_time_hours,"
+            " period_hours: gc.period_hours}) AS clusters"
+        )
+    else:
+        cluster_collect = (
+            "collect({cluster_id: gc.id, name: gc.name,"
+            " member_count: gc.member_count}) AS clusters"
+        )
+
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    score_with = ", score" if search_text is not None else ""
+
+    cypher = (
+        f"{match_block}"
+        f"{where_block}"
+        # Collect experiment IDs (OPTIONAL — edge may not exist)
+        "OPTIONAL MATCH (exp_link:Experiment)-[:ExperimentHasClusteringAnalysis]->(ca)\n"
+        f"WITH ca{score_with},\n"
+        "     collect(DISTINCT exp_link.id) AS experiment_ids\n"
+        # Collect inline clusters
+        "OPTIONAL MATCH (ca)-[:ClusteringAnalysisHasGeneCluster]->(gc:GeneCluster)\n"
+        f"WITH ca{score_with}, experiment_ids,\n"
+        f"     {cluster_collect}\n"
+        "RETURN ca.id AS analysis_id, ca.name AS name,\n"
+        "       ca.organism_name AS organism_name,\n"
+        "       ca.cluster_method AS cluster_method,\n"
+        "       ca.cluster_type AS cluster_type,\n"
+        "       ca.cluster_count AS cluster_count,\n"
+        "       ca.total_gene_count AS total_gene_count,\n"
+        "       ca.treatment_type AS treatment_type,\n"
+        "       coalesce(ca.background_factors, []) AS background_factors,\n"
+        "       ca.omics_type AS omics_type,\n"
+        f"       experiment_ids, clusters{score_col}{verbose_cols}\n"
+        f"ORDER BY {order_prefix}ca.organism_name, ca.name{skip_clause}{limit_clause}"
+    )
+    return cypher, params
+
+
 def build_gene_clusters_by_gene_summary(
     *,
     locus_tags: list[str],
