@@ -1,0 +1,46 @@
+# Human-authored content for list_clustering_analyses about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Orient — what clustering analyses exist?
+    call: list_clustering_analyses(summary=True)
+
+  - title: Search for nitrogen-related analyses
+    call: list_clustering_analyses(search_text="starvation")
+
+  - title: Browse all MED4 analyses with cluster details
+    call: list_clustering_analyses(organism="MED4", verbose=True)
+
+  - title: Find analyses then drill into member genes
+    steps: |
+      Step 1: list_clustering_analyses(search_text="starvation")
+              → extract analysis_id values from results
+
+      Step 2: genes_in_cluster(analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation")
+              → see all member genes across all clusters in the analysis
+
+      Step 3: gene_overview(locus_tags=["PMM0370", "PMM0920", ...])
+              → check data availability for cluster members
+
+verbose_fields:
+  - treatment
+  - light_condition
+  - experimental_context
+  - "clusters[].functional_description"
+  - "clusters[].behavioral_description"
+  - "clusters[].peak_time_hours"
+  - "clusters[].period_hours"
+
+chaining:
+  - "list_clustering_analyses → genes_in_cluster(analysis_id=...) → gene_overview"
+  - "list_clustering_analyses → genes_in_cluster → differential_expression_by_gene"
+  - "list_clustering_analyses → gene_clusters_by_gene (reverse lookup)"
+
+mistakes:
+  - "Analysis IDs are not in the fulltext index — use search_text for text queries, analysis_ids for direct lookup"
+  - "score_max/score_median are null when no search_text is given (browsing mode)"
+  - wrong: "genes_in_cluster(cluster_ids=['nitrogen'])  # passing text, not IDs"
+    right: "list_clustering_analyses(search_text='nitrogen')  # search first, then use analysis_id"
+  - wrong: "len(results)  # actual count"
+    right: "response['total_matching']  # use total, not len — results may be truncated"

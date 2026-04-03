@@ -4,20 +4,21 @@
 
 Get member genes of gene clusters.
 
-Takes cluster IDs from list_gene_clusters or gene_clusters_by_gene
-and returns their member genes. One row per gene × cluster.
+Takes cluster IDs or an analysis ID and returns member genes.
+One row per gene × cluster. Provide cluster_ids OR analysis_id (not both).
 
-For cluster discovery by text, use list_gene_clusters first.
+For analysis discovery, use list_clustering_analyses first.
 For gene → cluster direction, use gene_clusters_by_gene.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| cluster_ids | list[string] | — | GeneCluster node IDs (from list_gene_clusters or gene_clusters_by_gene). |
+| cluster_ids | list[string] \| None | None | GeneCluster node IDs (from list_clustering_analyses or gene_clusters_by_gene). Provide this OR analysis_id. |
+| analysis_id | string \| None | None | ClusteringAnalysis node ID — returns all genes in all clusters of this analysis. Provide this OR cluster_ids. |
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). Single organism enforced. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include function_description, gene_summary (gene-level), p_value (edge-level), functional_description, behavioral_description (cluster-level). |
+| verbose | bool | False | Include gene_function_description, gene_summary (gene-level), p_value (edge-level), cluster_functional_description, cluster_behavioral_description (cluster-level). |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
@@ -28,10 +29,11 @@ For gene → cluster direction, use gene_clusters_by_gene.
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, returned, offset, truncated, results
+total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, returned, offset, truncated, results
 ```
 
 - **total_matching** (int): Gene × cluster rows
+- **analysis_name** (string | None): Analysis name (when queried by analysis_id)
 - **by_organism** (list[GeneClusterOrganismBreakdown]): Members per organism
 - **by_cluster** (list[GenesInClusterClusterBreakdown]): Members per cluster
 - **top_categories** (list[GenesInClusterCategoryBreakdown]): Top 5 gene categories by count
@@ -61,48 +63,40 @@ total_matching, by_organism, by_cluster, top_categories, genes_per_cluster_max, 
 
 | Field | Type | Description |
 |---|---|---|
-| function_description | string \| None (optional) | Gene functional description (gene-level) |
+| gene_function_description | string \| None (optional) | Gene functional description (gene-level) |
 | gene_summary | string \| None (optional) | Gene summary text (gene-level) |
 | p_value | float \| None (optional) | Assignment p-value (edge-level) |
-| functional_description | string \| None (optional) | What the cluster genes ARE (cluster-level) |
-| behavioral_description | string \| None (optional) | What the cluster genes DO together (cluster-level) |
+| cluster_functional_description | string \| None (optional) | What the cluster genes ARE (cluster-level) |
+| cluster_behavioral_description | string \| None (optional) | What the cluster genes DO together (cluster-level) |
 
 ## Few-shot examples
 
-### Example 1: Get members of an N-transport cluster
+### Example 1: Get members of a specific cluster
 
 ```example-call
-genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
+genes_in_cluster(cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8"])
 ```
 
-```example-response
-{"total_matching": 5, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 5}], "by_cluster": [{"cluster_id": "cluster:msb4100087:med4:up_n_transport", "cluster_name": "MED4 cluster 1 (up, N transport)", "count": 5}], "top_categories": [{"category": "Unknown", "count": 2}, {"category": "Central intermediary metabolism", "count": 1}, {"category": "Amino acid metabolism", "count": 1}, {"category": "Stress response and adaptation", "count": 1}], "genes_per_cluster_max": 5, "genes_per_cluster_median": 5, "not_found_clusters": [], "not_matched_clusters": [], "returned": 5, "truncated": false, "offset": 0, "results": [{"locus_tag": "PMM0370", "gene_name": "cynA", "product": "cyanate ABC transporter, substrate-binding protein", "gene_category": "Central intermediary metabolism", "cluster_id": "cluster:msb4100087:med4:up_n_transport", "cluster_name": "MED4 cluster 1 (up, N transport)"}]}
-```
-
-### Example 2: Drill into multiple clusters at once
+### Example 2: Get all genes in a clustering analysis
 
 ```example-call
-genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport", "cluster:msb4100087:med4:down_translation"], limit=20)
+genes_in_cluster(analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation")
 ```
 
 ### Example 3: Handle invalid cluster IDs gracefully
 
 ```example-call
-genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport", "cluster:fake_id"])
+genes_in_cluster(cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8", "cluster:fake_id"])
 ```
 
-```example-response
-{"total_matching": 5, "not_found_clusters": ["cluster:fake_id"], "not_matched_clusters": [], "returned": 3, "truncated": true, ...}
-```
-
-### Example 4: From cluster search to member gene expression
+### Example 4: From analysis search to member gene expression
 
 ```
-Step 1: list_gene_clusters(search_text="N transport")
-        → extract cluster_id values from results
+Step 1: list_clustering_analyses(search_text="nitrogen")
+        → extract analysis_id values from results
 
-Step 2: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
-        → get member genes: PMM0370 (cynA), PMM0920 (glnA), PMM0958, PMM0970 (urtA), PMM1462
+Step 2: genes_in_cluster(analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation")
+        → get all member genes across clusters in the analysis
 
 Step 3: differential_expression_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM0958", "PMM0970", "PMM1462"])
         → check expression patterns for the cluster members
@@ -111,14 +105,16 @@ Step 3: differential_expression_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM09
 ## Chaining patterns
 
 ```
-list_gene_clusters → genes_in_cluster → gene_overview
-list_gene_clusters → genes_in_cluster → differential_expression_by_gene
+list_clustering_analyses → genes_in_cluster(analysis_id=...) → gene_overview
+list_clustering_analyses → genes_in_cluster → differential_expression_by_gene
 gene_clusters_by_gene → genes_in_cluster → differential_expression_by_gene
 ```
 
 ## Common mistakes
 
-- Cluster IDs come from list_gene_clusters or gene_clusters_by_gene results — they are not gene locus tags
+- Cluster IDs come from list_clustering_analyses or gene_clusters_by_gene results — they are not gene locus tags
+
+- Use analysis_id to get ALL genes across ALL clusters in an analysis; use cluster_ids for specific clusters
 
 - not_found_clusters means the ID doesn't exist in the KG; not_matched_clusters means the cluster exists but has no members matching your organism filter
 
@@ -133,11 +129,11 @@ gene_clusters_by_gene(locus_tags=['PMM0370'])  # use gene_clusters_by_gene for g
 ```
 
 ```mistake
-genes_in_cluster(cluster_ids='cluster:msb4100087:med4:up_n_transport')
+genes_in_cluster(cluster_ids='cluster:msb4100087:med4_kmeans_nstarvation:8')
 ```
 
 ```correction
-genes_in_cluster(cluster_ids=['cluster:msb4100087:med4:up_n_transport']) — always a list
+genes_in_cluster(cluster_ids=['cluster:msb4100087:med4_kmeans_nstarvation:8']) — always a list
 ```
 
 ## Package import equivalent
@@ -145,8 +141,8 @@ genes_in_cluster(cluster_ids=['cluster:msb4100087:med4:up_n_transport']) — alw
 ```python
 from multiomics_explorer import genes_in_cluster
 
-result = genes_in_cluster(cluster_ids=...)
-# returns dict with keys: total_matching, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, offset, results
+result = genes_in_cluster()
+# returns dict with keys: total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

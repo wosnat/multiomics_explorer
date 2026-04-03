@@ -3,47 +3,44 @@
 # come from Pydantic models via scripts/build_about_content.py.
 
 examples:
-  - title: Get members of an N-transport cluster
-    call: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
-    response: |
-      {"total_matching": 5, "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 5}], "by_cluster": [{"cluster_id": "cluster:msb4100087:med4:up_n_transport", "cluster_name": "MED4 cluster 1 (up, N transport)", "count": 5}], "top_categories": [{"category": "Unknown", "count": 2}, {"category": "Central intermediary metabolism", "count": 1}, {"category": "Amino acid metabolism", "count": 1}, {"category": "Stress response and adaptation", "count": 1}], "genes_per_cluster_max": 5, "genes_per_cluster_median": 5, "not_found_clusters": [], "not_matched_clusters": [], "returned": 5, "truncated": false, "offset": 0, "results": [{"locus_tag": "PMM0370", "gene_name": "cynA", "product": "cyanate ABC transporter, substrate-binding protein", "gene_category": "Central intermediary metabolism", "cluster_id": "cluster:msb4100087:med4:up_n_transport", "cluster_name": "MED4 cluster 1 (up, N transport)"}]}
+  - title: Get members of a specific cluster
+    call: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8"])
 
-  - title: Drill into multiple clusters at once
-    call: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport", "cluster:msb4100087:med4:down_translation"], limit=20)
+  - title: Get all genes in a clustering analysis
+    call: genes_in_cluster(analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation")
 
   - title: Handle invalid cluster IDs gracefully
-    call: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport", "cluster:fake_id"])
-    response: |
-      {"total_matching": 5, "not_found_clusters": ["cluster:fake_id"], "not_matched_clusters": [], "returned": 3, "truncated": true, ...}
+    call: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8", "cluster:fake_id"])
 
-  - title: From cluster search to member gene expression
+  - title: From analysis search to member gene expression
     steps: |
-      Step 1: list_gene_clusters(search_text="N transport")
-              → extract cluster_id values from results
+      Step 1: list_clustering_analyses(search_text="nitrogen")
+              → extract analysis_id values from results
 
-      Step 2: genes_in_cluster(cluster_ids=["cluster:msb4100087:med4:up_n_transport"])
-              → get member genes: PMM0370 (cynA), PMM0920 (glnA), PMM0958, PMM0970 (urtA), PMM1462
+      Step 2: genes_in_cluster(analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation")
+              → get all member genes across clusters in the analysis
 
       Step 3: differential_expression_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM0958", "PMM0970", "PMM1462"])
               → check expression patterns for the cluster members
 
 verbose_fields:
-  - function_description
+  - gene_function_description
   - gene_summary
   - p_value
-  - functional_description
-  - behavioral_description
+  - cluster_functional_description
+  - cluster_behavioral_description
 
 chaining:
-  - "list_gene_clusters → genes_in_cluster → gene_overview"
-  - "list_gene_clusters → genes_in_cluster → differential_expression_by_gene"
+  - "list_clustering_analyses → genes_in_cluster(analysis_id=...) → gene_overview"
+  - "list_clustering_analyses → genes_in_cluster → differential_expression_by_gene"
   - "gene_clusters_by_gene → genes_in_cluster → differential_expression_by_gene"
 
 mistakes:
-  - "Cluster IDs come from list_gene_clusters or gene_clusters_by_gene results — they are not gene locus tags"
+  - "Cluster IDs come from list_clustering_analyses or gene_clusters_by_gene results — they are not gene locus tags"
+  - "Use analysis_id to get ALL genes across ALL clusters in an analysis; use cluster_ids for specific clusters"
   - "not_found_clusters means the ID doesn't exist in the KG; not_matched_clusters means the cluster exists but has no members matching your organism filter"
   - "Results are gene × cluster rows — when querying multiple clusters, a gene in both appears twice. Use by_cluster to see per-cluster counts."
   - wrong: "genes_in_cluster(cluster_ids=['PMM0370'])  # passing a gene locus tag"
     right: "gene_clusters_by_gene(locus_tags=['PMM0370'])  # use gene_clusters_by_gene for gene → cluster direction"
-  - wrong: "genes_in_cluster(cluster_ids='cluster:msb4100087:med4:up_n_transport')"
-    right: "genes_in_cluster(cluster_ids=['cluster:msb4100087:med4:up_n_transport']) — always a list"
+  - wrong: "genes_in_cluster(cluster_ids='cluster:msb4100087:med4_kmeans_nstarvation:8')"
+    right: "genes_in_cluster(cluster_ids=['cluster:msb4100087:med4_kmeans_nstarvation:8']) — always a list"
