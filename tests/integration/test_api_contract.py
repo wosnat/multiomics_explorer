@@ -112,7 +112,7 @@ class TestGeneOverviewContract:
             "gene_category", "annotation_quality", "organism_name",
             "annotation_types", "expression_edge_count",
             "significant_up_count", "significant_down_count", "closest_ortholog_group_size",
-            "closest_ortholog_genera",
+            "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
         }
         assert set(result["results"][0].keys()) == expected_keys
 

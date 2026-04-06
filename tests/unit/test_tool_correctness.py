@@ -20,7 +20,7 @@ from tests.fixtures.gene_data import (
     GENES_WITH_EC,
     GENES_WITH_GENE_NAME,
     GENES_WITHOUT_GENE_NAME,
-    as_genes_by_function_result,
+    as_search_genes_result,
     as_resolve_gene_result,
     genes_by_organism,
     genes_with_property,
@@ -216,9 +216,9 @@ class TestGenesByFunctionCorrectness:
     async def test_fulltext_results_with_scores(self, tool_fns, mock_ctx):
         """Results from multiple organisms are returned with Pydantic envelope."""
         rows = [
-            as_genes_by_function_result(GENES_BY_LOCUS["PMM0001"], score=5.2),
-            as_genes_by_function_result(GENES_BY_LOCUS["PMT9312_0001"], score=4.8),
-            as_genes_by_function_result(GENES_BY_LOCUS["SYNW0305"], score=2.1),
+            as_search_genes_result(GENES_BY_LOCUS["PMM0001"], score=5.2),
+            as_search_genes_result(GENES_BY_LOCUS["PMT9312_0001"], score=4.8),
+            as_search_genes_result(GENES_BY_LOCUS["SYNW0305"], score=2.1),
         ]
         api_return = self._make_api_return(rows)
         with patch(
@@ -237,7 +237,7 @@ class TestGenesByFunctionCorrectness:
     @pytest.mark.asyncio
     async def test_organism_filter_forwarded(self, tool_fns, mock_ctx):
         """Organism filter passes through to the api function."""
-        rows = [as_genes_by_function_result(GENES_BY_LOCUS["SYNW0305"], score=3.0)]
+        rows = [as_search_genes_result(GENES_BY_LOCUS["SYNW0305"], score=3.0)]
         api_return = self._make_api_return(rows)
         with patch(
             "multiomics_explorer.api.functions.genes_by_function",
@@ -252,7 +252,7 @@ class TestGenesByFunctionCorrectness:
     @pytest.mark.asyncio
     async def test_quality_filter_forwarded(self, tool_fns, mock_ctx):
         """min_quality=2 is passed through to the api function."""
-        rows = [as_genes_by_function_result(GENES_BY_LOCUS["PMM0001"], score=5.0)]
+        rows = [as_search_genes_result(GENES_BY_LOCUS["PMM0001"], score=5.0)]
         api_return = self._make_api_return(rows)
         with patch(
             "multiomics_explorer.api.functions.genes_by_function",
@@ -267,7 +267,7 @@ class TestGenesByFunctionCorrectness:
     @pytest.mark.asyncio
     async def test_result_envelope_shape(self, tool_fns, mock_ctx):
         """Result envelope contains all expected fields."""
-        rows = [as_genes_by_function_result(GENES_BY_LOCUS["PMN2A_0044"], score=4.0)]
+        rows = [as_search_genes_result(GENES_BY_LOCUS["PMN2A_0044"], score=4.0)]
         api_return = self._make_api_return(rows)
         with patch(
             "multiomics_explorer.api.functions.genes_by_function",
@@ -1196,7 +1196,7 @@ class TestFixtureSubsetUsage:
     async def test_ec_gene_in_function_search(self, tool_fns, mock_ctx):
         """Gene with EC number appears in function search results."""
         gene = GENES_WITH_EC[0]
-        row = as_genes_by_function_result(gene, score=4.0)
+        row = as_search_genes_result(gene, score=4.0)
         with patch(
             "multiomics_explorer.api.functions.genes_by_function",
             return_value={
