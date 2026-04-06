@@ -114,7 +114,7 @@ def register_tools(mcp: FastMCP):
         background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle'])")
         omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS'])")
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this organism (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['response_pattern', 'diel_cycling'])")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel'])")
         # verbose-only fields
         family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae')")
         order: str | None = Field(default=None, description="Taxonomic order (e.g. 'Synechococcales')")
@@ -126,7 +126,7 @@ def register_tools(mcp: FastMCP):
         cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 35)")
 
     class OrgClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'response_pattern')")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
         count: int = Field(description="Number of organisms with this cluster type (e.g. 4)")
 
     class ListOrganismsResponse(BaseModel):
@@ -1000,7 +1000,7 @@ def register_tools(mcp: FastMCP):
         background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle'])")
         omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS)")
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['response_pattern'])")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
         score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
 
         abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
@@ -1024,7 +1024,7 @@ def register_tools(mcp: FastMCP):
         count: int = Field(description="Number of publications (e.g. 5)")
 
     class PubClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'response_pattern')")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
         count: int = Field(description="Number of publications (e.g. 4)")
 
     class ListPublicationsResponse(BaseModel):
@@ -1153,7 +1153,7 @@ def register_tools(mcp: FastMCP):
         genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status")
         timepoints: list[TimePoint] | None = Field(default=None, description="Per-timepoint gene counts. Omitted for non-time-course experiments.")
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this experiment (e.g. 4)")
-        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['response_pattern'])")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
         score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
         # verbose-only fields
         publication_title: str | None = Field(default=None, description="Publication title")
@@ -1192,7 +1192,7 @@ def register_tools(mcp: FastMCP):
         count: int = Field(description="Number of experiments with this scope (e.g. 22)")
 
     class ClusterTypeBreakdown(BaseModel):
-        cluster_type: str = Field(description="Cluster type (e.g. 'response_pattern')")
+        cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
         count: int = Field(description="Number of experiments with this cluster type (e.g. 7)")
 
     class ListExperimentsResponse(BaseModel):
@@ -2571,12 +2571,10 @@ def register_tools(mcp: FastMCP):
         # verbose-only
         functional_description: str | None = Field(default=None,
             description="What the cluster genes ARE")
-        behavioral_description: str | None = Field(default=None,
-            description="What the cluster genes DO together")
-        peak_time_hours: float | None = Field(default=None,
-            description="Peak expression time in hours (diel clusters)")
-        period_hours: float | None = Field(default=None,
-            description="Expression period in hours (diel clusters)")
+        expression_dynamics: str | None = Field(default=None,
+            description="Expression dynamics label (e.g. 'periodic in L:D only')")
+        temporal_pattern: str | None = Field(default=None,
+            description="Detailed temporal pattern description")
 
     class ListClusteringAnalysesResult(BaseModel):
         analysis_id: str = Field(
@@ -2588,7 +2586,7 @@ def register_tools(mcp: FastMCP):
         cluster_method: str | None = Field(default=None,
             description="Clustering method (e.g. 'K-means', 'fuzzy c-means')")
         cluster_type: str = Field(
-            description="Cluster category (e.g. 'stress_response')")
+            description="Cluster category (e.g. 'condition_comparison')")
         cluster_count: int = Field(
             description="Number of clusters in this analysis")
         total_gene_count: int = Field(
@@ -2681,8 +2679,8 @@ def register_tools(mcp: FastMCP):
         )] = False,
         verbose: Annotated[bool, Field(
             description="Include treatment, light_condition, experimental_context "
-            "on analyses; functional_description, behavioral_description, "
-            "peak_time_hours, period_hours on inline clusters.",
+            "on analyses; functional_description, expression_dynamics, "
+            "temporal_pattern on inline clusters.",
         )] = False,
         limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
         offset: Annotated[int, Field(
@@ -2764,7 +2762,7 @@ def register_tools(mcp: FastMCP):
         cluster_name: str = Field(
             description="Cluster name (e.g. 'MED4 cluster 1 (up, N transport)')")
         cluster_type: str = Field(
-            description="Cluster category (e.g. 'stress_response')")
+            description="Cluster category (e.g. 'condition_comparison')")
         membership_score: float | None = Field(default=None,
             description="Fuzzy membership score (null for K-means)")
         analysis_id: str = Field(
@@ -2782,12 +2780,10 @@ def register_tools(mcp: FastMCP):
             description="Total genes in this cluster")
         cluster_functional_description: str | None = Field(default=None,
             description="What the cluster genes ARE (cluster-level)")
-        cluster_behavioral_description: str | None = Field(default=None,
-            description="What the cluster genes DO together (cluster-level)")
-        peak_time_hours: float | None = Field(default=None,
-            description="Peak expression time in hours (diel clusters)")
-        period_hours: float | None = Field(default=None,
-            description="Expression period in hours (diel clusters)")
+        cluster_expression_dynamics: str | None = Field(default=None,
+            description="Expression dynamics label (e.g. 'periodic in L:D only')")
+        cluster_temporal_pattern: str | None = Field(default=None,
+            description="Detailed temporal pattern description (cluster-level)")
         treatment: str | None = Field(default=None,
             description="Free-text condition description")
         light_condition: str | None = Field(default=None,
@@ -2859,8 +2855,8 @@ def register_tools(mcp: FastMCP):
         )] = False,
         verbose: Annotated[bool, Field(
             description="Include cluster_method, member_count, "
-            "cluster_functional_description, cluster_behavioral_description, "
-            "peak_time_hours, period_hours, treatment, light_condition, "
+            "cluster_functional_description, cluster_expression_dynamics, "
+            "cluster_temporal_pattern, treatment, light_condition, "
             "experimental_context, p_value.",
         )] = False,
         limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
@@ -2950,8 +2946,10 @@ def register_tools(mcp: FastMCP):
             description="Assignment p-value (edge-level)")
         cluster_functional_description: str | None = Field(default=None,
             description="What the cluster genes ARE (cluster-level)")
-        cluster_behavioral_description: str | None = Field(default=None,
-            description="What the cluster genes DO together (cluster-level)")
+        cluster_expression_dynamics: str | None = Field(default=None,
+            description="Expression dynamics label (e.g. 'periodic in L:D only')")
+        cluster_temporal_pattern: str | None = Field(default=None,
+            description="Detailed temporal pattern description (cluster-level)")
 
     class GenesInClusterClusterBreakdown(BaseModel):
         cluster_id: str = Field(description="Cluster node ID")
@@ -3015,7 +3013,7 @@ def register_tools(mcp: FastMCP):
         verbose: Annotated[bool, Field(
             description="Include gene_function_description, gene_summary (gene-level), "
             "p_value (edge-level), cluster_functional_description, "
-            "cluster_behavioral_description (cluster-level).",
+            "cluster_expression_dynamics, cluster_temporal_pattern (cluster-level).",
         )] = False,
         limit: Annotated[int, Field(description="Max results.", ge=1)] = 5,
         offset: Annotated[int, Field(
