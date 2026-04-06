@@ -466,9 +466,8 @@ _ANALYSES_RESULT_VERBOSE = {
                     "name": "Cluster 1",
                     "member_count": 60,
                     "functional_description": "ribosomal genes",
-                    "behavioral_description": "early induction",
-                    "peak_time_hours": 6.0,
-                    "period_hours": None,
+                    "expression_dynamics": "early induction",
+                    "temporal_pattern": "Genes induced early under stress",
                 },
             ],
         },
@@ -521,15 +520,14 @@ class TestAnalysesToDataFrame:
             analyses_to_dataframe({"data": []})
 
     def test_verbose_cluster_fields(self):
-        """Verbose fields present → columns for functional/behavioral/peak/period."""
+        """Verbose fields present → columns for functional/expression_dynamics/temporal_pattern."""
         df = analyses_to_dataframe(_ANALYSES_RESULT_VERBOSE)
         assert "cluster_functional_description" in df.columns
-        assert "cluster_behavioral_description" in df.columns
-        assert "cluster_peak_time_hours" in df.columns
-        assert "cluster_period_hours" in df.columns
+        assert "cluster_expression_dynamics" in df.columns
+        assert "cluster_temporal_pattern" in df.columns
         row = df.iloc[0]
         assert row["cluster_functional_description"] == "ribosomal genes"
-        assert row["cluster_peak_time_hours"] == 6.0
+        assert row["cluster_expression_dynamics"] == "early induction"
 
     def test_no_nested_columns(self):
         """Output is CSV-safe — no list or dict values remain."""
