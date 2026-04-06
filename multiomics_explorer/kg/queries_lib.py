@@ -219,7 +219,7 @@ def build_gene_overview_summary(
 
     RETURN keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
-    has_orthologs, not_found.
+    has_orthologs, has_clusters, not_found.
     """
     cypher = (
         "UNWIND $locus_tags AS lt\n"
@@ -241,6 +241,7 @@ def build_gene_overview_summary(
         "       size([g IN found WHERE g.expression_edge_count > 0]) AS has_expression,\n"
         "       size([g IN found WHERE (g.significant_up_count + g.significant_down_count) > 0]) AS has_significant_expression,\n"
         "       size([g IN found WHERE g.closest_ortholog_group_size > 0]) AS has_orthologs,\n"
+        "       size([g IN found WHERE g.cluster_membership_count > 0]) AS has_clusters,\n"
         "       not_found"
     )
     return cypher, {"locus_tags": locus_tags}
@@ -258,7 +259,8 @@ def build_gene_overview(
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
     annotation_quality, organism_name, annotation_types,
     expression_edge_count, significant_up_count, significant_down_count,
-    closest_ortholog_group_size, closest_ortholog_genera.
+    closest_ortholog_group_size, closest_ortholog_genera,
+    cluster_membership_count, cluster_types.
     RETURN keys (verbose): adds gene_summary, function_description,
     all_identifiers.
     """
@@ -294,7 +296,9 @@ def build_gene_overview(
         "       g.significant_up_count AS significant_up_count,\n"
         "       g.significant_down_count AS significant_down_count,\n"
         "       g.closest_ortholog_group_size AS closest_ortholog_group_size,\n"
-        f"       g.closest_ortholog_genera AS closest_ortholog_genera{verbose_cols}\n"
+        "       g.closest_ortholog_genera AS closest_ortholog_genera,\n"
+        "       coalesce(g.cluster_membership_count, 0) AS cluster_membership_count,\n"
+        f"       coalesce(g.cluster_types, []) AS cluster_types{verbose_cols}\n"
         f"ORDER BY g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params

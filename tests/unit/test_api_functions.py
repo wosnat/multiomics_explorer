@@ -339,6 +339,7 @@ class TestGeneOverview:
             "has_expression": 1,
             "has_significant_expression": 1,
             "has_orthologs": 1,
+            "has_clusters": 0,
             "not_found": not_found or [],
         }]
 
@@ -372,6 +373,7 @@ class TestGeneOverview:
         assert "has_expression" in result
         assert "has_significant_expression" in result
         assert "has_orthologs" in result
+        assert "has_clusters" in result
         assert "returned" in result
         assert "truncated" in result
         assert "not_found" in result
@@ -424,6 +426,7 @@ class TestGeneOverview:
                     "has_expression": 0,
                     "has_significant_expression": 0,
                     "has_orthologs": 0,
+                    "has_clusters": 0,
                     "not_found": ["FAKE"],
                 }],
             ]

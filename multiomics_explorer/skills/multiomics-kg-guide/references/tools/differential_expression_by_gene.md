@@ -70,7 +70,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 | locus_tag | string | Gene locus tag (e.g. 'ACZ81_01830') |
 | gene_name | string \| None | Gene name (e.g. 'amtB'). Null if unannotated. |
 | experiment_id | string | Experiment ID (e.g. '10.1101/2025.11.24.690089_...') |
-| treatment_type | string | Treatment type from experiment (e.g. 'nitrogen_stress') |
+| treatment_type | list[string] | Treatment types from experiment (e.g. ['nitrogen_stress']) |
 | timepoint | string \| None | Timepoint label (e.g. 'days 60+89'). Null when edge has no label. |
 | timepoint_hours | float \| None | Numeric hours (e.g. 432.0). Null for non-numeric labels. |
 | timepoint_order | int | Sort key for time course order (e.g. 3) |
@@ -80,6 +80,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 | rank_up | int \| None (optional) | Rank by |log2FC| among significant_up genes within experiment x timepoint. Null if not significant_up. 1 = strongest. |
 | rank_down | int \| None (optional) | Rank by |log2FC| among significant_down genes within experiment x timepoint. Null if not significant_down. 1 = strongest. |
 | expression_status | string ('significant_up', 'significant_down', 'not_significant') | Significance call using publication-specific threshold (e.g. 'significant_up') |
+| background_factors | list[string] (optional) | Background experimental factors. Verbose only. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -196,7 +197,7 @@ Call once per organism — tool enforces single-organism constraint
 from multiomics_explorer import differential_expression_by_gene
 
 result = differential_expression_by_gene()
-# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, by_table_scope, top_categories, experiments, not_found, no_expression, offset, results
+# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, by_table_scope, top_categories, experiments, not_found, no_expression, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -14,10 +14,10 @@ Inline clusters included — use genes_in_cluster to drill into members.
 |---|---|---|---|
 | search_text | string \| None | None | Lucene full-text query over analysis name, cluster names, functional/behavioral descriptions, experimental_context. Results ranked by score. |
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). |
-| cluster_type | string \| None | None | Filter: 'diel_periodicity', 'stress_response', or 'expression_level'. |
+| cluster_type | string \| None | None | Filter: 'diel_cycling', 'diel_expression_pattern', 'expression_classification', 'expression_level', 'expression_pattern', 'periodicity_classification', 'response_pattern'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen_stress']. |
 | background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel_cycle']. |
-| omics_type | string \| None | None | Filter: 'MICROARRAY', 'RNASEQ', or 'PROTEOMICS'. |
+| omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'MICROARRAY', 'PROTEOMICS', 'RNASEQ'. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
 | experiment_ids | list[string] \| None | None | Filter by experiment IDs. |
 | analysis_ids | list[string] \| None | None | Filter by analysis IDs. |
@@ -86,7 +86,7 @@ list_clustering_analyses(summary=True)
 ### Example 2: Search for nitrogen-related analyses
 
 ```example-call
-list_clustering_analyses(search_text="nitrogen")
+list_clustering_analyses(search_text="starvation")
 ```
 
 ### Example 3: Browse all MED4 analyses with cluster details
@@ -98,7 +98,7 @@ list_clustering_analyses(organism="MED4", verbose=True)
 ### Example 4: Find analyses then drill into member genes
 
 ```
-Step 1: list_clustering_analyses(search_text="nitrogen")
+Step 1: list_clustering_analyses(search_text="starvation")
         → extract analysis_id values from results
 
 Step 2: genes_in_cluster(analysis_id="clustering_analysis:msb4100087:med4_kmeans_nstarvation")

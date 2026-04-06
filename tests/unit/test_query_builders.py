@@ -241,6 +241,7 @@ class TestBuildGeneOverview:
             "annotation_quality", "organism_name", "annotation_types",
             "expression_edge_count", "significant_up_count", "significant_down_count",
             "closest_ortholog_group_size", "closest_ortholog_genera",
+            "cluster_membership_count", "cluster_types",
         ]
         for col in expected_columns:
             assert col in cypher, f"Missing column '{col}' in RETURN clause"
@@ -306,6 +307,7 @@ class TestBuildGeneOverviewSummary:
         assert "has_expression" in cypher
         assert "has_significant_expression" in cypher
         assert "has_orthologs" in cypher
+        assert "has_clusters" in cypher
         assert "not_found" in cypher
         assert params["locus_tags"] == ["PMM1428"]
 

@@ -384,6 +384,8 @@ def register_tools(mcp: FastMCP):
         significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations (e.g. 2)")
         closest_ortholog_group_size: int | None = Field(default=None, description="Size of tightest ortholog group (e.g. 9)")
         closest_ortholog_genera: list[str] | None = Field(default=None, description="Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus'])")
+        cluster_membership_count: int = Field(default=0, description="Number of cluster memberships (e.g. 3)")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel'])")
         # verbose-only
         gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'dnaN :: DNA polymerase III subunit beta :: Alternative locus ID')")
         function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Alternative locus ID')")
@@ -409,6 +411,7 @@ def register_tools(mcp: FastMCP):
         has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0)")
         has_significant_expression: int = Field(description="Genes with significant DE observations")
         has_orthologs: int = Field(description="Genes with ortholog group membership")
+        has_clusters: int = Field(description="Genes with cluster membership")
         returned: int = Field(description="Results in this response (0 when summary=true)")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
@@ -463,6 +466,7 @@ def register_tools(mcp: FastMCP):
                 has_expression=data["has_expression"],
                 has_significant_expression=data["has_significant_expression"],
                 has_orthologs=data["has_orthologs"],
+                has_clusters=data["has_clusters"],
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],

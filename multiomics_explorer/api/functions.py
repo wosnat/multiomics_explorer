@@ -269,11 +269,12 @@ def gene_overview(
 
     Returns dict with keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
-    has_orthologs, returned, truncated, not_found, results.
+    has_orthologs, has_clusters, returned, truncated, not_found, results.
     Per result: locus_tag, gene_name, product, gene_category,
     annotation_quality, organism_name, annotation_types,
     expression_edge_count, significant_up_count, significant_down_count,
-    closest_ortholog_group_size, closest_ortholog_genera.
+    closest_ortholog_group_size, closest_ortholog_genera,
+    cluster_membership_count, cluster_types.
     Verbose adds: gene_summary, function_description, all_identifiers.
 
     Raises ValueError if locus_tags is empty.
@@ -308,6 +309,7 @@ def gene_overview(
         "has_expression": raw_summary["has_expression"],
         "has_significant_expression": raw_summary["has_significant_expression"],
         "has_orthologs": raw_summary["has_orthologs"],
+        "has_clusters": raw_summary["has_clusters"],
         "not_found": raw_summary["not_found"],
     }
 

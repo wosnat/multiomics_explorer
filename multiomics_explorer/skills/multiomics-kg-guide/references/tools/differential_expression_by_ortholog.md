@@ -74,7 +74,8 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 | consensus_gene_name | string \| None | Short gene name (e.g. 'psbB'). Null for hypotheticals. |
 | consensus_product | string | Group product description (e.g. 'photosystem II chlorophyll-binding protein CP47') |
 | experiment_id | string | Experiment ID |
-| treatment_type | string | Treatment category (e.g. 'nitrogen_limitation') |
+| treatment_type | list[string] | Treatment categories (e.g. ['nitrogen_limitation']) |
+| background_factors | list[string] (optional) | Background experimental factors |
 | organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | coculture_partner | string \| None (optional) | Coculture partner organism, if applicable |
 | timepoint | string \| None | Timepoint label (e.g. '24h'). Null when edge has no label. |
@@ -148,7 +149,7 @@ differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detai
 from multiomics_explorer import differential_expression_by_ortholog
 
 result = differential_expression_by_ortholog(group_ids=...)
-# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, offset, by_organism, rows_by_status, rows_by_treatment_type, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, offset, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
 Use package import for bulk data extraction in scripts.

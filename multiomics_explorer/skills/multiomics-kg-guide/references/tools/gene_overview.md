@@ -23,7 +23,7 @@ data exists.
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, returned, offset, truncated, not_found, results
+total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found in KG from input locus_tags
@@ -33,6 +33,7 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 - **has_expression** (int): Genes with expression data (expression_edge_count > 0)
 - **has_significant_expression** (int): Genes with significant DE observations
 - **has_orthologs** (int): Genes with ortholog group membership
+- **has_clusters** (int): Genes with cluster membership
 - **returned** (int): Results in this response (0 when summary=true)
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
@@ -54,6 +55,8 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 | significant_down_count | int (optional) | Significant down-regulated DE observations (e.g. 2) |
 | closest_ortholog_group_size | int \| None (optional) | Size of tightest ortholog group (e.g. 9) |
 | closest_ortholog_genera | list[string] \| None (optional) | Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus']) |
+| cluster_membership_count | int (optional) | Number of cluster memberships (e.g. 3) |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -77,10 +80,10 @@ gene_overview(locus_tags=["PMM1428"])
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
   "by_category": [{"category": "Unknown", "count": 1}],
   "by_annotation_type": [{"annotation_type": "go_mf", "count": 1}, ...],
-  "has_expression": 1, "has_significant_expression": 1, "has_orthologs": 1,
+  "has_expression": 1, "has_significant_expression": 1, "has_orthologs": 1, "has_clusters": 1,
   "returned": 1, "truncated": false, "offset": 0, "not_found": [],
   "results": [
-    {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein", "gene_category": "Unknown", "annotation_quality": 3, "organism_name": "Prochlorococcus MED4", "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"], "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9, "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]}
+    {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein", "gene_category": "Unknown", "annotation_quality": 3, "organism_name": "Prochlorococcus MED4", "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"], "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9, "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"], "cluster_membership_count": 2, "cluster_types": ["condition_comparison"]}
   ]
 }
 ```
@@ -104,7 +107,7 @@ Step 1: genes_by_function(search_text="photosystem")
         → collect locus_tags from results
 
 Step 2: gene_overview(locus_tags=["PMM0845", ...])
-        → check which genes have expression data, ontology, orthologs
+        → check which genes have expression data, ontology, orthologs, clusters
 
 Step 3: gene_ontology_terms(locus_tags=["PMM0845"])
         → drill into annotations for genes with rich annotation_types
@@ -118,6 +121,7 @@ genes_by_function → gene_overview
 gene_overview → gene_ontology_terms
 gene_overview → gene_homologs
 gene_overview → differential_expression_by_gene
+gene_overview → gene_clusters_by_gene
 ```
 
 ## Common mistakes
@@ -127,6 +131,8 @@ gene_overview → differential_expression_by_gene
 - expression_edge_count > 0 means expression data exists — use differential_expression_by_gene to explore it
 
 - closest_ortholog_genera shows cross-genus reach — use gene_homologs for full group membership
+
+- cluster_membership_count > 0 means cluster data exists — use gene_clusters_by_gene to explore it
 
 ```mistake
 gene_overview(locus_tags=['PMM0845'], verbose=True)  # just to see the gene
@@ -142,7 +148,7 @@ gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary te
 from multiomics_explorer import gene_overview
 
 result = gene_overview(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, offset, not_found, results
+# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -77,13 +77,14 @@ async def gene_overview(
     """
 ```
 
-**Return envelope:** `total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, returned, truncated, not_found, results`
+**Return envelope:** `total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, returned, truncated, not_found, results`
 
-**Per-result columns (compact — 11):**
+**Per-result columns (compact — 13):**
 `locus_tag`, `gene_name`, `product`, `gene_category`,
 `annotation_quality`, `organism_strain`, `annotation_types`,
 `expression_edge_count`, `significant_expression_count`,
-`closest_ortholog_group_size`, `closest_ortholog_genera`
+`closest_ortholog_group_size`, `closest_ortholog_genera`,
+`cluster_membership_count`, `cluster_types`
 
 **Verbose adds (3):**
 `gene_summary`, `function_description`, `all_identifiers`
@@ -103,6 +104,7 @@ Batch input can be large → summary + limit pattern.
 | `has_expression` | int | Genes with expression_edge_count > 0 (→ differential_expression_by_gene) |
 | `has_significant_expression` | int | Genes with significant_expression_count > 0 |
 | `has_orthologs` | int | Genes with closest_ortholog_group_size > 0 (→ gene_homologs) |
+| `has_clusters` | int | Genes with cluster_membership_count > 0 (→ gene_clusters_by_gene) |
 
 ### Batch handling
 
@@ -168,7 +170,7 @@ def build_gene_overview_summary(
 
     RETURN keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
-    has_orthologs, not_found.
+    has_orthologs, has_clusters, not_found.
     """
 ```
 
@@ -193,6 +195,7 @@ RETURN total_matching,
        size([g IN found WHERE g.expression_edge_count > 0]) AS has_expression,
        size([g IN found WHERE g.significant_expression_count > 0]) AS has_significant_expression,
        size([g IN found WHERE g.closest_ortholog_group_size > 0]) AS has_orthologs,
+       size([g IN found WHERE g.cluster_membership_count > 0]) AS has_clusters,
        not_found
 ```
 
@@ -210,7 +213,8 @@ def build_gene_overview(
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
     annotation_quality, organism_strain, annotation_types,
     expression_edge_count, significant_expression_count,
-    closest_ortholog_group_size, closest_ortholog_genera.
+    closest_ortholog_group_size, closest_ortholog_genera,
+    cluster_membership_count, cluster_types.
     RETURN keys (verbose): adds gene_summary, function_description,
     all_identifiers.
     """
@@ -228,7 +232,9 @@ RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,
        g.expression_edge_count AS expression_edge_count,
        g.significant_expression_count AS significant_expression_count,
        g.closest_ortholog_group_size AS closest_ortholog_group_size,
-       g.closest_ortholog_genera AS closest_ortholog_genera
+       g.closest_ortholog_genera AS closest_ortholog_genera,
+       coalesce(g.cluster_membership_count, 0) AS cluster_membership_count,
+       coalesce(g.cluster_types, []) AS cluster_types
        [, g.gene_summary AS gene_summary,               -- verbose only
           g.function_description AS function_description,
           g.all_identifiers AS all_identifiers]
@@ -264,11 +270,12 @@ def gene_overview(
 
     Returns dict with keys: total_matching, by_organism, by_category,
     by_annotation_type, has_expression, has_significant_expression,
-    has_orthologs, returned, truncated, not_found, results.
+    has_orthologs, has_clusters, returned, truncated, not_found, results.
     Per result: locus_tag, gene_name, product, gene_category,
     annotation_quality, organism_strain, annotation_types,
     expression_edge_count, significant_expression_count,
-    closest_ortholog_group_size, closest_ortholog_genera.
+    closest_ortholog_group_size, closest_ortholog_genera,
+    cluster_membership_count, cluster_types.
     Verbose adds: gene_summary, function_description, all_identifiers.
     """
 ```
@@ -303,6 +310,8 @@ class GeneOverviewResult(BaseModel):
     significant_expression_count: int = Field(default=0, description="Significant DE observations (e.g. 5)")
     closest_ortholog_group_size: int | None = Field(default=None, description="Size of tightest ortholog group (e.g. 9)")
     closest_ortholog_genera: list[str] | None = Field(default=None, description="Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus'])")
+    cluster_membership_count: int = Field(default=0, description="Number of cluster memberships (e.g. 3)")
+    cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel'])")
     # verbose-only
     gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'dnaN :: DNA polymerase III subunit beta :: Alternative locus ID')")
     function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Alternative locus ID')")
@@ -328,6 +337,7 @@ class GeneOverviewResponse(BaseModel):
     has_expression: int = Field(description="Genes with expression data (expression_edge_count > 0)")
     has_significant_expression: int = Field(description="Genes with significant DE observations")
     has_orthologs: int = Field(description="Genes with ortholog group membership")
+    has_clusters: int = Field(description="Genes with cluster membership")
     returned: int = Field(description="Results in this response (0 when summary=true)")
     truncated: bool = Field(description="True if total_matching > returned")
     not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
@@ -386,6 +396,7 @@ async def gene_overview(
             has_expression=data["has_expression"],
             has_significant_expression=data["has_significant_expression"],
             has_orthologs=data["has_orthologs"],
+            has_clusters=data["has_clusters"],
             returned=data["returned"],
             truncated=data["truncated"],
             not_found=data["not_found"],
@@ -529,7 +540,7 @@ examples:
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1}],
         "by_category": [{"category": "Unknown", "count": 1}],
         "by_annotation_type": [{"annotation_type": "go_mf", "count": 1}, {"annotation_type": "pfam", "count": 1}, ...],
-        "has_expression": 1, "has_significant_expression": 1, "has_orthologs": 1,
+        "has_expression": 1, "has_significant_expression": 1, "has_orthologs": 1, "has_clusters": 1,
         "returned": 1, "truncated": false, "not_found": [],
         "results": [
           {"locus_tag": "PMM1428", "gene_name": null, "product": "EVE domain protein",
@@ -538,7 +549,8 @@ examples:
            "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"],
            "expression_edge_count": 36, "significant_expression_count": 5,
            "closest_ortholog_group_size": 9,
-           "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]}
+           "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+           "cluster_membership_count": 2, "cluster_types": ["condition_comparison"]}
         ]
       }
 

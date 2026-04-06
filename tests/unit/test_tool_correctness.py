@@ -362,6 +362,7 @@ class TestGeneOverviewCorrectness:
         "has_expression": 1,
         "has_significant_expression": 1,
         "has_orthologs": 1,
+        "has_clusters": 1,
         "returned": 1,
         "truncated": False,
         "not_found": [],
@@ -372,7 +373,8 @@ class TestGeneOverviewCorrectness:
              "annotation_types": ["go_mf", "pfam", "cog_category", "tigr_role"],
              "expression_edge_count": 36, "significant_up_count": 3, "significant_down_count": 2,
              "closest_ortholog_group_size": 9,
-             "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]},
+             "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+             "cluster_membership_count": 2, "cluster_types": ["condition_comparison"]},
         ],
     }
 
@@ -405,13 +407,15 @@ class TestGeneOverviewCorrectness:
                  "organism_name": "Prochlorococcus MED4",
                  "annotation_types": ["go_mf"], "expression_edge_count": 36,
                  "significant_up_count": 3, "significant_down_count": 2, "closest_ortholog_group_size": 9,
-                 "closest_ortholog_genera": ["Prochlorococcus"]},
+                 "closest_ortholog_genera": ["Prochlorococcus"],
+                 "cluster_membership_count": 1, "cluster_types": ["diel"]},
                 {"locus_tag": "EZ55_00275", "gene_name": None, "product": "p2",
                  "gene_category": None, "annotation_quality": 0,
                  "organism_name": "Alteromonas EZ55",
                  "annotation_types": [], "expression_edge_count": 0,
                  "significant_up_count": 0, "significant_down_count": 0, "closest_ortholog_group_size": 1,
-                 "closest_ortholog_genera": []},
+                 "closest_ortholog_genera": [],
+                 "cluster_membership_count": 0, "cluster_types": []},
             ],
         }
         with patch(
@@ -1160,6 +1164,7 @@ class TestFixtureSubsetUsage:
                 "has_expression": 0,
                 "has_significant_expression": 0,
                 "has_orthologs": 0,
+                "has_clusters": 0,
                 "returned": 1,
                 "truncated": False,
                 "not_found": [],
@@ -1175,7 +1180,8 @@ class TestFixtureSubsetUsage:
                      "significant_up_count": 0,
                      "significant_down_count": 0,
                      "closest_ortholog_group_size": 0,
-                     "closest_ortholog_genera": []},
+                     "closest_ortholog_genera": [],
+                     "cluster_membership_count": 0, "cluster_types": []},
                 ],
             },
         ):

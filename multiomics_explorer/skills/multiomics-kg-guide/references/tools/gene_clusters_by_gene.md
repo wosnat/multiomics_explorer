@@ -16,7 +16,7 @@ Use genes_in_cluster to drill into a cluster's full membership.
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags (e.g. ['PMM0370', 'PMM0920']). |
 | organism | string \| None | None | Organism name (case-insensitive partial match); inferred from genes if omitted. Single organism enforced. |
-| cluster_type | string \| None | None | Filter: 'diel_periodicity', 'stress_response', or 'expression_level'. |
+| cluster_type | string \| None | None | Filter: 'diel_cycling', 'diel_expression_pattern', 'expression_classification', 'expression_level', 'expression_pattern', 'periodicity_classification', 'response_pattern'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). |
 | background_factors | list[string] \| None | None | Filter by background factors. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
