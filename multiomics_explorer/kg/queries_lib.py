@@ -2886,8 +2886,8 @@ def build_list_clustering_analyses(
     When search_text: adds score.
     RETURN keys (verbose): adds treatment, light_condition, experimental_context.
     Inline clusters (compact): cluster_id, name, member_count.
-    Inline clusters (verbose): adds functional_description, behavioral_description,
-    peak_time_hours, period_hours.
+    Inline clusters (verbose): adds functional_description, expression_dynamics,
+    temporal_pattern.
     """
     conditions, params = _clustering_analysis_where(
         organism=organism, cluster_type=cluster_type,
@@ -2938,9 +2938,8 @@ def build_list_clustering_analyses(
             "collect({cluster_id: gc.id, name: gc.name,"
             " member_count: gc.member_count,"
             " functional_description: gc.functional_description,"
-            " behavioral_description: gc.behavioral_description,"
-            " peak_time_hours: gc.peak_time_hours,"
-            " period_hours: gc.period_hours}) AS clusters"
+            " expression_dynamics: gc.expression_dynamics,"
+            " temporal_pattern: gc.temporal_pattern}) AS clusters"
         )
     else:
         cluster_collect = (
@@ -3092,9 +3091,9 @@ def build_gene_clusters_by_gene(
     cluster_type, membership_score, analysis_id, analysis_name,
     treatment_type, background_factors.
     RETURN keys (verbose): adds cluster_method, member_count,
-    cluster_functional_description, cluster_behavioral_description,
-    treatment, light_condition, experimental_context,
-    p_value, peak_time_hours, period_hours.
+    cluster_functional_description, cluster_expression_dynamics,
+    cluster_temporal_pattern, treatment, light_condition,
+    experimental_context, p_value.
     """
     params: dict = {"locus_tags": locus_tags}
 
@@ -3131,13 +3130,12 @@ def build_gene_clusters_by_gene(
             ",\n       ca.cluster_method AS cluster_method"
             ",\n       gc.member_count AS member_count"
             ",\n       gc.functional_description AS cluster_functional_description"
-            ",\n       gc.behavioral_description AS cluster_behavioral_description"
+            ",\n       gc.expression_dynamics AS cluster_expression_dynamics"
+            ",\n       gc.temporal_pattern AS cluster_temporal_pattern"
             ",\n       ca.treatment AS treatment"
             ",\n       ca.light_condition AS light_condition"
             ",\n       ca.experimental_context AS experimental_context"
             ",\n       r.p_value AS p_value"
-            ",\n       gc.peak_time_hours AS peak_time_hours"
-            ",\n       gc.period_hours AS period_hours"
         )
 
     if offset:
@@ -3277,7 +3275,8 @@ def build_genes_in_cluster(
     RETURN keys (compact): locus_tag, gene_name, product, gene_category,
     organism_name, cluster_id, cluster_name, membership_score.
     RETURN keys (verbose): adds gene_function_description, gene_summary,
-    p_value, cluster_functional_description, cluster_behavioral_description.
+    p_value, cluster_functional_description, cluster_expression_dynamics,
+    cluster_temporal_pattern.
     """
     params: dict = {}
 
@@ -3288,7 +3287,8 @@ def build_genes_in_cluster(
             ",\n       g.gene_summary AS gene_summary"
             ",\n       r.p_value AS p_value"
             ",\n       gc.functional_description AS cluster_functional_description"
-            ",\n       gc.behavioral_description AS cluster_behavioral_description"
+            ",\n       gc.expression_dynamics AS cluster_expression_dynamics"
+            ",\n       gc.temporal_pattern AS cluster_temporal_pattern"
         )
 
     if offset:
