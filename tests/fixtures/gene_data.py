@@ -156,6 +156,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 1212,
                 "taxonomic_level": "Prochloraceae"
+            },
+            {
+                "og_id": "eggnog:1FZV5@1117",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1117,
+                "taxonomic_level": "Cyanobacteria"
             }
         ],
         "pfam_ids": [
@@ -275,6 +282,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 1212,
                 "taxonomic_level": "Prochloraceae"
+            },
+            {
+                "og_id": "eggnog:1GBH7@1117",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1117,
+                "taxonomic_level": "Cyanobacteria"
             }
         ],
         "pfam_ids": [
@@ -505,6 +519,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 1212,
                 "taxonomic_level": "Prochloraceae"
+            },
+            {
+                "og_id": "eggnog:1G0EQ@1117",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1117,
+                "taxonomic_level": "Cyanobacteria"
             }
         ],
         "pfam_ids": [
@@ -688,6 +709,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 1212,
                 "taxonomic_level": "Prochloraceae"
+            },
+            {
+                "og_id": "eggnog:1FZV5@1117",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1117,
+                "taxonomic_level": "Cyanobacteria"
             }
         ],
         "pfam_ids": [
@@ -887,6 +915,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 1212,
                 "taxonomic_level": "Prochloraceae"
+            },
+            {
+                "og_id": "eggnog:1G10D@1117",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1117,
+                "taxonomic_level": "Cyanobacteria"
             }
         ],
         "pfam_ids": [
@@ -962,11 +997,11 @@ GENES = [
                 "taxonomic_level": "Bacteria"
             },
             {
-                "og_id": "eggnog:1S2QS@1236",
+                "og_id": "eggnog:1RCFZ@1224",
                 "source": "eggnog",
                 "specificity_rank": 2,
-                "taxon_id": 1236,
-                "taxonomic_level": "Gammaproteobacteria"
+                "taxon_id": 1224,
+                "taxonomic_level": "Proteobacteria"
             }
         ],
         "pfam_ids": [
@@ -1092,6 +1127,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 72275,
                 "taxonomic_level": "Alteromonadaceae"
+            },
+            {
+                "og_id": "eggnog:1MX03@1224",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1224,
+                "taxonomic_level": "Proteobacteria"
             }
         ],
         "pfam_ids": [
@@ -1173,6 +1215,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 72275,
                 "taxonomic_level": "Alteromonadaceae"
+            },
+            {
+                "og_id": "eggnog:1N7BI@1224",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1224,
+                "taxonomic_level": "Proteobacteria"
             }
         ],
         "pfam_ids": [
@@ -1395,6 +1444,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 1129,
                 "taxonomic_level": "Synechococcus"
+            },
+            {
+                "og_id": "eggnog:1G1BT@1117",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1117,
+                "taxonomic_level": "Cyanobacteria"
             }
         ],
         "pfam_ids": [
@@ -1533,6 +1589,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 1129,
                 "taxonomic_level": "Synechococcus"
+            },
+            {
+                "og_id": "eggnog:1G514@1117",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1117,
+                "taxonomic_level": "Cyanobacteria"
             }
         ],
         "pfam_ids": [
@@ -1715,6 +1778,13 @@ GENES = [
                 "specificity_rank": 1,
                 "taxon_id": 1212,
                 "taxonomic_level": "Prochloraceae"
+            },
+            {
+                "og_id": "eggnog:1G4IV@1117",
+                "source": "eggnog",
+                "specificity_rank": 2,
+                "taxon_id": 1117,
+                "taxonomic_level": "Cyanobacteria"
             }
         ],
         "pfam_ids": [
@@ -1793,11 +1863,11 @@ GENES = [
                 "taxonomic_level": "Bacteria"
             },
             {
-                "og_id": "eggnog:1S6WV@1236",
+                "og_id": "eggnog:1RDHA@1224",
                 "source": "eggnog",
                 "specificity_rank": 2,
-                "taxon_id": 1236,
-                "taxonomic_level": "Gammaproteobacteria"
+                "taxon_id": 1224,
+                "taxonomic_level": "Proteobacteria"
             }
         ],
         "pfam_ids": [
@@ -1834,21 +1904,18 @@ def as_resolve_gene_result(gene):
     }
 
 
-# Helper: project to genes_by_function return shape
-def as_genes_by_function_result(gene, score=1.0, verbose=False):
-    row = {
+# Helper: project to search_genes return shape
+def as_search_genes_result(gene, score=1.0):
+    return {
         "locus_tag": gene["locus_tag"],
         "gene_name": gene.get("gene_name"),
         "product": gene.get("product"),
+        "function_description": gene.get("function_description"),
+        "gene_summary": gene.get("gene_summary"),
         "organism_name": gene.get("organism_name"),
-        "gene_category": gene.get("gene_category"),
         "annotation_quality": gene.get("annotation_quality"),
         "score": score,
     }
-    if verbose:
-        row["function_description"] = gene.get("function_description")
-        row["gene_summary"] = gene.get("gene_summary")
-    return row
 
 
 # Filter helpers
