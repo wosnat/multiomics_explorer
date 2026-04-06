@@ -175,8 +175,7 @@ Compact cluster columns (always present): `cluster_id`, `cluster_name`,
 
 Verbose cluster columns (present only when the result was fetched with
 `verbose=True`): `cluster_functional_description`,
-`cluster_behavioral_description`, `cluster_peak_time_hours`,
-`cluster_period_hours`.
+`cluster_expression_dynamics`, `cluster_temporal_pattern`.
 
 ### Parameters
 
@@ -209,8 +208,8 @@ from multiomics_explorer.analysis import analyses_to_dataframe
 
 result = list_clustering_analyses(organism="MED4", verbose=True)
 df = analyses_to_dataframe(result)
-# Extra columns: cluster_functional_description, cluster_behavioral_description,
-#                cluster_peak_time_hours, cluster_period_hours
+# Extra columns: cluster_functional_description, cluster_expression_dynamics,
+#                cluster_temporal_pattern
 ```
 
 ### Common mistakes

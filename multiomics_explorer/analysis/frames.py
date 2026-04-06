@@ -159,8 +159,7 @@ def analyses_to_dataframe(result: dict) -> pd.DataFrame:
         for each cluster row. Compact cluster columns: ``cluster_id``,
         ``cluster_name``, ``cluster_member_count``. Verbose cluster columns
         (when present): ``cluster_functional_description``,
-        ``cluster_behavioral_description``, ``cluster_peak_time_hours``,
-        ``cluster_period_hours``.
+        ``cluster_expression_dynamics``, ``cluster_temporal_pattern``.
 
     Raises
     ------
@@ -179,9 +178,8 @@ def analyses_to_dataframe(result: dict) -> pd.DataFrame:
     # Verbose cluster field names (only present when verbose=True was used)
     _VERBOSE_CLUSTER_FIELDS = (
         "functional_description",
-        "behavioral_description",
-        "peak_time_hours",
-        "period_hours",
+        "expression_dynamics",
+        "temporal_pattern",
     )
 
     records = []
