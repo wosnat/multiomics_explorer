@@ -40,6 +40,36 @@ Integration tests (`@pytest.mark.kg`) that query the live KG and assert exact ma
 - One test function per constant (clear names like `test_valid_og_sources_match_kg`)
 - Failures show set diff (`expected - actual`, `actual - expected`)
 
+### Failure messaging
+
+Drift test failures must clearly communicate that the fix is a code change, not a fixture update.
+
+**Module docstring** at the top of the test file:
+
+```python
+"""Drift tests: hardcoded constants vs live KG.
+
+These tests detect when a KG rebuild introduces values that our
+constants don't account for.  When a test fails:
+
+  1. Update the constant in kg/constants.py (or queries_lib.py)
+  2. Check if tool descriptions or validators in tools.py reference
+     the old values and need updating
+  3. Re-run the full test suite to catch downstream breakage
+
+These are NOT fixture tests — do not "fix" by changing the assertions.
+"""
+```
+
+**Custom assertion messages** on every assert, naming the constant and file to update. Example:
+
+```
+AssertionError: VALID_TAXONOMIC_LEVELS in kg/constants.py is out of sync with KG.
+  Missing from constant: {'Proteobacteria'}
+  Extra in constant: {'Gammaproteobacteria'}
+  Update the constant, then check if tools.py descriptions or validators also need updating.
+```
+
 ### ONTOLOGY_CONFIG validation detail
 
 For each key in `ONTOLOGY_CONFIG`, verify:
