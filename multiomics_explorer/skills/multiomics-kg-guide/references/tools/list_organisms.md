@@ -49,7 +49,7 @@ total_entries, by_cluster_type, returned, offset, truncated, results
 | background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle']) |
 | omics_types | list[string] (optional) | Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']) |
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this organism (e.g. 4) |
-| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['response_pattern', 'diel_cycling']) |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -79,7 +79,7 @@ list_organisms()
   "truncated": false,
   "offset": 0,
   "results": [
-    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["response_pattern", "diel_cycling", "expression_level"]},
+    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel", "classification"]},
     {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas", "gene_count": 4136, "publication_count": 2, ...}
   ]
 }

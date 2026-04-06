@@ -28,7 +28,8 @@ verbose_fields:
   - gene_summary
   - p_value
   - cluster_functional_description
-  - cluster_behavioral_description
+  - cluster_expression_dynamics
+  - cluster_temporal_pattern
 
 chaining:
   - "list_clustering_analyses → genes_in_cluster(analysis_id=...) → gene_overview"

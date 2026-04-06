@@ -14,7 +14,7 @@ Inline clusters included — use genes_in_cluster to drill into members.
 |---|---|---|---|
 | search_text | string \| None | None | Lucene full-text query over analysis name, cluster names, functional/behavioral descriptions, experimental_context. Results ranked by score. |
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). |
-| cluster_type | string \| None | None | Filter: 'diel_cycling', 'diel_expression_pattern', 'expression_classification', 'expression_level', 'expression_pattern', 'periodicity_classification', 'response_pattern'. |
+| cluster_type | string \| None | None | Filter: 'classification', 'condition_comparison', 'diel', 'time_course'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen_stress']. |
 | background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel_cycle']. |
 | omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'MICROARRAY', 'PROTEOMICS', 'RNASEQ'. |
@@ -22,7 +22,7 @@ Inline clusters included — use genes_in_cluster to drill into members.
 | experiment_ids | list[string] \| None | None | Filter by experiment IDs. |
 | analysis_ids | list[string] \| None | None | Filter by analysis IDs. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include treatment, light_condition, experimental_context on analyses; functional_description, behavioral_description, peak_time_hours, period_hours on inline clusters. |
+| verbose | bool | False | Include treatment, light_condition, experimental_context on analyses; functional_description, expression_dynamics, temporal_pattern on inline clusters. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
@@ -57,7 +57,7 @@ total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, 
 | name | string | Analysis name (e.g. 'MED4 nitrogen stress response clustering') |
 | organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
 | cluster_method | string \| None (optional) | Clustering method (e.g. 'K-means', 'fuzzy c-means') |
-| cluster_type | string | Cluster category (e.g. 'stress_response') |
+| cluster_type | string | Cluster category (e.g. 'condition_comparison') |
 | cluster_count | int | Number of clusters in this analysis |
 | total_gene_count | int | Total genes across all clusters |
 | treatment_type | list[string] | Treatment types (e.g. ['nitrogen_stress']) |

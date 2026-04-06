@@ -76,7 +76,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | genes_by_status | GeneStatusBreakdown | Gene counts by expression status |
 | timepoints | list[TimePoint] \| None (optional) | Per-timepoint gene counts. Omitted for non-time-course experiments. |
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this experiment (e.g. 4) |
-| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['response_pattern']) |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
 | score | float \| None (optional) | Lucene relevance score, present only when search_text is used (e.g. 2.45) |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -108,7 +108,7 @@ list_experiments(summary=True)
  "by_treatment_type": [{"treatment_type": "coculture", "count": 16}, ...],
  "by_omics_type": [{"omics_type": "RNASEQ", "count": 48}, ...],
  "by_table_scope": [{"table_scope": "all_detected_genes", "count": 40}, ...],
- "by_cluster_type": [{"cluster_type": "response_pattern", "count": 7}, ...],
+ "by_cluster_type": [{"cluster_type": "condition_comparison", "count": 7}, ...],
  "time_course_count": 29, "returned": 0, "truncated": true, "offset": 0, "results": []}
 ```
 

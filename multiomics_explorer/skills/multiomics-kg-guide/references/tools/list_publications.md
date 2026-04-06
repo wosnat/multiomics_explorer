@@ -58,7 +58,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle']) |
 | omics_types | list[string] (optional) | Omics data types (e.g. RNASEQ, PROTEOMICS) |
 | clustering_analysis_count | int (optional) | Number of clustering analyses from this publication (e.g. 4) |
-| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['response_pattern']) |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
 | score | float \| None (optional) | Lucene relevance score (only with search_text) |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -83,11 +83,11 @@ list_publications()
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 11}, ...],
   "by_treatment_type": [{"treatment_type": "coculture", "count": 5}, ...],
   "by_omics_type": [{"omics_type": "RNASEQ", "count": 12}, ...],
-  "by_cluster_type": [{"cluster_type": "response_pattern", "count": 4}, ...],
+  "by_cluster_type": [{"cluster_type": "condition_comparison", "count": 4}, ...],
   "returned": 5, "truncated": true, "offset": 0,
   "results": [
     {"doi": "10.1101/2025.11.24.690089", "title": "Transcriptomic and Proteomic...", "year": 2025, "experiment_count": 10, "clustering_analysis_count": 0, "cluster_types": [], ...},
-    {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "experiment_count": 5, "clustering_analysis_count": 2, "cluster_types": ["response_pattern"], ...}
+    {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "experiment_count": 5, "clustering_analysis_count": 2, "cluster_types": ["condition_comparison"], ...}
   ]
 }
 ```

@@ -28,9 +28,8 @@ verbose_fields:
   - light_condition
   - experimental_context
   - "clusters[].functional_description"
-  - "clusters[].behavioral_description"
-  - "clusters[].peak_time_hours"
-  - "clusters[].period_hours"
+  - "clusters[].expression_dynamics"
+  - "clusters[].temporal_pattern"
 
 chaining:
   - "list_clustering_analyses → genes_in_cluster(analysis_id=...) → gene_overview"

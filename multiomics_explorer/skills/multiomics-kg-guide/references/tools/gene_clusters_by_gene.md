@@ -16,13 +16,13 @@ Use genes_in_cluster to drill into a cluster's full membership.
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags (e.g. ['PMM0370', 'PMM0920']). |
 | organism | string \| None | None | Organism name (case-insensitive partial match); inferred from genes if omitted. Single organism enforced. |
-| cluster_type | string \| None | None | Filter: 'diel_cycling', 'diel_expression_pattern', 'expression_classification', 'expression_level', 'expression_pattern', 'periodicity_classification', 'response_pattern'. |
+| cluster_type | string \| None | None | Filter: 'classification', 'condition_comparison', 'diel', 'time_course'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). |
 | background_factors | list[string] \| None | None | Filter by background factors. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
 | analysis_ids | list[string] \| None | None | Filter by clustering analysis IDs. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include cluster_method, member_count, cluster_functional_description, cluster_behavioral_description, peak_time_hours, period_hours, treatment, light_condition, experimental_context, p_value. |
+| verbose | bool | False | Include cluster_method, member_count, cluster_functional_description, cluster_expression_dynamics, cluster_temporal_pattern, treatment, light_condition, experimental_context, p_value. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
@@ -58,7 +58,7 @@ total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not
 | gene_name | string \| None (optional) | Gene name (e.g. 'cynA') |
 | cluster_id | string | Cluster node ID (e.g. 'cluster:msb4100087:med4:up_n_transport') |
 | cluster_name | string | Cluster name (e.g. 'MED4 cluster 1 (up, N transport)') |
-| cluster_type | string | Cluster category (e.g. 'stress_response') |
+| cluster_type | string | Cluster category (e.g. 'condition_comparison') |
 | membership_score | float \| None (optional) | Fuzzy membership score (null for K-means) |
 | analysis_id | string | Clustering analysis ID |
 | analysis_name | string | Clustering analysis name |
@@ -72,9 +72,8 @@ total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not
 | cluster_method | string \| None (optional) | Clustering method (e.g. 'K-means') |
 | member_count | int \| None (optional) | Total genes in this cluster |
 | cluster_functional_description | string \| None (optional) | What the cluster genes ARE (cluster-level) |
-| cluster_behavioral_description | string \| None (optional) | What the cluster genes DO together (cluster-level) |
-| peak_time_hours | float \| None (optional) | Peak expression time in hours (diel clusters) |
-| period_hours | float \| None (optional) | Expression period in hours (diel clusters) |
+| cluster_expression_dynamics | string \| None (optional) | Expression dynamics label (e.g. 'periodic in L:D only') |
+| cluster_temporal_pattern | string \| None (optional) | Detailed temporal pattern description (cluster-level) |
 | treatment | string \| None (optional) | Free-text condition description |
 | light_condition | string \| None (optional) | Light regime |
 | experimental_context | string \| None (optional) | Full experimental context description |
@@ -97,7 +96,7 @@ gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0001"], summary=True)
 ### Example 3: Filter to stress response clusters
 
 ```example-call
-gene_clusters_by_gene(locus_tags=["PMM0370"], cluster_type="stress_response", verbose=True)
+gene_clusters_by_gene(locus_tags=["PMM0370"], cluster_type="condition_comparison", verbose=True)
 ```
 
 ### Example 4: From gene search to cluster context

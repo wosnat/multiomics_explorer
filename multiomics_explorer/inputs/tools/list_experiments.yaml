@@ -11,7 +11,7 @@ examples:
        "by_treatment_type": [{"treatment_type": "coculture", "count": 16}, ...],
        "by_omics_type": [{"omics_type": "RNASEQ", "count": 48}, ...],
        "by_table_scope": [{"table_scope": "all_detected_genes", "count": 40}, ...],
-       "by_cluster_type": [{"cluster_type": "response_pattern", "count": 7}, ...],
+       "by_cluster_type": [{"cluster_type": "condition_comparison", "count": 7}, ...],
        "time_course_count": 29, "returned": 0, "truncated": true, "offset": 0, "results": []}
 
   - title: Summary for MED4 only

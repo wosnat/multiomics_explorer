@@ -10,7 +10,7 @@ examples:
     call: gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0001"], summary=True)
 
   - title: Filter to stress response clusters
-    call: gene_clusters_by_gene(locus_tags=["PMM0370"], cluster_type="stress_response", verbose=True)
+    call: gene_clusters_by_gene(locus_tags=["PMM0370"], cluster_type="condition_comparison", verbose=True)
 
   - title: From gene search to cluster context
     steps: |
@@ -25,11 +25,10 @@ examples:
 
 verbose_fields:
   - cluster_functional_description
-  - cluster_behavioral_description
+  - cluster_expression_dynamics
+  - cluster_temporal_pattern
   - cluster_method
   - member_count
-  - peak_time_hours
-  - period_hours
   - treatment
   - light_condition
   - experimental_context

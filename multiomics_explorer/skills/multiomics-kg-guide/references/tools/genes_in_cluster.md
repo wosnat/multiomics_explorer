@@ -18,7 +18,7 @@ For gene → cluster direction, use gene_clusters_by_gene.
 | analysis_id | string \| None | None | ClusteringAnalysis node ID — returns all genes in all clusters of this analysis. Provide this OR cluster_ids. |
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). Single organism enforced. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
-| verbose | bool | False | Include gene_function_description, gene_summary (gene-level), p_value (edge-level), cluster_functional_description, cluster_behavioral_description (cluster-level). |
+| verbose | bool | False | Include gene_function_description, gene_summary (gene-level), p_value (edge-level), cluster_functional_description, cluster_expression_dynamics, cluster_temporal_pattern (cluster-level). |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
 
@@ -67,7 +67,8 @@ total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_pe
 | gene_summary | string \| None (optional) | Gene summary text (gene-level) |
 | p_value | float \| None (optional) | Assignment p-value (edge-level) |
 | cluster_functional_description | string \| None (optional) | What the cluster genes ARE (cluster-level) |
-| cluster_behavioral_description | string \| None (optional) | What the cluster genes DO together (cluster-level) |
+| cluster_expression_dynamics | string \| None (optional) | Expression dynamics label (e.g. 'periodic in L:D only') |
+| cluster_temporal_pattern | string \| None (optional) | Detailed temporal pattern description (cluster-level) |
 
 ## Few-shot examples
 
