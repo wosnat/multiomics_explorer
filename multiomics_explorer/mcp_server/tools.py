@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.connection import GraphConnection
+from multiomics_explorer.kg.constants import VALID_CLUSTER_TYPES, VALID_OMICS_TYPES
 
 logger = logging.getLogger(__name__)
 
@@ -2650,7 +2651,7 @@ def register_tools(mcp: FastMCP):
             description="Filter by organism (case-insensitive partial match).",
         )] = None,
         cluster_type: Annotated[str | None, Field(
-            description="Filter: 'diel_periodicity', 'stress_response', or 'expression_level'.",
+            description="Filter: " + ", ".join(f"'{v}'" for v in sorted(VALID_CLUSTER_TYPES)) + ".",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s). E.g. ['nitrogen_stress'].",
@@ -2660,7 +2661,7 @@ def register_tools(mcp: FastMCP):
             "E.g. ['axenic', 'diel_cycle'].",
         )] = None,
         omics_type: Annotated[str | None, Field(
-            description="Filter: 'MICROARRAY', 'RNASEQ', or 'PROTEOMICS'.",
+            description="Filter: " + ", ".join(f"'{v}'" for v in sorted(VALID_OMICS_TYPES)) + ".",
         )] = None,
         publication_doi: Annotated[list[str] | None, Field(
             description="Filter by publication DOI(s).",
@@ -2835,8 +2836,7 @@ def register_tools(mcp: FastMCP):
             "inferred from genes if omitted. Single organism enforced.",
         )] = None,
         cluster_type: Annotated[str | None, Field(
-            description="Filter: 'diel_periodicity', 'stress_response', "
-            "or 'expression_level'.",
+            description="Filter: " + ", ".join(f"'{v}'" for v in sorted(VALID_CLUSTER_TYPES)) + ".",
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s).",
