@@ -888,7 +888,8 @@ class TestGeneClustersByGeneContract:
             locus_tags=["PMM0370"], verbose=True, conn=conn)
         if result["results"]:
             for key in ("cluster_functional_description",
-                        "cluster_behavioral_description",
+                        "cluster_expression_dynamics",
+                        "cluster_temporal_pattern",
                         "cluster_method", "member_count"):
                 assert key in result["results"][0]
 
@@ -952,7 +953,8 @@ class TestGenesInClusterContract:
         if result["results"]:
             for key in ("gene_function_description",
                         "cluster_functional_description",
-                        "cluster_behavioral_description"):
+                        "cluster_expression_dynamics",
+                        "cluster_temporal_pattern"):
                 assert key in result["results"][0]
 
     def test_unknown_cluster_in_not_found(self, conn):

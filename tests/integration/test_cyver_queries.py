@@ -118,7 +118,7 @@ def _substitute_params(cypher: str, params: dict) -> str:
 # cannot distinguish {org: g.organism_name} from g.org, so it reports
 # these as missing node properties.  We filter them out.
 # Also includes sparse/future-proofed properties that exist in the schema
-# but are not yet populated on all nodes (e.g. peak_time_hours on GeneCluster).
+# but are not yet populated on all nodes (e.g. p_value on Gene_in_gene_cluster).
 _KNOWN_MAP_KEYS = {
     "org", "cat", "lt", "cnt", "terms", "srcs", "gid",
     "org_input", "tt", "bfs", "ts", "eid", "status", "log2fc", "m",
@@ -126,7 +126,7 @@ _KNOWN_MAP_KEYS = {
     "cr_id", "cr_name", "cc_id", "cc_name", "og_ids", "src", "lvl",
     "cid", "cname",
     # Sparse cluster properties — valid in schema, not populated on all nodes
-    "peak_time_hours", "period_hours", "p_value",
+    "p_value",
 }
 
 # Regex to extract property name from CyVer description:
