@@ -2263,9 +2263,9 @@ def gene_clusters_by_gene(
     cluster_type, membership_score, analysis_id, analysis_name,
     treatment_type, background_factors.
     Per result (verbose): adds cluster_method, member_count,
-    cluster_functional_description, cluster_behavioral_description,
-    treatment, light_condition, experimental_context,
-    p_value, peak_time_hours, period_hours.
+    cluster_functional_description, cluster_expression_dynamics,
+    cluster_temporal_pattern, treatment, light_condition,
+    experimental_context, p_value.
 
     summary=True: results=[], summary fields only.
 
@@ -2363,7 +2363,8 @@ def genes_in_cluster(
     Per result (compact): locus_tag, gene_name, product, gene_category,
     organism_name, cluster_id, cluster_name, membership_score.
     Per result (verbose): adds gene_function_description, gene_summary,
-    p_value, cluster_functional_description, cluster_behavioral_description.
+    p_value, cluster_functional_description, cluster_expression_dynamics,
+    cluster_temporal_pattern.
 
     summary=True: results=[], summary fields only.
 
