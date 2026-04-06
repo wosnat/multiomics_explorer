@@ -58,6 +58,10 @@ rows:
   - Prochlorococcus
   - Synechococcus
   closest_ortholog_group_size: 11
+  cluster_membership_count: 2
+  cluster_types:
+  - condition_comparison
+  - diel
   end: 1331
   expression_edge_count: 27
   function_description: Confers DNA tethering and processivity to DNA polymerases

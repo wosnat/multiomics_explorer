@@ -10,9 +10,9 @@ rows:
   - '{''count'': 23, ''item'': ''light''}'
   - '{''count'': 24, ''item'': ''axenic''}'
   by_cluster_type:
-  - '{''count'': 1, ''item'': ''diel_cycling''}'
-  - '{''count'': 1, ''item'': ''expression_level''}'
-  - '{''count'': 2, ''item'': ''response_pattern''}'
+  - '{''count'': 1, ''item'': ''condition_comparison''}'
+  - '{''count'': 1, ''item'': ''diel''}'
+  - '{''count'': 2, ''item'': ''time_course''}'
   by_omics_type:
   - '{''count'': 12, ''item'': ''RNASEQ''}'
   - '{''count'': 19, ''item'': ''MICROARRAY''}'

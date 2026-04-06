@@ -6,6 +6,8 @@ rows:
   closest_ortholog_genera:
   - Alteromonas
   closest_ortholog_group_size: 1
+  cluster_membership_count: 0
+  cluster_types: []
   expression_edge_count: 0
   gene_category: Unknown
   gene_name: null

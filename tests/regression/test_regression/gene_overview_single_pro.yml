@@ -11,6 +11,11 @@ rows:
   - Prochlorococcus
   - Synechococcus
   closest_ortholog_group_size: 11
+  cluster_membership_count: 3
+  cluster_types:
+  - condition_comparison
+  - diel
+  - time_course
   expression_edge_count: 35
   gene_category: Unknown
   gene_name: null

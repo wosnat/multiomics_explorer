@@ -707,7 +707,7 @@ rows:
   - axenic
   - light
   cluster_types:
-  - expression_level
+  - condition_comparison
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
@@ -836,7 +836,7 @@ rows:
   - axenic
   - diel
   cluster_types:
-  - diel_cycling
+  - diel
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1371/journal.pone.0005135_diel_cycling_med4_microarray
@@ -862,7 +862,7 @@ rows:
 - background_factors:
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   coculture_partner: Phage
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
@@ -1135,7 +1135,7 @@ rows:
   - axenic
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray

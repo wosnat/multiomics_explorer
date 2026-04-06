@@ -272,7 +272,7 @@ rows:
   - coculture
   - diel
   cluster_types:
-  - periodicity_classification
+  - classification
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_mit1002_rnaseq
@@ -756,7 +756,7 @@ rows:
 - background_factors:
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   coculture_partner: Phage
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
@@ -831,7 +831,7 @@ rows:
   - axenic
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
@@ -1076,7 +1076,7 @@ rows:
   - axenic
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -1190,7 +1190,7 @@ rows:
   - coculture
   - diel
   cluster_types:
-  - diel_expression_pattern
+  - diel
   clustering_analysis_count: 2
   coculture_partner: null
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -1260,8 +1260,7 @@ rows:
   - axenic
   - diel
   cluster_types:
-  - expression_classification
-  - periodicity_classification
+  - classification
   clustering_analysis_count: 2
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
@@ -1307,8 +1306,7 @@ rows:
   - coculture
   - diel
   cluster_types:
-  - expression_classification
-  - periodicity_classification
+  - classification
   clustering_analysis_count: 2
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture

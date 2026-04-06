@@ -643,7 +643,7 @@ rows:
   - coculture
   - diel
   cluster_types:
-  - periodicity_classification
+  - classification
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_mit1002_rnaseq
@@ -1451,7 +1451,7 @@ rows:
   - axenic
   - light
   cluster_types:
-  - expression_level
+  - condition_comparison
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
@@ -1580,7 +1580,7 @@ rows:
   - axenic
   - diel
   cluster_types:
-  - diel_cycling
+  - diel
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1371/journal.pone.0005135_diel_cycling_med4_microarray
@@ -1606,7 +1606,7 @@ rows:
 - background_factors:
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   coculture_partner: Phage
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
@@ -1879,7 +1879,7 @@ rows:
   - axenic
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
@@ -2097,7 +2097,7 @@ rows:
   - axenic
   - diel
   cluster_types:
-  - expression_pattern
+  - condition_comparison
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1128/mbio.03425-22_thermal_acclimation_mit9301_rnaseq
@@ -2607,7 +2607,7 @@ rows:
   - axenic
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   coculture_partner: null
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -2754,7 +2754,7 @@ rows:
   - coculture
   - diel
   cluster_types:
-  - diel_expression_pattern
+  - diel
   clustering_analysis_count: 2
   coculture_partner: null
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -2890,8 +2890,7 @@ rows:
   - coculture
   - diel
   cluster_types:
-  - expression_classification
-  - periodicity_classification
+  - classification
   clustering_analysis_count: 2
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
@@ -2937,8 +2936,7 @@ rows:
   - axenic
   - diel
   cluster_types:
-  - expression_classification
-  - periodicity_classification
+  - classification
   clustering_analysis_count: 2
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
@@ -4052,7 +4050,7 @@ rows:
   - coculture
 - background_factors: []
   cluster_types:
-  - response_pattern
+  - condition_comparison
   clustering_analysis_count: 4
   coculture_partner: Meiothermus ruber
   experiment_id: 10.1128/mSystems.00181-16_coculture_bp1_mruber_light_oxygen_rnaseq

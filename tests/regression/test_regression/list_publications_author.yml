@@ -43,7 +43,7 @@ rows:
   - coculture
   - diel
   cluster_types:
-  - diel_expression_pattern
+  - diel
   clustering_analysis_count: 2
   doi: 10.1093/ismeco/ycae131
   experiment_count: 2
@@ -107,8 +107,7 @@ rows:
   - coculture
   - diel
   cluster_types:
-  - expression_classification
-  - periodicity_classification
+  - classification
   clustering_analysis_count: 3
   doi: 10.1128/mSystems.00040-18
   experiment_count: 3
@@ -259,7 +258,7 @@ rows:
   - axenic
   - diel
   cluster_types:
-  - diel_cycling
+  - diel
   clustering_analysis_count: 1
   doi: 10.1371/journal.pone.0005135
   experiment_count: 1
@@ -290,7 +289,7 @@ rows:
   background_factors:
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   doi: 10.1038/nature06130
   experiment_count: 1
@@ -342,7 +341,7 @@ rows:
   - axenic
   - light
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 2
   doi: 10.1038/msb4100087
   experiment_count: 6

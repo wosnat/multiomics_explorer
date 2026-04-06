@@ -19,10 +19,10 @@ rows:
   top_cyanorak_roles:
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 40, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
-  - '{''id'': ''cyanorak.role:J.1'', ''count'': 10, ''name'': ''Photosynthesis and
-    respiration > ATP synthase''}'
   - '{''id'': ''cyanorak.role:J.2'', ''count'': 40, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
+  - '{''id'': ''cyanorak.role:J.7'', ''count'': 21, ''name'': ''Photosynthesis and
+    respiration > Photosystem I''}'
   - '{''id'': ''cyanorak.role:J.8'', ''count'': 41, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
   - '{''id'': ''cyanorak.role:P.3'', ''count'': 1, ''name'': ''Transcription > Transcription

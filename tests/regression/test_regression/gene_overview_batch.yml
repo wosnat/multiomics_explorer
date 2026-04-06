@@ -6,6 +6,8 @@ rows:
   closest_ortholog_genera:
   - Alteromonas
   closest_ortholog_group_size: 1
+  cluster_membership_count: 0
+  cluster_types: []
   expression_edge_count: 0
   gene_category: Unknown
   gene_name: null
@@ -24,6 +26,11 @@ rows:
   - Prochlorococcus
   - Synechococcus
   closest_ortholog_group_size: 11
+  cluster_membership_count: 3
+  cluster_types:
+  - condition_comparison
+  - diel
+  - time_course
   expression_edge_count: 35
   gene_category: Unknown
   gene_name: null

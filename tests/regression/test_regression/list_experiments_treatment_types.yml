@@ -1339,7 +1339,7 @@ rows:
   - coculture
 - background_factors: []
   cluster_types:
-  - response_pattern
+  - condition_comparison
   clustering_analysis_count: 4
   coculture_partner: Meiothermus ruber
   experiment_id: 10.1128/mSystems.00181-16_coculture_bp1_mruber_light_oxygen_rnaseq

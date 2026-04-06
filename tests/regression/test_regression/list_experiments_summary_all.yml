@@ -10,13 +10,10 @@ rows:
   - '{''count'': 49, ''item'': ''axenic''}'
   - '{''count'': 76, ''item'': ''light''}'
   by_cluster_type:
-  - '{''count'': 1, ''item'': ''diel_cycling''}'
-  - '{''count'': 1, ''item'': ''diel_expression_pattern''}'
-  - '{''count'': 1, ''item'': ''expression_level''}'
-  - '{''count'': 1, ''item'': ''expression_pattern''}'
-  - '{''count'': 2, ''item'': ''expression_classification''}'
-  - '{''count'': 3, ''item'': ''periodicity_classification''}'
-  - '{''count'': 4, ''item'': ''response_pattern''}'
+  - '{''count'': 2, ''item'': ''diel''}'
+  - '{''count'': 3, ''item'': ''classification''}'
+  - '{''count'': 3, ''item'': ''condition_comparison''}'
+  - '{''count'': 3, ''item'': ''time_course''}'
   by_omics_type:
   - '{''count'': 26, ''item'': ''MICROARRAY''}'
   - '{''count'': 62, ''item'': ''RNASEQ''}'

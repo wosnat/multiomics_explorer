@@ -64,7 +64,7 @@ rows:
   - light
   clade: null
   cluster_types:
-  - periodicity_classification
+  - classification
   clustering_analysis_count: 1
   experiment_count: 8
   gene_count: 4028
@@ -117,7 +117,7 @@ rows:
 - background_factors: []
   clade: null
   cluster_types:
-  - response_pattern
+  - condition_comparison
   clustering_analysis_count: 2
   experiment_count: 1
   gene_count: 2884
@@ -182,9 +182,9 @@ rows:
   - viral
   clade: HLI
   cluster_types:
-  - diel_cycling
-  - expression_level
-  - response_pattern
+  - condition_comparison
+  - diel
+  - time_course
   clustering_analysis_count: 4
   experiment_count: 48
   gene_count: 1976
@@ -215,7 +215,7 @@ rows:
   - light
   clade: HLII
   cluster_types:
-  - expression_pattern
+  - condition_comparison
   clustering_analysis_count: 1
   experiment_count: 2
   gene_count: 1935
@@ -275,7 +275,7 @@ rows:
   - light
   clade: LLIV
   cluster_types:
-  - response_pattern
+  - time_course
   clustering_analysis_count: 1
   experiment_count: 21
   gene_count: 2948
@@ -321,9 +321,8 @@ rows:
   - viral
   clade: LLII
   cluster_types:
-  - diel_expression_pattern
-  - expression_classification
-  - periodicity_classification
+  - classification
+  - diel
   clustering_analysis_count: 4
   experiment_count: 14
   gene_count: 2214
@@ -522,7 +521,7 @@ rows:
 - background_factors: []
   clade: null
   cluster_types:
-  - response_pattern
+  - condition_comparison
   clustering_analysis_count: 2
   experiment_count: 1
   gene_count: 2449

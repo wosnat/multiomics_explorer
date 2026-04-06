@@ -46,6 +46,8 @@ rows:
   - Prochlorococcus
   - Synechococcus
   closest_ortholog_group_size: 11
+  cluster_membership_count: 0
+  cluster_types: []
   end: 304589
   expression_edge_count: 1
   function_description: Acts as a processive, ATP-dependent zinc metallopeptidase

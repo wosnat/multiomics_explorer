@@ -149,7 +149,7 @@ rows:
   - Young-Mo Kim
   background_factors: []
   cluster_types:
-  - response_pattern
+  - condition_comparison
   clustering_analysis_count: 4
   doi: 10.1128/mSystems.00181-16
   experiment_count: 1
