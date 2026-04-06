@@ -763,7 +763,7 @@ class TestListOrganisms:
          "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11,
          "experiment_count": 46, "treatment_types": ["coculture", "light_stress"],
          "omics_types": ["RNASEQ", "PROTEOMICS"],
-         "clustering_analysis_count": 4, "cluster_types": ["response_pattern", "diel_cycling"],
+         "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel"],
          "background_factors": []},
         {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas",
          "species": "Alteromonas macleodii", "strain": "EZ55", "clade": None,
@@ -803,10 +803,10 @@ class TestListOrganisms:
         mock_conn.execute_query.return_value = self._ROWS
         result = api.list_organisms(conn=mock_conn)
         assert "by_cluster_type" in result
-        # MED4 has response_pattern and diel_cycling; EZ55 has none
+        # MED4 has condition_comparison and diel; EZ55 has none
         ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
-        assert ct_map["response_pattern"] == 1
-        assert ct_map["diel_cycling"] == 1
+        assert ct_map["condition_comparison"] == 1
+        assert ct_map["diel"] == 1
 
     def test_verbose_includes_cluster_count(self, mock_conn):
         rows = [{**r, "cluster_count": 10} for r in self._ROWS]
@@ -1471,7 +1471,7 @@ class TestListPublications:
         "organisms": ["MED4"], "experiment_count": 1,
         "treatment_types": ["coculture"], "background_factors": [],
         "omics_types": ["RNASEQ"],
-        "clustering_analysis_count": 2, "cluster_types": ["response_pattern"],
+        "clustering_analysis_count": 2, "cluster_types": ["condition_comparison"],
     }
 
     def test_returns_dict(self, mock_conn):
@@ -1556,7 +1556,7 @@ class TestListPublications:
         ]
         result = api.list_publications(conn=mock_conn)
         ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
-        assert ct_map["response_pattern"] == 1
+        assert ct_map["condition_comparison"] == 1
 
     def test_verbose_includes_cluster_count(self, mock_conn):
         row = {**self._PUB_ROW, "abstract": "...", "description": "...", "cluster_count": 20}
@@ -1608,7 +1608,7 @@ class TestListExperiments:
             "by_omics_type": [{"item": "RNASEQ", "count": 48}],
             "by_publication": [{"item": "10.1038/ismej.2016.70", "count": 5}],
             "by_table_scope": [{"item": "gene_level", "count": 40}],
-            "by_cluster_type": [{"item": "response_pattern", "count": 3}],
+            "by_cluster_type": [{"item": "condition_comparison", "count": 3}],
         }]
 
     def _detail_row(self, **overrides):
@@ -1635,7 +1635,7 @@ class TestListExperiments:
             "time_point_significant_up": [245],
             "time_point_significant_down": [178],
             "clustering_analysis_count": 1,
-            "cluster_types": ["response_pattern"],
+            "cluster_types": ["condition_comparison"],
         }
         row.update(overrides)
         return row
@@ -1816,7 +1816,7 @@ class TestListExperiments:
         assert result["by_publication"][0]["publication_doi"] == "10.1038/ismej.2016.70"
         assert result["by_table_scope"][0]["table_scope"] == "gene_level"
         assert result["by_table_scope"][0]["count"] == 40
-        assert result["by_cluster_type"][0]["cluster_type"] == "response_pattern"
+        assert result["by_cluster_type"][0]["cluster_type"] == "condition_comparison"
         assert result["by_cluster_type"][0]["count"] == 3
 
     def test_verbose_includes_cluster_count(self, mock_conn):
