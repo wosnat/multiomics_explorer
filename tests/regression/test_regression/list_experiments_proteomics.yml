@@ -3,7 +3,9 @@ row_count: 7
 rows:
 - background_factors:
   - coculture
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -55,10 +57,12 @@ rows:
   - '2226'
   - '2226'
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -92,10 +96,12 @@ rows:
   - '2226'
   - '2226'
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -147,10 +153,12 @@ rows:
   - '1424'
   - '1424'
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -190,8 +198,11 @@ rows:
   - '1424'
   - '1424'
   treatment_type:
-  - nitrogen_stress
-- background_factors: []
+  - nitrogen
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus elongatus PCC 7942
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_proteomics
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
@@ -220,18 +231,21 @@ rows:
   - '228'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Pseudomonas putida KT2440
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (proteomics)
-  gene_count: 524
+  gene_count: 527
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Synechococcus elongatus PCC 7942
   publication_doi: 10.1038/s42003-024-06098-5
   significant_down_count: 81
-  significant_up_count: 70
+  significant_up_count: 71
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -244,13 +258,15 @@ rows:
   time_point_significant_down:
   - '81'
   time_point_significant_up:
-  - '70'
+  - '71'
   time_point_totals:
-  - '524'
+  - '527'
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Escherichia coli
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_proteomics
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic

@@ -3,34 +3,35 @@ row_count: 1
 rows:
 - by_level:
   - '{''count'': 1, ''item'': ''Alteromonadaceae''}'
-  - '{''count'': 15, ''item'': ''Cyanobacteria''}'
-  - '{''count'': 361, ''item'': ''Synechococcus''}'
-  - '{''count'': 364, ''item'': ''Bacteria''}'
+  - '{''count'': 166, ''item'': ''Synechococcus''}'
+  - '{''count'': 2, ''item'': ''Proteobacteria''}'
+  - '{''count'': 284, ''item'': ''Bacteria''}'
   - '{''count'': 378, ''item'': ''Prochloraceae''}'
-  - '{''count'': 416, ''item'': ''curated''}'
+  - '{''count'': 418, ''item'': ''curated''}'
+  - '{''count'': 457, ''item'': ''Cyanobacteria''}'
   by_source:
-  - '{''count'': 1119, ''item'': ''eggnog''}'
-  - '{''count'': 416, ''item'': ''cyanorak''}'
-  score_max: 6.1269
-  score_median: 1.0154
+  - '{''count'': 1288, ''item'': ''eggnog''}'
+  - '{''count'': 418, ''item'': ''cyanorak''}'
+  score_max: 6.673
+  score_median: 1.0836
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 525, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 520, ''name'': ''Energy production and
     conversion''}'
   - '{''id'': ''cog.category:K'', ''count'': 21, ''name'': ''Transcription''}'
-  - '{''id'': ''cog.category:N'', ''count'': 7, ''name'': ''Cell motility''}'
-  - '{''id'': ''cog.category:S'', ''count'': 548, ''name'': ''Function unknown''}'
-  - '{''id'': ''cog.category:U'', ''count'': 49, ''name'': ''Intracellular trafficking,
+  - '{''id'': ''cog.category:N'', ''count'': 11, ''name'': ''Cell motility''}'
+  - '{''id'': ''cog.category:S'', ''count'': 675, ''name'': ''Function unknown''}'
+  - '{''id'': ''cog.category:U'', ''count'': 64, ''name'': ''Intracellular trafficking,
     secretion, and vesicular transport''}'
   top_cyanorak_roles:
-  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 163, ''name'': ''Cellular processes
+  - '{''id'': ''cyanorak.role:D.1.1'', ''count'': 78, ''name'': ''Cellular processes
+    > Adaptation/acclimation to atypical conditions and detoxification > Iron''}'
+  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 209, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
-  - '{''id'': ''cyanorak.role:J.5.1'', ''count'': 17, ''name'': ''Photosynthesis and
-    respiration > Light-harvesting-Phycobilisomes > Allophycocyanin''}'
-  - '{''id'': ''cyanorak.role:J.7'', ''count'': 91, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J.7'', ''count'': 109, ''name'': ''Photosynthesis and
     respiration > Photosystem I''}'
-  - '{''id'': ''cyanorak.role:J.8'', ''count'': 180, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J.8'', ''count'': 198, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  - '{''id'': ''cyanorak.role:L.3'', ''count'': 20, ''name'': ''Protein fate > Protein
+  - '{''id'': ''cyanorak.role:L.3'', ''count'': 24, ''name'': ''Protein fate > Protein
     folding and stabilization''}'
-  total_entries: 21814
-  total_matching: 885
+  total_entries: 43019
+  total_matching: 975

@@ -1,807 +1,891 @@
 case_id: search_ontology_go_mf
-row_count: 268
+row_count: 296
 rows:
 - id: go:0000035
   name: acyl binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0000049
   name: tRNA binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0000062
   name: fatty-acyl-CoA binding
-  score: 1.086
+  score: 1.0711
 - id: go:0000166
   name: nucleotide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0000217
   name: DNA secondary structure binding
-  score: 1.086
+  score: 1.0711
 - id: go:0000287
   name: magnesium ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0000400
   name: four-way junction DNA binding
-  score: 0.993
+  score: 0.9793
 - id: go:0000403
   name: Y-form DNA binding
-  score: 1.086
+  score: 1.0711
 - id: go:0000900
   name: mRNA regulatory element binding translation repressor activity
-  score: 0.8478
+  score: 0.836
 - id: go:0000976
   name: transcription cis-regulatory region binding
-  score: 0.993
+  score: 0.9793
 - id: go:0000987
   name: cis-regulatory region sequence-specific DNA binding
-  score: 0.8478
+  score: 0.836
 - id: go:0001000
   name: bacterial-type RNA polymerase core enzyme binding
-  score: 0.8478
+  score: 0.836
 - id: go:0001046
   name: core promoter sequence-specific DNA binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0001067
   name: transcription regulatory region nucleic acid binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0001072
   name: transcription antitermination factor activity, RNA binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0001073
   name: transcription antitermination factor activity, DNA binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0001098
   name: basal transcription machinery binding
-  score: 1.086
+  score: 1.0711
 - id: go:0001108
   name: bacterial-type RNA polymerase holo enzyme binding
-  score: 0.8478
+  score: 0.836
 - id: go:0001216
   name: DNA-binding transcription activator activity
-  score: 0.993
+  score: 0.9793
 - id: go:0001217
   name: DNA-binding transcription repressor activity
-  score: 0.993
+  score: 0.9793
 - id: go:0001530
   name: lipopolysaccharide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0001882
   name: nucleoside binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0001883
   name: purine nucleoside binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0001884
   name: pyrimidine nucleoside binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0001968
   name: fibronectin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0002020
   name: protease binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0002054
   name: nucleobase binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0002055
   name: adenine binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0002057
+  name: guanine binding
+  score: 1.3182
 - id: go:0002058
   name: uracil binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0002060
   name: purine nucleobase binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0002061
   name: pyrimidine nucleobase binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0002134
   name: UTP binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0003676
   name: nucleic acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0003677
   name: DNA binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0003680
   name: minor groove of adenine-thymine-rich DNA binding
-  score: 0.79
+  score: 0.779
 - id: go:0003681
   name: bent DNA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0003682
   name: chromatin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0003684
   name: damaged DNA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0003688
   name: DNA replication origin binding
-  score: 1.086
+  score: 1.0711
 - id: go:0003690
   name: double-stranded DNA binding
-  score: 1.086
+  score: 1.0711
 - id: go:0003697
   name: single-stranded DNA binding
-  score: 1.086
+  score: 1.0711
 - id: go:0003700
   name: DNA-binding transcription factor activity
-  score: 0.993
+  score: 0.9793
 - id: go:0003723
   name: RNA binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0003725
   name: double-stranded RNA binding
-  score: 1.086
+  score: 1.0711
 - id: go:0003727
   name: single-stranded RNA binding
-  score: 1.086
+  score: 1.0711
 - id: go:0003729
   name: mRNA binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0003730
   name: mRNA 3^-UTR binding
-  score: 1.086
+  score: 1.0711
 - id: go:0003779
   name: actin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0005047
   name: signal recognition particle binding
-  score: 1.086
+  score: 1.0711
 - id: go:0005048
   name: signal sequence binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0005488
   name: binding
-  score: 1.5102
+  score: 1.4901
 - id: go:0005496
   name: steroid binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0005504
   name: fatty acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0005506
   name: iron ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0005507
   name: copper ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0005509
   name: calcium ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0005515
   name: protein binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0005516
   name: calmodulin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0005524
   name: ATP binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0005525
   name: GTP binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0005527
   name: macrolide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0005528
   name: FK506 binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0005534
+  name: galactose binding
+  score: 1.3182
 - id: go:0005536
   name: D-glucose binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0005539
   name: glycosaminoglycan binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0005542
   name: folic acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0005543
   name: phospholipid binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0008061
   name: chitin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0008092
   name: cytoskeletal protein binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0008097
   name: 5S rRNA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0008134
   name: transcription factor binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0008135
   name: translation factor activity, RNA binding
-  score: 0.993
+  score: 0.9793
 - id: go:0008143
   name: poly(A) binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0008198
   name: ferrous iron binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0008199
   name: ferric iron binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0008270
   name: zinc ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0008289
   name: lipid binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0008301
   name: DNA binding, bending
-  score: 1.1982
+  score: 1.1818
 - id: go:0008312
   name: 7S RNA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0008430
   name: selenium binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0008658
   name: penicillin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0009374
   name: biotin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0010181
   name: FMN binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0010385
   name: double-stranded methylated DNA binding
-  score: 0.993
+  score: 0.9793
 - id: go:0015643
   name: toxic substance binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0016018
   name: cyclosporin A binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0016151
   name: nickel cation binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0016168
   name: chlorophyll binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0016208
   name: AMP binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0016594
   name: glycine binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0016595
+  name: glutamate binding
+  score: 1.3182
 - id: go:0016597
   name: amino acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0017076
   name: purine nucleotide binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0017151
   name: DEAD/H-box RNA helicase binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0019001
   name: guanyl nucleotide binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0019003
   name: GDP binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0019103
   name: pyrimidine nucleotide binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0019808
   name: polyamine binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0019810
+  name: putrescine binding
+  score: 1.3182
 - id: go:0019825
   name: oxygen binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0019842
   name: vitamin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0019843
   name: rRNA binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0019894
   name: kinesin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0019899
   name: enzyme binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0019900
   name: kinase binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0019901
   name: protein kinase binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0019904
   name: protein domain specific binding
-  score: 1.086
+  score: 1.0711
+- id: go:0019992
+  name: diacylglycerol binding
+  score: 1.3182
 - id: go:0020037
   name: heme binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0030145
   name: manganese ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030151
   name: molybdenum ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030170
   name: pyridoxal phosphate binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030246
   name: carbohydrate binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0030247
   name: polysaccharide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0030395
   name: lactose binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0030544
   name: Hsp70 protein binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030551
   name: cyclic nucleotide binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030552
   name: cAMP binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0030554
   name: adenyl nucleotide binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030955
   name: potassium ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030973
   name: molybdate ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030975
   name: thiamine binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0030976
   name: thiamine pyrophosphate binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0030977
   name: taurine binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0030983
   name: mismatched DNA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0031072
   name: heat shock protein binding
-  score: 1.086
+  score: 1.0711
 - id: go:0031177
   name: phosphopantetheine binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0031249
   name: denatured protein binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0031267
   name: small GTPase binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0031402
   name: sodium ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0031403
   name: lithium ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0031404
   name: chloride ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0031405
   name: lipoic acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0031406
   name: carboxylic acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0031409
   name: pigment binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0031418
   name: L-ascorbic acid binding
-  score: 1.086
+  score: 1.0711
 - id: go:0031419
   name: cobalamin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0031420
   name: alkali metal ion binding
-  score: 1.086
+  score: 1.0711
 - id: go:0031593
   name: polyubiquitin modification-dependent protein binding
-  score: 0.993
+  score: 0.9793
 - id: go:0032131
   name: alkylated DNA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0032135
   name: DNA insertion or deletion binding
-  score: 0.993
+  score: 0.9793
 - id: go:0032136
   name: adenine/cytosine mispair binding
-  score: 1.086
+  score: 1.0711
 - id: go:0032356
   name: oxidized DNA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0032357
   name: oxidized purine DNA binding
-  score: 1.086
+  score: 1.0711
 - id: go:0032549
   name: ribonucleoside binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0032550
   name: purine ribonucleoside binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0032551
   name: pyrimidine ribonucleoside binding
-  score: 1.1982
+  score: 1.1818
+- id: go:0032552
+  name: deoxyribonucleotide binding
+  score: 1.3182
 - id: go:0032553
   name: ribonucleotide binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0032554
+  name: purine deoxyribonucleotide binding
+  score: 1.1818
 - id: go:0032555
   name: purine ribonucleotide binding
-  score: 1.1982
+  score: 1.1818
+- id: go:0032556
+  name: pyrimidine deoxyribonucleotide binding
+  score: 1.1818
 - id: go:0032557
   name: pyrimidine ribonucleotide binding
-  score: 1.1982
+  score: 1.1818
+- id: go:0032558
+  name: adenyl deoxyribonucleotide binding
+  score: 1.1818
 - id: go:0032559
   name: adenyl ribonucleotide binding
-  score: 1.1982
+  score: 1.1818
+- id: go:0032560
+  name: guanyl deoxyribonucleotide binding
+  score: 1.1818
 - id: go:0032561
   name: guanyl ribonucleotide binding
-  score: 1.1982
+  score: 1.1818
+- id: go:0032564
+  name: dATP binding
+  score: 1.3182
+- id: go:0032567
+  name: dGTP binding
+  score: 1.3182
 - id: go:0032791
   name: lead ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0032794
   name: GTPase activating protein binding
-  score: 1.086
+  score: 1.0711
 - id: go:0032934
   name: sterol binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0033219
   name: urea binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0033222
   name: xylose binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0033226
   name: 2-aminoethylphosphonate binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0033265
   name: choline binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0033293
   name: monocarboxylic acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0033294
   name: ectoine binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0033295
   name: hydroxyectoine binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0034236
   name: protein kinase A catalytic subunit binding
-  score: 0.9147
+  score: 0.9019
+- id: go:0034237
+  name: protein kinase A regulatory subunit binding
+  score: 0.9019
 - id: go:0034336
   name: misfolded RNA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0034618
   name: arginine binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0035091
+  name: phosphatidylinositol binding
+  score: 1.3182
+- id: go:0035368
+  name: selenocysteine insertion sequence binding
+  score: 1.0711
 - id: go:0035438
   name: cyclic-di-GMP binding
-  score: 1.086
+  score: 1.0711
 - id: go:0035485
   name: adenine/guanine mispair binding
-  score: 1.086
+  score: 1.0711
 - id: go:0035639
   name: purine ribonucleoside triphosphate binding
-  score: 1.086
+  score: 1.0711
 - id: go:0035925
   name: mRNA 3^-UTR AU-rich region binding
-  score: 0.8478
+  score: 0.836
 - id: go:0036094
   name: small molecule binding
-  score: 1.1982
+  score: 1.1818
+- id: go:0036173
+  name: thiosulfate binding
+  score: 1.3182
 - id: go:0042277
   name: peptide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0042301
   name: phosphate ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0042802
   name: identical protein binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0042834
   name: peptidoglycan binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043021
   name: ribonucleoprotein complex binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0043022
   name: ribosome binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043023
   name: ribosomal large subunit binding
-  score: 1.086
+  score: 1.0711
 - id: go:0043024
   name: ribosomal small subunit binding
-  score: 1.086
+  score: 1.0711
 - id: go:0043167
   name: ion binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043168
   name: anion binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043169
   name: cation binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043175
   name: RNA polymerase core enzyme binding
-  score: 0.993
+  score: 0.9793
 - id: go:0043176
   name: amine binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043177
   name: organic acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0043178
   name: alcohol binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0043199
+  name: sulfate binding
+  score: 1.3182
 - id: go:0043210
   name: alkanesulfonate binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043295
   name: glutathione binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043424
   name: protein histidine kinase binding
-  score: 1.086
+  score: 1.0711
 - id: go:0043531
   name: ADP binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0043546
   name: molybdopterin cofactor binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0043565
   name: sequence-specific DNA binding
-  score: 1.086
+  score: 1.0711
 - id: go:0044374
   name: sequence-specific DNA binding, bending
-  score: 0.993
+  score: 0.9793
 - id: go:0044620
   name: ACP phosphopantetheine attachment site binding
-  score: 0.993
+  score: 0.9793
 - id: go:0044729
   name: hemi-methylated DNA-binding
-  score: 1.086
+  score: 1.0711
 - id: go:0044877
   name: protein-containing complex binding
-  score: 1.086
+  score: 1.0711
 - id: go:0045027
   name: DNA end binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0045152
   name: antisigma factor binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0045340
   name: mercury ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0046790
   name: virion binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0046870
   name: cadmium ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0046871
   name: N-acetylgalactosamine binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0046872
   name: metal ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0046906
   name: tetrapyrrole binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0046914
   name: transition metal ion binding
-  score: 1.086
+  score: 1.0711
 - id: go:0048027
   name: mRNA 5^-UTR binding
-  score: 1.086
+  score: 1.0711
 - id: go:0048029
   name: monosaccharide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0048030
   name: disaccharide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0048038
   name: quinone binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0048039
   name: ubiquinone binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0050656
   name: 3^-phosphoadenosine 5^-phosphosulfate binding
-  score: 0.993
+  score: 0.9793
 - id: go:0050660
   name: flavin adenine dinucleotide binding
-  score: 1.086
+  score: 1.0711
 - id: go:0050661
   name: NADP binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0050897
   name: cobalt ion binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0050997
   name: quaternary ammonium group binding
-  score: 1.086
+  score: 1.0711
 - id: go:0051015
   name: actin filament binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0051018
   name: protein kinase A binding
-  score: 1.086
+  score: 1.0711
 - id: go:0051020
   name: GTPase binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0051082
   name: unfolded protein binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0051087
   name: protein-folding chaperone binding
-  score: 1.086
+  score: 1.0711
 - id: go:0051117
   name: ATPase binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0051192
   name: prosthetic group binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0051219
   name: phosphoprotein binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0051287
   name: NAD binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0051536
   name: iron-sulfur cluster binding
-  score: 1.086
+  score: 1.0711
 - id: go:0051537
   name: 2 iron, 2 sulfur cluster binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0051538
   name: 3 iron, 4 sulfur cluster binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0051539
   name: 4 iron, 4 sulfur cluster binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0051540
   name: metal cluster binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0051787
   name: misfolded protein binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0051870
   name: methotrexate binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0051871
   name: dihydrofolic acid binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0070025
   name: carbon monoxide binding
-  score: 1.1982
+  score: 1.1818
+- id: go:0070026
+  name: nitric oxide binding
+  score: 1.1818
 - id: go:0070063
   name: RNA polymerase binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0070064
   name: proline-rich region binding
-  score: 1.086
+  score: 1.0711
 - id: go:0070095
   name: fructose-6-phosphate binding
-  score: 1.086
+  score: 1.0711
 - id: go:0070180
   name: large ribosomal subunit rRNA binding
-  score: 0.993
+  score: 0.9793
 - id: go:0070181
   name: small ribosomal subunit rRNA binding
-  score: 0.993
+  score: 0.9793
+- id: go:0070273
+  name: phosphatidylinositol-4-phosphate binding
+  score: 1.0711
 - id: go:0070279
   name: vitamin B6 binding
-  score: 1.1982
+  score: 1.1818
+- id: go:0070335
+  name: aspartate binding
+  score: 1.3182
 - id: go:0070401
   name: NADP+ binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0070402
   name: NADPH binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0070403
   name: NAD+ binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0070404
   name: NADH binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0070405
+  name: ammonium ion binding
+  score: 1.1818
 - id: go:0070492
   name: oligosaccharide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0070717
   name: poly-purine tract binding
-  score: 1.086
+  score: 1.0711
 - id: go:0070905
   name: serine binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0070967
   name: coenzyme F420 binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0070968
   name: pyrroloquinoline quinone binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0071723
   name: lipopeptide binding
-  score: 1.3362
+  score: 1.3182
+- id: go:0071890
+  name: bicarbonate binding
+  score: 1.3182
 - id: go:0071949
   name: FAD binding
-  score: 1.3362
+  score: 1.3182
 - id: go:0072341
   name: modified amino acid binding
-  score: 1.086
+  score: 1.0711
+- id: go:0072570
+  name: ADP-D-ribose binding
+  score: 1.0711
 - id: go:0097216
   name: guanosine tetraphosphate binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0097367
   name: carbohydrate derivative binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0097718
   name: disordered domain specific binding
-  score: 1.086
+  score: 1.0711
 - id: go:0098847
   name: sequence-specific single stranded DNA binding
-  score: 0.9147
+  score: 0.9019
 - id: go:0120225
   name: coenzyme A binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0120227
   name: acyl-CoA binding
-  score: 1.1982
+  score: 1.1818
 - id: go:0140030
   name: modification-dependent protein binding
-  score: 1.086
+  score: 1.0711
+- id: go:0140032
+  name: glycosylation-dependent protein binding
+  score: 1.0711
 - id: go:1900750
   name: oligopeptide binding
-  score: 1.3362
+  score: 1.3182
 - id: go:1901265
   name: nucleoside phosphate binding
-  score: 1.1982
+  score: 1.1818
 - id: go:1901359
   name: tungstate binding
-  score: 1.3362
+  score: 1.3182
 - id: go:1901363
   name: heterocyclic compound binding
-  score: 1.1982
+  score: 1.1818
 - id: go:1901567
   name: fatty acid derivative binding
-  score: 1.086
+  score: 1.0711
 - id: go:1901611
   name: phosphatidylglycerol binding
-  score: 1.3362
+  score: 1.3182
+- id: go:1901612
+  name: cardiolipin binding
+  score: 1.3182
 - id: go:1901681
   name: sulfur compound binding
-  score: 1.1982
+  score: 1.1818
+- id: go:1901973
+  name: proline binding
+  score: 1.3182
+- id: go:1901981
+  name: phosphatidylinositol phosphate binding
+  score: 1.1818
 - id: go:1901982
   name: maltose binding
-  score: 1.3362
+  score: 1.3182
 - id: go:1902444
   name: riboflavin binding
-  score: 1.3362
+  score: 1.3182
 - id: go:1902670
   name: carbon dioxide binding
-  score: 1.1982
+  score: 1.1818
+- id: go:1903136
+  name: cuprous ion binding
+  score: 1.1818
 - id: go:1904047
   name: S-adenosyl-L-methionine binding
-  score: 0.993
+  score: 0.9793
 - id: go:1990275
   name: preribosome binding
-  score: 1.3362
+  score: 1.3182
 - id: go:1990827
   name: deaminase binding
-  score: 1.3362
+  score: 1.3182
 - id: go:1990837
   name: sequence-specific double-stranded DNA binding
-  score: 0.9147
+  score: 0.9019
 - id: go:1990856
   name: methionyl-initiator methionine tRNA binding
-  score: 0.993
+  score: 0.9793

@@ -2,13 +2,17 @@ case_id: list_experiments_summary_organism
 row_count: 1
 rows:
 - by_background_factors:
-  - '{''count'': 1, ''item'': ''chemical_inhibitor''}'
+  - '{''count'': 1, ''item'': ''chemical''}'
   - '{''count'': 1, ''item'': ''darkness''}'
-  - '{''count'': 1, ''item'': ''diel_cycle''}'
+  - '{''count'': 1, ''item'': ''diel''}'
   - '{''count'': 1, ''item'': ''viral''}'
   - '{''count'': 2, ''item'': ''coculture''}'
-  - '{''count'': 21, ''item'': ''continuous_light''}'
+  - '{''count'': 23, ''item'': ''light''}'
   - '{''count'': 24, ''item'': ''axenic''}'
+  by_cluster_type:
+  - '{''count'': 1, ''item'': ''diel_cycling''}'
+  - '{''count'': 1, ''item'': ''expression_level''}'
+  - '{''count'': 2, ''item'': ''response_pattern''}'
   by_omics_type:
   - '{''count'': 12, ''item'': ''RNASEQ''}'
   - '{''count'': 19, ''item'': ''MICROARRAY''}'
@@ -37,15 +41,15 @@ rows:
   - '{''count'': 3, ''item'': ''significant_any_timepoint''}'
   - '{''count'': 6, ''item'': ''significant_only''}'
   by_treatment_type:
-  - '{''count'': 1, ''item'': ''diel_cycle''}'
-  - '{''count'': 1, ''item'': ''none''}'
-  - '{''count'': 1, ''item'': ''phosphorus_stress''}'
-  - '{''count'': 1, ''item'': ''salt_stress''}'
+  - '{''count'': 1, ''item'': ''diel''}'
+  - '{''count'': 1, ''item'': ''growth_phase''}'
+  - '{''count'': 1, ''item'': ''phosphorus''}'
+  - '{''count'': 1, ''item'': ''salt''}'
   - '{''count'': 3, ''item'': ''coculture''}'
-  - '{''count'': 3, ''item'': ''iron_stress''}'
+  - '{''count'': 3, ''item'': ''iron''}'
   - '{''count'': 3, ''item'': ''viral''}'
-  - '{''count'': 4, ''item'': ''carbon_stress''}'
-  - '{''count'': 8, ''item'': ''light_stress''}'
-  - '{''count'': 8, ''item'': ''nitrogen_stress''}'
+  - '{''count'': 4, ''item'': ''carbon''}'
+  - '{''count'': 8, ''item'': ''light''}'
+  - '{''count'': 8, ''item'': ''nitrogen''}'
   time_course_count: 12
   total_matching: 33

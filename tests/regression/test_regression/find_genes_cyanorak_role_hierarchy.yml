@@ -1068,7 +1068,7 @@ rows:
   organism_name: Prochlorococcus MIT9303
   product: DNA mismatch repair protein, MutS family
 - gene_category: Replication and repair
-  gene_name: null
+  gene_name: ski2
   locus_tag: P9303_04601
   organism_name: Prochlorococcus MIT9303
   product: ATP-dependent DNA/RNA helicase, superfamily 1/2
@@ -3106,7 +3106,7 @@ rows:
   organism_name: Synechococcus WH7803
   product: DNA gyrase/topoisomerase IV, subunit A family protein
 - gene_category: Replication and repair
-  gene_name: null
+  gene_name: mcrA
   locus_tag: SynWH7803_0038
   organism_name: Synechococcus WH7803
   product: HNH endonuclease family protein
@@ -3181,7 +3181,7 @@ rows:
   organism_name: Synechococcus WH7803
   product: recB nuclease, TM0106 family domain protein
 - gene_category: Replication and repair
-  gene_name: null
+  gene_name: sll0832
   locus_tag: SynWH7803_0317
   organism_name: Synechococcus WH7803
   product: polynucleotidyl transferase, ribonuclease H fold superfamily
@@ -3196,7 +3196,7 @@ rows:
   organism_name: Synechococcus WH7803
   product: recombinase A
 - gene_category: Replication and repair
-  gene_name: null
+  gene_name: dinG
   locus_tag: SynWH7803_0442
   organism_name: Synechococcus WH7803
   product: ATP-dependent helicase C-terminal domain-containing protein
@@ -3296,7 +3296,7 @@ rows:
   organism_name: Synechococcus WH7803
   product: metallophosphoesterase, DNA ligase-associated
 - gene_category: Stress response and adaptation
-  gene_name: null
+  gene_name: mutT
   locus_tag: SynWH7803_1181
   organism_name: Synechococcus WH7803
   product: NUDIX hydrolase superfamily
@@ -3406,7 +3406,7 @@ rows:
   organism_name: Synechococcus WH7803
   product: DNA topoisomerase I, omega subunit
 - gene_category: Replication and repair
-  gene_name: null
+  gene_name: ski2
   locus_tag: SynWH7803_2040
   organism_name: Synechococcus WH7803
   product: ATP-dependent DNA/RNA helicase, superfamily 1/2

@@ -28,7 +28,7 @@ rows:
   timepoint_hours: 3.0
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   expression_status: significant_up
   gene_name: dnaN
@@ -42,8 +42,8 @@ rows:
   timepoint_hours: 336.0
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
-- experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  - nitrogen
+- experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
   locus_tag: PMM0001
@@ -56,7 +56,7 @@ rows:
   timepoint_hours: 48.0
   timepoint_order: 6
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: significant_up
   gene_name: dnaN
@@ -70,8 +70,8 @@ rows:
   timepoint_hours: 744.0
   timepoint_order: 2
   treatment_type:
-  - nitrogen_stress
-- experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  - nitrogen
+- experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
   locus_tag: PMM0001
@@ -84,7 +84,7 @@ rows:
   timepoint_hours: 12.0
   timepoint_order: 4
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   expression_status: not_significant
   gene_name: dnaN
@@ -98,7 +98,7 @@ rows:
   timepoint_hours: 12.0
   timepoint_order: 2
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   expression_status: not_significant
   gene_name: dnaN
@@ -112,21 +112,21 @@ rows:
   timepoint_hours: 24.0
   timepoint_order: 3
   treatment_type:
-  - nitrogen_stress
-- experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  - nitrogen
+- experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
   locus_tag: PMM0001
   log2fc: 0.8628
   padj: 1.0
-  rank: 467
+  rank: 468
   rank_down: null
   rank_up: null
   timepoint: 24h
   timepoint_hours: 24.0
   timepoint_order: 5
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -140,7 +140,7 @@ rows:
   timepoint_hours: 432.0
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   expression_status: not_significant
   gene_name: dnaN
@@ -168,7 +168,7 @@ rows:
   timepoint_hours: 2136.0
   timepoint_order: 4
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -182,7 +182,7 @@ rows:
   timepoint_hours: null
   timepoint_order: 5
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -196,21 +196,21 @@ rows:
   timepoint_hours: 1440.0
   timepoint_order: 3
   treatment_type:
-  - nitrogen_stress
-- experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  - nitrogen
+- experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
   locus_tag: PMM0001
   log2fc: 0.5111
   padj: 1.0
-  rank: 722
+  rank: 723
   rank_down: null
   rank_up: null
   timepoint: 6h
   timepoint_hours: 6.0
   timepoint_order: 3
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   expression_status: not_significant
   gene_name: dnaN
@@ -224,7 +224,7 @@ rows:
   timepoint_hours: 336.0
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
@@ -238,7 +238,7 @@ rows:
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
@@ -252,22 +252,22 @@ rows:
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
-- experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  - nitrogen
+- experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
   locus_tag: PMM0001
   log2fc: 0.1577
   padj: 1.0
-  rank: 1299
+  rank: 1300
   rank_down: null
   rank_up: null
   timepoint: 0h
   timepoint_hours: 0.0
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
-- experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  - nitrogen
+- experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
   locus_tag: PMM0001
@@ -280,7 +280,7 @@ rows:
   timepoint_hours: 3.0
   timepoint_order: 2
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -294,7 +294,7 @@ rows:
   timepoint_hours: 1440.0
   timepoint_order: 3
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -308,7 +308,7 @@ rows:
   timepoint_hours: 744.0
   timepoint_order: 2
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   expression_status: not_significant
   gene_name: dnaN
@@ -322,7 +322,7 @@ rows:
   timepoint_hours: 744.0
   timepoint_order: 2
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   expression_status: not_significant
   gene_name: dnaN
@@ -336,7 +336,7 @@ rows:
   timepoint_hours: 2136.0
   timepoint_order: 3
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -350,7 +350,7 @@ rows:
   timepoint_hours: null
   timepoint_order: 5
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -364,7 +364,7 @@ rows:
   timepoint_hours: 432.0
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
@@ -378,4 +378,4 @@ rows:
   timepoint_hours: 2136.0
   timepoint_order: 4
   treatment_type:
-  - nitrogen_stress
+  - nitrogen

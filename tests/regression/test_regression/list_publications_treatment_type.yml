@@ -8,7 +8,9 @@ rows:
   background_factors:
   - axenic
   - coculture
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1101/2025.11.24.690089
   experiment_count: 10
   journal: bioRxiv
@@ -23,7 +25,7 @@ rows:
     Mechanism for Prochlorococcus Prolonged Survival
   treatment_types:
   - coculture
-  - nitrogen_stress
+  - nitrogen
   year: 2025
 - authors:
   - Andreas Kremling
@@ -34,7 +36,10 @@ rows:
   - Katharina Pflüger-Grau
   - Marlene Urban
   - Mengxun Shi
-  background_factors: []
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/s42003-024-06098-5
   experiment_count: 4
   journal: Communications Biology
@@ -58,6 +63,9 @@ rows:
   background_factors:
   - axenic
   - coculture
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/s43705-022-00197-2
   experiment_count: 10
   journal: ISME Communications
@@ -72,7 +80,7 @@ rows:
   title: Community context and pCO 2 impact the transcriptome of the “helper” bacterium
     Alteromonas in co-culture with picocyanobacteria
   treatment_types:
-  - carbon_stress
+  - carbon
   - coculture
   year: 2022
 - authors:
@@ -83,7 +91,9 @@ rows:
   - Weiwen Zhang
   - Xinyu Song
   background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1186/s13068-022-02163-5
   experiment_count: 2
   journal: Biotechnology for Biofuels and Bioproducts
@@ -107,7 +117,9 @@ rows:
   - Juan R. Hernandez-Fernaud
   - Maria del Mar Aguilo-Ferretjans
   background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1111/1462-2920.14012
   experiment_count: 4
   journal: Environmental Microbiology
@@ -136,6 +148,9 @@ rows:
   - William B. Chrisler
   - Young-Mo Kim
   background_factors: []
+  cluster_types:
+  - response_pattern
+  clustering_analysis_count: 4
   doi: 10.1128/mSystems.00181-16
   experiment_count: 1
   journal: mSystems
@@ -149,7 +164,7 @@ rows:
     of a Cyanobacterium to Heterotrophic Partnership'
   treatment_types:
   - coculture
-  - light_stress
+  - light
   year: 2017
 - authors:
   - David J. Scanlan
@@ -158,7 +173,9 @@ rows:
   - Joseph A. Christie-Oleza
   - Matthew Lloyd
   background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/nmicrobiol.2017.100
   experiment_count: 3
   journal: Nature Microbiology
@@ -178,7 +195,9 @@ rows:
   - Sallie W Chisholm
   - Steven J Biller
   background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/ismej.2016.82
   experiment_count: 3
   journal: The ISME Journal
@@ -197,7 +216,9 @@ rows:
   - Daniel Sher
   - Dikla Aharonovich
   background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/ismej.2016.70
   experiment_count: 5
   journal: The ISME Journal
@@ -230,7 +251,9 @@ rows:
   - Nancy G Isern
   - William B Chrisler
   background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/ismej.2014.69
   experiment_count: 6
   journal: The ISME Journal
@@ -253,7 +276,9 @@ rows:
   - Katherine Phillippy
   - Vera Tai
   background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1111/j.1462-2920.2009.01997.x
   experiment_count: 1
   journal: Environmental Microbiology

@@ -7,7 +7,7 @@ rows:
   group_name: CK_00000646
   member_count: 11
   organism_count: 11
-  score: 3.8338
+  score: 3.9762
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -18,7 +18,7 @@ rows:
   group_name: CK_00000010
   member_count: 13
   organism_count: 11
-  score: 3.6667
+  score: 3.8494
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -28,7 +28,7 @@ rows:
   group_name: CK_00000137
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -38,7 +38,7 @@ rows:
   group_name: CK_00000252
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -48,7 +48,7 @@ rows:
   group_name: CK_00000272
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -58,7 +58,7 @@ rows:
   group_name: CK_00000331
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -68,7 +68,7 @@ rows:
   group_name: CK_00000463
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -78,7 +78,7 @@ rows:
   group_name: CK_00000480
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -88,7 +88,7 @@ rows:
   group_name: CK_00000554
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -98,7 +98,7 @@ rows:
   group_name: CK_00000626
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -108,7 +108,7 @@ rows:
   group_name: CK_00000683
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -118,7 +118,7 @@ rows:
   group_name: CK_00000684
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -128,7 +128,7 @@ rows:
   group_name: CK_00000750
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -138,7 +138,7 @@ rows:
   group_name: CK_00000788
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -148,7 +148,7 @@ rows:
   group_name: CK_00000809
   member_count: 12
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -158,7 +158,7 @@ rows:
   group_name: CK_00000907
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -168,7 +168,7 @@ rows:
   group_name: CK_00001123
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -178,7 +178,7 @@ rows:
   group_name: CK_00001549
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -188,7 +188,7 @@ rows:
   group_name: CK_00001550
   member_count: 3
   organism_count: 3
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -198,7 +198,7 @@ rows:
   group_name: CK_00001692
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -208,7 +208,7 @@ rows:
   group_name: CK_00001699
   member_count: 3
   organism_count: 3
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -218,17 +218,7 @@ rows:
   group_name: CK_00001996
   member_count: 9
   organism_count: 9
-  score: 1.454
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: psbX
-  consensus_product: photosystem II PsbX protein
-  group_id: cyanorak:CK_00002061
-  group_name: CK_00002061
-  member_count: 11
-  organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -238,7 +228,7 @@ rows:
   group_name: CK_00002206
   member_count: 8
   organism_count: 8
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -248,7 +238,7 @@ rows:
   group_name: CK_00002551
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -258,7 +248,7 @@ rows:
   group_name: CK_00002596
   member_count: 1
   organism_count: 1
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -268,7 +258,7 @@ rows:
   group_name: CK_00003852
   member_count: 11
   organism_count: 11
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -278,7 +268,7 @@ rows:
   group_name: CK_00004192
   member_count: 3
   organism_count: 3
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -288,7 +278,7 @@ rows:
   group_name: CK_00033163
   member_count: 4
   organism_count: 4
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -298,7 +288,7 @@ rows:
   group_name: CK_00050481
   member_count: 2
   organism_count: 2
-  score: 1.454
+  score: 1.6426
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -308,7 +298,7 @@ rows:
   group_name: CK_00000286
   member_count: 11
   organism_count: 11
-  score: 1.4203
+  score: 1.5633
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -318,17 +308,7 @@ rows:
   group_name: CK_00001055
   member_count: 11
   organism_count: 11
-  score: 1.3123
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: apcE
-  consensus_product: phycobilisome core-membrane linker polypeptide (Lcm)
-  group_id: cyanorak:CK_00001645
-  group_name: CK_00001645
-  member_count: 3
-  organism_count: 3
-  score: 1.3123
+  score: 1.455
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -338,7 +318,7 @@ rows:
   group_name: CK_00001646
   member_count: 3
   organism_count: 3
-  score: 1.3123
+  score: 1.455
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -348,18 +328,7 @@ rows:
   group_name: CK_00005473
   member_count: 11
   organism_count: 11
-  score: 1.3123
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: cpeE
-  consensus_product: rod linker polypeptide (Lr), C-phycoerythrin class I-associated
-    (CpeE)
-  group_id: cyanorak:CK_00008020
-  group_name: CK_00008020
-  member_count: 3
-  organism_count: 3
-  score: 1.3123
+  score: 1.455
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -369,7 +338,7 @@ rows:
   group_name: CK_00024045
   member_count: 1
   organism_count: 1
-  score: 1.3123
+  score: 1.455
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -379,7 +348,7 @@ rows:
   group_name: CK_00033672
   member_count: 11
   organism_count: 11
-  score: 1.3123
+  score: 1.455
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -389,7 +358,7 @@ rows:
   group_name: CK_00008090
   member_count: 3
   organism_count: 3
-  score: 1.2848
+  score: 1.3924
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -399,28 +368,7 @@ rows:
   group_name: CK_00001840
   member_count: 5
   organism_count: 5
-  score: 1.2513
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: rpcE
-  consensus_product: phycoerythrobilin Cys-84 alpha-phycocyanin lyase, RpcE subunit
-  group_id: cyanorak:CK_00001982
-  group_name: CK_00001982
-  member_count: 2
-  organism_count: 2
-  score: 1.2513
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: rpcF
-  consensus_product: putative phycoerythrobilin:Cys-84 alpha R-phycocyanin II lyase,
-    RpcF subunit
-  group_id: cyanorak:CK_00001983
-  group_name: CK_00001983
-  member_count: 2
-  organism_count: 2
-  score: 1.2513
+  score: 1.3764
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -430,7 +378,7 @@ rows:
   group_name: CK_00000032
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -440,7 +388,7 @@ rows:
   group_name: CK_00000042
   member_count: 14
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -450,7 +398,7 @@ rows:
   group_name: CK_00000070
   member_count: 1
   organism_count: 1
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -460,7 +408,7 @@ rows:
   group_name: CK_00000271
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -470,7 +418,7 @@ rows:
   group_name: CK_00000289
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -480,7 +428,7 @@ rows:
   group_name: CK_00000681
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -490,7 +438,7 @@ rows:
   group_name: CK_00000682
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -500,7 +448,7 @@ rows:
   group_name: CK_00000853
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -511,7 +459,7 @@ rows:
   group_name: CK_00000878
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -521,7 +469,7 @@ rows:
   group_name: CK_00000880
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -531,7 +479,7 @@ rows:
   group_name: CK_00001107
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -541,7 +489,7 @@ rows:
   group_name: CK_00001108
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -551,7 +499,7 @@ rows:
   group_name: CK_00001116
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -561,7 +509,7 @@ rows:
   group_name: CK_00001117
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -571,7 +519,7 @@ rows:
   group_name: CK_00001118
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -581,7 +529,7 @@ rows:
   group_name: CK_00001119
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -591,7 +539,7 @@ rows:
   group_name: CK_00001120
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -601,7 +549,7 @@ rows:
   group_name: CK_00001121
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -611,7 +559,7 @@ rows:
   group_name: CK_00001122
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -621,7 +569,7 @@ rows:
   group_name: CK_00001249
   member_count: 7
   organism_count: 7
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -631,7 +579,7 @@ rows:
   group_name: CK_00001319
   member_count: 5
   organism_count: 5
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -641,7 +589,7 @@ rows:
   group_name: CK_00001423
   member_count: 3
   organism_count: 3
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -651,7 +599,7 @@ rows:
   group_name: CK_00001520
   member_count: 5
   organism_count: 5
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -661,7 +609,7 @@ rows:
   group_name: CK_00001665
   member_count: 9
   organism_count: 9
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -671,17 +619,7 @@ rows:
   group_name: CK_00001754
   member_count: 10
   organism_count: 10
-  score: 1.1957
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: fbaB
-  consensus_product: fructose-1,6-bisphosphate aldolase class I
-  group_id: cyanorak:CK_00002059
-  group_name: CK_00002059
-  member_count: 1
-  organism_count: 1
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -691,7 +629,7 @@ rows:
   group_name: CK_00007993
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -701,7 +639,7 @@ rows:
   group_name: CK_00008058
   member_count: 19
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -711,7 +649,7 @@ rows:
   group_name: CK_00049420
   member_count: 11
   organism_count: 11
-  score: 1.1957
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -721,27 +659,7 @@ rows:
   group_name: CK_00050592
   member_count: 7
   organism_count: 7
-  score: 1.1957
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: ndhF5
-  consensus_product: NADH dehydrogenase subunit NdhF (chain 5 or L)
-  group_id: cyanorak:CK_00057090
-  group_name: CK_00057090
-  member_count: 2
-  organism_count: 2
-  score: 1.1957
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: ndhF4
-  consensus_product: NADH dehydrogenase I subunit NdhF (chain 5 or L)
-  group_id: cyanorak:CK_00001422
-  group_name: CK_00001422
-  member_count: 3
-  organism_count: 3
-  score: 1.1479
+  score: 1.3058
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -751,7 +669,7 @@ rows:
   group_name: CK_00000230
   member_count: 11
   organism_count: 11
-  score: 1.1449
+  score: 1.2422
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -761,7 +679,7 @@ rows:
   group_name: CK_00000570
   member_count: 11
   organism_count: 11
-  score: 1.1449
+  score: 1.2422
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -771,7 +689,7 @@ rows:
   group_name: CK_00000651
   member_count: 11
   organism_count: 11
-  score: 1.1449
+  score: 1.2422
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -781,7 +699,7 @@ rows:
   group_name: CK_00001031
   member_count: 11
   organism_count: 11
-  score: 1.1449
+  score: 1.2422
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -791,7 +709,7 @@ rows:
   group_name: CK_00001261
   member_count: 9
   organism_count: 9
-  score: 1.1449
+  score: 1.2422
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -801,7 +719,7 @@ rows:
   group_name: CK_00001644
   member_count: 3
   organism_count: 3
-  score: 1.1449
+  score: 1.2422
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -811,7 +729,17 @@ rows:
   group_name: CK_00008031
   member_count: 1
   organism_count: 1
-  score: 1.1449
+  score: 1.2422
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: ndhF4
+  consensus_product: NADH dehydrogenase I subunit NdhF (chain 5 or L)
+  group_id: cyanorak:CK_00001422
+  group_name: CK_00001422
+  member_count: 3
+  organism_count: 3
+  score: 1.225
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -821,7 +749,7 @@ rows:
   group_name: CK_00000004
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -831,7 +759,7 @@ rows:
   group_name: CK_00000013
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -841,7 +769,7 @@ rows:
   group_name: CK_00000044
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -851,7 +779,7 @@ rows:
   group_name: CK_00000063
   member_count: 5
   organism_count: 4
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -861,7 +789,7 @@ rows:
   group_name: CK_00000069
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -871,7 +799,7 @@ rows:
   group_name: CK_00000270
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -881,7 +809,7 @@ rows:
   group_name: CK_00000579
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -891,7 +819,7 @@ rows:
   group_name: CK_00000580
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -901,7 +829,7 @@ rows:
   group_name: CK_00000623
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -912,7 +840,7 @@ rows:
   group_name: CK_00000630
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -922,7 +850,7 @@ rows:
   group_name: CK_00001030
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -932,7 +860,7 @@ rows:
   group_name: CK_00001317
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -942,7 +870,7 @@ rows:
   group_name: CK_00001331
   member_count: 11
   organism_count: 11
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -952,7 +880,7 @@ rows:
   group_name: CK_00001382
   member_count: 9
   organism_count: 9
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -962,7 +890,7 @@ rows:
   group_name: CK_00001522
   member_count: 5
   organism_count: 5
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -972,7 +900,17 @@ rows:
   group_name: CK_00001587
   member_count: 5
   organism_count: 5
-  score: 1.0982
+  score: 1.1844
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: apcE
+  consensus_product: phycobilisome core-membrane linker polypeptide (Lcm)
+  group_id: cyanorak:CK_00001645
+  group_name: CK_00001645
+  member_count: 3
+  organism_count: 3
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -982,7 +920,7 @@ rows:
   group_name: CK_00001759
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -993,7 +931,17 @@ rows:
   group_name: CK_00001760
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: psbX
+  consensus_product: photosystem II PsbX protein
+  group_id: cyanorak:CK_00002061
+  group_name: CK_00002061
+  member_count: 11
+  organism_count: 11
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1003,7 +951,7 @@ rows:
   group_name: CK_00007994
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1013,7 +961,7 @@ rows:
   group_name: CK_00007996
   member_count: 4
   organism_count: 4
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1023,7 +971,7 @@ rows:
   group_name: CK_00007999
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1033,7 +981,7 @@ rows:
   group_name: CK_00008001
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1043,7 +991,7 @@ rows:
   group_name: CK_00008002
   member_count: 8
   organism_count: 8
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1053,7 +1001,7 @@ rows:
   group_name: CK_00008004
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1063,7 +1011,7 @@ rows:
   group_name: CK_00008005
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1073,7 +1021,7 @@ rows:
   group_name: CK_00008006
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1083,7 +1031,7 @@ rows:
   group_name: CK_00008007
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1093,7 +1041,7 @@ rows:
   group_name: CK_00008008
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1104,7 +1052,7 @@ rows:
   group_name: CK_00008012
   member_count: 2
   organism_count: 2
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1114,7 +1062,18 @@ rows:
   group_name: CK_00008016
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: cpeE
+  consensus_product: rod linker polypeptide (Lr), C-phycoerythrin class I-associated
+    (CpeE)
+  group_id: cyanorak:CK_00008020
+  group_name: CK_00008020
+  member_count: 3
+  organism_count: 3
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1124,7 +1083,7 @@ rows:
   group_name: CK_00008022
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1134,7 +1093,7 @@ rows:
   group_name: CK_00008032
   member_count: 2
   organism_count: 2
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1144,7 +1103,7 @@ rows:
   group_name: CK_00009072
   member_count: 3
   organism_count: 3
-  score: 1.0982
+  score: 1.1844
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1154,7 +1113,7 @@ rows:
   group_name: CK_00000136
   member_count: 2
   organism_count: 2
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1164,7 +1123,7 @@ rows:
   group_name: CK_00001231
   member_count: 11
   organism_count: 11
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1174,7 +1133,7 @@ rows:
   group_name: CK_00001336
   member_count: 5
   organism_count: 5
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1184,7 +1143,7 @@ rows:
   group_name: CK_00001393
   member_count: 3
   organism_count: 3
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1194,7 +1153,7 @@ rows:
   group_name: CK_00001396
   member_count: 3
   organism_count: 3
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1204,7 +1163,7 @@ rows:
   group_name: CK_00001528
   member_count: 3
   organism_count: 3
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1214,7 +1173,7 @@ rows:
   group_name: CK_00001571
   member_count: 7
   organism_count: 7
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1224,7 +1183,7 @@ rows:
   group_name: CK_00001592
   member_count: 3
   organism_count: 3
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1234,7 +1193,28 @@ rows:
   group_name: CK_00001757
   member_count: 3
   organism_count: 3
-  score: 1.0552
+  score: 1.1318
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: rpcE
+  consensus_product: phycoerythrobilin Cys-84 alpha-phycocyanin lyase, RpcE subunit
+  group_id: cyanorak:CK_00001982
+  group_name: CK_00001982
+  member_count: 2
+  organism_count: 2
+  score: 1.1318
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: rpcF
+  consensus_product: putative phycoerythrobilin:Cys-84 alpha R-phycocyanin II lyase,
+    RpcF subunit
+  group_id: cyanorak:CK_00001983
+  group_name: CK_00001983
+  member_count: 2
+  organism_count: 2
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1244,7 +1224,7 @@ rows:
   group_name: CK_00008055
   member_count: 6
   organism_count: 6
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1254,7 +1234,7 @@ rows:
   group_name: CK_00009110
   member_count: 1
   organism_count: 1
-  score: 1.0552
+  score: 1.1318
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1264,7 +1244,7 @@ rows:
   group_name: CK_00000995
   member_count: 11
   organism_count: 11
-  score: 1.0373
+  score: 1.0935
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1274,7 +1254,7 @@ rows:
   group_name: CK_00000015
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1284,7 +1264,7 @@ rows:
   group_name: CK_00000017
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1294,7 +1274,7 @@ rows:
   group_name: CK_00000067
   member_count: 3
   organism_count: 3
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1304,7 +1284,7 @@ rows:
   group_name: CK_00000213
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1314,7 +1294,7 @@ rows:
   group_name: CK_00000229
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1324,7 +1304,7 @@ rows:
   group_name: CK_00000237
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1334,7 +1314,7 @@ rows:
   group_name: CK_00000238
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1344,7 +1324,7 @@ rows:
   group_name: CK_00000239
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1354,7 +1334,7 @@ rows:
   group_name: CK_00000240
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1364,7 +1344,7 @@ rows:
   group_name: CK_00000266
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1374,7 +1354,7 @@ rows:
   group_name: CK_00000267
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1384,7 +1364,7 @@ rows:
   group_name: CK_00000268
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1394,7 +1374,7 @@ rows:
   group_name: CK_00000449
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1404,7 +1384,7 @@ rows:
   group_name: CK_00000535
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1414,7 +1394,7 @@ rows:
   group_name: CK_00000551
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1424,7 +1404,7 @@ rows:
   group_name: CK_00000606
   member_count: 10
   organism_count: 10
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1434,7 +1414,7 @@ rows:
   group_name: CK_00000947
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1444,7 +1424,7 @@ rows:
   group_name: CK_00000969
   member_count: 3
   organism_count: 3
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1454,7 +1434,7 @@ rows:
   group_name: CK_00001058
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1464,7 +1444,7 @@ rows:
   group_name: CK_00001313
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1474,7 +1454,7 @@ rows:
   group_name: CK_00001397
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1484,7 +1464,7 @@ rows:
   group_name: CK_00001414
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1494,7 +1474,7 @@ rows:
   group_name: CK_00001500
   member_count: 10
   organism_count: 10
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1504,7 +1484,7 @@ rows:
   group_name: CK_00001609
   member_count: 3
   organism_count: 3
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1514,7 +1494,7 @@ rows:
   group_name: CK_00001878
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1524,7 +1504,7 @@ rows:
   group_name: CK_00002025
   member_count: 23
   organism_count: 8
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1534,7 +1514,17 @@ rows:
   group_name: CK_00002026
   member_count: 15
   organism_count: 8
-  score: 1.0154
+  score: 1.0836
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: fbaB
+  consensus_product: fructose-1,6-bisphosphate aldolase class I
+  group_id: cyanorak:CK_00002059
+  group_name: CK_00002059
+  member_count: 1
+  organism_count: 1
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1544,7 +1534,7 @@ rows:
   group_name: CK_00002103
   member_count: 4
   organism_count: 4
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1554,7 +1544,7 @@ rows:
   group_name: CK_00002168
   member_count: 17
   organism_count: 6
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1564,7 +1554,7 @@ rows:
   group_name: CK_00002332
   member_count: 18
   organism_count: 6
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1574,7 +1564,7 @@ rows:
   group_name: CK_00002661
   member_count: 6
   organism_count: 6
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1584,7 +1574,7 @@ rows:
   group_name: CK_00003421
   member_count: 4
   organism_count: 4
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1594,7 +1584,7 @@ rows:
   group_name: CK_00003510
   member_count: 4
   organism_count: 4
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1604,7 +1594,7 @@ rows:
   group_name: CK_00003573
   member_count: 9
   organism_count: 8
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1614,7 +1604,7 @@ rows:
   group_name: CK_00003763
   member_count: 2
   organism_count: 2
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1624,7 +1614,7 @@ rows:
   group_name: CK_00003799
   member_count: 2
   organism_count: 2
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1634,7 +1624,7 @@ rows:
   group_name: CK_00004195
   member_count: 15
   organism_count: 3
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1644,7 +1634,7 @@ rows:
   group_name: CK_00008051
   member_count: 4
   organism_count: 3
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1654,7 +1644,7 @@ rows:
   group_name: CK_00008091
   member_count: 11
   organism_count: 11
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1664,7 +1654,7 @@ rows:
   group_name: CK_00008659
   member_count: 1
   organism_count: 1
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1674,7 +1664,7 @@ rows:
   group_name: CK_00009165
   member_count: 2
   organism_count: 2
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1684,7 +1674,7 @@ rows:
   group_name: CK_00043616
   member_count: 6
   organism_count: 4
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1694,7 +1684,7 @@ rows:
   group_name: CK_00050791
   member_count: 2
   organism_count: 2
-  score: 1.0154
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1704,17 +1694,7 @@ rows:
   group_name: CK_00057173
   member_count: 2
   organism_count: 2
-  score: 1.0154
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
-- consensus_gene_name: isiA
-  consensus_product: iron stress-induced chlorophyll-binding protein
-  group_id: cyanorak:CK_00009095
-  group_name: CK_00009095
-  member_count: 1
-  organism_count: 1
-  score: 0.9807
+  score: 1.0836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1724,7 +1704,7 @@ rows:
   group_name: CK_00000291
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1734,7 +1714,7 @@ rows:
   group_name: CK_00000411
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1744,7 +1724,7 @@ rows:
   group_name: CK_00000412
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1754,7 +1734,7 @@ rows:
   group_name: CK_00000596
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1764,7 +1744,7 @@ rows:
   group_name: CK_00000613
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1774,7 +1754,7 @@ rows:
   group_name: CK_00000614
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1784,7 +1764,7 @@ rows:
   group_name: CK_00000879
   member_count: 5
   organism_count: 5
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1794,7 +1774,7 @@ rows:
   group_name: CK_00000965
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1804,7 +1784,7 @@ rows:
   group_name: CK_00001026
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1814,7 +1794,7 @@ rows:
   group_name: CK_00001278
   member_count: 9
   organism_count: 9
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1824,7 +1804,7 @@ rows:
   group_name: CK_00001648
   member_count: 3
   organism_count: 3
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1834,7 +1814,7 @@ rows:
   group_name: CK_00001827
   member_count: 3
   organism_count: 3
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1844,7 +1824,7 @@ rows:
   group_name: CK_00001900
   member_count: 3
   organism_count: 3
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1854,7 +1834,7 @@ rows:
   group_name: CK_00033056
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1864,7 +1844,17 @@ rows:
   group_name: CK_00039172
   member_count: 11
   organism_count: 11
-  score: 0.9785
+  score: 1.0394
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: isiA
+  consensus_product: iron stress-induced chlorophyll-binding protein
+  group_id: cyanorak:CK_00009095
+  group_name: CK_00009095
+  member_count: 1
+  organism_count: 1
+  score: 1.0274
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1874,7 +1864,7 @@ rows:
   group_name: CK_00000037
   member_count: 7
   organism_count: 7
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1884,7 +1874,7 @@ rows:
   group_name: CK_00000680
   member_count: 11
   organism_count: 11
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1894,7 +1884,7 @@ rows:
   group_name: CK_00000685
   member_count: 11
   organism_count: 11
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1904,7 +1894,7 @@ rows:
   group_name: CK_00000686
   member_count: 11
   organism_count: 11
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1914,7 +1904,7 @@ rows:
   group_name: CK_00000802
   member_count: 11
   organism_count: 11
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1924,7 +1914,7 @@ rows:
   group_name: CK_00001097
   member_count: 11
   organism_count: 11
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1934,7 +1924,7 @@ rows:
   group_name: CK_00001160
   member_count: 11
   organism_count: 11
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1944,7 +1934,7 @@ rows:
   group_name: CK_00002612
   member_count: 11
   organism_count: 11
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1954,7 +1944,7 @@ rows:
   group_name: CK_00008056
   member_count: 11
   organism_count: 11
-  score: 0.9442
+  score: 0.9987
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1965,7 +1955,7 @@ rows:
   group_name: CK_00000173
   member_count: 18
   organism_count: 8
-  score: 0.9122
+  score: 0.961
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1975,7 +1965,7 @@ rows:
   group_name: CK_00001356
   member_count: 2
   organism_count: 2
-  score: 0.9122
+  score: 0.961
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1986,7 +1976,7 @@ rows:
   group_name: CK_00001466
   member_count: 5
   organism_count: 5
-  score: 0.9122
+  score: 0.961
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1996,7 +1986,7 @@ rows:
   group_name: CK_00002145
   member_count: 1
   organism_count: 1
-  score: 0.9122
+  score: 0.961
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2006,7 +1996,7 @@ rows:
   group_name: CK_00003367
   member_count: 6
   organism_count: 6
-  score: 0.9122
+  score: 0.961
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2016,7 +2006,7 @@ rows:
   group_name: CK_00001408
   member_count: 7
   organism_count: 7
-  score: 0.8824
+  score: 0.9261
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2026,7 +2016,7 @@ rows:
   group_name: CK_00000113
   member_count: 11
   organism_count: 11
-  score: 0.8544
+  score: 0.8936
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2036,7 +2026,7 @@ rows:
   group_name: CK_00000559
   member_count: 11
   organism_count: 11
-  score: 0.8544
+  score: 0.8936
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2046,7 +2036,7 @@ rows:
   group_name: CK_00000894
   member_count: 11
   organism_count: 11
-  score: 0.8544
+  score: 0.8936
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2056,7 +2046,7 @@ rows:
   group_name: CK_00000976
   member_count: 8
   organism_count: 8
-  score: 0.8544
+  score: 0.8936
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2066,7 +2056,17 @@ rows:
   group_name: CK_00001135
   member_count: 11
   organism_count: 11
-  score: 0.8544
+  score: 0.8936
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
+- consensus_gene_name: ndhF5
+  consensus_product: NADH dehydrogenase subunit NdhF (chain 5 or L)
+  group_id: cyanorak:CK_00057090
+  group_name: CK_00057090
+  member_count: 2
+  organism_count: 2
+  score: 0.8936
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2076,7 +2076,7 @@ rows:
   group_name: CK_00000009
   member_count: 9
   organism_count: 3
-  score: 0.8281
+  score: 0.8633
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2086,7 +2086,7 @@ rows:
   group_name: CK_00000219
   member_count: 11
   organism_count: 11
-  score: 0.8281
+  score: 0.8633
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2096,7 +2096,7 @@ rows:
   group_name: CK_00049122
   member_count: 1
   organism_count: 1
-  score: 0.8281
+  score: 0.8633
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2106,7 +2106,7 @@ rows:
   group_name: CK_00000979
   member_count: 11
   organism_count: 11
-  score: 0.8034
+  score: 0.835
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2116,7 +2116,7 @@ rows:
   group_name: CK_00000847
   member_count: 11
   organism_count: 11
-  score: 0.7801
+  score: 0.8085
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2126,7 +2126,7 @@ rows:
   group_name: CK_00000597
   member_count: 11
   organism_count: 11
-  score: 0.7582
+  score: 0.7836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2136,7 +2136,7 @@ rows:
   group_name: CK_00001570
   member_count: 7
   organism_count: 7
-  score: 0.7582
+  score: 0.7836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2146,7 +2146,7 @@ rows:
   group_name: CK_00001572
   member_count: 7
   organism_count: 7
-  score: 0.7582
+  score: 0.7836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2156,7 +2156,7 @@ rows:
   group_name: CK_00009073
   member_count: 1
   organism_count: 1
-  score: 0.7582
+  score: 0.7836
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2166,7 +2166,7 @@ rows:
   group_name: CK_00002115
   member_count: 1
   organism_count: 1
-  score: 0.7374
+  score: 0.7602
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2176,7 +2176,7 @@ rows:
   group_name: CK_00000016
   member_count: 11
   organism_count: 11
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2186,7 +2186,7 @@ rows:
   group_name: CK_00000050
   member_count: 15
   organism_count: 11
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2196,7 +2196,7 @@ rows:
   group_name: CK_00000571
   member_count: 9
   organism_count: 9
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2206,7 +2206,7 @@ rows:
   group_name: CK_00000687
   member_count: 11
   organism_count: 11
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2216,7 +2216,7 @@ rows:
   group_name: CK_00000816
   member_count: 11
   organism_count: 11
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2226,7 +2226,7 @@ rows:
   group_name: CK_00001253
   member_count: 5
   organism_count: 5
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2236,7 +2236,7 @@ rows:
   group_name: CK_00001274
   member_count: 11
   organism_count: 11
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2246,7 +2246,7 @@ rows:
   group_name: CK_00001583
   member_count: 3
   organism_count: 3
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2256,7 +2256,7 @@ rows:
   group_name: CK_00001790
   member_count: 3
   organism_count: 3
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2266,7 +2266,7 @@ rows:
   group_name: CK_00002301
   member_count: 5
   organism_count: 5
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2276,7 +2276,7 @@ rows:
   group_name: CK_00008097
   member_count: 9
   organism_count: 9
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2286,7 +2286,7 @@ rows:
   group_name: CK_00008098
   member_count: 3
   organism_count: 3
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2296,7 +2296,7 @@ rows:
   group_name: CK_00008118
   member_count: 3
   organism_count: 3
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2306,7 +2306,7 @@ rows:
   group_name: CK_00056848
   member_count: 3
   organism_count: 3
-  score: 0.7178
+  score: 0.7382
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2316,7 +2316,7 @@ rows:
   group_name: CK_00000501
   member_count: 11
   organism_count: 11
-  score: 0.6991
+  score: 0.7174
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2326,7 +2326,7 @@ rows:
   group_name: CK_00001992
   member_count: 11
   organism_count: 11
-  score: 0.6991
+  score: 0.7174
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2336,7 +2336,7 @@ rows:
   group_name: CK_00003803
   member_count: 11
   organism_count: 11
-  score: 0.6991
+  score: 0.7174
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2346,7 +2346,7 @@ rows:
   group_name: CK_00000987
   member_count: 11
   organism_count: 11
-  score: 0.6814
+  score: 0.6978
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2357,7 +2357,7 @@ rows:
   group_name: CK_00033109
   member_count: 7
   organism_count: 7
-  score: 0.6814
+  score: 0.6978
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2367,7 +2367,7 @@ rows:
   group_name: CK_00001716
   member_count: 3
   organism_count: 3
-  score: 0.6334
+  score: 0.6448
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2377,7 +2377,7 @@ rows:
   group_name: CK_00049168
   member_count: 1
   organism_count: 1
-  score: 0.6049
+  score: 0.6137
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2387,7 +2387,7 @@ rows:
   group_name: CK_00001833
   member_count: 9
   organism_count: 9
-  score: 0.5667
+  score: 0.5724
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated

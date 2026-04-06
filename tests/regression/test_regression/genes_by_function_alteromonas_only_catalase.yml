@@ -1,5 +1,5 @@
 case_id: genes_by_function_alteromonas_only_catalase
-row_count: 29
+row_count: 30
 rows:
 - annotation_quality: 3
   gene_category: Energy production
@@ -7,200 +7,207 @@ rows:
   locus_tag: ACZ81_02025
   organism_name: Alteromonas macleodii HOT1A3
   product: catalase
-  score: 12.9947
+  score: 13.2149
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: ACZ81_11985
   organism_name: Alteromonas macleodii HOT1A3
   product: catalase
-  score: 12.9947
+  score: 13.2149
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: katG
   locus_tag: ACZ81_16125
   organism_name: Alteromonas macleodii HOT1A3
   product: catalase/peroxidase HPI
-  score: 10.0265
+  score: 10.5755
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katB
   locus_tag: ACZ81_16915
   organism_name: Alteromonas macleodii HOT1A3
   product: catalase
-  score: 9.7386
+  score: 10.2535
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: EZ55_00433
   organism_name: Alteromonas macleodii EZ55
   product: catalase
-  score: 12.9947
+  score: 13.2149
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: EZ55_02459
   organism_name: Alteromonas macleodii EZ55
   product: catalase
-  score: 12.9947
+  score: 13.2149
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: EZ55_02907
   organism_name: Alteromonas macleodii EZ55
   product: catalase family protein
-  score: 10.3705
+  score: 10.6597
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: katG
   locus_tag: EZ55_03362
   organism_name: Alteromonas macleodii EZ55
   product: catalase/peroxidase HPI
-  score: 10.0265
+  score: 10.5755
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katB
   locus_tag: EZ55_03522
   organism_name: Alteromonas macleodii EZ55
   product: catalase
-  score: 9.7386
+  score: 10.2535
 - annotation_quality: 3
-  gene_category: Unknown
+  gene_category: Coenzyme metabolism
+  gene_name: katG
+  locus_tag: H6G84_04715
+  organism_name: Synechococcus elongatus PCC 7942
+  product: catalase/peroxidase HPI
+  score: 10.5755
+- annotation_quality: 3
+  gene_category: Inorganic ion transport
+  gene_name: H6G84_RS13535
+  locus_tag: H6G84_13535
+  organism_name: Synechococcus elongatus PCC 7942
+  product: catalase family peroxidase
+  score: 10.2416
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
   gene_name: katG
   locus_tag: M744_08205
   organism_name: Synechococcus elongatus UTEX 2973
   product: catalase/peroxidase HPI
-  score: 10.2084
-- annotation_quality: 2
-  gene_category: Unknown
+  score: 10.5755
+- annotation_quality: 3
+  gene_category: Inorganic ion transport
   gene_name: null
   locus_tag: M744_14035
   organism_name: Synechococcus elongatus UTEX 2973
   product: catalase family peroxidase
-  score: 10.4665
+  score: 10.3691
+- annotation_quality: 3
+  gene_category: Energy production
+  gene_name: katE
+  locus_tag: M8001_00585
+  organism_name: Pseudomonas putida KT2440
+  product: catalase HPII
+  score: 8.9533
+- annotation_quality: 3
+  gene_category: Energy production
+  gene_name: katA
+  locus_tag: M8001_02555
+  organism_name: Pseudomonas putida KT2440
+  product: catalase
+  score: 12.589
+- annotation_quality: 3
+  gene_category: Energy production
+  gene_name: katE
+  locus_tag: M8001_15070
+  organism_name: Pseudomonas putida KT2440
+  product: catalase family peroxidase
+  score: 10.2049
+- annotation_quality: 3
+  gene_category: Inorganic ion transport
+  gene_name: katG
+  locus_tag: M8001_19165
+  organism_name: Pseudomonas putida KT2440
+  product: catalase/peroxidase HPI
+  score: 10.5755
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: MIT1002_00461
   organism_name: Alteromonas macleodii MIT1002
   product: catalase
-  score: 12.9947
+  score: 13.2149
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katA
   locus_tag: MIT1002_02464
   organism_name: Alteromonas macleodii MIT1002
   product: catalase
-  score: 13.0249
+  score: 13.2477
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katE
   locus_tag: MIT1002_02513
   organism_name: Alteromonas macleodii MIT1002
   product: catalase
-  score: 9.5516
+  score: 10.0872
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: katG
   locus_tag: MIT1002_03345
   organism_name: Alteromonas macleodii MIT1002
   product: catalase/peroxidase HPI
-  score: 10.3795
+  score: 10.942
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: katB
   locus_tag: MIT1002_03530
   organism_name: Alteromonas macleodii MIT1002
   product: catalase
-  score: 9.7386
-- annotation_quality: 3
-  gene_category: Unknown
-  gene_name: katE
-  locus_tag: PP_0115
-  organism_name: Pseudomonas putida KT2440
-  product: catalase HPII
-  score: 8.7098
-- annotation_quality: 3
-  gene_category: Unknown
-  gene_name: katA
-  locus_tag: PP_0481
-  organism_name: Pseudomonas putida KT2440
-  product: catalase
-  score: 12.1782
-- annotation_quality: 3
-  gene_category: Unknown
-  gene_name: null
-  locus_tag: PP_2887
-  organism_name: Pseudomonas putida KT2440
-  product: catalase family peroxidase
-  score: 10.0776
-- annotation_quality: 3
-  gene_category: Unknown
-  gene_name: katG
-  locus_tag: PP_3668
-  organism_name: Pseudomonas putida KT2440
-  product: catalase/peroxidase HPI
-  score: 10.2084
+  score: 10.2535
 - annotation_quality: 2
-  gene_category: Unknown
+  gene_category: Inorganic ion transport
   gene_name: null
   locus_tag: SPO2184
   organism_name: Ruegeria pomeroyi DSS-3
   product: catalase family protein
-  score: 10.4665
+  score: 12.1941
 - annotation_quality: 3
-  gene_category: Unknown
+  gene_category: Inorganic ion transport
   gene_name: katG
   locus_tag: SPOA0061
   organism_name: Ruegeria pomeroyi DSS-3
   product: catalase/peroxidase HPI
-  score: 10.35
+  score: 10.942
 - annotation_quality: 3
-  gene_category: Unknown
+  gene_category: Inorganic ion transport
+  gene_name: ydbD
+  locus_tag: SY28_10620
+  organism_name: Meiothermus ruber
+  product: manganese catalase family protein
+  score: 12.0784
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
   gene_name: katG
   locus_tag: SYNPCC7002_A2422
   organism_name: Synechococcus PCC 7002
   product: catalase/peroxidase HPI
-  score: 10.2084
+  score: 10.5755
 - annotation_quality: 3
-  gene_category: Unknown
+  gene_category: Inorganic ion transport
   gene_name: katG
   locus_tag: Sputw3181_0269
   organism_name: Shewanella sp. W3-18-1
   product: catalase/peroxidase HPI
-  score: 10.2084
-- annotation_quality: 2
-  gene_category: Unknown
-  gene_name: null
+  score: 10.5755
+- annotation_quality: 3
+  gene_category: Energy production
+  gene_name: srpA
   locus_tag: Sputw3181_2629
   organism_name: Shewanella sp. W3-18-1
   product: catalase family peroxidase
-  score: 10.4665
+  score: 10.2416
 - annotation_quality: 3
-  gene_category: Unknown
-  gene_name: null
+  gene_category: Energy production
+  gene_name: katE
   locus_tag: Sputw3181_3582
   organism_name: Shewanella sp. W3-18-1
   product: catalase
-  score: 11.2809
+  score: 12.3929
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: katG
   locus_tag: SynWH7803_0792
   organism_name: Synechococcus WH7803
   product: catalase/peroxidase
-  score: 9.9961
-- annotation_quality: 3
-  gene_category: Unknown
-  gene_name: katG
-  locus_tag: Synpcc7942_1656
-  organism_name: Synechococcus elongatus PCC 7942
-  product: catalase/peroxidase HPI
-  score: 10.2084
-- annotation_quality: 2
-  gene_category: Unknown
-  gene_name: null
-  locus_tag: Synpcc7942_B2620
-  organism_name: Synechococcus elongatus PCC 7942
-  product: catalase family peroxidase
-  score: 10.4665
+  score: 10.3732

@@ -1,5 +1,5 @@
 case_id: homologs_synechococcus_gene
-row_count: 3
+row_count: 4
 rows:
 - consensus_gene_name: ftsH1
   consensus_product: cell division protein FtsH1
@@ -19,6 +19,14 @@ rows:
   taxonomic_level: Synechococcus
 - consensus_gene_name: ftsH1
   consensus_product: cell division protein FtsH1
+  group_id: eggnog:1G1BT@1117
+  locus_tag: SYNW0305
+  organism_name: Synechococcus WH8102
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- consensus_gene_name: ftsH
+  consensus_product: ATP-dependent zinc metalloprotease FtsH
   group_id: eggnog:COG0465@2
   locus_tag: SYNW0305
   organism_name: Synechococcus WH8102

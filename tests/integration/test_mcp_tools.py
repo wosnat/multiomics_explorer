@@ -271,10 +271,10 @@ class TestListExperiments:
         assert org_total == result["total_matching"]
 
     def test_summary_treatment_type_counts_sum(self, conn):
-        """by_treatment_type counts sum to total_matching."""
+        """by_treatment_type counts >= total_matching (experiments can have multiple treatment_types)."""
         result = api.list_experiments(summary=True, conn=conn)
         tt_total = sum(b["count"] for b in result["by_treatment_type"])
-        assert tt_total == result["total_matching"]
+        assert tt_total >= result["total_matching"]
 
     def test_summary_omics_type_counts_sum(self, conn):
         """by_omics_type counts sum to total_matching."""
@@ -648,7 +648,7 @@ class TestSearchHomologGroups:
             "kinase", summary=True, conn=conn,
         )
         detail = api.search_homolog_groups(
-            "kinase", limit=500, conn=conn,
+            "kinase", limit=1000, conn=conn,
         )
         assert summary["total_matching"] == detail["total_matching"]
         assert detail["total_matching"] == len(detail["results"])

@@ -186,7 +186,7 @@
   params: {}
   expect:
     min_rows: 13
-    max_rows: 25
+    max_rows: 35
     columns: [organism_name, genus, species, strain, clade, ncbi_taxon_id,
               gene_count, publication_count, experiment_count,
               treatment_types, omics_types]

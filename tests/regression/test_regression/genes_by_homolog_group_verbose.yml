@@ -173,10 +173,19 @@ rows:
   product: photosystem II chlorophyll-binding protein CP47
   source: cyanorak
 - consensus_product: photosystem II chlorophyll-binding protein CP47
-  function_description: null
+  function_description: One of the components of the core complex of photosystem II
+    (PSII). It binds chlorophyll and helps catalyze the primary light-induced photochemical
+    processes of PSII. PSII is a light- driven water plastoquinone oxidoreductase,
+    using light energy to abstract electrons from H(2)O, generating O(2) and a proton
+    gradient subsequently used for ATP formation
   gene_category: Photosynthesis
   gene_name: psbB
-  gene_summary: 'psbB :: photosystem II chlorophyll-binding protein CP47'
+  gene_summary: 'psbB :: photosystem II chlorophyll-binding protein CP47 :: One of
+    the components of the core complex of photosystem II (PSII). It binds chlorophyll
+    and helps catalyze the primary light-induced photochemical processes of PSII.
+    PSII is a light- driven water plastoquinone oxidoreductase, using light energy
+    to abstract electrons from H(2)O, generating O(2) and a proton gradient subsequently
+    used for ATP formation'
   group_id: cyanorak:CK_00000570
   locus_tag: SynWH7803_0518
   organism_name: Synechococcus WH7803

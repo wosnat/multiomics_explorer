@@ -77,7 +77,7 @@ class TestGeneResponseProfileTestedNotResponded:
         gene = result["results"][0]
 
         # ureA should respond to nitrogen
-        assert "nitrogen_stress" in gene["groups_responded"]
+        assert "nitrogen" in gene["groups_responded"]
 
         # Non-nitrogen groups with full-coverage scope should be tested_not_responded
         tested_nr = gene.get("groups_tested_not_responded", [])

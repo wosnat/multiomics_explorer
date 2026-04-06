@@ -3,94 +3,94 @@ row_count: 31
 rows:
 - id: go:0000076
   name: DNA replication checkpoint signaling
-  score: 2.0235
+  score: 2.0662
 - id: go:0006260
   name: DNA replication
-  score: 2.55
+  score: 2.6035
 - id: go:0006261
   name: DNA-templated DNA replication
-  score: 2.0235
+  score: 2.0662
 - id: go:0006269
   name: DNA replication, synthesis of primer
-  score: 1.8342
+  score: 1.8729
 - id: go:0006270
   name: DNA replication initiation
-  score: 2.2565
+  score: 2.3039
 - id: go:0006271
   name: DNA strand elongation involved in DNA replication
-  score: 1.5451
+  score: 1.5778
 - id: go:0006274
   name: DNA replication termination
-  score: 2.2565
+  score: 2.3039
 - id: go:0006275
   name: regulation of DNA replication
-  score: 2.0235
+  score: 2.0662
 - id: go:0008156
   name: negative regulation of DNA replication
-  score: 1.8342
+  score: 1.8729
 - id: go:0019045
   name: latent virus replication
-  score: 2.2565
+  score: 2.3039
 - id: go:0030174
   name: regulation of DNA-templated DNA replication initiation
-  score: 1.5451
+  score: 1.5778
 - id: go:0031297
   name: replication fork processing
-  score: 2.2565
+  score: 2.3039
 - id: go:0032297
   name: negative regulation of DNA-templated DNA replication initiation
-  score: 1.4322
+  score: 1.4625
 - id: go:0032298
   name: positive regulation of DNA-templated DNA replication initiation
-  score: 1.4322
+  score: 1.4625
 - id: go:0033567
   name: DNA replication, Okazaki fragment processing
-  score: 1.8342
+  score: 1.8729
 - id: go:0043111
   name: replication fork arrest
-  score: 2.2565
+  score: 2.3039
 - id: go:0043137
   name: DNA replication, removal of RNA primer
-  score: 1.6773
+  score: 1.7127
 - id: go:0044786
   name: cell cycle DNA replication
-  score: 2.0235
+  score: 2.0662
 - id: go:0044787
   name: bacterial-type DNA replication
-  score: 2.0235
+  score: 2.0662
 - id: go:0045004
   name: DNA replication proofreading
-  score: 2.2565
+  score: 2.3039
 - id: go:0045005
   name: DNA-templated DNA replication maintenance of fidelity
-  score: 1.5451
+  score: 1.5778
 - id: go:0045740
   name: positive regulation of DNA replication
-  score: 1.8342
+  score: 1.8729
 - id: go:0070581
   name: rolling circle DNA replication
-  score: 2.0235
+  score: 2.0662
 - id: go:0071807
   name: replication fork arrest involved in DNA replication termination
-  score: 2.1706
+  score: 2.2164
 - id: go:0071932
   name: replication fork reversal
-  score: 2.2565
+  score: 2.3039
 - id: go:0090329
   name: regulation of DNA-templated DNA replication
-  score: 1.6773
+  score: 1.7127
 - id: go:0090592
   name: DNA synthesis involved in DNA replication
-  score: 1.6773
+  score: 1.7127
 - id: go:1902292
   name: cell cycle DNA replication initiation
-  score: 1.8342
+  score: 1.8729
 - id: go:1902328
   name: bacterial-type DNA replication initiation
-  score: 1.8342
+  score: 1.8729
 - id: go:2000104
   name: negative regulation of DNA-templated DNA replication
-  score: 1.5451
+  score: 1.5778
 - id: go:2000105
   name: positive regulation of DNA-templated DNA replication
-  score: 1.5451
+  score: 1.5778

@@ -14,7 +14,7 @@ rows:
   timepoint_hours: 3.0
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   expression_status: significant_up
   gene_name: dnaN
@@ -28,7 +28,7 @@ rows:
   timepoint_hours: 336.0
   timepoint_order: 1
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: significant_up
   gene_name: dnaN
@@ -42,4 +42,4 @@ rows:
   timepoint_hours: 744.0
   timepoint_order: 2
   treatment_type:
-  - nitrogen_stress
+  - nitrogen

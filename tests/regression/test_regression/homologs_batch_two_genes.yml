@@ -1,5 +1,5 @@
 case_id: homologs_batch_two_genes
-row_count: 6
+row_count: 8
 rows:
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
@@ -19,6 +19,14 @@ rows:
   taxonomic_level: Prochloraceae
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
+  group_id: eggnog:1FZV5@1117
+  locus_tag: PMM0001
+  organism_name: Prochlorococcus MED4
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- consensus_gene_name: dnaN
+  consensus_product: DNA polymerase III subunit beta
   group_id: eggnog:COG0592@2
   locus_tag: PMM0001
   organism_name: Prochlorococcus MED4
@@ -41,6 +49,14 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
+- consensus_gene_name: ndhV
+  consensus_product: NADH dehydrogenase subunit NdhV
+  group_id: eggnog:1GEGZ@1117
+  locus_tag: PMM0845
+  organism_name: Prochlorococcus MED4
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
 - consensus_gene_name: ndhV
   consensus_product: NADH dehydrogenase subunit NdhV
   group_id: eggnog:31HP9@2

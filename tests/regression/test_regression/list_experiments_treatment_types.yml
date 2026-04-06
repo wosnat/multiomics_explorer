@@ -1,7 +1,10 @@
 case_id: list_experiments_treatment_types
-row_count: 52
+row_count: 37
 rows:
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MIT9312
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 400 ppm pCO2 vs
@@ -30,7 +33,10 @@ rows:
   - '419'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MIT9312
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 800 ppm pCO2 vs
@@ -59,7 +65,10 @@ rows:
   - '188'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus CC9311
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 at 400 ppm pCO2 vs Axenic
@@ -88,7 +97,10 @@ rows:
   - '293'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus CC9311
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 at 800 ppm pCO2 vs Axenic
@@ -117,7 +129,10 @@ rows:
   - '83'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 at 400 ppm pCO2 vs Axenic
@@ -146,7 +161,10 @@ rows:
   - '136'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 at 800 ppm pCO2 vs Axenic
@@ -175,7 +193,10 @@ rows:
   - '58'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
@@ -204,197 +225,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - coculture
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (PROTEOMICS)
-  gene_count: 11130
-  is_time_course: 'true'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas macleodii HOT1A3
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 1003
-  significant_up_count: 1379
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 5
-  time_point_hours:
-  - '-1.0'
-  - '1440.0'
-  - '2136.0'
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  - day 60
-  - day 89
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  time_point_significant_down:
-  - '179'
-  - '264'
-  - '265'
-  - '268'
-  - '27'
-  time_point_significant_up:
-  - '123'
-  - '243'
-  - '321'
-  - '337'
-  - '355'
-  time_point_totals:
-  - '2226'
-  - '2226'
-  - '2226'
-  - '2226'
-  - '2226'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (PROTEOMICS)
-  gene_count: 4452
-  is_time_course: 'true'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas macleodii HOT1A3
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 578
-  significant_up_count: 433
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 2
-  time_point_hours:
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  time_point_orders:
-  - '1'
-  - '2'
-  time_point_significant_down:
-  - '0'
-  - '578'
-  time_point_significant_up:
-  - '0'
-  - '433'
-  time_point_totals:
-  - '2226'
-  - '2226'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - coculture
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (RNASEQ)
-  gene_count: 19750
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_name: Alteromonas macleodii HOT1A3
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 2449
-  significant_up_count: 1675
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 5
-  time_point_hours:
-  - '-1.0'
-  - '1440.0'
-  - '2136.0'
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  - day 60
-  - day 89
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  time_point_significant_down:
-  - '329'
-  - '493'
-  - '528'
-  - '536'
-  - '563'
-  time_point_significant_up:
-  - '290'
-  - '327'
-  - '334'
-  - '346'
-  - '378'
-  time_point_totals:
-  - '3950'
-  - '3950'
-  - '3950'
-  - '3950'
-  - '3950'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (RNASEQ)
-  gene_count: 11850
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_name: Alteromonas macleodii HOT1A3
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 1648
-  significant_up_count: 778
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 3
-  time_point_hours:
-  - '-1.0'
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  time_point_significant_down:
-  - '366'
-  - '492'
-  - '790'
-  time_point_significant_up:
-  - '151'
-  - '177'
-  - '450'
-  time_point_totals:
-  - '3950'
-  - '3950'
-  - '3950'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MIT9313
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
@@ -418,7 +251,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MIT9313
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
@@ -442,7 +277,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Prochlorococcus NATL2A
   experiment_id: 10.1038/ismej.2016.82_coculture_24_hours_after_coculturing_mit1002_rnaseq
   experiment_name: MIT1002 24 hours after co-culturing with Prochlorococcus NATL2A
@@ -472,7 +309,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Prochlorococcus NATL2A
   experiment_id: 10.1038/ismej.2016.82_coculture_48_hours_after_coculturing_mit1002_rnaseq
   experiment_name: MIT1002 48 hours after co-culturing with Prochlorococcus NATL2A
@@ -501,7 +340,10 @@ rows:
   - '740'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
@@ -530,233 +372,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - coculture
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
-  gene_count: 7120
-  is_time_course: 'true'
-  omics_type: PROTEOMICS
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 394
-  significant_up_count: 609
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 5
-  time_point_hours:
-  - '-1.0'
-  - '1440.0'
-  - '2136.0'
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  - day 60
-  - day 89
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  time_point_significant_down:
-  - '137'
-  - '14'
-  - '74'
-  - '77'
-  - '92'
-  time_point_significant_up:
-  - '111'
-  - '145'
-  - '157'
-  - '161'
-  - '35'
-  time_point_totals:
-  - '1424'
-  - '1424'
-  - '1424'
-  - '1424'
-  - '1424'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
-  gene_count: 4272
-  is_time_course: 'true'
-  omics_type: PROTEOMICS
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 556
-  significant_up_count: 599
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 3
-  time_point_hours:
-  - '2136.0'
-  - '336.0'
-  - '744.0'
-  time_point_labels:
-  - day 14
-  - day 31
-  - day 89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  time_point_significant_down:
-  - '204'
-  - '257'
-  - '95'
-  time_point_significant_up:
-  - '264'
-  - '295'
-  - '40'
-  time_point_totals:
-  - '1424'
-  - '1424'
-  - '1424'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - coculture
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
-  gene_count: 9245
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 834
-  significant_up_count: 553
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 5
-  time_point_hours:
-  - '-1.0'
-  - '1440.0'
-  - '2136.0'
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  - day 60
-  - day 89
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  time_point_significant_down:
-  - '159'
-  - '169'
-  - '226'
-  - '235'
-  - '45'
-  time_point_significant_up:
-  - '108'
-  - '116'
-  - '134'
-  - '156'
-  - '39'
-  time_point_totals:
-  - '1849'
-  - '1849'
-  - '1849'
-  - '1849'
-  - '1849'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
-  gene_count: 1849
-  is_time_course: 'false'
-  omics_type: RNASEQ
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 472
-  significant_up_count: 405
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '336.0'
-  time_point_labels:
-  - day 14
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '472'
-  time_point_significant_up:
-  - '405'
-  time_point_totals:
-  - '1849'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
-  experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
-  gene_count: 2534
-  is_time_course: 'true'
-  omics_type: RNASEQ
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1038/ismej.2017.88
-  significant_down_count: 326
-  significant_up_count: 271
-  table_scope: filtered_subset
-  table_scope_detail: Top 50% of genes by expression level
-  time_point_count: 3
-  time_point_hours:
-  - '12.0'
-  - '24.0'
-  - '3.0'
-  time_point_labels:
-  - 12h
-  - 24h
-  - 3h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  time_point_significant_down:
-  - '126'
-  - '166'
-  - '34'
-  time_point_significant_up:
-  - '115'
-  - '67'
-  - '89'
-  time_point_totals:
-  - '840'
-  - '841'
-  - '853'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
@@ -786,130 +404,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
-  experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
-    medium (MED4) (MICROARRAY)
-  gene_count: 1696
-  is_time_course: 'false'
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 23
-  significant_up_count: 20
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '23'
-  time_point_significant_up:
-  - '20'
-  time_point_totals:
-  - '1696'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
-  experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
-    medium (MED4) (MICROARRAY)
-  gene_count: 1696
-  is_time_course: 'false'
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 14
-  significant_up_count: 18
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '14'
-  time_point_significant_up:
-  - '18'
-  time_point_totals:
-  - '1696'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
-  experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
-    (MICROARRAY)
-  gene_count: 10176
-  is_time_course: 'true'
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 476
-  significant_up_count: 392
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 6
-  time_point_hours:
-  - '0.0'
-  - '12.0'
-  - '24.0'
-  - '3.0'
-  - '48.0'
-  - '6.0'
-  time_point_labels:
-  - 0h
-  - 12h
-  - 24h
-  - 3h
-  - 48h
-  - 6h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  time_point_significant_down:
-  - '0'
-  - '123'
-  - '141'
-  - '162'
-  - '42'
-  - '8'
-  time_point_significant_up:
-  - '113'
-  - '145'
-  - '48'
-  - '5'
-  - '6'
-  - '75'
-  time_point_totals:
-  - '1696'
-  - '1696'
-  - '1696'
-  - '1696'
-  - '1696'
-  - '1696'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -939,7 +436,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -969,130 +468,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
-  experiment_name: MIT9313 Growth on nitrite as sole N source (MIT9313) vs N-replete
-    Pro99 medium (MIT9313) (MICROARRAY)
-  gene_count: 2241
-  is_time_course: 'false'
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MIT9313
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 8
-  significant_up_count: 12
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '8'
-  time_point_significant_up:
-  - '12'
-  time_point_totals:
-  - '2241'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
-  experiment_name: MIT9313 Growth on urea as sole N source (MIT9313) vs N-replete
-    Pro99 medium (MIT9313) (MICROARRAY)
-  gene_count: 2241
-  is_time_course: 'false'
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MIT9313
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 61
-  significant_up_count: 49
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - ''
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '61'
-  time_point_significant_up:
-  - '49'
-  time_point_totals:
-  - '2241'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - axenic
-  - continuous_light
-  coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_mit9313_mit9313_microarray
-  experiment_name: MIT9313 Nitrogen deprivation (MIT9313) vs N-replete Pro99 medium
-    (MIT9313) (MICROARRAY)
-  gene_count: 13446
-  is_time_course: 'true'
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MIT9313
-  publication_doi: 10.1038/msb4100087
-  significant_down_count: 604
-  significant_up_count: 305
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 6
-  time_point_hours:
-  - '0.0'
-  - '12.0'
-  - '24.0'
-  - '3.0'
-  - '48.0'
-  - '6.0'
-  time_point_labels:
-  - 0h
-  - 12h
-  - 24h
-  - 3h
-  - 48h
-  - 6h
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  time_point_significant_down:
-  - '0'
-  - '0'
-  - '141'
-  - '339'
-  - '46'
-  - '78'
-  time_point_significant_up:
-  - '0'
-  - '1'
-  - '105'
-  - '123'
-  - '25'
-  - '51'
-  time_point_totals:
-  - '2241'
-  - '2241'
-  - '2241'
-  - '2241'
-  - '2241'
-  - '2241'
-  treatment_type:
-  - nitrogen_stress
-- background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii MIT1002
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
@@ -1157,18 +535,21 @@ rows:
   - '353'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus elongatus PCC 7942
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_rnaseq
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
     putida cscRABY (RNA-seq)
-  gene_count: 4289
+  gene_count: 5103
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Pseudomonas putida KT2440
   publication_doi: 10.1038/s42003-024-06098-5
-  significant_down_count: 82
-  significant_up_count: 146
+  significant_down_count: 95
+  significant_up_count: 173
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1179,14 +560,17 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '82'
+  - '95'
   time_point_significant_up:
-  - '146'
+  - '173'
   time_point_totals:
-  - '4289'
+  - '5103'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus elongatus PCC 7942
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_proteomics
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
@@ -1216,57 +600,147 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_asw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in ASW coculture with
     Synechococcus WH7803
-  gene_count: 0
+  gene_count: 1533
   is_time_course: 'true'
   omics_type: EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1111/1462-2920.14012
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 197
+  significant_up_count: 449
   table_scope: all_detected_genes
   table_scope_detail: All R. pomeroyi DSS-3 proteins detected in ASW exoproteome across
     all timepoints
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 7
+  time_point_hours:
+  - '1440.0'
+  - '168.0'
+  - '2400.0'
+  - '336.0'
+  - '504.0'
+  - '72.0'
+  - '768.0'
+  time_point_labels:
+  - day 100
+  - day 14
+  - day 21
+  - day 3
+  - day 32
+  - day 60
+  - day 7
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '0'
+  - '18'
+  - '19'
+  - '44'
+  - '46'
+  - '61'
+  - '9'
+  time_point_significant_up:
+  - '1'
+  - '103'
+  - '11'
+  - '115'
+  - '48'
+  - '72'
+  - '99'
+  time_point_totals:
+  - '219'
+  - '219'
+  - '219'
+  - '219'
+  - '219'
+  - '219'
+  - '219'
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_sw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in SW coculture with
     Synechococcus WH7803
-  gene_count: 0
+  gene_count: 1267
   is_time_course: 'true'
   omics_type: EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1111/1462-2920.14012
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 140
+  significant_up_count: 176
   table_scope: all_detected_genes
   table_scope_detail: All R. pomeroyi DSS-3 proteins detected in SW exoproteome across
     all timepoints
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 7
+  time_point_hours:
+  - '1440.0'
+  - '168.0'
+  - '2400.0'
+  - '336.0'
+  - '504.0'
+  - '72.0'
+  - '768.0'
+  time_point_labels:
+  - day 100
+  - day 14
+  - day 21
+  - day 3
+  - day 32
+  - day 60
+  - day 7
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '1'
+  - '1'
+  - '1'
+  - '14'
+  - '26'
+  - '47'
+  - '50'
+  time_point_significant_up:
+  - '0'
+  - '0'
+  - '17'
+  - '30'
+  - '5'
+  - '55'
+  - '69'
+  time_point_totals:
+  - '181'
+  - '181'
+  - '181'
+  - '181'
+  - '181'
+  - '181'
+  - '181'
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
   experiment_id: 10.1038/nmicrobiol.2017.100_longterm_coculture_rpom_dss3_proteomics
   experiment_name: R. pomeroyi DSS-3 proteome in long-term coculture with Synechococcus
@@ -1297,78 +771,104 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus PCC 7002
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
-  gene_count: 0
+  gene_count: 1287
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
   significant_down_count: 0
-  significant_up_count: 0
+  significant_up_count: 486
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs axenic control
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '486'
+  time_point_totals:
+  - '1287'
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus PCC 7002
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (lactate) vs axenic (SOLiD RNA-seq)
-  gene_count: 0
+  gene_count: 454
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
   significant_down_count: 0
-  significant_up_count: 0
+  significant_up_count: 206
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in lactate co-culture vs axenic control
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '206'
+  time_point_totals:
+  - '454'
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Synechococcus PCC 7002
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture HCO3- vs coculture lactate (SOLiD
     RNA-seq)
-  gene_count: 0
+  gene_count: 1219
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
   significant_down_count: 0
-  significant_up_count: 0
+  significant_up_count: 474
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs lactate co-culture
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - ''
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '474'
+  time_point_totals:
+  - '1219'
   treatment_type:
   - carbon
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Shewanella sp. W3-18-1
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
@@ -1397,7 +897,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Shewanella sp. W3-18-1
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (lactate) vs axenic (SOLiD RNA-seq)
@@ -1426,7 +928,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Shewanella sp. W3-18-1
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture HCO3- vs coculture lactate (SOLiD
@@ -1457,57 +961,147 @@ rows:
   - carbon
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Ruegeria pomeroyi DSS-3
   experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_asw
   experiment_name: Synechococcus WH7803 exoproteome time course in ASW coculture with
     R. pomeroyi DSS-3
-  gene_count: 0
+  gene_count: 1547
   is_time_course: 'true'
   omics_type: EXOPROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1111/1462-2920.14012
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 183
+  significant_up_count: 201
   table_scope: all_detected_genes
   table_scope_detail: All Synechococcus WH7803 proteins detected in ASW exoproteome
     across all timepoints
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 7
+  time_point_hours:
+  - '1440.0'
+  - '168.0'
+  - '2400.0'
+  - '336.0'
+  - '504.0'
+  - '72.0'
+  - '768.0'
+  time_point_labels:
+  - day 100
+  - day 14
+  - day 21
+  - day 3
+  - day 32
+  - day 60
+  - day 7
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '0'
+  - '11'
+  - '15'
+  - '18'
+  - '53'
+  - '6'
+  - '80'
+  time_point_significant_up:
+  - '0'
+  - '20'
+  - '26'
+  - '30'
+  - '57'
+  - '60'
+  - '8'
+  time_point_totals:
+  - '221'
+  - '221'
+  - '221'
+  - '221'
+  - '221'
+  - '221'
+  - '221'
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Ruegeria pomeroyi DSS-3
   experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_sw
   experiment_name: Synechococcus WH7803 exoproteome time course in SW coculture with
     R. pomeroyi DSS-3
-  gene_count: 0
+  gene_count: 1309
   is_time_course: 'true'
   omics_type: EXOPROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1111/1462-2920.14012
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 183
+  significant_up_count: 114
   table_scope: all_detected_genes
   table_scope_detail: All Synechococcus WH7803 proteins detected in SW exoproteome
     across all timepoints
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 7
+  time_point_hours:
+  - '1440.0'
+  - '168.0'
+  - '2400.0'
+  - '336.0'
+  - '504.0'
+  - '72.0'
+  - '768.0'
+  time_point_labels:
+  - day 100
+  - day 14
+  - day 21
+  - day 3
+  - day 32
+  - day 60
+  - day 7
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '1'
+  - '24'
+  - '31'
+  - '57'
+  - '70'
+  time_point_significant_up:
+  - '1'
+  - '1'
+  - '1'
+  - '14'
+  - '22'
+  - '36'
+  - '39'
+  time_point_totals:
+  - '187'
+  - '187'
+  - '187'
+  - '187'
+  - '187'
+  - '187'
+  - '187'
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Ruegeria pomeroyi DSS-3
   experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
   experiment_name: Synechococcus WH7803 proteome in early coculture with R. pomeroyi
@@ -1538,7 +1132,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Ruegeria pomeroyi DSS-3
   experiment_id: 10.1038/nmicrobiol.2017.100_late_coculture_syn_wh7803_proteomics
   experiment_name: Synechococcus WH7803 proteome in late coculture with R. pomeroyi
@@ -1569,7 +1165,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Vibrio parahaemolyticus
   experiment_id: 10.1111/j.1462-2920.2009.01997.x_vibrio_coculture_wh8102_microarray
   experiment_name: WH8102 coculture with V. parahaemolyticus vs monoculture (microarray)
@@ -1603,18 +1201,21 @@ rows:
   - '294'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Pseudomonas putida KT2440
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_rnaseq
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (RNA-seq)
-  gene_count: 1873
+  gene_count: 2627
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Synechococcus elongatus PCC 7942
   publication_doi: 10.1038/s42003-024-06098-5
-  significant_down_count: 299
-  significant_up_count: 245
+  significant_down_count: 433
+  significant_up_count: 323
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1625,25 +1226,28 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '299'
+  - '433'
   time_point_significant_up:
-  - '245'
+  - '323'
   time_point_totals:
-  - '1873'
+  - '2627'
   treatment_type:
   - coculture
-- background_factors: []
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Pseudomonas putida KT2440
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (proteomics)
-  gene_count: 524
+  gene_count: 527
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Synechococcus elongatus PCC 7942
   publication_doi: 10.1038/s42003-024-06098-5
   significant_down_count: 81
-  significant_up_count: 70
+  significant_up_count: 71
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1656,13 +1260,15 @@ rows:
   time_point_significant_down:
   - '81'
   time_point_significant_up:
-  - '70'
+  - '71'
   time_point_totals:
-  - '524'
+  - '527'
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Escherichia coli
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_rnaseq
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
@@ -1699,7 +1305,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: Escherichia coli
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_proteomics
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
@@ -1730,6 +1338,9 @@ rows:
   treatment_type:
   - coculture
 - background_factors: []
+  cluster_types:
+  - response_pattern
+  clustering_analysis_count: 4
   coculture_partner: Meiothermus ruber
   experiment_id: 10.1128/mSystems.00181-16_coculture_bp1_mruber_light_oxygen_rnaseq
   experiment_name: BP-1 transcriptome profiling in coculture with M. ruber across
@@ -1752,4 +1363,4 @@ rows:
   time_point_totals: []
   treatment_type:
   - coculture
-  - light_stress
+  - light

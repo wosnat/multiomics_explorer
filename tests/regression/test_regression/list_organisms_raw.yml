@@ -1,5 +1,5 @@
 case_id: list_organisms_raw
-row_count: 27
+row_count: 28
 rows:
 - clade: null
   experiment_count: 0
@@ -24,7 +24,7 @@ rows:
   species: Alteromonas macleodii
   strain: EZ55
   treatment_types:
-  - carbon_stress
+  - carbon
   - coculture
 - clade: null
   experiment_count: 15
@@ -40,7 +40,7 @@ rows:
   strain: HOT1A3
   treatment_types:
   - coculture
-  - nitrogen_stress
+  - nitrogen
 - clade: null
   experiment_count: 8
   gene_count: 4028
@@ -82,7 +82,21 @@ rows:
   strain: null
   treatment_types:
   - coculture
-  - light_stress
+  - light
+- clade: null
+  experiment_count: 1
+  gene_count: 2884
+  genus: Meiothermus
+  ncbi_taxon_id: 172827
+  omics_types:
+  - RNASEQ
+  organism_name: Meiothermus ruber
+  publication_count: 1
+  species: null
+  strain: MruberA
+  treatment_types:
+  - coculture
+  - light
 - clade: null
   experiment_count: 6
   gene_count: 0
@@ -96,7 +110,7 @@ rows:
   species: null
   strain: null
   treatment_types:
-  - light_stress
+  - light
   - viral
 - clade: HLII
   experiment_count: 1
@@ -110,7 +124,7 @@ rows:
   species: Prochlorococcus marinus
   strain: AS9601
   treatment_types:
-  - salt_stress
+  - salt
 - clade: HLI
   experiment_count: 48
   gene_count: 1976
@@ -125,15 +139,15 @@ rows:
   species: Prochlorococcus marinus
   strain: MED4
   treatment_types:
-  - carbon_stress
+  - carbon
   - coculture
-  - diel_cycle
-  - iron_stress
-  - light_stress
-  - nitrogen_stress
-  - none
-  - phosphorus_stress
-  - salt_stress
+  - diel
+  - growth_phase
+  - iron
+  - light
+  - nitrogen
+  - phosphorus
+  - salt
   - viral
 - clade: HLII
   experiment_count: 2
@@ -147,7 +161,7 @@ rows:
   species: Prochlorococcus marinus
   strain: MIT9301
   treatment_types:
-  - growth_state
+  - growth_phase
   - temperature
 - clade: LLIV
   experiment_count: 2
@@ -174,9 +188,9 @@ rows:
   species: Prochlorococcus marinus
   strain: MIT9312
   treatment_types:
-  - carbon_stress
+  - carbon
   - coculture
-  - plastic_stress
+  - plastic
 - clade: LLIV
   experiment_count: 21
   gene_count: 2948
@@ -192,9 +206,9 @@ rows:
   treatment_types:
   - carbon
   - coculture
-  - iron_stress
-  - nitrogen_stress
-  - phosphorus_stress
+  - iron
+  - nitrogen
+  - phosphorus
   - viral
 - clade: LLII
   experiment_count: 2
@@ -208,7 +222,7 @@ rows:
   species: Prochlorococcus marinus
   strain: NATL1A
   treatment_types:
-  - salt_stress
+  - salt
 - clade: LLII
   experiment_count: 14
   gene_count: 2214
@@ -223,8 +237,8 @@ rows:
   treatment_types:
   - coculture
   - darkness
-  - phosphorus_stress
-  - plastic_stress
+  - phosphorus
+  - plastic
 - clade: HLI
   experiment_count: 0
   gene_count: 1870
@@ -289,7 +303,7 @@ rows:
   species: null
   strain: CC9311
   treatment_types:
-  - carbon_stress
+  - carbon
   - coculture
 - clade: null
   experiment_count: 6
@@ -331,11 +345,11 @@ rows:
   species: Parasynechococcus marenigrum
   strain: WH8102
   treatment_types:
-  - carbon_stress
+  - carbon
   - coculture
 - clade: null
   experiment_count: 4
-  gene_count: 2711
+  gene_count: 2714
   genus: Synechococcus
   ncbi_taxon_id: 1140
   omics_types:
@@ -374,7 +388,7 @@ rows:
   strain: BP1
   treatment_types:
   - coculture
-  - light_stress
+  - light
 - clade: null
   experiment_count: 1
   gene_count: 0

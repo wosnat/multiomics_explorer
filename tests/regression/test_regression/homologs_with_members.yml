@@ -1,5 +1,5 @@
 case_id: homologs_with_members
-row_count: 3
+row_count: 4
 rows:
 - consensus_gene_name: ndhV
   consensus_product: NADH dehydrogenase subunit NdhV
@@ -17,6 +17,14 @@ rows:
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
+- consensus_gene_name: ndhV
+  consensus_product: NADH dehydrogenase subunit NdhV
+  group_id: eggnog:1GEGZ@1117
+  locus_tag: PMM0845
+  organism_name: Prochlorococcus MED4
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
 - consensus_gene_name: ndhV
   consensus_product: NADH dehydrogenase subunit NdhV
   group_id: eggnog:31HP9@2

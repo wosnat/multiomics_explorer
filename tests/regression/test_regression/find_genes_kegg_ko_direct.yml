@@ -1,5 +1,5 @@
 case_id: find_genes_kegg_ko_direct
-row_count: 15
+row_count: 30
 rows:
 - gene_category: Lipid metabolism
   gene_name: gldA
@@ -22,6 +22,36 @@ rows:
   organism_name: Alteromonas macleodii EZ55
   product: zinc-dependent alcohol dehydrogenase family protein
 - gene_category: Energy production
+  gene_name: H6G84_RS01490
+  locus_tag: H6G84_01490
+  organism_name: Synechococcus elongatus PCC 7942
+  product: iron-containing alcohol dehydrogenase family protein
+- gene_category: Energy production
+  gene_name: gldA
+  locus_tag: M744_04875
+  organism_name: Synechococcus elongatus UTEX 2973
+  product: iron-containing alcohol dehydrogenase family protein
+- gene_category: Energy production
+  gene_name: dhaT
+  locus_tag: M8001_10715
+  organism_name: Pseudomonas putida KT2440
+  product: iron-containing alcohol dehydrogenase
+- gene_category: Energy production
+  gene_name: null
+  locus_tag: M8001_14655
+  organism_name: Pseudomonas putida KT2440
+  product: iron-containing alcohol dehydrogenase
+- gene_category: Energy production
+  gene_name: null
+  locus_tag: M8001_15450
+  organism_name: Pseudomonas putida KT2440
+  product: zinc-dependent alcohol dehydrogenase family protein
+- gene_category: Unknown
+  gene_name: adhP
+  locus_tag: M8001_20115
+  organism_name: Pseudomonas putida KT2440
+  product: alcohol dehydrogenase AdhP
+- gene_category: Energy production
   gene_name: null
   locus_tag: MIT1002_00636
   organism_name: Alteromonas macleodii MIT1002
@@ -43,6 +73,11 @@ rows:
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
+  locus_tag: P9303_09901
+  organism_name: Prochlorococcus MIT9303
+  product: glycerol dehydrogenase
+- gene_category: Lipid metabolism
+  gene_name: gldA
   locus_tag: PMM1087
   organism_name: Prochlorococcus MED4
   product: glycerol dehydrogenase
@@ -61,10 +96,45 @@ rows:
   locus_tag: PMT9312_1098
   organism_name: Prochlorococcus MIT9312
   product: glycerol dehydrogenase
+- gene_category: Energy production
+  gene_name: ccrA
+  locus_tag: SPO0370
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: crotonyl-CoA carboxylase/reductase
+- gene_category: Energy production
+  gene_name: null
+  locus_tag: SPO1889
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: zinc-dependent alcohol dehydrogenase family protein
+- gene_category: Energy production
+  gene_name: acuI
+  locus_tag: SPO1914
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: acryloyl-CoA reductase
+- gene_category: Energy production
+  gene_name: mdh1
+  locus_tag: SPO2609
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: iron-containing alcohol dehydrogenase
+- gene_category: Energy production
+  gene_name: null
+  locus_tag: SPO3399
+  organism_name: Ruegeria pomeroyi DSS-3
+  product: alcohol dehydrogenase family protein
+- gene_category: Energy production
+  gene_name: gldA
+  locus_tag: SYNPCC7002_A0605
+  organism_name: Synechococcus PCC 7002
+  product: iron-containing alcohol dehydrogenase family protein
 - gene_category: Lipid metabolism
   gene_name: gldA
   locus_tag: SYNW0939
   organism_name: Synechococcus WH8102
+  product: glycerol dehydrogenase
+- gene_category: Lipid metabolism
+  gene_name: gldA
+  locus_tag: SynWH7803_1536
+  organism_name: Synechococcus WH7803
   product: glycerol dehydrogenase
 - gene_category: Lipid metabolism
   gene_name: gldA
@@ -75,4 +145,9 @@ rows:
   gene_name: null
   locus_tag: sync_2669
   organism_name: Synechococcus CC9311
+  product: iron-containing alcohol dehydrogenase family protein
+- gene_category: Energy production
+  gene_name: gldA
+  locus_tag: tll2051
+  organism_name: Thermosynechococcus vestitus BP-1
   product: iron-containing alcohol dehydrogenase family protein

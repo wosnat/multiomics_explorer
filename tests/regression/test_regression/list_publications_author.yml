@@ -11,7 +11,9 @@ rows:
   - Sierra M. Parker
   background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1101/2025.08.05.668435
   experiment_count: 1
   journal: bioRxiv
@@ -22,7 +24,7 @@ rows:
   study_type: Ecology, Microbiology
   title: Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus
   treatment_types:
-  - growth_state
+  - growth_phase
   year: 2025
 - authors:
   - Aldo Arellano
@@ -39,7 +41,10 @@ rows:
   - Steven J. Biller
   background_factors:
   - coculture
-  - diel_cycle
+  - diel
+  cluster_types:
+  - diel_expression_pattern
+  clustering_analysis_count: 2
   doi: 10.1093/ismeco/ycae131
   experiment_count: 2
   journal: ISME Communications
@@ -75,7 +80,9 @@ rows:
   - Xinda Lu
   background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1073/pnas.2213271120
   experiment_count: 2
   journal: Proceedings of the National Academy of Sciences
@@ -98,7 +105,11 @@ rows:
   background_factors:
   - axenic
   - coculture
-  - diel_cycle
+  - diel
+  cluster_types:
+  - expression_classification
+  - periodicity_classification
+  clustering_analysis_count: 3
   doi: 10.1128/mSystems.00040-18
   experiment_count: 3
   journal: mSystems
@@ -123,7 +134,9 @@ rows:
   - Steven J Biller
   background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/ismej.2017.88
   experiment_count: 1
   journal: The ISME Journal
@@ -135,7 +148,7 @@ rows:
   title: Nitrogen cost minimization is promoted by structural changes in the transcriptome
     of N-deprived Prochlorococcus cells
   treatment_types:
-  - nitrogen_stress
+  - nitrogen
   year: 2017
 - authors:
   - Luke R. Thompson
@@ -143,9 +156,11 @@ rows:
   - Sallie W. Chisholm
   background_factors:
   - axenic
-  - continuous_light
   - darkness
+  - light
   - viral
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1371/journal.pone.0165375
   experiment_count: 4
   journal: PLOS ONE
@@ -158,7 +173,7 @@ rows:
   title: Gene Expression Patterns during Light and Dark Infection of Prochlorococcus
     by Cyanophage
   treatment_types:
-  - light_stress
+  - light
   - viral
   year: 2016
 - authors:
@@ -166,7 +181,9 @@ rows:
   - Sallie W Chisholm
   - Steven J Biller
   background_factors:
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/ismej.2016.82
   experiment_count: 3
   journal: The ISME Journal
@@ -186,7 +203,9 @@ rows:
   - Sarah C Bagby
   background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
   journal: ISME Journal
@@ -197,7 +216,7 @@ rows:
   study_type: Transcriptomics
   title: Response of Prochlorococcus to varying CO2:O2 ratios
   treatment_types:
-  - carbon_stress
+  - carbon
   year: 2015
 - authors:
   - Anne W Thompson
@@ -206,7 +225,9 @@ rows:
   - Sallie W Chisholm
   background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
   journal: The ISME Journal
@@ -219,7 +240,7 @@ rows:
   title: Transcriptome response of high- and low-light-adapted Prochlorococcus strains
     to changing iron availability
   treatment_types:
-  - iron_stress
+  - iron
   year: 2011
 - authors:
   - Claudia Steglich
@@ -236,7 +257,10 @@ rows:
   - Zackary I. Johnson
   background_factors:
   - axenic
-  - diel_cycle
+  - diel
+  cluster_types:
+  - diel_cycling
+  clustering_analysis_count: 1
   doi: 10.1371/journal.pone.0005135
   experiment_count: 1
   journal: PLOS ONE
@@ -248,7 +272,7 @@ rows:
   title: Choreography of the Transcriptome, Photophysiology, and Cell Cycle of a Minimal
     Photoautotroph, Prochlorococcus
   treatment_types:
-  - diel_cycle
+  - diel
   year: 2009
 - authors:
   - Debbie Lindell
@@ -264,7 +288,10 @@ rows:
   - Trent Rector
   - Wolfgang R. Hess
   background_factors:
-  - continuous_light
+  - light
+  cluster_types:
+  - response_pattern
+  clustering_analysis_count: 1
   doi: 10.1038/nature06130
   experiment_count: 1
   journal: Nature
@@ -287,7 +314,9 @@ rows:
   - Trent Rector
   background_factors:
   - axenic
-  - chemical_inhibitor
+  - chemical
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1128/JB.01097-06
   experiment_count: 6
   journal: Journal of Bacteriology
@@ -298,7 +327,7 @@ rows:
   study_type: Microarray (transcriptomics)
   title: Genome-Wide Analysis of Light Sensing in Prochlorococcus/H17188
   treatment_types:
-  - light_stress
+  - light
   year: 2006
 - authors:
   - Andrew C Tolonen
@@ -311,7 +340,10 @@ rows:
   - Zackary I Johnson
   background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types:
+  - response_pattern
+  clustering_analysis_count: 2
   doi: 10.1038/msb4100087
   experiment_count: 6
   journal: Molecular Systems Biology
@@ -324,7 +356,7 @@ rows:
   title: Global gene expression of Prochlorococcus ecotypes in response to changes
     in nitrogen availability
   treatment_types:
-  - nitrogen_stress
+  - nitrogen
   year: 2006
 - authors:
   - Adam C. Martiny
@@ -332,7 +364,9 @@ rows:
   - Sallie W. Chisholm
   background_factors:
   - axenic
-  - continuous_light
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1073/pnas.0601301103
   experiment_count: 2
   journal: PNAS
@@ -345,5 +379,5 @@ rows:
   title: 'Phosphate acquisition genes in Prochlorococcus ecotypes: Evidence for genome-wide
     adaptation'
   treatment_types:
-  - phosphorus_stress
+  - phosphorus
   year: 2006

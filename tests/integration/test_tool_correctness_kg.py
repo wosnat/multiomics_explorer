@@ -237,7 +237,7 @@ class TestGeneOverviewCorrectnessKG:
         assert set(r["annotation_types"]) >= {"go_mf", "pfam", "cog_category", "tigr_role"}
         assert r["expression_edge_count"] == 35
         assert r["significant_up_count"] + r["significant_down_count"] == 5
-        assert r["closest_ortholog_group_size"] == 9
+        assert r["closest_ortholog_group_size"] == 11
         assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
 
     def test_single_gene_alt(self, conn):
@@ -276,10 +276,10 @@ class TestGeneHomologsCorrectnessKG:
     """Validate gene_homologs queries return correct data (flat long format)."""
 
     def test_pmm1375_has_three_groups(self, conn):
-        """PMM1375 should belong to 3 ortholog groups."""
+        """PMM1375 should belong to 4 ortholog groups."""
         cypher, params = build_gene_homologs(locus_tags=["PMM1375"])
         results = conn.execute_query(cypher, **params)
-        assert len(results) == 3
+        assert len(results) == 4
 
     def test_results_have_compact_columns(self, conn):
         """Each result has compact columns."""

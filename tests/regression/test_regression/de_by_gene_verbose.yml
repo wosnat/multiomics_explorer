@@ -2,7 +2,7 @@ case_id: de_by_gene_verbose
 row_count: 27
 rows:
 - background_factors:
-  - continuous_light
+  - light
   coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
@@ -28,7 +28,7 @@ rows:
   - coculture
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
@@ -50,10 +50,10 @@ rows:
   timepoint_order: 1
   treatment: N-depleted Pro99 medium
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -76,12 +76,12 @@ rows:
   timepoint_order: 1
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
   expression_status: not_significant
@@ -102,10 +102,10 @@ rows:
   timepoint_order: 6
   treatment: Nitrogen deprivation (MED4)
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -128,12 +128,12 @@ rows:
   timepoint_order: 2
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
   expression_status: not_significant
@@ -154,10 +154,10 @@ rows:
   timepoint_order: 4
   treatment: Nitrogen deprivation (MED4)
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
@@ -179,10 +179,10 @@ rows:
   timepoint_order: 2
   treatment: N-depleted Pro99 medium
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
@@ -204,12 +204,12 @@ rows:
   timepoint_order: 3
   treatment: N-depleted Pro99 medium
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
   expression_status: not_significant
@@ -220,7 +220,7 @@ rows:
   omics_type: MICROARRAY
   padj: 1.0
   product: DNA polymerase III, beta subunit
-  rank: 467
+  rank: 468
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes
@@ -230,10 +230,10 @@ rows:
   timepoint_order: 5
   treatment: Nitrogen deprivation (MED4)
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -256,8 +256,9 @@ rows:
   timepoint_order: 1
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
-- background_factors: []
+  - nitrogen
+- background_factors:
+  - light
   coculture_partner: Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
@@ -282,7 +283,7 @@ rows:
   - coculture
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -305,10 +306,10 @@ rows:
   timepoint_order: 4
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -331,10 +332,10 @@ rows:
   timepoint_order: 5
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -357,12 +358,12 @@ rows:
   timepoint_order: 3
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
   expression_status: not_significant
@@ -373,7 +374,7 @@ rows:
   omics_type: MICROARRAY
   padj: 1.0
   product: DNA polymerase III, beta subunit
-  rank: 722
+  rank: 723
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes
@@ -383,10 +384,10 @@ rows:
   timepoint_order: 3
   treatment: Nitrogen deprivation (MED4)
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -409,10 +410,10 @@ rows:
   timepoint_order: 1
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
@@ -435,10 +436,10 @@ rows:
   timepoint_order: 1
   treatment: Growth on cyanate as sole N source (MED4)
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
@@ -461,12 +462,12 @@ rows:
   timepoint_order: 1
   treatment: Growth on urea as sole N source (MED4)
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
   expression_status: not_significant
@@ -477,7 +478,7 @@ rows:
   omics_type: MICROARRAY
   padj: 1.0
   product: DNA polymerase III, beta subunit
-  rank: 1299
+  rank: 1300
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes
@@ -487,12 +488,12 @@ rows:
   timepoint_order: 1
   treatment: Nitrogen deprivation (MED4)
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
-  experiment_id: 10.1038/msb4100087_nitrogen_stress_nitrogen_deprivation_med4_med4_microarray
+  experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
   expression_status: not_significant
@@ -513,10 +514,10 @@ rows:
   timepoint_order: 2
   treatment: Nitrogen deprivation (MED4)
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -539,10 +540,10 @@ rows:
   timepoint_order: 3
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -565,10 +566,10 @@ rows:
   timepoint_order: 2
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -591,10 +592,10 @@ rows:
   timepoint_order: 2
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - axenic
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -617,10 +618,10 @@ rows:
   timepoint_order: 3
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -643,10 +644,10 @@ rows:
   timepoint_order: 5
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -669,10 +670,10 @@ rows:
   timepoint_order: 1
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen
 - background_factors:
   - coculture
-  - continuous_light
+  - light
   coculture_partner: null
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -695,4 +696,4 @@ rows:
   timepoint_order: 4
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
-  - nitrogen_stress
+  - nitrogen

@@ -1,5 +1,5 @@
 case_id: homologs_source_filter_eggnog
-row_count: 2
+row_count: 3
 rows:
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
@@ -11,6 +11,14 @@ rows:
   taxonomic_level: Prochloraceae
 - consensus_gene_name: dnaN
   consensus_product: DNA polymerase III, beta subunit
+  group_id: eggnog:1FZV5@1117
+  locus_tag: PMM0001
+  organism_name: Prochlorococcus MED4
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- consensus_gene_name: dnaN
+  consensus_product: DNA polymerase III subunit beta
   group_id: eggnog:COG0592@2
   locus_tag: PMM0001
   organism_name: Prochlorococcus MED4
