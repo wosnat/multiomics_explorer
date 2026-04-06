@@ -23,10 +23,11 @@ filter uses partial matching — "MED4", "Prochlorococcus MED4", and
 ### Envelope
 
 ```expected-keys
-total_entries, returned, offset, truncated, results
+total_entries, by_cluster_type, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total organisms in the KG
+- **by_cluster_type** (list[OrgClusterTypeBreakdown]): Organism counts per cluster type, sorted by count descending
 - **returned** (int): Number of results returned
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if results were truncated by limit
@@ -45,7 +46,10 @@ total_entries, returned, offset, truncated, results
 | publication_count | int | Number of publications studying this organism (e.g. 11) |
 | experiment_count | int | Total experiments across all publications (e.g. 46) |
 | treatment_types | list[string] (optional) | Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress']) |
+| background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle']) |
 | omics_types | list[string] (optional) | Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']) |
+| clustering_analysis_count | int (optional) | Number of clustering analyses for this organism (e.g. 4) |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['response_pattern', 'diel_cycling']) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -58,6 +62,7 @@ total_entries, returned, offset, truncated, results
 | kingdom | string \| None (optional) | Taxonomic kingdom (e.g. 'Bacillati') |
 | superkingdom | string \| None (optional) | Taxonomic superkingdom (e.g. 'Bacteria') |
 | lineage | string \| None (optional) | Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus') |
+| cluster_count | int \| None (optional) | Total gene clusters across analyses (only with verbose=True, e.g. 35) |
 
 ## Few-shot examples
 
@@ -74,7 +79,7 @@ list_organisms()
   "truncated": false,
   "offset": 0,
   "results": [
-    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"]},
+    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["response_pattern", "diel_cycling", "expression_level"]},
     {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas", "gene_count": 4136, "publication_count": 2, ...}
   ]
 }
@@ -106,6 +111,7 @@ list_organisms → genes_by_function
 list_organisms → list_publications
 list_organisms → resolve_gene
 list_organisms → genes_by_ontology
+list_organisms → list_clustering_analyses(organism=...)
 ```
 
 ## Good to know
@@ -122,7 +128,7 @@ list_organisms → genes_by_ontology
 from multiomics_explorer import list_organisms
 
 result = list_organisms()
-# returns dict with keys: total_entries, offset, results
+# returns dict with keys: total_entries, by_cluster_type, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

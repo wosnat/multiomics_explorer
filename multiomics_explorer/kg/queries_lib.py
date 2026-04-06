@@ -596,9 +596,10 @@ def build_list_publications(
     """Build Cypher for listing publications with experiment summaries.
 
     RETURN keys (compact): doi, title, authors, year, journal, study_type,
-    organisms, experiment_count, treatment_types, background_factors, omics_types.
+    organisms, experiment_count, treatment_types, background_factors, omics_types,
+    clustering_analysis_count, cluster_types.
     When search_text is provided, also: score.
-    RETURN keys (verbose): adds abstract, description.
+    RETURN keys (verbose): adds abstract, description, cluster_count.
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
@@ -607,7 +608,8 @@ def build_list_publications(
     )
 
     verbose_cols = (
-        ",\n       p.abstract AS abstract, p.description AS description"
+        ",\n       p.abstract AS abstract, p.description AS description,"
+        "\n       p.cluster_count AS cluster_count"
         if verbose else ""
     )
     if limit is not None:
@@ -632,6 +634,8 @@ def build_list_publications(
             "       p.treatment_types AS treatment_types,\n"
             "       coalesce(p.background_factors, []) AS background_factors,\n"
             "       p.omics_types AS omics_types,\n"
+            "       coalesce(p.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
+            "       coalesce(p.cluster_types, []) AS cluster_types,\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
             f"{limit_clause}"
@@ -650,7 +654,9 @@ def build_list_publications(
             "       p.experiment_count AS experiment_count,\n"
             "       p.treatment_types AS treatment_types,\n"
             "       coalesce(p.background_factors, []) AS background_factors,\n"
-            f"       p.omics_types AS omics_types{verbose_cols}\n"
+            "       p.omics_types AS omics_types,\n"
+            "       coalesce(p.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
+            f"       coalesce(p.cluster_types, []) AS cluster_types{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, p.title\n"
             f"{limit_clause}"
         )
@@ -717,9 +723,10 @@ def build_list_organisms(
 
     RETURN keys (compact): organism_name, genus, species, strain, clade,
     ncbi_taxon_id, gene_count, publication_count, experiment_count,
-    treatment_types, background_factors, omics_types.
+    treatment_types, background_factors, omics_types,
+    clustering_analysis_count, cluster_types.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
-    superkingdom, lineage.
+    superkingdom, lineage, cluster_count.
     """
     verbose_cols = (
         ",\n       o.family AS family,"
@@ -728,7 +735,8 @@ def build_list_organisms(
         "\n       o.phylum AS phylum,"
         "\n       o.kingdom AS kingdom,"
         "\n       o.superkingdom AS superkingdom,"
-        "\n       o.lineage AS lineage"
+        "\n       o.lineage AS lineage,"
+        "\n       coalesce(o.cluster_count, 0) AS cluster_count"
         if verbose else ""
     )
 
@@ -745,7 +753,9 @@ def build_list_organisms(
         "       o.experiment_count AS experiment_count,\n"
         "       o.treatment_types AS treatment_types,\n"
         "       coalesce(o.background_factors, []) AS background_factors,\n"
-        "       o.omics_types AS omics_types"
+        "       o.omics_types AS omics_types,\n"
+        "       coalesce(o.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
+        "       coalesce(o.cluster_types, []) AS cluster_types"
         f"{verbose_cols}\n"
         "ORDER BY o.genus, o.preferred_name"
     )
@@ -846,10 +856,11 @@ def build_list_experiments(
     is_time_course, table_scope, table_scope_detail,
     gene_count, significant_up_count, significant_down_count,
     time_point_count, time_point_labels, time_point_orders, time_point_hours,
-    time_point_totals, time_point_significant_up, time_point_significant_down.
+    time_point_totals, time_point_significant_up, time_point_significant_down,
+    clustering_analysis_count, cluster_types.
     RETURN keys (verbose): adds publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
-    statistical_test, experimental_context.
+    statistical_test, experimental_context, cluster_count.
     RETURN keys (search_text): adds score.
     """
     where_block, params = _list_experiments_where(
@@ -869,7 +880,8 @@ def build_list_experiments(
         "\n       e.medium AS medium,"
         "\n       e.temperature AS temperature,"
         "\n       e.statistical_test AS statistical_test,"
-        "\n       e.experimental_context AS experimental_context"
+        "\n       e.experimental_context AS experimental_context,"
+        "\n       coalesce(e.cluster_count, 0) AS cluster_count"
         if verbose else ""
     )
 
@@ -905,7 +917,9 @@ def build_list_experiments(
         "       e.time_point_hours AS time_point_hours,\n"
         "       e.time_point_totals AS time_point_totals,\n"
         "       e.time_point_significant_up AS time_point_significant_up,\n"
-        "       e.time_point_significant_down AS time_point_significant_down"
+        "       e.time_point_significant_down AS time_point_significant_down,\n"
+        "       coalesce(e.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
+        "       coalesce(e.cluster_types, []) AS cluster_types"
     )
 
     if search_text:
@@ -946,11 +960,12 @@ def build_list_experiments_summary(
     """Build summary aggregation Cypher for list_experiments.
 
     Returns breakdowns by organism, treatment type, omics type,
-    publication, table_scope, and background_factors using apoc.coll.frequencies.
+    publication, table_scope, background_factors, and cluster_type
+    using apoc.coll.frequencies.
 
     RETURN keys: total_matching, time_course_count, by_organism,
     by_treatment_type, by_background_factors, by_omics_type, by_publication,
-    by_table_scope.
+    by_table_scope, by_cluster_type.
     RETURN keys (search_text): adds score_max, score_median.
     """
     where_block, params = _list_experiments_where(
@@ -968,7 +983,8 @@ def build_list_experiments_summary(
         "     collect(e.omics_type) AS omics,\n"
         "     collect(p.doi) AS dois,\n"
         "     collect(e.is_time_course) AS tc,\n"
-        "     collect(e.table_scope) AS scopes"
+        "     collect(e.table_scope) AS scopes,\n"
+        "     apoc.coll.flatten(collect(coalesce(e.cluster_types, []))) AS ctypes"
     )
 
     return_cols = (
@@ -979,7 +995,8 @@ def build_list_experiments_summary(
         "       apoc.coll.frequencies(bfs) AS by_background_factors,\n"
         "       apoc.coll.frequencies(omics) AS by_omics_type,\n"
         "       apoc.coll.frequencies(dois) AS by_publication,\n"
-        "       apoc.coll.frequencies(scopes) AS by_table_scope"
+        "       apoc.coll.frequencies(scopes) AS by_table_scope,\n"
+        "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
     )
 
     if search_text:

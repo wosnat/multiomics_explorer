@@ -759,12 +759,16 @@ class TestListOrganisms:
          "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI",
          "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11,
          "experiment_count": 46, "treatment_types": ["coculture", "light_stress"],
-         "omics_types": ["RNASEQ", "PROTEOMICS"]},
+         "omics_types": ["RNASEQ", "PROTEOMICS"],
+         "clustering_analysis_count": 4, "cluster_types": ["response_pattern", "diel_cycling"],
+         "background_factors": []},
         {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas",
          "species": "Alteromonas macleodii", "strain": "EZ55", "clade": None,
          "ncbi_taxon_id": 28108, "gene_count": 4136, "publication_count": 2,
          "experiment_count": 13, "treatment_types": ["carbon_stress"],
-         "omics_types": ["RNASEQ"]},
+         "omics_types": ["RNASEQ"],
+         "clustering_analysis_count": 0, "cluster_types": [],
+         "background_factors": []},
     ]
 
     def test_returns_dict(self, mock_conn):
@@ -792,12 +796,35 @@ class TestListOrganisms:
         result = api.list_organisms(conn=mock_conn)
         assert len(result["results"]) == 2
 
+    def test_by_cluster_type_in_envelope(self, mock_conn):
+        mock_conn.execute_query.return_value = self._ROWS
+        result = api.list_organisms(conn=mock_conn)
+        assert "by_cluster_type" in result
+        # MED4 has response_pattern and diel_cycling; EZ55 has none
+        ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
+        assert ct_map["response_pattern"] == 1
+        assert ct_map["diel_cycling"] == 1
+
+    def test_verbose_includes_cluster_count(self, mock_conn):
+        rows = [{**r, "cluster_count": 10} for r in self._ROWS]
+        mock_conn.execute_query.return_value = rows
+        result = api.list_organisms(verbose=True, conn=mock_conn)
+        assert "cluster_count" in result["results"][0]
+
+    def test_compact_excludes_cluster_count(self, mock_conn):
+        rows = [{**r, "cluster_count": 10} for r in self._ROWS]
+        mock_conn.execute_query.return_value = rows
+        result = api.list_organisms(verbose=False, conn=mock_conn)
+        assert "cluster_count" not in result["results"][0]
+
     def test_offset_skips_results(self, mock_conn):
         mock_conn.execute_query.return_value = [
             {"organism_name": f"Org{i}", "genus": "G", "species": "S",
              "strain": "s", "clade": None, "ncbi_taxon_id": i,
              "gene_count": 100, "publication_count": 1,
-             "experiment_count": 1, "treatment_types": [], "omics_types": []}
+             "experiment_count": 1, "treatment_types": [], "omics_types": [],
+             "clustering_analysis_count": 0, "cluster_types": [],
+             "background_factors": []}
             for i in range(5)
         ]
         result = api.list_organisms(limit=2, offset=2, conn=mock_conn)
@@ -1435,11 +1462,20 @@ class TestRunCypher:
 # list_publications
 # ---------------------------------------------------------------------------
 class TestListPublications:
+    _PUB_ROW = {
+        "doi": "10.1234/test", "title": "Test", "authors": ["A"],
+        "year": 2024, "journal": "J", "study_type": "S",
+        "organisms": ["MED4"], "experiment_count": 1,
+        "treatment_types": ["coculture"], "background_factors": [],
+        "omics_types": ["RNASEQ"],
+        "clustering_analysis_count": 2, "cluster_types": ["response_pattern"],
+    }
+
     def test_returns_dict(self, mock_conn):
         """Runs summary + data queries, returns dict with total_entries/total_matching/results."""
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 21, "total_matching": 21}],  # summary query
-            [{"doi": "10.1234/test", "title": "Test"}],      # data query
+            [self._PUB_ROW],                                 # data query
         ]
         result = api.list_publications(conn=mock_conn)
         assert isinstance(result, dict)
@@ -1448,6 +1484,7 @@ class TestListPublications:
         assert "by_organism" in result
         assert "by_treatment_type" in result
         assert "by_omics_type" in result
+        assert "by_cluster_type" in result
         assert len(result["results"]) == 1
         assert mock_conn.execute_query.call_count == 2
 
@@ -1509,13 +1546,42 @@ class TestListPublications:
         from multiomics_explorer import list_publications
         assert list_publications is api.list_publications
 
+    def test_by_cluster_type_computed(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}],
+            [self._PUB_ROW],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
+        assert ct_map["response_pattern"] == 1
+
+    def test_verbose_includes_cluster_count(self, mock_conn):
+        row = {**self._PUB_ROW, "abstract": "...", "description": "...", "cluster_count": 20}
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}],
+            [row],
+        ]
+        result = api.list_publications(verbose=True, conn=mock_conn)
+        assert "cluster_count" in result["results"][0]
+
+    def test_compact_excludes_cluster_count(self, mock_conn):
+        row = {**self._PUB_ROW, "cluster_count": 20}
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}],
+            [row],
+        ]
+        result = api.list_publications(verbose=False, conn=mock_conn)
+        assert "cluster_count" not in result["results"][0]
+
     def test_offset_skips_results(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [{"total_entries": 5, "total_matching": 5}],  # summary
             [{"doi": f"10.1234/{i}", "title": f"T{i}", "authors": "A",
               "year": 2024, "journal": "J", "study_type": "S",
               "organisms": ["MED4"], "experiment_count": 1,
-              "treatment_types": ["light"], "omics_types": ["RNASEQ"]}
+              "treatment_types": ["light"], "omics_types": ["RNASEQ"],
+              "clustering_analysis_count": 0, "cluster_types": [],
+              "background_factors": []}
              for i in range(5)],  # detail
         ]
         result = api.list_publications(limit=2, offset=2, conn=mock_conn)
@@ -1539,6 +1605,7 @@ class TestListExperiments:
             "by_omics_type": [{"item": "RNASEQ", "count": 48}],
             "by_publication": [{"item": "10.1038/ismej.2016.70", "count": 5}],
             "by_table_scope": [{"item": "gene_level", "count": 40}],
+            "by_cluster_type": [{"item": "response_pattern", "count": 3}],
         }]
 
     def _detail_row(self, **overrides):
@@ -1564,6 +1631,8 @@ class TestListExperiments:
             "time_point_totals": [1696],
             "time_point_significant_up": [245],
             "time_point_significant_down": [178],
+            "clustering_analysis_count": 1,
+            "cluster_types": ["response_pattern"],
         }
         row.update(overrides)
         return row
@@ -1744,6 +1813,28 @@ class TestListExperiments:
         assert result["by_publication"][0]["publication_doi"] == "10.1038/ismej.2016.70"
         assert result["by_table_scope"][0]["table_scope"] == "gene_level"
         assert result["by_table_scope"][0]["count"] == 40
+        assert result["by_cluster_type"][0]["cluster_type"] == "response_pattern"
+        assert result["by_cluster_type"][0]["count"] == 3
+
+    def test_verbose_includes_cluster_count(self, mock_conn):
+        row = self._detail_row(cluster_count=20)
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [row],
+        ]
+        result = api.list_experiments(verbose=True, conn=mock_conn)
+        assert "cluster_count" in result["results"][0]
+
+    def test_compact_excludes_cluster_count(self, mock_conn):
+        row = self._detail_row(cluster_count=20)
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [row],
+        ]
+        result = api.list_experiments(verbose=False, conn=mock_conn)
+        assert "cluster_count" not in result["results"][0]
 
     def test_creates_conn_when_none(self):
         """Default conn used when None."""

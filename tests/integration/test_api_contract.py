@@ -221,7 +221,7 @@ class TestListOrganismsContract:
             "organism_name", "genus", "species", "strain", "clade",
             "ncbi_taxon_id", "gene_count", "publication_count",
             "experiment_count", "treatment_types", "omics_types",
-            "background_factors",
+            "background_factors", "clustering_analysis_count", "cluster_types",
         }
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -537,7 +537,7 @@ class TestListPublicationsContract:
         assert isinstance(result, dict)
         expected_keys = {
             "total_entries", "total_matching", "by_organism",
-            "by_treatment_type", "by_omics_type",
+            "by_treatment_type", "by_omics_type", "by_cluster_type",
             "returned", "truncated", "offset", "results",
         }
         assert expected_keys <= set(result.keys())
@@ -548,7 +548,8 @@ class TestListPublicationsContract:
         row = result["results"][0]
         for key in ("doi", "title", "authors", "year",
                      "experiment_count", "organisms",
-                     "treatment_types", "omics_types"):
+                     "treatment_types", "omics_types",
+                     "clustering_analysis_count", "cluster_types"):
             assert key in row
 
     def test_verbose_adds_abstract(self, conn):
@@ -556,6 +557,7 @@ class TestListPublicationsContract:
         row = result["results"][0]
         assert "abstract" in row
         assert "description" in row
+        assert "cluster_count" in row
 
     def test_organism_filter_narrows(self, conn):
         all_pubs = api.list_publications(conn=conn)
@@ -575,7 +577,8 @@ class TestListExperimentsContract:
         expected_keys = {
             "total_entries", "total_matching",
             "by_organism", "by_treatment_type", "by_omics_type",
-            "by_publication", "by_table_scope", "time_course_count",
+            "by_publication", "by_table_scope", "by_cluster_type",
+            "time_course_count",
             "returned", "truncated", "offset", "results",
         }
         assert expected_keys <= set(result.keys())
@@ -588,13 +591,14 @@ class TestListExperimentsContract:
                      "publication_doi", "organism_name",
                      "treatment_type", "omics_type",
                      "is_time_course", "table_scope",
-                     "gene_count", "genes_by_status"):
+                     "gene_count", "genes_by_status",
+                     "clustering_analysis_count", "cluster_types"):
             assert key in row
 
     def test_verbose_adds_fields(self, conn):
         result = api.list_experiments(verbose=True, limit=1, conn=conn)
         row = result["results"][0]
-        for key in ("publication_title", "treatment", "control"):
+        for key in ("publication_title", "treatment", "control", "cluster_count"):
             assert key in row
 
     def test_summary_mode(self, conn):

@@ -527,20 +527,38 @@ def list_organisms(
 ) -> dict:
     """List all organisms in the knowledge graph.
 
-    Returns dict with keys: total_entries, returned, truncated, results.
+    Returns dict with keys: total_entries, returned, truncated,
+    by_cluster_type, results.
     Per result: organism_name, genus, species, strain, clade,
     ncbi_taxon_id, gene_count, publication_count, experiment_count,
-    treatment_types, omics_types.
+    treatment_types, omics_types, clustering_analysis_count, cluster_types.
     When verbose=True, also includes: family, order, tax_class, phylum,
-    kingdom, superkingdom, lineage.
+    kingdom, superkingdom, lineage, cluster_count.
     """
     conn = _default_conn(conn)
     cypher, params = build_list_organisms(verbose=verbose)
     all_results = conn.execute_query(cypher, **params)
     total = len(all_results)
+
+    # Compute by_cluster_type breakdown from all results
+    ct_counts: dict[str, int] = {}
+    for org in all_results:
+        for ct in org.get("cluster_types", []):
+            ct_counts[ct] = ct_counts.get(ct, 0) + 1
+
     results = all_results[offset:offset + limit] if limit else all_results[offset:]
+
+    # Gate verbose-only fields
+    if not verbose:
+        results = [{k: v for k, v in r.items() if k != "cluster_count"} for r in results]
+
     return {
         "total_entries": total,
+        "by_cluster_type": sorted(
+            [{"cluster_type": k, "count": v} for k, v in ct_counts.items()],
+            key=lambda x: x["count"],
+            reverse=True,
+        ),
         "returned": len(results),
         "offset": offset,
         "truncated": total > offset + len(results),
@@ -563,10 +581,12 @@ def list_publications(
     """List publications with expression data.
 
     Returns dict with keys: total_entries, total_matching, returned, truncated,
-    by_organism, by_treatment_type, by_background_factors, by_omics_type, results.
+    by_organism, by_treatment_type, by_background_factors, by_omics_type,
+    by_cluster_type, results.
     Per result: doi, title, authors, year, journal, study_type, organisms,
-    experiment_count, treatment_types, background_factors, omics_types.
-    When verbose=True, also includes abstract, description.
+    experiment_count, treatment_types, background_factors, omics_types,
+    clustering_analysis_count, cluster_types.
+    When verbose=True, also includes abstract, description, cluster_count.
     When search_text is provided, also includes score.
     """
     conn = _default_conn(conn)
@@ -603,6 +623,7 @@ def list_publications(
     tt_counts: dict[str, int] = {}
     bf_counts: dict[str, int] = {}
     omics_counts: dict[str, int] = {}
+    ct_counts: dict[str, int] = {}
     for pub in all_results:
         for org in pub.get("organisms", []):
             org_counts[org] = org_counts.get(org, 0) + 1
@@ -612,6 +633,8 @@ def list_publications(
             bf_counts[bf] = bf_counts.get(bf, 0) + 1
         for ot in pub.get("omics_types", []):
             omics_counts[ot] = omics_counts.get(ot, 0) + 1
+        for ct in pub.get("cluster_types", []):
+            ct_counts[ct] = ct_counts.get(ct, 0) + 1
 
     def _sorted_breakdown(counts, key_name):
         return sorted(
@@ -622,6 +645,10 @@ def list_publications(
 
     results = all_results[offset:offset + limit] if limit else all_results[offset:]
 
+    # Gate verbose-only fields
+    if not verbose:
+        results = [{k: v for k, v in r.items() if k != "cluster_count"} for r in results]
+
     return {
         "total_entries": summary["total_entries"],
         "total_matching": summary["total_matching"],
@@ -629,6 +656,7 @@ def list_publications(
         "by_treatment_type": _sorted_breakdown(tt_counts, "treatment_type"),
         "by_background_factors": _sorted_breakdown(bf_counts, "background_factor"),
         "by_omics_type": _sorted_breakdown(omics_counts, "omics_type"),
+        "by_cluster_type": _sorted_breakdown(ct_counts, "cluster_type"),
         "returned": len(results),
         "offset": offset,
         "truncated": summary["total_matching"] > offset + len(results),
@@ -657,7 +685,7 @@ def list_experiments(
 
     Always returns: total_entries, total_matching, by_organism,
     by_treatment_type, by_background_factors, by_omics_type,
-    by_publication, by_table_scope,
+    by_publication, by_table_scope, by_cluster_type,
     time_course_count, returned, truncated, results.
 
     summary=True is sugar for limit=0: results is empty list,
@@ -666,8 +694,8 @@ def list_experiments(
     Per result: experiment_id, experiment_name, publication_doi,
     organism_name, treatment_type, background_factors, coculture_partner,
     omics_type, is_time_course (bool), table_scope, table_scope_detail,
-    gene_count, genes_by_status (dict),
-    timepoints (list, omitted if not time-course).
+    gene_count, genes_by_status (dict), clustering_analysis_count,
+    cluster_types, timepoints (list, omitted if not time-course).
     When verbose=True, also includes: publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context.
@@ -732,6 +760,7 @@ def list_experiments(
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
         "by_publication": _rename_freq(raw_summary["by_publication"], "publication_doi"),
         "by_table_scope": _rename_freq(raw_summary["by_table_scope"], "table_scope"),
+        "by_cluster_type": _rename_freq(raw_summary["by_cluster_type"], "cluster_type"),
         "time_course_count": raw_summary["time_course_count"],
     }
 
@@ -807,6 +836,10 @@ def list_experiments(
                 timepoints.append(tp)
             r["timepoints"] = timepoints
         # Non-time-course: omit timepoints key entirely
+
+        # Gate verbose-only cluster field
+        if not verbose:
+            r.pop("cluster_count", None)
 
         processed.append(r)
 

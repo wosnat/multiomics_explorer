@@ -11,10 +11,11 @@ examples:
         "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 11}, ...],
         "by_treatment_type": [{"treatment_type": "coculture", "count": 5}, ...],
         "by_omics_type": [{"omics_type": "RNASEQ", "count": 12}, ...],
+        "by_cluster_type": [{"cluster_type": "response_pattern", "count": 4}, ...],
         "returned": 5, "truncated": true, "offset": 0,
         "results": [
-          {"doi": "10.1101/2025.11.24.690089", "title": "Transcriptomic and Proteomic...", "year": 2025, "experiment_count": 10, ...},
-          {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "experiment_count": 5, ...}
+          {"doi": "10.1101/2025.11.24.690089", "title": "Transcriptomic and Proteomic...", "year": 2025, "experiment_count": 10, "clustering_analysis_count": 0, "cluster_types": [], ...},
+          {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "experiment_count": 5, "clustering_analysis_count": 2, "cluster_types": ["response_pattern"], ...}
         ]
       }
 
@@ -35,10 +36,12 @@ examples:
 verbose_fields:
   - abstract
   - description
+  - cluster_count
 
 chaining:
   - "list_publications → list_experiments → differential_expression_by_gene"
   - "list_publications → genes_by_function"
+  - "list_publications → list_clustering_analyses(publication_doi=[...])"
 
 mistakes:
   - "treatment_type is a string filter, not a list — use treatment_type='coculture' not treatment_type=['coculture']"

@@ -112,6 +112,8 @@ def register_tools(mcp: FastMCP):
         treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types studied (e.g. ['coculture', 'light_stress', 'nitrogen_stress'])")
         background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'continuous_light', 'diel_cycle'])")
         omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS'])")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this organism (e.g. 4)")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['response_pattern', 'diel_cycling'])")
         # verbose-only fields
         family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae')")
         order: str | None = Field(default=None, description="Taxonomic order (e.g. 'Synechococcales')")
@@ -120,9 +122,15 @@ def register_tools(mcp: FastMCP):
         kingdom: str | None = Field(default=None, description="Taxonomic kingdom (e.g. 'Bacillati')")
         superkingdom: str | None = Field(default=None, description="Taxonomic superkingdom (e.g. 'Bacteria')")
         lineage: str | None = Field(default=None, description="Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus')")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 35)")
+
+    class OrgClusterTypeBreakdown(BaseModel):
+        cluster_type: str = Field(description="Cluster type (e.g. 'response_pattern')")
+        count: int = Field(description="Number of organisms with this cluster type (e.g. 4)")
 
     class ListOrganismsResponse(BaseModel):
         total_entries: int = Field(description="Total organisms in the KG")
+        by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type, sorted by count descending")
         returned: int = Field(description="Number of results returned")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if results were truncated by limit")
@@ -158,8 +166,10 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             result = api.list_organisms(verbose=verbose, limit=limit, offset=offset, conn=conn)
             organisms = [OrganismResult(**r) for r in result["results"]]
+            by_cluster_type = [OrgClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
             response = ListOrganismsResponse(
                 total_entries=result["total_entries"],
+                by_cluster_type=by_cluster_type,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
@@ -984,10 +994,13 @@ def register_tools(mcp: FastMCP):
         treatment_types: list[str] = Field(default=[], description="Experiment treatment types (e.g. coculture, nitrogen_stress)")
         background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle'])")
         omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS)")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication (e.g. 4)")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['response_pattern'])")
         score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
 
         abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
         description: str | None = Field(default=None, description="Curated study description (only with verbose=True)")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 20)")
 
     class PubOrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
@@ -1005,6 +1018,10 @@ def register_tools(mcp: FastMCP):
         background_factor: str = Field(description="Background factor (e.g. 'axenic', 'diel_cycle')")
         count: int = Field(description="Number of publications (e.g. 5)")
 
+    class PubClusterTypeBreakdown(BaseModel):
+        cluster_type: str = Field(description="Cluster type (e.g. 'response_pattern')")
+        count: int = Field(description="Number of publications (e.g. 4)")
+
     class ListPublicationsResponse(BaseModel):
         total_entries: int = Field(description="Total publications in KG (unfiltered)")
         total_matching: int = Field(description="Publications matching filters")
@@ -1012,6 +1029,7 @@ def register_tools(mcp: FastMCP):
         by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted by count descending")
         by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted by count descending")
         by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted by count descending")
+        by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted by count descending")
         returned: int = Field(description="Publications in this response")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
@@ -1075,6 +1093,7 @@ def register_tools(mcp: FastMCP):
             by_treatment_type = [PubTreatmentTypeBreakdown(**b) for b in result["by_treatment_type"]]
             by_background_factors = [PubBackgroundFactorBreakdown(**b) for b in result["by_background_factors"]]
             by_omics_type = [PubOmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
+            by_cluster_type = [PubClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
             response = ListPublicationsResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
@@ -1082,6 +1101,7 @@ def register_tools(mcp: FastMCP):
                 by_treatment_type=by_treatment_type,
                 by_background_factors=by_background_factors,
                 by_omics_type=by_omics_type,
+                by_cluster_type=by_cluster_type,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
@@ -1127,6 +1147,8 @@ def register_tools(mcp: FastMCP):
         gene_count: int = Field(description="Total genes with expression data (e.g. 1696)")
         genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status")
         timepoints: list[TimePoint] | None = Field(default=None, description="Per-timepoint gene counts. Omitted for non-time-course experiments.")
+        clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this experiment (e.g. 4)")
+        cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['response_pattern'])")
         score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
         # verbose-only fields
         publication_title: str | None = Field(default=None, description="Publication title")
@@ -1138,6 +1160,7 @@ def register_tools(mcp: FastMCP):
         temperature: str | None = Field(default=None, description="Temperature (e.g. '24C')")
         statistical_test: str | None = Field(default=None, description="Statistical method (e.g. 'Rockhopper')")
         experimental_context: str | None = Field(default=None, description="Context summary (e.g. 'in Pro99 medium under continuous light')")
+        cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 20)")
 
     class OrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
@@ -1163,6 +1186,10 @@ def register_tools(mcp: FastMCP):
         table_scope: str = Field(description="Table scope value (e.g. 'all_detected_genes', 'significant_only')")
         count: int = Field(description="Number of experiments with this scope (e.g. 22)")
 
+    class ClusterTypeBreakdown(BaseModel):
+        cluster_type: str = Field(description="Cluster type (e.g. 'response_pattern')")
+        count: int = Field(description="Number of experiments with this cluster type (e.g. 7)")
+
     class ListExperimentsResponse(BaseModel):
         total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
         total_matching: int = Field(description="Experiments matching filters")
@@ -1175,6 +1202,7 @@ def register_tools(mcp: FastMCP):
         by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted by count descending")
         by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted by count descending")
         by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted by count descending")
+        by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted by count descending")
         time_course_count: int = Field(description="Number of time-course experiments in matching set")
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
@@ -1280,6 +1308,7 @@ def register_tools(mcp: FastMCP):
             by_omics_type = [OmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
             by_publication = [PublicationBreakdown(**b) for b in result["by_publication"]]
             by_table_scope = [TableScopeBreakdown(**b) for b in result["by_table_scope"]]
+            by_cluster_type = [ClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
 
             # Build result models (empty list when summary=True)
             experiments = []
@@ -1309,6 +1338,7 @@ def register_tools(mcp: FastMCP):
                 by_omics_type=by_omics_type,
                 by_publication=by_publication,
                 by_table_scope=by_table_scope,
+                by_cluster_type=by_cluster_type,
                 time_course_count=result["time_course_count"],
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),

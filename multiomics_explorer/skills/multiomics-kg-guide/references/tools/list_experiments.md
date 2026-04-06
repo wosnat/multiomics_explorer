@@ -38,7 +38,7 @@ report all assayed genes (fair for cross-experiment comparison).
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, time_course_count, score_max, score_median, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered)
@@ -52,6 +52,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **by_omics_type** (list[OmicsTypeBreakdown]): Experiment counts per omics platform, sorted by count descending
 - **by_publication** (list[PublicationBreakdown]): Experiment counts per publication, sorted by count descending
 - **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted by count descending
+- **by_cluster_type** (list[ClusterTypeBreakdown]): Experiment counts per cluster type, sorted by count descending
 - **time_course_count** (int): Number of time-course experiments in matching set
 - **score_max** (float | None): Max Lucene relevance score, present only when search_text is used (e.g. 4.52)
 - **score_median** (float | None): Median Lucene relevance score, present only when search_text is used (e.g. 1.23)
@@ -74,6 +75,8 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | gene_count | int | Total genes with expression data (e.g. 1696) |
 | genes_by_status | GeneStatusBreakdown | Gene counts by expression status |
 | timepoints | list[TimePoint] \| None (optional) | Per-timepoint gene counts. Omitted for non-time-course experiments. |
+| clustering_analysis_count | int (optional) | Number of clustering analyses for this experiment (e.g. 4) |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['response_pattern']) |
 | score | float \| None (optional) | Lucene relevance score, present only when search_text is used (e.g. 2.45) |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -89,6 +92,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | temperature | string \| None (optional) | Temperature (e.g. '24C') |
 | statistical_test | string \| None (optional) | Statistical method (e.g. 'Rockhopper') |
 | experimental_context | string \| None (optional) | Context summary (e.g. 'in Pro99 medium under continuous light') |
+| cluster_count | int \| None (optional) | Total gene clusters across analyses (only with verbose=True, e.g. 20) |
 
 ## Few-shot examples
 
@@ -104,6 +108,7 @@ list_experiments(summary=True)
  "by_treatment_type": [{"treatment_type": "coculture", "count": 16}, ...],
  "by_omics_type": [{"omics_type": "RNASEQ", "count": 48}, ...],
  "by_table_scope": [{"table_scope": "all_detected_genes", "count": 40}, ...],
+ "by_cluster_type": [{"cluster_type": "response_pattern", "count": 7}, ...],
  "time_course_count": 29, "returned": 0, "truncated": true, "offset": 0, "results": []}
 ```
 
@@ -158,6 +163,7 @@ list_organisms → list_experiments
 list_publications → list_experiments
 list_filter_values → list_experiments
 list_experiments → differential_expression_by_gene
+list_experiments → list_clustering_analyses(experiment_ids=[...])
 ```
 
 ## Common mistakes
@@ -186,7 +192,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, time_course_count, score_max, score_median, results
+# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, time_course_count, score_max, score_median, results
 ```
 
 Use package import for bulk data extraction in scripts.

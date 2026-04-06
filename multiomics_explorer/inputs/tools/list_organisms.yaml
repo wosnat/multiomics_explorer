@@ -12,7 +12,7 @@ examples:
         "truncated": false,
         "offset": 0,
         "results": [
-          {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"]},
+          {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["response_pattern", "diel_cycling", "expression_level"]},
           {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas", "gene_count": 4136, "publication_count": 2, ...}
         ]
       }
@@ -36,6 +36,7 @@ chaining:
   - "list_organisms → list_publications"
   - "list_organisms → resolve_gene"
   - "list_organisms → genes_by_ontology"
+  - "list_organisms → list_clustering_analyses(organism=...)"
 
 verbose_fields:
   - family
@@ -45,6 +46,7 @@ verbose_fields:
   - kingdom
   - superkingdom
   - lineage
+  - cluster_count
 
 mistakes:
   - "gene_count and publication_count are counts of data in the KG, not biological totals"

@@ -28,7 +28,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, returned, offset, truncated, results
+total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total publications in KG (unfiltered)
@@ -37,6 +37,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted by count descending
 - **by_background_factors** (list[PubBackgroundFactorBreakdown]): Publication counts per background factor, sorted by count descending
 - **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted by count descending
+- **by_cluster_type** (list[PubClusterTypeBreakdown]): Publication counts per cluster type, sorted by count descending
 - **returned** (int): Publications in this response
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
@@ -56,6 +57,8 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | treatment_types | list[string] (optional) | Experiment treatment types (e.g. coculture, nitrogen_stress) |
 | background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'diel_cycle']) |
 | omics_types | list[string] (optional) | Omics data types (e.g. RNASEQ, PROTEOMICS) |
+| clustering_analysis_count | int (optional) | Number of clustering analyses from this publication (e.g. 4) |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['response_pattern']) |
 | score | float \| None (optional) | Lucene relevance score (only with search_text) |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -64,6 +67,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 |---|---|---|
 | abstract | string \| None (optional) | Publication abstract (only with verbose=True) |
 | description | string \| None (optional) | Curated study description (only with verbose=True) |
+| cluster_count | int \| None (optional) | Total gene clusters across analyses (only with verbose=True, e.g. 20) |
 
 ## Few-shot examples
 
@@ -79,10 +83,11 @@ list_publications()
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 11}, ...],
   "by_treatment_type": [{"treatment_type": "coculture", "count": 5}, ...],
   "by_omics_type": [{"omics_type": "RNASEQ", "count": 12}, ...],
+  "by_cluster_type": [{"cluster_type": "response_pattern", "count": 4}, ...],
   "returned": 5, "truncated": true, "offset": 0,
   "results": [
-    {"doi": "10.1101/2025.11.24.690089", "title": "Transcriptomic and Proteomic...", "year": 2025, "experiment_count": 10, ...},
-    {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "experiment_count": 5, ...}
+    {"doi": "10.1101/2025.11.24.690089", "title": "Transcriptomic and Proteomic...", "year": 2025, "experiment_count": 10, "clustering_analysis_count": 0, "cluster_types": [], ...},
+    {"doi": "10.1038/ismej.2016.70", "title": "Transcriptional response of Prochlorococcus...", "year": 2016, "experiment_count": 5, "clustering_analysis_count": 2, "cluster_types": ["response_pattern"], ...}
   ]
 }
 ```
@@ -111,6 +116,7 @@ Step 3: genes_by_function(search_text="photosystem", organism="MED4")
 ```
 list_publications → list_experiments → differential_expression_by_gene
 list_publications → genes_by_function
+list_publications → list_clustering_analyses(publication_doi=[...])
 ```
 
 ## Common mistakes
@@ -135,7 +141,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, offset, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.
