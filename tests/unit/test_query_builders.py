@@ -2708,10 +2708,10 @@ class TestClusteringAnalysisWhere:
 
     def test_cluster_type_filter(self):
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
-        conditions, params = _clustering_analysis_where(cluster_type="response_pattern")
+        conditions, params = _clustering_analysis_where(cluster_type="condition_comparison")
         assert len(conditions) == 1
         assert "$cluster_type" in conditions[0]
-        assert params["cluster_type"] == "response_pattern"
+        assert params["cluster_type"] == "condition_comparison"
 
     def test_treatment_type_filter(self):
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
@@ -2740,7 +2740,7 @@ class TestClusteringAnalysisWhere:
     def test_combined_filters(self):
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
         conditions, params = _clustering_analysis_where(
-            organism="MED4", cluster_type="response_pattern",
+            organism="MED4", cluster_type="condition_comparison",
             treatment_type=["nitrogen_stress"], omics_type="MICROARRAY",
             background_factors=["axenic"],
         )
@@ -2837,7 +2837,8 @@ class TestBuildListClusteringAnalyses:
         from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
         cypher, params = build_list_clustering_analyses(verbose=True)
         assert "functional_description" in cypher
-        assert "behavioral_description" in cypher
+        assert "expression_dynamics" in cypher
+        assert "temporal_pattern" in cypher
 
     def test_inline_clusters_compact(self):
         from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
@@ -2984,11 +2985,11 @@ class TestBuildGeneClustersByGene:
         cypher, _ = build_gene_clusters_by_gene(
             locus_tags=["PMM0370"], verbose=True)
         for col in ["cluster_functional_description",
-                     "cluster_behavioral_description",
+                     "cluster_expression_dynamics",
+                     "cluster_temporal_pattern",
                      "cluster_method", "member_count",
                      "treatment", "light_condition",
-                     "experimental_context", "p_value",
-                     "peak_time_hours", "period_hours"]:
+                     "experimental_context", "p_value"]:
             assert f"AS {col}" in cypher, f"Missing verbose column: {col}"
 
     def test_verbose_false_omits_verbose_columns(self):
@@ -2996,7 +2997,7 @@ class TestBuildGeneClustersByGene:
         cypher, _ = build_gene_clusters_by_gene(
             locus_tags=["PMM0370"], verbose=False)
         assert "cluster_functional_description" not in cypher
-        assert "cluster_behavioral_description" not in cypher
+        assert "cluster_expression_dynamics" not in cypher
         assert "cluster_method" not in cypher
 
     def test_analysis_ids_filter(self):
@@ -3082,14 +3083,15 @@ class TestBuildGenesInCluster:
             verbose=True)
         for col in ["gene_function_description", "gene_summary",
                      "p_value", "cluster_functional_description",
-                     "cluster_behavioral_description"]:
+                     "cluster_expression_dynamics",
+                     "cluster_temporal_pattern"]:
             assert f"AS {col}" in cypher, f"Missing verbose column: {col}"
         # Old column names must NOT appear
         assert "AS function_description" not in cypher
         assert "AS functional_description" not in cypher.replace(
             "cluster_functional_description", "")
-        assert "AS behavioral_description" not in cypher.replace(
-            "cluster_behavioral_description", "")
+        assert "AS expression_dynamics" not in cypher.replace(
+            "cluster_expression_dynamics", "")
 
     def test_analysis_id_mode(self):
         from multiomics_explorer.kg.queries_lib import build_genes_in_cluster
