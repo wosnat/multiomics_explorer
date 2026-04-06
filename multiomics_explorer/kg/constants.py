@@ -11,13 +11,10 @@ VALID_TAXONOMIC_LEVELS: set[str] = {
 MAX_SPECIFICITY_RANK: int = 3  # 0=curated, 1=family, 2=order, 3=domain
 
 VALID_CLUSTER_TYPES: set[str] = {
-    "diel_cycling",
-    "diel_expression_pattern",
-    "expression_classification",
-    "expression_level",
-    "expression_pattern",
-    "periodicity_classification",
-    "response_pattern",
+    "classification",
+    "condition_comparison",
+    "diel",
+    "time_course",
 }
 
 VALID_OMICS_TYPES: set[str] = {
