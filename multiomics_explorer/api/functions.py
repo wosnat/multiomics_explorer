@@ -18,6 +18,8 @@ from neo4j.exceptions import ClientError as Neo4jClientError
 
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.constants import (
+    ALL_ONTOLOGIES,
+    GO_ONTOLOGIES,
     MAX_SPECIFICITY_RANK,
     VALID_OG_SOURCES,
     VALID_TAXONOMIC_LEVELS,
@@ -73,6 +75,10 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_clusters_by_gene_summary,
     build_genes_in_cluster,
     build_genes_in_cluster_summary,
+    build_ontology_experiment_check,
+    build_ontology_expcov,
+    build_ontology_landscape,
+    build_ontology_organism_gene_count,
 )
 from multiomics_explorer.kg.schema import load_schema_from_neo4j
 
@@ -2438,3 +2444,245 @@ def genes_in_cluster(
     envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
+
+
+# ---------------------------------------------------------------------------
+# ontology_landscape helpers
+# ---------------------------------------------------------------------------
+
+
+def _ontology_size_factor(median: float) -> float:
+    """[5, 50] sweet-spot penalty on median term size."""
+    if median <= 0:
+        return 0.0
+    return min(1.0, median / 5.0) * min(1.0, 50.0 / median)
+
+
+def _ontology_relevance_score(
+    row: dict, experiment_weighted: bool,
+) -> float:
+    sf = _ontology_size_factor(row["median_genes_per_term"])
+    if experiment_weighted and "median_exp_coverage" in row:
+        return row["median_exp_coverage"] * sf
+    return row["genome_coverage"] * sf
+
+
+def _ontology_exp_coverage_stats(
+    expcov_rows: list[dict],
+    valid_eids: list[str],
+    level_keys: list[int],
+) -> dict:
+    """Zero-fill + min/median/max across experiments per level.
+
+    expcov_rows: rows from build_ontology_expcov for a single ontology.
+    valid_eids: experiments known to be valid -- any missing from a given
+                level contributes 0 to the aggregation.
+    level_keys: set of levels observed in landscape stats; experiments
+                contribute 0 at levels where they emit no row.
+
+    Returns {level: {min_exp_coverage, median_exp_coverage,
+    max_exp_coverage, n_experiments_with_coverage}}.
+    """
+    per_level: dict = {
+        lvl: {eid: 0.0 for eid in valid_eids} for lvl in level_keys
+    }
+    for r in expcov_rows:
+        lvl = r["level"]
+        eid = r["eid"]
+        if lvl in per_level and eid in per_level[lvl]:
+            per_level[lvl][eid] = (
+                r["n_at_level"] / r["n_total"] if r["n_total"] else 0.0
+            )
+    out: dict = {}
+    for lvl, by_eid in per_level.items():
+        covs = list(by_eid.values())
+        out[lvl] = {
+            "min_exp_coverage": min(covs) if covs else 0.0,
+            "median_exp_coverage": statistics.median(covs) if covs else 0.0,
+            "max_exp_coverage": max(covs) if covs else 0.0,
+            "n_experiments_with_coverage": sum(1 for c in covs if c > 0),
+        }
+    return out
+
+
+# ---------------------------------------------------------------------------
+# ontology_landscape
+# ---------------------------------------------------------------------------
+
+
+def ontology_landscape(
+    organism: str,
+    ontology: str | None = None,
+    experiment_ids: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int = 500,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Characterise ontologies for enrichment in one organism.
+
+    Per-(ontology x level) rows. Ranked by spec_score (genome_coverage
+    x size_factor(median_genes_per_term)) when experiment_ids is None,
+    or median_exp_coverage x size_factor when set. Only terms with
+    min_gene_set_size <= gene_count <= max_gene_set_size contribute to
+    per-level stats -- same filter as pathway_enrichment.
+
+    Returns dict with keys: organism_name, organism_gene_count,
+    n_ontologies, by_ontology, not_found, not_matched, results,
+    returned, total_matching, truncated, offset.
+
+    Raises ValueError on unknown/ambiguous organism or invalid ontology.
+    """
+    if ontology is not None and ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. "
+            f"Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # Step 1: Resolve organism to canonical string (raises on unknown/ambiguous)
+    canonical_org = _validate_organism_inputs(
+        organism=organism, locus_tags=None, experiment_ids=None, conn=conn,
+    )
+
+    # Step 2: Total gene count for genome_coverage denominator
+    gc_cypher, gc_params = build_ontology_organism_gene_count(
+        organism_name=canonical_org,
+    )
+    organism_gene_count = conn.execute_query(gc_cypher, **gc_params)[0]["total_genes"]
+
+    # Step 3: Experiment validation
+    valid_eids: list[str] = []
+    not_found: list[str] = []
+    not_matched: list[str] = []
+    if experiment_ids:
+        ec_cypher, ec_params = build_ontology_experiment_check(
+            experiment_ids=experiment_ids,
+        )
+        ec_rows = conn.execute_query(ec_cypher, **ec_params)
+        for r in ec_rows:
+            if not r["exists"]:
+                not_found.append(r["eid"])
+            elif r["exp_organism"] != canonical_org:
+                not_matched.append(r["eid"])
+            else:
+                valid_eids.append(r["eid"])
+
+    # Step 4: Per-ontology landscape queries
+    targets = [ontology] if ontology else ALL_ONTOLOGIES
+    all_rows: list[dict] = []
+    for ont in targets:
+        ls_cypher, ls_params = build_ontology_landscape(
+            ontology=ont, organism_name=canonical_org, verbose=verbose,
+            min_gene_set_size=min_gene_set_size,
+            max_gene_set_size=max_gene_set_size,
+        )
+        stat_rows = conn.execute_query(ls_cypher, **ls_params)
+        n_levels = len(stat_rows)
+
+        # Experiment coverage aggregation (per-ontology)
+        exp_stats: dict = {}
+        if valid_eids:
+            ec_cypher2, ec_params2 = build_ontology_expcov(
+                ontology=ont, organism_name=canonical_org,
+                experiment_ids=valid_eids,
+                min_gene_set_size=min_gene_set_size,
+                max_gene_set_size=max_gene_set_size,
+            )
+            expcov_rows = conn.execute_query(ec_cypher2, **ec_params2)
+            exp_stats = _ontology_exp_coverage_stats(
+                expcov_rows, valid_eids,
+                level_keys=[r["level"] for r in stat_rows],
+            )
+
+        for r in stat_rows:
+            row: dict = {
+                "ontology_type": ont,
+                "level": r["level"],
+                "n_terms_with_genes": r["n_terms_with_genes"],
+                "n_genes_at_level": r["n_genes_at_level"],
+                "genome_coverage": (
+                    r["n_genes_at_level"] / organism_gene_count
+                    if organism_gene_count else 0.0
+                ),
+                "min_genes_per_term": r["min_genes_per_term"],
+                "q1_genes_per_term": r["q1_genes_per_term"],
+                "median_genes_per_term": r["median_genes_per_term"],
+                "q3_genes_per_term": r["q3_genes_per_term"],
+                "max_genes_per_term": r["max_genes_per_term"],
+                "n_levels_in_ontology": n_levels,
+            }
+            # best_effort_share -- GO ontologies only
+            if ont in GO_ONTOLOGIES:
+                row["best_effort_share"] = (
+                    r["n_best_effort"] / r["n_terms_with_genes"]
+                    if r["n_terms_with_genes"] else 0.0
+                )
+            else:
+                row["best_effort_share"] = None
+            if verbose:
+                row["example_terms"] = r["example_terms"]
+            if valid_eids:
+                e = exp_stats.get(r["level"], {
+                    "min_exp_coverage": 0.0,
+                    "median_exp_coverage": 0.0,
+                    "max_exp_coverage": 0.0,
+                    "n_experiments_with_coverage": 0,
+                })
+                row.update(e)
+            all_rows.append(row)
+
+    # Step 5: Rank in Python. Before limit/offset so relevance_rank is
+    # stable when caller paginates.
+    experiment_weighted = bool(valid_eids)
+    for r in all_rows:
+        r["_score"] = _ontology_relevance_score(r, experiment_weighted)
+    all_rows.sort(
+        key=lambda r: (-r["_score"], -r["genome_coverage"], r["level"]),
+    )
+    for i, r in enumerate(all_rows):
+        r["relevance_rank"] = i + 1
+        r.pop("_score", None)
+
+    # by_ontology: summary keyed by ontology_type; first row per ontology
+    # (already sorted by rank) provides best_* fields.
+    by_ontology: dict[str, dict] = {}
+    for r in all_rows:
+        ont = r["ontology_type"]
+        if ont not in by_ontology:
+            by_ontology[ont] = {
+                "best_level": r["level"],
+                "best_genome_coverage": r["genome_coverage"],
+                "best_relevance_rank": r["relevance_rank"],
+                "n_levels": 0,
+            }
+        by_ontology[ont]["n_levels"] += 1
+
+    # Step 6: Paginate + envelope
+    total_matching = len(all_rows)
+    sliced = all_rows[offset:]
+    if limit is not None:
+        results = [] if limit == 0 else sliced[:limit]
+    else:
+        results = sliced
+
+    return {
+        "organism_name": canonical_org,
+        "organism_gene_count": organism_gene_count,
+        "n_ontologies": len({r["ontology_type"] for r in all_rows}),
+        "by_ontology": by_ontology,
+        "not_found": not_found,
+        "not_matched": not_matched,
+        "results": results,
+        "returned": len(results),
+        "total_matching": total_matching,
+        "truncated": total_matching > len(results),
+        "offset": offset,
+    }

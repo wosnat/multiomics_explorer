@@ -3255,3 +3255,183 @@ class TestGenesInCluster:
         result = api.genes_in_cluster(
             cluster_ids=["cluster:fake:id"], summary=True, conn=mock_conn)
         assert "cluster:fake:id" in result["not_found_clusters"]
+
+
+# ---------------------------------------------------------------------------
+# ontology_landscape
+# ---------------------------------------------------------------------------
+
+from multiomics_explorer.kg.constants import ALL_ONTOLOGIES, GO_ONTOLOGIES
+from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+
+
+class TestOntologyLandscape:
+    def _mock_conn(self, gene_count: int, per_ont_rows: dict):
+        """Build a mock conn whose execute_query returns results keyed by
+        the 'org' / 'experiment_ids' param dispatch implied by the Cypher.
+        """
+        conn = MagicMock()
+
+        def run(cypher, **params):
+            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if "count(g) AS total_genes" in cypher:
+                return [{"total_genes": gene_count}]
+            # Match one of the 9 ontology landscape queries
+            for ont, rows in per_ont_rows.items():
+                cfg = ONTOLOGY_CONFIG[ont]
+                if cfg["gene_rel"] in cypher and f":{cfg['label']}" in cypher:
+                    return rows
+            raise AssertionError(f"no mock for cypher:\n{cypher}")
+
+        conn.execute_query.side_effect = run
+        return conn
+
+    def _mock_conn_with_experiments(
+        self, gene_count, per_ont_stats, per_ont_expcov, exp_check_rows,
+    ):
+        conn = MagicMock()
+
+        def run(cypher, **params):
+            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if "count(g) AS total_genes" in cypher:
+                return [{"total_genes": gene_count}]
+            if "OPTIONAL MATCH (e:Experiment {id: eid})" in cypher:
+                return exp_check_rows
+            for ont, rows in per_ont_expcov.items():
+                cfg = ONTOLOGY_CONFIG[ont]
+                if ("Changes_expression_of" in cypher and
+                        cfg["gene_rel"] in cypher):
+                    return rows
+            for ont, rows in per_ont_stats.items():
+                cfg = ONTOLOGY_CONFIG[ont]
+                if cfg["gene_rel"] in cypher and f":{cfg['label']}" in cypher:
+                    return rows
+            raise AssertionError(f"no mock for cypher:\n{cypher[:200]}")
+
+        conn.execute_query.side_effect = run
+        return conn
+
+    def test_genome_branch_all_ontologies(self):
+        per_ont_rows = {
+            ont: [
+                {
+                    "level": 0, "n_terms_with_genes": 1,
+                    "n_genes_at_level": 1000,
+                    "min_genes_per_term": 1000, "q1_genes_per_term": 1000.0,
+                    "median_genes_per_term": 1000.0, "q3_genes_per_term": 1000.0,
+                    "max_genes_per_term": 1000, "n_best_effort": 0,
+                },
+            ]
+            for ont in ALL_ONTOLOGIES
+        }
+        conn = self._mock_conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        result = api.ontology_landscape(
+            organism="MED4", conn=conn,
+        )
+        # Envelope
+        assert result["organism_name"] == "Prochlorococcus MED4"
+        assert result["organism_gene_count"] == 1976
+        assert result["n_ontologies"] == len(ALL_ONTOLOGIES)
+        assert result["not_found"] == []
+        assert result["not_matched"] == []
+        assert "total_matching" in result
+        assert "total_rows" not in result
+        # Results
+        assert len(result["results"]) == len(ALL_ONTOLOGIES)
+        for row in result["results"]:
+            assert row["ontology_type"] in ALL_ONTOLOGIES
+            assert row["level"] == 0
+            assert row["genome_coverage"] == pytest.approx(1000 / 1976)
+
+    def test_ranking_and_by_ontology(self):
+        # tigr_role L0: cov=1765/1976, median=9 → sf=1.0 → rank 1
+        # cyanorak_role L1: cov=1491/1976, median=9 → sf=1.0 → rank 2
+        # go_bp L0: cov=1122/1976, median=1122 → sf≈0.045 → low rank
+        per_ont_rows = {ont: [] for ont in ALL_ONTOLOGIES}
+        per_ont_rows["tigr_role"] = [{
+            "level": 0, "n_terms_with_genes": 106,
+            "n_genes_at_level": 1765,
+            "min_genes_per_term": 1, "q1_genes_per_term": 3.0,
+            "median_genes_per_term": 9.0, "q3_genes_per_term": 17.0,
+            "max_genes_per_term": 451, "n_best_effort": 0,
+        }]
+        per_ont_rows["cyanorak_role"] = [{
+            "level": 1, "n_terms_with_genes": 110,
+            "n_genes_at_level": 1491,
+            "min_genes_per_term": 1, "q1_genes_per_term": 3.0,
+            "median_genes_per_term": 9.0, "q3_genes_per_term": 16.0,
+            "max_genes_per_term": 340, "n_best_effort": 0,
+        }]
+        per_ont_rows["go_bp"] = [{
+            "level": 0, "n_terms_with_genes": 1,
+            "n_genes_at_level": 1122,
+            "min_genes_per_term": 1122, "q1_genes_per_term": 1122.0,
+            "median_genes_per_term": 1122.0, "q3_genes_per_term": 1122.0,
+            "max_genes_per_term": 1122, "n_best_effort": 0,
+        }]
+        conn = self._mock_conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        result = api.ontology_landscape(organism="MED4", conn=conn)
+        # Rank 1 = tigr_role
+        top = result["results"][0]
+        assert top["ontology_type"] == "tigr_role"
+        assert top["relevance_rank"] == 1
+        # Rank 2 = cyanorak_role
+        assert result["results"][1]["ontology_type"] == "cyanorak_role"
+        assert result["results"][1]["relevance_rank"] == 2
+        # by_ontology summary
+        assert "tigr_role" in result["by_ontology"]
+        tigr_summary = result["by_ontology"]["tigr_role"]
+        assert tigr_summary["best_level"] == 0
+        assert tigr_summary["best_relevance_rank"] == 1
+        assert tigr_summary["n_levels"] == 1
+        assert tigr_summary["best_genome_coverage"] == pytest.approx(1765 / 1976)
+
+    def test_experiment_branch_not_found_and_not_matched(self):
+        per_ont_stats = {
+            "cyanorak_role": [{
+                "level": 1, "n_terms_with_genes": 110,
+                "n_genes_at_level": 1491,
+                "min_genes_per_term": 1, "q1_genes_per_term": 3.0,
+                "median_genes_per_term": 9.0, "q3_genes_per_term": 16.0,
+                "max_genes_per_term": 340, "n_best_effort": 0,
+            }],
+        }
+        per_ont_expcov = {
+            "cyanorak_role": [
+                {"eid": "EXP_A", "n_total": 100, "level": 1, "n_at_level": 80},
+                # No row for EXP_B at level 1 — zero-fill expected
+            ],
+        }
+        exp_check_rows = [
+            {"eid": "EXP_A", "exists": True,
+             "exp_organism": "Prochlorococcus MED4"},
+            {"eid": "EXP_B", "exists": True,
+             "exp_organism": "Prochlorococcus MED4"},
+            {"eid": "EXP_MISSING", "exists": False, "exp_organism": ""},
+            {"eid": "EXP_WRONG_ORG", "exists": True,
+             "exp_organism": "Alteromonas macleodii HOT1A3"},
+        ]
+        conn = self._mock_conn_with_experiments(
+            gene_count=1976,
+            per_ont_stats=per_ont_stats,
+            per_ont_expcov=per_ont_expcov,
+            exp_check_rows=exp_check_rows,
+        )
+        result = api.ontology_landscape(
+            organism="MED4", ontology="cyanorak_role",
+            experiment_ids=["EXP_A", "EXP_B", "EXP_MISSING", "EXP_WRONG_ORG"],
+            conn=conn,
+        )
+        assert result["not_found"] == ["EXP_MISSING"]
+        assert result["not_matched"] == ["EXP_WRONG_ORG"]
+        # Only one landscape row (cyanorak L1)
+        assert len(result["results"]) == 1
+        row = result["results"][0]
+        # Zero-fill: EXP_A has 80/100 = 0.8, EXP_B had no row → 0.0
+        # min=0.0, max=0.8, median=0.4
+        assert row["min_exp_coverage"] == pytest.approx(0.0)
+        assert row["max_exp_coverage"] == pytest.approx(0.8)
+        assert row["median_exp_coverage"] == pytest.approx(0.4)
+        assert row["n_experiments_with_coverage"] == 1
