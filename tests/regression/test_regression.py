@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene,
     build_differential_expression_by_ortholog_results,
@@ -64,6 +65,8 @@ TOOL_BUILDERS = {
     "genes_by_homolog_group_summary": build_genes_by_homolog_group_summary,
     "differential_expression_by_ortholog": build_differential_expression_by_ortholog_results,
     "gene_response_profile": build_gene_response_profile,
+    # ontology_landscape: dispatched via api (L2), not a query builder
+    "ontology_landscape": None,
 }
 
 
@@ -131,6 +134,9 @@ def test_regression(conn, case, data_regression):
     elif tool == "gene_homologs_with_members":
         cypher, params_b = build_gene_homologs(locus_tags=params["locus_tags"])
         results = conn.execute_query(cypher, **params_b)
+    elif tool == "ontology_landscape":
+        data = api.ontology_landscape(**params, conn=conn)
+        results = data["results"]
     else:
         builder = TOOL_BUILDERS[tool]
         # Strip tool-level params that aren't accepted by query builders

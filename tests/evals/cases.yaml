@@ -1219,3 +1219,40 @@
   expect:
     min_rows: 1
     columns: [group_id, significant_up, significant_down]
+
+# ── ontology_landscape ───────────────────────────────────────────────────────
+
+- id: ontology_landscape_med4_all
+  tool: ontology_landscape
+  desc: MED4 all-ontology survey with default gene-set-size filter
+  params:
+    organism: MED4
+    limit: null
+
+- id: ontology_landscape_med4_all_no_filter
+  tool: ontology_landscape
+  desc: MED4 all-ontology survey with relaxed filter (min=1, max=10000)
+  params:
+    organism: MED4
+    limit: null
+    min_gene_set_size: 1
+    max_gene_set_size: 10000
+
+- id: ontology_landscape_med4_cyanorak_10exp
+  tool: ontology_landscape
+  desc: MED4 cyanorak_role weighted by 10 real experiments
+  params:
+    organism: MED4
+    ontology: cyanorak_role
+    experiment_ids:
+      - "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"
+      - "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture"
+      - "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic"
+      - "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"
+      - "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture"
+      - "10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq"
+      - "10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq"
+      - "10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq"
+      - "10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark"
+      - "10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray"
+    limit: null
