@@ -852,3 +852,41 @@ class TestGeneOverview:
         assert summary["total_matching"] == detail["total_matching"]
         assert detail["total_matching"] == len(detail["results"])
 
+
+
+@pytest.mark.kg
+class TestOntologyLandscapeIntegration:
+    def test_med4_all_ontologies_cyanorak_l1_rank1_among_hierarchical(self, conn):
+        from multiomics_explorer.api.functions import ontology_landscape
+        result = ontology_landscape(
+            organism="MED4", limit=None, conn=conn,
+        )
+        hierarchical = [
+            r for r in result["results"]
+            if r["n_levels_in_ontology"] > 1
+        ]
+        assert hierarchical, "expected at least one hierarchical row"
+        top_hier = min(hierarchical, key=lambda r: r["relevance_rank"])
+        assert top_hier["ontology_type"] == "cyanorak_role"
+        assert top_hier["level"] == 1, (
+            f"expected cyanorak_role L1, got L{top_hier['level']}"
+        )
+
+    def test_med4_experiment_branch_coverage_fields(self, conn):
+        from multiomics_explorer.api.functions import ontology_landscape
+        result = ontology_landscape(
+            organism="MED4",
+            ontology="cyanorak_role",
+            experiment_ids=[
+                "10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq",
+                "THIS_DOES_NOT_EXIST",
+            ],
+            limit=None,
+            conn=conn,
+        )
+        assert "THIS_DOES_NOT_EXIST" in result["not_found"]
+        # Coverage fields present on every row
+        for r in result["results"]:
+            assert "min_exp_coverage" in r
+            assert "median_exp_coverage" in r
+            assert "max_exp_coverage" in r
