@@ -94,6 +94,20 @@ def _default_conn(conn: GraphConnection | None) -> GraphConnection:
     return conn
 
 
+def _chunk_locus_tags(locus_tags: list[str]) -> list[list[str]]:
+    """Split locus_tags into chunks for memory-bounded transactions.
+
+    Default 500; override via MULTIOMICS_KG_BATCH_SIZE env var.
+    Chunking prevents Neo4j's 1.4 GiB transaction cap on large
+    gene × term fan-out queries (e.g. 2000 × GO MF).
+    """
+    import os
+    size = int(os.getenv("MULTIOMICS_KG_BATCH_SIZE", "500"))
+    if size <= 0 or len(locus_tags) <= size:
+        return [locus_tags]
+    return [locus_tags[i: i + size] for i in range(0, len(locus_tags), size)]
+
+
 # Regex for blocking write operations in raw Cypher.
 _WRITE_KEYWORDS = re.compile(
     r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{|CALL\s+\w+\.\w+|LOAD\s+CSV)\b",
@@ -1283,37 +1297,48 @@ def gene_ontology_terms(
     # Determine which ontologies to query
     ontologies = [ontology] if ontology else sorted(ONTOLOGY_CONFIG)
 
-    # Step 2: summary queries — always run (stats from Cypher)
+    # Step 2: summary queries — chunked to avoid 1.4 GiB Neo4j transaction cap
     by_ontology: list[dict] = []
     all_by_term: list[dict] = []
     gene_term_counts: dict[str, int] = {lt: 0 for lt in found_tags}
 
     if found_tags:
         for ont in ontologies:
-            sum_cypher, sum_params = build_gene_ontology_terms_summary(
-                locus_tags=found_tags, ontology=ont,
-            )
-            rows = conn.execute_query(sum_cypher, **sum_params)
-            if not rows or rows[0]["gene_count"] == 0:
+            merged_gene_count = 0
+            merged_term_count = 0
+            merged_by_term: dict[str, dict] = {}
+            for chunk in _chunk_locus_tags(found_tags):
+                sum_cypher, sum_params = build_gene_ontology_terms_summary(
+                    locus_tags=chunk, ontology=ont,
+                )
+                rows = conn.execute_query(sum_cypher, **sum_params)
+                if not rows or rows[0]["gene_count"] == 0:
+                    continue
+                row = rows[0]
+                merged_gene_count += row["gene_count"]
+                merged_term_count += row["term_count"]
+                for bt in row["by_term"]:
+                    key = bt["term_id"]
+                    if key not in merged_by_term:
+                        merged_by_term[key] = {
+                            "term_id": key, "term_name": bt["term_name"],
+                            "count": 0,
+                        }
+                    merged_by_term[key]["count"] += bt["count"]
+                for gtc in row["gene_term_counts"]:
+                    gene_term_counts[gtc["locus_tag"]] = (
+                        gene_term_counts.get(gtc["locus_tag"], 0)
+                        + gtc["term_count"]
+                    )
+            if merged_gene_count == 0:
                 continue
-            row = rows[0]
             by_ontology.append({
                 "ontology_type": ont,
-                "term_count": row["term_count"],
-                "gene_count": row["gene_count"],
+                "term_count": merged_term_count,
+                "gene_count": merged_gene_count,
             })
-            for bt in row["by_term"]:
-                all_by_term.append({
-                    "term_id": bt["term_id"],
-                    "term_name": bt["term_name"],
-                    "ontology_type": ont,
-                    "count": bt["count"],
-                })
-            for gtc in row["gene_term_counts"]:
-                gene_term_counts[gtc["locus_tag"]] = (
-                    gene_term_counts.get(gtc["locus_tag"], 0)
-                    + gtc["term_count"]
-                )
+            for bt in merged_by_term.values():
+                all_by_term.append({**bt, "ontology_type": ont})
 
     total_matching = sum(o["term_count"] for o in by_ontology)
 
@@ -1324,15 +1349,16 @@ def gene_ontology_terms(
         all_detail_rows: list[dict] = []
         if found_tags:
             for ont in ontologies:
-                det_cypher, det_params = build_gene_ontology_terms(
-                    locus_tags=found_tags, ontology=ont,
-                    verbose=verbose, limit=None,
-                )
-                rows = conn.execute_query(det_cypher, **det_params)
-                if ontology is None:
-                    for r in rows:
-                        r["ontology_type"] = ont
-                all_detail_rows.extend(rows)
+                for chunk in _chunk_locus_tags(found_tags):
+                    det_cypher, det_params = build_gene_ontology_terms(
+                        locus_tags=chunk, ontology=ont,
+                        verbose=verbose, limit=None,
+                    )
+                    rows = conn.execute_query(det_cypher, **det_params)
+                    if ontology is None:
+                        for r in rows:
+                            r["ontology_type"] = ont
+                    all_detail_rows.extend(rows)
 
         all_detail_rows.sort(key=lambda r: (r["locus_tag"], r["term_id"]))
         # Apply offset then limit on the merged result set

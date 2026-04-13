@@ -3258,6 +3258,63 @@ class TestGenesInCluster:
 
 
 # ---------------------------------------------------------------------------
+# gene_ontology_terms batching fix
+# ---------------------------------------------------------------------------
+
+from multiomics_explorer.api.functions import _chunk_locus_tags
+
+
+class TestGeneOntologyTermsChunking:
+    def test_single_chunk_when_under_threshold(self, monkeypatch):
+        monkeypatch.setenv("MULTIOMICS_KG_BATCH_SIZE", "500")
+        assert _chunk_locus_tags(["a", "b", "c"]) == [["a", "b", "c"]]
+        assert _chunk_locus_tags([f"x{i}" for i in range(500)]) == [
+            [f"x{i}" for i in range(500)]
+        ]
+
+    def test_two_chunks_at_501(self, monkeypatch):
+        monkeypatch.setenv("MULTIOMICS_KG_BATCH_SIZE", "500")
+        tags = [f"x{i}" for i in range(501)]
+        chunks = _chunk_locus_tags(tags)
+        assert len(chunks) == 2
+        assert len(chunks[0]) == 500
+        assert len(chunks[1]) == 1
+
+    def test_chunks_on_threshold(self, monkeypatch):
+        """N=1001 genes, batch=500 → 3 chunks × 9 ontologies = 27 summary calls."""
+        monkeypatch.setenv("MULTIOMICS_KG_BATCH_SIZE", "500")
+        N = 1001
+        locus_tags = [f"PMM{i:04d}" for i in range(N)]
+        exist_rows = [{"lt": lt, "found": True} for lt in locus_tags]
+        summary_row = [{"gene_count": 0, "term_count": 0,
+                        "by_term": [], "gene_term_counts": []}]
+
+        conn = MagicMock()
+
+        def side(cypher, **params):
+            if "g IS NOT NULL AS found" in cypher:
+                # existence check — return found=True for each tag in chunk
+                return exist_rows[:len(params["locus_tags"])]
+            if "gene_count" in cypher:
+                return summary_row
+            return []
+
+        conn.execute_query.side_effect = side
+
+        api.gene_ontology_terms(locus_tags=locus_tags, summary=True, conn=conn)
+
+        summary_calls = [
+            c for c in conn.execute_query.call_args_list
+            if "gene_count" in (c.args[0] if c.args else "")
+        ]
+        # Without chunking: 9 calls (one per ontology).
+        # With chunking into 3 chunks: 27 calls.
+        assert len(summary_calls) >= 27, (
+            f"expected chunked summary calls, got {len(summary_calls)}"
+        )
+
+
+# ---------------------------------------------------------------------------
 # ontology_landscape
 # ---------------------------------------------------------------------------
 
