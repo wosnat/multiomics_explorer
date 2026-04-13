@@ -1,0 +1,44 @@
+# Human-authored content for ontology_landscape about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Default survey — which ontology/level should I use for MED4?
+    call: ontology_landscape(organism="MED4")
+    response: |
+      {"organism_name": "Prochlorococcus MED4", "organism_gene_count": 1976, "n_ontologies": 9, "by_ontology": {"tigr_role": {"best_level": 0, "best_genome_coverage": 0.893, "best_relevance_rank": 1, "n_levels": 1}, "cyanorak_role": {"best_level": 1, "best_genome_coverage": 0.755, "best_relevance_rank": 2, "n_levels": 3}}, "results": [{"ontology_type": "tigr_role", "level": 0, "relevance_rank": 1, "genome_coverage": 0.893, "median_genes_per_term": 9.0, "n_levels_in_ontology": 1}]}
+
+  - title: Drill into a specific ontology
+    call: ontology_landscape(organism="MED4", ontology="go_bp", verbose=True)
+    response: |
+      {"organism_name": "Prochlorococcus MED4", "n_ontologies": 1, "results": [{"ontology_type": "go_bp", "level": 2, "relevance_rank": 1, "example_terms": [{"term_id": "go:0044238", "name": "primary metabolic process", "n_genes": 657}]}]}
+
+  - title: Weight by experiments (coverage of quantified genes)
+    steps: |
+      Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])
+              -> collect experiment_ids
+
+      Step 2: ontology_landscape(
+                organism="MED4",
+                experiment_ids=[ids from Step 1],
+              )
+              -> rows ranked by median_exp_coverage x size_factor;
+                 min_exp_coverage and max_exp_coverage reveal per-experiment spread
+
+verbose_fields:
+  - example_terms
+
+chaining:
+  - "ontology_landscape -> genes_by_ontology(level=N) -> pathway_enrichment (Phase 2)"
+  - "list_experiments -> ontology_landscape(experiment_ids=...)"
+
+mistakes:
+  - "Don't pick a level by term-size stats alone -- always check genome_coverage. An ontology may have appealing median term size at a level that covers only 18% of the genome."
+  - "Top-ranked flat ontologies (tigr_role, cog_category, pfam) are valid enrichment surfaces but offer no level choice. For hierarchical drill-down, filter results to rows where n_levels_in_ontology > 1."
+  - "KEGG has ~40% orphan KOs lacking pathway membership. If L3 coverage is substantially higher than L0-L2 coverage, the gap is structural -- those genes have KO-level annotations only."
+  - "For GO BP, best_effort_share is typically 30-80% at useful levels (L3-L5). This is normal GO-DAG geometry (min-path != max-path), not a data quality issue."
+  - "Stats reflect only terms with min_gene_set_size <= genes <= max_gene_set_size (default 5-500). If you pass min_gene_set_size=1, coverage and term counts will be higher but include terms too small or large for meaningful enrichment."
+  - wrong: "results[0]['rank']  # AttributeError"
+    right: "results[0]['relevance_rank']"
+  - wrong: "result['total_rows']  # KeyError"
+    right: "result['total_matching']"
