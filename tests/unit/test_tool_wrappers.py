@@ -60,6 +60,7 @@ EXPECTED_TOOLS = [
     "list_clustering_analyses",
     "gene_clusters_by_gene",
     "genes_in_cluster",
+    "ontology_landscape",
 ]
 
 
@@ -3125,3 +3126,74 @@ class TestGenesInClusterWrapper:
         ):
             with pytest.raises(ToolError):
                 await tool_fns["genes_in_cluster"](mock_ctx)
+
+
+# ---------------------------------------------------------------------------
+# ontology_landscape
+# ---------------------------------------------------------------------------
+
+class TestOntologyLandscapeWrapper:
+    _SAMPLE_API_RETURN = {
+        "organism_name": "Prochlorococcus MED4",
+        "organism_gene_count": 1976,
+        "n_ontologies": 1,
+        "by_ontology": {
+            "cyanorak_role": {
+                "best_level": 1, "best_genome_coverage": 0.75,
+                "best_relevance_rank": 1, "n_levels": 3,
+            },
+        },
+        "not_found": [],
+        "not_matched": [],
+        "results": [{
+            "ontology_type": "cyanorak_role", "level": 1,
+            "relevance_rank": 1,
+            "n_terms_with_genes": 110, "n_genes_at_level": 1491,
+            "genome_coverage": 0.755,
+            "min_genes_per_term": 5, "q1_genes_per_term": 9.0,
+            "median_genes_per_term": 14.0, "q3_genes_per_term": 23.0,
+            "max_genes_per_term": 340,
+            "n_levels_in_ontology": 3,
+            "best_effort_share": None,
+        }],
+        "returned": 1, "total_matching": 3, "truncated": True, "offset": 0,
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_pydantic_response(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_landscape",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["ontology_landscape"](
+                mock_ctx, organism="MED4",
+            )
+        assert type(result).__name__ == "OntologyLandscapeResponse"
+
+    @pytest.mark.asyncio
+    async def test_has_expected_fields(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_landscape",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["ontology_landscape"](
+                mock_ctx, organism="MED4",
+            )
+        assert result.total_matching == 3
+        assert result.returned == 1
+        assert result.truncated is True
+        assert result.organism_gene_count == 1976
+        assert len(result.results) == 1
+        assert result.results[0].ontology_type == "cyanorak_role"
+        assert result.results[0].relevance_rank == 1
+        assert "cyanorak_role" in result.by_ontology
+        assert result.by_ontology["cyanorak_role"].best_relevance_rank == 1
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_landscape",
+            side_effect=ValueError("no organism matching 'BOGUS'"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["ontology_landscape"](mock_ctx, organism="BOGUS")

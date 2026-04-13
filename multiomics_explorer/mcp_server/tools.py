@@ -3069,3 +3069,124 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"genes_in_cluster unexpected error: {e}")
             raise ToolError(f"Error in genes_in_cluster: {e}")
+
+    class ExampleTerm(BaseModel):
+        term_id: str = Field(description="Ontology term ID (e.g. 'go:0044238')")
+        name: str = Field(description="Ontology term name")
+        n_genes: int = Field(description="Genes at this term in this organism")
+
+    class OntologyLandscapeRow(BaseModel):
+        ontology_type: str = Field(description="Ontology key (e.g. 'cyanorak_role')")
+        level: int = Field(description="Hierarchy level; 0 = broadest")
+        relevance_rank: int = Field(
+            description="1-indexed rank by spec_score; stable under pagination",
+        )
+        n_terms_with_genes: int
+        n_genes_at_level: int
+        genome_coverage: float = Field(
+            description="n_genes_at_level / organism_gene_count",
+        )
+        min_genes_per_term: int
+        q1_genes_per_term: float
+        median_genes_per_term: float
+        q3_genes_per_term: float
+        max_genes_per_term: int
+        n_levels_in_ontology: int = Field(
+            description="Levels this ontology spans (1 = flat)",
+        )
+        best_effort_share: float | None = Field(
+            default=None,
+            description="Fraction of reached terms flagged level_is_best_effort "
+                        "(GO only; None for others)",
+        )
+        example_terms: list[ExampleTerm] | None = Field(
+            default=None,
+            description="Top 3 terms by gene count (verbose only)",
+        )
+        min_exp_coverage: float | None = Field(default=None)
+        median_exp_coverage: float | None = Field(default=None)
+        max_exp_coverage: float | None = Field(default=None)
+        n_experiments_with_coverage: int | None = Field(default=None)
+
+    class OntologySummary(BaseModel):
+        best_level: int
+        best_genome_coverage: float
+        best_relevance_rank: int
+        n_levels: int
+
+    class OntologyLandscapeResponse(BaseModel):
+        organism_name: str
+        organism_gene_count: int
+        n_ontologies: int
+        by_ontology: dict[str, OntologySummary] = Field(default_factory=dict)
+        not_found: list[str] = Field(default_factory=list)
+        not_matched: list[str] = Field(default_factory=list)
+        total_matching: int
+        returned: int
+        truncated: bool
+        offset: int = 0
+        results: list[OntologyLandscapeRow] = Field(default_factory=list)
+
+    @mcp.tool(
+        tags={"ontology", "enrichment"},
+        annotations={"readOnlyHint": True},
+    )
+    async def ontology_landscape(
+        ctx: Context,
+        organism: Annotated[str, Field(
+            description="Organism (fuzzy match, e.g. 'MED4').",
+        )],
+        ontology: Annotated[
+            Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
+                    "cog_category", "cyanorak_role", "tigr_role", "pfam"] | None,
+            Field(description="If None, surveys all 9 ontologies."),
+        ] = None,
+        experiment_ids: Annotated[
+            list[str] | None,
+            Field(description="Restrict coverage computation to genes "
+                              "quantified in these experiments."),
+        ] = None,
+        summary: Annotated[bool, Field(
+            description="If true, omit per-row results (by_ontology only).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include example_terms (top 3 terms per level).",
+        )] = False,
+        limit: Annotated[int, Field(description="Max rows returned", ge=1)] = 10,
+        offset: Annotated[int, Field(description="Skip N rows before limit", ge=0)] = 0,
+        min_gene_set_size: Annotated[int, Field(
+            description="Exclude terms with fewer genes than this (default 5).",
+            ge=1,
+        )] = 5,
+        max_gene_set_size: Annotated[int, Field(
+            description="Exclude terms with more genes than this (default 500).",
+            ge=1,
+        )] = 500,
+    ) -> OntologyLandscapeResponse:
+        """Rank (ontology x level) combinations by enrichment suitability.
+
+        Per-(ontology x level) stats: term-size distribution, genome coverage,
+        best-effort share (GO). Ranked by coverage x size_factor(median) with
+        sweet-spot [5, 50] median genes-per-term. Default ontology=None surveys
+        all 9 ontologies. Pass experiment_ids to weight by coverage of those
+        experiments' quantified genes. See docs://tools/ontology_landscape.
+        """
+        await ctx.info(f"ontology_landscape organism={organism} ontology={ontology}")
+        try:
+            conn = _conn(ctx)
+            data = api.ontology_landscape(
+                organism=organism, ontology=ontology,
+                experiment_ids=experiment_ids,
+                summary=summary, verbose=verbose,
+                limit=limit, offset=offset,
+                min_gene_set_size=min_gene_set_size,
+                max_gene_set_size=max_gene_set_size,
+                conn=conn,
+            )
+            return OntologyLandscapeResponse(**data)
+        except ValueError as e:
+            await ctx.warning(f"ontology_landscape error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"ontology_landscape unexpected error: {e}")
+            raise ToolError(f"Error in ontology_landscape: {e}")
