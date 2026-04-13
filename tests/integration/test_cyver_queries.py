@@ -73,6 +73,10 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_homolog_groups_summary,
     build_search_ontology,
     build_search_ontology_summary,
+    build_ontology_landscape,
+    build_ontology_expcov,
+    build_ontology_experiment_check,
+    build_ontology_organism_gene_count,
 )
 
 # Suppress EXPLAIN notification noise from CyVer validators.
@@ -127,6 +131,11 @@ _KNOWN_MAP_KEYS = {
     "cid", "cname",
     # Sparse cluster properties — valid in schema, not populated on all nodes
     "p_value",
+    # ontology_landscape verbose example_terms map projection keys
+    "term_id", "n_genes",
+    # Sparse ontology property — present on GO nodes with best-effort levels,
+    # absent on flat ontology nodes (CyanorakRole, TigrRole, etc.)
+    "level_is_best_effort",
 }
 
 # Regex to extract property name from CyVer description:
@@ -270,6 +279,9 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("genes_in_cluster", build_genes_in_cluster, {"cluster_ids": ["cluster:test"]}),
     ("genes_in_cluster_verbose", build_genes_in_cluster, {"cluster_ids": ["cluster:test"], "verbose": True}),
     ("genes_in_cluster_by_analysis", build_genes_in_cluster, {"analysis_id": "clustering_analysis:test"}),
+    # --- ontology landscape non-ontology builders ---
+    ("ontology_experiment_check", build_ontology_experiment_check, {"experiment_ids": _EIDS}),
+    ("ontology_organism_gene_count", build_ontology_organism_gene_count, {"organism_name": "Prochlorococcus MED4"}),
 ]
 
 # Ontology-dependent builders: expand for each ontology key.
@@ -309,6 +321,21 @@ for _ont_key in ONTOLOGY_CONFIG:
             f"gene_ontology_terms_{_ont_key}",
             build_gene_ontology_terms,
             {"ontology": _ont_key, "locus_tags": _LOCUS},
+        ),
+        (
+            f"ontology_landscape_{_ont_key}",
+            build_ontology_landscape,
+            {"ontology": _ont_key, "organism_name": "Prochlorococcus MED4"},
+        ),
+        (
+            f"ontology_landscape_verbose_{_ont_key}",
+            build_ontology_landscape,
+            {"ontology": _ont_key, "organism_name": "Prochlorococcus MED4", "verbose": True},
+        ),
+        (
+            f"ontology_expcov_{_ont_key}",
+            build_ontology_expcov,
+            {"ontology": _ont_key, "organism_name": "Prochlorococcus MED4", "experiment_ids": _EIDS},
         ),
     ])
 

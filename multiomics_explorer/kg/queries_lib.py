@@ -3387,7 +3387,12 @@ def build_ontology_landscape(
 
     # Verbose clauses — Python string composition so compute is
     # short-circuited when verbose=False (see scoping D4).
-    pre_sort = "ORDER BY n_g_per_term DESC\n" if verbose else ""
+    # pre_sort is an intermediate WITH..ORDER BY to pre-sort rows by gene count
+    # before the final aggregation; collect()[0..3] then captures top-3.
+    pre_sort = (
+        "WITH t, n_g_per_term, term_genes ORDER BY n_g_per_term DESC\n"
+        if verbose else ""
+    )
     verbose_agg = (
         ",\n"
         "     collect({term_id:t.id, name:t.name, "
