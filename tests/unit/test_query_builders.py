@@ -5,6 +5,7 @@ Verifies Cypher structure and parameter correctness.
 
 import pytest
 
+from multiomics_explorer.kg.constants import ALL_ONTOLOGIES, GO_ONTOLOGIES
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
     build_gene_existence_check,
@@ -51,6 +52,10 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_organism_for_experiments,
     build_gene_response_profile_envelope,
     build_gene_response_profile,
+    build_ontology_landscape,
+    build_ontology_expcov,
+    build_ontology_experiment_check,
+    build_ontology_organism_gene_count,
 )
 
 
@@ -3257,3 +3262,163 @@ class TestBackgroundFactors:
             group_ids=["OG_1"]
         )
         assert "background_factors" in cypher
+
+
+# ---------------------------------------------------------------------------
+# Constants sanity checks
+# ---------------------------------------------------------------------------
+
+
+def test_all_ontologies_matches_config_keys():
+    assert set(ALL_ONTOLOGIES) == set(ONTOLOGY_CONFIG.keys())
+    assert ALL_ONTOLOGIES == [
+        "go_bp", "go_mf", "go_cc", "ec", "kegg",
+        "cog_category", "cyanorak_role", "tigr_role", "pfam",
+    ]
+
+
+def test_go_ontologies_subset_of_all():
+    assert GO_ONTOLOGIES <= set(ALL_ONTOLOGIES)
+    assert GO_ONTOLOGIES == {"go_bp", "go_mf", "go_cc"}
+
+
+# ---------------------------------------------------------------------------
+# build_ontology_landscape
+# ---------------------------------------------------------------------------
+
+
+class TestBuildOntologyLandscape:
+    def test_non_verbose_returns_stats_columns_only(self):
+        cypher, params = build_ontology_landscape(
+            ontology="cyanorak_role", organism_name="Prochlorococcus MED4",
+        )
+        assert params == {
+            "org": "Prochlorococcus MED4",
+            "min_gene_set_size": 5,
+            "max_gene_set_size": 500,
+        }
+        # RETURN columns
+        for col in [
+            "level", "n_terms_with_genes", "n_genes_at_level",
+            "min_genes_per_term", "q1_genes_per_term",
+            "median_genes_per_term", "q3_genes_per_term",
+            "max_genes_per_term", "n_best_effort",
+        ]:
+            assert col in cypher, f"missing RETURN column: {col}"
+        # Not verbose → no example_terms
+        assert "example_terms" not in cypher
+        assert "ORDER BY n_g_per_term DESC" not in cypher
+        assert "ORDER BY level" in cypher
+        # Filter clause present
+        assert "$min_gene_set_size" in cypher
+        assert "$max_gene_set_size" in cypher
+
+    def test_uses_ontology_config_edge_and_label(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="go_bp", organism_name="Prochlorococcus MED4",
+        )
+        assert ":Gene_involved_in_biological_process" in cypher
+        assert ":BiologicalProcess" in cypher
+        assert "Biological_process_is_a_biological_process" in cypher
+        assert "Biological_process_part_of_biological_process" in cypher
+
+    def test_flat_ontology_omits_hierarchy_walk(self):
+        """tigr_role has empty hierarchy_rels — only one MATCH."""
+        cypher, _ = build_ontology_landscape(
+            ontology="tigr_role", organism_name="Prochlorococcus MED4",
+        )
+        # No hierarchy-walk MATCH (the second MATCH line is absent)
+        assert cypher.count("MATCH") == 1
+        assert "*0.." not in cypher
+
+    def test_invalid_ontology_raises(self):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_ontology_landscape(
+                ontology="NOT_REAL", organism_name="Prochlorococcus MED4",
+            )
+
+    def test_verbose_adds_example_terms_and_pre_sort(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="go_bp", organism_name="Prochlorococcus MED4",
+            verbose=True,
+        )
+        assert "ORDER BY n_g_per_term DESC" in cypher
+        assert "[0..3] AS example_terms" in cypher
+        assert "example_terms" in cypher.split("RETURN", 1)[1]  # in RETURN
+
+
+# ---------------------------------------------------------------------------
+# build_ontology_expcov
+# ---------------------------------------------------------------------------
+
+
+class TestBuildOntologyExpcov:
+    def test_returns_per_eid_level_coverage(self):
+        cypher, params = build_ontology_expcov(
+            ontology="cyanorak_role",
+            organism_name="Prochlorococcus MED4",
+            experiment_ids=["e1", "e2"],
+        )
+        assert params == {
+            "org": "Prochlorococcus MED4",
+            "experiment_ids": ["e1", "e2"],
+            "min_gene_set_size": 5,
+            "max_gene_set_size": 500,
+        }
+        assert "UNWIND $experiment_ids AS eid" in cypher
+        assert "Changes_expression_of" in cypher
+        for col in ["eid", "n_total", "level", "n_at_level"]:
+            assert col in cypher
+        assert "ORDER BY eid, level" in cypher
+        # Filter clause present (same filter as Q_landscape for consistency)
+        assert "$min_gene_set_size" in cypher
+        assert "$max_gene_set_size" in cypher
+
+    def test_flat_ontology_omits_hierarchy_walk(self):
+        cypher, _ = build_ontology_expcov(
+            ontology="tigr_role",
+            organism_name="Prochlorococcus MED4",
+            experiment_ids=["e1"],
+        )
+        assert "*0.." not in cypher
+
+    def test_invalid_ontology_raises(self):
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_ontology_expcov(
+                ontology="bogus",
+                organism_name="Prochlorococcus MED4",
+                experiment_ids=["e1"],
+            )
+
+
+# ---------------------------------------------------------------------------
+# build_ontology_experiment_check
+# ---------------------------------------------------------------------------
+
+
+class TestBuildOntologyExperimentCheck:
+    def test_returns_exists_and_exp_organism_per_eid(self):
+        cypher, params = build_ontology_experiment_check(
+            experiment_ids=["a", "b"],
+        )
+        assert params == {"experiment_ids": ["a", "b"]}
+        assert "UNWIND $experiment_ids AS eid" in cypher
+        assert "OPTIONAL MATCH (e:Experiment {id: eid})" in cypher
+        for col in ["eid", "exists", "exp_organism"]:
+            assert col in cypher
+
+
+# ---------------------------------------------------------------------------
+# build_ontology_organism_gene_count
+# ---------------------------------------------------------------------------
+
+
+class TestBuildOntologyOrganismGeneCount:
+    def test_returns_single_count(self):
+        cypher, params = build_ontology_organism_gene_count(
+            organism_name="Prochlorococcus MED4",
+        )
+        assert params == {"org": "Prochlorococcus MED4"}
+        assert "MATCH (g:Gene {organism_name:$org})" in cypher
+        assert "count(g)" in cypher
+        assert "AS total_genes" in cypher

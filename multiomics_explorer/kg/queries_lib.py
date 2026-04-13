@@ -3337,3 +3337,188 @@ def build_genes_in_cluster(
         f"ORDER BY gc.id, g.organism_name, g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params
+
+
+# ---------------------------------------------------------------------------
+# Ontology landscape builders (Child 1 of KG enrichment surface)
+# ---------------------------------------------------------------------------
+
+
+def build_ontology_landscape(
+    *,
+    ontology: str,
+    organism_name: str,
+    verbose: bool = False,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int = 500,
+) -> tuple[str, dict]:
+    """Per-(ontology, level) aggregated landscape stats for one ontology.
+
+    Returns one row per level reached by the organism's genes. Aggregates
+    happen server-side — percentiles via percentileCont, distinct-gene
+    coverage via apoc.coll.toSet(apoc.coll.flatten(...)), best_effort
+    counts via CASE-sum. The min_gene_set_size/max_gene_set_size filter is
+    applied after per-term aggregation so the per-level stats describe only
+    terms that would be valid for pathway enrichment. Verbose adds top-3
+    example terms in the same scan via pre-aggregation ORDER BY + collect[0..3].
+
+    RETURN keys: level, n_terms_with_genes, n_genes_at_level,
+    min_genes_per_term, q1_genes_per_term, median_genes_per_term,
+    q3_genes_per_term, max_genes_per_term, n_best_effort.
+    Verbose adds: example_terms (list of {term_id, name, n_genes}).
+    """
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+    cfg = ONTOLOGY_CONFIG[ontology]
+    gene_rel = cfg["gene_rel"]
+    label = cfg["label"]
+    hierarchy_rels = cfg["hierarchy_rels"]
+
+    # Hierarchy walk — flat ontologies bind t directly
+    if hierarchy_rels:
+        rel_union = "|".join(hierarchy_rels)
+        bind = f"-[:{gene_rel}]->(leaf:{label})"
+        walk = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
+    else:
+        bind = f"-[:{gene_rel}]->(t:{label})"
+        walk = ""
+
+    # Verbose clauses — Python string composition so compute is
+    # short-circuited when verbose=False (see scoping D4).
+    pre_sort = "ORDER BY n_g_per_term DESC\n" if verbose else ""
+    verbose_agg = (
+        ",\n"
+        "     collect({term_id:t.id, name:t.name, "
+        "n_genes:n_g_per_term})[0..3] AS example_terms"
+        if verbose else ""
+    )
+    verbose_ret = ",\n       example_terms" if verbose else ""
+
+    cypher = (
+        f"MATCH (g:Gene {{organism_name:$org}}){bind}\n"
+        f"{walk}"
+        "WITH t, count(DISTINCT g) AS n_g_per_term, "
+        "collect(DISTINCT g) AS term_genes\n"
+        "WHERE n_g_per_term >= $min_gene_set_size "
+        "AND n_g_per_term <= $max_gene_set_size\n"
+        f"{pre_sort}"
+        "WITH t.level AS level,\n"
+        "     count(t) AS n_terms_with_genes,\n"
+        "     min(n_g_per_term) AS min_genes_per_term,\n"
+        "     percentileCont(toFloat(n_g_per_term), 0.25) AS q1_genes_per_term,\n"
+        "     percentileCont(toFloat(n_g_per_term), 0.5)  AS median_genes_per_term,\n"
+        "     percentileCont(toFloat(n_g_per_term), 0.75) AS q3_genes_per_term,\n"
+        "     max(n_g_per_term) AS max_genes_per_term,\n"
+        "     apoc.coll.toSet(apoc.coll.flatten(collect(term_genes))) AS all_genes,\n"
+        "     sum(CASE WHEN t.level_is_best_effort IS NOT NULL "
+        "THEN 1 ELSE 0 END) AS n_best_effort"
+        f"{verbose_agg}\n"
+        "RETURN level, n_terms_with_genes,\n"
+        "       size(all_genes) AS n_genes_at_level,\n"
+        "       min_genes_per_term, q1_genes_per_term, median_genes_per_term,\n"
+        "       q3_genes_per_term, max_genes_per_term,\n"
+        f"       n_best_effort{verbose_ret}\n"
+        "ORDER BY level"
+    )
+    return cypher, {
+        "org": organism_name,
+        "min_gene_set_size": min_gene_set_size,
+        "max_gene_set_size": max_gene_set_size,
+    }
+
+
+def build_ontology_expcov(
+    *,
+    ontology: str,
+    organism_name: str,
+    experiment_ids: list[str],
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int = 500,
+) -> tuple[str, dict]:
+    """Per-(experiment, level) coverage rows for ontology_landscape.
+
+    For each experiment, count distinct genes that (a) are quantified
+    in that experiment AND (b) reach any term at each level. The same
+    min_gene_set_size/max_gene_set_size filter as Q_landscape is applied
+    so coverage is computed over the same term population. Returns one row
+    per (eid, level). L2 applies zero-fill + min/median/max aggregation.
+
+    RETURN keys: eid, n_total, level, n_at_level.
+    """
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+    cfg = ONTOLOGY_CONFIG[ontology]
+    gene_rel = cfg["gene_rel"]
+    label = cfg["label"]
+    hierarchy_rels = cfg["hierarchy_rels"]
+
+    if hierarchy_rels:
+        rel_union = "|".join(hierarchy_rels)
+        bind = f"-[:{gene_rel}]->(leaf:{label})"
+        walk = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
+    else:
+        bind = f"-[:{gene_rel}]->(t:{label})"
+        walk = ""
+
+    cypher = (
+        "UNWIND $experiment_ids AS eid\n"
+        "MATCH (e:Experiment {id:eid})-[:Changes_expression_of]->"
+        "(g:Gene {organism_name:$org})\n"
+        "WITH eid, collect(DISTINCT g) AS quantified\n"
+        "WITH eid, quantified, size(quantified) AS n_total\n"
+        "UNWIND quantified AS g\n"
+        f"MATCH (g){bind}\n"
+        f"{walk}"
+        "WITH eid, n_total, t, count(DISTINCT g) AS n_g_per_term_exp, "
+        "collect(DISTINCT g) AS term_genes_exp\n"
+        "WHERE n_g_per_term_exp >= $min_gene_set_size "
+        "AND n_g_per_term_exp <= $max_gene_set_size\n"
+        "WITH eid, n_total, t.level AS level,\n"
+        "     apoc.coll.toSet(apoc.coll.flatten("
+        "collect(term_genes_exp))) AS level_genes\n"
+        "RETURN eid, n_total, level, size(level_genes) AS n_at_level\n"
+        "ORDER BY eid, level"
+    )
+    return cypher, {
+        "org": organism_name,
+        "experiment_ids": experiment_ids,
+        "min_gene_set_size": min_gene_set_size,
+        "max_gene_set_size": max_gene_set_size,
+    }
+
+
+def build_ontology_experiment_check(
+    *,
+    experiment_ids: list[str],
+) -> tuple[str, dict]:
+    """Classify experiment_ids — does each exist, which organism?
+
+    Consumers (ontology_landscape) compare exp_organism to the
+    canonical organism to decide found / not_found / not_matched.
+    Returns one row per input eid, preserving order.
+
+    RETURN keys: eid, exists (bool), exp_organism (str; '' if absent).
+    """
+    cypher = (
+        "UNWIND $experiment_ids AS eid\n"
+        "OPTIONAL MATCH (e:Experiment {id: eid})\n"
+        "RETURN eid,\n"
+        "       e IS NOT NULL AS exists,\n"
+        "       coalesce(e.organism_name, '') AS exp_organism"
+    )
+    return cypher, {"experiment_ids": experiment_ids}
+
+
+def build_ontology_organism_gene_count(
+    *, organism_name: str,
+) -> tuple[str, dict]:
+    """Total gene count for one organism — denominator for genome_coverage.
+
+    RETURN keys: total_genes (int).
+    """
+    cypher = "MATCH (g:Gene {organism_name:$org}) RETURN count(g) AS total_genes"
+    return cypher, {"org": organism_name}
