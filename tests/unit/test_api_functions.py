@@ -3492,3 +3492,72 @@ class TestOntologyLandscape:
         assert row["max_exp_coverage"] == pytest.approx(0.8)
         assert row["median_exp_coverage"] == pytest.approx(0.4)
         assert row["n_experiments_with_coverage"] == 1
+
+    def test_summary_mode_returns_empty_results(self):
+        per_ont_rows = {
+            ont: [
+                {
+                    "level": 0, "n_terms_with_genes": 50,
+                    "n_genes_at_level": 900,
+                    "min_genes_per_term": 5, "q1_genes_per_term": 10.0,
+                    "median_genes_per_term": 15.0, "q3_genes_per_term": 30.0,
+                    "max_genes_per_term": 100, "n_best_effort": 0,
+                },
+            ]
+            for ont in ALL_ONTOLOGIES
+        }
+        conn = self._mock_conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        result = api.ontology_landscape(organism="MED4", summary=True, conn=conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] == len(ALL_ONTOLOGIES)
+        assert result["truncated"] is True
+
+    def test_verbose_threads_example_terms(self):
+        per_ont_rows = {
+            ont: [
+                {
+                    "level": 0, "n_terms_with_genes": 1,
+                    "n_genes_at_level": 500,
+                    "min_genes_per_term": 500, "q1_genes_per_term": 500.0,
+                    "median_genes_per_term": 500.0, "q3_genes_per_term": 500.0,
+                    "max_genes_per_term": 500, "n_best_effort": 0,
+                    "example_terms": [
+                        {"term_id": "T001", "name": "Alpha process", "n_genes": 500}
+                    ],
+                },
+            ]
+            for ont in ALL_ONTOLOGIES
+        }
+        conn = self._mock_conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        result = api.ontology_landscape(organism="MED4", verbose=True, conn=conn)
+        for row in result["results"]:
+            assert "example_terms" in row
+            assert isinstance(row["example_terms"], list)
+
+    def test_truncated_respects_offset(self):
+        """truncated must be total_matching > offset + len(results), not > len(results)."""
+        per_ont_rows = {
+            ont: [
+                {
+                    "level": 0, "n_terms_with_genes": 50,
+                    "n_genes_at_level": 900,
+                    "min_genes_per_term": 5, "q1_genes_per_term": 10.0,
+                    "median_genes_per_term": 15.0, "q3_genes_per_term": 30.0,
+                    "max_genes_per_term": 100, "n_best_effort": 0,
+                },
+            ]
+            for ont in ALL_ONTOLOGIES
+        }
+        conn = self._mock_conn(gene_count=1976, per_ont_rows=per_ont_rows)
+        total = len(ALL_ONTOLOGIES)  # e.g. 9
+        # Fetch the last page: offset = total - 2, limit = 5 → 2 rows returned
+        offset = total - 2
+        result = api.ontology_landscape(
+            organism="MED4", offset=offset, limit=5, conn=conn,
+        )
+        assert result["returned"] == 2
+        assert result["offset"] == offset
+        assert result["total_matching"] == total
+        # No more rows after this page → truncated must be False
+        assert result["truncated"] is False

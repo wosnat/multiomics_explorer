@@ -3376,8 +3376,11 @@ def build_ontology_landscape(
     label = cfg["label"]
     hierarchy_rels = cfg["hierarchy_rels"]
 
-    # Hierarchy walk — flat ontologies bind t directly
-    if hierarchy_rels:
+    # Hierarchy walk — flat ontologies bind t directly.
+    # Ontologies with parent_label (pfam: Pfam→PfamClan) are also treated as
+    # flat here: the cross-label hierarchy cannot be walked with a single label
+    # constraint, so landscape stats are reported at the leaf (domain) level only.
+    if hierarchy_rels and not cfg.get("parent_label"):
         rel_union = "|".join(hierarchy_rels)
         bind = f"-[:{gene_rel}]->(leaf:{label})"
         walk = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
@@ -3461,7 +3464,9 @@ def build_ontology_expcov(
     label = cfg["label"]
     hierarchy_rels = cfg["hierarchy_rels"]
 
-    if hierarchy_rels:
+    # Same flat-treatment rule as build_ontology_landscape: cross-label hierarchies
+    # (parent_label present, e.g. pfam) cannot be walked with a single label constraint.
+    if hierarchy_rels and not cfg.get("parent_label"):
         rel_union = "|".join(hierarchy_rels)
         bind = f"-[:{gene_rel}]->(leaf:{label})"
         walk = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"

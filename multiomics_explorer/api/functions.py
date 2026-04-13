@@ -9,6 +9,7 @@ Validation errors raise ValueError with specific messages.
 """
 
 import logging
+import os
 import re
 import statistics
 
@@ -101,7 +102,6 @@ def _chunk_locus_tags(locus_tags: list[str]) -> list[list[str]]:
     Chunking prevents Neo4j's 1.4 GiB transaction cap on large
     gene × term fan-out queries (e.g. 2000 × GO MF).
     """
-    import os
     size = int(os.getenv("MULTIOMICS_KG_BATCH_SIZE", "500"))
     if size <= 0 or len(locus_tags) <= size:
         return [locus_tags]
@@ -2709,6 +2709,6 @@ def ontology_landscape(
         "results": results,
         "returned": len(results),
         "total_matching": total_matching,
-        "truncated": total_matching > len(results),
+        "truncated": total_matching > offset + len(results),
         "offset": offset,
     }
