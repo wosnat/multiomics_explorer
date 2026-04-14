@@ -1,0 +1,660 @@
+{
+  "organism": "Prochlorococcus MED4",
+  "per_ontology": {
+    "go_bp": {
+      "label": "BiologicalProcess",
+      "term_aggregation_ms": 181.1,
+      "distinct_genes_ms": 86.7,
+      "term_rows": [
+        {
+          "level": 0,
+          "n_terms_with_genes": 1,
+          "gene_term_pairs": 1122,
+          "min_g": 1122,
+          "median": 1122.0,
+          "max_g": 1122,
+          "q1": 1122.0,
+          "q3": 1122.0
+        },
+        {
+          "level": 1,
+          "n_terms_with_genes": 11,
+          "gene_term_pairs": 1453,
+          "min_g": 1,
+          "median": 7.0,
+          "max_g": 1038,
+          "q1": 5.5,
+          "q3": 105.5
+        },
+        {
+          "level": 2,
+          "n_terms_with_genes": 44,
+          "gene_term_pairs": 1878,
+          "min_g": 1,
+          "median": 9.0,
+          "max_g": 928,
+          "q1": 3.0,
+          "q3": 23.5
+        },
+        {
+          "level": 3,
+          "n_terms_with_genes": 132,
+          "gene_term_pairs": 3944,
+          "min_g": 1,
+          "median": 5.0,
+          "max_g": 657,
+          "q1": 2.0,
+          "q3": 14.0
+        },
+        {
+          "level": 4,
+          "n_terms_with_genes": 260,
+          "gene_term_pairs": 4779,
+          "min_g": 1,
+          "median": 5.0,
+          "max_g": 291,
+          "q1": 1.0,
+          "q3": 13.0
+        },
+        {
+          "level": 5,
+          "n_terms_with_genes": 312,
+          "gene_term_pairs": 3676,
+          "min_g": 1,
+          "median": 4.0,
+          "max_g": 217,
+          "q1": 1.0,
+          "q3": 10.0
+        },
+        {
+          "level": 6,
+          "n_terms_with_genes": 299,
+          "gene_term_pairs": 2416,
+          "min_g": 1,
+          "median": 3.0,
+          "max_g": 163,
+          "q1": 1.0,
+          "q3": 7.0
+        },
+        {
+          "level": 7,
+          "n_terms_with_genes": 225,
+          "gene_term_pairs": 955,
+          "min_g": 1,
+          "median": 2.0,
+          "max_g": 50,
+          "q1": 1.0,
+          "q3": 4.0
+        },
+        {
+          "level": 8,
+          "n_terms_with_genes": 82,
+          "gene_term_pairs": 353,
+          "min_g": 1,
+          "median": 2.0,
+          "max_g": 37,
+          "q1": 1.0,
+          "q3": 5.0
+        },
+        {
+          "level": 9,
+          "n_terms_with_genes": 12,
+          "gene_term_pairs": 19,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 7,
+          "q1": 1.0,
+          "q3": 1.0
+        },
+        {
+          "level": 10,
+          "n_terms_with_genes": 1,
+          "gene_term_pairs": 1,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 1,
+          "q1": 1.0,
+          "q3": 1.0
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 0,
+          "n_genes_at_level": 1122
+        },
+        {
+          "level": 1,
+          "n_genes_at_level": 1118
+        },
+        {
+          "level": 2,
+          "n_genes_at_level": 1118
+        },
+        {
+          "level": 3,
+          "n_genes_at_level": 1096
+        },
+        {
+          "level": 4,
+          "n_genes_at_level": 1004
+        },
+        {
+          "level": 5,
+          "n_genes_at_level": 927
+        },
+        {
+          "level": 6,
+          "n_genes_at_level": 691
+        },
+        {
+          "level": 7,
+          "n_genes_at_level": 413
+        },
+        {
+          "level": 8,
+          "n_genes_at_level": 180
+        },
+        {
+          "level": 9,
+          "n_genes_at_level": 16
+        },
+        {
+          "level": 10,
+          "n_genes_at_level": 1
+        }
+      ]
+    },
+    "go_mf": {
+      "label": "MolecularFunction",
+      "term_aggregation_ms": 83.2,
+      "distinct_genes_ms": 59.0,
+      "term_rows": [
+        {
+          "level": 0,
+          "n_terms_with_genes": 1,
+          "gene_term_pairs": 1200,
+          "min_g": 1200,
+          "median": 1200.0,
+          "max_g": 1200,
+          "q1": 1200.0,
+          "q3": 1200.0
+        },
+        {
+          "level": 1,
+          "n_terms_with_genes": 15,
+          "gene_term_pairs": 2075,
+          "min_g": 1,
+          "median": 17.0,
+          "max_g": 910,
+          "q1": 8.0,
+          "q3": 91.5
+        },
+        {
+          "level": 2,
+          "n_terms_with_genes": 70,
+          "gene_term_pairs": 3196,
+          "min_g": 1,
+          "median": 5.0,
+          "max_g": 563,
+          "q1": 1.0,
+          "q3": 27.25
+        },
+        {
+          "level": 3,
+          "n_terms_with_genes": 184,
+          "gene_term_pairs": 3579,
+          "min_g": 1,
+          "median": 3.0,
+          "max_g": 481,
+          "q1": 1.0,
+          "q3": 12.5
+        },
+        {
+          "level": 4,
+          "n_terms_with_genes": 283,
+          "gene_term_pairs": 2975,
+          "min_g": 1,
+          "median": 2.0,
+          "max_g": 304,
+          "q1": 1.0,
+          "q3": 6.5
+        },
+        {
+          "level": 5,
+          "n_terms_with_genes": 448,
+          "gene_term_pairs": 1747,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 225,
+          "q1": 1.0,
+          "q3": 2.0
+        },
+        {
+          "level": 6,
+          "n_terms_with_genes": 168,
+          "gene_term_pairs": 473,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 80,
+          "q1": 1.0,
+          "q3": 2.0
+        },
+        {
+          "level": 7,
+          "n_terms_with_genes": 50,
+          "gene_term_pairs": 142,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 42,
+          "q1": 1.0,
+          "q3": 1.0
+        },
+        {
+          "level": 8,
+          "n_terms_with_genes": 9,
+          "gene_term_pairs": 11,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 2,
+          "q1": 1.0,
+          "q3": 1.0
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 0,
+          "n_genes_at_level": 1200
+        },
+        {
+          "level": 1,
+          "n_genes_at_level": 1196
+        },
+        {
+          "level": 2,
+          "n_genes_at_level": 1186
+        },
+        {
+          "level": 3,
+          "n_genes_at_level": 1127
+        },
+        {
+          "level": 4,
+          "n_genes_at_level": 1032
+        },
+        {
+          "level": 5,
+          "n_genes_at_level": 828
+        },
+        {
+          "level": 6,
+          "n_genes_at_level": 358
+        },
+        {
+          "level": 7,
+          "n_genes_at_level": 130
+        },
+        {
+          "level": 8,
+          "n_genes_at_level": 9
+        }
+      ]
+    },
+    "go_cc": {
+      "label": "CellularComponent",
+      "term_aggregation_ms": 71.5,
+      "distinct_genes_ms": 43.3,
+      "term_rows": [
+        {
+          "level": 0,
+          "n_terms_with_genes": 1,
+          "gene_term_pairs": 805,
+          "min_g": 805,
+          "median": 805.0,
+          "max_g": 805,
+          "q1": 805.0,
+          "q3": 805.0
+        },
+        {
+          "level": 1,
+          "n_terms_with_genes": 2,
+          "gene_term_pairs": 1036,
+          "min_g": 257,
+          "median": 518.0,
+          "max_g": 779,
+          "q1": 387.5,
+          "q3": 648.5
+        },
+        {
+          "level": 2,
+          "n_terms_with_genes": 40,
+          "gene_term_pairs": 2292,
+          "min_g": 1,
+          "median": 4.0,
+          "max_g": 510,
+          "q1": 1.0,
+          "q3": 33.0
+        },
+        {
+          "level": 3,
+          "n_terms_with_genes": 90,
+          "gene_term_pairs": 1163,
+          "min_g": 1,
+          "median": 3.0,
+          "max_g": 169,
+          "q1": 1.0,
+          "q3": 8.0
+        },
+        {
+          "level": 4,
+          "n_terms_with_genes": 53,
+          "gene_term_pairs": 581,
+          "min_g": 1,
+          "median": 3.0,
+          "max_g": 156,
+          "q1": 1.0,
+          "q3": 11.0
+        },
+        {
+          "level": 5,
+          "n_terms_with_genes": 16,
+          "gene_term_pairs": 199,
+          "min_g": 1,
+          "median": 3.0,
+          "max_g": 76,
+          "q1": 1.0,
+          "q3": 10.75
+        },
+        {
+          "level": 6,
+          "n_terms_with_genes": 3,
+          "gene_term_pairs": 45,
+          "min_g": 1,
+          "median": 13.0,
+          "max_g": 31,
+          "q1": 7.0,
+          "q3": 22.0
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 0,
+          "n_genes_at_level": 805
+        },
+        {
+          "level": 1,
+          "n_genes_at_level": 801
+        },
+        {
+          "level": 2,
+          "n_genes_at_level": 801
+        },
+        {
+          "level": 3,
+          "n_genes_at_level": 386
+        },
+        {
+          "level": 4,
+          "n_genes_at_level": 248
+        },
+        {
+          "level": 5,
+          "n_genes_at_level": 189
+        },
+        {
+          "level": 6,
+          "n_genes_at_level": 45
+        }
+      ]
+    },
+    "cyanorak_role": {
+      "label": "CyanorakRole",
+      "term_aggregation_ms": 70.5,
+      "distinct_genes_ms": 37.2,
+      "term_rows": [
+        {
+          "level": 0,
+          "n_terms_with_genes": 19,
+          "gene_term_pairs": 1838,
+          "min_g": 1,
+          "median": 70.0,
+          "max_g": 419,
+          "q1": 40.0,
+          "q3": 121.5
+        },
+        {
+          "level": 1,
+          "n_terms_with_genes": 110,
+          "gene_term_pairs": 1850,
+          "min_g": 1,
+          "median": 9.0,
+          "max_g": 340,
+          "q1": 3.0,
+          "q3": 16.0
+        },
+        {
+          "level": 2,
+          "n_terms_with_genes": 26,
+          "gene_term_pairs": 398,
+          "min_g": 1,
+          "median": 12.0,
+          "max_g": 51,
+          "q1": 5.25,
+          "q3": 25.0
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 0,
+          "n_genes_at_level": 1504
+        },
+        {
+          "level": 1,
+          "n_genes_at_level": 1491
+        },
+        {
+          "level": 2,
+          "n_genes_at_level": 342
+        }
+      ]
+    },
+    "kegg": {
+      "label": "KeggTerm",
+      "term_aggregation_ms": 56.1,
+      "distinct_genes_ms": 38.7,
+      "term_rows": [
+        {
+          "level": 0,
+          "n_terms_with_genes": 6,
+          "gene_term_pairs": 913,
+          "min_g": 33,
+          "median": 66.5,
+          "max_g": 538,
+          "q1": 49.0,
+          "q3": 141.0
+        },
+        {
+          "level": 1,
+          "n_terms_with_genes": 38,
+          "gene_term_pairs": 1184,
+          "min_g": 1,
+          "median": 14.5,
+          "max_g": 164,
+          "q1": 5.0,
+          "q3": 37.25
+        },
+        {
+          "level": 2,
+          "n_terms_with_genes": 213,
+          "gene_term_pairs": 2674,
+          "min_g": 1,
+          "median": 4.0,
+          "max_g": 519,
+          "q1": 1.0,
+          "q3": 12.0
+        },
+        {
+          "level": 3,
+          "n_terms_with_genes": 1017,
+          "gene_term_pairs": 1124,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 4,
+          "q1": 1.0,
+          "q3": 1.0
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 0,
+          "n_genes_at_level": 765
+        },
+        {
+          "level": 1,
+          "n_genes_at_level": 765
+        },
+        {
+          "level": 2,
+          "n_genes_at_level": 765
+        },
+        {
+          "level": 3,
+          "n_genes_at_level": 1065
+        }
+      ]
+    },
+    "ec": {
+      "label": "EcNumber",
+      "term_aggregation_ms": 52.5,
+      "distinct_genes_ms": 36.6,
+      "term_rows": [
+        {
+          "level": 0,
+          "n_terms_with_genes": 7,
+          "gene_term_pairs": 897,
+          "min_g": 55,
+          "median": 80.0,
+          "max_g": 294,
+          "q1": 66.0,
+          "q3": 168.0
+        },
+        {
+          "level": 1,
+          "n_terms_with_genes": 61,
+          "gene_term_pairs": 891,
+          "min_g": 1,
+          "median": 7.0,
+          "max_g": 91,
+          "q1": 3.0,
+          "q3": 20.0
+        },
+        {
+          "level": 2,
+          "n_terms_with_genes": 143,
+          "gene_term_pairs": 889,
+          "min_g": 1,
+          "median": 3.0,
+          "max_g": 48,
+          "q1": 2.0,
+          "q3": 8.0
+        },
+        {
+          "level": 3,
+          "n_terms_with_genes": 649,
+          "gene_term_pairs": 866,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 16,
+          "q1": 1.0,
+          "q3": 1.0
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 0,
+          "n_genes_at_level": 828
+        },
+        {
+          "level": 1,
+          "n_genes_at_level": 808
+        },
+        {
+          "level": 2,
+          "n_genes_at_level": 782
+        },
+        {
+          "level": 3,
+          "n_genes_at_level": 708
+        }
+      ]
+    },
+    "tigr": {
+      "label": "TigrRole",
+      "term_aggregation_ms": 36.9,
+      "distinct_genes_ms": 23.3,
+      "term_rows": [
+        {
+          "level": 0,
+          "n_terms_with_genes": 106,
+          "gene_term_pairs": 1974,
+          "min_g": 1,
+          "median": 9.0,
+          "max_g": 451,
+          "q1": 3.25,
+          "q3": 17.0
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 0,
+          "n_genes_at_level": 1765
+        }
+      ]
+    },
+    "cog": {
+      "label": "CogFunctionalCategory",
+      "term_aggregation_ms": 42.0,
+      "distinct_genes_ms": 23.6,
+      "term_rows": [
+        {
+          "level": 0,
+          "n_terms_with_genes": 19,
+          "gene_term_pairs": 1826,
+          "min_g": 3,
+          "median": 65.0,
+          "max_g": 638,
+          "q1": 30.5,
+          "q3": 103.5
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 0,
+          "n_genes_at_level": 1751
+        }
+      ]
+    },
+    "pfam": {
+      "label": "Pfam",
+      "term_aggregation_ms": 41.5,
+      "distinct_genes_ms": 25.6,
+      "term_rows": [
+        {
+          "level": 1,
+          "n_terms_with_genes": 1527,
+          "gene_term_pairs": 2371,
+          "min_g": 1,
+          "median": 1.0,
+          "max_g": 27,
+          "q1": 1.0,
+          "q3": 2.0
+        }
+      ],
+      "gene_rows": [
+        {
+          "level": 1,
+          "n_genes_at_level": 1492
+        }
+      ]
+    }
+  }
+}

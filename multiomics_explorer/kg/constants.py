@@ -1,5 +1,16 @@
 """Shared constants for the knowledge graph layer."""
 
+# Canonical ontology keys — all nine supported by ONTOLOGY_CONFIG.
+# Order is load-bearing for ontology_landscape regression-fixture determinism.
+ALL_ONTOLOGIES: list[str] = [
+    "go_bp", "go_mf", "go_cc", "ec", "kegg",
+    "cog_category", "cyanorak_role", "tigr_role", "pfam",
+]
+
+# Subset of ALL_ONTOLOGIES that have GO-DAG-based level assignments.
+# Only these ontologies emit best_effort_share (non-GO rows get None).
+GO_ONTOLOGIES: frozenset[str] = frozenset({"go_bp", "go_mf", "go_cc"})
+
 VALID_OG_SOURCES: set[str] = {"cyanorak", "eggnog"}
 
 VALID_TAXONOMIC_LEVELS: set[str] = {

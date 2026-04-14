@@ -1,0 +1,184 @@
+{
+  "genome_timings": {
+    "go_bp": {
+      "terms_ms": 119.3,
+      "coverage_ms": 65.2,
+      "term_rows": 1379,
+      "levels": 11
+    },
+    "go_mf": {
+      "terms_ms": 92.3,
+      "coverage_ms": 46.7,
+      "term_rows": 1228,
+      "levels": 9
+    },
+    "go_cc": {
+      "terms_ms": 44.1,
+      "coverage_ms": 32.1,
+      "term_rows": 205,
+      "levels": 7
+    },
+    "cyanorak_role": {
+      "terms_ms": 39.8,
+      "coverage_ms": 29.5,
+      "term_rows": 155,
+      "levels": 3
+    },
+    "kegg": {
+      "terms_ms": 74.6,
+      "coverage_ms": 33.0,
+      "term_rows": 1274,
+      "levels": 4
+    },
+    "ec": {
+      "terms_ms": 58.2,
+      "coverage_ms": 31.1,
+      "term_rows": 860,
+      "levels": 4
+    },
+    "tigr": {
+      "terms_ms": 27.3,
+      "coverage_ms": 18.8,
+      "term_rows": 106,
+      "levels": 1
+    },
+    "cog": {
+      "terms_ms": 24.1,
+      "coverage_ms": 18.0,
+      "term_rows": 19,
+      "levels": 1
+    },
+    "pfam": {
+      "terms_ms": 79.5,
+      "coverage_ms": 21.9,
+      "term_rows": 1527,
+      "levels": 1
+    }
+  },
+  "genome_total_ms": 855.2,
+  "go_bp_sanity": [
+    {
+      "level": 0,
+      "n_terms_with_genes": 1,
+      "n_genes_at_level": 1122,
+      "min_genes_per_term": 1122,
+      "q1_genes_per_term": 1122.0,
+      "median_genes_per_term": 1122.0,
+      "q3_genes_per_term": 1122.0,
+      "max_genes_per_term": 1122,
+      "best_effort_share": 0.0
+    },
+    {
+      "level": 1,
+      "n_terms_with_genes": 11,
+      "n_genes_at_level": 1118,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 5.5,
+      "median_genes_per_term": 7.0,
+      "q3_genes_per_term": 105.5,
+      "max_genes_per_term": 1038,
+      "best_effort_share": 0.091
+    },
+    {
+      "level": 2,
+      "n_terms_with_genes": 44,
+      "n_genes_at_level": 1118,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 3.0,
+      "median_genes_per_term": 9.0,
+      "q3_genes_per_term": 23.5,
+      "max_genes_per_term": 928,
+      "best_effort_share": 0.227
+    },
+    {
+      "level": 3,
+      "n_terms_with_genes": 132,
+      "n_genes_at_level": 1096,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 2.0,
+      "median_genes_per_term": 5.0,
+      "q3_genes_per_term": 14.0,
+      "max_genes_per_term": 657,
+      "best_effort_share": 0.364
+    },
+    {
+      "level": 4,
+      "n_terms_with_genes": 260,
+      "n_genes_at_level": 1004,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 1.0,
+      "median_genes_per_term": 5.0,
+      "q3_genes_per_term": 13.0,
+      "max_genes_per_term": 291,
+      "best_effort_share": 0.462
+    },
+    {
+      "level": 5,
+      "n_terms_with_genes": 312,
+      "n_genes_at_level": 927,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 1.0,
+      "median_genes_per_term": 4.0,
+      "q3_genes_per_term": 10.0,
+      "max_genes_per_term": 217,
+      "best_effort_share": 0.638
+    },
+    {
+      "level": 6,
+      "n_terms_with_genes": 299,
+      "n_genes_at_level": 691,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 1.0,
+      "median_genes_per_term": 3.0,
+      "q3_genes_per_term": 7.0,
+      "max_genes_per_term": 163,
+      "best_effort_share": 0.776
+    },
+    {
+      "level": 7,
+      "n_terms_with_genes": 225,
+      "n_genes_at_level": 413,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 1.0,
+      "median_genes_per_term": 2.0,
+      "q3_genes_per_term": 4.0,
+      "max_genes_per_term": 50,
+      "best_effort_share": 0.804
+    },
+    {
+      "level": 8,
+      "n_terms_with_genes": 82,
+      "n_genes_at_level": 180,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 1.0,
+      "median_genes_per_term": 2.0,
+      "q3_genes_per_term": 5.0,
+      "max_genes_per_term": 37,
+      "best_effort_share": 0.756
+    },
+    {
+      "level": 9,
+      "n_terms_with_genes": 12,
+      "n_genes_at_level": 16,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 1.0,
+      "median_genes_per_term": 1.0,
+      "q3_genes_per_term": 1.0,
+      "max_genes_per_term": 7,
+      "best_effort_share": 0.75
+    },
+    {
+      "level": 10,
+      "n_terms_with_genes": 1,
+      "n_genes_at_level": 1,
+      "min_genes_per_term": 1,
+      "q1_genes_per_term": 1.0,
+      "median_genes_per_term": 1.0,
+      "q3_genes_per_term": 1.0,
+      "max_genes_per_term": 1,
+      "best_effort_share": 1.0
+    }
+  ],
+  "experiment_total_ms": 1290.5,
+  "edge_unknown_org": []
+}
