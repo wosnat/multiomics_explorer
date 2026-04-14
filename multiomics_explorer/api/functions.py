@@ -1184,7 +1184,7 @@ def genes_by_ontology(
     level: int | None = None,
     term_ids: list[str] | None = None,
     min_gene_set_size: int = 5,
-    max_gene_set_size: int = 500,
+    max_gene_set_size: int | None = 500,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -1246,53 +1246,32 @@ def genes_by_ontology(
                 wrong_level.append(r["tid"])
         ok_term_ids = [r["tid"] for r in v_rows if r["status"] == "ok"]
 
-    # If every term_id is invalid -> short-circuit, return empty envelope.
+    # Short-circuit when all term_ids invalid: skip queries A/B/D, fall through
+    # to envelope assembly with empty aggregates. _stats and Counter both handle
+    # empty inputs gracefully; `if limit == 0:` below skips Query D.
     effective_term_ids = ok_term_ids if term_ids else None
     if term_ids and not effective_term_ids:
-        return {
-            "ontology": ontology,
-            "organism_name": organism,
-            "total_matching": 0,
-            "total_genes": 0,
-            "total_terms": 0,
-            "total_categories": 0,
-            "genes_per_term_min": 0,
-            "genes_per_term_median": 0.0,
-            "genes_per_term_max": 0,
-            "terms_per_gene_min": 0,
-            "terms_per_gene_median": 0.0,
-            "terms_per_gene_max": 0,
-            "by_category": [],
-            "by_level": [],
-            "top_terms": [],
-            "n_best_effort_terms": 0,
-            "not_found": not_found,
-            "wrong_ontology": wrong_ontology,
-            "wrong_level": wrong_level,
-            "filtered_out": [],
-            "returned": 0,
-            "offset": offset,
-            "truncated": False,
-            "results": [],
-        }
+        per_term: list[dict] = []
+        per_gene: list[dict] = []
+        limit = 0  # forces detail to be skipped without re-checking summary flag
+    else:
+        # --- Query A: per-term aggregate ---
+        pt_cypher, pt_params = build_genes_by_ontology_per_term(
+            ontology=ontology, organism=organism,
+            level=level, term_ids=effective_term_ids,
+            min_gene_set_size=min_gene_set_size,
+            max_gene_set_size=max_gene_set_size,
+        )
+        per_term = conn.execute_query(pt_cypher, **pt_params)
 
-    # --- Query A: per-term aggregate ---
-    pt_cypher, pt_params = build_genes_by_ontology_per_term(
-        ontology=ontology, organism=organism,
-        level=level, term_ids=effective_term_ids,
-        min_gene_set_size=min_gene_set_size,
-        max_gene_set_size=max_gene_set_size,
-    )
-    per_term = conn.execute_query(pt_cypher, **pt_params)
-
-    # --- Query B: per-gene aggregate ---
-    pg_cypher, pg_params = build_genes_by_ontology_per_gene(
-        ontology=ontology, organism=organism,
-        level=level, term_ids=effective_term_ids,
-        min_gene_set_size=min_gene_set_size,
-        max_gene_set_size=max_gene_set_size,
-    )
-    per_gene = conn.execute_query(pg_cypher, **pg_params)
+        # --- Query B: per-gene aggregate ---
+        pg_cypher, pg_params = build_genes_by_ontology_per_gene(
+            ontology=ontology, organism=organism,
+            level=level, term_ids=effective_term_ids,
+            min_gene_set_size=min_gene_set_size,
+            max_gene_set_size=max_gene_set_size,
+        )
+        per_gene = conn.execute_query(pg_cypher, **pg_params)
 
     # --- Compose envelope ---
     total_matching = sum(r["n_genes"] for r in per_term)
@@ -1321,6 +1300,9 @@ def genes_by_ontology(
     # n_genes per level from per_gene.levels_hit
     for r in per_gene:
         for lvl in r["levels_hit"]:
+            # Only count levels that have surviving terms in per_term -- a gene
+            # that hits a level whose terms were size-filtered out shouldn't
+            # contribute to by_level for that level.
             if lvl in level_terms:
                 level_terms[lvl]["n_genes"] += 1  # count once per gene per level
     by_level = sorted(level_terms.values(), key=lambda e: e["level"])
