@@ -1250,6 +1250,156 @@ class TestBuildGenesByOntologyValidate:
             )
 
 
+class TestBuildGenesByOntologyDetail:
+    def test_mode1_term_ids_only_walks_down(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:0006260"],
+            level=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert params["term_ids"] == ["go:0006260"]
+        assert params["org"] == "Prochlorococcus MED4"
+        assert params["min_gene_set_size"] == 5
+        assert params["max_gene_set_size"] == 500
+        # Mode 1: walk DOWN from each input term
+        assert "UNWIND $term_ids AS input_tid" in cypher
+        assert "(t:BiologicalProcess {id: input_tid})" in cypher
+        assert "<-[:" in cypher  # walk direction
+        assert "(leaf:BiologicalProcess)" in cypher
+        # Size filter
+        assert "size(term_genes) >= $min_gene_set_size" in cypher
+        assert "size(term_genes) <= $max_gene_set_size" in cypher
+        # Row return
+        assert "g.locus_tag AS locus_tag" in cypher
+        assert "t.id AS term_id" in cypher
+        assert "t.level AS level" in cypher
+        # Verbose fields omitted by default
+        assert "function_description" not in cypher
+        assert "level_is_best_effort" not in cypher
+
+    def test_mode2_level_only_walks_up(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert params["level"] == 1
+        assert "$term_ids" not in cypher  # no term_ids clause
+        # Mode 2: bind gene → leaf, walk leaf → ancestor
+        assert "(g:Gene {organism_name: $org})-[:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in cypher
+        assert "(leaf)-[:" in cypher
+        assert "]->(t:BiologicalProcess)" in cypher
+        assert "WHERE t.level = $level" in cypher
+
+    def test_mode3_level_and_term_ids(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="cyanorak_role",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=["cyanorak.role:A.1"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Mode 3: same as Mode 2 but with term_ids scope
+        assert "WHERE t.level = $level AND t.id IN $term_ids" in cypher
+
+    def test_verbose_adds_columns(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+            verbose=True,
+        )
+        assert "g.function_description AS function_description" in cypher
+        assert "t.level_is_best_effort IS NOT NULL AS level_is_best_effort" in cypher
+
+    def test_limit_and_offset(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+            limit=100,
+            offset=50,
+        )
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 100
+        assert params["offset"] == 50
+
+    def test_order_by_stable(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "ORDER BY t.id, g.locus_tag" in cypher
+
+    def test_no_mode_raises(self):
+        import pytest
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        with pytest.raises(ValueError, match="level.*term_ids"):
+            build_genes_by_ontology_detail(
+                ontology="go_bp",
+                organism="MED4",
+                level=None,
+                term_ids=None,
+                min_gene_set_size=5,
+                max_gene_set_size=500,
+            )
+
+    def test_flat_ontology_mode2(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="cog_category",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Flat: t = leaf; no walk between leaf and t
+        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        # No explicit leaf→t walk
+        assert "(leaf)-[:" not in cypher
+
+
 class TestBuildGeneOntologyTerms:
     def test_single_ontology_returns_expected_columns(self):
         """go_bp returns locus_tag, term_id, term_name in RETURN."""

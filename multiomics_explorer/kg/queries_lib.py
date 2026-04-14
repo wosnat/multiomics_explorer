@@ -1465,6 +1465,138 @@ def build_genes_by_ontology_validate(
     }
 
 
+def build_genes_by_ontology_detail(
+    *,
+    ontology: str,
+    organism: str,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int = 500,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build (gene × term) detail query. Dispatches on (level, term_ids).
+
+    Mode 1: term_ids only — walk DOWN.
+    Mode 2: level only — walk UP, filter on level.
+    Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
+
+    RETURN keys (compact): locus_tag, gene_name, product, gene_category,
+    term_id, term_name, level.
+    RETURN keys (verbose): adds function_description, level_is_best_effort.
+    """
+    if level is None and not term_ids:
+        raise ValueError(
+            "At least one of `level` or `term_ids` must be provided."
+        )
+    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
+        raise ValueError(
+            "max_gene_set_size must be >= min_gene_set_size."
+        )
+
+    params: dict = {
+        "org": organism,
+        "min_gene_set_size": min_gene_set_size,
+        "max_gene_set_size": max_gene_set_size,
+    }
+
+    # Mode 1: term_ids only — walk DOWN from each input term.
+    if level is None:
+        # Pfam needs special handling because input may be Pfam OR PfamClan;
+        # caller-side validation (Query V) tells the apex label, but the
+        # builder must work without that. Use coalesce over both label MATCHes.
+        if ontology == "pfam":
+            cypher_head = (
+                "UNWIND $term_ids AS input_tid\n"
+                "OPTIONAL MATCH (tp:Pfam {id: input_tid})\n"
+                "OPTIONAL MATCH (tc:PfamClan {id: input_tid})\n"
+                "WITH input_tid, coalesce(tp, tc) AS t\n"
+                "OPTIONAL MATCH (t)<-[:Pfam_in_pfam_clan*0..1]-(leaf:Pfam)\n"
+                "WITH t, coalesce(leaf, t) AS leaf\n"
+                "MATCH (g:Gene {organism_name: $org})-[:Gene_has_pfam]->(leaf)\n"
+                "WHERE t:Pfam OR t:PfamClan\n"
+            )
+        else:
+            frag = _hierarchy_walk(ontology, direction="down")
+            leaf = frag["leaf_label"]
+            walk = frag["walk_down"]
+            # Single-label: walk DOWN from root to leaf to gene.
+            # Flat ontologies: no walk, leaf = t.
+            if walk:
+                cypher_head = (
+                    "UNWIND $term_ids AS input_tid\n"
+                    f"MATCH (t:{leaf} {{id: input_tid}})\n"
+                    f"{walk}\n"
+                    f"MATCH (g:Gene {{organism_name: $org}})-[:{frag['gene_rel']}]->(leaf)\n"
+                )
+            else:
+                # Flat: t = leaf; still the "input term's genes"
+                cypher_head = (
+                    "UNWIND $term_ids AS input_tid\n"
+                    f"MATCH (t:{leaf} {{id: input_tid}})\n"
+                    f"MATCH (g:Gene {{organism_name: $org}})-[:{frag['gene_rel']}]->(t)\n"
+                )
+        params["term_ids"] = term_ids
+
+    # Mode 2/3: walk UP, filter on level (and optionally term_ids).
+    else:
+        frag = _hierarchy_walk(ontology, direction="up")
+        bind = frag["bind_up"]
+        walk = frag["walk_up"]
+        params["level"] = level
+        if walk:
+            level_clause = "WHERE t.level = $level"
+            if term_ids is not None:
+                level_clause += " AND t.id IN $term_ids"
+                params["term_ids"] = term_ids
+            cypher_head = f"{bind}\n{walk}\n{level_clause}\n"
+        else:
+            # Flat ontology: t = leaf; no walk; level filter on t directly.
+            level_clause = "WHERE t.level = $level"
+            if term_ids is not None:
+                level_clause += " AND t.id IN $term_ids"
+                params["term_ids"] = term_ids
+            cypher_head = f"{bind}\n{level_clause}\n"
+
+    # Size filter (common to all modes)
+    size_filter = (
+        "WITH t, collect(DISTINCT g) AS term_genes\n"
+        "WHERE size(term_genes) >= $min_gene_set_size\n"
+        "  AND ($max_gene_set_size IS NULL OR "
+        "size(term_genes) <= $max_gene_set_size)\n"
+        "UNWIND term_genes AS g"
+    )
+
+    # Row return
+    verbose_cols = (
+        ",\n       g.function_description AS function_description,\n"
+        "       t.level_is_best_effort IS NOT NULL AS level_is_best_effort"
+        if verbose else ""
+    )
+    return_block = (
+        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       g.product AS product, g.gene_category AS gene_category,\n"
+        "       t.id AS term_id, t.name AS term_name, t.level AS level"
+        f"{verbose_cols}\n"
+        "ORDER BY t.id, g.locus_tag"
+    )
+
+    # Pagination
+    skip_clause = ""
+    limit_clause = ""
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+
+    cypher = f"{cypher_head}\n{size_filter}\n{return_block}{skip_clause}{limit_clause}"
+    return cypher, params
+
+
 def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
     """Return a WHERE NOT EXISTS clause for leaf filtering, or empty string.
 
