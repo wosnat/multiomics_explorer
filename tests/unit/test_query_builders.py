@@ -1400,6 +1400,65 @@ class TestBuildGenesByOntologyDetail:
         assert "(leaf)-[:" not in cypher
 
 
+class TestBuildGenesByOntologyPerTerm:
+    def test_mode2_returns_per_term_aggregate(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, params = build_genes_by_ontology_per_term(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert params["level"] == 1
+        assert params["org"] == "Prochlorococcus MED4"
+        # Returns per-term aggregate
+        assert "t.id AS term_id" in cypher
+        assert "t.name AS term_name" in cypher
+        assert "t.level AS level" in cypher
+        assert "t.level_is_best_effort IS NOT NULL AS best_effort" in cypher
+        assert "size(gene_rows) AS n_genes" in cypher
+        assert "apoc.coll.frequencies" in cypher
+        assert "AS cat_freqs" in cypher
+        assert "ORDER BY t.id" in cypher
+        # Pagination NOT applied to summary queries
+        assert "SKIP" not in cypher
+        assert "LIMIT" not in cypher
+
+    def test_mode1_term_ids(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, params = build_genes_by_ontology_per_term(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=None,
+            term_ids=["go:0006260"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert params["term_ids"] == ["go:0006260"]
+        assert "UNWIND $term_ids AS input_tid" in cypher
+
+    def test_mode3_level_and_term_ids(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="cyanorak_role",
+            organism="MED4",
+            level=1,
+            term_ids=["cyanorak.role:A.1"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "t.level = $level" in cypher
+        assert "t.id IN $term_ids" in cypher
+
+
 class TestBuildGeneOntologyTerms:
     def test_single_ontology_returns_expected_columns(self):
         """go_bp returns locus_tag, term_id, term_name in RETURN."""

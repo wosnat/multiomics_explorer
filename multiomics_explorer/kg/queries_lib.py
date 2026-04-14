@@ -1465,45 +1465,26 @@ def build_genes_by_ontology_validate(
     }
 
 
-def build_genes_by_ontology_detail(
+def _genes_by_ontology_match_stage(
     *,
     ontology: str,
+    level: int | None,
+    term_ids: list[str] | None,
     organism: str,
-    level: int | None = None,
-    term_ids: list[str] | None = None,
-    min_gene_set_size: int = 5,
-    max_gene_set_size: int = 500,
-    verbose: bool = False,
-    limit: int | None = None,
-    offset: int = 0,
 ) -> tuple[str, dict]:
-    """Build (gene × term) detail query. Dispatches on (level, term_ids).
+    """Shared MATCH + size-filter-WITH for detail/per_term/per_gene builders.
 
-    Mode 1: term_ids only — walk DOWN.
-    Mode 2: level only — walk UP, filter on level.
-    Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
-
-    RETURN keys (compact): locus_tag, gene_name, product, gene_category,
-    term_id, term_name, level.
-    RETURN keys (verbose): adds function_description, level_is_best_effort.
+    Returns the Cypher fragment through `WITH t, collect(DISTINCT g) AS term_genes`
+    with the $min_gene_set_size / $max_gene_set_size filter applied,
+    plus the common params dict (org, term_ids/level as applicable).
+    Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
+    into params, and for appending their own UNWIND/RETURN tail.
     """
-    if level is None and not term_ids:
-        raise ValueError(
-            "At least one of `level` or `term_ids` must be provided."
-        )
-    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
-        raise ValueError(
-            "max_gene_set_size must be >= min_gene_set_size."
-        )
+    params: dict = {"org": organism}
 
-    params: dict = {
-        "org": organism,
-        "min_gene_set_size": min_gene_set_size,
-        "max_gene_set_size": max_gene_set_size,
-    }
-
-    # Mode 1: term_ids only — walk DOWN from each input term.
     if level is None:
+        # Mode 1 — walk DOWN from each input term.
+        params["term_ids"] = term_ids
         # Pfam needs special handling because input may be Pfam OR PfamClan;
         # caller-side validation (Query V) tells the apex label, but the
         # builder must work without that. Use coalesce over both label MATCHes.
@@ -1529,45 +1510,84 @@ def build_genes_by_ontology_detail(
                     "UNWIND $term_ids AS input_tid\n"
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
                     f"{walk}\n"
-                    f"MATCH (g:Gene {{organism_name: $org}})-[:{frag['gene_rel']}]->(leaf)\n"
+                    f"MATCH (g:Gene {{organism_name: $org}})"
+                    f"-[:{frag['gene_rel']}]->(leaf)\n"
                 )
             else:
                 # Flat: t = leaf; still the "input term's genes"
                 cypher_head = (
                     "UNWIND $term_ids AS input_tid\n"
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
-                    f"MATCH (g:Gene {{organism_name: $org}})-[:{frag['gene_rel']}]->(t)\n"
+                    f"MATCH (g:Gene {{organism_name: $org}})"
+                    f"-[:{frag['gene_rel']}]->(t)\n"
                 )
-        params["term_ids"] = term_ids
-
-    # Mode 2/3: walk UP, filter on level (and optionally term_ids).
     else:
+        # Mode 2/3 — walk UP, filter on level (and optionally term_ids).
+        params["level"] = level
         frag = _hierarchy_walk(ontology, direction="up")
         bind = frag["bind_up"]
         walk = frag["walk_up"]
-        params["level"] = level
+        level_clause = "WHERE t.level = $level"
+        if term_ids is not None:
+            level_clause += " AND t.id IN $term_ids"
+            params["term_ids"] = term_ids
         if walk:
-            level_clause = "WHERE t.level = $level"
-            if term_ids is not None:
-                level_clause += " AND t.id IN $term_ids"
-                params["term_ids"] = term_ids
             cypher_head = f"{bind}\n{walk}\n{level_clause}\n"
         else:
             # Flat ontology: t = leaf; no walk; level filter on t directly.
-            level_clause = "WHERE t.level = $level"
-            if term_ids is not None:
-                level_clause += " AND t.id IN $term_ids"
-                params["term_ids"] = term_ids
             cypher_head = f"{bind}\n{level_clause}\n"
 
-    # Size filter (common to all modes)
+    # Size filter (common to all modes). Caller must add
+    # $min_gene_set_size and $max_gene_set_size to params.
     size_filter = (
         "WITH t, collect(DISTINCT g) AS term_genes\n"
         "WHERE size(term_genes) >= $min_gene_set_size\n"
         "  AND ($max_gene_set_size IS NULL OR "
-        "size(term_genes) <= $max_gene_set_size)\n"
-        "UNWIND term_genes AS g"
+        "size(term_genes) <= $max_gene_set_size)"
     )
+    return f"{cypher_head}\n{size_filter}", params
+
+
+def build_genes_by_ontology_detail(
+    *,
+    ontology: str,
+    organism: str,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build (gene × term) detail query. Dispatches on (level, term_ids).
+
+    `organism` is required (single-organism contract).
+
+    Mode 1: term_ids only — walk DOWN.
+    Mode 2: level only — walk UP, filter on level.
+    Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
+
+    RETURN keys (compact): locus_tag, gene_name, product, gene_category,
+    term_id, term_name, level.
+    RETURN keys (verbose): adds function_description, level_is_best_effort.
+    """
+    # Validation stays in the builder (helper would also need it, but the
+    # detail-builder tests expect `match="level.*term_ids"`).
+    if level is None and not term_ids:
+        raise ValueError(
+            "At least one of `level` or `term_ids` must be provided."
+        )
+    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
+        raise ValueError(
+            "max_gene_set_size must be >= min_gene_set_size."
+        )
+
+    head, params = _genes_by_ontology_match_stage(
+        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+    )
+    params["min_gene_set_size"] = min_gene_set_size
+    params["max_gene_set_size"] = max_gene_set_size
 
     # Row return
     verbose_cols = (
@@ -1593,8 +1613,53 @@ def build_genes_by_ontology_detail(
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
 
-    cypher = f"{cypher_head}\n{size_filter}\n{return_block}{skip_clause}{limit_clause}"
+    cypher = (
+        f"{head}\n"
+        f"UNWIND term_genes AS g\n"
+        f"{return_block}{skip_clause}{limit_clause}"
+    )
     return cypher, params
+
+
+def build_genes_by_ontology_per_term(
+    *,
+    ontology: str,
+    organism: str,
+    level: int | None,
+    term_ids: list[str] | None,
+    min_gene_set_size: int,
+    max_gene_set_size: int | None,
+) -> tuple[str, dict]:
+    """Per-term aggregate. One row per surviving term.
+
+    `organism` is required (single-organism contract). Feeds summary fields
+    such as `top_terms`, `by_level.n_terms`, `by_level.row_count`,
+    `n_best_effort_terms`, and `filtered_out` detection.
+
+    Mode 1: term_ids only — walk DOWN.
+    Mode 2: level only — walk UP, filter on level.
+    Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
+
+    RETURN keys: term_id, term_name, level, best_effort, n_genes, cat_freqs.
+    """
+    head, params = _genes_by_ontology_match_stage(
+        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+    )
+    params["min_gene_set_size"] = min_gene_set_size
+    params["max_gene_set_size"] = max_gene_set_size
+
+    tail = (
+        "UNWIND term_genes AS g\n"
+        "WITH t, collect({lt: g.locus_tag, "
+        "cat: coalesce(g.gene_category, 'Unknown')}) AS gene_rows\n"
+        "RETURN t.id AS term_id, t.name AS term_name, t.level AS level,\n"
+        "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
+        "       size(gene_rows) AS n_genes,\n"
+        "       apoc.coll.frequencies("
+        "[r IN gene_rows | r.cat]) AS cat_freqs\n"
+        "ORDER BY t.id"
+    )
+    return f"{head}\n{tail}", params
 
 
 def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
