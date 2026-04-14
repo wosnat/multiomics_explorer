@@ -3576,8 +3576,12 @@ def build_ontology_expcov(
     # build_ontology_landscape). For expcov we strip the Gene-Match prefix
     # from bind_up because `g` is already bound by the outer Experiment match.
     frag = _hierarchy_walk(ontology, direction="up")
-    _prefix = "MATCH (g:Gene {organism_name: $org})"
-    bind_tail = frag["bind_up"][len(_prefix):]
+    prefix = "MATCH (g:Gene {organism_name: $org})"
+    assert frag["bind_up"].startswith(prefix), (
+        f"_hierarchy_walk bind_up format changed; "
+        f"expcov prefix-stripping needs update. Got: {frag['bind_up']!r}"
+    )
+    bind_tail = frag["bind_up"][len(prefix):]
     walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
 
     cypher = (

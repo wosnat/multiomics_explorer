@@ -3470,6 +3470,20 @@ class TestBuildOntologyExpcov:
                 experiment_ids=["e1"],
             )
 
+    def test_asserts_when_hierarchy_walk_prefix_changes(self, monkeypatch):
+        from multiomics_explorer.kg import queries_lib
+
+        monkeypatch.setattr(
+            queries_lib, "_hierarchy_walk",
+            lambda *a, **kw: {"bind_up": "MATCH (g:Gene)", "walk_up": ""},
+        )
+        with pytest.raises(AssertionError, match="_hierarchy_walk bind_up format"):
+            build_ontology_expcov(
+                ontology="pfam",
+                organism_name="MED4",
+                experiment_ids=["e1"],
+            )
+
 
 # ---------------------------------------------------------------------------
 # build_ontology_experiment_check
