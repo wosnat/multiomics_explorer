@@ -17,7 +17,7 @@ examples:
     call: genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1, term_ids=["cyanorak.role:A.1", "cyanorak.role:A.2"])
 
   - title: Summary-only (envelope, no rows)
-    call: genes_by_ontology(ontology="go_bp", organism="MED4", level=1, summary=true)
+    call: genes_by_ontology(ontology="go_bp", organism="MED4", level=1, summary=True)
 
   - title: Inspect all terms (override size filter)
     call: genes_by_ontology(ontology="go_bp", organism="MED4", level=1, min_gene_set_size=0, max_gene_set_size=100000)

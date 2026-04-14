@@ -131,12 +131,18 @@ def _hierarchy_walk(
             "WHERE t:Pfam OR t:PfamClan"
         )
         if direction == "up":
+            # Parenthesize the label guard so downstream callers can safely
+            # append `AND ...` without altering operator precedence.
+            walk_up_safe = (
+                "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
+                "WHERE (t:Pfam OR t:PfamClan)"
+            )
             return {
                 "leaf_label": leaf_label,
                 "gene_rel": gene_rel,
                 "rel_union": "Pfam_in_pfam_clan",
                 "bind_up": bind_up,
-                "walk_up": walk_up,
+                "walk_up": walk_up_safe,
                 "walk_down": "",
             }
         # direction == "down"
@@ -1369,7 +1375,11 @@ def _genes_by_ontology_match_stage(
         frag = _hierarchy_walk(ontology, direction="up")
         bind = frag["bind_up"]
         walk = frag["walk_up"]
-        level_clause = "WHERE t.level = $level"
+        # Pfam's walk_up already carries a `WHERE t:Pfam OR t:PfamClan` guard
+        # — merge the level filter in via AND instead of opening a new WHERE.
+        walk_has_where = bool(walk) and "WHERE" in walk
+        level_keyword = "AND" if walk_has_where else "WHERE"
+        level_clause = f"{level_keyword} t.level = $level"
         if term_ids is not None:
             level_clause += " AND t.id IN $term_ids"
             params["term_ids"] = term_ids

@@ -3547,7 +3547,7 @@ class TestBuildOntologyLandscape:
         assert ":Gene_has_pfam" in cypher
         assert "(leaf:Pfam)" in cypher
         assert "Pfam_in_pfam_clan*0..1" in cypher
-        assert "WHERE t:Pfam OR t:PfamClan" in cypher
+        assert "(t:Pfam OR t:PfamClan)" in cypher
 
     def test_invalid_ontology_raises(self):
         with pytest.raises(ValueError, match="Invalid ontology"):

@@ -112,7 +112,7 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1, term_ids=[
 ### Example 4: Summary-only (envelope, no rows)
 
 ```example-call
-genes_by_ontology(ontology="go_bp", organism="MED4", level=1, summary=true)
+genes_by_ontology(ontology="go_bp", organism="MED4", level=1, summary=True)
 ```
 
 ### Example 5: Inspect all terms (override size filter)

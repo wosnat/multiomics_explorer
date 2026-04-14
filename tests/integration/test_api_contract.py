@@ -257,23 +257,44 @@ class TestSearchOntologyContract:
 @pytest.mark.kg
 class TestGenesByOntologyContract:
     def test_returns_dict_envelope(self, conn):
-        result = api.genes_by_ontology(["go:0006260"], "go_bp", conn=conn)
+        result = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:0006260"],
+            conn=conn,
+        )
         assert isinstance(result, dict)
-        for key in ("total_matching", "by_organism", "by_category",
-                     "by_term", "returned", "truncated", "offset", "results"):
-            assert key in result
+        for key in (
+            "ontology", "organism_name",
+            "total_matching", "total_genes", "total_terms", "total_categories",
+            "by_category", "by_level", "top_terms", "n_best_effort_terms",
+            "not_found", "wrong_ontology", "wrong_level", "filtered_out",
+            "returned", "truncated", "offset", "results",
+        ):
+            assert key in result, f"Missing envelope key: {key}"
         assert result["total_matching"] >= 1
         assert result["returned"] >= 1
 
     def test_result_keys(self, conn):
-        result = api.genes_by_ontology(["go:0006260"], "go_bp", conn=conn)
-        expected_keys = {"locus_tag", "gene_name", "product",
-                         "organism_name", "gene_category"}
+        result = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:0006260"],
+            conn=conn,
+        )
+        expected_keys = {
+            "locus_tag", "gene_name", "product", "gene_category",
+            "term_id", "term_name", "level",
+        }
         assert set(result["results"][0].keys()) == expected_keys
 
     def test_summary_mode(self, conn):
         result = api.genes_by_ontology(
-            ["go:0006260"], "go_bp", summary=True, conn=conn,
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:0006260"],
+            summary=True,
+            conn=conn,
         )
         assert result["results"] == []
         assert result["returned"] == 0
@@ -281,11 +302,14 @@ class TestGenesByOntologyContract:
 
     def test_verbose_adds_columns(self, conn):
         result = api.genes_by_ontology(
-            ["go:0006260"], "go_bp", verbose=True, limit=1, conn=conn,
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:0006260"],
+            verbose=True,
+            limit=1,
+            conn=conn,
         )
         row = result["results"][0]
-        assert "matched_terms" in row
-        assert "gene_summary" in row
         assert "function_description" in row
 
 
