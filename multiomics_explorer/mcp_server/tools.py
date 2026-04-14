@@ -792,103 +792,159 @@ def register_tools(mcp: FastMCP):
 
     class GenesByOntologyResult(BaseModel):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
-        gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN')")
-        product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III, beta subunit')")
-        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
-        gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair')")
+        gene_name: str | None = Field(default=None,
+            description="Gene name (e.g. 'dnaN')")
+        product: str | None = Field(default=None,
+            description="Gene product (e.g. 'DNA polymerase III, beta subunit')")
+        gene_category: str | None = Field(default=None,
+            description="Functional category (e.g. 'Replication and repair')")
+        term_id: str = Field(description="Ontology term ID (e.g. 'go:0050896')")
+        term_name: str = Field(description="Term name (e.g. 'response to stimulus')")
+        level: int = Field(description="Hierarchy level of this term (0 = broadest)")
         # verbose only
-        matched_terms: list[str] | None = Field(default=None, description="Input term IDs this gene was matched through (e.g. ['go:0006260'])")
-        gene_summary: str | None = Field(default=None, description="Concatenated summary text")
-        function_description: str | None = Field(default=None, description="Curated functional description")
-
-    class OntologyOrganismBreakdown(BaseModel):
-        organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
-        count: int = Field(description="Number of matching genes (e.g. 131)")
+        function_description: str | None = Field(default=None,
+            description="Curated functional description (verbose only)")
+        level_is_best_effort: bool | None = Field(default=None,
+            description="True when GO term's level is best-effort min-path "
+                        "(sparse: absent for non-GO or non-best-effort; "
+                        "verbose only)")
 
     class OntologyCategoryBreakdown(BaseModel):
-        category: str = Field(description="Gene category (e.g. 'Replication and repair')")
-        count: int = Field(description="Number of matching genes (e.g. 321)")
+        category: str = Field(description="gene_category value (e.g. 'Replication and repair')")
+        count: int = Field(description="Distinct gene count (e.g. 101)")
+
+    class OntologyLevelBreakdown(BaseModel):
+        level: int = Field(description="Hierarchy level (e.g. 1)")
+        n_terms: int = Field(description="Distinct terms at this level")
+        n_genes: int = Field(description="Distinct genes reached via this level")
+        row_count: int = Field(description="(gene × term) rows at this level")
 
     class OntologyTermBreakdown(BaseModel):
-        term_id: str = Field(description="Input term ID (e.g. 'go:0006260')")
-        count: int = Field(description="Genes annotated to this term or descendants (e.g. 411)")
+        term_id: str = Field(description="Term ID (e.g. 'go:0050896')")
+        term_name: str = Field(description="Term name (e.g. 'response to stimulus')")
+        count: int = Field(description="Distinct gene count (e.g. 152)")
 
     class GenesByOntologyResponse(BaseModel):
-        total_matching: int = Field(description="Distinct genes matching (e.g. 1742)")
-        by_organism: list[OntologyOrganismBreakdown] = Field(description="Gene counts per organism, sorted desc")
-        by_category: list[OntologyCategoryBreakdown] = Field(description="Gene counts per gene_category, sorted desc")
-        by_term: list[OntologyTermBreakdown] = Field(description="Gene counts per input term, sorted desc (can overlap)")
-        returned: int = Field(description="Results in this response (0 when summary=true)")
-        offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if total_matching > returned")
+        ontology: str = Field(description="Echo of input ontology (e.g. 'go_bp')")
+        organism_name: str = Field(description="Single organism for all results")
+        total_matching: int = Field(description="(gene × term) row count matching all filters")
+        total_genes: int = Field(description="Distinct genes across results")
+        total_terms: int = Field(description="Distinct terms emitted")
+        total_categories: int = Field(description="Distinct gene_category values")
+        genes_per_term_min: int = Field(description="Fewest genes in any surviving term")
+        genes_per_term_median: float = Field(description="Median genes per term")
+        genes_per_term_max: int = Field(description="Most genes in any surviving term")
+        terms_per_gene_min: int = Field(description="Fewest terms for any gene")
+        terms_per_gene_median: float = Field(description="Median terms per gene")
+        terms_per_gene_max: int = Field(description="Most terms for any gene")
+        by_category: list[OntologyCategoryBreakdown] = Field(
+            description="Distinct-gene counts per gene_category, sorted desc")
+        by_level: list[OntologyLevelBreakdown] = Field(
+            description="Per-level summary, sorted by level asc")
+        top_terms: list[OntologyTermBreakdown] = Field(
+            description="Top 5 terms by distinct-gene count, tie-break term_id asc")
+        n_best_effort_terms: int = Field(
+            description="Distinct best-effort terms (GO-only marker; 0 for other ontologies)")
+        not_found: list[str] = Field(default_factory=list,
+            description="Input term_ids absent from the KG entirely")
+        wrong_ontology: list[str] = Field(default_factory=list,
+            description="Input term_ids present but in a different ontology label")
+        wrong_level: list[str] = Field(default_factory=list,
+            description="Input term_ids in the ontology but at wrong level (Mode 3 only)")
+        filtered_out: list[str] = Field(default_factory=list,
+            description="Input term_ids valid but outside [min, max]_gene_set_size")
+        returned: int = Field(description="Rows in this response")
+        offset: int = Field(default=0, description="Offset into full result set")
+        truncated: bool = Field(description="True when total_matching > offset + returned")
         results: list[GenesByOntologyResult] = Field(
-            default_factory=list, description="One row per distinct gene",
-        )
+            default_factory=list,
+            description="One row per (gene × term) pair")
 
     @mcp.tool(
-        tags={"genes", "ontology"},
-        annotations={"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
+        tags={"genes", "ontology", "enrichment"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
     )
     async def genes_by_ontology(
         ctx: Context,
-        term_ids: Annotated[list[str], Field(
-            description="Ontology term IDs (from search_ontology). "
-            "E.g. ['go:0006260', 'go:0006412'].",
-        )],
         ontology: Annotated[Literal[
-            "go_bp", "go_mf", "go_cc", "kegg", "ec",
+            "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam",
         ], Field(
-            description="Ontology the term IDs belong to.",
+            description="Ontology for these term_ids / this level.",
         )],
-        organism: Annotated[str | None, Field(
-            description="Filter by organism (case-insensitive substring). "
-            "E.g. 'MED4', 'Alteromonas'. "
-            "Use list_organisms to see valid values.",
+        organism: Annotated[str, Field(
+            description="Organism (case-insensitive substring match, e.g. 'MED4'). "
+                        "Required — single-valued. Use list_organisms for valid values.",
+        )],
+        level: Annotated[int | None, Field(
+            description="Hierarchy level to roll UP to. 0 = broadest. "
+                        "At least one of `level` or `term_ids` must be provided.",
+            ge=0,
         )] = None,
+        term_ids: Annotated[list[str] | None, Field(
+            description="Ontology term IDs (from search_ontology). "
+                        "Mode 1 (no `level`): expand DOWN from each input term. "
+                        "Mode 3 (with `level`): scope rollup to these level-N terms.",
+        )] = None,
+        min_gene_set_size: Annotated[int, Field(
+            description="Exclude terms with fewer organism-scoped genes than this.",
+            ge=0,
+        )] = 5,
+        max_gene_set_size: Annotated[int, Field(
+            description="Exclude terms with more organism-scoped genes than this.",
+            ge=1,
+        )] = 500,
         summary: Annotated[bool, Field(
-            description="When true, return only summary fields (results=[]).",
+            description="If true, omit `results` (envelope only).",
         )] = False,
         verbose: Annotated[bool, Field(
-            description="Include matched_terms, gene_summary, function_description.",
+            description="Include function_description and sparse level_is_best_effort.",
         )] = False,
         limit: Annotated[int, Field(
-            description="Max results.", ge=1,
-        )] = 5,
+            description="Max rows returned. Default 500 — this tool feeds enrichment.",
+            ge=1,
+        )] = 500,
         offset: Annotated[int, Field(
-            description="Number of results to skip for pagination.", ge=0,
+            description="Skip N rows before limit", ge=0,
         )] = 0,
     ) -> GenesByOntologyResponse:
-        """Find genes annotated to ontology terms, with hierarchy expansion.
+        """Find (gene × term) pairs for an ontology, scoped by terms and/or level.
 
-        Takes term IDs from search_ontology and finds all genes annotated to
-        those terms or any descendant terms in the ontology hierarchy.
-        Results are distinct genes (deduplicated across terms).
+        Three modes:
+        - term_ids only → gene discovery by pathway (walk DOWN).
+        - level only → pathway definitions at level N (walk UP).
+        - level + term_ids → scoped rollup (walk UP, restrict to given terms).
 
-        For term discovery, use search_ontology first.
-        For per-gene ontology details, use gene_ontology_terms.
+        Single-organism enforced. Default `limit=500` because this tool feeds
+        enrichment (pathway_enrichment). For term discovery, chain from
+        search_ontology. For per-gene ontology details, use gene_ontology_terms.
         """
-        await ctx.info(f"genes_by_ontology term_ids={term_ids} ontology={ontology} organism={organism}")
+        await ctx.info(
+            f"genes_by_ontology ontology={ontology} organism={organism} "
+            f"level={level} term_ids_count={len(term_ids) if term_ids else 0}"
+        )
         try:
             conn = _conn(ctx)
             data = api.genes_by_ontology(
-                term_ids, ontology, organism=organism,
-                summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
+                ontology=ontology, organism=organism,
+                level=level, term_ids=term_ids,
+                min_gene_set_size=min_gene_set_size,
+                max_gene_set_size=max_gene_set_size,
+                summary=summary, verbose=verbose,
+                limit=limit, offset=offset, conn=conn,
             )
-            by_organism = [OntologyOrganismBreakdown(**b) for b in data["by_organism"]]
-            by_category = [OntologyCategoryBreakdown(**b) for b in data["by_category"]]
-            by_term = [OntologyTermBreakdown(**b) for b in data["by_term"]]
-            results = [GenesByOntologyResult(**r) for r in data["results"]]
-            return GenesByOntologyResponse(
-                total_matching=data["total_matching"],
-                by_organism=by_organism,
-                by_category=by_category,
-                by_term=by_term,
-                returned=data["returned"],
-                offset=data.get("offset", 0),
-                truncated=data["truncated"],
-                results=results,
-            )
+            if data["wrong_ontology"]:
+                await ctx.warning(
+                    f"genes_by_ontology: {len(data['wrong_ontology'])} "
+                    f"term_ids in wrong ontology (see response.wrong_ontology)"
+                )
+            if data["wrong_level"]:
+                await ctx.warning(
+                    f"genes_by_ontology: {len(data['wrong_level'])} "
+                    f"term_ids at wrong level (see response.wrong_level)"
+                )
+            return GenesByOntologyResponse(**data)
         except ValueError as e:
             await ctx.warning(f"genes_by_ontology error: {e}")
             raise ToolError(str(e))

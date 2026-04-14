@@ -652,36 +652,75 @@ class TestSearchOntologyCorrectness:
 class TestGenesByOntologyCorrectness:
     """Verify genes_by_ontology returns correct data for realistic mock responses."""
 
+    _EMPTY_ENVELOPE = {
+        "ontology": "go_bp",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 0,
+        "total_genes": 0,
+        "total_terms": 0,
+        "total_categories": 0,
+        "genes_per_term_min": 0,
+        "genes_per_term_median": 0.0,
+        "genes_per_term_max": 0,
+        "terms_per_gene_min": 0,
+        "terms_per_gene_median": 0.0,
+        "terms_per_gene_max": 0,
+        "by_category": [],
+        "by_level": [],
+        "top_terms": [],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
+        "returned": 0,
+        "offset": 0,
+        "truncated": False,
+        "results": [],
+    }
+
     @pytest.mark.asyncio
     async def test_single_term_returns_genes(self, tool_fns, mock_ctx):
-        """Single GO term returns annotated genes."""
+        """Single GO term returns annotated (gene × term) rows."""
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
             return_value={
+                **self._EMPTY_ENVELOPE,
                 "total_matching": 2,
-                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
+                "total_genes": 2,
+                "total_terms": 1,
+                "total_categories": 1,
+                "genes_per_term_min": 2,
+                "genes_per_term_median": 2.0,
+                "genes_per_term_max": 2,
+                "terms_per_gene_min": 1,
+                "terms_per_gene_median": 1.0,
+                "terms_per_gene_max": 1,
                 "by_category": [{"category": "DNA replication", "count": 2}],
-                "by_term": [{"term_id": "go:0006260", "count": 2}],
+                "by_level": [
+                    {"level": 3, "n_terms": 1, "n_genes": 2, "row_count": 2},
+                ],
+                "top_terms": [{"term_id": "go:0006260",
+                               "term_name": "DNA replication", "count": 2}],
                 "returned": 2,
                 "truncated": False,
                 "results": [
                     {"locus_tag": "PMM0001", "gene_name": "dnaN",
                      "product": "DNA polymerase III, beta subunit",
-                     "organism_name": "Prochlorococcus MED4",
                      "gene_category": "DNA replication",
-                     "annotation_quality": 3, "term_id": "go:0006260",
-                     "term_name": "DNA replication"},
+                     "term_id": "go:0006260",
+                     "term_name": "DNA replication", "level": 3},
                     {"locus_tag": "PMM0845", "gene_name": None,
                      "product": "hypothetical protein",
-                     "organism_name": "Prochlorococcus MED4",
                      "gene_category": None,
-                     "annotation_quality": 0, "term_id": "go:0006260",
-                     "term_name": "DNA replication"},
+                     "term_id": "go:0006260",
+                     "term_name": "DNA replication", "level": 3},
                 ],
             },
         ):
             result = await tool_fns["genes_by_ontology"](
-                mock_ctx, term_ids=["go:0006260"], ontology="go_bp",
+                mock_ctx, ontology="go_bp", organism="Prochlorococcus MED4",
+                term_ids=["go:0006260"],
             )
 
         assert result.total_matching == 2
@@ -694,14 +733,11 @@ class TestGenesByOntologyCorrectness:
         """Zero matches return empty results."""
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
-            return_value={
-                "total_matching": 0,
-                "by_organism": [], "by_category": [], "by_term": [],
-                "returned": 0, "truncated": False, "results": [],
-            },
+            return_value=self._EMPTY_ENVELOPE,
         ):
             result = await tool_fns["genes_by_ontology"](
-                mock_ctx, term_ids=["go:9999999"], ontology="go_bp",
+                mock_ctx, ontology="go_bp", organism="Prochlorococcus MED4",
+                term_ids=["go:9999999"],
             )
 
         assert result.total_matching == 0
@@ -713,15 +749,27 @@ class TestGenesByOntologyCorrectness:
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
             return_value={
+                **self._EMPTY_ENVELOPE,
                 "total_matching": 15,
-                "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 15}],
+                "total_genes": 15,
+                "total_terms": 1,
+                "total_categories": 1,
+                "genes_per_term_min": 15,
+                "genes_per_term_median": 15.0,
+                "genes_per_term_max": 15,
+                "terms_per_gene_min": 1,
+                "terms_per_gene_median": 1.0,
+                "terms_per_gene_max": 1,
                 "by_category": [{"category": "Transport", "count": 10}],
-                "by_term": [{"term_id": "go:0006810", "count": 15}],
-                "returned": 0, "truncated": True, "results": [],
+                "top_terms": [{"term_id": "go:0006810",
+                               "term_name": "transport", "count": 15}],
+                "returned": 0,
+                "truncated": True,
             },
         ):
             result = await tool_fns["genes_by_ontology"](
-                mock_ctx, term_ids=["go:0006810"], ontology="go_bp", summary=True,
+                mock_ctx, ontology="go_bp", organism="Prochlorococcus MED4",
+                term_ids=["go:0006810"], summary=True,
             )
 
         assert result.returned == 0
