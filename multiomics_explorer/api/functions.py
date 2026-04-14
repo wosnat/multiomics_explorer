@@ -1179,9 +1179,12 @@ def genes_by_homolog_group(
 
 
 def genes_by_ontology(
-    term_ids: list[str],
     ontology: str,
-    organism: str | None = None,
+    organism: str,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int = 500,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -1189,66 +1192,215 @@ def genes_by_ontology(
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Find genes annotated to ontology terms, with hierarchy expansion.
+    """Find genes x ontology-term pairs (TERM2GENE), three input modes.
 
-    Returns dict with keys: total_matching, by_organism, by_category,
-    by_term, returned, truncated, results.
-    Per result: locus_tag, gene_name, product, organism_name,
-    gene_category.
-    Verbose adds: matched_terms, gene_summary, function_description.
+    Mode 1 (term_ids only): expand DOWN, row term_id = input term.
+    Mode 2 (level only): roll UP, row term_id = level-N ancestor.
+    Mode 3 (level + term_ids): Mode 2 scoped to provided level-N terms.
+
+    Returns dict with full envelope -- see spec for shape.
     """
-    if not term_ids:
+    from collections import Counter
+
+    from multiomics_explorer.kg.queries_lib import (
+        build_genes_by_ontology_detail,
+        build_genes_by_ontology_per_gene,
+        build_genes_by_ontology_per_term,
+        build_genes_by_ontology_validate,
+    )
+
+    # --- Input validation ---
+    if ontology not in ALL_ONTOLOGIES:
         raise ValueError(
-            "term_ids must not be empty. "
-            "Use search_ontology to find term IDs."
+            f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}"
         )
-    if ontology not in ONTOLOGY_CONFIG:
-        valid = ", ".join(sorted(ONTOLOGY_CONFIG))
+    if level is None and not term_ids:
         raise ValueError(
-            f"Invalid ontology '{ontology}'. Valid: {valid}"
+            "At least one of `level` or `term_ids` must be provided."
         )
+    if min_gene_set_size < 0:
+        raise ValueError("min_gene_set_size must be >= 0.")
+    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
+        raise ValueError("max_gene_set_size must be >= min_gene_set_size.")
     if summary:
         limit = 0
 
     conn = _default_conn(conn)
 
-    # Summary query — always runs
-    sum_cypher, sum_params = build_genes_by_ontology_summary(
-        ontology=ontology, term_ids=term_ids, organism=organism,
-    )
-    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
-
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
+    # --- Query V: validate term_ids (only when provided) ---
+    not_found: list[str] = []
+    wrong_ontology: list[str] = []
+    wrong_level: list[str] = []
+    ok_term_ids: list[str] | None = None  # None = no validation needed
+    if term_ids:
+        v_cypher, v_params = build_genes_by_ontology_validate(
+            term_ids=term_ids, ontology=ontology, level=level,
         )
+        v_rows = conn.execute_query(v_cypher, **v_params)
+        for r in v_rows:
+            if r["status"] == "not_found":
+                not_found.append(r["tid"])
+            elif r["status"] == "wrong_ontology":
+                wrong_ontology.append(r["tid"])
+            elif r["status"] == "wrong_level":
+                wrong_level.append(r["tid"])
+        ok_term_ids = [r["tid"] for r in v_rows if r["status"] == "ok"]
 
-    total_matching = raw_summary["total_matching"]
+    # If every term_id is invalid -> short-circuit, return empty envelope.
+    effective_term_ids = ok_term_ids if term_ids else None
+    if term_ids and not effective_term_ids:
+        return {
+            "ontology": ontology,
+            "organism_name": organism,
+            "total_matching": 0,
+            "total_genes": 0,
+            "total_terms": 0,
+            "total_categories": 0,
+            "genes_per_term_min": 0,
+            "genes_per_term_median": 0.0,
+            "genes_per_term_max": 0,
+            "terms_per_gene_min": 0,
+            "terms_per_gene_median": 0.0,
+            "terms_per_gene_max": 0,
+            "by_category": [],
+            "by_level": [],
+            "top_terms": [],
+            "n_best_effort_terms": 0,
+            "not_found": not_found,
+            "wrong_ontology": wrong_ontology,
+            "wrong_level": wrong_level,
+            "filtered_out": [],
+            "returned": 0,
+            "offset": offset,
+            "truncated": False,
+            "results": [],
+        }
+
+    # --- Query A: per-term aggregate ---
+    pt_cypher, pt_params = build_genes_by_ontology_per_term(
+        ontology=ontology, organism=organism,
+        level=level, term_ids=effective_term_ids,
+        min_gene_set_size=min_gene_set_size,
+        max_gene_set_size=max_gene_set_size,
+    )
+    per_term = conn.execute_query(pt_cypher, **pt_params)
+
+    # --- Query B: per-gene aggregate ---
+    pg_cypher, pg_params = build_genes_by_ontology_per_gene(
+        ontology=ontology, organism=organism,
+        level=level, term_ids=effective_term_ids,
+        min_gene_set_size=min_gene_set_size,
+        max_gene_set_size=max_gene_set_size,
+    )
+    per_gene = conn.execute_query(pg_cypher, **pg_params)
+
+    # --- Compose envelope ---
+    total_matching = sum(r["n_genes"] for r in per_term)
+    total_genes = len(per_gene)
+    total_terms = len(per_term)
+    n_best_effort_terms = sum(1 for r in per_term if r["best_effort"])
+
+    # by_category from per_gene
+    cat_counter = Counter(r["gene_category"] for r in per_gene)
+    by_category = [
+        {"category": c, "count": n}
+        for c, n in cat_counter.most_common()
+    ]
+    total_categories = len(cat_counter)
+
+    # by_level from per_term (for n_terms, row_count) + per_gene (for n_genes)
+    level_terms: dict[int, dict] = {}
+    for r in per_term:
+        lvl = r["level"]
+        e = level_terms.setdefault(
+            lvl,
+            {"level": lvl, "n_terms": 0, "n_genes": 0, "row_count": 0},
+        )
+        e["n_terms"] += 1
+        e["row_count"] += r["n_genes"]
+    # n_genes per level from per_gene.levels_hit
+    for r in per_gene:
+        for lvl in r["levels_hit"]:
+            if lvl in level_terms:
+                level_terms[lvl]["n_genes"] += 1  # count once per gene per level
+    by_level = sorted(level_terms.values(), key=lambda e: e["level"])
+
+    # top_terms: top 5 by n_genes desc, tie-break term_id asc
+    top_terms_sorted = sorted(
+        per_term, key=lambda r: (-r["n_genes"], r["term_id"])
+    )[:5]
+    top_terms = [
+        {"term_id": r["term_id"], "term_name": r["term_name"], "count": r["n_genes"]}
+        for r in top_terms_sorted
+    ]
+
+    # Distributions
+    genes_per_term_vals = [r["n_genes"] for r in per_term]
+    terms_per_gene_vals = [r["n_terms"] for r in per_gene]
+
+    def _stats(vals):
+        if not vals:
+            return 0, 0.0, 0
+        return min(vals), float(statistics.median(vals)), max(vals)
+
+    g_min, g_med, g_max = _stats(genes_per_term_vals)
+    t_min, t_med, t_max = _stats(terms_per_gene_vals)
+
+    # filtered_out: ok term_ids not present in per_term output (Modes 1 & 3)
+    filtered_out: list[str] = []
+    if effective_term_ids:
+        emitted_term_ids = {r["term_id"] for r in per_term}
+        filtered_out = [
+            tid for tid in effective_term_ids if tid not in emitted_term_ids
+        ]
+
     envelope = {
+        "ontology": ontology,
+        "organism_name": organism,
         "total_matching": total_matching,
-        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
-        "by_category": _rename_freq(raw_summary["by_category"], "category"),
-        "by_term": _rename_freq(raw_summary["by_term"], "term_id"),
+        "total_genes": total_genes,
+        "total_terms": total_terms,
+        "total_categories": total_categories,
+        "genes_per_term_min": g_min,
+        "genes_per_term_median": g_med,
+        "genes_per_term_max": g_max,
+        "terms_per_gene_min": t_min,
+        "terms_per_gene_median": t_med,
+        "terms_per_gene_max": t_max,
+        "by_category": by_category,
+        "by_level": by_level,
+        "top_terms": top_terms,
+        "n_best_effort_terms": n_best_effort_terms,
+        "not_found": not_found,
+        "wrong_ontology": wrong_ontology,
+        "wrong_level": wrong_level,
+        "filtered_out": filtered_out,
+        "offset": offset,
     }
 
-    # Detail query — skip when limit=0
+    # --- Query D: detail rows (skipped when summary=True) ---
     if limit == 0:
         envelope["returned"] = 0
-        envelope["offset"] = offset
         envelope["truncated"] = total_matching > 0
         envelope["results"] = []
         return envelope
 
-    det_cypher, det_params = build_genes_by_ontology(
-        ontology=ontology, term_ids=term_ids, organism=organism,
+    det_cypher, det_params = build_genes_by_ontology_detail(
+        ontology=ontology, organism=organism,
+        level=level, term_ids=effective_term_ids,
+        min_gene_set_size=min_gene_set_size,
+        max_gene_set_size=max_gene_set_size,
         verbose=verbose, limit=limit, offset=offset,
     )
     results = conn.execute_query(det_cypher, **det_params)
 
+    # Strip sparse level_is_best_effort=False from rows (verbose only)
+    if verbose:
+        for r in results:
+            if r.get("level_is_best_effort") is False:
+                r.pop("level_is_best_effort", None)
+
     envelope["returned"] = len(results)
-    envelope["offset"] = offset
     envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
