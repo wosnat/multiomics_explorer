@@ -1,0 +1,255 @@
+by_category:
+- category: Replication and repair
+  count: 24
+- category: Post-translational modification
+  count: 2
+- category: Transcription
+  count: 1
+- category: Transport
+  count: 1
+- category: Coenzyme metabolism
+  count: 1
+- category: Regulatory functions
+  count: 1
+by_level:
+- level: 6
+  n_genes: 30
+  n_terms: 1
+  row_count: 30
+case_id: genes_by_ontology_mode1_term_ids
+filtered_out: []
+genes_per_term_max: 30
+genes_per_term_median: 30.0
+genes_per_term_min: 30
+n_best_effort_terms: 1
+not_found: []
+offset: 0
+ontology: go_bp
+organism_name: Prochlorococcus MED4
+results:
+- gene_category: Replication and repair
+  gene_name: dnaN
+  level: 6
+  locus_tag: PMM0001
+  product: DNA polymerase III, beta subunit
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: rarA
+  level: 6
+  locus_tag: PMM0077
+  product: recombination factor
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: holB
+  level: 6
+  locus_tag: PMM0129
+  product: DNA polymerase III, delta^ subunit
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Transcription
+  gene_name: rnhA
+  level: 6
+  locus_tag: PMM0200
+  product: ribonuclease HI
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: topA
+  level: 6
+  locus_tag: PMM0436
+  product: DNA topoisomerase I, omega subunit
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: priA
+  level: 6
+  locus_tag: PMM0497
+  product: primosomal protein N^
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Transport
+  gene_name: ycf41
+  level: 6
+  locus_tag: PMM0502
+  product: possible single-stranded DNA-binding protein
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: dnaA
+  level: 6
+  locus_tag: PMM0565
+  product: chromosomal replication initiator protein
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: dnaQ
+  level: 6
+  locus_tag: PMM0621
+  product: exonuclease family protein
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Coenzyme metabolism
+  gene_name: nrdJ
+  level: 6
+  locus_tag: PMM0661
+  product: ribonucleoside-diphosphate reductase
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: lig
+  level: 6
+  locus_tag: PMM0729
+  product: ATP-dependent DNA ligase
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Post-translational modification
+  gene_name: dnaK2
+  level: 6
+  locus_tag: PMM0897
+  product: chaperone protein DnaK
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: umuD
+  level: 6
+  locus_tag: PMM0936
+  product: DNA polymerase V, subunit D
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: umuC
+  level: 6
+  locus_tag: PMM0937
+  product: DNA polymerase V, subunit C
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: dnaG
+  level: 6
+  locus_tag: PMM0939
+  product: DNA primase
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: ruvA
+  level: 6
+  locus_tag: PMM0942
+  product: holliday junction ATP-dependent DNA helicase RuvA
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: dnaE
+  level: 6
+  locus_tag: PMM0945
+  product: DNA polymerase III, alpha subunit
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: ruvC
+  level: 6
+  locus_tag: PMM1054
+  product: crossover junction endodeoxyribonuclease RuvC
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: gyrA
+  level: 6
+  locus_tag: PMM1063
+  product: DNA gyrase, A subunit
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: polA
+  level: 6
+  locus_tag: PMM1140
+  product: DNA polymerase I
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Regulatory functions
+  gene_name: lexA
+  level: 6
+  locus_tag: PMM1262
+  product: SOS-response transcriptional repressor
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Post-translational modification
+  gene_name: dnaK1
+  level: 6
+  locus_tag: PMM1432
+  product: chaperone protein DnaK
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: recF
+  level: 6
+  locus_tag: PMM1573
+  product: DNA replication and repair protein recF
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: ruvB
+  level: 6
+  locus_tag: PMM1615
+  product: holliday junction ATP-dependent DNA helicase RuvB
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: ssb
+  level: 6
+  locus_tag: PMM1623
+  product: single-stranded DNA-binding protein
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: gyrB
+  level: 6
+  locus_tag: PMM1634
+  product: DNA gyrase, B subunit
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: holA
+  level: 6
+  locus_tag: PMM1647
+  product: DNA polymerase III, delta subunit
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: dnaX
+  level: 6
+  locus_tag: PMM1658
+  product: DNA polymerase III, gamma and tau subunits
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: dnaB
+  level: 6
+  locus_tag: PMM1674
+  product: replicative DNA helicase
+  term_id: go:0006260
+  term_name: DNA replication
+- gene_category: Replication and repair
+  gene_name: ligA
+  level: 6
+  locus_tag: PMM1679
+  product: ATP-dependent DNA ligase
+  term_id: go:0006260
+  term_name: DNA replication
+returned: 30
+row_count: 30
+terms_per_gene_max: 1
+terms_per_gene_median: 1.0
+terms_per_gene_min: 1
+top_terms:
+- count: 30
+  term_id: go:0006260
+  term_name: DNA replication
+total_categories: 6
+total_genes: 30
+total_matching: 30
+total_terms: 1
+truncated: false
+wrong_level: []
+wrong_ontology: []

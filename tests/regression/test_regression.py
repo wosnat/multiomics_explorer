@@ -25,7 +25,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function,
     build_genes_by_homolog_group,
     build_genes_by_homolog_group_summary,
-    build_genes_by_ontology,
     build_list_experiments,
     build_list_experiments_summary,
     build_list_gene_categories,
@@ -53,7 +52,8 @@ TOOL_BUILDERS = {
     "gene_homologs": build_gene_homologs,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
-    "genes_by_ontology": build_genes_by_ontology,
+    # genes_by_ontology: dispatched via api (L2) — returns envelope, not flat rows
+    "genes_by_ontology": None,
     "gene_ontology_terms": build_gene_ontology_terms,
     "list_publications": build_list_publications,
     "list_experiments": build_list_experiments,
@@ -137,6 +137,19 @@ def test_regression(conn, case, data_regression):
     elif tool == "ontology_landscape":
         data = api.ontology_landscape(**params, conn=conn)
         results = data["results"]
+    elif tool == "genes_by_ontology":
+        # Capture full envelope (top-level fields + results rows) — the new
+        # response shape is rich and changes here should surface cleanly.
+        data = api.genes_by_ontology(**params, conn=conn)
+        normalized_rows = _normalize(data.get("results", []))
+        envelope = {k: v for k, v in data.items() if k != "results"}
+        envelope["results"] = normalized_rows
+        envelope["row_count"] = len(normalized_rows)
+        data_regression.check(
+            {"case_id": case["id"], **envelope},
+            basename=case["id"],
+        )
+        return
     else:
         builder = TOOL_BUILDERS[tool]
         # Strip tool-level params that aren't accepted by query builders
