@@ -1191,6 +1191,65 @@ class TestBuildGenesByOntologySummary:
                 )
 
 
+class TestBuildGenesByOntologyValidate:
+    def test_single_label_ontology(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
+        )
+        cypher, params = build_genes_by_ontology_validate(
+            term_ids=["go:0006260", "go:0006412"],
+            ontology="go_bp",
+            level=3,
+        )
+        assert params == {
+            "term_ids": ["go:0006260", "go:0006412"],
+            "expected_labels": ["BiologicalProcess"],
+            "level": 3,
+        }
+        assert "UNWIND $term_ids AS tid" in cypher
+        assert "OPTIONAL MATCH (t {id: tid})" in cypher
+        # Guards all 10 label options
+        assert "t:BiologicalProcess" in cypher
+        assert "t:PfamClan" in cypher
+        assert "ANY(L IN $expected_labels WHERE L IN labels(t))" in cypher
+        assert "matched_label" in cypher
+
+    def test_pfam_accepts_both_labels(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
+        )
+        _, params = build_genes_by_ontology_validate(
+            term_ids=["pfam:PF00005", "pfam.clan:CL0023"],
+            ontology="pfam",
+            level=None,
+        )
+        assert params["expected_labels"] == ["Pfam", "PfamClan"]
+        assert params["level"] is None
+
+    def test_no_level_means_level_filter_skipped(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
+        )
+        cypher, params = build_genes_by_ontology_validate(
+            term_ids=["go:0006260"],
+            ontology="go_bp",
+            level=None,
+        )
+        # Level check is conditional on $level — expression must guard on NULL
+        assert "$level IS NOT NULL AND t.level <> $level" in cypher
+        assert params["level"] is None
+
+    def test_unknown_ontology_raises(self):
+        import pytest
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
+        )
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            build_genes_by_ontology_validate(
+                term_ids=["x"], ontology="nope", level=0,
+            )
+
+
 class TestBuildGeneOntologyTerms:
     def test_single_ontology_returns_expected_columns(self):
         """go_bp returns locus_tag, term_id, term_name in RETURN."""

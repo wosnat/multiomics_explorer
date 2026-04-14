@@ -1403,6 +1403,68 @@ def build_genes_by_ontology(
     return cypher, params
 
 
+# Ontologies → labels. Single-label ontologies get a one-element list;
+# pfam accepts Pfam (level 1) OR PfamClan (level 0).
+_ONTOLOGY_LABELS: dict[str, list[str]] = {
+    "go_bp": ["BiologicalProcess"],
+    "go_mf": ["MolecularFunction"],
+    "go_cc": ["CellularComponent"],
+    "ec": ["EcNumber"],
+    "kegg": ["KeggTerm"],
+    "cog_category": ["CogFunctionalCategory"],
+    "cyanorak_role": ["CyanorakRole"],
+    "tigr_role": ["TigrRole"],
+    "pfam": ["Pfam", "PfamClan"],
+}
+
+
+def build_genes_by_ontology_validate(
+    *,
+    term_ids: list[str],
+    ontology: str,
+    level: int | None,
+) -> tuple[str, dict]:
+    """Classify input term_ids into ok / not_found / wrong_ontology / wrong_level.
+
+    RETURN keys per row: tid, status, matched_label.
+    status ∈ {'ok','not_found','wrong_ontology','wrong_level'}.
+    matched_label is the expected-label the term carries when status='ok'
+    (used downstream for Pfam root-label dispatch).
+    """
+    if ontology not in _ONTOLOGY_LABELS:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. "
+            f"Valid: {sorted(_ONTOLOGY_LABELS)}"
+        )
+    expected_labels = _ONTOLOGY_LABELS[ontology]
+    cypher = (
+        "UNWIND $term_ids AS tid\n"
+        "OPTIONAL MATCH (t {id: tid})\n"
+        "  WHERE t:BiologicalProcess OR t:MolecularFunction "
+        "OR t:CellularComponent OR t:EcNumber OR t:KeggTerm "
+        "OR t:CogFunctionalCategory OR t:CyanorakRole "
+        "OR t:TigrRole OR t:Pfam OR t:PfamClan\n"
+        "WITH tid, head(collect(t)) AS t\n"
+        "RETURN tid,\n"
+        "  CASE\n"
+        "    WHEN t IS NULL THEN 'not_found'\n"
+        "    WHEN NOT ANY(L IN $expected_labels WHERE L IN labels(t)) "
+        "THEN 'wrong_ontology'\n"
+        "    WHEN $level IS NOT NULL AND t.level <> $level "
+        "THEN 'wrong_level'\n"
+        "    ELSE 'ok'\n"
+        "  END AS status,\n"
+        "  CASE WHEN t IS NOT NULL "
+        "THEN [L IN labels(t) WHERE L IN $expected_labels][0] "
+        "ELSE NULL END AS matched_label"
+    )
+    return cypher, {
+        "term_ids": term_ids,
+        "expected_labels": expected_labels,
+        "level": level,
+    }
+
+
 def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
     """Return a WHERE NOT EXISTS clause for leaf filtering, or empty string.
 
