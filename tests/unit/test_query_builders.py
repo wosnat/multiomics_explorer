@@ -18,8 +18,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_stub,
     build_genes_by_function,
     build_genes_by_function_summary,
-    build_genes_by_ontology,
-    build_genes_by_ontology_summary,
     build_gene_details,
     build_gene_details_summary,
     build_list_gene_categories,
@@ -815,14 +813,12 @@ class TestOntologyConfig:
             assert "hierarchy_rels" in cfg, f"{key} missing 'hierarchy_rels'"
             assert "fulltext_index" in cfg, f"{key} missing 'fulltext_index'"
 
-    def test_only_kegg_has_gene_connects_to_level(self):
+    def test_no_gene_connects_to_level(self):
+        """gene_connects_to_level was removed — graph structure enforces KEGG's ko-leaf rule."""
         for key, cfg in ONTOLOGY_CONFIG.items():
-            if key == "kegg":
-                assert cfg.get("gene_connects_to_level") == "ko"
-            else:
-                assert "gene_connects_to_level" not in cfg, (
-                    f"{key} should not have 'gene_connects_to_level'"
-                )
+            assert "gene_connects_to_level" not in cfg, (
+                f"{key} should not have 'gene_connects_to_level' (removed)"
+            )
 
     def test_pfam_has_parent_fields(self):
         """Pfam config has parent_label and parent_fulltext_index."""
@@ -959,236 +955,6 @@ class TestBuildSearchOntologySummary:
         cypher, params = build_search_ontology_summary(ontology="go_bp", search_text="replication")
         assert params["search_text"] == "replication"
         assert "$search_text" in cypher
-
-
-class TestBuildGenesByOntology:
-    def test_go_bp_hierarchy_expansion(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        assert "Biological_process_is_a_biological_process|Biological_process_part_of_biological_process" in cypher
-        assert "*0..15" in cypher
-        assert "BiologicalProcess" in cypher
-
-    def test_ec_hierarchy_expansion(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="ec", term_ids=["ec:1.-.-.-"],
-        )
-        assert "Ec_number_is_a_ec_number" in cypher
-        assert "*0..15" in cypher
-
-    def test_kegg_has_level_filter(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="kegg", term_ids=["kegg.category:09100"],
-        )
-        assert "Kegg_term_is_a_kegg_term" in cypher
-        assert "*0..15" in cypher
-        assert "descendant.level = 'ko'" in cypher
-
-    def test_non_kegg_no_level_filter(self):
-        for ontology in ["go_bp", "go_mf", "go_cc", "ec"]:
-            cypher, _ = build_genes_by_ontology(
-                ontology=ontology, term_ids=["test:001"],
-            )
-            assert "level" not in cypher, f"{ontology} should not have level filter"
-
-    def test_organism_filter_in_where(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], organism="MED4",
-        )
-        assert params["organism"] == "MED4"
-        assert "toLower($organism)" in cypher
-
-    def test_term_ids_passed_as_parameter(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260", "go:0006139"],
-        )
-        assert params["term_ids"] == ["go:0006260", "go:0006139"]
-        assert "$term_ids" in cypher
-
-    def test_returns_expected_columns(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        for col in ["locus_tag", "gene_name", "product", "organism_name"]:
-            assert col in cypher
-
-    def test_invalid_ontology_raises_valueerror(self):
-        with pytest.raises(ValueError, match="Invalid ontology"):
-            build_genes_by_ontology(ontology="bad", term_ids=["x"])
-
-    def test_go_mf_hierarchy_expansion(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_mf", term_ids=["go:0003677"],
-        )
-        assert "MolecularFunction" in cypher
-        assert "Molecular_function_is_a_molecular_function" in cypher
-
-    def test_go_cc_hierarchy_expansion(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_cc", term_ids=["go:0016020"],
-        )
-        assert "CellularComponent" in cypher
-        assert "Cellular_component_is_a_cellular_component" in cypher
-
-    def test_flat_ontology_no_hierarchy_expansion(self):
-        """Flat ontologies (empty hierarchy_rels) skip *0..15 traversal."""
-        cypher, _ = build_genes_by_ontology(
-            ontology="cog_category", term_ids=["cog.category:C"],
-        )
-        assert "*0..15" not in cypher
-        assert "root AS descendant" in cypher
-        assert "CogFunctionalCategory" in cypher
-        assert "Gene_in_cog_category" in cypher
-
-    def test_hierarchical_new_ontology(self):
-        """CyanorakRole has hierarchy and should use *0..15 traversal."""
-        cypher, _ = build_genes_by_ontology(
-            ontology="cyanorak_role", term_ids=["cyanorak.role:F"],
-        )
-        assert "Cyanorak_role_is_a_cyanorak_role" in cypher
-        assert "*0..15" in cypher
-
-    def test_pfam_multi_label_root(self):
-        """Pfam generates multi-label root match accepting both Pfam and PfamClan."""
-        cypher, _ = build_genes_by_ontology(
-            ontology="pfam", term_ids=["pfam:PF00712"],
-        )
-        assert "root:Pfam OR root:PfamClan" in cypher
-        assert "Pfam_in_pfam_clan" in cypher
-        assert "*0..15" in cypher
-        assert "Gene_has_pfam" in cypher
-
-    def test_non_pfam_single_label_root(self):
-        """Non-pfam ontologies use single-label root match."""
-        for ontology in ["go_bp", "go_mf", "go_cc", "ec", "kegg",
-                         "cog_category", "cyanorak_role", "tigr_role"]:
-            cypher, _ = build_genes_by_ontology(
-                ontology=ontology, term_ids=["test:001"],
-            )
-            assert "OR root:" not in cypher, f"{ontology} should not have multi-label root"
-
-    def test_verbose_false_no_gene_summary(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], verbose=False,
-        )
-        assert "gene_summary" not in cypher
-        assert "function_description" not in cypher
-        assert "matched_terms" not in cypher
-
-    def test_verbose_true_adds_columns(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], verbose=True,
-        )
-        assert "gene_summary" in cypher
-        assert "function_description" in cypher
-        assert "matched_terms" in cypher
-
-    def test_verbose_tid_survives_with_distinct(self):
-        """UNWIND-based verbose query must carry tid through WITH DISTINCT."""
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], verbose=True,
-        )
-        for line in cypher.split("\n"):
-            if "WITH DISTINCT" in line and "descendant" in line:
-                assert "tid" in line, f"tid dropped from scope: {line}"
-
-    def test_limit_clause(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], limit=10,
-        )
-        assert "LIMIT $limit" in cypher
-        assert params["limit"] == 10
-
-    def test_limit_none(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        assert "LIMIT" not in cypher
-
-    def test_order_by_organism_then_locus(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        assert "ORDER BY g.organism_name, g.locus_tag" in cypher
-
-    def test_gene_category_in_compact(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        assert "gene_category" in cypher
-
-    def test_offset_emits_skip(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], limit=10, offset=5,
-        )
-        assert "SKIP $offset" in cypher
-        assert params["offset"] == 5
-        assert cypher.index("SKIP") < cypher.index("LIMIT")
-
-    def test_offset_zero_no_skip(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], limit=10, offset=0,
-        )
-        assert "SKIP" not in cypher
-        assert "offset" not in params
-
-
-class TestBuildGenesByOntologySummary:
-    def test_returns_summary_keys(self):
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        for key in ["total_matching", "by_organism", "by_category", "by_term"]:
-            assert key in cypher
-
-    def test_uses_apoc_frequencies(self):
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        assert "apoc.coll.frequencies" in cypher
-
-    def test_organism_filter(self):
-        cypher, params = build_genes_by_ontology_summary(
-            ontology="go_bp", term_ids=["go:0006260"], organism="MED4",
-        )
-        assert params["organism"] == "MED4"
-        assert "toLower($organism)" in cypher
-
-    def test_invalid_ontology_raises_valueerror(self):
-        with pytest.raises(ValueError, match="Invalid ontology"):
-            build_genes_by_ontology_summary(ontology="bad", term_ids=["x"])
-
-    def test_pfam_parent_label(self):
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology="pfam", term_ids=["PF00001"],
-        )
-        assert "Pfam" in cypher
-        assert "PfamClan" in cypher
-
-    def test_tid_survives_with_distinct(self):
-        """UNWIND-based summary query must carry tid through WITH DISTINCT."""
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        for line in cypher.split("\n"):
-            if "WITH DISTINCT" in line and "descendant" in line:
-                assert "tid" in line, f"tid dropped from scope: {line}"
-
-    @pytest.mark.parametrize("ontology", [
-        "go_bp", "go_mf", "go_cc", "kegg", "ec",
-        "cog_category", "cyanorak_role", "tigr_role", "pfam",
-    ])
-    def test_tid_survives_all_ontologies(self, ontology):
-        """tid scoping must work for all ontology types (hierarchy + flat)."""
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology=ontology, term_ids=["test:001"],
-        )
-        for line in cypher.split("\n"):
-            if "WITH DISTINCT" in line and "descendant" in line:
-                assert "tid" in line, (
-                    f"{ontology}: tid dropped from scope: {line}"
-                )
 
 
 class TestBuildGenesByOntologyValidate:
@@ -1594,11 +1360,16 @@ class TestBuildGeneOntologyTerms:
         assert "Pfam" in cypher
 
     def test_leaf_filter_kegg(self):
-        """kegg has gene_connects_to_level, so NO NOT EXISTS."""
+        """kegg now emits NOT EXISTS like other hierarchical ontologies.
+
+        With gene_connects_to_level removed, the leaf filter is emitted
+        for KEGG too; it is a graph-structure no-op (genes only connect
+        at ko leaves) but kept for consistency with other ontologies.
+        """
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="kegg",
         )
-        assert "NOT EXISTS" not in cypher
+        assert "NOT EXISTS" in cypher
         assert "KeggTerm" in cypher
 
     def test_verbose_false(self):

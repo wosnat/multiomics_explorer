@@ -34,8 +34,10 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_overview_summary,
     build_genes_by_function,
     build_genes_by_function_summary,
-    build_genes_by_ontology,
-    build_genes_by_ontology_summary,
+    build_genes_by_ontology_detail,
+    build_genes_by_ontology_per_gene,
+    build_genes_by_ontology_per_term,
+    build_genes_by_ontology_validate,
     build_gene_details,
     build_gene_details_summary,
     build_gene_homologs,
@@ -1201,13 +1203,6 @@ def genes_by_ontology(
     Returns dict with full envelope -- see spec for shape.
     """
     from collections import Counter
-
-    from multiomics_explorer.kg.queries_lib import (
-        build_genes_by_ontology_detail,
-        build_genes_by_ontology_per_gene,
-        build_genes_by_ontology_per_term,
-        build_genes_by_ontology_validate,
-    )
 
     # --- Input validation ---
     if ontology not in ALL_ONTOLOGIES:
