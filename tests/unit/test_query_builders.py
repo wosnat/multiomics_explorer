@@ -1458,6 +1458,105 @@ class TestBuildGenesByOntologyPerTerm:
         assert "t.level = $level" in cypher
         assert "t.id IN $term_ids" in cypher
 
+    def test_pfam_mode1(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="pfam",
+            organism="Prochlorococcus MED4",
+            level=None,
+            term_ids=["pfam:PF00005"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "(tp:Pfam {id: input_tid})" in cypher
+        assert "coalesce(tp, tc) AS t" in cypher
+
+    def test_flat_ontology_mode2(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="tigr_role",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Flat ontology: t = leaf, no walk
+        assert "(g:Gene {organism_name: $org})-[:Gene_has_tigr_role]->(t:TigrRole)" in cypher
+        assert "(leaf)-[:" not in cypher
+
+
+class TestBuildGenesByOntologyPerGene:
+    def test_mode2_per_gene_shape(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "g.locus_tag AS locus_tag" in cypher
+        assert "coalesce(g.gene_category, 'Unknown') AS gene_category" in cypher
+        assert "size(gene_terms) AS n_terms" in cypher
+        assert "gene_levels AS levels_hit" in cypher
+        assert "ORDER BY g.locus_tag" in cypher
+
+    def test_mode1_per_gene(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        _, params = build_genes_by_ontology_per_gene(
+            ontology="go_bp",
+            organism="MED4",
+            level=None,
+            term_ids=["go:0006260"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert params["term_ids"] == ["go:0006260"]
+
+    def test_pfam_mode1(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="pfam",
+            organism="Prochlorococcus MED4",
+            level=None,
+            term_ids=["pfam:PF00005", "pfam.clan:CL0023"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Pfam Mode-1 dual-label coalesce path
+        assert "(tp:Pfam {id: input_tid})" in cypher
+        assert "(tc:PfamClan {id: input_tid})" in cypher
+        assert "coalesce(tp, tc) AS t" in cypher
+        assert "Pfam_in_pfam_clan*0..1" in cypher
+
+    def test_flat_ontology_mode2(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="cog_category",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Flat: t = leaf, no walk
+        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        assert "(leaf)-[:" not in cypher
+
 
 class TestBuildGeneOntologyTerms:
     def test_single_ontology_returns_expected_columns(self):

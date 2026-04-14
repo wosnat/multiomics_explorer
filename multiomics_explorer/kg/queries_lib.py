@@ -1662,6 +1662,39 @@ def build_genes_by_ontology_per_term(
     return f"{head}\n{tail}", params
 
 
+def build_genes_by_ontology_per_gene(
+    *,
+    ontology: str,
+    organism: str,
+    level: int | None,
+    term_ids: list[str] | None,
+    min_gene_set_size: int,
+    max_gene_set_size: int | None,
+) -> tuple[str, dict]:
+    """Per-gene aggregate. One row per surviving gene.
+
+    RETURN keys: locus_tag, gene_category, n_terms, levels_hit.
+    `levels_hit` is the distinct set of term levels each gene was reached
+    via — used by L2 to compute by_level.n_genes via set-union.
+    """
+    head, params = _genes_by_ontology_match_stage(
+        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+    )
+    params["min_gene_set_size"] = min_gene_set_size
+    params["max_gene_set_size"] = max_gene_set_size
+    tail = (
+        "UNWIND term_genes AS g\n"
+        "WITH g, collect(DISTINCT t.id) AS gene_terms, "
+        "collect(DISTINCT t.level) AS gene_levels\n"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       coalesce(g.gene_category, 'Unknown') AS gene_category,\n"
+        "       size(gene_terms) AS n_terms,\n"
+        "       gene_levels AS levels_hit\n"
+        "ORDER BY g.locus_tag"
+    )
+    return f"{head}\n{tail}", params
+
+
 def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
     """Return a WHERE NOT EXISTS clause for leaf filtering, or empty string.
 
