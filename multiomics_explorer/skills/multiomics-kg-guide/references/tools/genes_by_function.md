@@ -120,7 +120,7 @@ genes_by_function(search_text='GO:0015977')
 ```
 
 ```correction
-genes_by_ontology(term_ids=['go:0015977']) for ontology term lookup; genes_by_function is for free-text search
+genes_by_ontology(ontology='go_bp', organism='MED4', term_ids=['go:0015977']) for ontology term lookup (ontology + organism required); genes_by_function is for free-text search
 ```
 
 ```mistake

@@ -365,7 +365,7 @@ ORDER BY g.locus_tag, t.id
 | go_mf | `is_a`, `part_of` | NOT EXISTS with both rels |
 | go_cc | `is_a`, `part_of` | NOT EXISTS with both rels |
 | ec | `is_a` | NOT EXISTS with single rel |
-| kegg | `is_a` | No-op — genes only connect at `ko` level (`gene_connects_to_level`), so no ancestors to filter |
+| kegg | `is_a` | No-op — genes only connect at the `ko` (KO-term) leaf, so no ancestors to filter. (Note: the old `gene_connects_to_level` per-ontology config field was removed on 2026-04-14 when `genes_by_ontology` was redefined; the behavior is unchanged — gene→KEGG edges still target only `ko`.) |
 | cog_category | (none) | No-op — flat ontology, no hierarchy |
 | cyanorak_role | `is_a` | NOT EXISTS with single rel |
 | tigr_role | (none) | No-op — flat ontology, no hierarchy |
