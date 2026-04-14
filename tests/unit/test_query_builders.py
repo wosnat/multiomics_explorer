@@ -57,6 +57,72 @@ from multiomics_explorer.kg.queries_lib import (
     build_ontology_experiment_check,
     build_ontology_organism_gene_count,
 )
+from multiomics_explorer.kg.queries_lib import _hierarchy_walk
+
+
+class TestHierarchyWalk:
+    def test_go_bp_up(self):
+        frag = _hierarchy_walk("go_bp", direction="up")
+        assert frag["leaf_label"] == "BiologicalProcess"
+        assert frag["gene_rel"] == "Gene_involved_in_biological_process"
+        assert "Biological_process_is_a_biological_process" in frag["rel_union"]
+        assert "Biological_process_part_of_biological_process" in frag["rel_union"]
+        # Up walk binds gene → leaf, then leaf → ancestor
+        assert "(g:Gene {organism_name: $org})-[:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in frag["bind_up"]
+        assert "(leaf)-[:" in frag["walk_up"]
+        assert "]->(t:BiologicalProcess)" in frag["walk_up"]
+
+    def test_go_bp_down(self):
+        frag = _hierarchy_walk("go_bp", direction="down")
+        # Down walk: root matched first, then walk to descendants/leaves
+        assert "(t:BiologicalProcess)<-[:" in frag["walk_down"]
+        assert "]-(leaf:BiologicalProcess)" in frag["walk_down"]
+
+    def test_flat_ontology_has_no_walk(self):
+        frag = _hierarchy_walk("cog_category", direction="up")
+        # Flat: t = leaf; walk_up is empty; bind goes directly to t
+        assert frag["rel_union"] == ""
+        assert frag["walk_up"] == ""
+        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in frag["bind_up"]
+
+    def test_tigr_role_flat(self):
+        frag = _hierarchy_walk("tigr_role", direction="up")
+        assert frag["walk_up"] == ""
+        assert frag["leaf_label"] == "TigrRole"
+
+    def test_pfam_up_crosses_to_clan(self):
+        frag = _hierarchy_walk("pfam", direction="up")
+        # Pfam up: leaf=Pfam, walk via Pfam_in_pfam_clan *0..1, t can be Pfam or PfamClan
+        assert "(leaf:Pfam)" in frag["bind_up"]
+        assert "Pfam_in_pfam_clan" in frag["walk_up"]
+        assert "*0..1" in frag["walk_up"]
+        # target can be either label
+        assert "t:Pfam OR t:PfamClan" in frag["walk_up"] or "t:PfamClan OR t:Pfam" in frag["walk_up"]
+
+    def test_pfam_down_pfam_root(self):
+        """Pfam root (level 1): no walk — t is the leaf."""
+        frag = _hierarchy_walk("pfam", direction="down", root_label="Pfam")
+        assert frag["walk_down"] == ""  # Pfam root has no Pfam descendants
+
+    def test_pfam_down_pfamclan_root(self):
+        """PfamClan root (level 0): walk down via Pfam_in_pfam_clan."""
+        frag = _hierarchy_walk("pfam", direction="down", root_label="PfamClan")
+        assert "(t:PfamClan)<-[:Pfam_in_pfam_clan]-(leaf:Pfam)" in frag["walk_down"]
+
+    def test_kegg_single_label(self):
+        frag = _hierarchy_walk("kegg", direction="up")
+        assert frag["leaf_label"] == "KeggTerm"
+        assert "Kegg_term_is_a_kegg_term" in frag["rel_union"]
+
+    def test_unknown_ontology_raises(self):
+        import pytest
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            _hierarchy_walk("not_a_real_ontology", direction="up")
+
+    def test_direction_required(self):
+        import pytest
+        with pytest.raises(ValueError, match="direction"):
+            _hierarchy_walk("go_bp", direction="sideways")
 
 
 class TestBuildResolveGene:

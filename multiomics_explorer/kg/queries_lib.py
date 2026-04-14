@@ -4,6 +4,8 @@ Each builder returns a (cypher, params) tuple. The caller is responsible
 for executing the query via GraphConnection.execute_query(cypher, **params).
 """
 
+from typing import Literal
+
 # Ontology type configuration — drives all three ontology query builders.
 ONTOLOGY_CONFIG = {
     "go_bp": {
@@ -73,6 +75,126 @@ ONTOLOGY_CONFIG = {
         "parent_fulltext_index": "pfamClanFullText",
     },
 }
+
+def _hierarchy_walk(
+    ontology: str,
+    direction: Literal["up", "down"],
+    root_label: str | None = None,
+) -> dict:
+    """Return Cypher fragments for ontology hierarchy walks.
+
+    Consumed by genes_by_ontology builders and (post-refactor)
+    ontology_landscape. Dispatches on ONTOLOGY_CONFIG + known special
+    cases (Pfam cross-label, flat ontologies).
+
+    Args:
+        ontology: one of ALL_ONTOLOGIES.
+        direction: 'up' = gene → leaf → ancestor at target level.
+                   'down' = root-at-input → descendants → genes.
+        root_label: used only when ontology='pfam' + direction='down';
+                    distinguishes Pfam root (no walk) vs PfamClan root
+                    (walk down via Pfam_in_pfam_clan).
+
+    Returns:
+        dict with keys:
+          - leaf_label: str — label for the gene-bound node.
+          - gene_rel: str — relationship from Gene to leaf.
+          - rel_union: str — '|'.join(hierarchy_rels) (empty for flat).
+          - bind_up: str — Cypher for gene→leaf binding (direction=up).
+          - walk_up: str — Cypher for leaf→ancestor walk (direction=up).
+          - walk_down: str — Cypher for root→leaf walk (direction=down).
+    """
+    if direction not in ("up", "down"):
+        raise ValueError(
+            f"direction must be 'up' or 'down', got '{direction}'"
+        )
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. "
+            f"Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+
+    cfg = ONTOLOGY_CONFIG[ontology]
+    leaf_label = cfg["label"]
+    gene_rel = cfg["gene_rel"]
+    hierarchy_rels = cfg["hierarchy_rels"]
+    rel_union = "|".join(hierarchy_rels)
+
+    # --- Pfam: cross-label two-level ontology ---
+    if ontology == "pfam":
+        bind_up = (
+            f"MATCH (g:Gene {{organism_name: $org}})"
+            f"-[:{gene_rel}]->(leaf:Pfam)"
+        )
+        # *0..1 because Pfam.level=1 (t=leaf) OR PfamClan.level=0 (t=clan)
+        walk_up = (
+            "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
+            "WHERE t:Pfam OR t:PfamClan"
+        )
+        if direction == "up":
+            return {
+                "leaf_label": leaf_label,
+                "gene_rel": gene_rel,
+                "rel_union": "Pfam_in_pfam_clan",
+                "bind_up": bind_up,
+                "walk_up": walk_up,
+                "walk_down": "",
+            }
+        # direction == "down"
+        if root_label == "PfamClan":
+            walk_down = (
+                "MATCH (t:PfamClan)<-[:Pfam_in_pfam_clan]-(leaf:Pfam)"
+            )
+        elif root_label == "Pfam":
+            # Pfam root has no descendants in this 2-level ontology
+            walk_down = ""
+        else:
+            raise ValueError(
+                f"For ontology='pfam' direction='down', root_label must "
+                f"be 'Pfam' or 'PfamClan', got {root_label!r}"
+            )
+        return {
+            "leaf_label": leaf_label,
+            "gene_rel": gene_rel,
+            "rel_union": "Pfam_in_pfam_clan",
+            "bind_up": bind_up,
+            "walk_up": walk_up,
+            "walk_down": walk_down,
+        }
+
+    # --- Flat ontologies (no hierarchy_rels): t = leaf ---
+    if not hierarchy_rels:
+        bind_up = (
+            f"MATCH (g:Gene {{organism_name: $org}})"
+            f"-[:{gene_rel}]->(t:{leaf_label})"
+        )
+        return {
+            "leaf_label": leaf_label,
+            "gene_rel": gene_rel,
+            "rel_union": "",
+            "bind_up": bind_up,
+            "walk_up": "",
+            "walk_down": "",
+        }
+
+    # --- Single-label tree ontologies (GO BP/MF/CC, EC, KEGG, CyanoRak) ---
+    bind_up = (
+        f"MATCH (g:Gene {{organism_name: $org}})"
+        f"-[:{gene_rel}]->(leaf:{leaf_label})"
+    )
+    walk_up = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{leaf_label})"
+    walk_down = (
+        f"MATCH (t:{leaf_label})<-[:{rel_union}*0..]-(leaf:{leaf_label})"
+    )
+    return {
+        "leaf_label": leaf_label,
+        "gene_rel": gene_rel,
+        "rel_union": rel_union,
+        "bind_up": bind_up,
+        "walk_up": walk_up,
+        "walk_down": walk_down,
+    }
+
 
 def build_resolve_gene(
     *, identifier: str, organism: str | None = None
