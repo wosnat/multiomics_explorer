@@ -1403,19 +1403,21 @@ def build_genes_by_ontology(
     return cypher, params
 
 
-# Ontologies → labels. Single-label ontologies get a one-element list;
-# pfam accepts Pfam (level 1) OR PfamClan (level 0).
+# Ontology key → expected node label(s). Single-label ontologies get a
+# one-element list; pfam accepts both Pfam (level 1) and PfamClan (level 0).
+# Derived from ONTOLOGY_CONFIG so adding a new ontology is one-place.
 _ONTOLOGY_LABELS: dict[str, list[str]] = {
-    "go_bp": ["BiologicalProcess"],
-    "go_mf": ["MolecularFunction"],
-    "go_cc": ["CellularComponent"],
-    "ec": ["EcNumber"],
-    "kegg": ["KeggTerm"],
-    "cog_category": ["CogFunctionalCategory"],
-    "cyanorak_role": ["CyanorakRole"],
-    "tigr_role": ["TigrRole"],
-    "pfam": ["Pfam", "PfamClan"],
+    key: (
+        [cfg["label"], cfg["parent_label"]]
+        if "parent_label" in cfg else [cfg["label"]]
+    )
+    for key, cfg in ONTOLOGY_CONFIG.items()
 }
+
+_ALL_ONTOLOGY_LABELS: list[str] = sorted({
+    label for labels in _ONTOLOGY_LABELS.values() for label in labels
+})
+_ONTOLOGY_LABEL_GUARD: str = " OR ".join(f"t:{L}" for L in _ALL_ONTOLOGY_LABELS)
 
 
 def build_genes_by_ontology_validate(
@@ -1428,8 +1430,9 @@ def build_genes_by_ontology_validate(
 
     RETURN keys per row: tid, status, matched_label.
     status ∈ {'ok','not_found','wrong_ontology','wrong_level'}.
-    matched_label is the expected-label the term carries when status='ok'
-    (used downstream for Pfam root-label dispatch).
+    matched_label is the expected-label the term carries when the term exists
+    and belongs to the requested ontology (status='ok' or 'wrong_level').
+    NULL when status='not_found' or 'wrong_ontology'.
     """
     if ontology not in _ONTOLOGY_LABELS:
         raise ValueError(
@@ -1440,10 +1443,7 @@ def build_genes_by_ontology_validate(
     cypher = (
         "UNWIND $term_ids AS tid\n"
         "OPTIONAL MATCH (t {id: tid})\n"
-        "  WHERE t:BiologicalProcess OR t:MolecularFunction "
-        "OR t:CellularComponent OR t:EcNumber OR t:KeggTerm "
-        "OR t:CogFunctionalCategory OR t:CyanorakRole "
-        "OR t:TigrRole OR t:Pfam OR t:PfamClan\n"
+        f"  WHERE {_ONTOLOGY_LABEL_GUARD}\n"
         "WITH tid, head(collect(t)) AS t\n"
         "RETURN tid,\n"
         "  CASE\n"
