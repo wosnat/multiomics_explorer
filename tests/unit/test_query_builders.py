@@ -3397,16 +3397,19 @@ class TestBuildOntologyLandscape:
         assert cypher.count("MATCH") == 1
         assert "*0.." not in cypher
 
-    def test_pfam_treated_as_flat_due_to_cross_label_hierarchy(self):
-        """pfam has hierarchy_rels but parent_label=PfamClan — must be treated as flat."""
+    def test_pfam_walks_cross_label_hierarchy_via_helper(self):
+        """pfam is 2-level: Pfam leaf (level=1) + PfamClan parent (level=0).
+
+        Post-helper refactor, landscape walks Pfam_in_pfam_clan *0..1 so
+        stats surface both levels.
+        """
         cypher, _ = build_ontology_landscape(
             ontology="pfam", organism_name="Prochlorococcus MED4",
         )
-        # The cross-label hierarchy cannot be walked with a single label constraint,
-        # so landscape stats are reported at the leaf (domain) level only.
-        assert cypher.count("MATCH") == 1
-        assert "*0.." not in cypher
-        assert "PfamClan" not in cypher
+        assert ":Gene_has_pfam" in cypher
+        assert "(leaf:Pfam)" in cypher
+        assert "Pfam_in_pfam_clan*0..1" in cypher
+        assert "WHERE t:Pfam OR t:PfamClan" in cypher
 
     def test_invalid_ontology_raises(self):
         with pytest.raises(ValueError, match="Invalid ontology"):

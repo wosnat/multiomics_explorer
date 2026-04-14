@@ -3493,22 +3493,12 @@ def build_ontology_landscape(
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
-    cfg = ONTOLOGY_CONFIG[ontology]
-    gene_rel = cfg["gene_rel"]
-    label = cfg["label"]
-    hierarchy_rels = cfg["hierarchy_rels"]
 
-    # Hierarchy walk — flat ontologies bind t directly.
-    # Ontologies with parent_label (pfam: Pfam→PfamClan) are also treated as
-    # flat here: the cross-label hierarchy cannot be walked with a single label
-    # constraint, so landscape stats are reported at the leaf (domain) level only.
-    if hierarchy_rels and not cfg.get("parent_label"):
-        rel_union = "|".join(hierarchy_rels)
-        bind = f"-[:{gene_rel}]->(leaf:{label})"
-        walk = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
-    else:
-        bind = f"-[:{gene_rel}]->(t:{label})"
-        walk = ""
+    # Unified hierarchy walk via _hierarchy_walk helper.
+    # This corrects the previous flat-Pfam treatment: Pfam is actually 2-level
+    # (Pfam leaf + PfamClan parent), and the helper walks Pfam_in_pfam_clan.
+    frag = _hierarchy_walk(ontology, direction="up")
+    walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
 
     # Verbose clauses — Python string composition so compute is
     # short-circuited when verbose=False (see scoping D4).
@@ -3527,7 +3517,7 @@ def build_ontology_landscape(
     verbose_ret = ",\n       example_terms" if verbose else ""
 
     cypher = (
-        f"MATCH (g:Gene {{organism_name:$org}}){bind}\n"
+        f"{frag['bind_up']}\n"
         f"{walk}"
         "WITH t, count(DISTINCT g) AS n_g_per_term, "
         "collect(DISTINCT g) AS term_genes\n"
@@ -3581,20 +3571,14 @@ def build_ontology_expcov(
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
-    cfg = ONTOLOGY_CONFIG[ontology]
-    gene_rel = cfg["gene_rel"]
-    label = cfg["label"]
-    hierarchy_rels = cfg["hierarchy_rels"]
 
-    # Same flat-treatment rule as build_ontology_landscape: cross-label hierarchies
-    # (parent_label present, e.g. pfam) cannot be walked with a single label constraint.
-    if hierarchy_rels and not cfg.get("parent_label"):
-        rel_union = "|".join(hierarchy_rels)
-        bind = f"-[:{gene_rel}]->(leaf:{label})"
-        walk = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
-    else:
-        bind = f"-[:{gene_rel}]->(t:{label})"
-        walk = ""
+    # Unified hierarchy walk via _hierarchy_walk helper (shared with
+    # build_ontology_landscape). For expcov we strip the Gene-Match prefix
+    # from bind_up because `g` is already bound by the outer Experiment match.
+    frag = _hierarchy_walk(ontology, direction="up")
+    _prefix = "MATCH (g:Gene {organism_name: $org})"
+    bind_tail = frag["bind_up"][len(_prefix):]
+    walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
 
     cypher = (
         "UNWIND $experiment_ids AS eid\n"
@@ -3603,7 +3587,7 @@ def build_ontology_expcov(
         "WITH eid, collect(DISTINCT g) AS quantified\n"
         "WITH eid, quantified, size(quantified) AS n_total\n"
         "UNWIND quantified AS g\n"
-        f"MATCH (g){bind}\n"
+        f"MATCH (g){bind_tail}\n"
         f"{walk}"
         "WITH eid, n_total, t, count(DISTINCT g) AS n_g_per_term_exp, "
         "collect(DISTINCT g) AS term_genes_exp\n"
