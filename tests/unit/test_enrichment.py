@@ -79,3 +79,119 @@ class TestFisherOra:
         )
         assert "level" in df.columns
         assert "extra" in df.columns
+
+    def test_basic_enrichment_math(self):
+        """A pathway enriched with 2/2 DE hits out of 3 members in a 10-gene background."""
+        from multiomics_explorer import fisher_ora
+        t2g = self._term2gene_simple()
+        gene_sets = {"c1": ["g1", "g2"]}
+        # Background has all 9 pathway members + 11 others = 20 genes.
+        bg = ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9"] + [f"x{i}" for i in range(11)]
+        df = fisher_ora(
+            gene_sets=gene_sets,
+            background={"c1": bg},
+            term2gene=t2g,
+            min_gene_set_size=0,
+        )
+        # Two pathways: P (size 3, 2 hits); Q (size 6, 0 hits).
+        assert set(df["term_id"]) == {"P", "Q"}
+        p_row = df[df["term_id"] == "P"].iloc[0]
+        assert p_row["count"] == 2
+        assert p_row["bg_count"] == 3
+        assert p_row["gene_ratio"] == "2/2"
+        assert p_row["bg_ratio"] == "3/20"
+        assert p_row["cluster"] == "c1"
+        # Fisher's exact one-sided reference for [[2, 0], [1, 17]]:
+        # scipy.stats.fisher_exact(..., alternative='greater')
+        import scipy.stats as stats
+        expected_p = stats.fisher_exact([[2, 0], [1, 17]], alternative="greater").pvalue
+        assert math.isclose(p_row["pvalue"], expected_p, rel_tol=1e-9)
+
+    def test_per_cluster_M_filter(self):
+        """A pathway is tested in cluster A (M=3 >= min=3) but filtered in cluster B (M=1)."""
+        from multiomics_explorer import fisher_ora
+        t2g = self._term2gene_simple()
+        bg_a = ["g1", "g2", "g3"] + [f"x{i}" for i in range(10)]
+        bg_b = ["g1"] + [f"y{i}" for i in range(10)]  # only g1 is a P member in bg_b
+        df = fisher_ora(
+            gene_sets={"A": ["g1"], "B": ["g1"]},
+            background={"A": bg_a, "B": bg_b},
+            term2gene=t2g,
+            min_gene_set_size=3,
+            max_gene_set_size=None,
+        )
+        p_clusters = set(df[df["term_id"] == "P"]["cluster"])
+        assert "A" in p_clusters
+        assert "B" not in p_clusters  # M=1 < min=3 for cluster B
+
+    def test_bh_per_cluster(self):
+        """BH correction is within cluster, not across clusters."""
+        from multiomics_explorer import fisher_ora
+        import statsmodels.stats.multitest as mt
+        t2g = self._term2gene_simple()
+        bg = ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9"] + [f"x{i}" for i in range(11)]
+        df = fisher_ora(
+            gene_sets={"c1": ["g1", "g2"], "c2": ["g5", "g6"]},
+            background={"c1": bg, "c2": bg},
+            term2gene=t2g,
+            min_gene_set_size=0,
+        )
+        for cluster in ("c1", "c2"):
+            sub = df[df["cluster"] == cluster].sort_values("term_id")
+            pvals = sub["pvalue"].tolist()
+            expected = mt.multipletests(pvals, method="fdr_bh")[1]
+            assert list(sub["p_adjust"]) == pytest.approx(list(expected))
+
+    def test_global_sort_by_padj(self):
+        """Output rows globally sorted by p_adjust asc, tie-break cluster then term_id."""
+        from multiomics_explorer import fisher_ora
+        t2g = self._term2gene_simple()
+        bg = ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9"] + [f"x{i}" for i in range(11)]
+        df = fisher_ora(
+            gene_sets={"c2": ["g1"], "c1": ["g4", "g5", "g6", "g7"]},
+            background={"c2": bg, "c1": bg},
+            term2gene=t2g,
+            min_gene_set_size=0,
+        )
+        padjs = df["p_adjust"].tolist()
+        assert padjs == sorted(padjs)
+
+    def test_shared_background_list_broadcast(self):
+        """Passing background as list broadcasts to every cluster."""
+        from multiomics_explorer import fisher_ora
+        t2g = self._term2gene_simple()
+        bg = ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9"]
+        df = fisher_ora(
+            gene_sets={"c1": ["g1"], "c2": ["g2"]},
+            background=bg,
+            term2gene=t2g,
+            min_gene_set_size=0,
+        )
+        assert set(df["cluster"]) == {"c1", "c2"}
+
+    def test_max_gene_set_size_none_disables_upper_bound(self):
+        from multiomics_explorer import fisher_ora
+        t2g = self._term2gene_simple()
+        bg = ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9"]
+        df = fisher_ora(
+            gene_sets={"c1": ["g4"]},
+            background={"c1": bg},
+            term2gene=t2g,
+            min_gene_set_size=0,
+            max_gene_set_size=None,
+        )
+        assert "Q" in set(df["term_id"])
+
+    def test_fold_enrichment_rich_factor_computed(self):
+        from multiomics_explorer import fisher_ora
+        t2g = self._term2gene_simple()
+        bg = ["g1", "g2", "g3"] + [f"x{i}" for i in range(17)]
+        df = fisher_ora(
+            gene_sets={"c1": ["g1", "g2"]},
+            background={"c1": bg},
+            term2gene=t2g,
+            min_gene_set_size=0,
+        )
+        p_row = df[df["term_id"] == "P"].iloc[0]
+        assert math.isclose(p_row["rich_factor"], 2 / 3, rel_tol=1e-9)
+        assert math.isclose(p_row["fold_enrichment"], (2 / 2) / (3 / 20), rel_tol=1e-9)

@@ -166,7 +166,86 @@ def fisher_ora(
 
 
 def _fisher_ora_impl(gene_sets, background, term2gene, min_gene_set_size, max_gene_set_size):
-    """Stub — real body lands in Task 3."""
-    return pd.DataFrame(columns=["cluster", "term_id", "term_name"] + [
-        c for c in term2gene.columns if c not in {"term_id", "term_name", "locus_tag"}
-    ])
+    # Build fast lookups: term_id -> frozenset(members), and name/passthrough maps.
+    term_members: dict[str, frozenset] = (
+        term2gene.groupby("term_id")["locus_tag"].apply(frozenset).to_dict()
+    )
+    term_name_map: dict[str, str] = dict(
+        term2gene.drop_duplicates("term_id").set_index("term_id")["term_name"]
+    )
+    passthrough_cols = [
+        c for c in term2gene.columns
+        if c not in {"term_id", "term_name", "locus_tag"}
+    ]
+    passthrough_by_term: dict[str, dict] = {}
+    if passthrough_cols:
+        first_rows = term2gene.drop_duplicates("term_id").set_index("term_id")
+        for tid in first_rows.index:
+            passthrough_by_term[tid] = {
+                c: first_rows.at[tid, c] for c in passthrough_cols
+            }
+
+    rows: list[dict] = []
+
+    for cluster, gene_list in gene_sets.items():
+        gene_set = set(gene_list)
+        bg = set(background[cluster])
+        N = len(bg)
+        n = len(gene_set & bg)
+        if n == 0 or N == 0:
+            continue
+        cluster_rows: list[dict] = []
+        for term_id, members in term_members.items():
+            pathway_in_bg = members & bg
+            M = len(pathway_in_bg)
+            if M < min_gene_set_size:
+                continue
+            if max_gene_set_size is not None and M > max_gene_set_size:
+                continue
+            k = len(pathway_in_bg & gene_set)
+            a, b, c, d = k, n - k, M - k, N - n - (M - k)
+            p = _stats.fisher_exact(
+                [[a, b], [c, d]], alternative="greater"
+            ).pvalue
+            row = {
+                "cluster": cluster,
+                "term_id": term_id,
+                "term_name": term_name_map.get(term_id, ""),
+                "gene_ratio": f"{k}/{n}",
+                "gene_ratio_numeric": k / n if n else 0.0,
+                "bg_ratio": f"{M}/{N}",
+                "bg_ratio_numeric": M / N if N else 0.0,
+                "rich_factor": k / M if M else 0.0,
+                "fold_enrichment": (
+                    (k / n) / (M / N)
+                    if n and M and N
+                    else 0.0
+                ),
+                "pvalue": p,
+                "count": k,
+                "bg_count": M,
+            }
+            row.update(passthrough_by_term.get(term_id, {}))
+            cluster_rows.append(row)
+        if not cluster_rows:
+            continue
+        pvals = [r["pvalue"] for r in cluster_rows]
+        padj = _multitest.multipletests(pvals, method="fdr_bh")[1]
+        for r, pa in zip(cluster_rows, padj):
+            r["p_adjust"] = float(pa)
+        rows.extend(cluster_rows)
+
+    if not rows:
+        columns = [
+            "cluster", "term_id", "term_name",
+            "gene_ratio", "gene_ratio_numeric",
+            "bg_ratio", "bg_ratio_numeric",
+            "rich_factor", "fold_enrichment",
+            "pvalue", "p_adjust", "count", "bg_count",
+        ] + passthrough_cols
+        return pd.DataFrame(columns=columns)
+    df = pd.DataFrame(rows)
+    return df.sort_values(
+        by=["p_adjust", "cluster", "term_id"],
+        ascending=[True, True, True],
+    ).reset_index(drop=True)
