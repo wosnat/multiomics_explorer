@@ -3752,3 +3752,94 @@ class TestPathwayEnrichment:
                 organism="MED4", experiment_ids=[],
                 ontology="cyanorak_role", level=1,
             )
+
+    @staticmethod
+    def _stub_de_result(rows=(), not_found=(), not_matched=(), no_expression=()):
+        return {
+            "organism_name": "MED4",
+            "results": list(rows),
+            "not_found": list(not_found),
+            "not_matched": list(not_matched),
+            "no_expression": list(no_expression),
+        }
+
+    @staticmethod
+    def _stub_gbo_result(rows=(), not_found=(), wrong_ontology=(),
+                        wrong_level=(), filtered_out=()):
+        return {
+            "ontology": "cyanorak_role",
+            "organism_name": "MED4",
+            "results": list(rows),
+            "not_found": list(not_found),
+            "wrong_ontology": list(wrong_ontology),
+            "wrong_level": list(wrong_level),
+            "filtered_out": list(filtered_out),
+        }
+
+    def test_vacuous_success_when_all_experiments_missing(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(not_found=["exp1"]),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: self._stub_gbo_result(),
+        )
+        out = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+        )
+        assert out["total_matching"] == 0
+        assert out["results"] == []
+        assert out["not_found"] == ["exp1"]
+        assert out["n_significant"] == 0
+
+    def test_term_validation_passthrough(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: self._stub_gbo_result(
+                not_found=["missing_term"],
+                wrong_level=["wrong_level_term"],
+            ),
+        )
+        out = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            term_ids=["missing_term", "wrong_level_term"],
+        )
+        assert out["term_validation"]["not_found"] == ["missing_term"]
+        assert out["term_validation"]["wrong_level"] == ["wrong_level_term"]
+
+    def test_envelope_shape_echoes_inputs(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: self._stub_gbo_result(),
+        )
+        out = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+        )
+        assert out["organism_name"] == "MED4"
+        assert out["ontology"] == "cyanorak_role"
+        assert out["level"] == 1
+        for key in ("total_matching", "returned", "truncated", "offset",
+                    "n_significant", "by_experiment", "by_direction",
+                    "by_omics_type", "cluster_summary",
+                    "top_clusters_by_min_padj", "top_pathways_by_padj",
+                    "not_found", "not_matched", "no_expression",
+                    "term_validation", "clusters_skipped", "results"):
+            assert key in out, f"envelope missing key: {key}"

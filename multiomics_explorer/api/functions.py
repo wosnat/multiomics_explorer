@@ -3118,7 +3118,88 @@ def pathway_enrichment(
     if not experiment_ids:
         raise ValueError("at least one experiment_id required")
 
-    # Implementation continues in Task 8.
-    raise NotImplementedError(
-        "pathway_enrichment orchestration lands in Task 8"
+    from multiomics_explorer.analysis.enrichment import (
+        de_enrichment_inputs, fisher_ora,
     )
+    import pandas as pd
+
+    conn = _default_conn(conn)
+
+    # Step 2: build EnrichmentInputs
+    inputs = de_enrichment_inputs(
+        experiment_ids=experiment_ids,
+        organism=organism,
+        direction=direction,
+        significant_only=significant_only,
+        timepoint_filter=timepoint_filter,
+        conn=conn,
+    )
+
+    # Step 3: resolve background
+    if background == "table_scope":
+        resolved_bg = inputs.background
+    elif background == "organism":
+        org_cypher = (
+            "MATCH (g:Gene {organism_name: $org}) "
+            "RETURN collect(g.locus_tag) AS locus_tags"
+        )
+        org_rows = conn.execute_query(org_cypher, org=inputs.organism_name)
+        org_locus_tags = org_rows[0]["locus_tags"] if org_rows else []
+        resolved_bg = {c: list(org_locus_tags) for c in inputs.gene_sets}
+    else:
+        resolved_bg = {c: list(background) for c in inputs.gene_sets}
+
+    # Step 4: TERM2GENE
+    gbo_result = genes_by_ontology(
+        ontology=ontology,
+        organism=inputs.organism_name,
+        level=level,
+        term_ids=term_ids,
+        min_gene_set_size=0,
+        max_gene_set_size=None,
+        summary=False,
+        verbose=False,
+        limit=None,
+        offset=0,
+        conn=conn,
+    )
+    from multiomics_explorer.analysis.frames import to_dataframe
+    term2gene = to_dataframe(gbo_result)
+
+    # Step 5: fisher_ora
+    if term2gene.empty or not inputs.gene_sets:
+        df = pd.DataFrame()
+    else:
+        df = fisher_ora(
+            gene_sets=inputs.gene_sets,
+            background=resolved_bg,
+            term2gene=term2gene,
+            min_gene_set_size=min_gene_set_size,
+            max_gene_set_size=max_gene_set_size,
+        )
+
+    # Step 6: attach metadata + signed_score
+    if not df.empty:
+        md_df = pd.DataFrame.from_dict(
+            inputs.cluster_metadata, orient="index"
+        ).reset_index().rename(columns={"index": "cluster"})
+        df = df.merge(md_df, on="cluster", how="left")
+        import numpy as np
+        sign = np.where(df["direction"] == "up", 1,
+                        np.where(df["direction"] == "down", -1, 0))
+        df["signed_score"] = sign * -np.log10(df["p_adjust"].clip(lower=1e-300))
+
+    # Step 7: envelope
+    envelope = _build_pathway_enrichment_envelope(
+        df=df,
+        inputs=inputs,
+        gbo_result=gbo_result,
+        ontology=ontology,
+        level=level,
+        pvalue_cutoff=pvalue_cutoff,
+        summary=summary,
+        verbose=verbose,
+        limit=limit if limit is not None else len(df),
+        offset=offset,
+    )
+    return envelope
