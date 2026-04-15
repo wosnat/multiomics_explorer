@@ -61,6 +61,7 @@ EXPECTED_TOOLS = [
     "gene_clusters_by_gene",
     "genes_in_cluster",
     "ontology_landscape",
+    "pathway_enrichment",
 ]
 
 
@@ -3286,3 +3287,47 @@ class TestOntologyLandscapeWrapper:
         ):
             with pytest.raises(ToolError):
                 await tool_fns["ontology_landscape"](mock_ctx, organism="BOGUS")
+
+
+class TestPathwayEnrichmentWrapper:
+    def test_response_model_imports(self):
+        from multiomics_explorer.mcp_server.tools import (
+            PathwayEnrichmentResult,
+            PathwayEnrichmentResponse,
+        )
+        assert PathwayEnrichmentResult is not None
+        assert PathwayEnrichmentResponse is not None
+
+    def test_every_result_field_has_description(self):
+        from multiomics_explorer.mcp_server.tools import PathwayEnrichmentResult
+        for name, field in PathwayEnrichmentResult.model_fields.items():
+            assert field.description, (
+                f"PathwayEnrichmentResult.{name} missing Field(description=...)"
+            )
+
+    def test_every_envelope_field_has_description(self):
+        from multiomics_explorer.mcp_server.tools import PathwayEnrichmentResponse
+        for name, field in PathwayEnrichmentResponse.model_fields.items():
+            assert field.description, (
+                f"PathwayEnrichmentResponse.{name} missing Field(description=...)"
+            )
+
+    def test_clusterprofiler_names_mention_equivalent(self):
+        """clusterProfiler-named fields must document the mapping."""
+        from multiomics_explorer.mcp_server.tools import PathwayEnrichmentResult
+        expected_mentions = {
+            "gene_ratio": "GeneRatio",
+            "bg_ratio": "BgRatio",
+            "rich_factor": "RichFactor",
+            "fold_enrichment": "FoldEnrichment",
+            "count": "Count",
+        }
+        for field_name, cp_name in expected_mentions.items():
+            field = PathwayEnrichmentResult.model_fields[field_name]
+            assert cp_name in field.description, (
+                f"{field_name} description should mention clusterProfiler name {cp_name}"
+            )
+
+    # Default limit=100 is asserted in the Task 16 integration test, not here —
+    # introspecting FastMCP's tool registry for signature defaults is brittle, and
+    # the default is verified by end-to-end calling behavior in integration.
