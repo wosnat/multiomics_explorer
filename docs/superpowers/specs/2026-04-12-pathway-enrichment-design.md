@@ -83,9 +83,11 @@ def fisher_ora(
     background: dict[str, list[str]] | list[str],   # per-cluster OR shared universe
     term2gene: pd.DataFrame,                        # see column contract below
     min_gene_set_size: int = 5,
-    max_gene_set_size: int = 500,
+    max_gene_set_size: int | None = 500,
 ) -> pd.DataFrame
 ```
+
+**Size filter is per-cluster on M (background-scoped pathway size).** For each (cluster, term), compute `M = |pathway_members ∩ cluster_background|`. Drop (cluster, term) pairs where `M < min_gene_set_size` or `M > max_gene_set_size`. This matches clusterProfiler's ORA semantics. A given pathway can be tested in one cluster and dropped in another when `background='table_scope'` varies per cluster — that's the intended behavior. `max_gene_set_size=None` disables the upper bound.
 
 **`term2gene` column contract.**
 - **Required:** `term_id` (str), `term_name` (str), `locus_tag` (str).
@@ -146,6 +148,15 @@ pathway_enrichment(
 )
 ```
 
+### Size-filter semantics
+
+`min_gene_set_size` / `max_gene_set_size` filter on **M**, the pathway's gene count within the current cluster's background (the "a + c" cell of Fisher's 2×2). Matches clusterProfiler. Key consequences:
+
+- The filter is **per-cluster**, not global. Under `background='table_scope'` (default), different clusters have different backgrounds, so a pathway may be tested in one cluster and dropped in another. Intended.
+- **Distinct from `ontology_landscape`'s filter**, which is organism-scoped (used for ranking levels by `genome_coverage`). Same parameter name, different scope. Document in the methodology note.
+- **`pathway_enrichment` calls `genes_by_ontology` with wide bounds** internally (`min_gene_set_size=0`, `max_gene_set_size=None`) so the organism-scoped filter doesn't pre-exclude pathways that would have been valid under M. The caller's bounds apply only in `fisher_ora`.
+- `max_gene_set_size=None` disables the upper bound (useful for inspection / debugging).
+
 ### Input validation (L2, raises `ValueError`)
 
 - `ontology` must be in `ALL_ONTOLOGIES`.
@@ -163,8 +174,8 @@ pathway_enrichment(
    - `'table_scope'` (default): use `inputs.background` as-is (per-cluster universe).
    - `'organism'`: fetch organism locus_tags once; broadcast to every cluster.
    - `list[str]`: broadcast caller-supplied list to every cluster.
-4. `gbo_result = genes_by_ontology(ontology, organism, level, term_ids, min/max_gene_set_size)`. Collect its validation buckets for envelope passthrough. Build `term2gene` DataFrame via `to_dataframe(gbo_result)` — same chain exposed to Python callers.
-5. `df = fisher_ora(inputs.gene_sets, background, term2gene, min/max_gene_set_size)`.
+4. `gbo_result = genes_by_ontology(ontology, organism, level, term_ids, min_gene_set_size=0, max_gene_set_size=None)`. Wide bounds intentional — the real size filter is M-based and happens in `fisher_ora`. Collect its validation buckets for envelope passthrough. Build `term2gene` DataFrame via `to_dataframe(gbo_result)` — same chain exposed to Python callers.
+5. `df = fisher_ora(inputs.gene_sets, background, term2gene, min_gene_set_size, max_gene_set_size)`.
 6. Attach cluster metadata (one row-level join against `cluster_metadata`) to `df`. Compute `signed_score = sign × -log10(p_adjust)` using the row's `direction` (up → +, down → −).
 7. Assemble response envelope. Apply `limit`/`offset` for pagination.
 
@@ -346,6 +357,7 @@ YAML content:
 - "Timepoints aren't comparable across experiments — `T0` in exp1 ≠ `T0` in exp2. That's why there's no `by_timepoint` breakdown."
 - "For cluster-membership / ortholog-group / custom-list enrichment, use the Python `fisher_ora` primitive (see `docs://analysis/enrichment`). The MCP tool is the DE-wired convenience only. Idiom: `term2gene = to_dataframe(genes_by_ontology(...))` then `fisher_ora(gene_sets, background, term2gene)` — no manual column munging."
 - "At least one of `level` or `term_ids` must be provided (matches `genes_by_ontology`)."
+- "`min/max_gene_set_size` here means **M** — pathway size within each cluster's background (clusterProfiler semantics). This differs from `ontology_landscape`'s filter, which is organism-scoped. A pathway may be tested in one cluster and dropped in another when `background='table_scope'`."
 - wrong: `pathway_enrichment(..., background='genome')  # not a valid string`
   right: `pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list`
 
@@ -500,7 +512,7 @@ Each scenario function:
 
 ### Unit — new `tests/unit/test_enrichment.py`
 
-- `fisher_ora`: math correctness against scipy + statsmodels reference; per-cluster BH; per-cluster vs shared background branches; size-filter application. TERM2GENE contract: accepts `to_dataframe(genes_by_ontology(...))` output unchanged (integration-style unit test with a mocked `genes_by_ontology` result). Raises clear error on missing required columns. (No `signed_score` assertion — primitive doesn't compute it.)
+- `fisher_ora`: math correctness against scipy + statsmodels reference; per-cluster BH; per-cluster vs shared background branches; **size filter is per-cluster on M**, tests both bounds (a pathway passes in one cluster and is filtered in another when backgrounds differ); `max_gene_set_size=None` disables upper bound. TERM2GENE contract: accepts `to_dataframe(genes_by_ontology(...))` output unchanged (integration-style unit test with a mocked `genes_by_ontology` result). Raises clear error on missing required columns. (No `signed_score` assertion — primitive doesn't compute it.)
 - `signed_enrichment_score`: up-only, down-only, both-significant (dominant wins); re-derivation under new `padj_col` / cutoff.
 - `de_enrichment_inputs`: partitioning (`exp|tp|direction` keys); NaN-timepoint grouping as `"NA"`; `timepoint_filter` behavior; full-universe `background` vs `significant_only` `gene_sets`; single-organism enforcement (mixed-organism `experiment_ids` → `ValueError`; experiments not belonging to `organism` → `ValueError`).
 
