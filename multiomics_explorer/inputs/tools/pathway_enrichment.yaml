@@ -4,19 +4,19 @@
 
 examples:
   - title: Single experiment, default direction=both
-    call: pathway_enrichment(organism="MED4", experiment_ids=["exp1"], ontology="cyanorak_role", level=1)
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1)
 
   - title: Multi-experiment compareCluster analog (10 experiments in one call)
-    call: pathway_enrichment(organism="MED4", experiment_ids=["exp1", "exp2", "exp3", "exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10"], ontology="cyanorak_role", level=1)
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic", "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic", "10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics", "10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics", "10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics", "10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics", "10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq", "10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq", "10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark", "10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light"], ontology="cyanorak_role", level=1)
 
   - title: Summary-only (envelope, no rows)
-    call: pathway_enrichment(organism="MED4", experiment_ids=["exp1"], ontology="cyanorak_role", level=1, summary=True)
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, summary=True)
 
   - title: Verbose with gene-id lists
-    call: pathway_enrichment(organism="MED4", experiment_ids=["exp1"], ontology="cyanorak_role", level=1, verbose=True)
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, verbose=True)
 
   - title: Scope to specific pathways at a level
-    call: pathway_enrichment(organism="MED4", experiment_ids=["exp1"], ontology="cyanorak_role", level=1, term_ids=["cyanorak.role:J", "cyanorak.role:K"])
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, term_ids=["cyanorak.role:J", "cyanorak.role:K"])
 
   - title: From landscape to enrichment
     steps: |

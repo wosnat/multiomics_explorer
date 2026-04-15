@@ -100,31 +100,31 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 ### Example 1: Single experiment, default direction=both
 
 ```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["exp1"], ontology="cyanorak_role", level=1)
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1)
 ```
 
 ### Example 2: Multi-experiment compareCluster analog (10 experiments in one call)
 
 ```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["exp1", "exp2", "exp3", "exp4", "exp5", "exp6", "exp7", "exp8", "exp9", "exp10"], ontology="cyanorak_role", level=1)
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic", "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic", "10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics", "10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics", "10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics", "10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics", "10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq", "10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq", "10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark", "10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light"], ontology="cyanorak_role", level=1)
 ```
 
 ### Example 3: Summary-only (envelope, no rows)
 
 ```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["exp1"], ontology="cyanorak_role", level=1, summary=True)
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, summary=True)
 ```
 
 ### Example 4: Verbose with gene-id lists
 
 ```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["exp1"], ontology="cyanorak_role", level=1, verbose=True)
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, verbose=True)
 ```
 
 ### Example 5: Scope to specific pathways at a level
 
 ```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["exp1"], ontology="cyanorak_role", level=1, term_ids=["cyanorak.role:J", "cyanorak.role:K"])
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, term_ids=["cyanorak.role:J", "cyanorak.role:K"])
 ```
 
 ### Example 6: From landscape to enrichment
