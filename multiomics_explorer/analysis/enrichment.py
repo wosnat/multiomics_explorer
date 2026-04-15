@@ -249,3 +249,70 @@ def _fisher_ora_impl(gene_sets, background, term2gene, min_gene_set_size, max_ge
         by=["p_adjust", "cluster", "term_id"],
         ascending=[True, True, True],
     ).reset_index(drop=True)
+
+
+import math as _math
+
+
+def signed_enrichment_score(
+    df: pd.DataFrame,
+    direction_col: str = "direction",
+    padj_col: str = "p_adjust",
+) -> pd.DataFrame:
+    """Collapse up/down cluster pairs into one signed row per (stem, term).
+
+    Sign from the direction with the smaller ``p_adjust``; score =
+    ``sign * -log10(min_padj)``. Standalone so callers re-derive under
+    new cutoffs. Expects a ``direction`` column (or a caller-supplied
+    equivalent) plus a cluster-name convention ``{stem}|{direction}``.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Long-format rows from ``fisher_ora`` with at minimum ``cluster``,
+        ``term_id``, the direction column, and the p_adjust column.
+    direction_col : str, default 'direction'
+        Column to read the direction from. ``"up"`` -> +, ``"down"`` -> -.
+    padj_col : str, default 'p_adjust'
+        Column to read the BH-adjusted p-value from.
+
+    Returns
+    -------
+    pandas.DataFrame
+        One row per ``(cluster_stem, term_id)``. Columns: ``cluster_stem``,
+        ``term_id``, ``direction`` (the dominant one), ``p_adjust`` (the
+        smaller of the pair), ``signed_score``. Other columns from the
+        winning row are preserved.
+
+    Examples
+    --------
+    >>> from multiomics_explorer import signed_enrichment_score
+    >>> out = signed_enrichment_score(df_from_fisher_ora)  # doctest: +SKIP
+
+    See Also
+    --------
+    fisher_ora : Produces the input DataFrame.
+    """
+    needed = {"cluster", "term_id", direction_col, padj_col}
+    missing = needed - set(df.columns)
+    if missing:
+        raise ValueError(
+            f"signed_enrichment_score: missing required columns: {sorted(missing)}"
+        )
+    work = df.copy()
+    # Stem = cluster with trailing |direction stripped. Fall back to cluster
+    # itself if the suffix isn't present.
+    work["cluster_stem"] = work["cluster"].astype(str).where(
+        ~work["cluster"].astype(str).str.endswith(("|up", "|down")),
+        work["cluster"].astype(str).str.rsplit("|", n=1).str[0],
+    )
+    winners = (
+        work.sort_values(padj_col, ascending=True)
+        .drop_duplicates(subset=["cluster_stem", "term_id"], keep="first")
+        .copy()
+    )
+    sign = winners[direction_col].map({"up": 1, "down": -1}).fillna(1)
+    winners["signed_score"] = sign * winners[padj_col].apply(
+        lambda p: -_math.log10(p) if p > 0 else float("inf")
+    )
+    return winners.reset_index(drop=True)

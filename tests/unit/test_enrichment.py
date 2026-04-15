@@ -195,3 +195,53 @@ class TestFisherOra:
         p_row = df[df["term_id"] == "P"].iloc[0]
         assert math.isclose(p_row["rich_factor"], 2 / 3, rel_tol=1e-9)
         assert math.isclose(p_row["fold_enrichment"], (2 / 2) / (3 / 20), rel_tol=1e-9)
+
+
+import numpy as np
+
+
+class TestSignedEnrichmentScore:
+    def test_importable_from_top_level(self):
+        from multiomics_explorer import signed_enrichment_score
+        assert signed_enrichment_score is not None
+
+    def test_both_directions_dominant_wins(self):
+        """Up and down both significant — sign from smaller p_adjust wins."""
+        from multiomics_explorer import signed_enrichment_score
+        df = pd.DataFrame([
+            {"cluster": "exp1|T0|up",   "direction": "up",   "term_id": "P", "p_adjust": 1e-8},
+            {"cluster": "exp1|T0|down", "direction": "down", "term_id": "P", "p_adjust": 1e-3},
+        ])
+        out = signed_enrichment_score(df)
+        assert len(out) == 1
+        row = out.iloc[0]
+        assert row["signed_score"] == pytest.approx(-math.log10(1e-8))
+        assert row["term_id"] == "P"
+
+    def test_down_only(self):
+        from multiomics_explorer import signed_enrichment_score
+        df = pd.DataFrame([
+            {"cluster": "exp1|T0|down", "direction": "down", "term_id": "Q", "p_adjust": 1e-4},
+        ])
+        out = signed_enrichment_score(df)
+        assert len(out) == 1
+        assert out.iloc[0]["signed_score"] == pytest.approx(math.log10(1e-4))
+
+    def test_up_only(self):
+        from multiomics_explorer import signed_enrichment_score
+        df = pd.DataFrame([
+            {"cluster": "exp1|T0|up", "direction": "up", "term_id": "R", "p_adjust": 1e-5},
+        ])
+        out = signed_enrichment_score(df)
+        assert out.iloc[0]["signed_score"] == pytest.approx(-math.log10(1e-5))
+
+    def test_multiple_clusters_preserved(self):
+        """Different (exp, tp) pairs stay as separate rows per pathway."""
+        from multiomics_explorer import signed_enrichment_score
+        df = pd.DataFrame([
+            {"cluster": "exp1|T0|up", "direction": "up", "term_id": "P", "p_adjust": 1e-2},
+            {"cluster": "exp2|T0|up", "direction": "up", "term_id": "P", "p_adjust": 1e-3},
+        ])
+        out = signed_enrichment_score(df)
+        assert len(out) == 2
+        assert set(out["cluster_stem"]) == {"exp1|T0", "exp2|T0"}
