@@ -659,6 +659,10 @@ Each scenario function:
 - MCP Pydantic round-trip; `limit=100` default; `summary=True` returns empty `results`; `verbose=True` includes gene_id lists; `ctx.warning` on non-empty validation buckets.
 - **Field-description coverage:** assert every field on the result-row model and envelope model has a non-empty `Field(description=...)` value (prevents silently shipping an undocumented field). Spot-check that clusterProfiler-named fields (`gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, `bg_count`) mention their clusterProfiler equivalent in the description.
 
+### Unit — `tests/unit/test_frames.py`
+
+- **Default framer handles `pathway_enrichment` output:** feed a synthetic envelope (scalars + list-of-strings in `treatment_type` / `background_factors` / `foreground_gene_ids` / `background_gene_ids`) to `to_dataframe` and assert it produces a clean DataFrame with joined-string columns, no `UserWarning` about dropped complex values, and expected column names. Both compact-only and verbose variants.
+
 ### Integration (`-m kg`)
 
 - **B1 reproduction:** MED4 × CyanoRak level 1 × 10 experiments × `direction='both'` surfaces the B1 enriched pathways (E.4 N-metabolism, J.1–J.8 photosynthesis, K.2 ribosomal). Exact count may drift with KG rebuilds; assert key pathways appear where expected.
@@ -680,7 +684,7 @@ Freeze the B1 reproduction in `tests/regression/`. Regenerate after KG rebuilds 
 - **L1:** no new builders. `pathway_contingency_counts_query` is deleted from the earlier draft.
 - **L2 — package (`analysis/enrichment.py`):** `EnrichmentInputs` dataclass, `de_enrichment_inputs`, `fisher_ora`, `signed_enrichment_score`. Pure Python; pandas + scipy + statsmodels deps.
 - **L2 — api (`api/functions.py`):** new `pathway_enrichment()` composes `de_enrichment_inputs`, `genes_by_ontology`, `fisher_ora`. Validates inputs. Assembles envelope dict.
-- **L2 — frames (`analysis/frames.py`):** add an enrichment-DataFrame → envelope-dict converter (or the composition may live in `api/functions.py` — decision deferred to plan stage).
+- **L2 — frames (`analysis/frames.py`):** no bespoke framer expected. Result rows are scalars plus a few `list[str]` columns (`treatment_type`, `background_factors`, `foreground_gene_ids`, `background_gene_ids`), all of which the default `to_dataframe()` handles by joining with `" | "`. **Validated by test** (see Tests section). If the test surfaces nesting the default framer can't handle, add a dedicated converter — otherwise no new code in `frames.py`.
 - **L3 (`mcp_server/tools.py`):** thin wrapper. Pydantic response model. `limit=100` default. `ToolError` on invalid input. `await ctx.info` for DE / TERM2GENE fetches; `ctx.warning` when any validation bucket non-empty.
   - **Every Pydantic field on the result-row and envelope models carries a `Field(description=...)`** explaining the meaning and, where applicable, the clusterProfiler equivalent (e.g., `"k/n — DE genes in pathway over total DE genes in cluster (clusterProfiler: GeneRatio)"`). `scripts/build_about_content.py` pulls these descriptions into the auto-generated tool-about doc's response-format section, so MCP callers see the field meanings without leaving the tool page.
 - **L4:** `inputs/tools/pathway_enrichment.yaml`; skill reference auto-regenerated via `scripts/build_about_content.py` + `scripts/sync_skills.sh`.
@@ -730,6 +734,5 @@ from multiomics_explorer.analysis.enrichment import (
 
 ## Open questions deferred to plan stage
 
-- Should the DataFrame → envelope-dict converter live in `analysis/frames.py` (extends existing pattern) or in `api/functions.py` (local to the single consumer)? Lean `frames.py` for consistency; confirm at plan stage.
 - Default `top_pathways_by_padj` N — spec fixes at 10; callers wanting more paginate `results`.
 - For Python callers who want `signed_score` out of `fisher_ora` results without going through the MCP wrapper: document the pattern — attach a `direction` column to the DataFrame (from their own metadata) and pass through `signed_enrichment_score` or compute `sign × -log10(p_adjust)` directly. Doc-only.
