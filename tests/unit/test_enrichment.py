@@ -365,3 +365,58 @@ class TestDeEnrichmentInputs:
             timepoint_filter=["T4"],
         )
         assert set(out.gene_sets.keys()) == {"exp1|T4|up"}
+
+
+import inspect
+import re
+
+
+class TestDocstringCoverage:
+    """Public enrichment API must carry NumPy-style docstrings."""
+
+    PUBLIC_NAMES = [
+        "EnrichmentInputs",
+        "de_enrichment_inputs",
+        "fisher_ora",
+        "signed_enrichment_score",
+    ]
+
+    REQUIRED_SECTIONS = {
+        "EnrichmentInputs": [],  # Pydantic model - per-field descriptions checked elsewhere
+        "de_enrichment_inputs": ["Parameters", "Returns", "Raises", "Examples", "See Also"],
+        "fisher_ora": ["Parameters", "Returns", "Raises", "Examples", "See Also"],
+        "signed_enrichment_score": ["Parameters", "Returns", "Examples", "See Also"],
+    }
+
+    def test_every_public_name_has_docstring(self):
+        import multiomics_explorer as me
+        for name in self.PUBLIC_NAMES:
+            obj = getattr(me, name)
+            assert obj.__doc__ is not None, f"{name} missing docstring"
+            assert len(obj.__doc__.strip()) > 20, (
+                f"{name} docstring too short: {obj.__doc__!r}"
+            )
+
+    def test_required_sections_present(self):
+        import multiomics_explorer as me
+        for name, sections in self.REQUIRED_SECTIONS.items():
+            obj = getattr(me, name)
+            doc = obj.__doc__ or ""
+            for section in sections:
+                pattern = rf"^{re.escape(section)}\s*$\s*^-+\s*$"
+                assert re.search(pattern, doc, re.MULTILINE), (
+                    f"{name} docstring missing section '{section}'"
+                )
+
+    def test_every_parameter_documented_for_functions(self):
+        import multiomics_explorer as me
+        for name in ["de_enrichment_inputs", "fisher_ora", "signed_enrichment_score"]:
+            fn = getattr(me, name)
+            sig = inspect.signature(fn)
+            doc = fn.__doc__ or ""
+            for param in sig.parameters:
+                if param in {"self", "cls"} or param.startswith("_"):
+                    continue
+                assert re.search(rf"\b{re.escape(param)}\b", doc), (
+                    f"{name} signature parameter '{param}' not documented in docstring"
+                )
