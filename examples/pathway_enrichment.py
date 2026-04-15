@@ -66,10 +66,20 @@ def scenario_1_landscape(args: argparse.Namespace) -> None:
 
 def scenario_2_de(args: argparse.Namespace) -> None:
     """DE → enrichment. Reproduces the MCP tool's output."""
-    experiments = list_experiments(organism=args.organism, limit=10)
-    exp_ids = [e["experiment_id"] for e in experiments["results"]][:5]
+    experiments = list_experiments(organism=args.organism, limit=50)
+    # Filter: list_experiments returns all experiments touching the organism (including cocultures),
+    # so we need to filter to experiments where organism_name matches and there's no conflicting
+    # organism_id in the experiment_ids that would cause the DE call to fail.
+    # The safest approach: only use experiments for the target organism.
+    exp_ids = []
+    for e in experiments["results"]:
+        # Skip cocultures to avoid multi-organism constraint violations
+        if "coculture" not in (e.get("treatment_type") or []):
+            exp_ids.append(e["experiment_id"])
+        if len(exp_ids) >= 5:
+            break
     if not exp_ids:
-        print(f"No experiments for organism={args.organism}")
+        print(f"No non-coculture experiments for organism={args.organism}")
         return
     inputs = de_enrichment_inputs(
         experiment_ids=exp_ids,
