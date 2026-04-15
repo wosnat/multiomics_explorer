@@ -1,5 +1,5 @@
 case_id: resolve_gene_by_name
-row_count: 23
+row_count: 27
 rows:
 - gene_name: dnaN
   locus_tag: A9601_00001
@@ -9,6 +9,10 @@ rows:
   locus_tag: ACZ81_00010
   organism_name: Alteromonas macleodii HOT1A3
   product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: BL107_06649
+  organism_name: Synechococcus sp. BL107
+  product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: BSR22_03070
   organism_name: Prochlorococcus RSP50
@@ -22,12 +26,20 @@ rows:
   organism_name: Synechococcus elongatus PCC 7942
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
+  locus_tag: HP15_3703
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
   locus_tag: M744_03100
   organism_name: Synechococcus elongatus UTEX 2973
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
   locus_tag: M8001_00055
   organism_name: Pseudomonas putida KT2440
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: MADE_1000015
+  organism_name: Alteromonas mediterranea DE
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
   locus_tag: MIT1002_00002
@@ -60,6 +72,10 @@ rows:
 - gene_name: dnaN
   locus_tag: PMT9312_0001
   organism_name: Prochlorococcus MIT9312
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: Pro0001
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: SPO0150

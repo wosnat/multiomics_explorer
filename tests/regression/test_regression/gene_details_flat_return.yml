@@ -57,13 +57,13 @@ rows:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 11
+  closest_ortholog_group_size: 13
   cluster_membership_count: 2
   cluster_types:
   - condition_comparison
   - diel
   end: 1331
-  expression_edge_count: 27
+  expression_edge_count: 31
   function_description: Confers DNA tethering and processivity to DNA polymerases
     and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
     by the clamp-loading complex) which diffuses in an ATP-independent manner freely

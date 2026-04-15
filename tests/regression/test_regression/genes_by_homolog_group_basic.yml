@@ -1,11 +1,17 @@
 case_id: genes_by_homolog_group_basic
-row_count: 11
+row_count: 13
 rows:
 - gene_category: Photosynthesis
   gene_name: psbB
   group_id: cyanorak:CK_00000570
   locus_tag: A9601_03391
   organism_name: Prochlorococcus AS9601
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: BL107_09101
+  organism_name: Synechococcus sp. BL107
   product: photosystem II chlorophyll-binding protein CP47
 - gene_category: Photosynthesis
   gene_name: psbB
@@ -48,6 +54,12 @@ rows:
   group_id: cyanorak:CK_00000570
   locus_tag: PMT9312_0321
   organism_name: Prochlorococcus MIT9312
+  product: photosystem II chlorophyll-binding protein CP47
+- gene_category: Photosynthesis
+  gene_name: psbB
+  group_id: cyanorak:CK_00000570
+  locus_tag: Pro0354
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II chlorophyll-binding protein CP47
 - gene_category: Photosynthesis
   gene_name: psbB

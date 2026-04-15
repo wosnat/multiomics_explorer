@@ -5,7 +5,7 @@ rows:
   annotation_types: []
   closest_ortholog_genera:
   - Alteromonas
-  closest_ortholog_group_size: 1
+  closest_ortholog_group_size: 2
   cluster_membership_count: 0
   cluster_types: []
   expression_edge_count: 0
@@ -25,7 +25,7 @@ rows:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 11
+  closest_ortholog_group_size: 13
   cluster_membership_count: 3
   cluster_types:
   - condition_comparison

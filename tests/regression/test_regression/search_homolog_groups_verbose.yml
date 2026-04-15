@@ -1,5 +1,5 @@
 case_id: search_homolog_groups_verbose
-row_count: 246
+row_count: 262
 rows:
 - cog_categories:
   - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
@@ -15,7 +15,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 7.1525
+  score: 7.1775
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -33,7 +33,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 6.5116
+  score: 6.5322
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -51,7 +51,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 6.5116
+  score: 6.5322
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -67,9 +67,9 @@ rows:
   group_id: eggnog:46416@72275
   group_name: 46416@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 5.8889
+  member_count: 4
+  organism_count: 4
+  score: 5.9055
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -88,9 +88,9 @@ rows:
   group_id: eggnog:1MVN6@1224
   group_name: 1MVN6@1224
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 5.8889
+  member_count: 7
+  organism_count: 7
+  score: 5.9055
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -103,6 +103,7 @@ rows:
   functional_description: null
   genera:
   - Alteromonas
+  - Marinobacter
   - Meiothermus
   - Prochlorococcus
   - Pseudomonas
@@ -113,9 +114,9 @@ rows:
   group_id: eggnog:COG0388@2
   group_name: COG0388@2
   has_cross_genus_members: cross_genus
-  member_count: 82
-  organism_count: 23
-  score: 5.3239
+  member_count: 97
+  organism_count: 27
+  score: 5.3383
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -134,9 +135,9 @@ rows:
   group_id: eggnog:1RD0E@1224
   group_name: 1RD0E@1224
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 5.2858
+  member_count: 7
+  organism_count: 7
+  score: 5.2987
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -160,12 +161,38 @@ rows:
   group_id: cyanorak:CK_00000468
   group_name: CK_00000468
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 5.2388
+  member_count: 13
+  organism_count: 13
+  score: 5.2741
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: ntcA
+  consensus_product: global nitrogen regulatory protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N.5'', ''name'': ''Regulatory functions > Other''}'
+  description: COG0664 cAMP-binding proteins - catabolite gene activator and regulatory
+    subunit of cAMP-dependent protein kinases
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Regulatory functions > Other; Transcription
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYSB@1129
+  group_name: 1GYSB@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 5.2741
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
   consensus_gene_name: ntcA
@@ -185,9 +212,9 @@ rows:
   group_id: eggnog:1MM09@1212
   group_name: 1MM09@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 5.2388
+  member_count: 10
+  organism_count: 10
+  score: 5.2741
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -213,9 +240,9 @@ rows:
   group_id: eggnog:1G07U@1117
   group_name: 1G07U@1117
   has_cross_genus_members: cross_genus
-  member_count: 17
-  organism_count: 16
-  score: 5.2388
+  member_count: 19
+  organism_count: 18
+  score: 5.2741
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -239,12 +266,37 @@ rows:
   group_id: cyanorak:CK_00000186
   group_name: CK_00000186
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 4.8955
+  member_count: 13
+  organism_count: 13
+  score: 4.9295
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: glnB
+  consensus_product: nitrogen regulatory protein P-II
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:N.1'', ''name'': ''Regulatory functions > DNA interactions''}'
+  description: Belongs to the P(II) protein family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Regulatory functions > DNA interactions; Transcription
+  genera:
+  - Synechococcus
+  group_id: eggnog:1H0HR@1129
+  group_name: 1H0HR@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 4.9295
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
   consensus_gene_name: glnB
@@ -264,9 +316,9 @@ rows:
   group_id: eggnog:1MMKX@1212
   group_name: 1MMKX@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 4.8955
+  member_count: 10
+  organism_count: 10
+  score: 4.9295
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -291,9 +343,9 @@ rows:
   group_id: eggnog:1G5QJ@1117
   group_name: 1G5QJ@1117
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 4.8955
+  member_count: 18
+  organism_count: 18
+  score: 4.9295
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -325,7 +377,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 3
   organism_count: 3
-  score: 4.5952
+  score: 4.6357
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -356,7 +408,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 4.5952
+  score: 4.6357
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -374,7 +426,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 3.9835
+  score: 3.9881
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -392,7 +444,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 4
   organism_count: 4
-  score: 3.7162
+  score: 3.7187
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -405,6 +457,7 @@ rows:
   functional_description: Inorganic ion transport and metabolism
   genera:
   - Alteromonas
+  - Marinobacter
   - Meiothermus
   - Prochlorococcus
   - Pseudomonas
@@ -415,9 +468,9 @@ rows:
   group_id: eggnog:COG0601@2
   group_name: COG0601@2
   has_cross_genus_members: cross_genus
-  member_count: 55
-  organism_count: 23
-  score: 3.7162
+  member_count: 60
+  organism_count: 27
+  score: 3.7187
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -433,9 +486,9 @@ rows:
   group_id: eggnog:465G5@72275
   group_name: 465G5@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 3.4363
+  member_count: 4
+  organism_count: 4
+  score: 3.4587
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -454,7 +507,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 3
   organism_count: 3
-  score: 3.4363
+  score: 3.4587
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -470,9 +523,9 @@ rows:
   group_id: eggnog:1MXG5@1224
   group_name: 1MXG5@1224
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 3.4363
+  member_count: 4
+  organism_count: 4
+  score: 3.4587
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -490,9 +543,9 @@ rows:
   group_id: eggnog:1G9W6@1117
   group_name: 1G9W6@1117
   has_cross_genus_members: cross_genus
-  member_count: 8
-  organism_count: 6
-  score: 3.2765
+  member_count: 10
+  organism_count: 8
+  score: 3.2761
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -510,7 +563,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 3.2765
+  score: 3.2761
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -528,52 +581,10 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 3.2765
+  score: 3.2761
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: cobN
-  consensus_product: protoporphyrin IX Mg-chelatase, subunit ChlH
-  cyanorak_roles: []
-  description: ligase activity, forming nitrogen-metal bonds
-  functional_description: Coenzyme transport and metabolism
-  genera:
-  - Prochlorococcus
-  - Pseudomonas
-  - Ruegeria
-  - Shewanella
-  - Synechococcus
-  - Thermosynechococcus
-  group_id: eggnog:COG1429@2
-  group_name: COG1429@2
-  has_cross_genus_members: cross_genus
-  member_count: 35
-  organism_count: 19
-  score: 3.0935
-  source: eggnog
-  specificity_rank: 3
-  taxonomic_level: Bacteria
-- cog_categories:
-  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
-  consensus_gene_name: ntcA
-  consensus_product: global nitrogen regulatory protein
-  cyanorak_roles: []
-  description: COG0664 cAMP-binding proteins - catabolite gene activator and regulatory
-    subunit of cAMP-dependent protein kinases
-  functional_description: Transcription
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GYSB@1129
-  group_name: 1GYSB@1129
-  has_cross_genus_members: single_genus
-  member_count: 6
-  organism_count: 6
-  score: 3.0829
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
   - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
@@ -591,9 +602,9 @@ rows:
   group_id: eggnog:1G2AC@1117
   group_name: 1G2AC@1117
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 3.0829
+  member_count: 7
+  organism_count: 7
+  score: 3.1029
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -614,30 +625,35 @@ rows:
   group_id: eggnog:COG1221@2
   group_name: COG1221@2
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 3.0829
+  member_count: 7
+  organism_count: 7
+  score: 3.1029
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
 - cog_categories:
-  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
-  consensus_gene_name: glnB
-  consensus_product: nitrogen regulatory protein P-II
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: cobN
+  consensus_product: protoporphyrin IX Mg-chelatase, subunit ChlH
   cyanorak_roles: []
-  description: Belongs to the P(II) protein family
-  functional_description: Transcription
+  description: ligase activity, forming nitrogen-metal bonds
+  functional_description: Coenzyme transport and metabolism
   genera:
+  - Prochlorococcus
+  - Pseudomonas
+  - Ruegeria
+  - Shewanella
   - Synechococcus
-  group_id: eggnog:1H0HR@1129
-  group_name: 1H0HR@1129
-  has_cross_genus_members: single_genus
-  member_count: 6
-  organism_count: 6
-  score: 2.7954
+  - Thermosynechococcus
+  group_id: eggnog:COG1429@2
+  group_name: COG1429@2
+  has_cross_genus_members: cross_genus
+  member_count: 39
+  organism_count: 21
+  score: 3.0921
   source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
+  specificity_rank: 3
+  taxonomic_level: Bacteria
 - cog_categories:
   - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
   consensus_gene_name: H6G84_RS11020
@@ -652,7 +668,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.7954
+  score: 2.8134
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -669,9 +685,9 @@ rows:
   group_id: eggnog:463YY@72275
   group_name: 463YY@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.7954
+  member_count: 4
+  organism_count: 4
+  score: 2.8134
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -687,9 +703,9 @@ rows:
   group_id: eggnog:466U1@72275
   group_name: 466U1@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.7954
+  member_count: 4
+  organism_count: 4
+  score: 2.8134
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -705,9 +721,9 @@ rows:
   group_id: eggnog:4679F@72275
   group_name: 4679F@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.7954
+  member_count: 4
+  organism_count: 4
+  score: 2.8134
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -723,9 +739,9 @@ rows:
   group_id: eggnog:467D0@72275
   group_name: 467D0@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.7954
+  member_count: 4
+  organism_count: 4
+  score: 2.8134
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -743,7 +759,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.7954
+  score: 2.8134
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -762,9 +778,9 @@ rows:
   group_id: eggnog:1MUUB@1224
   group_name: 1MUUB@1224
   has_cross_genus_members: cross_genus
-  member_count: 7
-  organism_count: 6
-  score: 2.7954
+  member_count: 8
+  organism_count: 7
+  score: 2.8134
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -782,7 +798,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.7954
+  score: 2.8134
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -800,7 +816,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.7954
+  score: 2.8134
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -818,7 +834,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.7954
+  score: 2.8134
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -837,9 +853,9 @@ rows:
   group_id: eggnog:1RGWK@1224
   group_name: 1RGWK@1224
   has_cross_genus_members: cross_genus
-  member_count: 12
-  organism_count: 6
-  score: 2.7954
+  member_count: 14
+  organism_count: 7
+  score: 2.8134
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -852,6 +868,7 @@ rows:
   functional_description: Transcription
   genera:
   - Alteromonas
+  - Marinobacter
   - Meiothermus
   - Prochlorococcus
   - Pseudomonas
@@ -862,9 +879,9 @@ rows:
   group_id: eggnog:COG0347@2
   group_name: COG0347@2
   has_cross_genus_members: cross_genus
-  member_count: 42
-  organism_count: 23
-  score: 2.7954
+  member_count: 50
+  organism_count: 27
+  score: 2.8134
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -877,38 +894,19 @@ rows:
   functional_description: Signal transduction mechanisms
   genera:
   - Alteromonas
+  - Marinobacter
   - Pseudomonas
   - Ruegeria
   - Shewanella
   group_id: eggnog:COG3852@2
   group_name: COG3852@2
   has_cross_genus_members: cross_genus
-  member_count: 8
-  organism_count: 6
-  score: 2.7954
+  member_count: 11
+  organism_count: 8
+  score: 2.8134
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
-- cog_categories: []
-  consensus_gene_name: cynS
-  consensus_product: cyanate hydratase
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
-    Nitrogen metabolism''}'
-  description: null
-  functional_description: Central intermediary metabolism > Nitrogen metabolism
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  group_id: cyanorak:CK_00001552
-  group_name: CK_00001552
-  has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 2.613
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
 - cog_categories:
   - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
   consensus_gene_name: narM
@@ -923,9 +921,9 @@ rows:
   group_id: cyanorak:CK_00001674
   group_name: CK_00001674
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.613
+  member_count: 4
+  organism_count: 4
+  score: 2.6106
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -942,12 +940,32 @@ rows:
   group_id: cyanorak:CK_00003051
   group_name: CK_00003051
   has_cross_genus_members: single_genus
-  member_count: 4
-  organism_count: 3
-  score: 2.613
+  member_count: 5
+  organism_count: 4
+  score: 2.6106
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- cog_categories:
+  - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
+  consensus_gene_name: narM
+  consensus_product: nitrate reductase associated protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: Conserved nitrate reductase-associated protein (Nitr_red_assoc)
+  functional_description: Central intermediary metabolism > Nitrogen metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1H027@1129
+  group_name: 1H027@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 2.6106
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories: []
   consensus_gene_name: cynH
   consensus_product: cyanate hydratase
@@ -961,9 +979,9 @@ rows:
   group_id: eggnog:1H235@1129
   group_name: 1H235@1129
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 2.613
+  member_count: 3
+  organism_count: 3
+  score: 2.6106
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -980,9 +998,9 @@ rows:
   group_id: eggnog:1GP1E@1117
   group_name: 1GP1E@1117
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 2.613
+  member_count: 3
+  organism_count: 3
+  score: 2.6106
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -999,9 +1017,9 @@ rows:
   group_id: eggnog:30VKU@2
   group_name: 30VKU@2
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 2.613
+  member_count: 3
+  organism_count: 3
+  score: 2.6106
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1019,7 +1037,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.557
+  score: 2.5734
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1037,7 +1055,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.557
+  score: 2.5734
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1055,7 +1073,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.557
+  score: 2.5734
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1068,15 +1086,16 @@ rows:
   functional_description: null
   genera:
   - Alteromonas
+  - Marinobacter
   - Meiothermus
   - Ruegeria
   - Shewanella
   group_id: eggnog:COG1610@2
   group_name: COG1610@2
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 2.5285
+  member_count: 8
+  organism_count: 8
+  score: 2.5249
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1094,7 +1113,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 4
   organism_count: 4
-  score: 2.356
+  score: 2.3711
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1112,7 +1131,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 4
   organism_count: 4
-  score: 2.356
+  score: 2.3711
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1129,9 +1148,9 @@ rows:
   group_id: eggnog:46810@72275
   group_name: 46810@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.356
+  member_count: 4
+  organism_count: 4
+  score: 2.3711
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -1150,7 +1169,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 5
   organism_count: 5
-  score: 2.356
+  score: 2.3711
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1169,7 +1188,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 5
   organism_count: 5
-  score: 2.356
+  score: 2.3711
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1182,15 +1201,16 @@ rows:
   functional_description: Carbohydrate transport and metabolism
   genera:
   - Alteromonas
+  - Marinobacter
   - Pseudomonas
   - Ruegeria
   - Shewanella
   group_id: eggnog:COG1762@2
   group_name: COG1762@2
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 2.356
+  member_count: 8
+  organism_count: 8
+  score: 2.3711
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1202,15 +1222,17 @@ rows:
   description: null
   functional_description: null
   genera:
+  - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Ruegeria
   - Synechococcus
   group_id: eggnog:COG2044@2
   group_name: COG2044@2
   has_cross_genus_members: cross_genus
-  member_count: 8
-  organism_count: 8
-  score: 2.356
+  member_count: 10
+  organism_count: 10
+  score: 2.3711
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1229,9 +1251,9 @@ rows:
   group_id: eggnog:463XX@72275
   group_name: 463XX@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.317
+  member_count: 4
+  organism_count: 4
+  score: 2.3127
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -1253,9 +1275,9 @@ rows:
   group_id: eggnog:1MV93@1224
   group_name: 1MV93@1224
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 2.317
+  member_count: 7
+  organism_count: 7
+  score: 2.3127
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -1268,14 +1290,15 @@ rows:
   functional_description: Transcription
   genera:
   - Alteromonas
+  - Marinobacter
   - Pseudomonas
   - Synechococcus
   group_id: eggnog:COG3905@2
   group_name: COG3905@2
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 5
-  score: 2.317
+  member_count: 8
+  organism_count: 7
+  score: 2.3127
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1291,15 +1314,16 @@ rows:
     metabolism
   genera:
   - Alteromonas
+  - Marinobacter
   - Pseudomonas
   - Ruegeria
   - Shewanella
   group_id: eggnog:COG4230@2
   group_name: COG4230@2
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 2.317
+  member_count: 8
+  organism_count: 8
+  score: 2.3127
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1322,9 +1346,9 @@ rows:
   group_id: eggnog:COG0010@2
   group_name: COG0010@2
   has_cross_genus_members: cross_genus
-  member_count: 33
-  organism_count: 20
-  score: 2.2239
+  member_count: 36
+  organism_count: 23
+  score: 2.2195
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1338,6 +1362,7 @@ rows:
   functional_description: Nucleotide transport and metabolism
   genera:
   - Alteromonas
+  - Marinobacter
   - Meiothermus
   - Prochlorococcus
   - Pseudomonas
@@ -1347,9 +1372,9 @@ rows:
   group_id: eggnog:COG0044@2
   group_name: COG0044@2
   has_cross_genus_members: cross_genus
-  member_count: 21
-  organism_count: 14
-  score: 2.2239
+  member_count: 24
+  organism_count: 17
+  score: 2.2195
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1364,6 +1389,7 @@ rows:
   functional_description: Secondary metabolites biosynthesis, transport and catabolism
   genera:
   - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Pseudomonas
   - Ruegeria
@@ -1373,9 +1399,9 @@ rows:
   group_id: eggnog:COG1335@2
   group_name: COG1335@2
   has_cross_genus_members: cross_genus
-  member_count: 39
-  organism_count: 18
-  score: 2.2239
+  member_count: 43
+  organism_count: 21
+  score: 2.2195
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1398,9 +1424,9 @@ rows:
   group_id: cyanorak:CK_00001355
   group_name: CK_00001355
   has_cross_genus_members: cross_genus
-  member_count: 7
-  organism_count: 7
-  score: 2.1559
+  member_count: 8
+  organism_count: 8
+  score: 2.1712
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1422,9 +1448,9 @@ rows:
   group_id: cyanorak:CK_00001675
   group_name: CK_00001675
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.1559
+  member_count: 4
+  organism_count: 4
+  score: 2.1712
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1448,10 +1474,59 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.1559
+  score: 2.1712
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: narB
+  consensus_product: nitrate reductase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: Belongs to the prokaryotic molybdopterin-containing oxidoreductase
+    family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Energy production and conversion
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYE2@1129
+  group_name: 1GYE2@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 2.1712
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
+  consensus_gene_name: nirA
+  consensus_product: ferredoxin--nitrite reductase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: Belongs to the nitrite and sulfite reductase 4Fe-4S domain family
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Energy production and conversion
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZSX@1129
+  group_name: 1GZSX@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 2.1712
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:C'', ''name'': ''Energy production and conversion''}'
   consensus_gene_name: nirA
@@ -1472,7 +1547,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 5
   organism_count: 4
-  score: 2.1559
+  score: 2.1712
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1496,7 +1571,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.1559
+  score: 2.1712
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1520,9 +1595,9 @@ rows:
   group_id: eggnog:1G0Z6@1117
   group_name: 1G0Z6@1117
   has_cross_genus_members: cross_genus
-  member_count: 12
-  organism_count: 11
-  score: 2.1559
+  member_count: 13
+  organism_count: 12
+  score: 2.1712
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1546,7 +1621,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 2.1559
+  score: 2.1712
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1569,9 +1644,9 @@ rows:
   group_id: cyanorak:CK_00000134
   group_name: CK_00000134
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 2.1001
+  member_count: 13
+  organism_count: 13
+  score: 2.1161
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1594,9 +1669,9 @@ rows:
   group_id: cyanorak:CK_00001358
   group_name: CK_00001358
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 2.1001
+  member_count: 11
+  organism_count: 11
+  score: 2.1161
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1619,9 +1694,9 @@ rows:
   group_id: cyanorak:CK_00001359
   group_name: CK_00001359
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 2.1001
+  member_count: 11
+  organism_count: 11
+  score: 2.1161
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1644,9 +1719,9 @@ rows:
   group_id: cyanorak:CK_00001360
   group_name: CK_00001360
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 2.1001
+  member_count: 11
+  organism_count: 11
+  score: 2.1161
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -1669,9 +1744,33 @@ rows:
   group_id: eggnog:1GZ2M@1129
   group_name: 1GZ2M@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.1001
+  member_count: 4
+  organism_count: 4
+  score: 2.1161
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: glsF
+  consensus_product: ferredoxin-dependent glutamate synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: glutamate synthase
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
+    metabolism; Amino acid transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZS6@1129
+  group_name: 1GZS6@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 2.1161
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1693,9 +1792,9 @@ rows:
   group_id: eggnog:1H0QG@1129
   group_name: 1H0QG@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.1001
+  member_count: 4
+  organism_count: 4
+  score: 2.1161
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1717,9 +1816,9 @@ rows:
   group_id: eggnog:1H0QJ@1129
   group_name: 1H0QJ@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 2.1001
+  member_count: 4
+  organism_count: 4
+  score: 2.1161
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1744,7 +1843,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 2.1001
+  score: 2.1161
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1766,9 +1865,9 @@ rows:
   group_id: eggnog:1MKFG@1212
   group_name: 1MKFG@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 2.1001
+  member_count: 10
+  organism_count: 10
+  score: 2.1161
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1792,7 +1891,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 2.1001
+  score: 2.1161
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1816,7 +1915,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 2.1001
+  score: 2.1161
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -1840,9 +1939,9 @@ rows:
   group_id: eggnog:1G0XM@1117
   group_name: 1G0XM@1117
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 2.1001
+  member_count: 18
+  organism_count: 18
+  score: 2.1161
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1867,9 +1966,9 @@ rows:
   group_id: eggnog:1G12D@1117
   group_name: 1G12D@1117
   has_cross_genus_members: cross_genus
-  member_count: 13
-  organism_count: 13
-  score: 2.1001
+  member_count: 14
+  organism_count: 14
+  score: 2.1161
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1893,9 +1992,9 @@ rows:
   group_id: eggnog:1G6IB@1117
   group_name: 1G6IB@1117
   has_cross_genus_members: cross_genus
-  member_count: 13
-  organism_count: 13
-  score: 2.1001
+  member_count: 14
+  organism_count: 14
+  score: 2.1161
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1919,9 +2018,9 @@ rows:
   group_id: eggnog:1G6KQ@1117
   group_name: 1G6KQ@1117
   has_cross_genus_members: cross_genus
-  member_count: 13
-  organism_count: 13
-  score: 2.1001
+  member_count: 14
+  organism_count: 14
+  score: 2.1161
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1940,6 +2039,8 @@ rows:
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Amino acid transport and metabolism
   genera:
+  - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Pseudomonas
   - Ruegeria
@@ -1948,9 +2049,9 @@ rows:
   group_id: eggnog:COG0804@2
   group_name: COG0804@2
   has_cross_genus_members: cross_genus
-  member_count: 15
-  organism_count: 15
-  score: 2.1001
+  member_count: 18
+  organism_count: 18
+  score: 2.1161
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1968,6 +2069,8 @@ rows:
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Amino acid transport and metabolism
   genera:
+  - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Pseudomonas
   - Ruegeria
@@ -1976,9 +2079,9 @@ rows:
   group_id: eggnog:COG0831@2
   group_name: COG0831@2
   has_cross_genus_members: cross_genus
-  member_count: 15
-  organism_count: 15
-  score: 2.1001
+  member_count: 18
+  organism_count: 18
+  score: 2.1161
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1996,6 +2099,8 @@ rows:
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Amino acid transport and metabolism
   genera:
+  - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Pseudomonas
   - Ruegeria
@@ -2004,12 +2109,34 @@ rows:
   group_id: eggnog:COG0832@2
   group_name: COG0832@2
   has_cross_genus_members: cross_genus
-  member_count: 15
-  organism_count: 15
-  score: 2.1001
+  member_count: 18
+  organism_count: 18
+  score: 2.1161
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: cynS
+  consensus_product: cyanate hydratase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: null
+  functional_description: Central intermediary metabolism > Nitrogen metabolism; Coenzyme
+    transport and metabolism
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  group_id: cyanorak:CK_00001552
+  group_name: CK_00001552
+  has_cross_genus_members: cross_genus
+  member_count: 7
+  organism_count: 7
+  score: 2.0879
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
 - cog_categories:
   - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
   consensus_gene_name: cynS
@@ -2027,9 +2154,9 @@ rows:
   group_id: eggnog:1G529@1117
   group_name: 1G529@1117
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 9
-  score: 2.0772
+  member_count: 11
+  organism_count: 10
+  score: 2.0879
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2053,9 +2180,9 @@ rows:
   group_id: cyanorak:CK_00001364
   group_name: CK_00001364
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.9966
+  member_count: 11
+  organism_count: 11
+  score: 2.0139
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2081,7 +2208,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 1.9966
+  score: 2.0139
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2107,9 +2234,9 @@ rows:
   group_id: eggnog:1G0GT@1117
   group_name: 1G0GT@1117
   has_cross_genus_members: cross_genus
-  member_count: 13
-  organism_count: 13
-  score: 1.9966
+  member_count: 14
+  organism_count: 14
+  score: 2.0139
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2131,7 +2258,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.9759
+  score: 1.9883
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2153,7 +2280,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.9759
+  score: 1.9883
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2175,88 +2302,10 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 1.9759
+  score: 1.9883
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: nadE
-  consensus_product: ammonia-dependent NAD(+) synthetase
-  cyanorak_roles: []
-  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
-    ammonia as a nitrogen source
-  functional_description: Coenzyme transport and metabolism
-  genera:
-  - Alteromonas
-  group_id: eggnog:463ZH@72275
-  group_name: 463ZH@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.9162
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- cog_categories:
-  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
-  consensus_gene_name: nadE
-  consensus_product: ammonia-dependent NAD(+) synthetase
-  cyanorak_roles: []
-  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
-    ammonia as a nitrogen source
-  functional_description: Nucleotide transport and metabolism
-  genera:
-  - Shewanella
-  group_id: eggnog:1QHZ4@1224
-  group_name: 1QHZ4@1224
-  has_cross_genus_members: single_genus
-  member_count: 1
-  organism_count: 1
-  score: 1.9162
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Proteobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
-  consensus_gene_name: yhcX
-  consensus_product: bifunctional GNAT family N-acetyltransferase/carbon-nitrogen
-    hydrolase family protein
-  cyanorak_roles: []
-  description: COG0454 Histone acetyltransferase HPA2 and related acetyltransferases
-  functional_description: Transcription
-  genera:
-  - Alteromonas
-  group_id: eggnog:4648Q@72275
-  group_name: 4648Q@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.9065
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- cog_categories:
-  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
-  consensus_gene_name: yhcX
-  consensus_product: bifunctional GNAT family N-acetyltransferase/carbon-nitrogen
-    hydrolase family protein
-  cyanorak_roles: []
-  description: Nitrilase cyanide hydratase and apolipoprotein N-acyltransferase
-  functional_description: Transcription
-  genera:
-  - Alteromonas
-  - Pseudomonas
-  - Ruegeria
-  group_id: eggnog:1MX4I@1224
-  group_name: 1MX4I@1224
-  has_cross_genus_members: cross_genus
-  member_count: 5
-  organism_count: 5
-  score: 1.9065
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Proteobacteria
 - cog_categories:
   - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
     turnover, chaperones''}'
@@ -2279,9 +2328,9 @@ rows:
   group_id: cyanorak:CK_00001361
   group_name: CK_00001361
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.9028
+  member_count: 11
+  organism_count: 11
+  score: 1.9212
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2307,9 +2356,9 @@ rows:
   group_id: cyanorak:CK_00001362
   group_name: CK_00001362
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.9028
+  member_count: 11
+  organism_count: 11
+  score: 1.9212
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2335,9 +2384,9 @@ rows:
   group_id: cyanorak:CK_00001363
   group_name: CK_00001363
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.9028
+  member_count: 11
+  organism_count: 11
+  score: 1.9212
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2362,9 +2411,9 @@ rows:
   group_id: cyanorak:CK_00001367
   group_name: CK_00001367
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.9028
+  member_count: 11
+  organism_count: 11
+  score: 1.9212
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2390,7 +2439,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.9028
+  score: 1.9212
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -2414,9 +2463,9 @@ rows:
   group_id: eggnog:1GZ29@1129
   group_name: 1GZ29@1129
   has_cross_genus_members: single_genus
-  member_count: 2
-  organism_count: 2
-  score: 1.9028
+  member_count: 3
+  organism_count: 3
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2442,9 +2491,9 @@ rows:
   group_id: eggnog:1GZCT@1129
   group_name: 1GZCT@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.9028
+  member_count: 4
+  organism_count: 4
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2470,9 +2519,9 @@ rows:
   group_id: eggnog:1GZD2@1129
   group_name: 1GZD2@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.9028
+  member_count: 4
+  organism_count: 4
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2498,9 +2547,9 @@ rows:
   group_id: eggnog:1H0TA@1129
   group_name: 1H0TA@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.9028
+  member_count: 4
+  organism_count: 4
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -2526,7 +2575,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 7
   organism_count: 7
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2554,7 +2603,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2582,7 +2631,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2610,7 +2659,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2636,7 +2685,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2664,7 +2713,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -2692,9 +2741,9 @@ rows:
   group_id: eggnog:1G10F@1117
   group_name: 1G10F@1117
   has_cross_genus_members: cross_genus
-  member_count: 13
-  organism_count: 13
-  score: 1.9028
+  member_count: 14
+  organism_count: 14
+  score: 1.9212
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2720,9 +2769,38 @@ rows:
   group_id: eggnog:1G2Q2@1117
   group_name: 1G2Q2@1117
   has_cross_genus_members: cross_genus
+  member_count: 6
+  organism_count: 6
+  score: 1.9212
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
+    turnover, chaperones''}'
+  consensus_gene_name: ureF
+  consensus_product: urease accessory protein UreF
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.4'', ''name'': ''Cellular processes > Chaperones''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: Required for maturation of urease via the functional incorporation
+    of the urease nickel metallocenter
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Cellular processes > Chaperones; Central
+    intermediary metabolism > Nitrogen metabolism; Post-translational modification,
+    protein turnover, chaperones
+  genera:
+  - Synechococcus
+  - Thermosynechococcus
+  group_id: eggnog:1G3PC@1117
+  group_name: 1G3PC@1117
+  has_cross_genus_members: cross_genus
   member_count: 5
   organism_count: 5
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2748,7 +2826,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 7
   organism_count: 7
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2776,9 +2854,9 @@ rows:
   group_id: eggnog:1G6TF@1117
   group_name: 1G6TF@1117
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.9028
+  member_count: 12
+  organism_count: 12
+  score: 1.9212
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2806,7 +2884,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2834,7 +2912,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 1.9028
+  score: 1.9212
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -2855,6 +2933,8 @@ rows:
     intermediary metabolism > Nitrogen metabolism; Post-translational modification,
     protein turnover, chaperones
   genera:
+  - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Pseudomonas
   - Ruegeria
@@ -2863,9 +2943,9 @@ rows:
   group_id: eggnog:COG0829@2
   group_name: COG0829@2
   has_cross_genus_members: cross_genus
-  member_count: 15
-  organism_count: 15
-  score: 1.9028
+  member_count: 18
+  organism_count: 18
+  score: 1.9212
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -2886,6 +2966,8 @@ rows:
     intermediary metabolism > Nitrogen metabolism; Post-translational modification,
     protein turnover, chaperones
   genera:
+  - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Pseudomonas
   - Ruegeria
@@ -2894,9 +2976,9 @@ rows:
   group_id: eggnog:COG0830@2
   group_name: COG0830@2
   has_cross_genus_members: cross_genus
-  member_count: 15
-  organism_count: 15
-  score: 1.9028
+  member_count: 18
+  organism_count: 18
+  score: 1.9212
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -2917,6 +2999,8 @@ rows:
     intermediary metabolism > Nitrogen metabolism; Post-translational modification,
     protein turnover, chaperones
   genera:
+  - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Pseudomonas
   - Ruegeria
@@ -2925,9 +3009,9 @@ rows:
   group_id: eggnog:COG2371@2
   group_name: COG2371@2
   has_cross_genus_members: cross_genus
-  member_count: 14
-  organism_count: 14
-  score: 1.9028
+  member_count: 17
+  organism_count: 17
+  score: 1.9212
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -2947,6 +3031,8 @@ rows:
     conditions and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen
     metabolism; Transport and binding proteins > Amino acids, peptides and amines
   genera:
+  - Alteromonas
+  - Marinobacter
   - Prochlorococcus
   - Pseudomonas
   - Ruegeria
@@ -2955,12 +3041,109 @@ rows:
   group_id: eggnog:COG4674@2
   group_name: COG4674@2
   has_cross_genus_members: cross_genus
-  member_count: 14
-  organism_count: 14
-  score: 1.9028
+  member_count: 18
+  organism_count: 17
+  score: 1.9212
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: yhcX
+  consensus_product: bifunctional GNAT family N-acetyltransferase/carbon-nitrogen
+    hydrolase family protein
+  cyanorak_roles: []
+  description: COG0454 Histone acetyltransferase HPA2 and related acetyltransferases
+  functional_description: Transcription
+  genera:
+  - Alteromonas
+  group_id: eggnog:4648Q@72275
+  group_name: 4648Q@72275
+  has_cross_genus_members: single_genus
+  member_count: 4
+  organism_count: 4
+  score: 1.9186
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
+- cog_categories:
+  - '{''id'': ''cog.category:K'', ''name'': ''Transcription''}'
+  consensus_gene_name: yhcX
+  consensus_product: bifunctional GNAT family N-acetyltransferase/carbon-nitrogen
+    hydrolase family protein
+  cyanorak_roles: []
+  description: Nitrilase cyanide hydratase and apolipoprotein N-acyltransferase
+  functional_description: Transcription
+  genera:
+  - Alteromonas
+  - Pseudomonas
+  - Ruegeria
+  group_id: eggnog:1MX4I@1224
+  group_name: 1MX4I@1224
+  has_cross_genus_members: cross_genus
+  member_count: 6
+  organism_count: 6
+  score: 1.9186
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Proteobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: nadE
+  consensus_product: ammonia-dependent NAD(+) synthetase
+  cyanorak_roles: []
+  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
+    ammonia as a nitrogen source
+  functional_description: Coenzyme transport and metabolism
+  genera:
+  - Alteromonas
+  group_id: eggnog:463ZH@72275
+  group_name: 463ZH@72275
+  has_cross_genus_members: single_genus
+  member_count: 3
+  organism_count: 3
+  score: 1.9113
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: nadE
+  consensus_product: ammonia-dependent NAD(+) synthetase
+  cyanorak_roles: []
+  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
+    ammonia as a nitrogen source
+  functional_description: Coenzyme transport and metabolism
+  genera:
+  - Alteromonas
+  group_id: eggnog:46CZK@72275
+  group_name: 46CZK@72275
+  has_cross_genus_members: single_genus
+  member_count: 1
+  organism_count: 1
+  score: 1.9113
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
+- cog_categories: []
+  consensus_gene_name: nadE
+  consensus_product: ammonia-dependent NAD(+) synthetase
+  cyanorak_roles: []
+  description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
+    ammonia as a nitrogen source
+  functional_description: null
+  genera:
+  - Alteromonas
+  - Shewanella
+  group_id: eggnog:1QHZ4@1224
+  group_name: 1QHZ4@1224
+  has_cross_genus_members: cross_genus
+  member_count: 2
+  organism_count: 2
+  score: 1.9113
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Proteobacteria
 - cog_categories:
   - '{''id'': ''cog.category:S'', ''name'': ''Function unknown''}'
   consensus_gene_name: merR
@@ -2985,7 +3168,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.8592
+  score: 1.8779
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3012,9 +3195,9 @@ rows:
   group_id: eggnog:1GYI8@1129
   group_name: 1GYI8@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.8592
+  member_count: 4
+  organism_count: 4
+  score: 1.8779
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3022,18 +3205,21 @@ rows:
   - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
   consensus_gene_name: nadE
   consensus_product: NAD+ synthase (glutamine-hydrolysing)
-  cyanorak_roles: []
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.6'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Pyridine nucleotides (NAD, NADP)''}'
   description: Catalyzes the ATP-dependent amidation of deamido-NAD to form NAD. Uses
     L-glutamine as a nitrogen source
-  functional_description: Coenzyme transport and metabolism
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Pyridine nucleotides (NAD, NADP); Coenzyme transport and metabolism
   genera:
   - Synechococcus
   group_id: eggnog:1GZBH@1129
   group_name: 1GZBH@1129
   has_cross_genus_members: single_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.8521
+  member_count: 7
+  organism_count: 7
+  score: 1.8471
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3053,9 +3239,9 @@ rows:
   group_id: eggnog:1MM58@1212
   group_name: 1MM58@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.8521
+  member_count: 10
+  organism_count: 10
+  score: 1.8471
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3073,9 +3259,9 @@ rows:
   group_id: eggnog:46B00@72275
   group_name: 46B00@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.8521
+  member_count: 4
+  organism_count: 4
+  score: 1.8471
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -3097,9 +3283,9 @@ rows:
   group_id: eggnog:1G1DF@1117
   group_name: 1G1DF@1117
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.8521
+  member_count: 18
+  organism_count: 18
+  score: 1.8471
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -3120,7 +3306,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 5
   organism_count: 5
-  score: 1.8521
+  score: 1.8471
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -3139,7 +3325,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.8521
+  score: 1.8471
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -3157,117 +3343,9 @@ rows:
   group_id: eggnog:1RD6W@1224
   group_name: 1RD6W@1224
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.8521
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Proteobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
-  consensus_gene_name: glmS
-  consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
-  cyanorak_roles: []
-  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
-    into glucosamine-6P using glutamine as a nitrogen source
-  functional_description: Cell wall/membrane/envelope biogenesis
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GZCN@1129
-  group_name: 1GZCN@1129
-  has_cross_genus_members: single_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.7921
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- cog_categories:
-  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
-  consensus_gene_name: glmS
-  consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:A'', ''name'': ''Amino acid biosynthesis''}'
-  - '{''id'': ''cyanorak.role:E.1'', ''name'': ''Central intermediary metabolism >
-    Amino sugars''}'
-  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
-    into glucosamine-6P using glutamine as a nitrogen source
-  functional_description: Amino acid biosynthesis; Central intermediary metabolism
-    > Amino sugars; Cell wall/membrane/envelope biogenesis
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKHH@1212
-  group_name: 1MKHH@1212
-  has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.7921
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- cog_categories:
-  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
-  consensus_gene_name: glmS
-  consensus_product: glutamine--fructose-6-phosphate transaminase (isomerizing)
-  cyanorak_roles: []
-  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
-    into glucosamine-6P using glutamine as a nitrogen source
-  functional_description: Cell wall/membrane/envelope biogenesis
-  genera:
-  - Alteromonas
-  group_id: eggnog:464V8@72275
-  group_name: 464V8@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7921
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- cog_categories:
-  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
-  consensus_gene_name: glmS
-  consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:A'', ''name'': ''Amino acid biosynthesis''}'
-  - '{''id'': ''cyanorak.role:E.1'', ''name'': ''Central intermediary metabolism >
-    Amino sugars''}'
-  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
-    into glucosamine-6P using glutamine as a nitrogen source
-  functional_description: Amino acid biosynthesis; Central intermediary metabolism
-    > Amino sugars; Cell wall/membrane/envelope biogenesis
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  - Thermosynechococcus
-  group_id: eggnog:1FZVQ@1117
-  group_name: 1FZVQ@1117
-  has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.7921
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Cyanobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
-  consensus_gene_name: glmS
-  consensus_product: glutamine--fructose-6-phosphate transaminase (isomerizing)
-  cyanorak_roles: []
-  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
-    into glucosamine-6P using glutamine as a nitrogen source
-  functional_description: Cell wall/membrane/envelope biogenesis
-  genera:
-  - Alteromonas
-  - Pseudomonas
-  - Ruegeria
-  - Shewanella
-  group_id: eggnog:1MW4K@1224
-  group_name: 1MW4K@1224
-  has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.7921
+  member_count: 4
+  organism_count: 4
+  score: 1.8471
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -3293,9 +3371,9 @@ rows:
   group_id: cyanorak:CK_00000545
   group_name: CK_00000545
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.7776
+  member_count: 13
+  organism_count: 13
+  score: 1.797
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3320,9 +3398,9 @@ rows:
   group_id: cyanorak:CK_00001670
   group_name: CK_00001670
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7776
+  member_count: 4
+  organism_count: 4
+  score: 1.797
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3348,9 +3426,9 @@ rows:
   group_id: cyanorak:CK_00001671
   group_name: CK_00001671
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7776
+  member_count: 4
+  organism_count: 4
+  score: 1.797
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3375,9 +3453,9 @@ rows:
   group_id: cyanorak:CK_00001672
   group_name: CK_00001672
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7776
+  member_count: 4
+  organism_count: 4
+  score: 1.797
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3402,9 +3480,9 @@ rows:
   group_id: cyanorak:CK_00001673
   group_name: CK_00001673
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7776
+  member_count: 4
+  organism_count: 4
+  score: 1.797
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3429,9 +3507,9 @@ rows:
   group_id: cyanorak:CK_00001678
   group_name: CK_00001678
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7776
+  member_count: 4
+  organism_count: 4
+  score: 1.797
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3457,12 +3535,150 @@ rows:
   group_id: cyanorak:CK_00001749
   group_name: CK_00001749
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7776
+  member_count: 4
+  organism_count: 4
+  score: 1.797
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moeA
+  consensus_product: molybdopterin biosynthesis protein MoeA
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: Molybdopterin biosynthesis
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYHD@1129
+  group_name: 1GYHD@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.797
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaA
+  consensus_product: molybdenum cofactor biosynthesis protein A
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: Catalyzes the cyclization of GTP to (8S)-3^,8-cyclo-7,8- dihydroguanosine
+    5^-triphosphate
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZFP@1129
+  group_name: 1GZFP@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.797
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaC
+  consensus_product: molybdenum cofactor biosynthesis protein C
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: Catalyzes the conversion of (8S)-3^,8-cyclo-7,8- dihydroguanosine 5^-triphosphate
+    to cyclic pyranopterin monophosphate (cPMP)
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZWU@1129
+  group_name: 1GZWU@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.797
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaB
+  consensus_product: molybdenum cofactor biosynthesis protein B
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: May be involved in the biosynthesis of molybdopterin
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1H08Z@1129
+  group_name: 1H08Z@1129
+  has_cross_genus_members: single_genus
+  member_count: 5
+  organism_count: 5
+  score: 1.797
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaE
+  consensus_product: molybdenum cofactor biosynthesis protein E (molydbopterin converting
+    factor large subunit)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: Molybdopterin converting factor
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1H0Y0@1129
+  group_name: 1H0Y0@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.797
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
   consensus_gene_name: moaD
@@ -3485,9 +3701,9 @@ rows:
   group_id: eggnog:1H1FR@1129
   group_name: 1H1FR@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7776
+  member_count: 4
+  organism_count: 4
+  score: 1.797
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3512,9 +3728,9 @@ rows:
   group_id: eggnog:1MKU6@1212
   group_name: 1MKU6@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.7776
+  member_count: 10
+  organism_count: 10
+  score: 1.797
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3541,9 +3757,36 @@ rows:
   group_id: eggnog:1G0FS@1117
   group_name: 1G0FS@1117
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.7776
+  member_count: 18
+  organism_count: 18
+  score: 1.797
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: moaB
+  consensus_product: molybdenum cofactor biosynthesis protein B
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: May be involved in the biosynthesis of molybdopterin
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1G514@1117
+  group_name: 1G514@1117
+  has_cross_genus_members: single_genus
+  member_count: 5
+  organism_count: 5
+  score: 1.797
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -3569,12 +3812,124 @@ rows:
   group_id: eggnog:1GNRD@1117
   group_name: 1GNRD@1117
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7776
+  member_count: 4
+  organism_count: 4
+  score: 1.797
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
+  consensus_gene_name: glmS
+  consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A'', ''name'': ''Amino acid biosynthesis''}'
+  - '{''id'': ''cyanorak.role:E.1'', ''name'': ''Central intermediary metabolism >
+    Amino sugars''}'
+  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
+    into glucosamine-6P using glutamine as a nitrogen source
+  functional_description: Amino acid biosynthesis; Central intermediary metabolism
+    > Amino sugars; Cell wall/membrane/envelope biogenesis
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZCN@1129
+  group_name: 1GZCN@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.7872
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
+  consensus_gene_name: glmS
+  consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A'', ''name'': ''Amino acid biosynthesis''}'
+  - '{''id'': ''cyanorak.role:E.1'', ''name'': ''Central intermediary metabolism >
+    Amino sugars''}'
+  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
+    into glucosamine-6P using glutamine as a nitrogen source
+  functional_description: Amino acid biosynthesis; Central intermediary metabolism
+    > Amino sugars; Cell wall/membrane/envelope biogenesis
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MKHH@1212
+  group_name: 1MKHH@1212
+  has_cross_genus_members: single_genus
+  member_count: 10
+  organism_count: 10
+  score: 1.7872
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- cog_categories:
+  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
+  consensus_gene_name: glmS
+  consensus_product: glutamine--fructose-6-phosphate transaminase (isomerizing)
+  cyanorak_roles: []
+  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
+    into glucosamine-6P using glutamine as a nitrogen source
+  functional_description: Cell wall/membrane/envelope biogenesis
+  genera:
+  - Alteromonas
+  group_id: eggnog:464V8@72275
+  group_name: 464V8@72275
+  has_cross_genus_members: single_genus
+  member_count: 4
+  organism_count: 4
+  score: 1.7872
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
+- cog_categories:
+  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
+  consensus_gene_name: glmS
+  consensus_product: glutamine---fructose-6-phosphate transaminase (isomerizing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A'', ''name'': ''Amino acid biosynthesis''}'
+  - '{''id'': ''cyanorak.role:E.1'', ''name'': ''Central intermediary metabolism >
+    Amino sugars''}'
+  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
+    into glucosamine-6P using glutamine as a nitrogen source
+  functional_description: Amino acid biosynthesis; Central intermediary metabolism
+    > Amino sugars; Cell wall/membrane/envelope biogenesis
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  - Thermosynechococcus
+  group_id: eggnog:1FZVQ@1117
+  group_name: 1FZVQ@1117
+  has_cross_genus_members: cross_genus
+  member_count: 18
+  organism_count: 18
+  score: 1.7872
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:M'', ''name'': ''Cell wall/membrane/envelope biogenesis''}'
+  consensus_gene_name: glmS
+  consensus_product: glutamine--fructose-6-phosphate transaminase (isomerizing)
+  cyanorak_roles: []
+  description: Catalyzes the first step in hexosamine metabolism, converting fructose-6P
+    into glucosamine-6P using glutamine as a nitrogen source
+  functional_description: Cell wall/membrane/envelope biogenesis
+  genera:
+  - Alteromonas
+  - Pseudomonas
+  - Ruegeria
+  - Shewanella
+  group_id: eggnog:1MW4K@1224
+  group_name: 1MW4K@1224
+  has_cross_genus_members: cross_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.7872
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Proteobacteria
 - cog_categories:
   - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
   consensus_gene_name: urtA
@@ -3597,9 +3952,9 @@ rows:
   group_id: cyanorak:CK_00000076
   group_name: CK_00000076
   has_cross_genus_members: cross_genus
-  member_count: 12
-  organism_count: 11
-  score: 1.7029
+  member_count: 13
+  organism_count: 12
+  score: 1.7228
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3625,9 +3980,9 @@ rows:
   group_id: cyanorak:CK_00001365
   group_name: CK_00001365
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.7029
+  member_count: 11
+  organism_count: 11
+  score: 1.7228
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3653,9 +4008,9 @@ rows:
   group_id: cyanorak:CK_00001366
   group_name: CK_00001366
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.7029
+  member_count: 11
+  organism_count: 11
+  score: 1.7228
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3681,9 +4036,9 @@ rows:
   group_id: cyanorak:CK_00008074
   group_name: CK_00008074
   has_cross_genus_members: cross_genus
-  member_count: 10
-  organism_count: 10
-  score: 1.7029
+  member_count: 11
+  organism_count: 11
+  score: 1.7228
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -3708,9 +4063,9 @@ rows:
   group_id: eggnog:1GYF7@1129
   group_name: 1GYF7@1129
   has_cross_genus_members: single_genus
-  member_count: 5
-  organism_count: 4
-  score: 1.7029
+  member_count: 6
+  organism_count: 5
+  score: 1.7228
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3736,9 +4091,9 @@ rows:
   group_id: eggnog:1GYNB@1129
   group_name: 1GYNB@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7029
+  member_count: 4
+  organism_count: 4
+  score: 1.7228
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3763,9 +4118,9 @@ rows:
   group_id: eggnog:1GYQZ@1129
   group_name: 1GYQZ@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7029
+  member_count: 4
+  organism_count: 4
+  score: 1.7228
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3791,9 +4146,9 @@ rows:
   group_id: eggnog:1GZDA@1129
   group_name: 1GZDA@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.7029
+  member_count: 4
+  organism_count: 4
+  score: 1.7228
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -3820,7 +4175,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 1.7029
+  score: 1.7228
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3848,7 +4203,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 1.7029
+  score: 1.7228
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3876,7 +4231,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 7
   organism_count: 7
-  score: 1.7029
+  score: 1.7228
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3903,7 +4258,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 9
-  score: 1.7029
+  score: 1.7228
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -3931,9 +4286,9 @@ rows:
   group_id: eggnog:1G0QD@1117
   group_name: 1G0QD@1117
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.7029
+  member_count: 12
+  organism_count: 12
+  score: 1.7228
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -3960,9 +4315,9 @@ rows:
   group_id: eggnog:1G0UF@1117
   group_name: 1G0UF@1117
   has_cross_genus_members: cross_genus
-  member_count: 13
-  organism_count: 13
-  score: 1.7029
+  member_count: 14
+  organism_count: 14
+  score: 1.7228
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -3990,9 +4345,9 @@ rows:
   group_id: eggnog:1G22F@1117
   group_name: 1G22F@1117
   has_cross_genus_members: cross_genus
-  member_count: 13
-  organism_count: 13
-  score: 1.7029
+  member_count: 14
+  organism_count: 14
+  score: 1.7228
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -4019,81 +4374,12 @@ rows:
   group_id: eggnog:1G29H@1117
   group_name: 1G29H@1117
   has_cross_genus_members: cross_genus
-  member_count: 15
-  organism_count: 14
-  score: 1.7029
+  member_count: 16
+  organism_count: 15
+  score: 1.7228
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
-  consensus_gene_name: add
-  consensus_product: adenosine deaminase
-  cyanorak_roles: []
-  description: Catalyzes the hydrolytic deamination of adenine to hypoxanthine. Plays
-    an important role in the purine salvage pathway and in nitrogen catabolism
-  functional_description: Nucleotide transport and metabolism
-  genera:
-  - Alteromonas
-  group_id: eggnog:464HM@72275
-  group_name: 464HM@72275
-  has_cross_genus_members: single_genus
-  member_count: 5
-  organism_count: 3
-  score: 1.6832
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- cog_categories:
-  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
-  consensus_gene_name: add
-  consensus_product: adenosine deaminase
-  cyanorak_roles: []
-  description: Catalyzes the hydrolytic deamination of adenine to hypoxanthine. Plays
-    an important role in the purine salvage pathway and in nitrogen catabolism
-  functional_description: Nucleotide transport and metabolism
-  genera:
-  - Alteromonas
-  - Pseudomonas
-  - Ruegeria
-  - Shewanella
-  group_id: eggnog:1MWBV@1224
-  group_name: 1MWBV@1224
-  has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 6
-  score: 1.6832
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Proteobacteria
-- cog_categories: []
-  consensus_gene_name: nrtP
-  consensus_product: nitrate transporter
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
-    to atypical conditions and detoxification > Nitrogen''}'
-  - '{''id'': ''cyanorak.role:D.1.9'', ''name'': ''Cellular processes > Adaptation/acclimation
-    to atypical conditions and detoxification > Other''}'
-  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
-    Nitrogen metabolism''}'
-  - '{''id'': ''cyanorak.role:Q.2'', ''name'': ''Transport and binding proteins >
-    Anions''}'
-  description: null
-  functional_description: Cellular processes > Adaptation/acclimation to atypical
-    conditions and detoxification > Nitrogen; Cellular processes > Adaptation/acclimation
-    to atypical conditions and detoxification > Other; Central intermediary metabolism
-    > Nitrogen metabolism; Transport and binding proteins > Anions
-  genera:
-  - Synechococcus
-  group_id: cyanorak:CK_00001676
-  group_name: CK_00001676
-  has_cross_genus_members: single_genus
-  member_count: 4
-  organism_count: 3
-  score: 1.6679
-  source: cyanorak
-  specificity_rank: 0
-  taxonomic_level: curated
 - cog_categories:
   - '{''id'': ''cog.category:U'', ''name'': ''Intracellular trafficking, secretion,
     and vesicular transport''}'
@@ -4119,7 +4405,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.6679
+  score: 1.6879
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4148,10 +4434,51 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.6679
+  score: 1.6879
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: add
+  consensus_product: adenosine deaminase
+  cyanorak_roles: []
+  description: Catalyzes the hydrolytic deamination of adenine to hypoxanthine. Plays
+    an important role in the purine salvage pathway and in nitrogen catabolism
+  functional_description: Nucleotide transport and metabolism
+  genera:
+  - Alteromonas
+  group_id: eggnog:464HM@72275
+  group_name: 464HM@72275
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 4
+  score: 1.6782
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: add
+  consensus_product: adenosine deaminase
+  cyanorak_roles: []
+  description: Catalyzes the hydrolytic deamination of adenine to hypoxanthine. Plays
+    an important role in the purine salvage pathway and in nitrogen catabolism
+  functional_description: Nucleotide transport and metabolism
+  genera:
+  - Alteromonas
+  - Pseudomonas
+  - Ruegeria
+  - Shewanella
+  group_id: eggnog:1MWBV@1224
+  group_name: 1MWBV@1224
+  has_cross_genus_members: cross_genus
+  member_count: 13
+  organism_count: 7
+  score: 1.6782
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Proteobacteria
 - cog_categories: []
   consensus_gene_name: amt2
   consensus_product: ammonium transporter
@@ -4170,7 +4497,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.6534
+  score: 1.6699
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4199,7 +4526,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.6343
+  score: 1.6544
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4228,7 +4555,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.6343
+  score: 1.6544
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4257,10 +4584,39 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.6343
+  score: 1.6544
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: moeB
+  consensus_product: molybdopterin biosynthesis protein MoeB
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.3'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Molybdopterin''}'
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: COG0476 Dinucleotide-utilizing enzymes involved in molybdopterin and
+    thiamine biosynthesis family 2
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Molybdopterin; Cellular processes > Adaptation/acclimation to atypical conditions
+    and detoxification > Nitrogen; Central intermediary metabolism > Nitrogen metabolism;
+    Coenzyme transport and metabolism; Inorganic ion transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYMY@1129
+  group_name: 1GYMY@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.6223
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
   consensus_gene_name: allA
@@ -4277,7 +4633,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.5868
+  score: 1.5818
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -4297,7 +4653,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 1.5868
+  score: 1.5818
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -4317,9 +4673,9 @@ rows:
   group_id: eggnog:COG3194@2
   group_name: COG3194@2
   has_cross_genus_members: cross_genus
-  member_count: 5
-  organism_count: 5
-  score: 1.5868
+  member_count: 6
+  organism_count: 6
+  score: 1.5818
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -4337,9 +4693,9 @@ rows:
   group_id: eggnog:46AA3@72275
   group_name: 46AA3@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.5426
+  member_count: 4
+  organism_count: 4
+  score: 1.5376
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -4357,12 +4713,42 @@ rows:
   group_id: eggnog:1QV1P@1224
   group_name: 1QV1P@1224
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.5426
+  member_count: 4
+  organism_count: 4
+  score: 1.5376
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: nrtP
+  consensus_product: nitrate transporter
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.3'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Nitrogen''}'
+  - '{''id'': ''cyanorak.role:D.1.9'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Other''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.2'', ''name'': ''Transport and binding proteins >
+    Anions''}'
+  description: null
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Nitrogen; Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Other; Central intermediary metabolism
+    > Nitrogen metabolism; Transport and binding proteins > Anions; Inorganic ion
+    transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: cyanorak:CK_00001676
+  group_name: CK_00001676
+  has_cross_genus_members: single_genus
+  member_count: 5
+  organism_count: 4
+  score: 1.5328
+  source: cyanorak
+  specificity_rank: 0
+  taxonomic_level: curated
 - cog_categories:
   - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
   consensus_gene_name: nrtP
@@ -4387,9 +4773,9 @@ rows:
   group_id: eggnog:1GYVB@1129
   group_name: 1GYVB@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.5123
+  member_count: 4
+  organism_count: 4
+  score: 1.5328
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4417,9 +4803,9 @@ rows:
   group_id: eggnog:1G0NY@1117
   group_name: 1G0NY@1117
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.5123
+  member_count: 4
+  organism_count: 4
+  score: 1.5328
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -4442,9 +4828,9 @@ rows:
   group_id: cyanorak:CK_00000783
   group_name: CK_00000783
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.4731
+  member_count: 13
+  organism_count: 13
+  score: 1.4908
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4466,12 +4852,36 @@ rows:
   group_id: cyanorak:CK_00001677
   group_name: CK_00001677
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.4731
+  member_count: 4
+  organism_count: 4
+  score: 1.4908
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: carA
+  consensus_product: carbamoyl-phosphate synthase small subunit
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
+  description: Carbamoyl-phosphate synthetase glutamine chain
+  functional_description: Central intermediary metabolism > Nitrogen metabolism; Purines,
+    pyrimidines, nucleosides, and nucleotides > Pyrimidine ribonucleotide biosynthesis;
+    Nucleotide transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYPV@1129
+  group_name: 1GYPV@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.4908
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
   consensus_gene_name: mobA
@@ -4492,9 +4902,9 @@ rows:
   group_id: eggnog:1H033@1129
   group_name: 1H033@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.4731
+  member_count: 4
+  organism_count: 4
+  score: 1.4908
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -4516,9 +4926,9 @@ rows:
   group_id: eggnog:1MKUE@1212
   group_name: 1MKUE@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.4731
+  member_count: 10
+  organism_count: 10
+  score: 1.4908
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4542,9 +4952,9 @@ rows:
   group_id: eggnog:1G19V@1117
   group_name: 1G19V@1117
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.4731
+  member_count: 18
+  organism_count: 18
+  score: 1.4908
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -4568,57 +4978,9 @@ rows:
   group_id: eggnog:1GMZN@1117
   group_name: 1GMZN@1117
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.4731
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Cyanobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: cobB
-  consensus_product: hydrogenobyrinic acid a,c-diamide synthase (glutamine-hydrolysing)
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:B.10.2'', ''name'': ''Biosynthesis of cofactors, prosthetic
-    groups, and carriers > Vitamins > Cobalamin (b12)''}'
-  description: Catalyzes the ATP-dependent amidation of the two carboxylate groups
-    at positions a and c of cobyrinate, using either L-glutamine or ammonia as the
-    nitrogen source
-  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
-    > Vitamins > Cobalamin (b12); Coenzyme transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GZBG@1129
-  group_name: 1GZBG@1129
-  has_cross_genus_members: single_genus
-  member_count: 5
-  organism_count: 5
-  score: 1.4236
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: cobB
-  consensus_product: hydrogenobyrinic acid a,c-diamide synthase (glutamine-hydrolysing)
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:B.10.2'', ''name'': ''Biosynthesis of cofactors, prosthetic
-    groups, and carriers > Vitamins > Cobalamin (b12)''}'
-  description: Catalyzes the ATP-dependent amidation of the two carboxylate groups
-    at positions a and c of cobyrinate, using either L-glutamine or ammonia as the
-    nitrogen source
-  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
-    > Vitamins > Cobalamin (b12); Coenzyme transport and metabolism
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  - Thermosynechococcus
-  group_id: eggnog:1G1SF@1117
-  group_name: 1G1SF@1117
-  has_cross_genus_members: cross_genus
-  member_count: 15
-  organism_count: 15
-  score: 1.4236
+  member_count: 4
+  organism_count: 4
+  score: 1.4908
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -4641,9 +5003,9 @@ rows:
   group_id: cyanorak:CK_00000103
   group_name: CK_00000103
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.4214
+  member_count: 13
+  organism_count: 13
+  score: 1.4394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -4666,12 +5028,36 @@ rows:
   group_id: cyanorak:CK_00008104
   group_name: CK_00008104
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.4214
+  member_count: 13
+  organism_count: 13
+  score: 1.4394
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: glnA
+  consensus_product: glutamine synthetase, type I
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:A.3'', ''name'': ''Amino acid biosynthesis > Glutamate
+    family (Arg, Gln, Glu, Pro)''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  description: glutamine synthetase
+  functional_description: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu,
+    Pro); Central intermediary metabolism > Nitrogen metabolism; Coenzyme transport
+    and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYJX@1129
+  group_name: 1GYJX@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.4394
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
   consensus_gene_name: cysK
@@ -4690,9 +5076,9 @@ rows:
   group_id: eggnog:1MKKG@1212
   group_name: 1MKKG@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.4214
+  member_count: 10
+  organism_count: 10
+  score: 1.4394
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4714,9 +5100,9 @@ rows:
   group_id: eggnog:1MKS0@1212
   group_name: 1MKS0@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.4214
+  member_count: 10
+  organism_count: 10
+  score: 1.4394
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -4740,9 +5126,9 @@ rows:
   group_id: eggnog:1G255@1117
   group_name: 1G255@1117
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.4214
+  member_count: 18
+  organism_count: 18
+  score: 1.4394
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -4765,9 +5151,57 @@ rows:
   group_id: eggnog:1G493@1117
   group_name: 1G493@1117
   has_cross_genus_members: cross_genus
+  member_count: 20
+  organism_count: 16
+  score: 1.4394
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: cobB
+  consensus_product: hydrogenobyrinic acid a,c-diamide synthase (glutamine-hydrolysing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.2'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Cobalamin (b12)''}'
+  description: Catalyzes the ATP-dependent amidation of the two carboxylate groups
+    at positions a and c of cobyrinate, using either L-glutamine or ammonia as the
+    nitrogen source
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Vitamins > Cobalamin (b12); Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZBG@1129
+  group_name: 1GZBG@1129
+  has_cross_genus_members: single_genus
+  member_count: 6
+  organism_count: 6
+  score: 1.4187
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: cobB
+  consensus_product: hydrogenobyrinic acid a,c-diamide synthase (glutamine-hydrolysing)
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.2'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Cobalamin (b12)''}'
+  description: Catalyzes the ATP-dependent amidation of the two carboxylate groups
+    at positions a and c of cobyrinate, using either L-glutamine or ammonia as the
+    nitrogen source
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Vitamins > Cobalamin (b12); Coenzyme transport and metabolism
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  - Thermosynechococcus
+  group_id: eggnog:1G1SF@1117
+  group_name: 1G1SF@1117
+  has_cross_genus_members: cross_genus
   member_count: 17
-  organism_count: 14
-  score: 1.4214
+  organism_count: 17
+  score: 1.4187
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -4791,9 +5225,9 @@ rows:
   group_id: eggnog:464DC@72275
   group_name: 464DC@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.4055
+  member_count: 4
+  organism_count: 4
+  score: 1.4
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -4820,168 +5254,12 @@ rows:
   group_id: eggnog:1MU4I@1224
   group_name: 1MU4I@1224
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.4055
+  member_count: 7
+  organism_count: 7
+  score: 1.4
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: bioD
-  consensus_product: dethiobiotin synthase
-  cyanorak_roles: []
-  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
-    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
-    to form an ureido ring
-  functional_description: Coenzyme transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GZGF@1129
-  group_name: 1GZGF@1129
-  has_cross_genus_members: single_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.3879
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: bioD
-  consensus_product: dethiobiotin synthase
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:B.10.1'', ''name'': ''Biosynthesis of cofactors, prosthetic
-    groups, and carriers > Vitamins > Biotin (b7)''}'
-  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
-    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
-    to form an ureido ring
-  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
-    > Vitamins > Biotin (b7); Coenzyme transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MMBG@1212
-  group_name: 1MMBG@1212
-  has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.3879
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: bioD
-  consensus_product: dethiobiotin synthase
-  cyanorak_roles: []
-  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
-    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
-    to form an ureido ring
-  functional_description: Coenzyme transport and metabolism
-  genera:
-  - Alteromonas
-  group_id: eggnog:466IJ@72275
-  group_name: 466IJ@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.3879
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: bioD
-  consensus_product: dethiobiotin synthase
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:B.10.1'', ''name'': ''Biosynthesis of cofactors, prosthetic
-    groups, and carriers > Vitamins > Biotin (b7)''}'
-  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
-    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
-    to form an ureido ring
-  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
-    > Vitamins > Biotin (b7); Coenzyme transport and metabolism
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  - Thermosynechococcus
-  group_id: eggnog:1G03P@1117
-  group_name: 1G03P@1117
-  has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.3879
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Cyanobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
-  consensus_gene_name: dcyD
-  consensus_product: 1-aminocyclopropane-1-carboxylate deaminase/D-cysteine desulfhydrase
-  cyanorak_roles: []
-  description: Catalyzes a cyclopropane ring-opening reaction, the irreversible conversion
-    of 1-aminocyclopropane-1-carboxylate (ACC) to ammonia and alpha-ketobutyrate.
-    Allows growth on ACC as a nitrogen source
-  functional_description: Amino acid transport and metabolism
-  genera:
-  - Alteromonas
-  - Ruegeria
-  group_id: eggnog:1MVYF@1224
-  group_name: 1MVYF@1224
-  has_cross_genus_members: cross_genus
-  member_count: 5
-  organism_count: 4
-  score: 1.3879
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Proteobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: bioD
-  consensus_product: dethiobiotin synthase
-  cyanorak_roles: []
-  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
-    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
-    to form an ureido ring
-  functional_description: Coenzyme transport and metabolism
-  genera:
-  - Alteromonas
-  - Pseudomonas
-  - Shewanella
-  group_id: eggnog:1RDRK@1224
-  group_name: 1RDRK@1224
-  has_cross_genus_members: cross_genus
-  member_count: 5
-  organism_count: 5
-  score: 1.3879
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Proteobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
-  consensus_gene_name: bioD
-  consensus_product: dethiobiotin synthase
-  cyanorak_roles: []
-  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
-    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
-    to form an ureido ring
-  functional_description: Coenzyme transport and metabolism
-  genera:
-  - Alteromonas
-  - Prochlorococcus
-  - Pseudomonas
-  - Shewanella
-  - Synechococcus
-  - Thermosynechococcus
-  group_id: eggnog:COG0132@2
-  group_name: COG0132@2
-  has_cross_genus_members: cross_genus
-  member_count: 23
-  organism_count: 21
-  score: 1.3879
-  source: eggnog
-  specificity_rank: 3
-  taxonomic_level: Bacteria
 - cog_categories:
   - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
   consensus_gene_name: amt1
@@ -5001,9 +5279,9 @@ rows:
   group_id: cyanorak:CK_00000244
   group_name: CK_00000244
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.3733
+  member_count: 13
+  organism_count: 13
+  score: 1.3914
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -5028,7 +5306,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 2
   organism_count: 2
-  score: 1.3733
+  score: 1.3914
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -5050,9 +5328,9 @@ rows:
   group_id: eggnog:1MKV9@1212
   group_name: 1MKV9@1212
   has_cross_genus_members: single_genus
-  member_count: 7
-  organism_count: 7
-  score: 1.3733
+  member_count: 8
+  organism_count: 8
+  score: 1.3914
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -5074,12 +5352,172 @@ rows:
   group_id: eggnog:1GD8R@1117
   group_name: 1GD8R@1117
   has_cross_genus_members: single_genus
-  member_count: 7
-  organism_count: 7
-  score: 1.3733
+  member_count: 8
+  organism_count: 8
+  score: 1.3914
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
+  consensus_product: dethiobiotin synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.1'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Biotin (b7)''}'
+  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
+    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
+    to form an ureido ring
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Vitamins > Biotin (b7); Coenzyme transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GZGF@1129
+  group_name: 1GZGF@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.3831
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
+  consensus_product: dethiobiotin synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.1'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Biotin (b7)''}'
+  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
+    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
+    to form an ureido ring
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Vitamins > Biotin (b7); Coenzyme transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MMBG@1212
+  group_name: 1MMBG@1212
+  has_cross_genus_members: single_genus
+  member_count: 10
+  organism_count: 10
+  score: 1.3831
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
+  consensus_product: dethiobiotin synthase
+  cyanorak_roles: []
+  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
+    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
+    to form an ureido ring
+  functional_description: Coenzyme transport and metabolism
+  genera:
+  - Alteromonas
+  group_id: eggnog:466IJ@72275
+  group_name: 466IJ@72275
+  has_cross_genus_members: single_genus
+  member_count: 4
+  organism_count: 4
+  score: 1.3831
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
+  consensus_product: dethiobiotin synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:B.10.1'', ''name'': ''Biosynthesis of cofactors, prosthetic
+    groups, and carriers > Vitamins > Biotin (b7)''}'
+  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
+    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
+    to form an ureido ring
+  functional_description: Biosynthesis of cofactors, prosthetic groups, and carriers
+    > Vitamins > Biotin (b7); Coenzyme transport and metabolism
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  - Thermosynechococcus
+  group_id: eggnog:1G03P@1117
+  group_name: 1G03P@1117
+  has_cross_genus_members: cross_genus
+  member_count: 18
+  organism_count: 18
+  score: 1.3831
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
+  consensus_gene_name: dcyD
+  consensus_product: 1-aminocyclopropane-1-carboxylate deaminase/D-cysteine desulfhydrase
+  cyanorak_roles: []
+  description: Catalyzes a cyclopropane ring-opening reaction, the irreversible conversion
+    of 1-aminocyclopropane-1-carboxylate (ACC) to ammonia and alpha-ketobutyrate.
+    Allows growth on ACC as a nitrogen source
+  functional_description: Amino acid transport and metabolism
+  genera:
+  - Alteromonas
+  - Ruegeria
+  group_id: eggnog:1MVYF@1224
+  group_name: 1MVYF@1224
+  has_cross_genus_members: cross_genus
+  member_count: 6
+  organism_count: 5
+  score: 1.3831
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Proteobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
+  consensus_product: dethiobiotin synthase
+  cyanorak_roles: []
+  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
+    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
+    to form an ureido ring
+  functional_description: Coenzyme transport and metabolism
+  genera:
+  - Alteromonas
+  - Pseudomonas
+  - Shewanella
+  group_id: eggnog:1RDRK@1224
+  group_name: 1RDRK@1224
+  has_cross_genus_members: cross_genus
+  member_count: 6
+  organism_count: 6
+  score: 1.3831
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Proteobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:H'', ''name'': ''Coenzyme transport and metabolism''}'
+  consensus_gene_name: bioD
+  consensus_product: dethiobiotin synthase
+  cyanorak_roles: []
+  description: Catalyzes a mechanistically unusual reaction, the ATP- dependent insertion
+    of CO2 between the N7 and N8 nitrogen atoms of 7,8-diaminopelargonic acid (DAPA)
+    to form an ureido ring
+  functional_description: Coenzyme transport and metabolism
+  genera:
+  - Alteromonas
+  - Marinobacter
+  - Prochlorococcus
+  - Pseudomonas
+  - Shewanella
+  - Synechococcus
+  - Thermosynechococcus
+  group_id: eggnog:COG0132@2
+  group_name: COG0132@2
+  has_cross_genus_members: cross_genus
+  member_count: 27
+  organism_count: 25
+  score: 1.3831
+  source: eggnog
+  specificity_rank: 3
+  taxonomic_level: Bacteria
 - cog_categories:
   - '{''id'': ''cog.category:U'', ''name'': ''Intracellular trafficking, secretion,
     and vesicular transport''}'
@@ -5101,121 +5539,10 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 1.3282
+  score: 1.3465
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
-- cog_categories:
-  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
-  consensus_gene_name: pyrG
-  consensus_product: CTP synthase
-  cyanorak_roles: []
-  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
-    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
-    interactions with the four ribonucleotide triphosphates
-  functional_description: Nucleotide transport and metabolism
-  genera:
-  - Synechococcus
-  group_id: eggnog:1GYEF@1129
-  group_name: 1GYEF@1129
-  has_cross_genus_members: single_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.2909
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Synechococcus
-- cog_categories:
-  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
-  consensus_gene_name: pyrG
-  consensus_product: CTP synthase
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
-    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
-  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
-    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
-    interactions with the four ribonucleotide triphosphates
-  functional_description: Purines, pyrimidines, nucleosides, and nucleotides > Pyrimidine
-    ribonucleotide biosynthesis; Nucleotide transport and metabolism
-  genera:
-  - Prochlorococcus
-  group_id: eggnog:1MKBI@1212
-  group_name: 1MKBI@1212
-  has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.2909
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Prochloraceae
-- cog_categories:
-  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
-  consensus_gene_name: pyrG
-  consensus_product: CTP synthase
-  cyanorak_roles: []
-  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
-    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
-    interactions with the four ribonucleotide triphosphates
-  functional_description: Nucleotide transport and metabolism
-  genera:
-  - Alteromonas
-  group_id: eggnog:4646Z@72275
-  group_name: 4646Z@72275
-  has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.2909
-  source: eggnog
-  specificity_rank: 1
-  taxonomic_level: Alteromonadaceae
-- cog_categories:
-  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
-  consensus_gene_name: pyrG
-  consensus_product: CTP synthase
-  cyanorak_roles:
-  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
-    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
-  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
-    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
-    interactions with the four ribonucleotide triphosphates
-  functional_description: Purines, pyrimidines, nucleosides, and nucleotides > Pyrimidine
-    ribonucleotide biosynthesis; Nucleotide transport and metabolism
-  genera:
-  - Prochlorococcus
-  - Synechococcus
-  - Thermosynechococcus
-  group_id: eggnog:1G0ET@1117
-  group_name: 1G0ET@1117
-  has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.2909
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Cyanobacteria
-- cog_categories:
-  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
-  consensus_gene_name: pyrG
-  consensus_product: CTP synthase
-  cyanorak_roles: []
-  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
-    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
-    interactions with the four ribonucleotide triphosphates
-  functional_description: Nucleotide transport and metabolism
-  genera:
-  - Alteromonas
-  - Pseudomonas
-  - Ruegeria
-  - Shewanella
-  group_id: eggnog:1MUIT@1224
-  group_name: 1MUIT@1224
-  has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.2909
-  source: eggnog
-  specificity_rank: 2
-  taxonomic_level: Proteobacteria
 - cog_categories:
   - '{''id'': ''cog.category:E'', ''name'': ''Amino acid transport and metabolism''}'
   consensus_gene_name: metB
@@ -5235,9 +5562,9 @@ rows:
   group_id: cyanorak:CK_00001508
   group_name: CK_00001508
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.2861
+  member_count: 13
+  organism_count: 13
+  score: 1.3043
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -5260,9 +5587,9 @@ rows:
   group_id: cyanorak:CK_00001509
   group_name: CK_00001509
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.2861
+  member_count: 13
+  organism_count: 13
+  score: 1.3043
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -5284,9 +5611,9 @@ rows:
   group_id: eggnog:1GZ2F@1129
   group_name: 1GZ2F@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.2861
+  member_count: 4
+  organism_count: 4
+  score: 1.3043
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -5308,9 +5635,9 @@ rows:
   group_id: eggnog:1GZIB@1129
   group_name: 1GZIB@1129
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.2861
+  member_count: 4
+  organism_count: 4
+  score: 1.3043
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -5332,9 +5659,9 @@ rows:
   group_id: eggnog:1MKHQ@1212
   group_name: 1MKHQ@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.2861
+  member_count: 10
+  organism_count: 10
+  score: 1.3043
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -5356,9 +5683,9 @@ rows:
   group_id: eggnog:1MM2Z@1212
   group_name: 1MM2Z@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.2861
+  member_count: 10
+  organism_count: 10
+  score: 1.3043
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -5381,9 +5708,9 @@ rows:
   group_id: eggnog:1G43Q@1117
   group_name: 1G43Q@1117
   has_cross_genus_members: cross_genus
-  member_count: 12
-  organism_count: 12
-  score: 1.2861
+  member_count: 14
+  organism_count: 14
+  score: 1.3043
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -5405,9 +5732,9 @@ rows:
   group_id: eggnog:1GCF1@1117
   group_name: 1GCF1@1117
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 1.2861
+  member_count: 4
+  organism_count: 4
+  score: 1.3043
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -5429,9 +5756,9 @@ rows:
   group_id: eggnog:1GMGD@1117
   group_name: 1GMGD@1117
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.2861
+  member_count: 10
+  organism_count: 10
+  score: 1.3043
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -5449,6 +5776,7 @@ rows:
     Lys, Met, Thr); Central intermediary metabolism > Nitrogen metabolism; Amino acid
     transport and metabolism
   genera:
+  - Marinobacter
   - Meiothermus
   - Prochlorococcus
   - Pseudomonas
@@ -5458,12 +5786,126 @@ rows:
   group_id: eggnog:COG0626@2
   group_name: COG0626@2
   has_cross_genus_members: cross_genus
-  member_count: 38
-  organism_count: 16
-  score: 1.2861
+  member_count: 43
+  organism_count: 19
+  score: 1.3043
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrG
+  consensus_product: CTP synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
+  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
+    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
+    interactions with the four ribonucleotide triphosphates
+  functional_description: Purines, pyrimidines, nucleosides, and nucleotides > Pyrimidine
+    ribonucleotide biosynthesis; Nucleotide transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYEF@1129
+  group_name: 1GYEF@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.2861
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrG
+  consensus_product: CTP synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
+  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
+    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
+    interactions with the four ribonucleotide triphosphates
+  functional_description: Purines, pyrimidines, nucleosides, and nucleotides > Pyrimidine
+    ribonucleotide biosynthesis; Nucleotide transport and metabolism
+  genera:
+  - Prochlorococcus
+  group_id: eggnog:1MKBI@1212
+  group_name: 1MKBI@1212
+  has_cross_genus_members: single_genus
+  member_count: 10
+  organism_count: 10
+  score: 1.2861
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Prochloraceae
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrG
+  consensus_product: CTP synthase
+  cyanorak_roles: []
+  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
+    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
+    interactions with the four ribonucleotide triphosphates
+  functional_description: Nucleotide transport and metabolism
+  genera:
+  - Alteromonas
+  group_id: eggnog:4646Z@72275
+  group_name: 4646Z@72275
+  has_cross_genus_members: single_genus
+  member_count: 4
+  organism_count: 4
+  score: 1.2861
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Alteromonadaceae
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrG
+  consensus_product: CTP synthase
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:M.4'', ''name'': ''Purines, pyrimidines, nucleosides,
+    and nucleotides > Pyrimidine ribonucleotide biosynthesis''}'
+  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
+    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
+    interactions with the four ribonucleotide triphosphates
+  functional_description: Purines, pyrimidines, nucleosides, and nucleotides > Pyrimidine
+    ribonucleotide biosynthesis; Nucleotide transport and metabolism
+  genera:
+  - Prochlorococcus
+  - Synechococcus
+  - Thermosynechococcus
+  group_id: eggnog:1G0ET@1117
+  group_name: 1G0ET@1117
+  has_cross_genus_members: cross_genus
+  member_count: 18
+  organism_count: 18
+  score: 1.2861
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Cyanobacteria
+- cog_categories:
+  - '{''id'': ''cog.category:F'', ''name'': ''Nucleotide transport and metabolism''}'
+  consensus_gene_name: pyrG
+  consensus_product: CTP synthase
+  cyanorak_roles: []
+  description: Catalyzes the ATP-dependent amination of UTP to CTP with either L-glutamine
+    or ammonia as the source of nitrogen. Regulates intracellular CTP levels through
+    interactions with the four ribonucleotide triphosphates
+  functional_description: Nucleotide transport and metabolism
+  genera:
+  - Alteromonas
+  - Pseudomonas
+  - Ruegeria
+  - Shewanella
+  group_id: eggnog:1MUIT@1224
+  group_name: 1MUIT@1224
+  has_cross_genus_members: cross_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.2861
+  source: eggnog
+  specificity_rank: 2
+  taxonomic_level: Proteobacteria
 - cog_categories:
   - '{''id'': ''cog.category:O'', ''name'': ''Post-translational modification, protein
     turnover, chaperones''}'
@@ -5485,7 +5927,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 1.096
+  score: 1.0914
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -5513,7 +5955,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 6
   organism_count: 6
-  score: 1.096
+  score: 1.0914
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -5533,15 +5975,16 @@ rows:
   functional_description: Post-translational modification, protein turnover, chaperones
   genera:
   - Alteromonas
+  - Marinobacter
   - Pseudomonas
   - Ruegeria
   - Shewanella
   group_id: eggnog:COG2844@2
   group_name: COG2844@2
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.096
+  member_count: 7
+  organism_count: 7
+  score: 1.0914
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -5566,9 +6009,9 @@ rows:
   group_id: cyanorak:CK_00001284
   group_name: CK_00001284
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.0257
+  member_count: 13
+  organism_count: 13
+  score: 1.0433
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -5592,9 +6035,9 @@ rows:
   group_id: eggnog:1GZNU@1129
   group_name: 1GZNU@1129
   has_cross_genus_members: single_genus
-  member_count: 5
-  organism_count: 5
-  score: 1.0257
+  member_count: 6
+  organism_count: 6
+  score: 1.0433
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -5618,9 +6061,9 @@ rows:
   group_id: eggnog:1MKCY@1212
   group_name: 1MKCY@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.0257
+  member_count: 10
+  organism_count: 10
+  score: 1.0433
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -5645,9 +6088,9 @@ rows:
   group_id: eggnog:1G4EH@1117
   group_name: 1G4EH@1117
   has_cross_genus_members: cross_genus
-  member_count: 14
-  organism_count: 14
-  score: 1.0257
+  member_count: 16
+  organism_count: 16
+  score: 1.0433
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -5673,9 +6116,9 @@ rows:
   group_id: cyanorak:CK_00000408
   group_name: CK_00000408
   has_cross_genus_members: cross_genus
-  member_count: 11
-  organism_count: 11
-  score: 1.0004
+  member_count: 13
+  organism_count: 13
+  score: 1.0179
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -5701,12 +6144,39 @@ rows:
   group_id: cyanorak:CK_00001669
   group_name: CK_00001669
   has_cross_genus_members: cross_genus
-  member_count: 6
-  organism_count: 6
-  score: 1.0004
+  member_count: 7
+  organism_count: 7
+  score: 1.0179
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
+- cog_categories:
+  - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
+  consensus_gene_name: metC
+  consensus_product: cystathionine beta-lyase family aluminum resistance protein
+  cyanorak_roles:
+  - '{''id'': ''cyanorak.role:D.1.7'', ''name'': ''Cellular processes > Adaptation/acclimation
+    to atypical conditions and detoxification > Trace metals''}'
+  - '{''id'': ''cyanorak.role:E.4'', ''name'': ''Central intermediary metabolism >
+    Nitrogen metabolism''}'
+  - '{''id'': ''cyanorak.role:Q.4'', ''name'': ''Transport and binding proteins >
+    Cations and iron carrying compounds''}'
+  description: Cystathionine beta-lyase family protein (Involved in aluminum resistance)
+  functional_description: Cellular processes > Adaptation/acclimation to atypical
+    conditions and detoxification > Trace metals; Central intermediary metabolism
+    > Nitrogen metabolism; Transport and binding proteins > Cations and iron carrying
+    compounds; Inorganic ion transport and metabolism
+  genera:
+  - Synechococcus
+  group_id: eggnog:1GYMJ@1129
+  group_name: 1GYMJ@1129
+  has_cross_genus_members: single_genus
+  member_count: 7
+  organism_count: 7
+  score: 1.0179
+  source: eggnog
+  specificity_rank: 1
+  taxonomic_level: Synechococcus
 - cog_categories:
   - '{''id'': ''cog.category:P'', ''name'': ''Inorganic ion transport and metabolism''}'
   consensus_gene_name: focA
@@ -5730,7 +6200,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 1.0004
+  score: 1.0179
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -5755,9 +6225,9 @@ rows:
   group_id: eggnog:1MKH5@1212
   group_name: 1MKH5@1212
   has_cross_genus_members: single_genus
-  member_count: 9
-  organism_count: 9
-  score: 1.0004
+  member_count: 10
+  organism_count: 10
+  score: 1.0179
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -5784,7 +6254,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 4
   organism_count: 4
-  score: 1.0004
+  score: 1.0179
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -5811,9 +6281,9 @@ rows:
   group_id: eggnog:1G03T@1117
   group_name: 1G03T@1117
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.0004
+  member_count: 18
+  organism_count: 18
+  score: 1.0179
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -5841,7 +6311,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 7
   organism_count: 7
-  score: 1.0004
+  score: 1.0179
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -5868,9 +6338,9 @@ rows:
   group_id: eggnog:COG4100@2
   group_name: COG4100@2
   has_cross_genus_members: cross_genus
-  member_count: 16
-  organism_count: 16
-  score: 1.0004
+  member_count: 18
+  organism_count: 18
+  score: 1.0179
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -5891,9 +6361,9 @@ rows:
   group_id: eggnog:468N2@72275
   group_name: 468N2@72275
   has_cross_genus_members: single_genus
-  member_count: 3
-  organism_count: 3
-  score: 0.9245
+  member_count: 4
+  organism_count: 4
+  score: 0.9205
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -5915,9 +6385,9 @@ rows:
   group_id: eggnog:1MV0W@1224
   group_name: 1MV0W@1224
   has_cross_genus_members: cross_genus
-  member_count: 5
-  organism_count: 4
-  score: 0.9245
+  member_count: 6
+  organism_count: 5
+  score: 0.9205
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -5939,7 +6409,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 3
   organism_count: 2
-  score: 0.9245
+  score: 0.9205
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -5960,7 +6430,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 0.9245
+  score: 0.9205
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria

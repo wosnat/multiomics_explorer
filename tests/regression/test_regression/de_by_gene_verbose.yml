@@ -1,5 +1,5 @@
 case_id: de_by_gene_verbose
-row_count: 27
+row_count: 31
 rows:
 - background_factors:
   - light
@@ -103,6 +103,31 @@ rows:
   treatment: Nitrogen deprivation (MED4)
   treatment_type:
   - nitrogen
+- background_factors:
+  - coculture
+  - light
+  coculture_partner: null
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
+  experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -1.1726
+  omics_type: PROTEOMICS
+  padj: 0.1017
+  product: DNA polymerase III, beta subunit
+  rank: 81
+  rank_down: null
+  rank_up: null
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: stationary
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment: Light + 5 mM glucose addition
+  treatment_type:
+  - carbon
 - background_factors:
   - coculture
   - light
@@ -386,6 +411,31 @@ rows:
   treatment_type:
   - nitrogen
 - background_factors:
+  - coculture
+  - darkness
+  coculture_partner: null
+  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
+  experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.5071
+  omics_type: PROTEOMICS
+  padj: 0.1863
+  product: DNA polymerase III, beta subunit
+  rank: 172
+  rank_down: null
+  rank_up: null
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: darkness
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment: Darkness + 5 mM glucose addition
+  treatment_type:
+  - carbon
+- background_factors:
   - axenic
   - light
   coculture_partner: null
@@ -431,12 +481,37 @@ rows:
   rank_up: null
   table_scope: all_detected_genes
   table_scope_detail: ''
-  timepoint: null
+  timepoint: steady state
   timepoint_hours: null
   timepoint_order: 1
   treatment: Growth on cyanate as sole N source (MED4)
   treatment_type:
   - nitrogen
+- background_factors:
+  - coculture
+  - darkness
+  coculture_partner: null
+  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
+  experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.2314
+  omics_type: PROTEOMICS
+  padj: 0.2832
+  product: DNA polymerase III, beta subunit
+  rank: 132
+  rank_down: null
+  rank_up: null
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: darkness
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment: Darkness + 100 nM glucose addition
+  treatment_type:
+  - carbon
 - background_factors:
   - axenic
   - light
@@ -457,7 +532,7 @@ rows:
   rank_up: null
   table_scope: all_detected_genes
   table_scope_detail: ''
-  timepoint: null
+  timepoint: steady state
   timepoint_hours: null
   timepoint_order: 1
   treatment: Growth on urea as sole N source (MED4)
@@ -567,6 +642,31 @@ rows:
   treatment: PRO99-lowN nutrient starvation
   treatment_type:
   - nitrogen
+- background_factors:
+  - coculture
+  - light
+  coculture_partner: null
+  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
+  experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
+  expression_status: not_significant
+  gene_category: Replication and repair
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.121
+  omics_type: PROTEOMICS
+  padj: 0.4309
+  product: DNA polymerase III, beta subunit
+  rank: 236
+  rank_down: null
+  rank_up: null
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  timepoint: stationary
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment: Light + 100 nM glucose addition
+  treatment_type:
+  - carbon
 - background_factors:
   - axenic
   - light

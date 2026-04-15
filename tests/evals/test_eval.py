@@ -60,9 +60,11 @@ TOOL_BUILDERS = {
     "gene_homologs": build_gene_homologs,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
-    # genes_by_ontology: dispatched via api (L2) — composes envelope from
-    # multiple queries; can't be reduced to a single (cypher, params) tuple.
+    # genes_by_ontology / ontology_landscape: dispatched via api (L2) —
+    # compose envelopes from multiple queries; can't be reduced to a single
+    # (cypher, params) tuple.
     "genes_by_ontology": None,
+    "ontology_landscape": None,
     "gene_ontology_terms": build_gene_ontology_terms,
     "list_publications": build_list_publications,
     "list_experiments": build_list_experiments,
@@ -99,6 +101,13 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         if limit is not None:
             api_params["limit"] = limit
         return api.genes_by_ontology(**api_params, conn=conn).get("results", [])
+
+    if tool == "ontology_landscape":
+        limit = params.get("limit")
+        api_params = {k: v for k, v in params.items() if k != "limit"}
+        if limit is not None:
+            api_params["limit"] = limit
+        return api.ontology_landscape(**api_params, conn=conn).get("results", [])
 
     builder = TOOL_BUILDERS[tool]
     limit = params.get("limit")

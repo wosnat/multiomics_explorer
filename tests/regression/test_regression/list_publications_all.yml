@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 32
+row_count: 35
 rows:
 - authors:
   - James I. Mullet
@@ -150,6 +150,37 @@ rows:
     lifestyle
   treatment_types:
   - carbon
+  year: 2023
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
+  - coculture
+  - darkness
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: 10.1128/spectrum.03275-22
+  experiment_count: 60
+  journal: Microbiology Spectrum
+  omics_types:
+  - PROTEOMICS
+  organisms:
+  - Alteromonas mediterranea DE
+  - Marinobacter adhaerens DSM 23420 / HP15
+  - Prochlorococcus MED4
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus sp. BL107
+  study_type: Proteomics|Metabolomics
+  title: Integrated Proteomic and Metabolomic Analyses Show Differential Effects of
+    Glucose Availability in Marine Synechococcus and Prochlorococcus
+  treatment_types:
+  - carbon
+  - coculture
   year: 2023
 - authors:
   - ' Ana M. Cabello'
@@ -475,6 +506,31 @@ rows:
   - coculture
   year: 2017
 - authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - Maria Agustina Domínguez-Martín
+  - Maria José López-Grueso
+  - Robert J. Beynon
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: 10.1128/mSystems.00008-17
+  experiment_count: 1
+  journal: mSystems
+  omics_types:
+  - PROTEOMICS
+  organisms:
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  study_type: Proteomics
+  title: Quantitative Proteomics Shows Extensive Remodeling Induced by Nitrogen Limitation
+    in Prochlorococcus marinus SS120
+  treatment_types:
+  - nitrogen
+  year: 2017
+- authors:
   - Luke R. Thompson
   - Qinglu Zeng
   - Sallie W. Chisholm
@@ -671,6 +727,30 @@ rows:
   treatment_types:
   - growth_phase
   year: 2014
+- authors:
+  - Catherine A Biggs
+  - Matthew A Fuszard
+  - Phillip C Wright
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: null
+  experiment_count: 3
+  journal: Aquatic Biosystems
+  omics_types:
+  - PROTEOMICS
+  organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus NATL2A
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  study_type: Proteomics
+  title: Comparative quantitative proteomics of Prochlorococcus ecotypes to a decrease
+    in environmental phosphate concentrations
+  treatment_types:
+  - phosphorus
+  year: 2012
 - authors:
   - Anne W Thompson
   - Katherine Huang

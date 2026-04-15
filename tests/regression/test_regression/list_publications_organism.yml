@@ -1,5 +1,5 @@
 case_id: list_publications_organism
-row_count: 13
+row_count: 14
 rows:
 - authors:
   - Daniel Sher
@@ -27,6 +27,37 @@ rows:
   - coculture
   - nitrogen
   year: 2025
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
+  - coculture
+  - darkness
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: 10.1128/spectrum.03275-22
+  experiment_count: 60
+  journal: Microbiology Spectrum
+  omics_types:
+  - PROTEOMICS
+  organisms:
+  - Alteromonas mediterranea DE
+  - Marinobacter adhaerens DSM 23420 / HP15
+  - Prochlorococcus MED4
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus sp. BL107
+  study_type: Proteomics|Metabolomics
+  title: Integrated Proteomic and Metabolomic Analyses Show Differential Effects of
+    Glucose Availability in Marine Synechococcus and Prochlorococcus
+  treatment_types:
+  - carbon
+  - coculture
+  year: 2023
 - authors:
   - Huan Liu
   - Junde Dong

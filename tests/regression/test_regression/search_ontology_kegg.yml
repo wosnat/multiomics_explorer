@@ -3,217 +3,217 @@ row_count: 72
 rows:
 - id: kegg.category:09100
   name: Metabolism
-  score: 2.9165
+  score: 2.9357
 - id: kegg.orthology:K03402
   name: argR, ahrC; transcriptional regulator of arginine metabolism
-  score: 1.8708
+  score: 1.8844
 - id: kegg.pathway:ko00051
   name: Fructose and mannose metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00052
   name: Galactose metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00053
   name: Ascorbate and aldarate metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00230
   name: Purine metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00240
   name: Pyrimidine metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00250
   name: Alanine, aspartate and glutamate metabolism
-  score: 2.1248
+  score: 2.1398
 - id: kegg.pathway:ko00260
   name: Glycine, serine and threonine metabolism
-  score: 2.1248
+  score: 2.1398
 - id: kegg.pathway:ko00270
   name: Cysteine and methionine metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00330
   name: Arginine and proline metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00340
   name: Histidine metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00350
   name: Tyrosine metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00360
   name: Phenylalanine metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00380
   name: Tryptophan metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00410
   name: beta-Alanine metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko00430
   name: Taurine and hypotaurine metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00440
   name: Phosphonate and phosphinate metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00450
   name: Selenocompound metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00460
   name: Cyanoamino acid metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko00470
   name: D-Amino acid metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00480
   name: Glutathione metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00500
   name: Starch and sucrose metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00520
   name: Amino sugar and nucleotide sugar metabolism
-  score: 1.9897
+  score: 2.004
 - id: kegg.pathway:ko00561
   name: Glycerolipid metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00562
   name: Inositol phosphate metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko00564
   name: Glycerophospholipid metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00565
   name: Ether lipid metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko00566
   name: Sulfoquinovose metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00590
   name: Arachidonic acid metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko00591
   name: Linoleic acid metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko00592
   name: alpha-Linolenic acid metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00600
   name: Sphingolipid metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00620
   name: Pyruvate metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00630
   name: Glyoxylate and dicarboxylate metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00640
   name: Propanoate metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00650
   name: Butanoate metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00660
   name: C5-Branched dibasic acid metabolism
-  score: 2.1248
+  score: 2.1398
 - id: kegg.pathway:ko00680
   name: Methane metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00730
   name: Thiamine metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00740
   name: Riboflavin metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00750
   name: Vitamin B6 metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko00760
   name: Nicotinate and nicotinamide metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00780
   name: Biotin metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00785
   name: Lipoic acid metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko00830
   name: Retinol metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00860
   name: Porphyrin metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00910
   name: Nitrogen metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00920
   name: Sulfur metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko00980
   name: Metabolism of xenobiotics by cytochrome P450
-  score: 1.9897
+  score: 2.004
 - id: kegg.pathway:ko00982
   name: Drug metabolism - cytochrome P450
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko00983
   name: Drug metabolism - other enzymes
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko01120
   name: Microbial metabolism in diverse environments
-  score: 2.1248
+  score: 2.1398
 - id: kegg.pathway:ko01200
   name: Carbon metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko01210
   name: 2-Oxocarboxylic acid metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko01212
   name: Fatty acid metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.pathway:ko01232
   name: Nucleotide metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko04979
   name: Cholesterol metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.pathway:ko04980
   name: Cobalamin transport and metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko04981
   name: Folate transport and metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.pathway:ko05230
   name: Central carbon metabolism in cancer
-  score: 2.1248
+  score: 2.1398
 - id: kegg.pathway:ko05231
   name: Choline metabolism in cancer
-  score: 2.2795
+  score: 2.2954
 - id: kegg.subcategory:09101
   name: Carbohydrate metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.subcategory:09102
   name: Energy metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.subcategory:09103
   name: Lipid metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.subcategory:09104
   name: Nucleotide metabolism
-  score: 2.6679
+  score: 2.6859
 - id: kegg.subcategory:09105
   name: Amino acid metabolism
-  score: 2.4584
+  score: 2.4753
 - id: kegg.subcategory:09106
   name: Metabolism of other amino acids
-  score: 2.1248
+  score: 2.1398
 - id: kegg.subcategory:09107
   name: Glycan biosynthesis and metabolism
-  score: 2.2795
+  score: 2.2954
 - id: kegg.subcategory:09108
   name: Metabolism of cofactors and vitamins
-  score: 2.1248
+  score: 2.1398
 - id: kegg.subcategory:09109
   name: Metabolism of terpenoids and polyketides
-  score: 2.1248
+  score: 2.1398
 - id: kegg.subcategory:09111
   name: Xenobiotics biodegradation and metabolism
-  score: 2.2795
+  score: 2.2954

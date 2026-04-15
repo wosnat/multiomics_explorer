@@ -1,183 +1,192 @@
 case_id: search_ontology_go_cc
-row_count: 60
+row_count: 63
 rows:
 - id: go:0000139
   name: Golgi membrane
-  score: 1.0361
+  score: 1.0323
+- id: go:0000329
+  name: fungal-type vacuole membrane
+  score: 0.7966
 - id: go:0005741
   name: mitochondrial outer membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0005743
   name: mitochondrial inner membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0005765
   name: lysosomal membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0005774
   name: vacuolar membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0005789
   name: endoplasmic reticulum membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0005886
   name: plasma membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0009279
   name: cell outer membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0009528
   name: plastid inner membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0009535
   name: chloroplast thylakoid membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0009706
   name: chloroplast inner membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0009897
   name: external side of plasma membrane
-  score: 0.7182
+  score: 0.715
 - id: go:0009898
   name: cytoplasmic side of plasma membrane
-  score: 0.7182
+  score: 0.715
 - id: go:0016020
   name: membrane
-  score: 1.2155
+  score: 1.2115
 - id: go:0019866
   name: organelle inner membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0019867
   name: outer membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0019897
   name: extrinsic component of plasma membrane
-  score: 0.7182
+  score: 0.715
 - id: go:0019898
   name: extrinsic component of membrane
-  score: 0.8
+  score: 0.7966
+- id: go:0030077
+  name: plasma membrane light-harvesting complex
+  score: 0.715
 - id: go:0030094
   name: plasma membrane-derived photosystem I
-  score: 0.7182
+  score: 0.715
 - id: go:0030096
   name: plasma membrane-derived thylakoid photosystem II
-  score: 0.6515
+  score: 0.6486
 - id: go:0030288
   name: outer membrane-bounded periplasmic space
-  score: 0.7182
+  score: 0.715
 - id: go:0031090
   name: organelle membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0031232
   name: extrinsic component of external side of plasma membrane
-  score: 0.5495
+  score: 0.5469
 - id: go:0031234
   name: extrinsic component of cytoplasmic side of plasma membrane
-  score: 0.5495
+  score: 0.5469
 - id: go:0031236
   name: extrinsic component of periplasmic side of plasma membrane
-  score: 0.5495
+  score: 0.5469
 - id: go:0031240
   name: external side of cell outer membrane
-  score: 0.6515
+  score: 0.6486
 - id: go:0031241
   name: periplasmic side of cell outer membrane
-  score: 0.6515
+  score: 0.6486
 - id: go:0031676
   name: plasma membrane-derived thylakoid membrane
-  score: 1.044
+  score: 1.0399
 - id: go:0031966
   name: mitochondrial membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0031968
   name: organelle outer membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0031969
   name: chloroplast membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0031974
   name: membrane-enclosed lumen
-  score: 0.9029
+  score: 0.8993
 - id: go:0031979
   name: plasma membrane-derived thylakoid lumen
-  score: 0.7182
+  score: 0.715
 - id: go:0032588
   name: trans-Golgi network membrane
-  score: 0.8
+  score: 0.7966
 - id: go:0033644
   name: host cell membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0034357
   name: photosynthetic membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0042170
   name: plastid membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0042175
   name: nuclear outer membrane-endoplasmic reticulum membrane network
-  score: 0.9089
+  score: 0.905
 - id: go:0042651
   name: thylakoid membrane
-  score: 1.0361
+  score: 1.0323
 - id: go:0042716
   name: plasma membrane-derived chromatophore
-  score: 0.8
+  score: 0.7966
 - id: go:0042717
   name: plasma membrane-derived chromatophore membrane
-  score: 1.044
+  score: 1.0399
 - id: go:0043227
   name: membrane-bounded organelle
-  score: 0.9029
+  score: 0.8993
 - id: go:0043231
   name: intracellular membrane-bounded organelle
-  score: 0.8
+  score: 0.7966
 - id: go:0044384
   name: host outer membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0044853
   name: plasma membrane raft
-  score: 0.9029
+  score: 0.8993
 - id: go:0045121
   name: membrane raft
-  score: 1.0361
+  score: 1.0323
 - id: go:0048501
   name: signal recognition particle, plasma membrane targeting
-  score: 0.6515
+  score: 0.6486
 - id: go:0055035
   name: plastid thylakoid membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0098552
   name: side of membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0098562
   name: cytoplasmic side of membrane
-  score: 0.8
+  score: 0.7966
 - id: go:0098567
   name: periplasmic side of plasma membrane
-  score: 0.7182
+  score: 0.715
 - id: go:0098588
   name: bounding membrane of organelle
-  score: 0.8
+  score: 0.7966
 - id: go:0098590
   name: plasma membrane region
-  score: 0.9029
+  score: 0.8993
 - id: go:0098796
   name: membrane protein complex
-  score: 0.9029
+  score: 0.8993
 - id: go:0098797
   name: plasma membrane protein complex
-  score: 0.8
+  score: 0.7966
 - id: go:0098800
   name: inner mitochondrial membrane protein complex
-  score: 0.7182
+  score: 0.715
 - id: go:0098802
   name: plasma membrane signaling receptor complex
-  score: 0.7182
+  score: 0.715
 - id: go:0098807
   name: chloroplast thylakoid membrane protein complex
-  score: 0.7182
+  score: 0.715
 - id: go:0098852
   name: lytic vacuole membrane
-  score: 0.9029
+  score: 0.8993
 - id: go:0098857
   name: membrane microdomain
-  score: 1.0361
+  score: 1.0323
+- id: go:0120025
+  name: plasma membrane bounded cell projection
+  score: 0.715

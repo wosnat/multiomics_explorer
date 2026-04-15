@@ -45,11 +45,11 @@ rows:
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 11
+  closest_ortholog_group_size: 13
   cluster_membership_count: 0
   cluster_types: []
   end: 304589
-  expression_edge_count: 1
+  expression_edge_count: 5
   function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
     for both cytoplasmic and membrane proteins. Plays a role in the quality control
     of integral membrane proteins

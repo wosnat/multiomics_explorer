@@ -1,5 +1,5 @@
 case_id: de_by_gene_single_gene
-row_count: 27
+row_count: 31
 rows:
 - experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   expression_status: not_significant
@@ -57,6 +57,20 @@ rows:
   timepoint_order: 6
   treatment_type:
   - nitrogen
+- experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
+  expression_status: not_significant
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -1.1726
+  padj: 0.1017
+  rank: 81
+  rank_down: null
+  rank_up: null
+  timepoint: stationary
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - carbon
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: significant_up
   gene_name: dnaN
@@ -211,6 +225,20 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
+  expression_status: not_significant
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.5071
+  padj: 0.1863
+  rank: 172
+  rank_down: null
+  rank_up: null
+  timepoint: darkness
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - carbon
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   expression_status: not_significant
   gene_name: dnaN
@@ -234,11 +262,25 @@ rows:
   rank: 694
   rank_down: null
   rank_up: null
-  timepoint: null
+  timepoint: steady state
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
+  expression_status: not_significant
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: -0.2314
+  padj: 0.2832
+  rank: 132
+  rank_down: null
+  rank_up: null
+  timepoint: darkness
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - carbon
 - experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
@@ -248,7 +290,7 @@ rows:
   rank: 937
   rank_down: null
   rank_up: null
-  timepoint: null
+  timepoint: steady state
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -309,6 +351,20 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
+  expression_status: not_significant
+  gene_name: dnaN
+  locus_tag: PMM0001
+  log2fc: 0.121
+  padj: 0.4309
+  rank: 236
+  rank_down: null
+  rank_up: null
+  timepoint: stationary
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - carbon
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   expression_status: not_significant
   gene_name: dnaN

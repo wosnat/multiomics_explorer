@@ -2,22 +2,22 @@ case_id: search_homolog_groups_summary_source_filter
 row_count: 1
 rows:
 - by_level:
-  - '{''count'': 418, ''item'': ''curated''}'
+  - '{''count'': 420, ''item'': ''curated''}'
   by_source:
-  - '{''count'': 418, ''item'': ''cyanorak''}'
-  score_max: 3.9762
-  score_median: 1.0836
+  - '{''count'': 420, ''item'': ''cyanorak''}'
+  score_max: 3.8962
+  score_median: 1.0711
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 152, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 153, ''name'': ''Energy production and
     conversion''}'
   - '{''id'': ''cog.category:F'', ''count'': 7, ''name'': ''Nucleotide transport and
     metabolism''}'
-  - '{''id'': ''cog.category:H'', ''count'': 21, ''name'': ''Coenzyme transport and
+  - '{''id'': ''cog.category:H'', ''count'': 20, ''name'': ''Coenzyme transport and
     metabolism''}'
   - '{''id'': ''cog.category:K'', ''count'': 6, ''name'': ''Transcription''}'
   - '{''id'': ''cog.category:S'', ''count'': 134, ''name'': ''Function unknown''}'
   top_cyanorak_roles:
-  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 40, ''name'': ''Cellular processes
+  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 41, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
   - '{''id'': ''cyanorak.role:J.2'', ''count'': 40, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
@@ -27,5 +27,5 @@ rows:
     respiration > Photosystem II''}'
   - '{''id'': ''cyanorak.role:P.3'', ''count'': 1, ''name'': ''Transcription > Transcription
     factors''}'
-  total_entries: 43019
-  total_matching: 238
+  total_entries: 45048
+  total_matching: 239

@@ -235,7 +235,7 @@ class TestGeneOverviewCorrectnessKG:
         assert set(r["annotation_types"]) >= {"go_mf", "pfam", "cog_category", "tigr_role"}
         assert r["expression_edge_count"] == 35
         assert r["significant_up_count"] + r["significant_down_count"] == 5
-        assert r["closest_ortholog_group_size"] == 11
+        assert r["closest_ortholog_group_size"] == 13
         assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
 
     def test_single_gene_alt(self, conn):
@@ -247,7 +247,7 @@ class TestGeneOverviewCorrectnessKG:
         assert r["locus_tag"] == "EZ55_00275"
         assert r["annotation_types"] == []
         assert r["expression_edge_count"] == 0
-        assert r["closest_ortholog_group_size"] == 1
+        assert r["closest_ortholog_group_size"] == 2
 
     def test_batch_mixed_organisms(self, conn):
         """[PMM1428, EZ55_00275]: returns 2 rows with correct organism_name."""

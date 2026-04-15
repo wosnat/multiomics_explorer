@@ -14,7 +14,7 @@ rows:
   organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
-  timepoint: null
+  timepoint: max across 3-24h
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -32,7 +32,7 @@ rows:
   organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
-  timepoint: null
+  timepoint: max across 3-24h
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -121,7 +121,7 @@ rows:
   organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
-  timepoint: null
+  timepoint: steady state
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -139,7 +139,7 @@ rows:
   organism_name: Prochlorococcus MED4
   significant_down: 0
   significant_up: 0
-  timepoint: null
+  timepoint: steady state
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -568,7 +568,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   significant_down: 0
   significant_up: 0
-  timepoint: null
+  timepoint: steady state
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -586,7 +586,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   significant_down: 0
   significant_up: 0
-  timepoint: null
+  timepoint: steady state
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:

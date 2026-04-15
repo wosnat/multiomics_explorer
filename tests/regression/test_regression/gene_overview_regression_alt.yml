@@ -5,7 +5,7 @@ rows:
   annotation_types: []
   closest_ortholog_genera:
   - Alteromonas
-  closest_ortholog_group_size: 1
+  closest_ortholog_group_size: 2
   cluster_membership_count: 0
   cluster_types: []
   expression_edge_count: 0

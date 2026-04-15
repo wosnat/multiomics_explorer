@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 28
+row_count: 32
 rows:
 - background_factors: []
   clade: null
@@ -80,6 +80,26 @@ rows:
   - coculture
   - darkness
 - background_factors:
+  - coculture
+  - darkness
+  - light
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  experiment_count: 60
+  gene_count: 3817
+  genus: Alteromonas
+  ncbi_taxon_id: 1774373
+  omics_types:
+  - PROTEOMICS
+  organism_name: Alteromonas mediterranea DE
+  publication_count: 1
+  species: Alteromonas mediterranea
+  strain: AltMedDE
+  treatment_types:
+  - carbon
+  - coculture
+- background_factors:
   - light
   clade: null
   cluster_types: []
@@ -96,6 +116,26 @@ rows:
   species: null
   strain: null
   treatment_types:
+  - coculture
+- background_factors:
+  - coculture
+  - darkness
+  - light
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  experiment_count: 60
+  gene_count: 4240
+  genus: Marinobacter
+  ncbi_taxon_id: 225937
+  omics_types:
+  - PROTEOMICS
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  publication_count: 1
+  species: Marinobacter adhaerens
+  strain: HP15
+  treatment_types:
+  - carbon
   - coculture
 - background_factors: []
   clade: null
@@ -186,7 +226,7 @@ rows:
   - diel
   - time_course
   clustering_analysis_count: 4
-  experiment_count: 48
+  experiment_count: 108
   gene_count: 1976
   genus: Prochlorococcus
   ncbi_taxon_id: 59919
@@ -195,7 +235,7 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus MED4
-  publication_count: 13
+  publication_count: 14
   species: Prochlorococcus marinus
   strain: MED4
   treatment_types:
@@ -256,19 +296,21 @@ rows:
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
-  experiment_count: 17
+  experiment_count: 20
   gene_count: 1978
   genus: Prochlorococcus
   ncbi_taxon_id: 74546
   omics_types:
+  - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9312
-  publication_count: 3
+  publication_count: 4
   species: Prochlorococcus marinus
   strain: MIT9312
   treatment_types:
   - carbon
   - coculture
+  - phosphorus
   - plastic
 - background_factors:
   - axenic
@@ -324,14 +366,15 @@ rows:
   - classification
   - diel
   clustering_analysis_count: 4
-  experiment_count: 14
+  experiment_count: 17
   gene_count: 2214
   genus: Prochlorococcus
   ncbi_taxon_id: 59920
   omics_types:
+  - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus NATL2A
-  publication_count: 5
+  publication_count: 6
   species: Prochlorococcus marinus
   strain: NATL2A
   treatment_types:
@@ -353,6 +396,29 @@ rows:
   species: null
   strain: RSP50
   treatment_types: []
+- background_factors:
+  - axenic
+  - coculture
+  - darkness
+  - light
+  clade: LLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  experiment_count: 64
+  gene_count: 1964
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167539
+  omics_types:
+  - PROTEOMICS
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  publication_count: 3
+  species: Prochlorococcus marinus
+  strain: SS120
+  treatment_types:
+  - carbon
+  - coculture
+  - nitrogen
+  - phosphorus
 - background_factors:
   - light
   clade: null
@@ -445,38 +511,44 @@ rows:
   - carbon
   - coculture
 - background_factors:
+  - coculture
+  - darkness
   - light
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
-  experiment_count: 7
+  experiment_count: 67
   gene_count: 2621
   genus: Synechococcus
   ncbi_taxon_id: 32051
   omics_types:
   - EXOPROTEOMICS
+  - PROTEOMICS
   organism_name: Synechococcus WH7803
-  publication_count: 2
+  publication_count: 3
   species: null
   strain: WH7803
   treatment_types:
+  - carbon
   - coculture
 - background_factors:
   - axenic
   - coculture
+  - darkness
   - light
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
-  experiment_count: 11
+  experiment_count: 71
   gene_count: 2881
   genus: Parasynechococcus
   ncbi_taxon_id: 84588
   omics_types:
   - MICROARRAY
+  - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH8102
-  publication_count: 2
+  publication_count: 3
   species: Parasynechococcus marenigrum
   strain: WH8102
   treatment_types:
@@ -517,6 +589,26 @@ rows:
   species: Synechococcus elongatus
   strain: UTEX2973
   treatment_types:
+  - coculture
+- background_factors:
+  - coculture
+  - darkness
+  - light
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  experiment_count: 60
+  gene_count: 2595
+  genus: Synechococcus
+  ncbi_taxon_id: 313625
+  omics_types:
+  - PROTEOMICS
+  organism_name: Synechococcus sp. BL107
+  publication_count: 1
+  species: Synechococcus sp.
+  strain: BL107
+  treatment_types:
+  - carbon
   - coculture
 - background_factors: []
   clade: null

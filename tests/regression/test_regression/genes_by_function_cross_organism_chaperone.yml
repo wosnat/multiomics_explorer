@@ -1,5 +1,5 @@
 case_id: genes_by_function_cross_organism_chaperone
-row_count: 616
+row_count: 740
 rows:
 - annotation_quality: 3
   gene_category: Stress response and adaptation
@@ -7,4039 +7,4907 @@ rows:
   locus_tag: A9601_00151
   organism_name: Prochlorococcus AS9601
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: A9601_00161
   organism_name: Prochlorococcus AS9601
   product: DnaJ type I chaperone protein
-  score: 1.8596
+  score: 1.8684
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: A9601_01401
   organism_name: Prochlorococcus AS9601
   product: DnaJ type III chaperone protein
-  score: 4.1927
+  score: 4.1983
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: ycf3
   locus_tag: A9601_01491
   organism_name: Prochlorococcus AS9601
   product: photosystem I assembly protein Ycf3
-  score: 2.7821
+  score: 2.7918
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tsaB
   locus_tag: A9601_01561
   organism_name: Prochlorococcus AS9601
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
-  score: 5.2543
+  score: 5.2566
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB2
   locus_tag: A9601_02251
   organism_name: Prochlorococcus AS9601
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 1.6739
+  score: 1.6823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: A9601_06361
   organism_name: Prochlorococcus AS9601
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 2.0739
+  score: 2.0832
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: A9601_07191
   organism_name: Prochlorococcus AS9601
   product: conserved hypothetical protein
-  score: 5.255
+  score: 5.2563
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: A9601_07201
   organism_name: Prochlorococcus AS9601
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: A9601_09601
   organism_name: Prochlorococcus AS9601
   product: molecular chaperone HtpG
-  score: 6.1036
+  score: 6.1028
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: A9601_09641
   organism_name: Prochlorococcus AS9601
   product: chaperone protein DnaK
-  score: 6.5872
+  score: 6.5831
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: A9601_09651
   organism_name: Prochlorococcus AS9601
   product: DnaJ type II chaperone protein
-  score: 5.6361
+  score: 5.6378
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: A9601_09891
   organism_name: Prochlorococcus AS9601
   product: DnaJ type IV chaperone protein
-  score: 4.9738
+  score: 4.9777
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: A9601_11191
   organism_name: Prochlorococcus AS9601
   product: possible Gram-negative pili assembly chaperone
-  score: 5.2949
+  score: 5.2942
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: A9601_11941
   organism_name: Prochlorococcus AS9601
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN
   locus_tag: A9601_15101
   organism_name: Prochlorococcus AS9601
   product: oxygen-independent coproporphyrinogen III oxidase
-  score: 3.0559
+  score: 3.0655
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: A9601_16341
   organism_name: Prochlorococcus AS9601
   product: chaperone protein DnaK
-  score: 3.9567
+  score: 3.9635
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: A9601_16391
   organism_name: Prochlorococcus AS9601
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: A9601_16761
   organism_name: Prochlorococcus AS9601
   product: DnaJ type III chaperone protein
-  score: 4.2992
+  score: 4.3045
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: A9601_18641
   organism_name: Prochlorococcus AS9601
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: A9601_18661
   organism_name: Prochlorococcus AS9601
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: A9601_19141
   organism_name: Prochlorococcus AS9601
   product: chaperone protein DnaK
-  score: 6.2046
+  score: 6.2034
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: ACZ81_00705
   organism_name: Alteromonas macleodii HOT1A3
   product: DNA-J related domain-containing protein
-  score: 5.3506
+  score: 5.3497
 - annotation_quality: 2
   gene_category: Cell motility
   gene_name: lptM
   locus_tag: ACZ81_00850
   organism_name: Alteromonas macleodii HOT1A3
   product: LPS translocon maturation chaperone LptM
-  score: 5.3299
+  score: 5.3289
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: spy
   locus_tag: ACZ81_02095
   organism_name: Alteromonas macleodii HOT1A3
   product: Spy/CpxP family protein refolding chaperone
-  score: 5.1675
+  score: 5.1674
 - annotation_quality: 3
   gene_category: Intracellular trafficking
   gene_name: secB
   locus_tag: ACZ81_02150
   organism_name: Alteromonas macleodii HOT1A3
   product: protein-export chaperone SecB
-  score: 4.3269
+  score: 4.3351
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: ACZ81_02335
   organism_name: Alteromonas macleodii HOT1A3
   product: copper chaperone PCu(A)C
-  score: 5.3299
+  score: 5.3289
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: surA
   locus_tag: ACZ81_03510
   organism_name: Alteromonas macleodii HOT1A3
   product: peptidylprolyl isomerase SurA
-  score: 2.6577
+  score: 2.6667
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: djlA
   locus_tag: ACZ81_03525
   organism_name: Alteromonas macleodii HOT1A3
   product: co-chaperone DjlA
-  score: 4.1826
+  score: 4.1901
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: ACZ81_04510
   organism_name: Alteromonas macleodii HOT1A3
   product: radical SAM family heme chaperone HemW
-  score: 4.6117
+  score: 4.6152
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
   locus_tag: ACZ81_04645
   organism_name: Alteromonas macleodii HOT1A3
   product: cytochrome c maturation protein CcmE
-  score: 3.438
+  score: 3.4454
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgN
   locus_tag: ACZ81_04975
   organism_name: Alteromonas macleodii HOT1A3
   product: flagellar export chaperone FlgN
-  score: 5.7465
+  score: 5.7419
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgA
   locus_tag: ACZ81_04985
   organism_name: Alteromonas macleodii HOT1A3
   product: flagellar basal body P-ring formation chaperone FlgA
-  score: 3.2517
+  score: 3.2605
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: fliS
   locus_tag: ACZ81_05085
   organism_name: Alteromonas macleodii HOT1A3
   product: flagellar export chaperone FliS
-  score: 5.5692
+  score: 5.5661
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: ACZ81_07045
   organism_name: Alteromonas macleodii HOT1A3
   product: molecular chaperone DnaK
-  score: 6.7073
+  score: 6.7008
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: ACZ81_07050
   organism_name: Alteromonas macleodii HOT1A3
   product: molecular chaperone DnaJ
-  score: 1.4609
+  score: 1.4686
 - annotation_quality: 3
   gene_category: Defense mechanisms
   gene_name: lolD
   locus_tag: ACZ81_08415
   organism_name: Alteromonas macleodii HOT1A3
   product: lipoprotein-releasing ABC transporter ATP-binding protein LolD
-  score: 2.6076
+  score: 2.6169
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: proQ
   locus_tag: ACZ81_10190
   organism_name: Alteromonas macleodii HOT1A3
   product: RNA chaperone ProQ
-  score: 6.1055
+  score: 6.1046
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lolA
   locus_tag: ACZ81_10605
   organism_name: Alteromonas macleodii HOT1A3
   product: outer membrane lipoprotein chaperone LolA
-  score: 2.7381
+  score: 2.7467
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: bepA
   locus_tag: ACZ81_10770
   organism_name: Alteromonas macleodii HOT1A3
   product: M48 family metalloprotease
-  score: 3.3807
+  score: 3.3885
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: zigA
   locus_tag: ACZ81_12405
   organism_name: Alteromonas macleodii HOT1A3
   product: zinc metallochaperone GTPase ZigA
-  score: 2.8497
+  score: 2.8589
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: ACZ81_12775
   organism_name: Alteromonas macleodii HOT1A3
   product: molecular chaperone HtpG
-  score: 6.5748
+  score: 6.5707
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: ACZ81_12910
   organism_name: Alteromonas macleodii HOT1A3
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: slyD
   locus_tag: ACZ81_13155
   organism_name: Alteromonas macleodii HOT1A3
   product: FKBP-type peptidyl-prolyl cis-trans isomerase
-  score: 2.9562
+  score: 2.9651
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ppiD
   locus_tag: ACZ81_13305
   organism_name: Alteromonas macleodii HOT1A3
   product: SurA N-terminal domain-containing protein
-  score: 2.2127
+  score: 2.2152
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: ACZ81_13320
   organism_name: Alteromonas macleodii HOT1A3
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 4.1927
+  score: 4.1992
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: ACZ81_13330
   organism_name: Alteromonas macleodii HOT1A3
   product: trigger factor
-  score: 3.7585
+  score: 3.767
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: ACZ81_14895
   organism_name: Alteromonas macleodii HOT1A3
   product: M48 family metallopeptidase
-  score: 5.2819
+  score: 5.2811
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: pqqD
   locus_tag: ACZ81_15935
   organism_name: Alteromonas macleodii HOT1A3
   product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
-  score: 4.8897
+  score: 4.8915
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslU
   locus_tag: ACZ81_17655
   organism_name: Alteromonas macleodii HOT1A3
   product: HslU--HslV peptidase ATPase subunit
-  score: 2.7369
+  score: 2.7457
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: lifO
   locus_tag: ACZ81_18240
   organism_name: Alteromonas macleodii HOT1A3
   product: lipase secretion chaperone
-  score: 5.1159
+  score: 5.1166
 - annotation_quality: 3
   gene_category: Translation
   gene_name: hfq
   locus_tag: ACZ81_18300
   organism_name: Alteromonas macleodii HOT1A3
   product: RNA chaperone Hfq
-  score: 4.8283
+  score: 4.8346
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: ACZ81_19080
   organism_name: Alteromonas macleodii HOT1A3
   product: co-chaperone GroES
-  score: 2.3609
+  score: 2.37
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: ACZ81_19265
   organism_name: Alteromonas macleodii HOT1A3
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: nfuA
   locus_tag: ACZ81_19480
   organism_name: Alteromonas macleodii HOT1A3
   product: Fe-S biogenesis protein NfuA
-  score: 3.3191
+  score: 3.328
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
   locus_tag: ACZ81_19605
   organism_name: Alteromonas macleodii HOT1A3
   product: YifB family Mg chelatase-like AAA ATPase
-  score: 4.6221
+  score: 4.6261
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hypC
   locus_tag: ACZ81_20250
   organism_name: Alteromonas macleodii HOT1A3
   product: HypC/HybG/HupF family hydrogenase formation chaperone
-  score: 5.2034
+  score: 5.203
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaJ4
+  locus_tag: BL107_04999
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type III chaperone protein
+  score: 5.8379
+- annotation_quality: 1
+  gene_category: Carbohydrate metabolism
+  gene_name: null
+  locus_tag: BL107_06204
+  organism_name: Synechococcus sp. BL107
+  product: conserved hypothetical protein
+  score: 2.6001
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: tig
+  locus_tag: BL107_06304
+  organism_name: Synechococcus sp. BL107
+  product: trigger factor
+  score: 2.7318
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: clpX
+  locus_tag: BL107_06314
+  organism_name: Synechococcus sp. BL107
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.5672
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: dnaJ1
+  locus_tag: BL107_06544
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type I chaperone protein
+  score: 2.8532
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  locus_tag: BL107_06549
+  organism_name: Synechococcus sp. BL107
+  product: chaperone protein GrpE
+  score: 2.3701
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: dnaK3
+  locus_tag: BL107_06744
+  organism_name: Synechococcus sp. BL107
+  product: chaperone protein DnaK
+  score: 5.0482
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: dnaJ2
+  locus_tag: BL107_09276
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type II chaperone protein
+  score: 5.7847
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: hscB
+  locus_tag: BL107_10746
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type IV chaperone protein
+  score: 4.5569
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: hemN
+  locus_tag: BL107_11011
+  organism_name: Synechococcus sp. BL107
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 1.6199
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: BL107_12550
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type IV chaperone protein
+  score: 7.0592
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: htpG
+  locus_tag: BL107_12790
+  organism_name: Synechococcus sp. BL107
+  product: molecular chaperone HtpG
+  score: 4.9778
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaK2
+  locus_tag: BL107_12835
+  organism_name: Synechococcus sp. BL107
+  product: chaperone protein DnaK
+  score: 5.4814
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaJ3
+  locus_tag: BL107_12840
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type II chaperone protein
+  score: 5.8379
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: BL107_13055
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type IV chaperone protein
+  score: 5.691
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: hslO
+  locus_tag: BL107_13395
+  organism_name: Synechococcus sp. BL107
+  product: hsp33 family protein
+  score: 3.7553
+- annotation_quality: 1
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: BL107_13400
+  organism_name: Synechococcus sp. BL107
+  product: conserved hypothetical protein
+  score: 5.6297
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: BL107_14090
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type IV chaperone protein
+  score: 6.1413
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: clpB1
+  locus_tag: BL107_14420
+  organism_name: Synechococcus sp. BL107
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 3.1754
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaJ5
+  locus_tag: BL107_15975
+  organism_name: Synechococcus sp. BL107
+  product: DnaJ type III chaperone protein
+  score: 5.7466
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaK1
+  locus_tag: BL107_16550
+  organism_name: Synechococcus sp. BL107
+  product: chaperone protein DnaK
+  score: 6.1734
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: groES
+  locus_tag: BL107_16595
+  organism_name: Synechococcus sp. BL107
+  product: co-chaperonin GroES
+  score: 1.49
+- annotation_quality: 3
+  gene_category: Regulatory functions
+  gene_name: comM
+  locus_tag: BL107_17135
+  organism_name: Synechococcus sp. BL107
+  product: putative ATP-dependent protease
+  score: 4.1498
+- annotation_quality: 3
+  gene_category: Regulatory functions
+  gene_name: comM
+  locus_tag: BL107_17140
+  organism_name: Synechococcus sp. BL107
+  product: putative ATP-dependent protease
+  score: 4.1498
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: BSR22_01050
   organism_name: Prochlorococcus RSP50
   product: radical SAM family heme chaperone HemW
-  score: 4.6117
+  score: 4.6152
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: BSR22_01645
   organism_name: Prochlorococcus RSP50
   product: co-chaperone GroES
-  score: 4.2775
+  score: 4.2823
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: BSR22_02750
   organism_name: Prochlorococcus RSP50
   product: trigger factor
-  score: 3.4238
+  score: 3.4322
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: BSR22_02760
   organism_name: Prochlorococcus RSP50
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 3.3047
+  score: 3.3132
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: BSR22_03000
   organism_name: Prochlorococcus RSP50
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: BSR22_03150
   organism_name: Prochlorococcus RSP50
   product: molecular chaperone DnaJ
-  score: 2.7093
+  score: 2.7181
 - annotation_quality: 2
   gene_category: Cell motility
   gene_name: ycf3
   locus_tag: BSR22_03750
   organism_name: Prochlorococcus RSP50
   product: photosystem I assembly protein Ycf3
-  score: 3.3992
+  score: 3.4075
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: BSR22_03785
   organism_name: Prochlorococcus RSP50
   product: molecular chaperone
-  score: 7.6035
+  score: 7.5874
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: BSR22_06015
   organism_name: Prochlorococcus RSP50
   product: ATP-dependent Clp protease ATP-binding subunit
-  score: 2.9764
+  score: 2.9857
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: BSR22_06435
   organism_name: Prochlorococcus RSP50
   product: CPP1-like family protein
-  score: 5.3772
+  score: 5.377
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: BSR22_06440
   organism_name: Prochlorococcus RSP50
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: BSR22_07755
   organism_name: Prochlorococcus RSP50
   product: molecular chaperone HtpG
-  score: 6.5754
+  score: 6.5702
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: BSR22_07780
   organism_name: Prochlorococcus RSP50
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: dnaJ2
   locus_tag: BSR22_07785
   organism_name: Prochlorococcus RSP50
   product: DnaJ C-terminal domain-containing protein
-  score: 5.0325
+  score: 5.0336
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: BSR22_07905
   organism_name: Prochlorococcus RSP50
   product: molecular chaperone DnaJ
-  score: 5.551
+  score: 5.5486
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: EZ55_00151
   organism_name: Alteromonas macleodii EZ55
   product: DNA-J related domain-containing protein
-  score: 5.3506
+  score: 5.3497
 - annotation_quality: 2
   gene_category: Cell motility
   gene_name: lptM
   locus_tag: EZ55_00179
   organism_name: Alteromonas macleodii EZ55
   product: LPS translocon maturation chaperone LptM
-  score: 5.3299
+  score: 5.3289
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: spy
   locus_tag: EZ55_00449
   organism_name: Alteromonas macleodii EZ55
   product: Spy/CpxP family protein refolding chaperone
-  score: 5.1675
+  score: 5.1674
 - annotation_quality: 3
   gene_category: Intracellular trafficking
   gene_name: secB
   locus_tag: EZ55_00464
   organism_name: Alteromonas macleodii EZ55
   product: protein-export chaperone SecB
-  score: 4.3269
+  score: 4.3351
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: EZ55_00505
   organism_name: Alteromonas macleodii EZ55
   product: copper chaperone PCu(A)C
-  score: 5.3299
+  score: 5.3289
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: surA
   locus_tag: EZ55_00761
   organism_name: Alteromonas macleodii EZ55
   product: peptidylprolyl isomerase SurA
-  score: 2.6577
+  score: 2.6667
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: djlA
   locus_tag: EZ55_00763
   organism_name: Alteromonas macleodii EZ55
   product: co-chaperone DjlA
-  score: 4.0238
+  score: 4.0329
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: EZ55_00944
   organism_name: Alteromonas macleodii EZ55
   product: radical SAM family heme chaperone HemW
-  score: 4.6117
+  score: 4.6152
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
   locus_tag: EZ55_00971
   organism_name: Alteromonas macleodii EZ55
   product: cytochrome c maturation protein CcmE
-  score: 3.438
+  score: 3.4454
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgN
   locus_tag: EZ55_01042
   organism_name: Alteromonas macleodii EZ55
   product: flagellar export chaperone FlgN
-  score: 5.7465
+  score: 5.7419
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgA
   locus_tag: EZ55_01044
   organism_name: Alteromonas macleodii EZ55
   product: flagellar basal body P-ring formation chaperone FlgA
-  score: 3.2517
+  score: 3.2605
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: fliS
   locus_tag: EZ55_01064
   organism_name: Alteromonas macleodii EZ55
   product: flagellar export chaperone FliS
-  score: 5.5692
+  score: 5.5661
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: EZ55_01479
   organism_name: Alteromonas macleodii EZ55
   product: molecular chaperone DnaK
-  score: 6.7073
+  score: 6.7008
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: EZ55_01480
   organism_name: Alteromonas macleodii EZ55
   product: molecular chaperone DnaJ
-  score: 1.4609
+  score: 1.4686
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: proQ
   locus_tag: EZ55_02086
   organism_name: Alteromonas macleodii EZ55
   product: RNA chaperone ProQ
-  score: 6.1055
+  score: 6.1046
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lolA
   locus_tag: EZ55_02180
   organism_name: Alteromonas macleodii EZ55
   product: outer membrane lipoprotein chaperone LolA
-  score: 2.7381
+  score: 2.7467
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: bepA
   locus_tag: EZ55_02213
   organism_name: Alteromonas macleodii EZ55
   product: beta-barrel assembly-enhancing protease
-  score: 3.5263
+  score: 3.5349
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: EZ55_02255
   organism_name: Alteromonas macleodii EZ55
   product: ClpX C4-type zinc finger protein
-  score: 4.0765
+  score: 4.083
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: EZ55_02623
   organism_name: Alteromonas macleodii EZ55
   product: molecular chaperone HtpG
-  score: 6.3772
+  score: 6.3737
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: EZ55_02651
   organism_name: Alteromonas macleodii EZ55
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: slyD
   locus_tag: EZ55_02699
   organism_name: Alteromonas macleodii EZ55
   product: FKBP-type peptidyl-prolyl cis-trans isomerase
-  score: 2.9562
+  score: 2.9651
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ppiD
   locus_tag: EZ55_02729
   organism_name: Alteromonas macleodii EZ55
   product: SurA N-terminal domain-containing protein
-  score: 2.2127
+  score: 2.2152
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: EZ55_02732
   organism_name: Alteromonas macleodii EZ55
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 4.1927
+  score: 4.1992
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: EZ55_02734
   organism_name: Alteromonas macleodii EZ55
   product: trigger factor
-  score: 3.7585
+  score: 3.767
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: EZ55_03075
   organism_name: Alteromonas macleodii EZ55
   product: M48 family metallopeptidase
-  score: 5.2819
+  score: 5.2811
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: pqqD
   locus_tag: EZ55_03324
   organism_name: Alteromonas macleodii EZ55
   product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
-  score: 4.8897
+  score: 4.8915
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslU
   locus_tag: EZ55_03652
   organism_name: Alteromonas macleodii EZ55
   product: HslU--HslV peptidase ATPase subunit
-  score: 2.7369
+  score: 2.7457
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: lifO
   locus_tag: EZ55_03769
   organism_name: Alteromonas macleodii EZ55
   product: lipase secretion chaperone
-  score: 5.1159
+  score: 5.1166
 - annotation_quality: 3
   gene_category: Translation
   gene_name: hfq
   locus_tag: EZ55_03781
   organism_name: Alteromonas macleodii EZ55
   product: RNA chaperone Hfq
-  score: 4.8283
+  score: 4.8346
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: EZ55_03939
   organism_name: Alteromonas macleodii EZ55
   product: co-chaperone GroES
-  score: 2.3609
+  score: 2.37
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: EZ55_03972
   organism_name: Alteromonas macleodii EZ55
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: nfuA
   locus_tag: EZ55_04039
   organism_name: Alteromonas macleodii EZ55
   product: Fe-S biogenesis protein NfuA
-  score: 3.3191
+  score: 3.328
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
   locus_tag: EZ55_04063
   organism_name: Alteromonas macleodii EZ55
   product: YifB family Mg chelatase-like AAA ATPase
-  score: 4.6221
+  score: 4.6261
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hypC
   locus_tag: EZ55_04180
   organism_name: Alteromonas macleodii EZ55
   product: HypC/HybG/HupF family hydrogenase formation chaperone
-  score: 5.2034
+  score: 5.203
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: H6G84_RS00130
   locus_tag: H6G84_00130
   organism_name: Synechococcus elongatus PCC 7942
   product: HypC/HybG/HupF family hydrogenase formation chaperone
-  score: 5.2034
+  score: 5.203
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: H6G84_RS00215
   locus_tag: H6G84_00215
   organism_name: Synechococcus elongatus PCC 7942
   product: J domain-containing protein
-  score: 5.0793
+  score: 5.0802
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: H6G84_00265
   organism_name: Synechococcus elongatus PCC 7942
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 3.3047
+  score: 3.3132
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: H6G84_00275
   organism_name: Synechococcus elongatus PCC 7942
   product: trigger factor
-  score: 3.4238
+  score: 3.4322
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: H6G84_00550
   organism_name: Synechococcus elongatus PCC 7942
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: H6G84_RS00955
   locus_tag: H6G84_00955
   organism_name: Synechococcus elongatus PCC 7942
   product: J domain-containing protein
-  score: 5.3566
+  score: 5.355
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: H6G84_00990
   organism_name: Synechococcus elongatus PCC 7942
   product: radical SAM family heme chaperone HemW
-  score: 4.2117
+  score: 4.22
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: H6G84_RS01305
   locus_tag: H6G84_01305
   organism_name: Synechococcus elongatus PCC 7942
   product: photosystem I assembly protein Ycf3
-  score: 3.5484
+  score: 3.556
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: H6G84_01340
   organism_name: Synechococcus elongatus PCC 7942
   product: co-chaperone GroES
-  score: 4.2775
+  score: 4.2823
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: H6G84_RS01385
   locus_tag: H6G84_01385
   organism_name: Synechococcus elongatus PCC 7942
   product: J domain-containing protein
-  score: 4.8289
+  score: 4.8307
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: H6G84_02595
   organism_name: Synechococcus elongatus PCC 7942
   product: molecular chaperone DnaJ
-  score: 1.4609
+  score: 1.4686
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: H6G84_02600
   organism_name: Synechococcus elongatus PCC 7942
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: H6G84_03925
   organism_name: Synechococcus elongatus PCC 7942
   product: molecular chaperone HtpG
-  score: 4.9062
+  score: 4.9084
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: H6G84_RS03990
   locus_tag: H6G84_03990
   organism_name: Synechococcus elongatus PCC 7942
   product: Spy/CpxP family protein refolding chaperone
-  score: 5.111
+  score: 5.1117
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: H6G84_RS04045
   locus_tag: H6G84_04045
   organism_name: Synechococcus elongatus PCC 7942
   product: DnaJ C-terminal domain-containing protein
-  score: 5.2608
+  score: 5.2604
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: kdpC
   locus_tag: H6G84_04640
   organism_name: Synechococcus elongatus PCC 7942
   product: K(+)-transporting ATPase subunit C
-  score: 2.5396
+  score: 2.5483
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: H6G84_04960
   organism_name: Synechococcus elongatus PCC 7942
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: H6G84_RS04965
   locus_tag: H6G84_04965
   organism_name: Synechococcus elongatus PCC 7942
   product: CPP1-like family protein
-  score: 5.6731
+  score: 5.6711
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: H6G84_RS06470
   locus_tag: H6G84_06470
   organism_name: Synechococcus elongatus PCC 7942
   product: J domain-containing protein
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: H6G84_RS07265
   locus_tag: H6G84_07265
   organism_name: Synechococcus elongatus PCC 7942
   product: Hsp70 family protein
-  score: 5.6561
+  score: 5.6527
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: H6G84_08005
   organism_name: Synechococcus elongatus PCC 7942
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: H6G84_09580
   organism_name: Synechococcus elongatus PCC 7942
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: H6G84_RS10590
   locus_tag: H6G84_10590
   organism_name: Synechococcus elongatus PCC 7942
   product: YifB family Mg chelatase-like AAA ATPase
-  score: 1.8287
+  score: 1.8329
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: H6G84_RS10975
   locus_tag: H6G84_10975
   organism_name: Synechococcus elongatus PCC 7942
   product: J domain-containing protein
-  score: 5.7465
+  score: 5.7419
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: H6G84_RS12640
   locus_tag: H6G84_12640
   organism_name: Synechococcus elongatus PCC 7942
   product: phage tail assembly protein
-  score: 5.353
+  score: 5.3531
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: H6G84_13410
   organism_name: Synechococcus elongatus PCC 7942
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: djlA
+  locus_tag: HP15_1026
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: co-chaperone DjlA
+  score: 4.0329
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: htpG
+  locus_tag: HP15_1395
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: molecular chaperone HtpG
+  score: 6.5707
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: flgA
+  locus_tag: HP15_1546
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: flagellar basal body P-ring formation chaperone FlgA
+  score: 3.7873
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: HP15_1691
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: ATP-dependent Clp protease ATP-binding subunit
+  score: 2.9153
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: slyD
+  locus_tag: HP15_1758
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: FKBP-type peptidyl-prolyl cis-trans isomerase
+  score: 2.9651
+- annotation_quality: 3
+  gene_category: Energy production
+  gene_name: nfuA
+  locus_tag: HP15_1791
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: Fe-S biogenesis protein NfuA
+  score: 3.328
+- annotation_quality: 3
+  gene_category: Cell wall and membrane
+  gene_name: lolA
+  locus_tag: HP15_1818
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: outer membrane lipoprotein chaperone LolA
+  score: 2.1998
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: ccoQ
+  locus_tag: HP15_2109
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: CcoQ/FixQ family Cbb3-type cytochrome c oxidase assembly chaperone
+  score: 4.4508
+- annotation_quality: 2
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: HP15_2118
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: DNA-J related domain-containing protein
+  score: 5.0021
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: ppiD
+  locus_tag: HP15_2181
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: SurA N-terminal domain-containing protein
+  score: 2.2152
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: clpX
+  locus_tag: HP15_2184
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: ATP-dependent Clp protease ATP-binding subunit ClpX
+  score: 4.1271
+- annotation_quality: 3
+  gene_category: Cell cycle and division
+  gene_name: tig
+  locus_tag: HP15_2186
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: trigger factor
+  score: 3.767
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: ccmE
+  locus_tag: HP15_2282
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: cytochrome c maturation protein CcmE
+  score: 3.7038
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: fliJ
+  locus_tag: HP15_2322
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: flagellar export protein FliJ
+  score: 5.3289
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: htpX
+  locus_tag: HP15_2354
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: M48 family metallopeptidase
+  score: 5.203
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: groES
+  locus_tag: HP15_2359
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: co-chaperone GroES
+  score: 4.2823
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: fliS
+  locus_tag: HP15_2368
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: flagellar export chaperone FliS
+  score: 5.4538
+- annotation_quality: 2
+  gene_category: Unknown
+  gene_name: lptM
+  locus_tag: HP15_246
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: LPS translocon maturation chaperone LptM
+  score: 6.1134
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: HP15_2664
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: M48 family metallopeptidase
+  score: 5.1439
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: comM
+  locus_tag: HP15_277
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: YifB family Mg chelatase-like AAA ATPase
+  score: 4.6261
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: HP15_2788
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: DnaJ domain-containing protein
+  score: 5.3289
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: hemW
+  locus_tag: HP15_280
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: radical SAM family heme chaperone HemW
+  score: 4.6152
+- annotation_quality: 3
+  gene_category: Transcription
+  gene_name: cbpM
+  locus_tag: HP15_2908
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: chaperone modulator CbpM
+  score: 5.3645
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: cbpA
+  locus_tag: HP15_2909
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: DnaJ C-terminal domain-containing protein
+  score: 4.9289
+- annotation_quality: 3
+  gene_category: Intracellular trafficking
+  gene_name: secB
+  locus_tag: HP15_3003
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: protein-export chaperone SecB
+  score: 4.3351
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaJ
+  locus_tag: HP15_3080
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: molecular chaperone DnaJ
+  score: 1.4686
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaK
+  locus_tag: HP15_3081
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: molecular chaperone DnaK
+  score: 6.7008
+- annotation_quality: 3
+  gene_category: Unknown
+  gene_name: pqqD
+  locus_tag: HP15_3138
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
+  score: 3.7474
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: HP15_3260
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: J domain-containing protein
+  score: 5.3289
+- annotation_quality: 2
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: HP15_3268
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: lipase secretion chaperone
+  score: 5.1634
+- annotation_quality: 3
+  gene_category: Cell wall and membrane
+  gene_name: surA
+  locus_tag: HP15_3280
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: peptidylprolyl isomerase
+  score: 2.9727
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: lifO
+  locus_tag: HP15_3336
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: lipase secretion chaperone
+  score: 5.1105
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: hslO
+  locus_tag: HP15_3497
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: Hsp33 family molecular chaperone HslO
+  score: 5.1311
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: HP15_3652
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: AAA family ATPase
+  score: 4.8011
+- annotation_quality: 3
+  gene_category: Unknown
+  gene_name: null
+  locus_tag: HP15_4121
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: TorD/DmsD family molecular chaperone
+  score: 6.6409
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: hslU
+  locus_tag: HP15_465
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: HslU--HslV peptidase ATPase subunit
+  score: 3.2106
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: clpB
+  locus_tag: HP15_529
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: ATP-dependent chaperone ClpB
+  score: 4.7195
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: null
+  locus_tag: HP15_637
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: Spy/CpxP family protein refolding chaperone
+  score: 4.4795
+- annotation_quality: 3
+  gene_category: Unknown
+  gene_name: null
+  locus_tag: HP15_652
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: phage tail assembly protein
+  score: 5.4143
+- annotation_quality: 3
+  gene_category: Unknown
+  gene_name: null
+  locus_tag: HP15_846
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: copper chaperone PCu(A)C
+  score: 6.7097
+- annotation_quality: 2
+  gene_category: Unknown
+  gene_name: null
+  locus_tag: HP15_883
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: YdbH domain-containing protein
+  score: 2.6974
+- annotation_quality: 3
+  gene_category: Translation
+  gene_name: hfq
+  locus_tag: HP15_RS21705
+  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  product: RNA chaperone Hfq
+  score: 4.9579
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: M744_00145
   organism_name: Synechococcus elongatus UTEX 2973
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: M744_00150
   organism_name: Synechococcus elongatus UTEX 2973
   product: CPP1-like family protein
-  score: 5.7467
+  score: 5.7443
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: M744_01695
   organism_name: Synechococcus elongatus UTEX 2973
   product: J domain-containing protein
-  score: 5.5692
+  score: 5.5661
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: M744_02520
   organism_name: Synechococcus elongatus UTEX 2973
   product: Hsp70 family protein
-  score: 6.0046
+  score: 5.9979
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: M744_03280
   organism_name: Synechococcus elongatus UTEX 2973
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hypC
   locus_tag: M744_03455
   organism_name: Synechococcus elongatus UTEX 2973
   product: HypC/HybG/HupF family hydrogenase formation chaperone
-  score: 5.2034
+  score: 5.203
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: M744_03540
   organism_name: Synechococcus elongatus UTEX 2973
   product: J domain-containing protein
-  score: 5.2949
+  score: 5.2942
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: M744_03590
   organism_name: Synechococcus elongatus UTEX 2973
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 3.3047
+  score: 3.3132
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: M744_03600
   organism_name: Synechococcus elongatus UTEX 2973
   product: trigger factor
-  score: 3.4238
+  score: 3.4322
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: M744_03880
   organism_name: Synechococcus elongatus UTEX 2973
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: M744_04315
   organism_name: Synechococcus elongatus UTEX 2973
   product: J domain-containing protein
-  score: 5.4405
+  score: 5.4384
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: M744_04350
   organism_name: Synechococcus elongatus UTEX 2973
   product: radical SAM family heme chaperone HemW
-  score: 4.6117
+  score: 4.6152
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: ycf3
   locus_tag: M744_04680
   organism_name: Synechococcus elongatus UTEX 2973
   product: photosystem I assembly protein Ycf3
-  score: 3.5484
+  score: 3.556
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: M744_04720
   organism_name: Synechococcus elongatus UTEX 2973
   product: co-chaperone GroES
-  score: 4.2775
+  score: 4.2823
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: M744_04770
   organism_name: Synechococcus elongatus UTEX 2973
   product: J domain-containing protein
-  score: 4.8904
+  score: 4.8919
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: M744_06020
   organism_name: Synechococcus elongatus UTEX 2973
   product: molecular chaperone DnaJ
-  score: 2.7093
+  score: 2.7181
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: M744_06025
   organism_name: Synechococcus elongatus UTEX 2973
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: M744_07405
   organism_name: Synechococcus elongatus UTEX 2973
   product: molecular chaperone HtpG
-  score: 5.0446
+  score: 5.046
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: null
   locus_tag: M744_07470
   organism_name: Synechococcus elongatus UTEX 2973
   product: Spy/CpxP family protein refolding chaperone
-  score: 5.1949
+  score: 5.1951
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: M744_07530
   organism_name: Synechococcus elongatus UTEX 2973
   product: DnaJ C-terminal domain-containing protein
-  score: 5.2608
+  score: 5.2604
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: kdpC
   locus_tag: M744_08130
   organism_name: Synechococcus elongatus UTEX 2973
   product: K(+)-transporting ATPase subunit C
-  score: 2.5396
+  score: 2.5483
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: M744_08330
   organism_name: Synechococcus elongatus UTEX 2973
   product: J domain-containing protein
-  score: 5.8504
+  score: 5.8451
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
   locus_tag: M744_09640
   organism_name: Synechococcus elongatus UTEX 2973
   product: YifB family Mg chelatase-like AAA ATPase
-  score: 4.6221
+  score: 4.6261
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: M744_11220
   organism_name: Synechococcus elongatus UTEX 2973
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: M744_12995
   organism_name: Synechococcus elongatus UTEX 2973
   product: phage tail assembly protein
-  score: 5.4145
+  score: 5.4143
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: M744_13640
   organism_name: Synechococcus elongatus UTEX 2973
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: M8001_01325
   organism_name: Pseudomonas putida KT2440
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: pqqD
   locus_tag: M8001_01995
   organism_name: Pseudomonas putida KT2440
   product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
-  score: 4.6121
+  score: 4.6154
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: surA
   locus_tag: M8001_02135
   organism_name: Pseudomonas putida KT2440
   product: peptidylprolyl isomerase SurA
-  score: 2.6577
+  score: 2.6667
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: M8001_02720
   organism_name: Pseudomonas putida KT2440
   product: YbaY family lipoprotein
-  score: 5.8777
+  score: 5.8743
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: M8001_03320
   organism_name: Pseudomonas putida KT2440
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: slyD
   locus_tag: M8001_04150
   organism_name: Pseudomonas putida KT2440
   product: FKBP-type peptidyl-prolyl cis-trans isomerase
-  score: 3.0147
+  score: 3.0234
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: suhB
   locus_tag: M8001_04455
   organism_name: Pseudomonas putida KT2440
   product: type III secretion system regulator SuhB
-  score: 2.4452
+  score: 2.4541
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hscB
   locus_tag: M8001_04490
   organism_name: Pseudomonas putida KT2440
   product: co-chaperone HscB
-  score: 5.4242
+  score: 5.4266
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hscA
   locus_tag: M8001_04495
   organism_name: Pseudomonas putida KT2440
   product: Fe-S protein assembly chaperone HscA
-  score: 5.3421
+  score: 5.3445
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: bepA
   locus_tag: M8001_06425
   organism_name: Pseudomonas putida KT2440
   product: M48 family metalloprotease
-  score: 3.6186
+  score: 3.627
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groS
   locus_tag: M8001_07065
   organism_name: Pseudomonas putida KT2440
   product: co-chaperone GroES
-  score: 4.2775
+  score: 4.2823
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: ybaY
   locus_tag: M8001_07870
   organism_name: Pseudomonas putida KT2440
   product: YbaY family lipoprotein
-  score: 2.8009
+  score: 2.799
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: M8001_08170
   organism_name: Pseudomonas putida KT2440
   product: phage tail assembly chaperone family protein, TAC
-  score: 6.8693
+  score: 6.8616
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ompH
   locus_tag: M8001_08310
   organism_name: Pseudomonas putida KT2440
   product: OmpH/Skp family outer membrane protein
-  score: 4.827
+  score: 4.8293
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: M8001_09800
   organism_name: Pseudomonas putida KT2440
   product: fimbrial biogenesis chaperone
-  score: 6.4497
+  score: 6.4431
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: null
   locus_tag: M8001_10075
   organism_name: Pseudomonas putida KT2440
   product: SEC-C metal-binding domain-containing protein
-  score: 4.5574
+  score: 4.5618
 - annotation_quality: 3
   gene_category: Defense mechanisms
   gene_name: lolD
   locus_tag: M8001_11255
   organism_name: Pseudomonas putida KT2440
   product: lipoprotein-releasing ABC transporter ATP-binding protein LolD
-  score: 3.0057
+  score: 3.0139
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: null
   locus_tag: M8001_11400
   organism_name: Pseudomonas putida KT2440
   product: ProQ/FinO family protein
-  score: 4.5875
+  score: 4.5908
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: M8001_12085
   organism_name: Pseudomonas putida KT2440
   product: trigger factor
-  score: 3.4238
+  score: 3.4322
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: M8001_12095
   organism_name: Pseudomonas putida KT2440
   product: ATP-dependent Clp protease ATP-binding subunit ClpX
-  score: 3.2781
+  score: 3.2866
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ppiD
   locus_tag: M8001_12110
   organism_name: Pseudomonas putida KT2440
   product: SurA N-terminal domain-containing protein
-  score: 2.2127
+  score: 2.2152
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: csuC
   locus_tag: M8001_12390
   organism_name: Pseudomonas putida KT2440
   product: fimbrial biogenesis chaperone
-  score: 6.7217
+  score: 6.7155
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: nfuA
   locus_tag: M8001_12470
   organism_name: Pseudomonas putida KT2440
   product: Fe-S biogenesis protein NfuA
-  score: 3.0402
+  score: 3.0487
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: M8001_12480
   organism_name: Pseudomonas putida KT2440
   product: copper chaperone PCu(A)C
-  score: 6.7167
+  score: 6.7097
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: pqqD
   locus_tag: M8001_14050
   organism_name: Pseudomonas putida KT2440
   product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
-  score: 4.6121
+  score: 4.6154
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: M8001_15945
   organism_name: Pseudomonas putida KT2440
   product: phage tail assembly protein
-  score: 5.4145
+  score: 5.4143
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpK
   locus_tag: M8001_17405
   organism_name: Pseudomonas putida KT2440
   product: heat shock survival AAA family ATPase ClpK
-  score: 2.9764
+  score: 2.9857
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: cobW
   locus_tag: M8001_18360
   organism_name: Pseudomonas putida KT2440
   product: cobalamin biosynthesis protein CobW
-  score: 2.8497
+  score: 2.8589
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: M8001_20220
   organism_name: Pseudomonas putida KT2440
   product: hypothetical protein
-  score: 6.2865
+  score: 6.2798
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: M8001_20270
   organism_name: Pseudomonas putida KT2440
   product: phage tail assembly protein
-  score: 5.4145
+  score: 5.4143
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lolA
   locus_tag: M8001_20970
   organism_name: Pseudomonas putida KT2440
   product: outer membrane lipoprotein periplasmic chaperone LolA
-  score: 2.7381
+  score: 2.7467
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: kdpC
   locus_tag: M8001_21755
   organism_name: Pseudomonas putida KT2440
   product: potassium-transporting ATPase subunit KdpC
-  score: 2.5396
+  score: 2.5483
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: M8001_21855
   organism_name: Pseudomonas putida KT2440
   product: molecular chaperone HtpG
-  score: 6.3772
+  score: 6.3737
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccoQ-II
   locus_tag: M8001_22260
   organism_name: Pseudomonas putida KT2440
   product: CcoQ/FixQ family Cbb3-type cytochrome c oxidase assembly chaperone
-  score: 4.6424
+  score: 4.6455
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
   locus_tag: M8001_22605
   organism_name: Pseudomonas putida KT2440
   product: cytochrome c maturation protein CcmE
-  score: 3.438
+  score: 3.4454
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: fliS
   locus_tag: M8001_22870
   organism_name: Pseudomonas putida KT2440
   product: flagellar export chaperone FliS
-  score: 5.4557
+  score: 5.4538
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgA
   locus_tag: M8001_22970
   organism_name: Pseudomonas putida KT2440
   product: flagellar basal body P-ring formation chaperone FlgA
-  score: 3.1698
+  score: 3.1789
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: null
   locus_tag: M8001_23625
   organism_name: Pseudomonas putida KT2440
   product: Spy/CpxP family protein refolding chaperone
-  score: 6.4237
+  score: 6.4193
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: M8001_24825
   organism_name: Pseudomonas putida KT2440
   product: molecular chaperone DnaJ
-  score: 2.7093
+  score: 2.7181
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: M8001_24830
   organism_name: Pseudomonas putida KT2440
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: M8001_25425
   organism_name: Pseudomonas putida KT2440
   product: copper chaperone PCu(A)C
-  score: 6.7167
+  score: 6.7097
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: cbpM
   locus_tag: M8001_25480
   organism_name: Pseudomonas putida KT2440
   product: chaperone modulator CbpM
-  score: 6.2294
+  score: 6.2288
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: cbpA
   locus_tag: M8001_25485
   organism_name: Pseudomonas putida KT2440
   product: curved DNA-binding protein
-  score: 4.9327
+  score: 4.9375
 - annotation_quality: 3
   gene_category: Translation
   gene_name: hfq
   locus_tag: M8001_25730
   organism_name: Pseudomonas putida KT2440
   product: RNA chaperone Hfq
-  score: 4.9535
+  score: 4.9579
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslU
   locus_tag: M8001_26270
   organism_name: Pseudomonas putida KT2440
   product: ATP-dependent protease ATPase subunit HslU
-  score: 2.6577
+  score: 2.6667
 - annotation_quality: 3
   gene_category: Intracellular trafficking
   gene_name: secB
   locus_tag: M8001_26525
   organism_name: Pseudomonas putida KT2440
   product: protein-export chaperone SecB
-  score: 4.4621
+  score: 4.4687
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: yggW
   locus_tag: M8001_26770
   organism_name: Pseudomonas putida KT2440
   product: radical SAM family heme chaperone HemW
-  score: 4.2117
+  score: 4.22
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lptM
   locus_tag: M8001_27420
   organism_name: Pseudomonas putida KT2440
   product: LPS translocon maturation chaperone LptM
-  score: 5.211
+  score: 5.2108
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: yifB
   locus_tag: M8001_27500
   organism_name: Pseudomonas putida KT2440
   product: YifB family Mg chelatase-like AAA ATPase
-  score: 4.4412
+  score: 4.4463
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: yeiR
   locus_tag: M8001_28095
   organism_name: Pseudomonas putida KT2440
   product: CobW family GTP-binding protein
-  score: 2.8643
+  score: 2.8733
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: zigA
   locus_tag: M8001_28105
   organism_name: Pseudomonas putida KT2440
   product: zinc metallochaperone GTPase ZigA
-  score: 2.8497
+  score: 2.8589
+- annotation_quality: 3
+  gene_category: Cell wall and membrane
+  gene_name: lolA
+  locus_tag: MADE_000001022095
+  organism_name: Alteromonas mediterranea DE
+  product: outer membrane lipoprotein periplasmic chaperone LolA
+  score: 2.1998
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: clpB
+  locus_tag: MADE_000001022275
+  organism_name: Alteromonas mediterranea DE
+  product: ATP-dependent chaperone ClpB
+  score: 4.7195
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: mliC
+  locus_tag: MADE_000001022430
+  organism_name: Alteromonas mediterranea DE
+  product: META domain-containing protein
+  score: 2.4064
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: lifO
+  locus_tag: MADE_000001023490
+  organism_name: Alteromonas mediterranea DE
+  product: lipase secretion chaperone
+  score: 5.1105
+- annotation_quality: 3
+  gene_category: Translation
+  gene_name: hfq
+  locus_tag: MADE_000001023550
+  organism_name: Alteromonas mediterranea DE
+  product: RNA chaperone Hfq
+  score: 4.8346
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: comM
+  locus_tag: MADE_000001023700
+  organism_name: Alteromonas mediterranea DE
+  product: YifB family Mg chelatase-like AAA ATPase
+  score: 4.4463
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: MADE_1000890
+  organism_name: Alteromonas mediterranea DE
+  product: DNA-J related domain-containing protein
+  score: 5.3497
+- annotation_quality: 2
+  gene_category: Cell motility
+  gene_name: lptM
+  locus_tag: MADE_1001020
+  organism_name: Alteromonas mediterranea DE
+  product: LPS translocon maturation chaperone LptM
+  score: 5.3289
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: hypC
+  locus_tag: MADE_1001685
+  organism_name: Alteromonas mediterranea DE
+  product: HypC/HybG/HupF family hydrogenase formation chaperone
+  score: 5.203
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: spy
+  locus_tag: MADE_1002675
+  organism_name: Alteromonas mediterranea DE
+  product: Spy/CpxP family protein refolding chaperone
+  score: 5.0336
+- annotation_quality: 3
+  gene_category: Intracellular trafficking
+  gene_name: secB
+  locus_tag: MADE_1002710
+  organism_name: Alteromonas mediterranea DE
+  product: protein-export chaperone SecB
+  score: 4.4687
+- annotation_quality: 3
+  gene_category: Unknown
+  gene_name: null
+  locus_tag: MADE_1002890
+  organism_name: Alteromonas mediterranea DE
+  product: copper chaperone PCu(A)C
+  score: 5.3289
+- annotation_quality: 3
+  gene_category: Cell wall and membrane
+  gene_name: surA
+  locus_tag: MADE_1003990
+  organism_name: Alteromonas mediterranea DE
+  product: peptidylprolyl isomerase SurA
+  score: 2.9451
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: djlA
+  locus_tag: MADE_1004000
+  organism_name: Alteromonas mediterranea DE
+  product: co-chaperone DjlA
+  score: 4.0329
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: hemW
+  locus_tag: MADE_1004655
+  organism_name: Alteromonas mediterranea DE
+  product: radical SAM family heme chaperone HemW
+  score: 4.22
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: ccmE
+  locus_tag: MADE_1004780
+  organism_name: Alteromonas mediterranea DE
+  product: cytochrome c maturation protein CcmE
+  score: 3.4454
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: flgN
+  locus_tag: MADE_1005680
+  organism_name: Alteromonas mediterranea DE
+  product: flagellar export chaperone FlgN
+  score: 4.8293
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: flgA
+  locus_tag: MADE_1005690
+  organism_name: Alteromonas mediterranea DE
+  product: flagellar basal body P-ring formation chaperone FlgA
+  score: 3.2605
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: fliS
+  locus_tag: MADE_1005785
+  organism_name: Alteromonas mediterranea DE
+  product: flagellar export chaperone FliS
+  score: 5.4538
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaK
+  locus_tag: MADE_1007055
+  organism_name: Alteromonas mediterranea DE
+  product: molecular chaperone DnaK
+  score: 5.4768
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaJ
+  locus_tag: MADE_1007060
+  organism_name: Alteromonas mediterranea DE
+  product: molecular chaperone DnaJ
+  score: 2.7181
+- annotation_quality: 3
+  gene_category: Signal transduction
+  gene_name: proQ
+  locus_tag: MADE_1010130
+  organism_name: Alteromonas mediterranea DE
+  product: RNA chaperone ProQ
+  score: 6.031
+- annotation_quality: 3
+  gene_category: Unknown
+  gene_name: bepA
+  locus_tag: MADE_1010845
+  organism_name: Alteromonas mediterranea DE
+  product: beta-barrel assembly-enhancing protease
+  score: 3.5818
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: slyD
+  locus_tag: MADE_1012575
+  organism_name: Alteromonas mediterranea DE
+  product: FKBP-type peptidyl-prolyl cis-trans isomerase
+  score: 2.9651
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: ppiD
+  locus_tag: MADE_1012730
+  organism_name: Alteromonas mediterranea DE
+  product: SurA N-terminal domain-containing protein
+  score: 2.2152
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: clpX
+  locus_tag: MADE_1012750
+  organism_name: Alteromonas mediterranea DE
+  product: ATP-dependent protease ATP-binding subunit ClpX
+  score: 4.1992
+- annotation_quality: 3
+  gene_category: Cell cycle and division
+  gene_name: tig
+  locus_tag: MADE_1012760
+  organism_name: Alteromonas mediterranea DE
+  product: trigger factor
+  score: 3.767
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: htpG
+  locus_tag: MADE_1013255
+  organism_name: Alteromonas mediterranea DE
+  product: molecular chaperone HtpG
+  score: 6.5707
+- annotation_quality: 3
+  gene_category: Cell motility
+  gene_name: spy
+  locus_tag: MADE_1014055
+  organism_name: Alteromonas mediterranea DE
+  product: Spy/CpxP family protein refolding chaperone
+  score: 5.0336
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: MADE_1015305
+  organism_name: Alteromonas mediterranea DE
+  product: M48 family metallopeptidase
+  score: 5.1439
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: hslU
+  locus_tag: MADE_1018285
+  organism_name: Alteromonas mediterranea DE
+  product: HslU--HslV peptidase ATPase subunit
+  score: 2.7457
+- annotation_quality: 3
+  gene_category: Energy production
+  gene_name: narJ
+  locus_tag: MADE_1019265
+  organism_name: Alteromonas mediterranea DE
+  product: nitrate reductase molybdenum cofactor assembly chaperone
+  score: 5.1674
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: groS
+  locus_tag: MADE_1019630
+  organism_name: Alteromonas mediterranea DE
+  product: co-chaperone GroES
+  score: 4.2823
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: hslO
+  locus_tag: MADE_1019810
+  organism_name: Alteromonas mediterranea DE
+  product: Hsp33 family molecular chaperone HslO
+  score: 5.1835
+- annotation_quality: 3
+  gene_category: Energy production
+  gene_name: nfuA
+  locus_tag: MADE_1020025
+  organism_name: Alteromonas mediterranea DE
+  product: Fe-S biogenesis protein NfuA
+  score: 3.0487
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: MIT1002_00133
   organism_name: Alteromonas macleodii MIT1002
   product: DNA-J related domain-containing protein
-  score: 5.3506
+  score: 5.3497
 - annotation_quality: 2
   gene_category: Cell motility
   gene_name: lptM
   locus_tag: MIT1002_00161
   organism_name: Alteromonas macleodii MIT1002
   product: LPS translocon maturation chaperone LptM
-  score: 5.3299
+  score: 5.3289
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hypC
   locus_tag: MIT1002_00277
   organism_name: Alteromonas macleodii MIT1002
   product: HypC/HybG/HupF family hydrogenase formation chaperone
-  score: 5.065
+  score: 5.0659
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: spy
   locus_tag: MIT1002_00476
   organism_name: Alteromonas macleodii MIT1002
   product: Spy/CpxP family protein refolding chaperone
-  score: 5.1675
+  score: 5.1674
 - annotation_quality: 3
   gene_category: Intracellular trafficking
   gene_name: secB
   locus_tag: MIT1002_00486
   organism_name: Alteromonas macleodii MIT1002
   product: protein-export chaperone SecB
-  score: 4.3269
+  score: 4.3351
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: MIT1002_00524
   organism_name: Alteromonas macleodii MIT1002
   product: copper chaperone PCu(A)C
-  score: 5.3299
+  score: 5.3289
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: surA
   locus_tag: MIT1002_00783
   organism_name: Alteromonas macleodii MIT1002
   product: peptidylprolyl isomerase SurA
-  score: 2.9357
+  score: 2.9451
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: djlA
   locus_tag: MIT1002_00785
   organism_name: Alteromonas macleodii MIT1002
   product: co-chaperone DjlA
-  score: 4.0238
+  score: 4.0329
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: MIT1002_00939
   organism_name: Alteromonas macleodii MIT1002
   product: radical SAM family heme chaperone HemW
-  score: 4.6117
+  score: 4.6152
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
   locus_tag: MIT1002_00964
   organism_name: Alteromonas macleodii MIT1002
   product: cytochrome c maturation protein CcmE
-  score: 3.438
+  score: 3.4454
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgN
   locus_tag: MIT1002_01034
   organism_name: Alteromonas macleodii MIT1002
   product: flagellar export chaperone FlgN
-  score: 5.7465
+  score: 5.7419
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgA
   locus_tag: MIT1002_01036
   organism_name: Alteromonas macleodii MIT1002
   product: flagellar basal body P-ring formation chaperone FlgA
-  score: 3.2517
+  score: 3.2605
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: fliS
   locus_tag: MIT1002_01057
   organism_name: Alteromonas macleodii MIT1002
   product: flagellar export chaperone FliS
-  score: 5.5692
+  score: 5.5661
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: MIT1002_01457
   organism_name: Alteromonas macleodii MIT1002
   product: molecular chaperone DnaK
-  score: 6.7073
+  score: 6.7008
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: MIT1002_01458
   organism_name: Alteromonas macleodii MIT1002
   product: molecular chaperone DnaJ
-  score: 1.4609
+  score: 1.4686
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: proQ
   locus_tag: MIT1002_02024
   organism_name: Alteromonas macleodii MIT1002
   product: RNA chaperone ProQ
-  score: 6.1055
+  score: 6.1046
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lolA
   locus_tag: MIT1002_02179
   organism_name: Alteromonas macleodii MIT1002
   product: outer membrane lipoprotein chaperone LolA
-  score: 2.7381
+  score: 2.7467
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: bepA
   locus_tag: MIT1002_02211
   organism_name: Alteromonas macleodii MIT1002
   product: beta-barrel assembly-enhancing protease
-  score: 3.5263
+  score: 3.5349
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: MIT1002_02648
   organism_name: Alteromonas macleodii MIT1002
   product: molecular chaperone HtpG
-  score: 6.3772
+  score: 6.3737
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: MIT1002_02677
   organism_name: Alteromonas macleodii MIT1002
   product: ATP-dependent chaperone ClpB
-  score: 4.7121
+  score: 4.7195
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: slyD
   locus_tag: MIT1002_02725
   organism_name: Alteromonas macleodii MIT1002
   product: FKBP-type peptidyl-prolyl cis-trans isomerase
-  score: 2.9562
+  score: 2.9651
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ppiD
   locus_tag: MIT1002_02755
   organism_name: Alteromonas macleodii MIT1002
   product: SurA N-terminal domain-containing protein
-  score: 2.2127
+  score: 2.2152
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: MIT1002_02759
   organism_name: Alteromonas macleodii MIT1002
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 4.1927
+  score: 4.1992
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: MIT1002_02761
   organism_name: Alteromonas macleodii MIT1002
   product: trigger factor
-  score: 3.7585
+  score: 3.767
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: MIT1002_03052
   organism_name: Alteromonas macleodii MIT1002
   product: M48 family metallopeptidase
-  score: 5.1435
+  score: 5.1439
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: pqqD
   locus_tag: MIT1002_03288
   organism_name: Alteromonas macleodii MIT1002
   product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
-  score: 4.8897
+  score: 4.8915
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslU
   locus_tag: MIT1002_03659
   organism_name: Alteromonas macleodii MIT1002
   product: HslU--HslV peptidase ATPase subunit
-  score: 2.7369
+  score: 2.7457
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: lifO
   locus_tag: MIT1002_03775
   organism_name: Alteromonas macleodii MIT1002
   product: lipase secretion chaperone
-  score: 5.1159
+  score: 5.1166
 - annotation_quality: 3
   gene_category: Translation
   gene_name: hfq
   locus_tag: MIT1002_03788
   organism_name: Alteromonas macleodii MIT1002
   product: RNA chaperone Hfq
-  score: 4.8283
+  score: 4.8346
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: MIT1002_03936
   organism_name: Alteromonas macleodii MIT1002
   product: co-chaperone GroES
-  score: 2.3609
+  score: 2.37
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: MIT1002_03973
   organism_name: Alteromonas macleodii MIT1002
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: nfuA
   locus_tag: MIT1002_04019
   organism_name: Alteromonas macleodii MIT1002
   product: Fe-S biogenesis protein NfuA
-  score: 3.3191
+  score: 3.328
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
   locus_tag: MIT1002_04043
   organism_name: Alteromonas macleodii MIT1002
   product: YifB family Mg chelatase-like AAA ATPase
-  score: 4.6221
+  score: 4.6261
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: NATL1_00151
   organism_name: Prochlorococcus NATL1A
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: NATL1_00161
   organism_name: Prochlorococcus NATL1A
   product: DnaJ type I chaperone protein
-  score: 1.8596
+  score: 1.8684
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: NATL1_01941
   organism_name: Prochlorococcus NATL1A
   product: DnaJ type III chaperone protein
-  score: 4.1088
+  score: 4.1149
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: ycf3
   locus_tag: NATL1_02041
   organism_name: Prochlorococcus NATL1A
   product: photosystem I assembly protein Ycf3
-  score: 2.7821
+  score: 2.7918
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tsaB
   locus_tag: NATL1_02111
   organism_name: Prochlorococcus NATL1A
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
-  score: 4.3342
+  score: 4.339
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB2
   locus_tag: NATL1_02831
   organism_name: Prochlorococcus NATL1A
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 1.6739
+  score: 1.6823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ2
   locus_tag: NATL1_02921
   organism_name: Prochlorococcus NATL1A
   product: DnaJ type II chaperone protein
-  score: 5.6361
+  score: 5.6378
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: NATL1_06361
   organism_name: Prochlorococcus NATL1A
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 2.4977
+  score: 2.5071
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: NATL1_07211
   organism_name: Prochlorococcus NATL1A
   product: conserved hypothetical protein
-  score: 5.255
+  score: 5.2563
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: NATL1_07221
   organism_name: Prochlorococcus NATL1A
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 2
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: NATL1_08451
   organism_name: Prochlorococcus NATL1A
   product: putative gram-negative pili assembly chaperone
-  score: 5.0101
+  score: 5.0115
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: NATL1_09791
   organism_name: Prochlorococcus NATL1A
   product: molecular chaperone HtpG
-  score: 6.1036
+  score: 6.1028
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: NATL1_09851
   organism_name: Prochlorococcus NATL1A
   product: chaperone protein DnaK
-  score: 6.5872
+  score: 6.5831
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: NATL1_09861
   organism_name: Prochlorococcus NATL1A
   product: DnaJ type II chaperone protein
-  score: 5.6896
+  score: 5.691
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: NATL1_10101
   organism_name: Prochlorococcus NATL1A
   product: DnaJ type IV chaperone protein
-  score: 4.234
+  score: 4.2391
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: NATL1_12101
   organism_name: Prochlorococcus NATL1A
   product: possible Gram-negative pili assembly chaperone
-  score: 5.2949
+  score: 5.2942
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: NATL1_14921
   organism_name: Prochlorococcus NATL1A
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN
   locus_tag: NATL1_17311
   organism_name: Prochlorococcus NATL1A
   product: oxygen-independent coproporphyrinogen III oxidase
-  score: 3.0559
+  score: 3.0655
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: NATL1_18321
   organism_name: Prochlorococcus NATL1A
   product: chaperone protein DnaK
-  score: 3.8623
+  score: 3.8693
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: NATL1_18371
   organism_name: Prochlorococcus NATL1A
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: NATL1_18731
   organism_name: Prochlorococcus NATL1A
   product: DnaJ type III chaperone protein
-  score: 4.2992
+  score: 4.3045
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: NATL1_21241
   organism_name: Prochlorococcus NATL1A
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: NATL1_21261
   organism_name: Prochlorococcus NATL1A
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: NATL1_21861
   organism_name: Prochlorococcus NATL1A
   product: chaperone protein DnaK
-  score: 6.2046
+  score: 6.2034
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: P9301_00151
   organism_name: Prochlorococcus MIT9301
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: P9301_00161
   organism_name: Prochlorococcus MIT9301
   product: DnaJ type I chaperone protein
-  score: 1.8596
+  score: 1.8684
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: P9301_01391
   organism_name: Prochlorococcus MIT9301
   product: DnaJ type III chaperone protein
-  score: 4.1927
+  score: 4.1983
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: ycf3
   locus_tag: P9301_01511
   organism_name: Prochlorococcus MIT9301
   product: photosystem I assembly protein Ycf3
-  score: 2.7821
+  score: 2.7918
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tsaB
   locus_tag: P9301_01581
   organism_name: Prochlorococcus MIT9301
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
-  score: 4.4476
+  score: 4.4521
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB2
   locus_tag: P9301_02271
   organism_name: Prochlorococcus MIT9301
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 1.6739
+  score: 1.6823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: P9301_06061
   organism_name: Prochlorococcus MIT9301
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 2.0739
+  score: 2.0832
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: P9301_07171
   organism_name: Prochlorococcus MIT9301
   product: conserved hypothetical protein
-  score: 5.255
+  score: 5.2563
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: P9301_07181
   organism_name: Prochlorococcus MIT9301
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: P9301_09581
   organism_name: Prochlorococcus MIT9301
   product: molecular chaperone HtpG
-  score: 6.1036
+  score: 6.1028
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: P9301_09621
   organism_name: Prochlorococcus MIT9301
   product: chaperone protein DnaK
-  score: 6.5872
+  score: 6.5831
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: P9301_09631
   organism_name: Prochlorococcus MIT9301
   product: DnaJ type II chaperone protein
-  score: 5.6361
+  score: 5.6378
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: P9301_09871
   organism_name: Prochlorococcus MIT9301
   product: DnaJ type IV chaperone protein
-  score: 4.9738
+  score: 4.9777
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: P9301_11181
   organism_name: Prochlorococcus MIT9301
   product: possible Gram-negative pili assembly chaperone
-  score: 5.2949
+  score: 5.2942
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: P9301_11951
   organism_name: Prochlorococcus MIT9301
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN
   locus_tag: P9301_14971
   organism_name: Prochlorococcus MIT9301
   product: oxygen-independent coproporphyrinogen III oxidase
-  score: 3.0559
+  score: 3.0655
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: P9301_16221
   organism_name: Prochlorococcus MIT9301
   product: chaperone protein DnaK
-  score: 3.9567
+  score: 3.9635
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: P9301_16271
   organism_name: Prochlorococcus MIT9301
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: P9301_16641
   organism_name: Prochlorococcus MIT9301
   product: DnaJ type III chaperone protein
-  score: 4.2992
+  score: 4.3045
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: P9301_18451
   organism_name: Prochlorococcus MIT9301
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: P9301_18471
   organism_name: Prochlorococcus MIT9301
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: P9301_18951
   organism_name: Prochlorococcus MIT9301
   product: chaperone protein DnaK
-  score: 6.2046
+  score: 6.2034
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: P9303_00201
   organism_name: Prochlorococcus MIT9303
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: P9303_00211
   organism_name: Prochlorococcus MIT9303
   product: DnaJ type I chaperone protein
-  score: 1.8596
+  score: 1.8684
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: P9303_00681
   organism_name: Prochlorococcus MIT9303
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: P9303_00701
   organism_name: Prochlorococcus MIT9303
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 1
   gene_category: Cell motility
   gene_name: ycf3
   locus_tag: P9303_02831
   organism_name: Prochlorococcus MIT9303
   product: hypothetical protein
-  score: 3.4221
+  score: 3.4306
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ2
   locus_tag: P9303_03871
   organism_name: Prochlorococcus MIT9303
   product: DnaJ type II chaperone protein
-  score: 5.6361
+  score: 5.6378
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: P9303_04511
   organism_name: Prochlorococcus MIT9303
   product: DnaJ type III chaperone protein
-  score: 4.2992
+  score: 4.3045
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: P9303_05101
   organism_name: Prochlorococcus MIT9303
   product: chaperone protein DnaK
-  score: 3.8623
+  score: 3.8693
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: P9303_05731
   organism_name: Prochlorococcus MIT9303
   product: possible DnaJ type IV chaperone protein
-  score: 5.4534
+  score: 5.4519
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: P9303_09911
   organism_name: Prochlorococcus MIT9303
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: P9303_14221
   organism_name: Prochlorococcus MIT9303
   product: conserved hypothetical protein
-  score: 5.255
+  score: 5.2563
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: P9303_14821
   organism_name: Prochlorococcus MIT9303
   product: DnaJ type IV chaperone protein
-  score: 4.9738
+  score: 4.9777
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: P9303_15171
   organism_name: Prochlorococcus MIT9303
   product: DnaJ type II chaperone protein
-  score: 5.6896
+  score: 5.691
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: P9303_15181
   organism_name: Prochlorococcus MIT9303
   product: chaperone protein DnaK
-  score: 6.5872
+  score: 6.5831
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: P9303_15251
   organism_name: Prochlorococcus MIT9303
   product: molecular chaperone HtpG
-  score: 6.1036
+  score: 6.1028
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: P9303_18321
   organism_name: Prochlorococcus MIT9303
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 2.4977
+  score: 2.5071
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: P9303_20751
   organism_name: Prochlorococcus MIT9303
   product: conserved hypothetical protein (DUF2063)
-  score: 2.4051
+  score: 2.4064
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: P9303_26301
   organism_name: Prochlorococcus MIT9303
   product: DnaJ type III chaperone protein
-  score: 4.1088
+  score: 4.1149
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: ycf3
   locus_tag: P9303_26511
   organism_name: Prochlorococcus MIT9303
   product: photosystem I assembly protein Ycf3
-  score: 2.7821
+  score: 2.7918
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tsaB
   locus_tag: P9303_26591
   organism_name: Prochlorococcus MIT9303
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
-  score: 4.3342
+  score: 4.339
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB2
   locus_tag: P9303_27741
   organism_name: Prochlorococcus MIT9303
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 1.6739
+  score: 1.6823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: P9303_30041
   organism_name: Prochlorococcus MIT9303
   product: chaperone protein DnaK
-  score: 6.2046
+  score: 6.2034
 - annotation_quality: 2
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: P9303_50006
   organism_name: Prochlorococcus MIT9303
   product: putative gram-negative pili assembly chaperone
-  score: 5.0101
+  score: 5.0115
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: P9303_RS02295
   organism_name: Prochlorococcus MIT9303
   product: co-chaperone GroES
-  score: 4.2775
+  score: 4.2823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: PMM0016
   organism_name: Prochlorococcus MED4
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: PMM0017
   organism_name: Prochlorococcus MED4
   product: DnaJ type I chaperone protein
-  score: 2.8437
+  score: 2.8532
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: PMM0122
   organism_name: Prochlorococcus MED4
   product: DnaJ type III chaperone protein
-  score: 4.1927
+  score: 4.1983
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: ycf3
   locus_tag: PMM0132
   organism_name: Prochlorococcus MED4
   product: photosystem I assembly protein Ycf3
-  score: 2.7821
+  score: 2.7918
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tsaB
   locus_tag: PMM0139
   organism_name: Prochlorococcus MED4
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
-  score: 4.4476
+  score: 4.4521
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB2
   locus_tag: PMM0207
   organism_name: Prochlorococcus MED4
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 1.6739
+  score: 1.6823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: PMM0580
   organism_name: Prochlorococcus MED4
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 2.413
+  score: 2.4226
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMM0664
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein
-  score: 5.255
+  score: 5.2563
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hsp33
   locus_tag: PMM0665
   organism_name: Prochlorococcus MED4
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMM0873
   organism_name: Prochlorococcus MED4
   product: DnaJ type IV chaperone protein
-  score: 4.9738
+  score: 4.9777
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: PMM0896
   organism_name: Prochlorococcus MED4
   product: DnaJ type II chaperone protein
-  score: 5.6361
+  score: 5.6378
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: PMM0897
   organism_name: Prochlorococcus MED4
   product: chaperone protein DnaK
-  score: 5.4808
+  score: 5.4814
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: PMM0901
   organism_name: Prochlorococcus MED4
   product: molecular chaperone HtpG
-  score: 6.1036
+  score: 6.1028
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM1021
   organism_name: Prochlorococcus MED4
   product: possible Gram-negative pili assembly chaperone
-  score: 5.2949
+  score: 5.2942
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: PMM1088
   organism_name: Prochlorococcus MED4
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN
   locus_tag: PMM1311
   organism_name: Prochlorococcus MED4
   product: oxygen-independent coproporphyrinogen III oxidase
-  score: 1.6151
+  score: 1.6199
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: PMM1432
   organism_name: Prochlorococcus MED4
   product: chaperone protein DnaK
-  score: 3.8623
+  score: 3.8693
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: PMM1437
   organism_name: Prochlorococcus MED4
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: PMM1474
   organism_name: Prochlorococcus MED4
   product: DnaJ type III chaperone protein
-  score: 4.2992
+  score: 4.3045
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: PMM1655
   organism_name: Prochlorococcus MED4
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: PMM1657
   organism_name: Prochlorococcus MED4
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: PMM1704
   organism_name: Prochlorococcus MED4
   product: chaperone protein DnaK
-  score: 5.0446
+  score: 5.0482
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: PMN2A_0016
   organism_name: Prochlorococcus NATL2A
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 2.4977
+  score: 2.5071
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: PMN2A_RS03430
   locus_tag: PMN2A_0096
   organism_name: Prochlorococcus NATL2A
   product: conserved hypothetical protein
-  score: 5.1936
+  score: 5.1951
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: PMN2A_0097
   organism_name: Prochlorococcus NATL2A
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 2
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMN2A_0213
   organism_name: Prochlorococcus NATL2A
   product: putative gram-negative pili assembly chaperone
-  score: 5.0101
+  score: 5.0115
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: PMN2A_0306
   organism_name: Prochlorococcus NATL2A
   product: molecular chaperone HtpG
-  score: 6.1036
+  score: 6.1028
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: PMN2A_0312
   organism_name: Prochlorococcus NATL2A
   product: chaperone protein DnaK
-  score: 6.5872
+  score: 6.5831
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: PMN2A_0313
   organism_name: Prochlorococcus NATL2A
   product: DnaJ type II chaperone protein
-  score: 5.6896
+  score: 5.691
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: PMN2A_RS04625
   locus_tag: PMN2A_0337
   organism_name: Prochlorococcus NATL2A
   product: DnaJ type IV chaperone protein
-  score: 4.884
+  score: 4.8884
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: PMN2A_RS05470
   locus_tag: PMN2A_0488
   organism_name: Prochlorococcus NATL2A
   product: possible Gram-negative pili assembly chaperone
-  score: 5.211
+  score: 5.2108
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: PMN2A_0660
   organism_name: Prochlorococcus NATL2A
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN
   locus_tag: PMN2A_0877
   organism_name: Prochlorococcus NATL2A
   product: oxygen-independent coproporphyrinogen III oxidase
-  score: 3.0559
+  score: 3.0655
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: PMN2A_0964
   organism_name: Prochlorococcus NATL2A
   product: chaperone protein DnaK
-  score: 3.8623
+  score: 3.8693
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: PMN2A_0969
   organism_name: Prochlorococcus NATL2A
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: PMN2A_1004
   organism_name: Prochlorococcus NATL2A
   product: DnaJ type III chaperone protein
-  score: 4.2992
+  score: 4.3045
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: PMN2A_1253
   organism_name: Prochlorococcus NATL2A
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: PMN2A_1255
   organism_name: Prochlorococcus NATL2A
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: PMN2A_1313
   organism_name: Prochlorococcus NATL2A
   product: chaperone protein DnaK
-  score: 5.0446
+  score: 5.0482
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: PMN2A_1343
   organism_name: Prochlorococcus NATL2A
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: PMN2A_1344
   organism_name: Prochlorococcus NATL2A
   product: DnaJ type I chaperone protein
-  score: 1.8596
+  score: 1.8684
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: PMN2A_1489
   organism_name: Prochlorococcus NATL2A
   product: DnaJ type III chaperone protein
-  score: 4.1088
+  score: 4.1149
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: ycf3
   locus_tag: PMN2A_1498
   organism_name: Prochlorococcus NATL2A
   product: photosystem I assembly protein Ycf3
-  score: 2.7821
+  score: 2.7918
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tsaB
   locus_tag: PMN2A_1505
   organism_name: Prochlorococcus NATL2A
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
-  score: 4.3342
+  score: 4.339
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB2
   locus_tag: PMN2A_1574
   organism_name: Prochlorococcus NATL2A
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 1.6739
+  score: 1.6823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ2
   locus_tag: PMN2A_1582
   organism_name: Prochlorococcus NATL2A
   product: DnaJ type II chaperone protein
-  score: 5.6361
+  score: 5.6378
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: PMT0021
   organism_name: Prochlorococcus MIT9313
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: PMT0022
   organism_name: Prochlorococcus MIT9313
   product: DnaJ type I chaperone protein
-  score: 2.8437
+  score: 2.8532
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: PMT0061
   organism_name: Prochlorococcus MIT9313
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: PMT0063
   organism_name: Prochlorococcus MIT9313
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: PMT0449
   organism_name: Prochlorococcus MIT9313
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 3.1656
+  score: 3.1754
 - annotation_quality: 2
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: PMT0498
   organism_name: Prochlorococcus MIT9313
   product: putative gram-negative pili assembly chaperone
-  score: 5.0101
+  score: 5.0115
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: PMT0696
   organism_name: Prochlorococcus MIT9313
   product: molecular chaperone HtpG
-  score: 6.1036
+  score: 6.1028
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: PMT0703
   organism_name: Prochlorococcus MIT9313
   product: chaperone protein DnaK
-  score: 5.4808
+  score: 5.4814
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: PMT0704
   organism_name: Prochlorococcus MIT9313
   product: DnaJ type II chaperone protein
-  score: 5.6896
+  score: 5.691
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMT0736
   organism_name: Prochlorococcus MIT9313
   product: DnaJ type IV chaperone protein
-  score: 4.9738
+  score: 4.9777
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMT0789
   organism_name: Prochlorococcus MIT9313
   product: conserved hypothetical protein
-  score: 5.255
+  score: 5.2563
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: PMT1011
   organism_name: Prochlorococcus MIT9313
   product: putative trigger factor
-  score: 3.361
+  score: 3.3695
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: PMT1061
   organism_name: Prochlorococcus MIT9313
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: PMT1444
   organism_name: Prochlorococcus MIT9313
   product: chaperone protein DnaK
-  score: 3.8623
+  score: 3.8693
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: PMT1450
   organism_name: Prochlorococcus MIT9313
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: PMT1495
   organism_name: Prochlorococcus MIT9313
   product: DnaJ type III chaperone protein
-  score: 4.2992
+  score: 4.3045
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ2
   locus_tag: PMT1548
   organism_name: Prochlorococcus MIT9313
   product: DnaJ type II chaperone protein
-  score: 5.6361
+  score: 5.6378
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: PMT1977
   organism_name: Prochlorococcus MIT9313
   product: DnaJ type III chaperone protein
-  score: 4.1088
+  score: 4.1149
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: ycf3
   locus_tag: PMT1992
   organism_name: Prochlorococcus MIT9313
   product: photosystem I assembly protein Ycf3
-  score: 2.7821
+  score: 2.7918
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tsaB
   locus_tag: PMT1999
   organism_name: Prochlorococcus MIT9313
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
-  score: 4.3342
+  score: 4.339
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB2
   locus_tag: PMT2085
   organism_name: Prochlorococcus MIT9313
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 1.6739
+  score: 1.6823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: PMT2255
   organism_name: Prochlorococcus MIT9313
   product: chaperone protein DnaK
-  score: 5.0446
+  score: 5.0482
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: PMT9312_0016
   organism_name: Prochlorococcus MIT9312
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: PMT9312_0017
   organism_name: Prochlorococcus MIT9312
   product: DnaJ type I chaperone protein
-  score: 1.8596
+  score: 1.8684
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: PMT9312_0125
   organism_name: Prochlorococcus MIT9312
   product: DnaJ type III chaperone protein
-  score: 4.1927
+  score: 4.1983
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: ycf3
   locus_tag: PMT9312_0134
   organism_name: Prochlorococcus MIT9312
   product: photosystem I assembly protein Ycf3
-  score: 2.7821
+  score: 2.7918
 - annotation_quality: 3
   gene_category: Translation
   gene_name: tsaB
   locus_tag: PMT9312_0141
   organism_name: Prochlorococcus MIT9312
   product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
-  score: 4.4476
+  score: 4.4521
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB2
   locus_tag: PMT9312_0209
   organism_name: Prochlorococcus MIT9312
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 1.6739
+  score: 1.6823
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: PMT9312_0580
   organism_name: Prochlorococcus MIT9312
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 2.0739
+  score: 2.0832
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMT9312_0664
   organism_name: Prochlorococcus MIT9312
   product: conserved hypothetical protein
-  score: 5.255
+  score: 5.2563
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: PMT9312_0665
   organism_name: Prochlorococcus MIT9312
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: PMT9312_0899
   organism_name: Prochlorococcus MIT9312
   product: molecular chaperone HtpG
-  score: 6.1036
+  score: 6.1028
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: PMT9312_0903
   organism_name: Prochlorococcus MIT9312
   product: chaperone protein DnaK
-  score: 6.5872
+  score: 6.5831
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: PMT9312_0904
   organism_name: Prochlorococcus MIT9312
   product: DnaJ type II chaperone protein
-  score: 5.6361
+  score: 5.6378
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMT9312_0928
   organism_name: Prochlorococcus MIT9312
   product: DnaJ type IV chaperone protein
-  score: 4.9738
+  score: 4.9777
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: PMT9312_1031
   organism_name: Prochlorococcus MIT9312
   product: possible Gram-negative pili assembly chaperone
-  score: 5.2949
+  score: 5.2942
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: PMT9312_1099
   organism_name: Prochlorococcus MIT9312
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ7
   locus_tag: PMT9312_1138
   organism_name: Prochlorococcus MIT9312
   product: DnaJ type III chaperone protein
-  score: 4.6802
+  score: 4.6839
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN
   locus_tag: PMT9312_1408
   organism_name: Prochlorococcus MIT9312
   product: oxygen-independent coproporphyrinogen III oxidase
-  score: 3.0559
+  score: 3.0655
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: PMT9312_1525
   organism_name: Prochlorococcus MIT9312
   product: chaperone protein DnaK
-  score: 3.8623
+  score: 3.8693
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: PMT9312_1530
   organism_name: Prochlorococcus MIT9312
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: PMT9312_1567
   organism_name: Prochlorococcus MIT9312
   product: DnaJ type III chaperone protein
-  score: 4.2992
+  score: 4.3045
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: PMT9312_1747
   organism_name: Prochlorococcus MIT9312
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: PMT9312_1749
   organism_name: Prochlorococcus MIT9312
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: PMT9312_1797
   organism_name: Prochlorococcus MIT9312
   product: chaperone protein DnaK
-  score: 5.0446
+  score: 5.0482
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: PMT_2694
   organism_name: Prochlorococcus MIT9313
   product: possible DnaJ type IV chaperone protein
-  score: 5.4534
+  score: 5.4519
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  locus_tag: Pro0016
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: chaperone protein GrpE
+  score: 2.3701
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: dnaJ1
+  locus_tag: Pro0017
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: DnaJ type I chaperone protein
+  score: 2.8532
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaJ4
+  locus_tag: Pro0142
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: DnaJ type III chaperone protein
+  score: 4.1149
+- annotation_quality: 3
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  locus_tag: Pro0154
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: photosystem I assembly protein Ycf3
+  score: 2.7918
+- annotation_quality: 3
+  gene_category: Translation
+  gene_name: tsaB
+  locus_tag: Pro0162
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: tRNA threonylcarbamoyladenosine biosynthesis protein TsaB
+  score: 4.339
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: clpB2
+  locus_tag: Pro0233
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 1.6823
+- annotation_quality: 2
+  gene_category: Stress response and adaptation
+  gene_name: null
+  locus_tag: Pro0883
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: putative gram-negative pili assembly chaperone
+  score: 5.0115
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: htpG
+  locus_tag: Pro0934
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: molecular chaperone HtpG
+  score: 6.1028
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaK2
+  locus_tag: Pro0938
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: chaperone protein DnaK
+  score: 5.4814
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaJ3
+  locus_tag: Pro0939
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: DnaJ type II chaperone protein
+  score: 5.691
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: Pro0963
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: DnaJ type IV chaperone protein
+  score: 4.1934
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: hslO
+  locus_tag: Pro1027
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: hsp33 family protein
+  score: 3.7553
+- annotation_quality: 1
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: Pro1028
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: conserved hypothetical protein
+  score: 5.2563
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: clpB1
+  locus_tag: Pro1082
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  score: 3.1754
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: clpC
+  locus_tag: Pro1107
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  score: 1.5636
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: hemN
+  locus_tag: Pro1385
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: oxygen-independent coproporphyrinogen III oxidase
+  score: 3.0655
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaK1
+  locus_tag: Pro1585
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: chaperone protein DnaK
+  score: 3.9635
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: groES
+  locus_tag: Pro1590
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: co-chaperonin GroES
+  score: 1.49
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: dnaJ5
+  locus_tag: Pro1628
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: DnaJ type III chaperone protein
+  score: 4.3045
+- annotation_quality: 3
+  gene_category: Post-translational modification
+  gene_name: tig
+  locus_tag: Pro1815
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: trigger factor
+  score: 2.7318
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: clpX
+  locus_tag: Pro1817
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  score: 2.5672
+- annotation_quality: 3
+  gene_category: Stress response and adaptation
+  gene_name: dnaK3
+  locus_tag: Pro1871
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: chaperone protein DnaK
+  score: 5.0482
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: SPO0006
   organism_name: Ruegeria pomeroyi DSS-3
   product: radical SAM family heme chaperone HemW
-  score: 4.2117
+  score: 4.22
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: SPO0024
   organism_name: Ruegeria pomeroyi DSS-3
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: SPO0043
   organism_name: Ruegeria pomeroyi DSS-3
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: SPO0044
   organism_name: Ruegeria pomeroyi DSS-3
   product: molecular chaperone DnaJ
-  score: 1.4609
+  score: 1.4686
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgA
   locus_tag: SPO0176
   organism_name: Ruegeria pomeroyi DSS-3
   product: flagellar basal body P-ring formation chaperone FlgA
-  score: 3.2517
+  score: 3.2605
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SPO0518
   organism_name: Ruegeria pomeroyi DSS-3
   product: ATP12 family chaperone protein
-  score: 7.3201
+  score: 7.3084
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: SPO0657
   organism_name: Ruegeria pomeroyi DSS-3
   product: CobW family GTP-binding protein
-  score: 2.9562
+  score: 2.9651
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: SPO0886
   organism_name: Ruegeria pomeroyi DSS-3
   product: co-chaperone GroES
-  score: 2.3609
+  score: 2.37
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: SPO0976
   organism_name: Ruegeria pomeroyi DSS-3
   product: copper chaperone PCu(A)C
-  score: 6.7167
+  score: 6.7097
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: SPO1004
   organism_name: Ruegeria pomeroyi DSS-3
   product: ATP-dependent Clp protease ATP-binding subunit ClpX
-  score: 4.1203
+  score: 4.1271
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: djlA
   locus_tag: SPO1108
   organism_name: Ruegeria pomeroyi DSS-3
   product: molecular chaperone DjiA
-  score: 6.7618
+  score: 6.7545
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: SPO1406
   organism_name: Ruegeria pomeroyi DSS-3
   product: DUF2182 domain-containing protein
-  score: 2.8368
+  score: 2.8346
 - annotation_quality: 3
   gene_category: Lipid metabolism
   gene_name: pqqD
   locus_tag: SPO1501
   organism_name: Ruegeria pomeroyi DSS-3
   product: pyrroloquinoline quinone biosynthesis peptide chaperone PqqD
-  score: 3.7809
+  score: 3.7881
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: torD
   locus_tag: SPO1798
   organism_name: Ruegeria pomeroyi DSS-3
   product: TorD/DmsD family molecular chaperone
-  score: 6.8375
+  score: 6.8295
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
   locus_tag: SPO1877
   organism_name: Ruegeria pomeroyi DSS-3
   product: cytochrome c maturation protein CcmE
-  score: 3.6959
+  score: 3.7038
 - annotation_quality: 3
   gene_category: Translation
   gene_name: hfq
   locus_tag: SPO2081
   organism_name: Ruegeria pomeroyi DSS-3
   product: RNA chaperone Hfq
-  score: 4.8399
+  score: 4.8452
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ppiD
   locus_tag: SPO2145
   organism_name: Ruegeria pomeroyi DSS-3
   product: peptidylprolyl isomerase
-  score: 2.5729
+  score: 2.573
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: SPO2255
   organism_name: Ruegeria pomeroyi DSS-3
   product: rcc01693 family protein
-  score: 6.0157
+  score: 6.0112
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: SPO2288
   organism_name: Ruegeria pomeroyi DSS-3
   product: trigger factor
-  score: 3.7585
+  score: 3.767
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: cobW
   locus_tag: SPO2862
   organism_name: Ruegeria pomeroyi DSS-3
   product: cobalamin biosynthesis protein CobW
-  score: 2.8497
+  score: 2.8589
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SPO2951
   organism_name: Ruegeria pomeroyi DSS-3
   product: YbaY family lipoprotein
-  score: 5.7744
+  score: 5.7721
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SPO3096
   organism_name: Ruegeria pomeroyi DSS-3
   product: ATPase
-  score: 6.1854
+  score: 6.1767
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: SPO3276
   organism_name: Ruegeria pomeroyi DSS-3
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: ccoQ
   locus_tag: SPO3524
   organism_name: Ruegeria pomeroyi DSS-3
   product: CcoQ/FixQ family Cbb3-type cytochrome c oxidase assembly chaperone
-  score: 4.6121
+  score: 4.6154
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslU
   locus_tag: SPO3882
   organism_name: Ruegeria pomeroyi DSS-3
   product: ATP-dependent protease ATPase subunit HslU
-  score: 3.1409
+  score: 3.1498
 - annotation_quality: 3
   gene_category: Intracellular trafficking
   gene_name: secB
   locus_tag: SPO3888
   organism_name: Ruegeria pomeroyi DSS-3
   product: protein-export chaperone SecB
-  score: 4.3269
+  score: 4.3351
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SPOA0188
   organism_name: Ruegeria pomeroyi DSS-3
   product: CcoQ/FixQ family Cbb3-type cytochrome c oxidase assembly chaperone
-  score: 4.5825
+  score: 4.5861
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
   locus_tag: SPOA0193
   organism_name: Ruegeria pomeroyi DSS-3
   product: cytochrome c maturation protein CcmE
-  score: 3.6959
+  score: 3.7038
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: slyD
   locus_tag: SPOA0438
   organism_name: Ruegeria pomeroyi DSS-3
   product: FKBP-type peptidyl-prolyl cis-trans isomerase
-  score: 3.0147
+  score: 3.0234
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
   locus_tag: SY28_00690
   organism_name: Meiothermus ruber
   product: cytochrome c maturation protein CcmE
-  score: 3.438
+  score: 3.4454
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: null
   locus_tag: SY28_02170
   organism_name: Meiothermus ruber
   product: copper chaperone PCu(A)C
-  score: 6.7167
+  score: 6.7097
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: SY28_02525
   organism_name: Meiothermus ruber
   product: ATP-dependent Clp protease ATP-binding subunit ClpX
-  score: 3.2781
+  score: 3.2866
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: SY28_02535
   organism_name: Meiothermus ruber
   product: trigger factor
-  score: 3.8546
+  score: 3.8627
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: SY28_02960
   organism_name: Meiothermus ruber
   product: molecular chaperone DnaJ
-  score: 2.7093
+  score: 2.7181
 - annotation_quality: 3
   gene_category: Translation
   gene_name: csaA
   locus_tag: SY28_03070
   organism_name: Meiothermus ruber
   product: tRNA-binding protein
-  score: 5.5303
+  score: 5.5277
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groS
   locus_tag: SY28_03460
   organism_name: Meiothermus ruber
   product: co-chaperone GroES
-  score: 2.3609
+  score: 2.37
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SY28_03805
   organism_name: Meiothermus ruber
   product: FKBP-type peptidyl-prolyl cis-trans isomerase
-  score: 3.0541
+  score: 3.0629
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SY28_04705
   organism_name: Meiothermus ruber
   product: OmpH family outer membrane protein
-  score: 5.0983
+  score: 5.0989
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SY28_04710
   organism_name: Meiothermus ruber
   product: OmpH family outer membrane protein
-  score: 5.0983
+  score: 5.0989
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: SY28_07680
   organism_name: Meiothermus ruber
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: SY28_08425
   organism_name: Meiothermus ruber
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1264
+  score: 5.1311
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: SY28_11510
   organism_name: Meiothermus ruber
   product: radical SAM family heme chaperone HemW
-  score: 4.6117
+  score: 4.6152
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslU
   locus_tag: SY28_11535
   organism_name: Meiothermus ruber
   product: ATP-dependent protease ATPase subunit HslU
-  score: 2.03
+  score: 2.0334
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SY28_11840
   organism_name: Meiothermus ruber
   product: YifB family Mg chelatase-like AAA ATPase
-  score: 4.6958
+  score: 4.6994
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: SY28_12125
   organism_name: Meiothermus ruber
   product: molecular chaperone DnaK
-  score: 6.7073
+  score: 6.7008
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ2
   locus_tag: SY28_12135
   organism_name: Meiothermus ruber
   product: DnaJ C-terminal domain-containing protein
-  score: 4.4705
+  score: 4.4747
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hypC
   locus_tag: SYNPCC7002_A0205
   organism_name: Synechococcus PCC 7002
   product: HypC/HybG/HupF family hydrogenase formation chaperone
-  score: 5.2034
+  score: 5.203
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: null
   locus_tag: SYNPCC7002_A0293
   organism_name: Synechococcus PCC 7002
   product: co-chaperone YbbN
-  score: 6.2138
+  score: 6.2052
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
   locus_tag: SYNPCC7002_A0360
   organism_name: Synechococcus PCC 7002
   product: YifB family Mg chelatase-like AAA ATPase
-  score: 4.6221
+  score: 4.6261
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: SYNPCC7002_A0431
   organism_name: Synechococcus PCC 7002
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNPCC7002_A0476
   organism_name: Synechococcus PCC 7002
   product: Hsp70 family protein
-  score: 6.0046
+  score: 5.9979
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNPCC7002_A0540
   organism_name: Synechococcus PCC 7002
   product: J domain-containing protein
-  score: 5.5692
+  score: 5.5661
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: SYNPCC7002_A0693
   organism_name: Synechococcus PCC 7002
   product: molecular chaperone DnaJ
-  score: 2.7093
+  score: 2.7181
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: SYNPCC7002_A0694
   organism_name: Synechococcus PCC 7002
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNPCC7002_A0815
   organism_name: Synechococcus PCC 7002
   product: CesT family type III secretion system chaperone
-  score: 5.8764
+  score: 5.8704
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNPCC7002_A0932
   organism_name: Synechococcus PCC 7002
   product: CPP1-like family protein
-  score: 5.7467
+  score: 5.7443
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: SYNPCC7002_A1123
   organism_name: Synechococcus PCC 7002
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNPCC7002_A1196
   organism_name: Synechococcus PCC 7002
   product: co-chaperone YbbN
-  score: 6.2138
+  score: 6.2052
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: SYNPCC7002_A1276
   organism_name: Synechococcus PCC 7002
   product: trigger factor
-  score: 3.4238
+  score: 3.4322
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: SYNPCC7002_A1534
   organism_name: Synechococcus PCC 7002
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 3.3047
+  score: 3.3132
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: ycf3
   locus_tag: SYNPCC7002_A1566
   organism_name: Synechococcus PCC 7002
   product: photosystem I assembly protein Ycf3
-  score: 3.5484
+  score: 3.556
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNPCC7002_A1738
   organism_name: Synechococcus PCC 7002
   product: J domain-containing protein
-  score: 5.8504
+  score: 5.8451
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: SYNPCC7002_A1902
   organism_name: Synechococcus PCC 7002
   product: molecular chaperone HtpG
-  score: 5.0446
+  score: 5.046
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: SYNPCC7002_A1925
   organism_name: Synechococcus PCC 7002
   product: DnaJ C-terminal domain-containing protein
-  score: 5.2608
+  score: 5.2604
 - annotation_quality: 2
   gene_category: Cell motility
   gene_name: null
   locus_tag: SYNPCC7002_A2109
   organism_name: Synechococcus PCC 7002
   product: Spy/CpxP family protein refolding chaperone
-  score: 5.1949
+  score: 5.1951
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: SYNPCC7002_A2160
   organism_name: Synechococcus PCC 7002
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: SYNPCC7002_A2353
   organism_name: Synechococcus PCC 7002
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: trxM1
   locus_tag: SYNPCC7002_A2368
   organism_name: Synechococcus PCC 7002
   product: co-chaperone YbbN
-  score: 5.5192
+  score: 5.5163
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: SYNPCC7002_A2418
   organism_name: Synechococcus PCC 7002
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: SYNPCC7002_A2457
   organism_name: Synechococcus PCC 7002
   product: co-chaperone GroES
-  score: 4.2775
+  score: 4.2823
 - annotation_quality: 2
   gene_category: Replication and repair
   gene_name: null
   locus_tag: SYNPCC7002_A2512
   organism_name: Synechococcus PCC 7002
   product: chaperone DnaJ domain-containing protein
-  score: 2.8591
+  score: 2.8674
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNPCC7002_A2514
   organism_name: Synechococcus PCC 7002
   product: pentapeptide repeat-containing protein
-  score: 5.2275
+  score: 5.2273
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNPCC7002_A2593
   organism_name: Synechococcus PCC 7002
   product: J domain-containing protein
-  score: 5.2949
+  score: 5.2942
 - annotation_quality: 1
   gene_category: Cell motility
   gene_name: null
   locus_tag: SYNPCC7002_A2596
   organism_name: Synechococcus PCC 7002
   product: hypothetical protein
-  score: 6.5373
+  score: 6.5252
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: SYNPCC7002_A2831
   organism_name: Synechococcus PCC 7002
   product: radical SAM family heme chaperone HemW
-  score: 4.6117
+  score: 4.6152
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: kdpC
   locus_tag: SYNPCC7002_G0055
   organism_name: Synechococcus PCC 7002
   product: K(+)-transporting ATPase subunit C
-  score: 2.5396
+  score: 2.5483
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: SYNW0023
   organism_name: Synechococcus WH8102
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: SYNW0024
   organism_name: Synechococcus WH8102
   product: DnaJ type I chaperone protein
-  score: 2.8437
+  score: 2.8532
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: SYNW0063
   organism_name: Synechococcus WH8102
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: SYNW0065
   organism_name: Synechococcus WH8102
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: comM
   locus_tag: SYNW0327
   organism_name: Synechococcus WH8102
   product: putative ATP-dependent protease
-  score: 1.341
+  score: 1.3461
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: SYNW0480
   organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
-  score: 4.6172
+  score: 4.6209
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: SYNW0513
   organism_name: Synechococcus WH8102
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: SYNW0523
   organism_name: Synechococcus WH8102
   product: chaperone protein DnaK
-  score: 6.1757
+  score: 6.1734
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: SYNW0627
   organism_name: Synechococcus WH8102
   product: DnaJ type III chaperone protein
-  score: 5.7455
+  score: 5.7466
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
   locus_tag: SYNW0938
   organism_name: Synechococcus WH8102
   product: ATP-dependent Clp protease ATP-binding subunit ClpC
-  score: 1.5555
+  score: 1.5636
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNW1152
   organism_name: Synechococcus WH8102
   product: conserved hypothetical protein
-  score: 5.6306
+  score: 5.6297
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: SYNW1153
   organism_name: Synechococcus WH8102
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNW1230
   organism_name: Synechococcus WH8102
   product: DnaJ type IV chaperone protein
-  score: 6.1563
+  score: 6.1556
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: SYNW1268
   organism_name: Synechococcus WH8102
   product: DnaJ type II chaperone protein
-  score: 5.8377
+  score: 5.8379
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: SYNW1269
   organism_name: Synechococcus WH8102
   product: chaperone protein DnaK
-  score: 5.4808
+  score: 5.4814
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: SYNW1278
   organism_name: Synechococcus WH8102
   product: molecular chaperone HtpG
-  score: 4.8856
+  score: 4.8896
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNW1328
   organism_name: Synechococcus WH8102
   product: DnaJ type IV chaperone protein
-  score: 7.0679
+  score: 7.0592
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SYNW1429
   organism_name: Synechococcus WH8102
   product: DnaJ type IV chaperone protein
-  score: 6.1429
+  score: 6.1413
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: SYNW1503
   organism_name: Synechococcus WH8102
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 3.1656
+  score: 3.1754
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN
   locus_tag: SYNW1646
   organism_name: Synechococcus WH8102
   product: oxygen-independent coproporphyrinogen III oxidase
-  score: 3.0559
+  score: 3.0655
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ2
   locus_tag: SYNW1934
   organism_name: Synechococcus WH8102
   product: DnaJ type II chaperone protein
-  score: 5.7842
+  score: 5.7847
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: SYNW2221
   organism_name: Synechococcus WH8102
   product: DnaJ type III chaperone protein
-  score: 5.8377
+  score: 5.8379
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: SYNW2508
   organism_name: Synechococcus WH8102
   product: chaperone protein DnaK
-  score: 5.0446
+  score: 5.0482
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: nfuA
   locus_tag: Sputw3181_0119
   organism_name: Shewanella sp. W3-18-1
   product: Fe-S biogenesis protein NfuA
-  score: 3.0402
+  score: 3.0487
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
   locus_tag: Sputw3181_0184
   organism_name: Shewanella sp. W3-18-1
   product: cytochrome c maturation protein CcmE
-  score: 3.438
+  score: 3.4454
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: spy
   locus_tag: Sputw3181_0218
   organism_name: Shewanella sp. W3-18-1
   product: Spy/CpxP family protein refolding chaperone
-  score: 5.1675
+  score: 5.1674
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: yaaW
   locus_tag: Sputw3181_0314
   organism_name: Shewanella sp. W3-18-1
   product: GTPase
-  score: 6.2787
+  score: 6.2725
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgA
   locus_tag: Sputw3181_0470
   organism_name: Shewanella sp. W3-18-1
   product: flagellar basal body P-ring formation chaperone FlgA
-  score: 3.7812
+  score: 3.7873
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: fliS
   locus_tag: Sputw3181_0486
   organism_name: Shewanella sp. W3-18-1
   product: flagellar export chaperone FliS
-  score: 5.5692
+  score: 5.5661
 - annotation_quality: 3
   gene_category: Translation
   gene_name: hfq
   locus_tag: Sputw3181_0661
   organism_name: Shewanella sp. W3-18-1
   product: RNA chaperone Hfq
-  score: 4.9535
+  score: 4.9579
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: napD
   locus_tag: Sputw3181_0796
   organism_name: Shewanella sp. W3-18-1
   product: chaperone NapD
-  score: 6.0479
+  score: 6.0408
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: Sputw3181_0976
   organism_name: Shewanella sp. W3-18-1
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Translation
   gene_name: dnaJ
   locus_tag: Sputw3181_0977
   organism_name: Shewanella sp. W3-18-1
   product: molecular chaperone DnaJ
-  score: 2.7093
+  score: 2.7181
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemW
   locus_tag: Sputw3181_1318
   organism_name: Shewanella sp. W3-18-1
   product: radical SAM family heme chaperone HemW
-  score: 4.6117
+  score: 4.6152
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: flgA
   locus_tag: Sputw3181_1403
   organism_name: Shewanella sp. W3-18-1
   product: flagellar basal body P-ring formation chaperone FlgA
-  score: 3.7812
+  score: 3.7873
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: fliS
   locus_tag: Sputw3181_1422
   organism_name: Shewanella sp. W3-18-1
   product: flagellar export chaperone FliS
-  score: 5.4405
+  score: 5.4384
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: Sputw3181_1709
   organism_name: Shewanella sp. W3-18-1
   product: molecular chaperone HtpG
-  score: 6.3772
+  score: 6.3737
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: proQ
   locus_tag: Sputw3181_1806
   organism_name: Shewanella sp. W3-18-1
   product: RNA chaperone ProQ
-  score: 6.0324
+  score: 6.031
 - annotation_quality: 3
   gene_category: Defense mechanisms
   gene_name: lolD
   locus_tag: Sputw3181_1856
   organism_name: Shewanella sp. W3-18-1
   product: lipoprotein-releasing ABC transporter ATP-binding protein LolD
-  score: 3.0057
+  score: 3.0139
 - annotation_quality: 3
   gene_category: Translation
   gene_name: hscB
   locus_tag: Sputw3181_1865
   organism_name: Shewanella sp. W3-18-1
   product: co-chaperone HscB
-  score: 5.4242
+  score: 5.4266
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hscA
   locus_tag: Sputw3181_1866
   organism_name: Shewanella sp. W3-18-1
   product: Fe-S protein assembly chaperone HscA
-  score: 5.3421
+  score: 5.3445
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lolA
   locus_tag: Sputw3181_2002
   organism_name: Shewanella sp. W3-18-1
   product: outer membrane lipoprotein chaperone LolA
-  score: 2.7381
+  score: 2.7467
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccoQ
   locus_tag: Sputw3181_2048
   organism_name: Shewanella sp. W3-18-1
   product: CcoQ/FixQ family Cbb3-type cytochrome c oxidase assembly chaperone
-  score: 4.5276
+  score: 4.5314
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: null
   locus_tag: Sputw3181_2106
   organism_name: Shewanella sp. W3-18-1
   product: chaperone NapD
-  score: 5.8504
+  score: 5.8451
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hypC
   locus_tag: Sputw3181_2174
   organism_name: Shewanella sp. W3-18-1
   product: HypC/HybG/HupF family hydrogenase formation chaperone
-  score: 4.7956
+  score: 4.7977
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: yegD
   locus_tag: Sputw3181_2291
   organism_name: Shewanella sp. W3-18-1
   product: molecular chaperone
-  score: 5.8925
+  score: 5.8867
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: Sputw3181_2296
   organism_name: Shewanella sp. W3-18-1
   product: YbaY family lipoprotein
-  score: 5.8777
+  score: 5.8743
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: bepA
   locus_tag: Sputw3181_2330
   organism_name: Shewanella sp. W3-18-1
   product: M48 family metalloprotease
-  score: 3.3807
+  score: 3.3885
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: Sputw3181_2472
   organism_name: Shewanella sp. W3-18-1
   product: phage tail assembly chaperone family protein, TAC
-  score: 6.8693
+  score: 6.8616
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: Sputw3181_2610
   organism_name: Shewanella sp. W3-18-1
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 3.3047
+  score: 3.3132
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: Sputw3181_2612
   organism_name: Shewanella sp. W3-18-1
   product: trigger factor
-  score: 3.4238
+  score: 3.4322
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: Sputw3181_2668
   organism_name: Shewanella sp. W3-18-1
   product: hypothetical protein
-  score: 6.0261
+  score: 6.0188
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: ybaY
   locus_tag: Sputw3181_2707
   organism_name: Shewanella sp. W3-18-1
   product: YbaY family lipoprotein
-  score: 5.7992
+  score: 5.7962
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
   locus_tag: Sputw3181_2886
   organism_name: Shewanella sp. W3-18-1
   product: putative phage tail assembly chaperone
-  score: 7.1651
+  score: 7.1548
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: Sputw3181_3141
   organism_name: Shewanella sp. W3-18-1
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: djlA
   locus_tag: Sputw3181_3172
   organism_name: Shewanella sp. W3-18-1
   product: co-chaperone DjlA
-  score: 4.1826
+  score: 4.1901
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: surA
   locus_tag: Sputw3181_3176
   organism_name: Shewanella sp. W3-18-1
   product: peptidylprolyl isomerase SurA
-  score: 2.6577
+  score: 2.6667
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: Sputw3181_3410
   organism_name: Shewanella sp. W3-18-1
   product: copper chaperone PCu(A)C
-  score: 6.7167
+  score: 6.7097
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groS
   locus_tag: Sputw3181_3470
   organism_name: Shewanella sp. W3-18-1
   product: co-chaperone GroES
-  score: 4.2775
+  score: 4.2823
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslU
   locus_tag: Sputw3181_3643
   organism_name: Shewanella sp. W3-18-1
   product: HslU--HslV peptidase ATPase subunit
-  score: 2.7369
+  score: 2.7457
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: Sputw3181_3707
   organism_name: Shewanella sp. W3-18-1
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: lptM
   locus_tag: Sputw3181_3723
   organism_name: Shewanella sp. W3-18-1
   product: LPS translocon maturation chaperone LptM
-  score: 5.211
+  score: 5.2108
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: Sputw3181_3869
   organism_name: Shewanella sp. W3-18-1
   product: molecular chaperone
-  score: 6.9491
+  score: 6.94
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: null
   locus_tag: Sputw3181_3905
   organism_name: Shewanella sp. W3-18-1
   product: molecular chaperone
-  score: 7.1047
+  score: 7.096
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: null
   locus_tag: Sputw3181_3908
   organism_name: Shewanella sp. W3-18-1
   product: molecular chaperone
-  score: 7.4963
+  score: 7.4839
 - annotation_quality: 3
   gene_category: Intracellular trafficking
   gene_name: secB
   locus_tag: Sputw3181_4036
   organism_name: Shewanella sp. W3-18-1
   product: protein-export chaperone SecB
-  score: 4.4621
+  score: 4.4687
+- annotation_quality: 2
+  gene_category: Post-translational modification
+  gene_name: null
+  locus_tag: SynBL107_50009
+  organism_name: Synechococcus sp. BL107
+  product: possible DnaJ type IV chaperone protein
+  score: 5.5824
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: SynWH7803_0022
   organism_name: Synechococcus WH7803
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: SynWH7803_0023
   organism_name: Synechococcus WH7803
   product: DnaJ type I chaperone protein
-  score: 2.8437
+  score: 2.8532
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: SynWH7803_0064
   organism_name: Synechococcus WH7803
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: SynWH7803_0071
   organism_name: Synechococcus WH7803
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SynWH7803_0821
   organism_name: Synechococcus WH7803
   product: DnaJ type IV chaperone protein
-  score: 7.0679
+  score: 7.0592
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SynWH7803_0857
   organism_name: Synechococcus WH7803
   product: DnaJ type IV chaperone protein
-  score: 6.1429
+  score: 6.1413
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SynWH7803_0904
   organism_name: Synechococcus WH7803
   product: DnaJ type IV chaperone protein
-  score: 5.7133
+  score: 5.7148
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: SynWH7803_1238
   organism_name: Synechococcus WH7803
   product: molecular chaperone HtpG
-  score: 4.9742
+  score: 4.9778
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: SynWH7803_1246
   organism_name: Synechococcus WH7803
   product: chaperone protein DnaK
-  score: 5.4808
+  score: 5.4814
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: dnaJ3
   locus_tag: SynWH7803_1247
   organism_name: Synechococcus WH7803
   product: DnaJ type II chaperone protein
-  score: 5.8377
+  score: 5.8379
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SynWH7803_1287
   organism_name: Synechococcus WH7803
   product: DnaJ type IV chaperone protein
-  score: 5.5358
+  score: 5.538
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: SynWH7803_1490
   organism_name: Synechococcus WH7803
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SynWH7803_1491
   organism_name: Synechococcus WH7803
   product: conserved hypothetical protein
-  score: 6.0363
+  score: 6.0326
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
   locus_tag: SynWH7803_1676
   organism_name: Synechococcus WH7803
   product: conserved hypothetical protein
-  score: 4.6172
+  score: 4.6209
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: SynWH7803_1926
   organism_name: Synechococcus WH7803
   product: possible DnaJ type IV chaperone protein
-  score: 5.5852
+  score: 5.5824
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: SynWH7803_1991
   organism_name: Synechococcus WH7803
   product: chaperone protein DnaK
-  score: 6.1757
+  score: 6.1734
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: SynWH7803_1999
   organism_name: Synechococcus WH7803
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: SynWH7803_2050
   organism_name: Synechococcus WH7803
   product: DnaJ type III chaperone protein
-  score: 5.7455
+  score: 5.7466
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ2
   locus_tag: SynWH7803_2100
   organism_name: Synechococcus WH7803
   product: DnaJ type II chaperone protein
-  score: 5.8377
+  score: 5.8379
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: comM
   locus_tag: SynWH7803_2137
   organism_name: Synechococcus WH7803
   product: putative ATP-dependent protease
-  score: 4.0984
+  score: 4.1041
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: SynWH7803_2233
   organism_name: Synechococcus WH7803
   product: DnaJ type III chaperone protein
-  score: 5.8377
+  score: 5.8379
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: SynWH7803_2514
   organism_name: Synechococcus WH7803
   product: chaperone protein DnaK
-  score: 5.0446
+  score: 5.0482
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: TX72_RS02870
   organism_name: Synechococcus WH8102
   product: possible DnaJ type IV chaperone protein
-  score: 5.4534
+  score: 5.4519
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: grpE
   locus_tag: sync_0022
   organism_name: Synechococcus CC9311
   product: chaperone protein GrpE
-  score: 2.3606
+  score: 2.3701
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
   locus_tag: sync_0023
   organism_name: Synechococcus CC9311
   product: DnaJ type I chaperone protein
-  score: 2.8437
+  score: 2.8532
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpX
   locus_tag: sync_0064
   organism_name: Synechococcus CC9311
   product: ATP-dependent Clp protease ATP-binding subunit, ClpX
-  score: 2.5576
+  score: 2.5672
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: tig
   locus_tag: sync_0066
   organism_name: Synechococcus CC9311
   product: trigger factor
-  score: 2.7222
+  score: 2.7318
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN
   locus_tag: sync_0729
   organism_name: Synechococcus CC9311
   product: oxygen-independent coproporphyrinogen III oxidase
-  score: 1.6151
+  score: 1.6199
 - annotation_quality: 1
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: sync_1271
   organism_name: Synechococcus CC9311
   product: conserved hypothetical protein
-  score: 5.6306
+  score: 5.6297
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: sync_1272
   organism_name: Synechococcus CC9311
   product: hsp33 family protein
-  score: 3.7469
+  score: 3.7553
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK4
   locus_tag: sync_1293
   organism_name: Synechococcus CC9311
   product: chaperone protein DnaK
-  score: 5.1031
+  score: 5.1064
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
@@ -4053,263 +4921,263 @@ rows:
   locus_tag: sync_1388
   organism_name: Synechococcus CC9311
   product: DnaJ type II chaperone protein
-  score: 5.8377
+  score: 5.8379
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
   locus_tag: sync_1389
   organism_name: Synechococcus CC9311
   product: chaperone protein DnaK
-  score: 5.4808
+  score: 5.4814
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: htpG
   locus_tag: sync_1398
   organism_name: Synechococcus CC9311
   product: molecular chaperone HtpG
-  score: 4.9742
+  score: 4.9778
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: sync_1452
   organism_name: Synechococcus CC9311
   product: DnaJ type IV chaperone protein
-  score: 6.1429
+  score: 6.1413
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: sync_1819
   organism_name: Synechococcus CC9311
   product: DnaJ type IV chaperone protein
-  score: 7.0679
+  score: 7.0592
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
   locus_tag: sync_1897
   organism_name: Synechococcus CC9311
   product: ATP-dependent Clp protease ATP-binding subunit ClpB
-  score: 3.1656
+  score: 3.1754
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: sync_2189
   organism_name: Synechococcus CC9311
   product: possible DnaJ type IV chaperone protein
-  score: 5.5852
+  score: 5.5824
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK1
   locus_tag: sync_2271
   organism_name: Synechococcus CC9311
   product: chaperone protein DnaK
-  score: 6.1757
+  score: 6.1734
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: groES
   locus_tag: sync_2283
   organism_name: Synechococcus CC9311
   product: co-chaperonin GroES
-  score: 1.485
+  score: 1.49
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ5
   locus_tag: sync_2345
   organism_name: Synechococcus CC9311
   product: DnaJ type III chaperone protein
-  score: 5.7455
+  score: 5.7466
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ2
   locus_tag: sync_2399
   organism_name: Synechococcus CC9311
   product: DnaJ type II chaperone protein
-  score: 5.7842
+  score: 5.7847
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: comM
   locus_tag: sync_2468
   organism_name: Synechococcus CC9311
   product: putative ATP-dependent protease
-  score: 4.0984
+  score: 4.1041
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ4
   locus_tag: sync_2576
   organism_name: Synechococcus CC9311
   product: DnaJ type III chaperone protein
-  score: 5.8377
+  score: 5.8379
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaK3
   locus_tag: sync_2923
   organism_name: Synechococcus CC9311
   product: chaperone protein DnaK
-  score: 5.0446
+  score: 5.0482
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: tll0118
   organism_name: Thermosynechococcus vestitus BP-1
   product: J domain-containing protein
-  score: 4.8289
+  score: 4.8307
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: groES
   locus_tag: tll0186
   organism_name: Thermosynechococcus vestitus BP-1
   product: co-chaperone GroES
-  score: 4.2775
+  score: 4.2823
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: tll0280
   organism_name: Thermosynechococcus vestitus BP-1
   product: DnaJ C-terminal domain-containing protein
-  score: 4.4705
+  score: 4.4747
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: null
   locus_tag: tll0639
   organism_name: Thermosynechococcus vestitus BP-1
   product: M48 family metallopeptidase
-  score: 5.2608
+  score: 5.2604
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: tll0789
   organism_name: Thermosynechococcus vestitus BP-1
   product: tetratricopeptide repeat protein
-  score: 5.7055
+  score: 5.7014
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: tll0790
   organism_name: Thermosynechococcus vestitus BP-1
   product: molecular chaperone DnaJ
-  score: 2.7093
+  score: 2.7181
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: tll0791
   organism_name: Thermosynechococcus vestitus BP-1
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
   locus_tag: tll0808
   organism_name: Thermosynechococcus vestitus BP-1
   product: Hsp33 family molecular chaperone HslO
-  score: 5.1803
+  score: 5.1835
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: tll0881
   organism_name: Thermosynechococcus vestitus BP-1
   product: J domain-containing protein
-  score: 4.8904
+  score: 4.8919
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: tll1085
   organism_name: Thermosynechococcus vestitus BP-1
   product: zinc metalloprotease HtpX
-  score: 5.2608
+  score: 5.2604
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: htpG
   locus_tag: tll1191
   organism_name: Thermosynechococcus vestitus BP-1
   product: molecular chaperone HtpG
-  score: 6.2541
+  score: 6.2517
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: hemN2
   locus_tag: tll1192
   organism_name: Thermosynechococcus vestitus BP-1
   product: radical SAM family heme chaperone HemW
-  score: 4.2117
+  score: 4.22
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: tll1433
   organism_name: Thermosynechococcus vestitus BP-1
   product: J domain-containing protein
-  score: 4.7618
+  score: 4.7645
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: rcbX
   locus_tag: tll1505
   organism_name: Thermosynechococcus vestitus BP-1
   product: RuBisCO chaperone RbcX
-  score: 5.7465
+  score: 5.7419
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ
   locus_tag: tll2149
   organism_name: Thermosynechococcus vestitus BP-1
   product: DnaJ C-terminal domain-containing protein
-  score: 4.4705
+  score: 4.4747
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: tll2150
   organism_name: Thermosynechococcus vestitus BP-1
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: tll2453
   organism_name: Thermosynechococcus vestitus BP-1
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: null
   locus_tag: tlr0319
   organism_name: Thermosynechococcus vestitus BP-1
   product: Spy/CpxP family protein refolding chaperone
-  score: 4.2372
+  score: 4.2427
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: tig
   locus_tag: tlr0508
   organism_name: Thermosynechococcus vestitus BP-1
   product: trigger factor
-  score: 3.4238
+  score: 3.4322
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpX
   locus_tag: tlr0510
   organism_name: Thermosynechococcus vestitus BP-1
   product: ATP-dependent protease ATP-binding subunit ClpX
-  score: 3.3047
+  score: 3.3132
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
   locus_tag: tlr1389
   organism_name: Thermosynechococcus vestitus BP-1
   product: ATP-dependent chaperone ClpB
-  score: 4.6631
+  score: 4.6701
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK
   locus_tag: tlr1733
   organism_name: Thermosynechococcus vestitus BP-1
   product: molecular chaperone DnaK
-  score: 5.4793
+  score: 5.4768
 - annotation_quality: 3
   gene_category: Intracellular trafficking
   gene_name: null
   locus_tag: tlr2132
   organism_name: Thermosynechococcus vestitus BP-1
   product: YadA family autotransporter adhesin
-  score: 1.7153
+  score: 1.7198
 - annotation_quality: 2
   gene_category: Post-translational modification
   gene_name: null
   locus_tag: tlr2348
   organism_name: Thermosynechococcus vestitus BP-1
   product: CPP1-like family protein
-  score: 2.6659
+  score: 2.6652

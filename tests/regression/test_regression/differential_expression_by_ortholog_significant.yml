@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_significant
-row_count: 30
+row_count: 31
 rows:
 - background_factors:
   - axenic
@@ -14,7 +14,7 @@ rows:
   organism_name: Prochlorococcus AS9601
   significant_down: 1
   significant_up: 0
-  timepoint: null
+  timepoint: acclimated
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -32,7 +32,7 @@ rows:
   organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
-  timepoint: null
+  timepoint: max across 3-24h
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -50,7 +50,7 @@ rows:
   organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
-  timepoint: null
+  timepoint: max across 3-24h
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -266,8 +266,8 @@ rows:
   organism_name: Prochlorococcus MIT9312
   significant_down: 1
   significant_up: 0
-  timepoint: null
-  timepoint_hours: null
+  timepoint: 120 min
+  timepoint_hours: 2.0
   timepoint_order: 1
   treatment_type:
   - plastic
@@ -284,8 +284,8 @@ rows:
   organism_name: Prochlorococcus MIT9312
   significant_down: 1
   significant_up: 0
-  timepoint: null
-  timepoint_hours: null
+  timepoint: 90 min
+  timepoint_hours: 1.5
   timepoint_order: 1
   treatment_type:
   - plastic
@@ -338,8 +338,8 @@ rows:
   organism_name: Prochlorococcus NATL2A
   significant_down: 1
   significant_up: 0
-  timepoint: null
-  timepoint_hours: null
+  timepoint: 120 min
+  timepoint_hours: 2.0
   timepoint_order: 1
   treatment_type:
   - plastic
@@ -356,8 +356,8 @@ rows:
   organism_name: Prochlorococcus NATL2A
   significant_down: 1
   significant_up: 0
-  timepoint: null
-  timepoint_hours: null
+  timepoint: 90 min
+  timepoint_hours: 1.5
   timepoint_order: 1
   treatment_type:
   - plastic
@@ -506,6 +506,24 @@ rows:
   treatment_type:
   - darkness
 - background_factors:
+  - coculture
+  - light
+  coculture_partner: null
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_ss120_proteomics
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  not_significant: 0
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  significant_down: 0
+  significant_up: 1
+  timepoint: stationary
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - carbon
+- background_factors:
   - light
   coculture_partner: Ruegeria pomeroyi DSS-3
   consensus_gene_name: psbB
@@ -517,8 +535,8 @@ rows:
   organism_name: Synechococcus WH7803
   significant_down: 0
   significant_up: 1
-  timepoint: null
-  timepoint_hours: null
+  timepoint: 35 days
+  timepoint_hours: 840.0
   timepoint_order: 1
   treatment_type:
   - coculture
@@ -534,7 +552,7 @@ rows:
   organism_name: Synechococcus WH8102
   significant_down: 1
   significant_up: 0
-  timepoint: null
+  timepoint: mid-log phase
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
