@@ -542,3 +542,66 @@ class TestAnalysesToDataFrame:
         """The raw 'clusters' column should not appear in the output."""
         df = analyses_to_dataframe(_ANALYSES_RESULT_COMPACT)
         assert "clusters" not in df.columns
+
+
+# ---------------------------------------------------------------------------
+# Tests for enrichment output
+# ---------------------------------------------------------------------------
+
+
+class TestToDataFrameEnrichmentOutput:
+    """Default to_dataframe must handle pathway_enrichment envelopes cleanly."""
+
+    @staticmethod
+    def _envelope(verbose=False):
+        row = {
+            "cluster": "exp1|T0|up",
+            "experiment_id": "exp1",
+            "name": "exp1_name",
+            "timepoint": "T0",
+            "timepoint_hours": 0.0,
+            "timepoint_order": 0,
+            "direction": "up",
+            "omics_type": "transcriptomics",
+            "table_scope": "rna_all",
+            "treatment_type": ["N_stress"],
+            "background_factors": None,
+            "is_time_course": True,
+            "term_id": "P",
+            "term_name": "Pathway P",
+            "level": 1,
+            "gene_ratio": "2/10",
+            "gene_ratio_numeric": 0.2,
+            "bg_ratio": "3/100",
+            "bg_ratio_numeric": 0.03,
+            "rich_factor": 0.67,
+            "fold_enrichment": 6.67,
+            "pvalue": 1e-5,
+            "p_adjust": 1e-4,
+            "count": 2,
+            "bg_count": 3,
+            "signed_score": 4.0,
+        }
+        if verbose:
+            row["foreground_gene_ids"] = ["PMM0001", "PMM0002"]
+            row["background_gene_ids"] = ["PMM0003"]
+        return {"results": [row]}
+
+    def test_compact_rows_produce_clean_dataframe(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            df = to_dataframe(self._envelope(verbose=False))
+            assert not any(issubclass(w.category, UserWarning) for w in caught), (
+                f"Unexpected warnings: {[str(w.message) for w in caught]}"
+            )
+        assert len(df) == 1
+        assert df.loc[0, "treatment_type"] == "N_stress"
+
+    def test_verbose_rows_with_gene_id_lists(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            df = to_dataframe(self._envelope(verbose=True))
+            assert not any(issubclass(w.category, UserWarning) for w in caught)
+        row = df.iloc[0]
+        assert "PMM0001" in str(row["foreground_gene_ids"])
+        assert "PMM0003" in str(row["background_gene_ids"])
