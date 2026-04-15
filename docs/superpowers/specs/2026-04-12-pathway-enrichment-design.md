@@ -425,7 +425,27 @@ YAML content:
    - `genes_by_ontology(ontology, organism, level, term_ids=...)` — TERM2GENE source for `fisher_ora`.
    - `list_organisms(...)` / explicit locus_tag list — alternative backgrounds.
 
-3. **Code example — DE path (reproduces the MCP tool):**
+3. **Code example — choosing ontology + level with `ontology_landscape`:**
+   ```python
+   from multiomics_explorer.api import ontology_landscape
+   from multiomics_explorer.analysis.frames import to_dataframe
+
+   # Characterize all ontologies for MED4; optionally weight by experiments.
+   landscape = ontology_landscape(
+       organism="MED4",
+       experiment_ids=["exp1", "exp2", ...],   # optional, ranks by experiment coverage
+       min_gene_set_size=5, max_gene_set_size=500,
+   )
+   df_landscape = to_dataframe(landscape)
+
+   # Rows are (ontology x level) combinations ranked by relevance_rank.
+   # Key signals: genome_coverage, median_genes_per_term, best_effort_share (GO only).
+   df_landscape.sort_values("relevance_rank").head(10)
+   # -> pick an (ontology, level) with good coverage + reasonable term sizes.
+   ```
+   Pick `(ontology, level)` from the top of `df_landscape` before running enrichment. Genome coverage is required — term-size distributions alone mislead (B1's original bug).
+
+4. **Code example — DE path (reproduces the MCP tool):**
    ```python
    from multiomics_explorer import (
        de_enrichment_inputs, fisher_ora, signed_enrichment_score,
@@ -453,7 +473,7 @@ YAML content:
    collapsed = signed_enrichment_score(df)
    ```
 
-4. **Code example — cluster-membership enrichment (non-DE):**
+5. **Code example — cluster-membership enrichment (non-DE):**
    ```python
    from multiomics_explorer.api import gene_clusters_by_gene, genes_by_ontology
    from multiomics_explorer.analysis.frames import to_dataframe
@@ -471,7 +491,7 @@ YAML content:
    df = fisher_ora(gene_sets, background, term2gene)
    ```
 
-5. **Code example — ortholog-group enrichment (non-DE):**
+6. **Code example — ortholog-group enrichment (non-DE):**
    ```python
    # Gene sets: members of specific ortholog groups.
    from multiomics_explorer.api import genes_by_homolog_group
@@ -482,7 +502,7 @@ YAML content:
    df = fisher_ora(gene_sets, organism_genes, term2gene)
    ```
 
-6. **Code example — custom gene list:**
+7. **Code example — custom gene list:**
    ```python
    # Any list of locus_tags works — clustering results, manual curation,
    # upstream analyses, etc.
@@ -491,40 +511,41 @@ YAML content:
    df = fisher_ora(gene_sets, background, term2gene)
    ```
 
-7. **Choosing a background.**
+8. **Choosing a background.**
    - `table_scope` (DE path): per-experiment quantified gene set. Cite B1 decision D2 — unquantified genes can't be DE.
    - `organism`: full organism gene set. Use when the gene set came from a whole-genome analysis.
    - Custom list: whatever defines *could this gene have been in the foreground*. For clustering, it's the clustered universe; for manual curation, it's the curator's candidate pool.
 
-8. **Choosing an ontology + level.**
-   - `ontology_landscape` ranks `(ontology × level)` combinations by `genome_coverage × size_factor(median_genes_per_term)`.
+9. **Choosing an ontology + level (narrative).**
+   - `ontology_landscape` ranks `(ontology × level)` combinations by `genome_coverage × size_factor(median_genes_per_term)`. See the code example in section 3.
+   - `relevance_rank` bakes in both genome coverage and median term size — 1st is best. `experiment_ids` re-ranks by experiment-specific coverage when supplied.
    - Hierarchy-level convention: `level=0` is root (broadest), higher integers more specific.
    - Tree-vs-DAG caveat: CyanoRak / TIGR / COG are tree-native; GO is a DAG with best-effort levels (`level_is_best_effort`).
 
-9. **Interpretation.**
+10. **Interpretation.**
    - Signed score as a visualization scalar; caveat when both directions significant (use `signed_enrichment_score` to collapse).
    - Catch-all categories (B1 caveat C3: CyanoRak R.2 "Conserved hypothetical proteins", D.1 "Adaptation/acclimation" routinely enrich and should be interpreted with care).
    - Cross-experiment FDR (B1 caveat C4: BH is within-cluster; biological replication across experiments provides confidence, not statistical correction).
 
-10. **Gotchas.**
+11. **Gotchas.**
     - **`min/max_gene_set_size` means different things in different tools.** In `ontology_landscape` it filters organism-scoped pathway size (for ranking levels). In `pathway_enrichment` / `fisher_ora` it filters per-cluster M (pathway size within the cluster's background — clusterProfiler semantics). Passing the same bound value across the chain is correct but the filter is applied at different scopes. Under `background='table_scope'`, a pathway can be tested in one cluster and dropped in another.
     - **`background='table_scope'` means per-cluster universes, not one.** Each experiment's quantified gene set is its own background. Cross-experiment comparisons of `fold_enrichment` carry the caveat that `N` differs per cluster.
     - **NaN timepoints are a cluster named `"NA"`.** Not dropped. Surfaces in `by_experiment` and result rows like any other timepoint.
     - **Timepoints don't align across experiments.** `T0` in exp1 ≠ `T0` in exp2 — that's why there's no `by_timepoint` breakdown. Group by `(experiment_id, timepoint)` or by `treatment_type` if you need a cross-experiment axis.
     - **GO levels are best-effort.** Any pathway coming from GO with `level_is_best_effort=True` (from `genes_by_ontology`'s verbose output) should carry an asterisk in interpretation — min-path-from-root is ambiguous for DAG children.
 
-11. **Divergences from clusterProfiler.**
+12. **Divergences from clusterProfiler.**
     - Per-experiment `table_scope` background (not a single universe).
     - `genome_coverage`-driven ontology selection (not in clusterProfiler).
     - Tree-vs-DAG honesty in tool output (`level_is_best_effort`).
     - `min_gene_set_size=5` default (cyanobacterial genomes are small).
     - `qvalue` dropped — BH only; callers compute Storey if needed.
 
-12. **The MCP tool.** One subsection near the end: `pathway_enrichment` is the DE-path wrapper. Examples in the YAML / tool-about doc. For any other gene-list source, use the Python API directly.
+13. **The MCP tool.** One subsection near the end: `pathway_enrichment` is the DE-path wrapper. Examples in the YAML / tool-about doc. For any other gene-list source, use the Python API directly.
 
-13. **Deferred methodology** (pointers, not implementations): GSEA, `simplify()` / GOSemSim, topGO elim/weight, `gson` export.
+14. **Deferred methodology** (pointers, not implementations): GSEA, `simplify()` / GOSemSim, topGO elim/weight, `gson` export.
 
-14. **References:**
+15. **References:**
     - yulab-smu biomedical-knowledge-mining book: https://yulab-smu.top/biomedical-knowledge-mining-book/
     - Xu, S. et al. *Nat Protoc* **19**, 3292–3320 (2024). doi:10.1038/s41596-024-01020-z
     - Yu, G. et al. clusterProfiler. *OMICS* **16**, 284–287 (2012).
@@ -540,15 +561,16 @@ Register as a static MCP resource (see project backlog: "MCP resource templates 
 **Audience:** anyone copy-pasting into a notebook or running end-to-end.
 **Purpose:** each code snippet in `enrichment.md` has a runnable counterpart. Executable, import-checked in CI, and exercised by an integration test to keep it from bit-rotting.
 
-**Structure:** four numbered sections matching the methodology doc's code examples:
+**Structure:** five numbered scenarios matching the methodology doc's code examples:
 
 ```
 examples/pathway_enrichment.py
   main() — parses --scenario argument, dispatches to one of:
-  scenario_1_de()         # DE path — reproduces the MCP tool output
-  scenario_2_cluster()    # cluster-membership enrichment
-  scenario_3_homolog()    # ortholog-group enrichment
-  scenario_4_custom()     # manual gene list
+  scenario_1_landscape()  # pick (ontology, level) via ontology_landscape
+  scenario_2_de()         # DE path — reproduces the MCP tool output
+  scenario_3_cluster()    # cluster-membership enrichment
+  scenario_4_homolog()    # ortholog-group enrichment
+  scenario_5_custom()     # manual gene list
 ```
 
 Each scenario function:
