@@ -223,9 +223,11 @@ background_gene_ids: list[str]    # pathway members in background NOT in DE set 
 
 ### Sort order
 
-Within cluster: `p_adjust` asc, tie-break by `term_id` asc.
-Across clusters: `(experiment_id, timepoint_order, timepoint, direction)` asc.
-Stable across `limit/offset` pagination.
+**Global sort by `p_adjust` asc across all clusters.** Tie-break: `cluster` asc, then `term_id` asc. Stable across `limit/offset` pagination.
+
+Rationale: with `limit=100` default, callers see the top 100 most-significant hits across the entire study, not 100 rows from the alphabetically-first cluster. Matches the analytical workflow ("show me what's enriched anywhere") rather than a per-cluster scan.
+
+Callers who want per-cluster grouping do it in pandas: `df.sort_values(['cluster', 'p_adjust']).groupby('cluster')`.
 
 ## Response envelope
 
