@@ -11,7 +11,6 @@ See docs://analysis/enrichment for methodology.
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
-from typing import Literal
 
 import pandas as pd
 import scipy.stats as _stats
@@ -316,3 +315,158 @@ def signed_enrichment_score(
         lambda p: -_math.log10(p) if p > 0 else float("inf")
     )
     return winners.reset_index(drop=True)
+
+
+from typing import Any
+
+_METADATA_FIELDS = (
+    "experiment_id", "experiment_name",
+    "timepoint", "timepoint_hours", "timepoint_order",
+    "direction",
+    "omics_type", "table_scope",
+    "treatment_type", "background_factors",
+    "is_time_course",
+)
+
+
+def _normalize_timepoint(tp: Any) -> str:
+    if tp is None:
+        return "NA"
+    if isinstance(tp, float) and _math.isnan(tp):
+        return "NA"
+    return str(tp)
+
+
+def _call_de(**kwargs):
+    """Thin indirection so tests can monkeypatch the DE call.
+
+    Imported inside the function to avoid circular imports at module load.
+    """
+    from multiomics_explorer.api.functions import (
+        differential_expression_by_gene as _de,
+    )
+    return _de(**kwargs)
+
+
+def de_enrichment_inputs(
+    experiment_ids: list[str],
+    organism: str,
+    direction: str = "both",
+    significant_only: bool = True,
+    timepoint_filter: list[str] | None = None,
+    *,
+    conn=None,
+) -> EnrichmentInputs:
+    """Build EnrichmentInputs from differential-expression results.
+
+    Calls ``differential_expression_by_gene`` once per call to get both the
+    significant-gene foregrounds and the per-cluster universes (table_scope
+    backgrounds), partitions rows by ``(experiment_id, timepoint, direction)``
+    into clusters named ``"{experiment_id}|{timepoint}|{direction}"``, and
+    surfaces partial-failure buckets on the returned ``EnrichmentInputs``.
+
+    Parameters
+    ----------
+    experiment_ids : list[str]
+        Experiment identifiers to pull DE rows for. Must be non-empty.
+    organism : str
+        Single organism name (fuzzy-matched). Required — single-organism
+        enforced via ``_validate_organism_inputs``.
+    direction : {'up', 'down', 'both'}, default 'both'
+        Which DE directions contribute to ``gene_sets``. ``background`` is
+        always the full quantified set regardless of direction.
+    significant_only : bool, default True
+        If True, ``gene_sets`` include only rows flagged significant.
+        ``background`` is always the full set regardless of this flag.
+    timepoint_filter : list[str] or None, default None
+        If provided, restrict clusters to these timepoint labels. Useful
+        for experiments with 10+ timepoints.
+    conn : GraphConnection, optional
+        Passed through to the DE call. Default: module default.
+
+    Returns
+    -------
+    EnrichmentInputs
+        Includes ``gene_sets``, ``background`` (per-cluster), and
+        ``cluster_metadata`` dicts, plus three partial-failure buckets
+        (``not_found``, ``not_matched``, ``no_expression``).
+
+    Raises
+    ------
+    ValueError
+        If ``experiment_ids`` is empty or ``direction`` invalid.
+    ValueError
+        If ``experiment_ids`` span multiple organisms (propagated from
+        ``_validate_organism_inputs``).
+
+    Examples
+    --------
+    >>> from multiomics_explorer import de_enrichment_inputs, fisher_ora
+    >>> inputs = de_enrichment_inputs(
+    ...     experiment_ids=["exp1"], organism="MED4",
+    ... )  # doctest: +SKIP
+
+    See Also
+    --------
+    fisher_ora : Primary consumer.
+    multiomics_explorer.api.differential_expression_by_gene : Underlying data source.
+    """
+    if not experiment_ids:
+        raise ValueError("at least one experiment_id required")
+    if direction not in {"up", "down", "both"}:
+        raise ValueError(
+            f"direction must be one of 'up', 'down', 'both'; got {direction!r}"
+        )
+
+    de_full = _call_de(
+        organism=organism,
+        experiment_ids=experiment_ids,
+        direction=None,
+        significant_only=False,
+        summary=False,
+        limit=None,
+        conn=conn,
+    )
+
+    gene_sets: dict[str, list[str]] = {}
+    background: dict[str, list[str]] = {}
+    cluster_metadata: dict[str, dict] = {}
+
+    allowed_dirs = {"up", "down"} if direction == "both" else {direction}
+
+    for row in de_full.get("results", []):
+        tp = _normalize_timepoint(row.get("timepoint"))
+        if timepoint_filter is not None and tp not in set(timepoint_filter):
+            continue
+        row_direction = row.get("direction")
+        if row_direction not in ("up", "down"):
+            continue
+        exp_id = row.get("experiment_id")
+        cluster = f"{exp_id}|{tp}|{row_direction}"
+
+        background.setdefault(cluster, []).append(row["locus_tag"])
+        if cluster not in cluster_metadata:
+            md: dict = {}
+            for field in _METADATA_FIELDS:
+                md[field] = row.get(field)
+            md["name"] = row.get("experiment_name") or row.get("name")
+            md["timepoint"] = tp
+            cluster_metadata[cluster] = md
+
+        if row_direction in allowed_dirs:
+            if significant_only and not row.get("significant"):
+                continue
+            gene_sets.setdefault(cluster, []).append(row["locus_tag"])
+
+    for cluster in background:
+        gene_sets.setdefault(cluster, [])
+
+    return EnrichmentInputs(
+        organism_name=de_full.get("organism_name", organism),
+        gene_sets=gene_sets,
+        background=background,
+        cluster_metadata=cluster_metadata,
+        not_found=list(de_full.get("not_found", []) or []),
+        not_matched=list(de_full.get("not_matched", []) or []),
+        no_expression=list(de_full.get("no_expression", []) or []),
+    )

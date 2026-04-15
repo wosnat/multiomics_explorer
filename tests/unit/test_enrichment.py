@@ -245,3 +245,123 @@ class TestSignedEnrichmentScore:
         out = signed_enrichment_score(df)
         assert len(out) == 2
         assert set(out["cluster_stem"]) == {"exp1|T0", "exp2|T0"}
+
+
+from unittest.mock import MagicMock
+
+
+class TestDeEnrichmentInputs:
+    def test_importable_from_top_level(self):
+        from multiomics_explorer import de_enrichment_inputs
+        assert de_enrichment_inputs is not None
+
+    def test_partition_into_clusters(self, monkeypatch):
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                 "timepoint": "T0", "timepoint_hours": 24.0, "timepoint_order": 1,
+                 "direction": "up", "significant": True,
+                 "omics_type": "transcriptomics",
+                 "table_scope": "rna_all",
+                 "treatment_type": ["N_stress"],
+                 "background_factors": None,
+                 "is_time_course": True,
+                 "experiment_name": "exp1_name"},
+                {"locus_tag": "PMM0002", "experiment_id": "exp1",
+                 "timepoint": "T0", "timepoint_hours": 24.0, "timepoint_order": 1,
+                 "direction": "down", "significant": True,
+                 "omics_type": "transcriptomics",
+                 "table_scope": "rna_all",
+                 "treatment_type": ["N_stress"],
+                 "background_factors": None,
+                 "is_time_course": True,
+                 "experiment_name": "exp1_name"},
+            ],
+            "not_found": [],
+            "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+
+        out = de_enrichment_inputs(
+            experiment_ids=["exp1"],
+            organism="MED4",
+            direction="both",
+            significant_only=True,
+        )
+        assert out.organism_name == "MED4"
+        assert set(out.gene_sets.keys()) == {"exp1|T0|up", "exp1|T0|down"}
+        assert out.gene_sets["exp1|T0|up"] == ["PMM0001"]
+        assert out.gene_sets["exp1|T0|down"] == ["PMM0002"]
+        md = out.cluster_metadata["exp1|T0|up"]
+        assert md["experiment_id"] == "exp1"
+        assert md["timepoint_hours"] == 24.0
+        assert md["omics_type"] == "transcriptomics"
+        assert md["treatment_type"] == ["N_stress"]
+
+    def test_nan_timepoint_bucketed_as_NA(self, monkeypatch):
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                 "timepoint": None, "timepoint_hours": math.nan, "timepoint_order": None,
+                 "direction": "up", "significant": True,
+                 "omics_type": "transcriptomics", "table_scope": "rna_all",
+                 "treatment_type": ["cyanate"], "background_factors": None,
+                 "is_time_course": False, "experiment_name": "steglich"},
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+        )
+        assert "exp1|NA|up" in out.gene_sets
+
+    def test_buckets_populated_from_de(self, monkeypatch):
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [],
+            "not_found": ["missing_exp"],
+            "no_expression": ["empty_de_exp"],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out = de_enrichment_inputs(
+            experiment_ids=["missing_exp", "empty_de_exp"], organism="MED4",
+        )
+        assert out.not_found == ["missing_exp"]
+        assert out.no_expression == ["empty_de_exp"]
+
+    def test_timepoint_filter_applied(self, monkeypatch):
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                 "timepoint": "T0", "timepoint_hours": 0.0, "timepoint_order": 0,
+                 "direction": "up", "significant": True,
+                 "omics_type": "transcriptomics", "table_scope": "rna_all",
+                 "treatment_type": None, "background_factors": None,
+                 "is_time_course": True, "experiment_name": "exp1_name"},
+                {"locus_tag": "PMM0002", "experiment_id": "exp1",
+                 "timepoint": "T4", "timepoint_hours": 24.0, "timepoint_order": 4,
+                 "direction": "up", "significant": True,
+                 "omics_type": "transcriptomics", "table_scope": "rna_all",
+                 "treatment_type": None, "background_factors": None,
+                 "is_time_course": True, "experiment_name": "exp1_name"},
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+            timepoint_filter=["T4"],
+        )
+        assert set(out.gene_sets.keys()) == {"exp1|T4|up"}

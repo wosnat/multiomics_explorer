@@ -1,6 +1,6 @@
 """Multi-omics knowledge graph explorer for Prochlorococcus and Alteromonas."""
 
-from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora, signed_enrichment_score
+from multiomics_explorer.analysis.enrichment import EnrichmentInputs, de_enrichment_inputs, fisher_ora, signed_enrichment_score
 from multiomics_explorer.api.functions import (
     gene_ontology_terms,
     gene_overview,
@@ -29,6 +29,7 @@ from multiomics_explorer.api.functions import (
 
 __all__ = [
     "EnrichmentInputs",
+    "de_enrichment_inputs",
     "fisher_ora",
     "signed_enrichment_score",
     "gene_ontology_terms",
