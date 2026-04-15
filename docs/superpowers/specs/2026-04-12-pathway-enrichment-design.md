@@ -81,11 +81,28 @@ One `differential_expression_by_gene` call (without `significant_only` filter to
 def fisher_ora(
     gene_sets: dict[str, list[str]],
     background: dict[str, list[str]] | list[str],   # per-cluster OR shared universe
-    term2gene: pd.DataFrame,                        # columns: term_id, term_name, locus_tag, level
+    term2gene: pd.DataFrame,                        # see column contract below
     min_gene_set_size: int = 5,
     max_gene_set_size: int = 500,
 ) -> pd.DataFrame
 ```
+
+**`term2gene` column contract.**
+- **Required:** `term_id` (str), `term_name` (str), `locus_tag` (str).
+- **Optional (passed through to output rows):** `level` (int), any other column present on the input frame.
+
+Designed so the idiomatic chain just works:
+
+```python
+from multiomics_explorer.analysis.frames import to_dataframe
+from multiomics_explorer.api import genes_by_ontology
+
+gbo = genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
+term2gene = to_dataframe(gbo)                       # -> DataFrame with the needed columns
+df = fisher_ora(gene_sets, background, term2gene)   # no manual column renaming
+```
+
+`genes_by_ontology` is the canonical TERM2GENE source, but any DataFrame with the required columns works (clusterProfiler's `TERM2GENE` frames, hand-curated CSVs, custom ontology annotations).
 
 Pure pandas/scipy. Direction-agnostic. For each (cluster, term): Fisher-exact (scipy) + BH within cluster (statsmodels `fdr_bh`). Output is long-format DataFrame with compareCluster-compatible columns. Size filter applied per-cluster to the pathway's count within that cluster's background. `signed_score` is **not** computed here — it requires direction, which this primitive doesn't know about. Callers compute it in one of two ways:
 
@@ -146,7 +163,7 @@ pathway_enrichment(
    - `'table_scope'` (default): use `inputs.background` as-is (per-cluster universe).
    - `'organism'`: fetch organism locus_tags once; broadcast to every cluster.
    - `list[str]`: broadcast caller-supplied list to every cluster.
-4. `gbo_result = genes_by_ontology(ontology, organism, level, term_ids, min/max_gene_set_size)`. Collect its validation buckets for envelope passthrough. Build `term2gene` DataFrame from `gbo_result["results"]`.
+4. `gbo_result = genes_by_ontology(ontology, organism, level, term_ids, min/max_gene_set_size)`. Collect its validation buckets for envelope passthrough. Build `term2gene` DataFrame via `to_dataframe(gbo_result)` — same chain exposed to Python callers.
 5. `df = fisher_ora(inputs.gene_sets, background, term2gene, min/max_gene_set_size)`.
 6. Attach cluster metadata (one row-level join against `cluster_metadata`) to `df`. Compute `signed_score = sign × -log10(p_adjust)` using the row's `direction` (up → +, down → −).
 7. Assemble response envelope. Apply `limit`/`offset` for pagination.
@@ -327,7 +344,7 @@ YAML content:
 - "BH correction is per-cluster (experiment × timepoint × direction), NOT across clusters. Cross-experiment FDR is biological replication, not statistical."
 - "Single-organism enforced. Run separate calls per organism."
 - "Timepoints aren't comparable across experiments — `T0` in exp1 ≠ `T0` in exp2. That's why there's no `by_timepoint` breakdown."
-- "For cluster-membership / ortholog-group / custom-list enrichment, use the Python `fisher_ora` primitive (see `docs://analysis/enrichment`). The MCP tool is the DE-wired convenience only."
+- "For cluster-membership / ortholog-group / custom-list enrichment, use the Python `fisher_ora` primitive (see `docs://analysis/enrichment`). The MCP tool is the DE-wired convenience only. Idiom: `term2gene = to_dataframe(genes_by_ontology(...))` then `fisher_ora(gene_sets, background, term2gene)` — no manual column munging."
 - "At least one of `level` or `term_ids` must be provided (matches `genes_by_ontology`)."
 - wrong: `pathway_enrichment(..., background='genome')  # not a valid string`
   right: `pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list`
@@ -356,7 +373,7 @@ YAML content:
        de_enrichment_inputs, fisher_ora, signed_enrichment_score,
    )
    from multiomics_explorer.api import genes_by_ontology
-   import pandas as pd
+   from multiomics_explorer.analysis.frames import to_dataframe
 
    inputs = de_enrichment_inputs(
        experiment_ids=["exp1", "exp2", ...],
@@ -366,7 +383,7 @@ YAML content:
    gbo = genes_by_ontology(
        ontology="cyanorak_role", organism="MED4", level=1,
    )
-   term2gene = pd.DataFrame(gbo["results"])
+   term2gene = to_dataframe(gbo)
    df = fisher_ora(
        inputs.gene_sets, inputs.background, term2gene,
        min_gene_set_size=5, max_gene_set_size=500,
@@ -381,6 +398,7 @@ YAML content:
 4. **Code example — cluster-membership enrichment (non-DE):**
    ```python
    from multiomics_explorer.api import gene_clusters_by_gene, genes_by_ontology
+   from multiomics_explorer.analysis.frames import to_dataframe
    # Gene sets from a clustering analysis: one cluster per row.
    analysis = ...  # list_clustering_analyses(...) result
    gene_sets = {
@@ -389,10 +407,8 @@ YAML content:
    }
    # Background: all genes that were clustered (the analysis universe).
    background = {c: analysis["universe"] for c in gene_sets}  # shared universe
-   term2gene = pd.DataFrame(
-       genes_by_ontology(
-           ontology="cyanorak_role", organism="MED4", level=1,
-       )["results"]
+   term2gene = to_dataframe(
+       genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
    )
    df = fisher_ora(gene_sets, background, term2gene)
    ```
@@ -484,7 +500,7 @@ Each scenario function:
 
 ### Unit — new `tests/unit/test_enrichment.py`
 
-- `fisher_ora`: math correctness against scipy + statsmodels reference; per-cluster BH; per-cluster vs shared background branches; size-filter application. (No `signed_score` assertion — primitive doesn't compute it.)
+- `fisher_ora`: math correctness against scipy + statsmodels reference; per-cluster BH; per-cluster vs shared background branches; size-filter application. TERM2GENE contract: accepts `to_dataframe(genes_by_ontology(...))` output unchanged (integration-style unit test with a mocked `genes_by_ontology` result). Raises clear error on missing required columns. (No `signed_score` assertion — primitive doesn't compute it.)
 - `signed_enrichment_score`: up-only, down-only, both-significant (dominant wins); re-derivation under new `padj_col` / cutoff.
 - `de_enrichment_inputs`: partitioning (`exp|tp|direction` keys); NaN-timepoint grouping as `"NA"`; `timepoint_filter` behavior; full-universe `background` vs `significant_only` `gene_sets`; single-organism enforcement (mixed-organism `experiment_ids` → `ValueError`; experiments not belonging to `organism` → `ValueError`).
 
