@@ -543,9 +543,63 @@ YAML content:
 
 13. **The MCP tool.** One subsection near the end: `pathway_enrichment` is the DE-path wrapper. Examples in the YAML / tool-about doc. For any other gene-list source, use the Python API directly.
 
-14. **Deferred methodology** (pointers, not implementations): GSEA, `simplify()` / GOSemSim, topGO elim/weight, `gson` export.
+14. **Output field reference.** Every field in the result rows and envelope, with the clusterProfiler mapping where it exists. A dedicated subsection because the clusterProfiler names (`gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, `bg_count`) are idiomatic but not self-explanatory.
 
-15. **References:**
+    **Fisher's 2×2 table** — the foundation. For a single (cluster, term):
+
+    |                        | In pathway | Not in pathway | Total |
+    | ---------------------- | ---------- | -------------- | ----- |
+    | **DE gene set**        | `a = k`    | `b = n − k`    | `n`   |
+    | **Background (not DE)**| `c = M − k`| `d = N − n − c`| `N − n` |
+    | **Total (background)** | `M`        | `N − M`        | `N`   |
+
+    where `k = count`, `n = DE set size`, `M = bg_count` (pathway members in background), `N = background size`. The Fisher-exact test asks: is `k` larger than expected under the null (uniform draw from the background)?
+
+    **Result row fields:**
+
+    | Field | clusterProfiler | Meaning |
+    |---|---|---|
+    | `cluster` | `Cluster` | `"{experiment}|{timepoint}|{direction}"` cluster key |
+    | `term_id` | `ID` | Ontology term ID |
+    | `term_name` | `Description` | Human-readable term label |
+    | `level` | — | Hierarchy depth of the term (0=root) |
+    | `count` | `Count` | `k` — DE genes in the pathway |
+    | `bg_count` | — | `M` — pathway members in the cluster's background |
+    | `gene_ratio` | `GeneRatio` | `"k/n"` string — DE genes in pathway over total DE genes in cluster |
+    | `gene_ratio_numeric` | — | `k/n` float |
+    | `bg_ratio` | `BgRatio` | `"M/N"` string — pathway members over background size |
+    | `bg_ratio_numeric` | — | `M/N` float |
+    | `rich_factor` | `RichFactor` | `k/M` — fraction of the pathway's background members that are DE |
+    | `fold_enrichment` | `FoldEnrichment` | `(k/n) / (M/N)` — observed enrichment over null expectation. `>1` means enriched |
+    | `pvalue` | `pvalue` | Fisher-exact p-value (one-sided, enrichment direction) |
+    | `p_adjust` | `p.adjust` | Benjamini-Hochberg FDR within the cluster |
+    | `signed_score` | — | `sign × −log10(p_adjust)` — sign from direction (up:+, down:−) |
+    | `foreground_gene_ids` | `geneID` (split) | `list[str]` — the k DE genes in the pathway (verbose) |
+    | `background_gene_ids` | — | `list[str]` — pathway members in background *not* in DE set (verbose) |
+
+    **Context fields (experiment-level, threaded per row):** `experiment_id`, `name`, `timepoint`, `timepoint_hours`, `timepoint_order`, `direction`, `omics_type`, `table_scope`, `treatment_type`, `background_factors`, `is_time_course` — all defined by their experiment source; see `list_experiments`.
+
+    **Envelope fields:**
+
+    | Field | Meaning |
+    |---|---|
+    | `total_rows`, `returned`, `truncated`, `offset` | Pagination |
+    | `n_tests` | Total Fisher tests run (= total result rows pre-filter) |
+    | `n_significant` | Rows with `p_adjust < pvalue_cutoff` |
+    | `by_experiment` | Per-experiment `{n_tests, n_significant, n_clusters}` plus experiment metadata |
+    | `by_direction` | Per-direction `{n_tests, n_significant}` |
+    | `by_omics_type` | Per-omics-type `{n_tests, n_significant}` |
+    | `cluster_summary` | `n_clusters` + min/median/max of `n_tests`, `n_significant`, `universe_size` |
+    | `top_clusters_by_min_padj` | Top 5 clusters by their smallest `p_adjust`, full metadata |
+    | `top_pathways_by_padj` | Top 10 pathways across all clusters by `p_adjust` |
+    | `not_found` | Requested `experiment_ids` absent from KG |
+    | `not_matched` | Experiment IDs found but wrong organism or no DE rows |
+    | `term_validation` | Namespaced `{not_found, wrong_ontology, wrong_level, filtered_out}` for `term_ids` (passthrough from `genes_by_ontology`) |
+    | `clusters_skipped` | Clusters with `{cluster, reason}`: `empty_gene_set`, `no_pathways_in_size_range`, `empty_background` |
+
+15. **Deferred methodology** (pointers, not implementations): GSEA, `simplify()` / GOSemSim, topGO elim/weight, `gson` export.
+
+16. **References:**
     - yulab-smu biomedical-knowledge-mining book: https://yulab-smu.top/biomedical-knowledge-mining-book/
     - Xu, S. et al. *Nat Protoc* **19**, 3292–3320 (2024). doi:10.1038/s41596-024-01020-z
     - Yu, G. et al. clusterProfiler. *OMICS* **16**, 284–287 (2012).
@@ -603,6 +657,7 @@ Each scenario function:
 ### Unit — `tests/unit/test_tool_wrappers.py`
 
 - MCP Pydantic round-trip; `limit=100` default; `summary=True` returns empty `results`; `verbose=True` includes gene_id lists; `ctx.warning` on non-empty validation buckets.
+- **Field-description coverage:** assert every field on the result-row model and envelope model has a non-empty `Field(description=...)` value (prevents silently shipping an undocumented field). Spot-check that clusterProfiler-named fields (`gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, `bg_count`) mention their clusterProfiler equivalent in the description.
 
 ### Integration (`-m kg`)
 
@@ -627,6 +682,7 @@ Freeze the B1 reproduction in `tests/regression/`. Regenerate after KG rebuilds 
 - **L2 — api (`api/functions.py`):** new `pathway_enrichment()` composes `de_enrichment_inputs`, `genes_by_ontology`, `fisher_ora`. Validates inputs. Assembles envelope dict.
 - **L2 — frames (`analysis/frames.py`):** add an enrichment-DataFrame → envelope-dict converter (or the composition may live in `api/functions.py` — decision deferred to plan stage).
 - **L3 (`mcp_server/tools.py`):** thin wrapper. Pydantic response model. `limit=100` default. `ToolError` on invalid input. `await ctx.info` for DE / TERM2GENE fetches; `ctx.warning` when any validation bucket non-empty.
+  - **Every Pydantic field on the result-row and envelope models carries a `Field(description=...)`** explaining the meaning and, where applicable, the clusterProfiler equivalent (e.g., `"k/n — DE genes in pathway over total DE genes in cluster (clusterProfiler: GeneRatio)"`). `scripts/build_about_content.py` pulls these descriptions into the auto-generated tool-about doc's response-format section, so MCP callers see the field meanings without leaving the tool page.
 - **L4:** `inputs/tools/pathway_enrichment.yaml`; skill reference auto-regenerated via `scripts/build_about_content.py` + `scripts/sync_skills.sh`.
 
 ## Public exports
