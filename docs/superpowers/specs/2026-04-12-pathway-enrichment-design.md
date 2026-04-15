@@ -157,14 +157,58 @@ pathway_enrichment(
 - **`pathway_enrichment` calls `genes_by_ontology` with wide bounds** internally (`min_gene_set_size=0`, `max_gene_set_size=None`) so the organism-scoped filter doesn't pre-exclude pathways that would have been valid under M. The caller's bounds apply only in `fisher_ora`.
 - `max_gene_set_size=None` disables the upper bound (useful for inspection / debugging).
 
-### Input validation (L2, raises `ValueError`)
+### Error handling
 
-- `ontology` must be in `ALL_ONTOLOGIES`.
-- At least one of `level` or `term_ids` must be provided (matches `genes_by_ontology`).
-- Single-organism enforced via `_validate_organism_inputs(organism, locus_tags=None, experiment_ids, conn)`.
-- `direction` in `{'up', 'down', 'both'}`.
-- `background` in `{'table_scope', 'organism'}` or a `list[str]`.
-- `min_gene_set_size >= 0`; `max_gene_set_size >= min_gene_set_size`.
+Three failure categories, handled differently:
+
+#### 1. Input validation (raise `ValueError` at L2; MCP `ToolError` at L3)
+
+Caller-fixable mistakes. Fail fast before any KG call.
+
+- `ontology not in ALL_ONTOLOGIES`.
+- `level is None and not term_ids` (mirrors `genes_by_ontology`).
+- `direction not in {'up', 'down', 'both'}`.
+- `background` neither `'table_scope'` / `'organism'` nor a non-empty `list[str]`.
+- `min_gene_set_size < 0`; `max_gene_set_size < min_gene_set_size` when `max_gene_set_size is not None`.
+- `not (0 < pvalue_cutoff < 1)`.
+- `experiment_ids` empty list → `ValueError("at least one experiment_id required")`.
+- Mixed-organism `experiment_ids`, or experiments not belonging to `organism` → raised by `_validate_organism_inputs` and propagated.
+- Ambiguous organism fuzzy match → raised by `_validate_organism_inputs` and propagated.
+
+#### 2. Partial success (surface in envelope, do not raise)
+
+Sub-tool validation buckets become envelope fields. The tool returns a successful response with the problem locations called out, rather than refusing to run.
+
+- Some `experiment_ids` absent from KG → `not_found`.
+- Some `experiment_ids` exist but wrong organism or no DE rows → `not_matched`.
+- Some `term_ids` absent / wrong ontology / wrong level → `term_validation.not_found` / `.wrong_ontology` / `.wrong_level` (namespaced passthrough from `genes_by_ontology`).
+- A cluster has empty `gene_sets[cluster]` (e.g., `significant_only=True` and no hits) → `clusters_skipped` with `reason="empty_gene_set"`.
+- A cluster has no pathways passing the M filter → `clusters_skipped` with `reason="no_pathways_in_size_range"`.
+- A cluster has empty background → `clusters_skipped` with `reason="empty_background"`.
+
+When any validation bucket is non-empty, the MCP wrapper calls `await ctx.warning(...)` with a compact summary. `results` may still be non-empty if some clusters succeeded.
+
+#### 3. Vacuous success (return valid empty envelope, do not raise)
+
+The call is well-formed but yields zero rows. Return the full envelope with `results=[]`, all `by_*` breakdowns empty or zeroed, `n_tests=0`, `n_significant=0`. Caller can distinguish from "error" by the success status.
+
+Triggers:
+- All experiments in `not_found` / `not_matched` → empty `gene_sets`, empty `results`. `clusters_skipped` lists every requested cluster.
+- `genes_by_ontology` returns zero rows (e.g., `ontology='cog_category', level=3` — flat ontology at non-existent level). Surfaced via `term_validation` where applicable; `results=[]`.
+- Every cluster is in `clusters_skipped`.
+
+#### 4. Propagated errors (do not swallow)
+
+Let these bubble up:
+- Neo4j connection errors, query timeouts, transaction memory-cap violations.
+- Unexpected `TypeError` / `KeyError` from malformed sub-tool responses (indicates a bug, not a user error).
+
+Rationale: swallowing infrastructure errors into the envelope hides real problems; they have different remediation than validation or data-shape issues.
+
+#### Observability — `ctx.info` / `ctx.warning`
+
+- `ctx.info` at: DE fetch complete (`N experiments, M DE rows`), TERM2GENE fetch complete (`K pathways`), Fisher complete (`P tests, Q significant`).
+- `ctx.warning` at: any non-empty validation bucket (experiments or terms); any `clusters_skipped`; significance share below a low threshold (e.g., <1% of tests significant — signal that bounds might be too tight).
 
 ### Pipeline (api/ layer)
 
@@ -528,6 +572,11 @@ Each scenario function:
 ### Unit — `tests/unit/test_api_functions.py`
 
 - `pathway_enrichment` orchestration with mocked conn: XOR validation of `level`/`term_ids`; mixed-organism `ValueError`; background-mode dispatch; `term_validation` passthrough from `genes_by_ontology`; envelope composition (breakdowns, `cluster_summary`, `top_*`, `clusters_skipped`).
+- **Error handling coverage:**
+  - Input validation: each `ValueError` case (bad ontology, no level/term_ids, bad direction, bad background shape, negative `min_gene_set_size`, `max < min`, empty `experiment_ids`, `pvalue_cutoff` out of range).
+  - Partial success: some `experiment_ids` not_found / not_matched; some `term_ids` wrong_ontology / wrong_level; mix of passing and `empty_gene_set` clusters — `results` non-empty, validation buckets populated, warnings issued.
+  - Vacuous success: all experiments missing → valid empty envelope (`results=[]`, `n_tests=0`), no raise.
+  - Propagated: simulate Neo4j error from the mocked conn → propagates, not swallowed.
 
 ### Unit — `tests/unit/test_tool_wrappers.py`
 
