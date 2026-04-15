@@ -28,6 +28,8 @@ dependencies = [
     "cyver>=2.0.2",
     # Analysis utilities
     "pandas>=2.0",
+    "scipy>=1.11",
+    "statsmodels>=0.14",
 ]
 
 [dependency-groups]
