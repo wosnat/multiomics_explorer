@@ -67,6 +67,8 @@ TOOL_BUILDERS = {
     "gene_response_profile": build_gene_response_profile,
     # ontology_landscape: dispatched via api (L2), not a query builder
     "ontology_landscape": None,
+    # pathway_enrichment: dispatched via api (L2), not a query builder
+    "pathway_enrichment": None,
 }
 
 
@@ -141,6 +143,19 @@ def test_regression(conn, case, data_regression):
         # Capture full envelope (top-level fields + results rows) — the new
         # response shape is rich and changes here should surface cleanly.
         data = api.genes_by_ontology(**params, conn=conn)
+        normalized_rows = _normalize(data.get("results", []))
+        envelope = {k: v for k, v in data.items() if k != "results"}
+        envelope["results"] = normalized_rows
+        envelope["row_count"] = len(normalized_rows)
+        data_regression.check(
+            {"case_id": case["id"], **envelope},
+            basename=case["id"],
+        )
+        return
+    elif tool == "pathway_enrichment":
+        # Capture full envelope — shape changes (new summary fields, etc.)
+        # should surface cleanly in the golden file diff.
+        data = api.pathway_enrichment(**params, conn=conn)
         normalized_rows = _normalize(data.get("results", []))
         envelope = {k: v for k, v in data.items() if k != "results"}
         envelope["results"] = normalized_rows
