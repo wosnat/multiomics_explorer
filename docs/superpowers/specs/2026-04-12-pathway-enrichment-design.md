@@ -591,7 +591,7 @@ YAML content:
     | `by_omics_type` | Per-omics-type `{n_tests, n_significant}` |
     | `cluster_summary` | `n_clusters` + min/median/max of `n_tests`, `n_significant`, `universe_size` |
     | `top_clusters_by_min_padj` | Top 5 clusters by their smallest `p_adjust`, full metadata |
-    | `top_pathways_by_padj` | Top 10 pathways across all clusters by `p_adjust` |
+    | `top_pathways_by_padj` | Top 10 pathways across all clusters by `p_adjust`. Fixed slice of what `results` already carries — `results` is globally sorted by `p_adjust` asc, so pagination (`limit`/`offset`) on `results` recovers positions 11+ |
     | `not_found` | Requested `experiment_ids` absent from KG |
     | `not_matched` | Experiment IDs found but wrong organism or no DE rows |
     | `term_validation` | Namespaced `{not_found, wrong_ontology, wrong_level, filtered_out}` for `term_ids` (passthrough from `genes_by_ontology`) |
@@ -734,5 +734,4 @@ from multiomics_explorer.analysis.enrichment import (
 
 ## Open questions deferred to plan stage
 
-- Default `top_pathways_by_padj` N — spec fixes at 10; callers wanting more paginate `results`.
 - For Python callers who want `signed_score` out of `fisher_ora` results without going through the MCP wrapper: document the pattern — attach a `direction` column to the DataFrame (from their own metadata) and pass through `signed_enrichment_score` or compute `sign × -log10(p_adjust)` directly. Doc-only.
