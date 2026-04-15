@@ -42,6 +42,7 @@ Four public names, all importable from `multiomics_explorer`:
 ```python
 @dataclass
 class EnrichmentInputs:
+    organism_name: str                       # single-organism (enforced)
     gene_sets: dict[str, list[str]]          # cluster -> foreground locus_tags
     background: dict[str, list[str]]         # cluster -> universe locus_tags (per-cluster)
     cluster_metadata: dict[str, dict]        # cluster -> metadata dict (see fields below)
@@ -62,12 +63,15 @@ treatment_type, background_factors, is_time_course
 ```python
 def de_enrichment_inputs(
     experiment_ids: list[str],
+    organism: str,                           # required — single-organism enforced
     direction: str = 'both',                 # 'up' | 'down' | 'both'
     significant_only: bool = True,
     timepoint_filter: list[str] | None = None,
     *, conn=None,
 ) -> EnrichmentInputs
 ```
+
+**Single-organism enforced** via `_validate_organism_inputs(organism, locus_tags=None, experiment_ids, conn)` — same contract as `differential_expression_by_gene` and `pathway_enrichment`. Mixed-organism `experiment_ids` raises `ValueError`. Experiments not belonging to `organism` raise `ValueError` (not silently dropped — the returned `EnrichmentInputs` has a single `organism_name`, so the validation is meaningful).
 
 One `differential_expression_by_gene` call (without `significant_only` filter to get the full universe). Partitions rows by `(experiment_id, timepoint, direction)` into clusters named `"{experiment_id}|{timepoint}|{direction}"`. NaN timepoints group as `"NA"` (not dropped). `gene_sets` uses `significant_only` semantics; `background` is always the full per-cluster quantified set (the table_scope universe).
 
@@ -137,7 +141,7 @@ pathway_enrichment(
 ### Pipeline (api/ layer)
 
 1. Validate inputs.
-2. `inputs = de_enrichment_inputs(experiment_ids, direction, significant_only, timepoint_filter)`.
+2. `inputs = de_enrichment_inputs(experiment_ids, organism, direction, significant_only, timepoint_filter)`.
 3. Resolve background:
    - `'table_scope'` (default): use `inputs.background` as-is (per-cluster universe).
    - `'organism'`: fetch organism locus_tags once; broadcast to every cluster.
@@ -356,6 +360,7 @@ YAML content:
 
    inputs = de_enrichment_inputs(
        experiment_ids=["exp1", "exp2", ...],
+       organism="MED4",
        direction="both", significant_only=True,
    )
    gbo = genes_by_ontology(
@@ -481,7 +486,7 @@ Each scenario function:
 
 - `fisher_ora`: math correctness against scipy + statsmodels reference; per-cluster BH; per-cluster vs shared background branches; size-filter application. (No `signed_score` assertion — primitive doesn't compute it.)
 - `signed_enrichment_score`: up-only, down-only, both-significant (dominant wins); re-derivation under new `padj_col` / cutoff.
-- `de_enrichment_inputs`: partitioning (`exp|tp|direction` keys); NaN-timepoint grouping as `"NA"`; `timepoint_filter` behavior; full-universe `background` vs `significant_only` `gene_sets`.
+- `de_enrichment_inputs`: partitioning (`exp|tp|direction` keys); NaN-timepoint grouping as `"NA"`; `timepoint_filter` behavior; full-universe `background` vs `significant_only` `gene_sets`; single-organism enforcement (mixed-organism `experiment_ids` → `ValueError`; experiments not belonging to `organism` → `ValueError`).
 
 ### Unit — `tests/unit/test_api_functions.py`
 
