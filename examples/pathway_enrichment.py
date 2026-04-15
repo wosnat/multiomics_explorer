@@ -152,16 +152,6 @@ def scenario_5_custom(args: argparse.Namespace) -> None:
         print("scenario_5_custom: pass --locus-tags with a comma-separated list.")
         return
     gene_sets = {"custom": args.locus_tags.split(",")}
-    organisms = list_organisms()
-    background_rows = [
-        g["locus_tag"]
-        for org in organisms["results"]
-        if org["organism_name"] == args.organism
-        for g in (org.get("genes") or [])
-    ]
-    if not background_rows:
-        print(f"No background genes found for organism={args.organism}")
-        return
     term2gene = to_dataframe(
         genes_by_ontology(
             ontology=args.ontology,
@@ -169,7 +159,12 @@ def scenario_5_custom(args: argparse.Namespace) -> None:
             level=args.level,
         )
     )
-    df = fisher_ora(gene_sets, background_rows, term2gene)
+    if term2gene.empty:
+        print(f"No ontology annotations found for organism={args.organism}")
+        return
+    # Use the genes in the ontology as the background universe
+    background = list(term2gene["locus_tag"].unique())
+    df = fisher_ora(gene_sets, background, term2gene)
     _print_top(df, title="Custom gene-list enrichment")
 
 
@@ -188,8 +183,8 @@ def main(argv: list[str] | None = None) -> int:
         "--scenario", choices=list(_SCENARIOS), required=True,
         help="Which scenario to run",
     )
-    parser.add_argument("--organism", default="MED4")
-    parser.add_argument("--ontology", default="cyanorak_role")
+    parser.add_argument("--organism", default="Prochlorococcus MED4")
+    parser.add_argument("--ontology", default="go_bp")
     parser.add_argument("--level", type=int, default=1)
     parser.add_argument("--locus-tags", default=None, help="Comma-separated locus_tags (custom scenario)")
     args = parser.parse_args(argv)
