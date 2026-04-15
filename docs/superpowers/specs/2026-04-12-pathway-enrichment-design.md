@@ -460,18 +460,25 @@ YAML content:
    - Catch-all categories (B1 caveat C3: CyanoRak R.2 "Conserved hypothetical proteins", D.1 "Adaptation/acclimation" routinely enrich and should be interpreted with care).
    - Cross-experiment FDR (B1 caveat C4: BH is within-cluster; biological replication across experiments provides confidence, not statistical correction).
 
-10. **Divergences from clusterProfiler.**
+10. **Gotchas.**
+    - **`min/max_gene_set_size` means different things in different tools.** In `ontology_landscape` it filters organism-scoped pathway size (for ranking levels). In `pathway_enrichment` / `fisher_ora` it filters per-cluster M (pathway size within the cluster's background — clusterProfiler semantics). Passing the same bound value across the chain is correct but the filter is applied at different scopes. Under `background='table_scope'`, a pathway can be tested in one cluster and dropped in another.
+    - **`background='table_scope'` means per-cluster universes, not one.** Each experiment's quantified gene set is its own background. Cross-experiment comparisons of `fold_enrichment` carry the caveat that `N` differs per cluster.
+    - **NaN timepoints are a cluster named `"NA"`.** Not dropped. Surfaces in `by_experiment` and result rows like any other timepoint.
+    - **Timepoints don't align across experiments.** `T0` in exp1 ≠ `T0` in exp2 — that's why there's no `by_timepoint` breakdown. Group by `(experiment_id, timepoint)` or by `treatment_type` if you need a cross-experiment axis.
+    - **GO levels are best-effort.** Any pathway coming from GO with `level_is_best_effort=True` (from `genes_by_ontology`'s verbose output) should carry an asterisk in interpretation — min-path-from-root is ambiguous for DAG children.
+
+11. **Divergences from clusterProfiler.**
     - Per-experiment `table_scope` background (not a single universe).
     - `genome_coverage`-driven ontology selection (not in clusterProfiler).
     - Tree-vs-DAG honesty in tool output (`level_is_best_effort`).
     - `min_gene_set_size=5` default (cyanobacterial genomes are small).
     - `qvalue` dropped — BH only; callers compute Storey if needed.
 
-11. **The MCP tool.** One subsection near the end: `pathway_enrichment` is the DE-path wrapper. Examples in the YAML / tool-about doc. For any other gene-list source, use the Python API directly.
+12. **The MCP tool.** One subsection near the end: `pathway_enrichment` is the DE-path wrapper. Examples in the YAML / tool-about doc. For any other gene-list source, use the Python API directly.
 
-12. **Deferred methodology** (pointers, not implementations): GSEA, `simplify()` / GOSemSim, topGO elim/weight, `gson` export.
+13. **Deferred methodology** (pointers, not implementations): GSEA, `simplify()` / GOSemSim, topGO elim/weight, `gson` export.
 
-13. **References:**
+14. **References:**
     - yulab-smu biomedical-knowledge-mining book: https://yulab-smu.top/biomedical-knowledge-mining-book/
     - Xu, S. et al. *Nat Protoc* **19**, 3292–3320 (2024). doi:10.1038/s41596-024-01020-z
     - Yu, G. et al. clusterProfiler. *OMICS* **16**, 284–287 (2012).
