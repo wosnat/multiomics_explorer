@@ -15,7 +15,7 @@
 2. **`pathway_enrichment` MCP tool** — thin wrapper over the package. DE-driven ORA end-to-end.
 3. **Two documentation outputs:**
    - **Tool-about reference** auto-generated from `inputs/tools/pathway_enrichment.yaml`. Audience: MCP tool caller. Signature + examples + chaining + mistakes.
-   - **Methodology doc** at `multiomics_explorer/analysis/enrichment.md`, served as `docs://analysis/enrichment`. Audience: Python user. Building blocks + code examples (DE, cluster, ortholog, custom gene lists) + biological methodology.
+   - **Methodology doc** at `multiomics_explorer/analysis/enrichment.md`, served as `docs://analysis/enrichment`. Audience: Python user. Building blocks + code examples (landscape, DE, cluster, ortholog, custom gene lists) + biological methodology.
 4. **`examples/pathway_enrichment.py`** — runnable collateral for the methodology doc's code examples, exercised by an integration test.
 
 ## What's not in this spec
@@ -46,6 +46,10 @@ class EnrichmentInputs:
     gene_sets: dict[str, list[str]]          # cluster -> foreground locus_tags
     background: dict[str, list[str]]         # cluster -> universe locus_tags (per-cluster)
     cluster_metadata: dict[str, dict]        # cluster -> metadata dict (see fields below)
+    # Partial-failure buckets for the input `experiment_ids` (see Error handling):
+    not_found: list[str]                     # experiment_id absent from KG
+    not_matched: list[str]                   # experiment exists but wrong organism
+    no_expression: list[str]                 # matches organism but has no DE rows
 ```
 
 `cluster_metadata[cluster]` carries the compact field set:
@@ -71,7 +75,14 @@ def de_enrichment_inputs(
 ) -> EnrichmentInputs
 ```
 
-**Single-organism enforced** via `_validate_organism_inputs(organism, locus_tags=None, experiment_ids, conn)` — same contract as `differential_expression_by_gene` and `pathway_enrichment`. Mixed-organism `experiment_ids` raises `ValueError`. Experiments not belonging to `organism` raise `ValueError` (not silently dropped — the returned `EnrichmentInputs` has a single `organism_name`, so the validation is meaningful).
+**Single-organism enforced** via `_validate_organism_inputs(organism, locus_tags=None, experiment_ids, conn)` — same contract as `differential_expression_by_gene` and `pathway_enrichment`. **Raises `ValueError`** only for genuinely ambiguous inputs: mixed-organism `experiment_ids` (input set spans multiple organisms), unknown or ambiguous `organism` fuzzy match.
+
+**Partial failures populate the three buckets on the returned `EnrichmentInputs`**, not raise:
+- Experiment ID absent from the KG → `not_found`.
+- Experiment exists but belongs to a different organism → `not_matched`.
+- Experiment matches organism but has no DE rows in the table → `no_expression`.
+
+The wrapper passes these buckets through to the `pathway_enrichment` envelope. Python callers using `de_enrichment_inputs` directly inspect them on the dataclass.
 
 One `differential_expression_by_gene` call (without `significant_only` filter to get the full universe). Partitions rows by `(experiment_id, timepoint, direction)` into clusters named `"{experiment_id}|{timepoint}|{direction}"`. NaN timepoints group as `"NA"` (not dropped). `gene_sets` uses `significant_only` semantics; `background` is always the full per-cluster quantified set (the table_scope universe).
 
@@ -172,8 +183,10 @@ Caller-fixable mistakes. Fail fast before any KG call.
 - `min_gene_set_size < 0`; `max_gene_set_size < min_gene_set_size` when `max_gene_set_size is not None`.
 - `not (0 < pvalue_cutoff < 1)`.
 - `experiment_ids` empty list → `ValueError("at least one experiment_id required")`.
-- Mixed-organism `experiment_ids`, or experiments not belonging to `organism` → raised by `_validate_organism_inputs` and propagated.
-- Ambiguous organism fuzzy match → raised by `_validate_organism_inputs` and propagated.
+- Mixed-organism `experiment_ids` (the input set itself spans multiple organisms) → raised by `_validate_organism_inputs`.
+- Ambiguous or unknown organism fuzzy match → raised by `_validate_organism_inputs`.
+
+(Individual experiments belonging to a different organism than `organism` do **not** raise — they land in the `not_matched` bucket. See category 2.)
 
 #### 2. Partial success (surface in envelope, do not raise)
 
@@ -191,7 +204,7 @@ When any validation bucket is non-empty, the MCP wrapper calls `await ctx.warnin
 
 #### 3. Vacuous success (return valid empty envelope, do not raise)
 
-The call is well-formed but yields zero rows. Return the full envelope with `results=[]`, all `by_*` breakdowns empty or zeroed, `n_tests=0`, `n_significant=0`. Caller can distinguish from "error" by the success status.
+The call is well-formed but yields zero rows. Return the full envelope with `results=[]`, all `by_*` breakdowns empty or zeroed, `total_matching=0`, `n_significant=0`. Caller can distinguish from "error" by the success status.
 
 Triggers:
 - All experiments in `not_found` / `not_matched` / `no_expression` → empty `gene_sets`, empty `results`. `clusters_skipped` lists every requested cluster.
@@ -214,7 +227,7 @@ Rationale: swallowing infrastructure errors into the envelope hides real problem
 ### Pipeline (api/ layer)
 
 1. Validate inputs.
-2. `inputs = de_enrichment_inputs(experiment_ids, organism, direction, significant_only, timepoint_filter)`.
+2. `inputs = de_enrichment_inputs(experiment_ids, organism, direction, significant_only, timepoint_filter)` — may raise `ValueError` on ambiguous-organism inputs; otherwise returns `EnrichmentInputs` carrying the three partial-failure buckets (`inputs.not_found`, `inputs.not_matched`, `inputs.no_expression`) which flow into the envelope.
 3. Resolve background:
    - `'table_scope'` (default): use `inputs.background` as-is (per-cluster universe).
    - `'organism'`: fetch organism locus_tags once; broadcast to every cluster.
@@ -681,7 +694,7 @@ Each scenario function:
 
 - `fisher_ora`: math correctness against scipy + statsmodels reference; per-cluster BH; per-cluster vs shared background branches; **size filter is per-cluster on M**, tests both bounds (a pathway passes in one cluster and is filtered in another when backgrounds differ); `max_gene_set_size=None` disables upper bound. TERM2GENE contract: accepts `to_dataframe(genes_by_ontology(...))` output unchanged (integration-style unit test with a mocked `genes_by_ontology` result). Raises clear error on missing required columns. (No `signed_score` assertion — primitive doesn't compute it.)
 - `signed_enrichment_score`: up-only, down-only, both-significant (dominant wins); re-derivation under new `padj_col` / cutoff.
-- `de_enrichment_inputs`: partitioning (`exp|tp|direction` keys); NaN-timepoint grouping as `"NA"`; `timepoint_filter` behavior; full-universe `background` vs `significant_only` `gene_sets`; single-organism enforcement (mixed-organism `experiment_ids` → `ValueError`; experiments not belonging to `organism` → `ValueError`).
+- `de_enrichment_inputs`: partitioning (`exp|tp|direction` keys); NaN-timepoint grouping as `"NA"`; `timepoint_filter` behavior; full-universe `background` vs `significant_only` `gene_sets`; single-organism enforcement (mixed-organism `experiment_ids` → `ValueError`); partial-failure bucketing (individual experiments absent → `not_found`; wrong organism → `not_matched`; no DE rows → `no_expression`).
 
 ### Unit — `tests/unit/test_api_functions.py`
 
@@ -689,7 +702,7 @@ Each scenario function:
 - **Error handling coverage:**
   - Input validation: each `ValueError` case (bad ontology, no level/term_ids, bad direction, bad background shape, negative `min_gene_set_size`, `max < min`, empty `experiment_ids`, `pvalue_cutoff` out of range).
   - Partial success: some `experiment_ids` not_found / not_matched; some `term_ids` wrong_ontology / wrong_level; mix of passing and `empty_gene_set` clusters — `results` non-empty, validation buckets populated, warnings issued.
-  - Vacuous success: all experiments missing → valid empty envelope (`results=[]`, `n_tests=0`), no raise.
+  - Vacuous success: all experiments missing → valid empty envelope (`results=[]`, `total_matching=0`), no raise.
   - Propagated: simulate Neo4j error from the mocked conn → propagates, not swallowed.
 
 ### Unit — `tests/unit/test_tool_wrappers.py`
@@ -715,7 +728,7 @@ Freeze the B1 reproduction in `tests/regression/`. Regenerate after KG rebuilds 
 
 ### Example-script smoke test
 
-`tests/integration/test_examples.py` (new, `-m kg`): parametrize over the four scenarios in `examples/pathway_enrichment.py`; run each end-to-end; assert non-empty result for the DE scenario and clean exit for the rest. Keeps the example code compiling, importable, and runnable as the API evolves.
+`tests/integration/test_examples.py` (new, `-m kg`): parametrize over the five scenarios in `examples/pathway_enrichment.py` (landscape, DE, cluster, ortholog, custom); run each end-to-end; assert non-empty result for the DE scenario and clean exit for the rest. Keeps the example code compiling, importable, and runnable as the API evolves.
 
 ## Layer-rules compliance
 
@@ -768,7 +781,7 @@ from multiomics_explorer.analysis.enrichment import (
 - `cluster_summary` distribution + `top_clusters_by_min_padj` top-K replace full `by_cluster`.
 - Rich per-cluster metadata (3 timepoint fields + omics_type + table_scope + is_time_course + treatment_type + background_factors).
 - `background_gene_ids` (non-overlapping) added alongside `foreground_gene_ids` in verbose.
-- Sort tie-break rule: by `p_adjust` asc, tie-break `cluster` asc then `term_id` asc.
+- Result rows sorted **globally by `p_adjust` asc** (tie-break `cluster` asc then `term_id` asc) — top-N under pagination is the most-significant slice across all clusters, not a per-cluster scan.
 
 ## Open questions deferred to plan stage
 
