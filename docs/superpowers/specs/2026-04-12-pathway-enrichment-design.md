@@ -180,7 +180,8 @@ Caller-fixable mistakes. Fail fast before any KG call.
 Sub-tool validation buckets become envelope fields. The tool returns a successful response with the problem locations called out, rather than refusing to run.
 
 - Some `experiment_ids` absent from KG → `not_found`.
-- Some `experiment_ids` exist but wrong organism or no DE rows → `not_matched`.
+- Some `experiment_ids` exist but wrong organism → `not_matched`.
+- Some `experiment_ids` match organism but have no DE rows → `no_expression` (reuses DE tool's term).
 - Some `term_ids` absent / wrong ontology / wrong level → `term_validation.not_found` / `.wrong_ontology` / `.wrong_level` (namespaced passthrough from `genes_by_ontology`).
 - A cluster has empty `gene_sets[cluster]` (e.g., `significant_only=True` and no hits) → `clusters_skipped` with `reason="empty_gene_set"`.
 - A cluster has no pathways passing the M filter → `clusters_skipped` with `reason="no_pathways_in_size_range"`.
@@ -193,7 +194,7 @@ When any validation bucket is non-empty, the MCP wrapper calls `await ctx.warnin
 The call is well-formed but yields zero rows. Return the full envelope with `results=[]`, all `by_*` breakdowns empty or zeroed, `n_tests=0`, `n_significant=0`. Caller can distinguish from "error" by the success status.
 
 Triggers:
-- All experiments in `not_found` / `not_matched` → empty `gene_sets`, empty `results`. `clusters_skipped` lists every requested cluster.
+- All experiments in `not_found` / `not_matched` / `no_expression` → empty `gene_sets`, empty `results`. `clusters_skipped` lists every requested cluster.
 - `genes_by_ontology` returns zero rows (e.g., `ontology='cog_category', level=3` — flat ontology at non-existent level). Surfaced via `term_validation` where applicable; `results=[]`.
 - Every cluster is in `clusters_skipped`.
 
@@ -283,11 +284,10 @@ Callers who want per-cluster grouping do it in pandas: `df.sort_values(['cluster
     "level": 1,
 
     # Counts
-    "total_rows": 1040,                # (cluster × term) rows post-size-filter
+    "total_matching": 1040,            # (cluster × term) rows post-size-filter; one row = one Fisher test
     "returned": 100,
     "truncated": True,
     "offset": 0,
-    "n_tests": 1040,                   # = total_rows
     "n_significant": 87,               # rows with p_adjust < pvalue_cutoff
 
     # Breakdowns
@@ -327,9 +327,10 @@ Callers who want per-cluster grouping do it in pandas: `df.sort_values(['cluster
         ...
     ],
 
-    # Validation — experiments (flat, matches DE/landscape convention)
+    # Validation — experiments (three buckets, matching DE + landscape naming)
     "not_found": [],                   # experiment_ids absent from KG
-    "not_matched": [],                 # wrong organism, or no DE rows
+    "not_matched": [],                 # experiment exists but wrong organism
+    "no_expression": [],               # experiment exists, matches organism, but no DE rows (reuses DE tool's term)
 
     # Validation — terms (namespaced passthrough from genes_by_ontology)
     "term_validation": {
@@ -359,6 +360,43 @@ Callers who want per-cluster grouping do it in pandas: `df.sort_values(['cluster
 - `by_timepoint` — cross-experiment timepoint aggregation is meaningless (T0 in exp1 ≠ T0 in exp2).
 - `by_cluster` full list — replaced by `cluster_summary` distribution + `top_clusters_by_min_padj` top-K.
 - `by_table_scope` — not comparable across values (different universes). `by_omics_type` covers the analytical cross-cut.
+
+## Envelope consistency with called tools
+
+Side-by-side audit of envelope conventions across the four tools in the pipeline. The goal is that a caller chaining `ontology_landscape → genes_by_ontology → pathway_enrichment → differential_expression_by_gene` (drill-down) sees consistent field names and shapes.
+
+### Fields that match across the family (keep as-is)
+
+| Field | DE | `genes_by_ontology` | `ontology_landscape` | `pathway_enrichment` |
+|---|---|---|---|---|
+| `organism_name` | ✓ (envelope) | ✓ | ✓ | ✓ |
+| `returned` / `offset` / `truncated` | ✓ | ✓ | ✓ | ✓ |
+| `results` (list, empty when `summary`) | ✓ | ✓ | ✓ | ✓ |
+| `not_found` (list) | ✓ | ✓ | ✓ | ✓ |
+
+### Inconsistencies to resolve in this spec
+
+**1. `total_matching` vs `total_rows`** — earlier draft used `total_rows`. The family (DE, `genes_by_ontology`, `ontology_landscape`) all use **`total_matching`**. Rename.
+
+**2. `n_tests` is redundant with `total_matching`** — both mean "count of (cluster × term) rows pre-pagination." Drop `n_tests`; mention in the `total_matching` field description that "each row is one Fisher test."
+
+**3. Experiment validation bucket naming** — DE tool uses `not_found` (locus_tags missing) + `no_expression` (locus_tags without DE rows). Landscape uses `not_found` + `not_matched` (wrong organism). `pathway_enrichment`'s current spec uses `not_matched` to mean BOTH "wrong organism" AND "no DE rows" — conflating two distinct failure modes.
+   
+   **Decision:** split into three buckets for clarity:
+   - `not_found` — experiment_id absent from KG.
+   - `not_matched` — experiment_id exists but wrong organism.
+   - `no_expression` — experiment exists, matches organism, has no DE rows (reuses DE's term).
+
+   Consistent with DE (`no_expression`) and landscape (`not_found`/`not_matched`). Callers can distinguish user typos from organism mismatches from empty DE tables.
+
+**4. `by_experiment` shape** — DE tool has `experiments: list[...]` (per-experiment detail) plus `rows_by_treatment_type`, `rows_by_background_factors`, `by_table_scope` (count-aggregates). `pathway_enrichment` has `by_experiment: list[...]` (per-experiment) — matches `genes_by_ontology`'s `by_category`/`by_level` naming convention rather than DE's `experiments` key, which is fine but worth noting. **Keep `by_experiment`** — the `by_X` pattern is more uniform across the family than DE's split naming.
+
+### Intentional divergences (document, don't normalize)
+
+- **Top-K default N**: `genes_by_ontology.top_terms = 5`, DE `top_categories = 5`, `pathway_enrichment.top_pathways_by_padj = 10`. Enrichment has more analytic axis-variety; 10 surfaces more meaningful pathways. Keep.
+- **`cluster_summary` (distribution instead of full list)**: specific to enrichment because the cluster cardinality is high (up to 200+). No analogue in sibling tools. Keep.
+- **`term_validation` namespaced dict**: passthrough from `genes_by_ontology`'s four buckets. Namespace prevents collision with experiment-level `not_found`/`not_matched`/`no_expression`. Keep.
+- **`clusters_skipped` with reason field**: enrichment-specific concept; no analogue. Keep.
 
 ## compareCluster alignment
 
@@ -583,8 +621,7 @@ YAML content:
 
     | Field | Meaning |
     |---|---|
-    | `total_rows`, `returned`, `truncated`, `offset` | Pagination |
-    | `n_tests` | Total Fisher tests run (= total result rows pre-filter) |
+    | `total_matching`, `returned`, `truncated`, `offset` | Pagination. `total_matching` is the pre-pagination row count (= total Fisher tests run; one row = one test) |
     | `n_significant` | Rows with `p_adjust < pvalue_cutoff` |
     | `by_experiment` | Per-experiment `{n_tests, n_significant, n_clusters}` plus experiment metadata |
     | `by_direction` | Per-direction `{n_tests, n_significant}` |
@@ -593,7 +630,8 @@ YAML content:
     | `top_clusters_by_min_padj` | Top 5 clusters by their smallest `p_adjust`, full metadata |
     | `top_pathways_by_padj` | Top 10 pathways across all clusters by `p_adjust`. Fixed slice of what `results` already carries — `results` is globally sorted by `p_adjust` asc, so pagination (`limit`/`offset`) on `results` recovers positions 11+ |
     | `not_found` | Requested `experiment_ids` absent from KG |
-    | `not_matched` | Experiment IDs found but wrong organism or no DE rows |
+    | `not_matched` | Experiment IDs found but wrong organism |
+    | `no_expression` | Experiment matches organism but has no DE rows (reuses DE tool's term) |
     | `term_validation` | Namespaced `{not_found, wrong_ontology, wrong_level, filtered_out}` for `term_ids` (passthrough from `genes_by_ontology`) |
     | `clusters_skipped` | Clusters with `{cluster, reason}`: `empty_gene_set`, `no_pathways_in_size_range`, `empty_background` |
 
