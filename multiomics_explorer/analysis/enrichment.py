@@ -434,11 +434,22 @@ def de_enrichment_inputs(
 
     allowed_dirs = {"up", "down"} if direction == "both" else {direction}
 
+    _STATUS_TO_DIR = {
+        "significant_up": "up",
+        "significant_down": "down",
+        "up": "up",
+        "down": "down",
+    }
+
     for row in de_full.get("results", []):
         tp = _normalize_timepoint(row.get("timepoint"))
         if timepoint_filter is not None and tp not in set(timepoint_filter):
             continue
-        row_direction = row.get("direction")
+        # Support both `direction` (unit-test mocks) and `expression_status`
+        # (real DE query output).
+        row_direction = row.get("direction") or _STATUS_TO_DIR.get(
+            row.get("expression_status", ""), None
+        )
         if row_direction not in ("up", "down"):
             continue
         exp_id = row.get("experiment_id")
@@ -449,12 +460,19 @@ def de_enrichment_inputs(
             md: dict = {}
             for field in _METADATA_FIELDS:
                 md[field] = row.get(field)
+            # Backfill direction from expression_status when not present directly.
+            if md.get("direction") is None:
+                md["direction"] = row_direction
             md["name"] = row.get("experiment_name") or row.get("name")
             md["timepoint"] = tp
             cluster_metadata[cluster] = md
 
         if row_direction in allowed_dirs:
-            if significant_only and not row.get("significant"):
+            is_significant = (
+                row.get("significant")
+                or (row.get("expression_status", "") not in ("not_significant", ""))
+            )
+            if significant_only and not is_significant:
                 continue
             gene_sets.setdefault(cluster, []).append(row["locus_tag"])
 

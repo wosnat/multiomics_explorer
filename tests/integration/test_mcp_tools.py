@@ -890,3 +890,104 @@ class TestOntologyLandscapeIntegration:
             assert "min_exp_coverage" in r
             assert "median_exp_coverage" in r
             assert "max_exp_coverage" in r
+
+
+@pytest.mark.kg
+class TestPathwayEnrichmentIntegration:
+    """Live-KG integration for pathway_enrichment."""
+
+    def test_b1_reproduction_cyanorak_level1(self, conn):
+        """MED4 × CyanoRak level 1 produces recognizable enriched pathways.
+
+        Baseline: B1 analysis found enrichments in N-metabolism (E.4),
+        photosynthesis (J.1–J.8), and ribosomal (K.2) categories.
+
+        Uses background='organism' to give a meaningful universe size;
+        table_scope background would be too small per-cluster to yield significance.
+        """
+        from multiomics_explorer.api.functions import pathway_enrichment, list_experiments
+        all_experiments = list_experiments(organism="MED4", limit=100, conn=conn)
+        # Filter to MED4-only experiments (exclude co-culture rows where Alteromonas is primary)
+        exp_ids = [
+            e["experiment_id"]
+            for e in all_experiments["results"]
+            if "MED4" in e.get("organism_name", "")
+        ]
+        result = pathway_enrichment(
+            organism="MED4",
+            experiment_ids=exp_ids,
+            ontology="cyanorak_role",
+            level=1,
+            direction="both",
+            significant_only=True,
+            background="organism",
+            conn=conn,
+        )
+        assert result["total_matching"] > 0
+        assert result["n_significant"] > 0
+        top_terms = {p["term_id"] for p in result["top_pathways_by_padj"]}
+        expected_family_prefixes = ("cyanorak.role:E.", "cyanorak.role:J.", "cyanorak.role:K.")
+        assert any(any(t.startswith(p) for p in expected_family_prefixes) for t in top_terms), (
+            f"Expected at least one E./J./K. pathway; got {top_terms}"
+        )
+
+    def test_organism_background(self, conn):
+        """`background='organism'` fetches the full MED4 gene set."""
+        from multiomics_explorer.api.functions import pathway_enrichment, list_experiments
+        all_experiments = list_experiments(organism="MED4", limit=20, conn=conn)
+        exp_ids = [
+            e["experiment_id"]
+            for e in all_experiments["results"]
+            if "MED4" in e.get("organism_name", "")
+        ][:1]
+        result = pathway_enrichment(
+            organism="MED4",
+            experiment_ids=exp_ids,
+            ontology="cyanorak_role",
+            level=1,
+            background="organism",
+            conn=conn,
+        )
+        assert result["total_matching"] >= 0
+
+    def test_explicit_background_list(self, conn):
+        """`background=<list>` uses caller's universe."""
+        from multiomics_explorer.api.functions import pathway_enrichment, list_experiments
+        all_experiments = list_experiments(organism="MED4", limit=20, conn=conn)
+        med4_exps = [
+            e["experiment_id"]
+            for e in all_experiments["results"]
+            if "MED4" in e.get("organism_name", "")
+        ]
+        exp_ids = med4_exps[:1]
+        custom_bg = [f"PMM{i:04d}" for i in range(1, 501)]
+        result = pathway_enrichment(
+            organism="MED4",
+            experiment_ids=exp_ids,
+            ontology="cyanorak_role",
+            level=1,
+            background=custom_bg,
+            conn=conn,
+        )
+        assert result["cluster_summary"]["universe_size_max"] <= len(custom_bg)
+
+    def test_clusters_skipped_for_undersized(self, conn):
+        """Very high min_gene_set_size forces all clusters to be skipped."""
+        from multiomics_explorer.api.functions import pathway_enrichment, list_experiments
+        all_experiments = list_experiments(organism="MED4", limit=20, conn=conn)
+        med4_exps = [
+            e["experiment_id"]
+            for e in all_experiments["results"]
+            if "MED4" in e.get("organism_name", "")
+        ]
+        exp_ids = med4_exps[:1]
+        result = pathway_enrichment(
+            organism="MED4",
+            experiment_ids=exp_ids,
+            ontology="cyanorak_role",
+            level=1,
+            min_gene_set_size=100000,
+            max_gene_set_size=None,
+            conn=conn,
+        )
+        assert result["clusters_skipped"], "expected clusters skipped under impossible min filter"
