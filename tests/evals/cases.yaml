@@ -608,124 +608,53 @@
     columns: [id, name, score]
 
 # ── Genes by ontology ──────────────────────────────────────
+# All four cases exercise the new long-format (gene × term) signature.
+# Single organism is required. Modes: term_ids only / level only / both.
 
-- id: find_genes_go_bp_hierarchy
+- id: genes_by_ontology_mode1_term_ids
   tool: genes_by_ontology
-  desc: GO BP hierarchy expansion finds genes in descendant terms
+  desc: Mode 1 — term_ids only, hierarchy expanded DOWN
   params:
-    term_ids: ["go:0006139"]
     ontology: go_bp
-  expect:
-    min_rows: 10
-
-- id: find_genes_ec_hierarchy
-  tool: genes_by_ontology
-  desc: EC hierarchy from top-level class
-  params:
-    term_ids: ["ec:1.-.-.-"]
-    ontology: ec
-  expect:
-    min_rows: 10
-
-- id: find_genes_kegg_category
-  tool: genes_by_ontology
-  desc: KEGG Category traversal to genes
-  params:
-    term_ids: ["kegg.category:09100"]
-    ontology: kegg
-  expect:
-    min_rows: 10
-
-- id: find_genes_kegg_ko_direct
-  tool: genes_by_ontology
-  desc: KEGG KO direct lookup
-  params:
-    term_ids: ["kegg.orthology:K00001"]
-    ontology: kegg
+    organism: Prochlorococcus MED4
+    term_ids: ["go:0006260"]
   expect:
     min_rows: 1
+    columns: [locus_tag, gene_name, product, gene_category, term_id, term_name, level]
 
-- id: find_genes_with_organism
+- id: genes_by_ontology_mode2_level
   tool: genes_by_ontology
-  desc: Organism filter restricts results
+  desc: Mode 2 — level only, rolls UP to level-N ancestors
   params:
-    term_ids: ["go:0006139"]
-    ontology: go_bp
-    organism: MED4
-  expect:
-    min_rows: 1
-
-- id: find_genes_multiple_ids
-  tool: genes_by_ontology
-  desc: Multiple GO term IDs return combined results
-  params:
-    term_ids: ["go:0006260", "go:0006139"]
-    ontology: go_bp
-  expect:
-    min_rows: 1
-
-- id: find_genes_go_mf
-  tool: genes_by_ontology
-  desc: GO MF finds genes by molecular function
-  params:
-    term_ids: ["go:0003677"]
-    ontology: go_mf
-  expect:
-    min_rows: 1
-
-- id: find_genes_go_cc
-  tool: genes_by_ontology
-  desc: GO CC finds genes by cellular component
-  params:
-    term_ids: ["go:0016020"]
-    ontology: go_cc
-  expect:
-    min_rows: 1
-
-- id: find_genes_kegg_subcategory
-  tool: genes_by_ontology
-  desc: KEGG subcategory level traversal
-  params:
-    term_ids: ["kegg.subcategory:09101"]
-    ontology: kegg
-  expect:
-    min_rows: 1
-
-- id: find_genes_ec_intermediate
-  tool: genes_by_ontology
-  desc: EC intermediate level (ec:1.1.-.-) returns oxidoreductases acting on CH-OH
-  params:
-    term_ids: ["ec:1.1.-.-"]
-    ontology: ec
-  expect:
-    min_rows: 1
-
-- id: find_genes_cog_category
-  tool: genes_by_ontology
-  desc: COG category C (Energy) finds annotated genes
-  params:
-    term_ids: ["cog.category:C"]
-    ontology: cog_category
-  expect:
-    min_rows: 1
-
-- id: find_genes_cyanorak_role_hierarchy
-  tool: genes_by_ontology
-  desc: Cyanorak role hierarchy expansion from main role finds genes in sub-roles
-  params:
-    term_ids: ["cyanorak.role:F"]
     ontology: cyanorak_role
+    organism: Prochlorococcus MED4
+    level: 1
   expect:
     min_rows: 1
+    columns: [locus_tag, gene_name, product, gene_category, term_id, term_name, level]
 
-- id: find_genes_tigr_role
+- id: genes_by_ontology_mode3_level_and_ids
   tool: genes_by_ontology
-  desc: TIGR role finds annotated genes (flat, no hierarchy)
+  desc: Mode 3 — level + term_ids, scoped rollup to provided level-N terms
   params:
-    term_ids: ["tigr.role:120"]
-    ontology: tigr_role
+    ontology: cyanorak_role
+    organism: Prochlorococcus MED4
+    level: 1
+    term_ids: ["cyanorak.role:A.1"]
   expect:
     min_rows: 1
+    columns: [locus_tag, gene_name, product, gene_category, term_id, term_name, level]
+
+- id: genes_by_ontology_pfam_clans
+  tool: genes_by_ontology
+  desc: Pfam two-level — level=0 rolls Pfam domains UP to PfamClans
+  params:
+    ontology: pfam
+    organism: Prochlorococcus MED4
+    level: 0
+  expect:
+    min_rows: 1
+    columns: [locus_tag, gene_name, product, gene_category, term_id, term_name, level]
 
 # ── Gene ontology terms ────────────────────────────────────
 
@@ -863,26 +792,6 @@
   expect:
     min_rows: 1
     columns: [id, name, score]
-
-- id: genes_by_ontology_pfam_domain
-  tool: genes_by_ontology
-  desc: Find genes by Pfam domain ID
-  params:
-    ontology: pfam
-    term_ids: ["pfam:PF00712"]
-  expect:
-    min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_name]
-
-- id: genes_by_ontology_pfam_clan
-  tool: genes_by_ontology
-  desc: Find genes by Pfam clan (hierarchy expansion)
-  params:
-    ontology: pfam
-    term_ids: ["pfam.clan:CL0060"]
-  expect:
-    min_rows: 1
-    columns: [locus_tag, gene_name, product, organism_name]
 
 - id: gene_ontology_terms_pfam
   tool: gene_ontology_terms

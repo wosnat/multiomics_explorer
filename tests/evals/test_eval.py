@@ -26,7 +26,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function,
     build_genes_by_homolog_group,
     build_genes_by_homolog_group_summary,
-    build_genes_by_ontology,
     build_gene_details,
     build_gene_homologs,
     build_list_gene_categories,
@@ -61,7 +60,9 @@ TOOL_BUILDERS = {
     "gene_homologs": build_gene_homologs,
     "list_organisms": build_list_organisms,
     "search_ontology": build_search_ontology,
-    "genes_by_ontology": build_genes_by_ontology,
+    # genes_by_ontology: dispatched via api (L2) — composes envelope from
+    # multiple queries; can't be reduced to a single (cypher, params) tuple.
+    "genes_by_ontology": None,
     "gene_ontology_terms": build_gene_ontology_terms,
     "list_publications": build_list_publications,
     "list_experiments": build_list_experiments,
@@ -90,6 +91,14 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         # Legacy eval case — run detail query for batch locus_tags
         cypher, params_b = build_gene_homologs(locus_tags=params["locus_tags"])
         return conn.execute_query(cypher, **params_b)
+
+    if tool == "genes_by_ontology":
+        # Dispatch via api (L2) — composes envelope; eval cases assert on rows.
+        limit = params.get("limit")
+        api_params = {k: v for k, v in params.items() if k != "limit"}
+        if limit is not None:
+            api_params["limit"] = limit
+        return api.genes_by_ontology(**api_params, conn=conn).get("results", [])
 
     builder = TOOL_BUILDERS[tool]
     limit = params.get("limit")

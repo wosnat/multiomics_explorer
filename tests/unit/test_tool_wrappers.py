@@ -1241,141 +1241,229 @@ class TestSearchOntologyWrapper:
 # ---------------------------------------------------------------------------
 class TestGenesByOntologyWrapper:
     _SAMPLE_API_RETURN = {
-        "total_matching": 2,
-        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 1},
-                       {"organism_name": "Alteromonas macleodii MIT1002", "count": 1}],
-        "by_category": [{"category": "Replication and repair", "count": 2}],
-        "by_term": [{"term_id": "go:0006260", "count": 2}],
+        "ontology": "go_bp",
+        "organism_name": "Prochlorococcus MED4",
+        "total_matching": 410,
+        "total_genes": 332,
+        "total_terms": 8,
+        "total_categories": 22,
+        "genes_per_term_min": 5,
+        "genes_per_term_median": 15.0,
+        "genes_per_term_max": 152,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 4,
+        "by_category": [{"category": "Stress", "count": 101}],
+        "by_level": [
+            {"level": 1, "n_terms": 8, "n_genes": 332, "row_count": 410}
+        ],
+        "top_terms": [
+            {"term_id": "go:0050896",
+             "term_name": "response to stimulus", "count": 152}
+        ],
+        "n_best_effort_terms": 1,
+        "not_found": [],
+        "wrong_ontology": [],
+        "wrong_level": [],
+        "filtered_out": [],
         "returned": 2,
-        "truncated": False,
+        "offset": 0,
+        "truncated": True,
         "results": [
-            {"locus_tag": "PMM0120", "gene_name": "dnaN", "product": "p1",
-             "organism_name": "Prochlorococcus MED4",
-             "gene_category": "Replication and repair"},
-            {"locus_tag": "MIT1002_00001", "gene_name": "geneA", "product": "p2",
-             "organism_name": "Alteromonas macleodii MIT1002",
-             "gene_category": "Translation"},
+            {"locus_tag": "PMM0001", "gene_name": "dnaN",
+             "product": "DNA pol", "gene_category": "Replication",
+             "term_id": "go:0050896",
+             "term_name": "response to stimulus", "level": 1},
+            {"locus_tag": "PMM0002", "gene_name": None,
+             "product": None, "gene_category": None,
+             "term_id": "go:0050896",
+             "term_name": "response to stimulus", "level": 1},
         ],
     }
 
     @pytest.mark.asyncio
-    async def test_returns_dict_envelope(self, tool_fns, mock_ctx):
-        """Response has total_matching, by_organism, by_category, by_term, returned, truncated, results."""
+    async def test_wraps_api_result(self, tool_fns, mock_ctx):
+        """Full envelope conversion to Pydantic, including by_level entries."""
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
             return_value=self._SAMPLE_API_RETURN,
         ):
             result = await tool_fns["genes_by_ontology"](
-                mock_ctx, term_ids=["go:0006260"], ontology="go_bp",
+                mock_ctx,
+                ontology="go_bp",
+                organism="Prochlorococcus MED4",
+                level=1,
             )
-        assert result.total_matching == 2
-        assert result.returned == 2
-        assert result.truncated is False
-        assert len(result.by_organism) == 2
-        assert result.by_organism[0].organism_name == "Prochlorococcus MED4"
+        assert result.ontology == "go_bp"
+        assert result.organism_name == "Prochlorococcus MED4"
+        assert result.total_matching == 410
+        assert result.total_genes == 332
+        assert result.total_terms == 8
+        assert result.total_categories == 22
+        assert result.genes_per_term_median == 15.0
+        assert result.terms_per_gene_max == 4
         assert len(result.by_category) == 1
-        assert len(result.by_term) == 1
-        assert result.by_term[0].term_id == "go:0006260"
+        assert result.by_category[0].category == "Stress"
+        assert len(result.by_level) == 1
+        assert result.by_level[0].level == 1
+        assert result.by_level[0].n_terms == 8
+        assert result.by_level[0].n_genes == 332
+        assert result.by_level[0].row_count == 410
+        assert len(result.top_terms) == 1
+        assert result.top_terms[0].term_id == "go:0050896"
+        assert result.top_terms[0].term_name == "response to stimulus"
+        assert result.n_best_effort_terms == 1
+        assert result.returned == 2
+        assert result.truncated is True
         assert len(result.results) == 2
-        r = result.results[0]
-        assert r.locus_tag == "PMM0120"
-        assert r.gene_name == "dnaN"
-        assert r.gene_category == "Replication and repair"
+        r0 = result.results[0]
+        assert r0.locus_tag == "PMM0001"
+        assert r0.gene_name == "dnaN"
+        assert r0.term_id == "go:0050896"
+        assert r0.level == 1
 
     @pytest.mark.asyncio
-    async def test_empty_results(self, tool_fns, mock_ctx):
-        """When api returns no matches."""
+    async def test_default_limit_is_500(self, tool_fns, mock_ctx):
+        """Default MCP limit is 500 (not 5) because this tool feeds enrichment."""
         empty_return = {
-            "total_matching": 0,
-            "by_organism": [],
-            "by_category": [],
-            "by_term": [],
-            "returned": 0,
-            "truncated": False,
-            "results": [],
+            "ontology": "go_bp", "organism_name": "MED4",
+            "total_matching": 0, "total_genes": 0, "total_terms": 0,
+            "total_categories": 0,
+            "genes_per_term_min": 0, "genes_per_term_median": 0.0,
+            "genes_per_term_max": 0,
+            "terms_per_gene_min": 0, "terms_per_gene_median": 0.0,
+            "terms_per_gene_max": 0,
+            "by_category": [], "by_level": [], "top_terms": [],
+            "n_best_effort_terms": 0,
+            "not_found": [], "wrong_ontology": [],
+            "wrong_level": [], "filtered_out": [],
+            "returned": 0, "offset": 0, "truncated": False, "results": [],
         }
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
             return_value=empty_return,
+        ) as mock_api:
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="go_bp", organism="MED4", level=1,
+            )
+        mock_api.assert_called_once()
+        assert mock_api.call_args.kwargs["limit"] == 500
+
+    @pytest.mark.asyncio
+    async def test_sparse_level_is_best_effort(self, tool_fns, mock_ctx):
+        """Verbose mode: True passes through; absent (None) acceptable."""
+        resp = {
+            "ontology": "go_bp", "organism_name": "MED4",
+            "total_matching": 2, "total_genes": 2, "total_terms": 1,
+            "total_categories": 1,
+            "genes_per_term_min": 2, "genes_per_term_median": 2.0,
+            "genes_per_term_max": 2,
+            "terms_per_gene_min": 1, "terms_per_gene_median": 1.0,
+            "terms_per_gene_max": 1,
+            "by_category": [], "by_level": [], "top_terms": [],
+            "n_best_effort_terms": 1,
+            "not_found": [], "wrong_ontology": [], "wrong_level": [],
+            "filtered_out": [],
+            "returned": 2, "offset": 0, "truncated": False,
+            "results": [
+                {
+                    "locus_tag": "PMM0001", "gene_name": None, "product": None,
+                    "gene_category": None, "term_id": "go:0098754",
+                    "term_name": "detoxification", "level": 1,
+                    "level_is_best_effort": True,  # sparse — only set when True
+                },
+                {
+                    # Absent level_is_best_effort (None) is acceptable.
+                    "locus_tag": "PMM0002", "gene_name": None, "product": None,
+                    "gene_category": None, "term_id": "go:0098754",
+                    "term_name": "detoxification", "level": 1,
+                },
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value=resp,
         ):
             result = await tool_fns["genes_by_ontology"](
-                mock_ctx, term_ids=["go:9999999"], ontology="go_bp",
+                mock_ctx, ontology="go_bp", organism="MED4", level=1,
+                verbose=True,
             )
-        assert result.total_matching == 0
-        assert result.returned == 0
-        assert result.results == []
+        assert result.results[0].level_is_best_effort is True
+        assert result.results[1].level_is_best_effort is None
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
-        """All params passed through to api."""
+        """All params passed through to api as kwargs."""
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
             return_value={**self._SAMPLE_API_RETURN, "results": [], "returned": 0},
         ) as mock_api:
             await tool_fns["genes_by_ontology"](
                 mock_ctx,
-                term_ids=["go:0006260"],
                 ontology="go_bp",
                 organism="MED4",
+                level=2,
+                term_ids=["go:0006260"],
+                min_gene_set_size=3,
+                max_gene_set_size=200,
                 summary=True,
                 verbose=True,
                 limit=10,
+                offset=5,
             )
         mock_api.assert_called_once()
-        call_kwargs = mock_api.call_args
-        assert call_kwargs.args[0] == ["go:0006260"]
-        assert call_kwargs.args[1] == "go_bp"
-        assert call_kwargs.kwargs["organism"] == "MED4"
-        assert call_kwargs.kwargs["summary"] is True
-        assert call_kwargs.kwargs["verbose"] is True
-        assert call_kwargs.kwargs["limit"] == 10
-
-    @pytest.mark.asyncio
-    async def test_truncation_metadata(self, tool_fns, mock_ctx):
-        """returned/truncated from api are preserved."""
-        truncated_return = {
-            **self._SAMPLE_API_RETURN,
-            "total_matching": 50,
-            "returned": 2,
-            "truncated": True,
-        }
-        with patch(
-            "multiomics_explorer.api.functions.genes_by_ontology",
-            return_value=truncated_return,
-        ):
-            result = await tool_fns["genes_by_ontology"](
-                mock_ctx, term_ids=["go:0006260"], ontology="go_bp",
-            )
-        assert result.total_matching == 50
-        assert result.returned == 2
-        assert result.truncated is True
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["ontology"] == "go_bp"
+        assert kwargs["organism"] == "MED4"
+        assert kwargs["level"] == 2
+        assert kwargs["term_ids"] == ["go:0006260"]
+        assert kwargs["min_gene_set_size"] == 3
+        assert kwargs["max_gene_set_size"] == 200
+        assert kwargs["summary"] is True
+        assert kwargs["verbose"] is True
+        assert kwargs["limit"] == 10
+        assert kwargs["offset"] == 5
 
     @pytest.mark.asyncio
     async def test_invalid_ontology_raises_toolerror(self, tool_fns, mock_ctx):
         """ValueError from API is converted to ToolError."""
-        from fastmcp.exceptions import ToolError
-
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
             side_effect=ValueError("Invalid ontology 'bad'"),
         ):
             with pytest.raises(ToolError):
                 await tool_fns["genes_by_ontology"](
-                    mock_ctx, term_ids=["x"], ontology="go_bp",
+                    mock_ctx, ontology="go_bp", organism="MED4", level=1,
                 )
 
     @pytest.mark.asyncio
-    async def test_offset_passed_to_api(self, tool_fns, mock_ctx):
+    async def test_warning_emitted_on_validation_buckets(self, tool_fns, mock_ctx):
+        """ctx.warning is emitted when wrong_ontology or wrong_level are non-empty."""
+        resp = {
+            **self._SAMPLE_API_RETURN,
+            "wrong_ontology": ["ec:1.1.1.1"],
+            "wrong_level": ["go:0050896"],
+            "results": [],
+            "returned": 0,
+        }
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
-            return_value={**self._SAMPLE_API_RETURN, "offset": 5},
-        ) as mock_api:
-            result = await tool_fns["genes_by_ontology"](
-                mock_ctx, term_ids=["go:0006260"], ontology="go_bp", offset=5,
+            return_value=resp,
+        ):
+            await tool_fns["genes_by_ontology"](
+                mock_ctx,
+                ontology="go_bp",
+                organism="MED4",
+                level=1,
+                term_ids=["ec:1.1.1.1", "go:0050896"],
             )
-        mock_api.assert_called_once()
-        call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
-        assert call_kwargs.get("offset") == 5
+        # Both warnings should have been emitted.
+        warning_calls = [str(c) for c in mock_ctx.warning.call_args_list]
+        assert any("wrong ontology" in c for c in warning_calls)
+        assert any("wrong level" in c for c in warning_calls)
+
+    def test_expected_tools_registration(self):
+        assert "genes_by_ontology" in EXPECTED_TOOLS
 
 
 # ---------------------------------------------------------------------------
@@ -1691,7 +1779,8 @@ class TestErrorHandling:
         ):
             with pytest.raises(ToolError, match="Error in genes_by_ontology"):
                 await tool_fns["genes_by_ontology"](
-                    mock_ctx, term_ids=["go:0006260"], ontology="go_bp",
+                    mock_ctx, ontology="go_bp", organism="MED4",
+                    term_ids=["go:0006260"],
                 )
 
     @pytest.mark.asyncio

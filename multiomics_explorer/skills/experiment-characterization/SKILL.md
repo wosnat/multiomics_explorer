@@ -165,7 +165,7 @@ functional landscape:
 gene_overview(locus_tags=<top_de_genes>, summary=True)
 → by_category breakdown shows which functional categories dominate
 
-genes_by_ontology(term_ids=<relevant_terms>, ontology="go_bp", summary=True)
+genes_by_ontology(ontology="go_bp", organism=<organism>, term_ids=<relevant_terms>, summary=True)
 → check overlap between DE genes and known pathways
 ```
 

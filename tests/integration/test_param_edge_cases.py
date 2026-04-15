@@ -46,7 +46,12 @@ class TestAPIInputValidation:
 
     def test_genes_by_ontology_invalid_ontology(self, conn):
         with pytest.raises(ValueError, match="Invalid ontology"):
-            api.genes_by_ontology(["go:0006260"], "invalid_ont", conn=conn)
+            api.genes_by_ontology(
+                ontology="invalid_ont",
+                organism="Prochlorococcus MED4",
+                term_ids=["go:0006260"],
+                conn=conn,
+            )
 
     def test_run_cypher_empty_query(self, conn):
         with pytest.raises(ValueError, match="query"):
@@ -69,8 +74,14 @@ class TestAPIInputValidation:
             api.gene_ontology_terms([], conn=conn)
 
     def test_genes_by_ontology_empty_term_ids(self, conn):
-        with pytest.raises(ValueError, match="term_ids"):
-            api.genes_by_ontology([], "go_bp", conn=conn)
+        # With no level and no term_ids, API requires at least one.
+        with pytest.raises(ValueError, match="level.*term_ids"):
+            api.genes_by_ontology(
+                ontology="go_bp",
+                organism="Prochlorococcus MED4",
+                term_ids=[],
+                conn=conn,
+            )
 
     def test_genes_by_homolog_group_empty(self, conn):
         with pytest.raises(ValueError, match="group_ids"):
@@ -300,24 +311,27 @@ class TestSearchOntologyEdgeCases:
 # ---------------------------------------------------------------------------
 @pytest.mark.kg
 class TestGenesByOntologyEdgeCases:
-    def test_nonexistent_term_returns_empty(self, conn):
+    def test_nonexistent_term_goes_to_not_found(self, conn):
+        """Unknown term IDs land in not_found, total_matching=0."""
         result = api.genes_by_ontology(
-            ["go:9999999"], "go_bp", conn=conn,
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:9999999"],
+            conn=conn,
         )
         assert result["total_matching"] == 0
+        assert result["not_found"] == ["go:9999999"]
 
-    def test_organism_filter(self, conn):
+    def test_top_terms_populated(self, conn):
+        """top_terms has entries when we have multiple surviving terms."""
         result = api.genes_by_ontology(
-            ["go:0006260"], "go_bp", organism="MED4", conn=conn,
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:0006260", "go:0006139"],
+            summary=True,
+            conn=conn,
         )
-        for row in result["results"]:
-            assert "MED4" in row["organism_name"]
-
-    def test_by_term_populated(self, conn):
-        result = api.genes_by_ontology(
-            ["go:0006260", "go:0006139"], "go_bp", summary=True, conn=conn,
-        )
-        assert len(result["by_term"]) >= 1
+        assert len(result["top_terms"]) >= 1
 
 
 # ---------------------------------------------------------------------------

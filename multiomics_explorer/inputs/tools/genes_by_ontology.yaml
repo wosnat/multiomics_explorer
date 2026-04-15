@@ -1,61 +1,59 @@
 # Human-authored content for genes_by_ontology about page.
-# Auto-generated sections (params, response format, expected-keys)
-# come from Pydantic models via scripts/build_about_content.py.
+# Auto-generated sections (params, response format, expected-keys) come from
+# Pydantic models via scripts/build_about_content.py.
 
 examples:
-  - title: Find genes in a GO biological process
-    call: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
+  - title: Mode 1 — gene discovery by pathway (term_ids only)
+    call: genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
     response: |
-      {
-        "total_matching": 411,
-        "by_organism": [{"organism_name": "Alteromonas macleodii EZ55", "count": 44}, ...],
-        "by_category": [{"category": "Replication and repair", "count": 321}, ...],
-        "by_term": [{"term_id": "go:0006260", "count": 411}],
-        "returned": 5, "truncated": true, "offset": 0,
-        "results": [
-          {"locus_tag": "A9601_00001", "gene_name": "dnaN", "product": "DNA polymerase III, beta subunit", "organism_name": "Prochlorococcus AS9601", "gene_category": "Replication and repair"},
-          ...
-        ]
-      }
+      {"ontology": "go_bp", "organism_name": "Prochlorococcus MED4", "total_matching": 30, "total_genes": 30, "total_terms": 1, "total_categories": 1, "by_level": [{"level": 6, "n_terms": 1, "n_genes": 30, "row_count": 30}], "top_terms": [{"term_id": "go:0006260", "term_name": "DNA replication", "count": 30}], "n_best_effort_terms": 0, "not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [], "returned": 5, "truncated": true, "offset": 0, "results": [{"locus_tag": "PMM0001", "gene_name": "dnaN", "product": "DNA polymerase III", "gene_category": "Replication", "term_id": "go:0006260", "term_name": "DNA replication", "level": 6}]}
 
-  - title: Compare gene counts across terms
-    call: genes_by_ontology(term_ids=["go:0006260", "go:0006412"], ontology="go_bp", summary=True)
+  - title: Mode 2 — pathway definitions at level N (level only)
+    call: genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
     response: |
-      {
-        "total_matching": 1742,
-        "by_organism": [{"organism_name": "Alteromonas macleodii EZ55", "count": 152}, ...],
-        "by_category": [{"category": "Translation", "count": 1182}, ...],
-        "by_term": [{"term_id": "go:0006412", "count": 1331}, {"term_id": "go:0006260", "count": 411}],
-        "returned": 0, "truncated": true, "offset": 0, "results": []
-      }
+      {"ontology": "cyanorak_role", "organism_name": "Prochlorococcus MED4", "total_matching": 1740, "total_genes": 1100, "total_terms": 69, "by_level": [{"level": 1, "n_terms": 69, "n_genes": 1100, "row_count": 1740}], "top_terms": [{"term_id": "cyanorak.role:A.1", "term_name": "...", "count": 120}], "returned": 500, "truncated": true, "results": [...]}
 
-  - title: Filter by organism
-    call: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp", organism="MED4")
+  - title: Mode 3 — scope rollup to specific pathways (level + term_ids)
+    call: genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1, term_ids=["cyanorak.role:A.1", "cyanorak.role:A.2"])
 
-  - title: From term search to gene discovery
+  - title: Summary-only (envelope, no rows)
+    call: genes_by_ontology(ontology="go_bp", organism="MED4", level=1, summary=True)
+
+  - title: Inspect all terms (override size filter)
+    call: genes_by_ontology(ontology="go_bp", organism="MED4", level=1, min_gene_set_size=0, max_gene_set_size=100000)
+
+  - title: From level-survey to pathway defs
     steps: |
-      Step 1: search_ontology(search_text="replication", ontology="go_bp")
-              → collect term IDs from results (e.g. "go:0006260")
+      Step 1: ontology_landscape(organism="MED4")
+              → identify best (ontology, level) pair, e.g. (cyanorak_role, level=1)
 
-      Step 2: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
-              → find genes annotated to these terms (with hierarchy expansion)
+      Step 2: genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
+              → get TERM2GENE pathway definitions at that level
 
-      Step 3: gene_overview(locus_tags=["PMM0845", ...])
-              → check data availability for discovered genes
+      Step 3: pathway_enrichment(ontology="cyanorak_role", organism="MED4", level=1, experiment_ids=[...])
+              → run ORA with those pathway definitions
 
 verbose_fields:
-  - matched_terms
-  - gene_summary
   - function_description
+  - level_is_best_effort
 
 chaining:
-  - "search_ontology → genes_by_ontology"
+  - "ontology_landscape → genes_by_ontology(level=N)"
+  - "search_ontology → genes_by_ontology(term_ids=[...])"
+  - "genes_by_ontology → pathway_enrichment"
   - "genes_by_ontology → gene_overview"
-  - "genes_by_ontology → gene_ontology_terms"
 
 mistakes:
-  - "term_ids must come from the SAME ontology — don't mix GO and KEGG IDs"
-  - "by_term counts can overlap — a gene annotated to 2 input terms is counted in both"
-  - "Results are distinct genes, not per-term rows"
-  - wrong: "genes_by_ontology(term_ids=['replication'], ontology='go_bp')  # passing text, not IDs"
-    right: "search_ontology(search_text='replication', ontology='go_bp')  # search first, then use IDs"
+  - "At least one of `level` or `term_ids` must be set — calling without either is an error."
+  - "Results are `(gene × term)` pairs, not distinct genes — use `total_genes` for the gene count. `total_matching` is the row count."
+  - "Gene-set-size filter is organism-scoped via descendants — count of distinct genes annotated to the term or any descendant for `$organism`. Matches `ontology_landscape`'s convention."
+  - "For GO (a DAG), level slicing is a best-effort approximation — `level_is_best_effort` flags rows where the min-path to root was ambiguous. Check `ontology_landscape`'s `best_effort_share` per level."
+  - "`level_is_best_effort` is a sparse column — absent when not GO / not best-effort. In pandas, call `df['level_is_best_effort'].fillna(False)` before boolean filtering."
+  - "`organism` is required and single-valued. For cross-organism browsing, loop the tool or use `gene_ontology_terms`."
+  - "Pfam is a 2-level ontology: `level=1` → Pfam domains (leaf), `level=0` → PfamClan (parent). Both kinds of IDs are accepted under `ontology='pfam'`."
+  - "KEGG: gene edges only hit the KO leaf (`level=3`). Passing `level=0/1/2` rolls up to category/subcategory/pathway via `is_a`."
+  - "Flat ontologies (`cog_category`, `tigr_role`) have only `level=0`. Passing `level >= 1` in Mode 2 returns empty results; in Mode 3 the ids route to `wrong_level`."
+  - wrong: "genes_by_ontology(ontology='go_bp', organism='MED4')  # no level or term_ids"
+    right: "genes_by_ontology(ontology='go_bp', organism='MED4', level=3)"
+  - wrong: "len(response.results)  # wrong — that's the row count after limit"
+    right: "response.total_genes  # distinct genes across all matches"

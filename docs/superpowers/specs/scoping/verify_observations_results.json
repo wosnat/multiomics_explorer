@@ -1,0 +1,746 @@
+{
+  "o1_o2": {
+    "rows": [
+      {
+        "ontology": "tigr",
+        "level": 0,
+        "n_terms_with_genes": 106,
+        "median": 9.0,
+        "n_genes_at_level": 1765,
+        "coverage": 0.8932,
+        "size_factor": 1.0,
+        "spec_score": 0.8932,
+        "b1_score": 0.0,
+        "spec_rank": 1,
+        "b1_rank": 10
+      },
+      {
+        "ontology": "cyanorak_role",
+        "level": 1,
+        "n_terms_with_genes": 110,
+        "median": 9.0,
+        "n_genes_at_level": 1491,
+        "coverage": 0.7546,
+        "size_factor": 1.0,
+        "spec_score": 0.7546,
+        "b1_score": 0.7546,
+        "spec_rank": 2,
+        "b1_rank": 1
+      },
+      {
+        "ontology": "cog",
+        "level": 0,
+        "n_terms_with_genes": 19,
+        "median": 65.0,
+        "n_genes_at_level": 1751,
+        "coverage": 0.8861,
+        "size_factor": 0.7692,
+        "spec_score": 0.6816,
+        "b1_score": 0.0,
+        "spec_rank": 3,
+        "b1_rank": 11
+      },
+      {
+        "ontology": "go_mf",
+        "level": 1,
+        "n_terms_with_genes": 15,
+        "median": 17.0,
+        "n_genes_at_level": 1196,
+        "coverage": 0.6053,
+        "size_factor": 1.0,
+        "spec_score": 0.6053,
+        "b1_score": 0.6053,
+        "spec_rank": 4,
+        "b1_rank": 2
+      },
+      {
+        "ontology": "go_mf",
+        "level": 2,
+        "n_terms_with_genes": 70,
+        "median": 5.0,
+        "n_genes_at_level": 1186,
+        "coverage": 0.6002,
+        "size_factor": 1.0,
+        "spec_score": 0.6002,
+        "b1_score": 0.6002,
+        "spec_rank": 5,
+        "b1_rank": 3
+      },
+      {
+        "ontology": "go_bp",
+        "level": 1,
+        "n_terms_with_genes": 11,
+        "median": 7.0,
+        "n_genes_at_level": 1118,
+        "coverage": 0.5658,
+        "size_factor": 1.0,
+        "spec_score": 0.5658,
+        "b1_score": 0.5658,
+        "spec_rank": 6,
+        "b1_rank": 4
+      },
+      {
+        "ontology": "go_bp",
+        "level": 2,
+        "n_terms_with_genes": 44,
+        "median": 9.0,
+        "n_genes_at_level": 1118,
+        "coverage": 0.5658,
+        "size_factor": 1.0,
+        "spec_score": 0.5658,
+        "b1_score": 0.5658,
+        "spec_rank": 7,
+        "b1_rank": 5
+      },
+      {
+        "ontology": "go_bp",
+        "level": 3,
+        "n_terms_with_genes": 132,
+        "median": 5.0,
+        "n_genes_at_level": 1096,
+        "coverage": 0.5547,
+        "size_factor": 1.0,
+        "spec_score": 0.5547,
+        "b1_score": 0.5547,
+        "spec_rank": 8,
+        "b1_rank": 6
+      },
+      {
+        "ontology": "cyanorak_role",
+        "level": 0,
+        "n_terms_with_genes": 19,
+        "median": 70.0,
+        "n_genes_at_level": 1504,
+        "coverage": 0.7611,
+        "size_factor": 0.7143,
+        "spec_score": 0.5437,
+        "b1_score": 0.0,
+        "spec_rank": 9,
+        "b1_rank": 12
+      },
+      {
+        "ontology": "go_bp",
+        "level": 4,
+        "n_terms_with_genes": 260,
+        "median": 5.0,
+        "n_genes_at_level": 1004,
+        "coverage": 0.5081,
+        "size_factor": 1.0,
+        "spec_score": 0.5081,
+        "b1_score": 0.5081,
+        "spec_rank": 10,
+        "b1_rank": 7
+      },
+      {
+        "ontology": "ec",
+        "level": 1,
+        "n_terms_with_genes": 61,
+        "median": 7.0,
+        "n_genes_at_level": 808,
+        "coverage": 0.4089,
+        "size_factor": 1.0,
+        "spec_score": 0.4089,
+        "b1_score": 0.4089,
+        "spec_rank": 11,
+        "b1_rank": 8
+      },
+      {
+        "ontology": "kegg",
+        "level": 1,
+        "n_terms_with_genes": 38,
+        "median": 14.5,
+        "n_genes_at_level": 765,
+        "coverage": 0.3871,
+        "size_factor": 1.0,
+        "spec_score": 0.3871,
+        "b1_score": 0.3871,
+        "spec_rank": 12,
+        "b1_rank": 9
+      },
+      {
+        "ontology": "go_bp",
+        "level": 5,
+        "n_terms_with_genes": 312,
+        "median": 4.0,
+        "n_genes_at_level": 927,
+        "coverage": 0.4691,
+        "size_factor": 0.8,
+        "spec_score": 0.3753,
+        "b1_score": 0.0,
+        "spec_rank": 13,
+        "b1_rank": 19
+      },
+      {
+        "ontology": "go_mf",
+        "level": 3,
+        "n_terms_with_genes": 184,
+        "median": 3.0,
+        "n_genes_at_level": 1127,
+        "coverage": 0.5703,
+        "size_factor": 0.6,
+        "spec_score": 0.3422,
+        "b1_score": 0.0,
+        "spec_rank": 14,
+        "b1_rank": 15
+      },
+      {
+        "ontology": "go_cc",
+        "level": 2,
+        "n_terms_with_genes": 40,
+        "median": 4.0,
+        "n_genes_at_level": 801,
+        "coverage": 0.4054,
+        "size_factor": 0.8,
+        "spec_score": 0.3243,
+        "b1_score": 0.0,
+        "spec_rank": 15,
+        "b1_rank": 24
+      },
+      {
+        "ontology": "kegg",
+        "level": 2,
+        "n_terms_with_genes": 213,
+        "median": 4.0,
+        "n_genes_at_level": 765,
+        "coverage": 0.3871,
+        "size_factor": 0.8,
+        "spec_score": 0.3097,
+        "b1_score": 0.0,
+        "spec_rank": 16,
+        "b1_rank": 27
+      },
+      {
+        "ontology": "kegg",
+        "level": 0,
+        "n_terms_with_genes": 6,
+        "median": 66.5,
+        "n_genes_at_level": 765,
+        "coverage": 0.3871,
+        "size_factor": 0.7519,
+        "spec_score": 0.2911,
+        "b1_score": 0.0,
+        "spec_rank": 17,
+        "b1_rank": 26
+      },
+      {
+        "ontology": "ec",
+        "level": 0,
+        "n_terms_with_genes": 7,
+        "median": 80.0,
+        "n_genes_at_level": 828,
+        "coverage": 0.419,
+        "size_factor": 0.625,
+        "spec_score": 0.2619,
+        "b1_score": 0.0,
+        "spec_rank": 18,
+        "b1_rank": 20
+      },
+      {
+        "ontology": "ec",
+        "level": 2,
+        "n_terms_with_genes": 143,
+        "median": 3.0,
+        "n_genes_at_level": 782,
+        "coverage": 0.3957,
+        "size_factor": 0.6,
+        "spec_score": 0.2374,
+        "b1_score": 0.0,
+        "spec_rank": 19,
+        "b1_rank": 25
+      },
+      {
+        "ontology": "go_bp",
+        "level": 6,
+        "n_terms_with_genes": 299,
+        "median": 3.0,
+        "n_genes_at_level": 691,
+        "coverage": 0.3497,
+        "size_factor": 0.6,
+        "spec_score": 0.2098,
+        "b1_score": 0.0,
+        "spec_rank": 20,
+        "b1_rank": 29
+      },
+      {
+        "ontology": "go_mf",
+        "level": 4,
+        "n_terms_with_genes": 283,
+        "median": 2.0,
+        "n_genes_at_level": 1032,
+        "coverage": 0.5223,
+        "size_factor": 0.4,
+        "spec_score": 0.2089,
+        "b1_score": 0.0,
+        "spec_rank": 21,
+        "b1_rank": 18
+      },
+      {
+        "ontology": "cyanorak_role",
+        "level": 2,
+        "n_terms_with_genes": 26,
+        "median": 12.0,
+        "n_genes_at_level": 342,
+        "coverage": 0.1731,
+        "size_factor": 1.0,
+        "spec_score": 0.1731,
+        "b1_score": 0.0,
+        "spec_rank": 22,
+        "b1_rank": 33
+      },
+      {
+        "ontology": "pfam",
+        "level": 1,
+        "n_terms_with_genes": 1527,
+        "median": 1.0,
+        "n_genes_at_level": 1492,
+        "coverage": 0.7551,
+        "size_factor": 0.2,
+        "spec_score": 0.151,
+        "b1_score": 0.0,
+        "spec_rank": 23,
+        "b1_rank": 13
+      },
+      {
+        "ontology": "go_cc",
+        "level": 3,
+        "n_terms_with_genes": 90,
+        "median": 3.0,
+        "n_genes_at_level": 386,
+        "coverage": 0.1953,
+        "size_factor": 0.6,
+        "spec_score": 0.1172,
+        "b1_score": 0.0,
+        "spec_rank": 24,
+        "b1_rank": 31
+      },
+      {
+        "ontology": "kegg",
+        "level": 3,
+        "n_terms_with_genes": 1017,
+        "median": 1.0,
+        "n_genes_at_level": 1065,
+        "coverage": 0.539,
+        "size_factor": 0.2,
+        "spec_score": 0.1078,
+        "b1_score": 0.0,
+        "spec_rank": 25,
+        "b1_rank": 17
+      },
+      {
+        "ontology": "go_mf",
+        "level": 5,
+        "n_terms_with_genes": 448,
+        "median": 1.0,
+        "n_genes_at_level": 828,
+        "coverage": 0.419,
+        "size_factor": 0.2,
+        "spec_score": 0.0838,
+        "b1_score": 0.0,
+        "spec_rank": 26,
+        "b1_rank": 21
+      },
+      {
+        "ontology": "go_bp",
+        "level": 7,
+        "n_terms_with_genes": 225,
+        "median": 2.0,
+        "n_genes_at_level": 413,
+        "coverage": 0.209,
+        "size_factor": 0.4,
+        "spec_score": 0.0836,
+        "b1_score": 0.0,
+        "spec_rank": 27,
+        "b1_rank": 30
+      },
+      {
+        "ontology": "go_cc",
+        "level": 4,
+        "n_terms_with_genes": 53,
+        "median": 3.0,
+        "n_genes_at_level": 248,
+        "coverage": 0.1255,
+        "size_factor": 0.6,
+        "spec_score": 0.0753,
+        "b1_score": 0.0,
+        "spec_rank": 28,
+        "b1_rank": 34
+      },
+      {
+        "ontology": "ec",
+        "level": 3,
+        "n_terms_with_genes": 649,
+        "median": 1.0,
+        "n_genes_at_level": 708,
+        "coverage": 0.3583,
+        "size_factor": 0.2,
+        "spec_score": 0.0717,
+        "b1_score": 0.0,
+        "spec_rank": 29,
+        "b1_rank": 28
+      },
+      {
+        "ontology": "go_cc",
+        "level": 5,
+        "n_terms_with_genes": 16,
+        "median": 3.0,
+        "n_genes_at_level": 189,
+        "coverage": 0.0956,
+        "size_factor": 0.6,
+        "spec_score": 0.0574,
+        "b1_score": 0.0,
+        "spec_rank": 30,
+        "b1_rank": 35
+      },
+      {
+        "ontology": "go_cc",
+        "level": 1,
+        "n_terms_with_genes": 2,
+        "median": 518.0,
+        "n_genes_at_level": 801,
+        "coverage": 0.4054,
+        "size_factor": 0.0965,
+        "spec_score": 0.0391,
+        "b1_score": 0.0,
+        "spec_rank": 31,
+        "b1_rank": 23
+      },
+      {
+        "ontology": "go_bp",
+        "level": 8,
+        "n_terms_with_genes": 82,
+        "median": 2.0,
+        "n_genes_at_level": 180,
+        "coverage": 0.0911,
+        "size_factor": 0.4,
+        "spec_score": 0.0364,
+        "b1_score": 0.0,
+        "spec_rank": 32,
+        "b1_rank": 36
+      },
+      {
+        "ontology": "go_mf",
+        "level": 6,
+        "n_terms_with_genes": 168,
+        "median": 1.0,
+        "n_genes_at_level": 358,
+        "coverage": 0.1812,
+        "size_factor": 0.2,
+        "spec_score": 0.0362,
+        "b1_score": 0.0,
+        "spec_rank": 33,
+        "b1_rank": 32
+      },
+      {
+        "ontology": "go_mf",
+        "level": 0,
+        "n_terms_with_genes": 1,
+        "median": 1200.0,
+        "n_genes_at_level": 1200,
+        "coverage": 0.6073,
+        "size_factor": 0.0417,
+        "spec_score": 0.0253,
+        "b1_score": 0.0,
+        "spec_rank": 34,
+        "b1_rank": 14
+      },
+      {
+        "ontology": "go_bp",
+        "level": 0,
+        "n_terms_with_genes": 1,
+        "median": 1122.0,
+        "n_genes_at_level": 1122,
+        "coverage": 0.5678,
+        "size_factor": 0.0446,
+        "spec_score": 0.0253,
+        "b1_score": 0.0,
+        "spec_rank": 35,
+        "b1_rank": 16
+      },
+      {
+        "ontology": "go_cc",
+        "level": 0,
+        "n_terms_with_genes": 1,
+        "median": 805.0,
+        "n_genes_at_level": 805,
+        "coverage": 0.4074,
+        "size_factor": 0.0621,
+        "spec_score": 0.0253,
+        "b1_score": 0.0,
+        "spec_rank": 36,
+        "b1_rank": 22
+      },
+      {
+        "ontology": "go_cc",
+        "level": 6,
+        "n_terms_with_genes": 3,
+        "median": 13.0,
+        "n_genes_at_level": 45,
+        "coverage": 0.0228,
+        "size_factor": 1.0,
+        "spec_score": 0.0228,
+        "b1_score": 0.0,
+        "spec_rank": 37,
+        "b1_rank": 38
+      },
+      {
+        "ontology": "go_mf",
+        "level": 7,
+        "n_terms_with_genes": 50,
+        "median": 1.0,
+        "n_genes_at_level": 130,
+        "coverage": 0.0658,
+        "size_factor": 0.2,
+        "spec_score": 0.0132,
+        "b1_score": 0.0,
+        "spec_rank": 38,
+        "b1_rank": 37
+      },
+      {
+        "ontology": "go_bp",
+        "level": 9,
+        "n_terms_with_genes": 12,
+        "median": 1.0,
+        "n_genes_at_level": 16,
+        "coverage": 0.0081,
+        "size_factor": 0.2,
+        "spec_score": 0.0016,
+        "b1_score": 0.0,
+        "spec_rank": 39,
+        "b1_rank": 39
+      },
+      {
+        "ontology": "go_mf",
+        "level": 8,
+        "n_terms_with_genes": 9,
+        "median": 1.0,
+        "n_genes_at_level": 9,
+        "coverage": 0.0046,
+        "size_factor": 0.2,
+        "spec_score": 0.0009,
+        "b1_score": 0.0,
+        "spec_rank": 40,
+        "b1_rank": 40
+      },
+      {
+        "ontology": "go_bp",
+        "level": 10,
+        "n_terms_with_genes": 1,
+        "median": 1.0,
+        "n_genes_at_level": 1,
+        "coverage": 0.0005,
+        "size_factor": 0.2,
+        "spec_score": 0.0001,
+        "b1_score": 0.0,
+        "spec_rank": 41,
+        "b1_rank": 41
+      }
+    ],
+    "per_ont_n_levels": {
+      "go_bp": 11,
+      "go_mf": 9,
+      "go_cc": 7,
+      "cyanorak_role": 3,
+      "kegg": 4,
+      "ec": 4,
+      "tigr": 1,
+      "cog": 1,
+      "pfam": 1
+    }
+  },
+  "o3": {
+    "n_ko_total": 4367,
+    "ko_parent_breakdown": [
+      {
+        "has_parent": true,
+        "n": 2543
+      },
+      {
+        "has_parent": false,
+        "n": 1824
+      }
+    ],
+    "med4_ko_parent_breakdown": [
+      {
+        "has_parent": true,
+        "n_kos": 722,
+        "gene_term_pairs": 792
+      },
+      {
+        "has_parent": false,
+        "n_kos": 295,
+        "gene_term_pairs": 332
+      }
+    ],
+    "med4_orphan_ko_genes": 319
+  },
+  "o4": {
+    "go_bp": [
+      {
+        "level": 0,
+        "n_terms_reached": 1,
+        "n_best_effort": 0,
+        "frac": 0.0
+      },
+      {
+        "level": 1,
+        "n_terms_reached": 11,
+        "n_best_effort": 1,
+        "frac": 0.09090909090909091
+      },
+      {
+        "level": 2,
+        "n_terms_reached": 44,
+        "n_best_effort": 10,
+        "frac": 0.22727272727272727
+      },
+      {
+        "level": 3,
+        "n_terms_reached": 132,
+        "n_best_effort": 48,
+        "frac": 0.36363636363636365
+      },
+      {
+        "level": 4,
+        "n_terms_reached": 260,
+        "n_best_effort": 120,
+        "frac": 0.46153846153846156
+      },
+      {
+        "level": 5,
+        "n_terms_reached": 312,
+        "n_best_effort": 199,
+        "frac": 0.6378205128205128
+      },
+      {
+        "level": 6,
+        "n_terms_reached": 299,
+        "n_best_effort": 232,
+        "frac": 0.7759197324414716
+      },
+      {
+        "level": 7,
+        "n_terms_reached": 225,
+        "n_best_effort": 181,
+        "frac": 0.8044444444444444
+      },
+      {
+        "level": 8,
+        "n_terms_reached": 82,
+        "n_best_effort": 62,
+        "frac": 0.7560975609756098
+      },
+      {
+        "level": 9,
+        "n_terms_reached": 12,
+        "n_best_effort": 9,
+        "frac": 0.75
+      },
+      {
+        "level": 10,
+        "n_terms_reached": 1,
+        "n_best_effort": 1,
+        "frac": 1.0
+      }
+    ],
+    "go_mf": [
+      {
+        "level": 0,
+        "n_terms_reached": 1,
+        "n_best_effort": 0,
+        "frac": 0.0
+      },
+      {
+        "level": 1,
+        "n_terms_reached": 15,
+        "n_best_effort": 0,
+        "frac": 0.0
+      },
+      {
+        "level": 2,
+        "n_terms_reached": 70,
+        "n_best_effort": 16,
+        "frac": 0.22857142857142856
+      },
+      {
+        "level": 3,
+        "n_terms_reached": 184,
+        "n_best_effort": 59,
+        "frac": 0.32065217391304346
+      },
+      {
+        "level": 4,
+        "n_terms_reached": 283,
+        "n_best_effort": 71,
+        "frac": 0.2508833922261484
+      },
+      {
+        "level": 5,
+        "n_terms_reached": 448,
+        "n_best_effort": 77,
+        "frac": 0.171875
+      },
+      {
+        "level": 6,
+        "n_terms_reached": 168,
+        "n_best_effort": 44,
+        "frac": 0.2619047619047619
+      },
+      {
+        "level": 7,
+        "n_terms_reached": 50,
+        "n_best_effort": 12,
+        "frac": 0.24
+      },
+      {
+        "level": 8,
+        "n_terms_reached": 9,
+        "n_best_effort": 1,
+        "frac": 0.1111111111111111
+      }
+    ],
+    "go_cc": [
+      {
+        "level": 0,
+        "n_terms_reached": 1,
+        "n_best_effort": 0,
+        "frac": 0.0
+      },
+      {
+        "level": 1,
+        "n_terms_reached": 2,
+        "n_best_effort": 0,
+        "frac": 0.0
+      },
+      {
+        "level": 2,
+        "n_terms_reached": 40,
+        "n_best_effort": 20,
+        "frac": 0.5
+      },
+      {
+        "level": 3,
+        "n_terms_reached": 90,
+        "n_best_effort": 69,
+        "frac": 0.7666666666666667
+      },
+      {
+        "level": 4,
+        "n_terms_reached": 53,
+        "n_best_effort": 41,
+        "frac": 0.7735849056603774
+      },
+      {
+        "level": 5,
+        "n_terms_reached": 16,
+        "n_best_effort": 7,
+        "frac": 0.4375
+      },
+      {
+        "level": 6,
+        "n_terms_reached": 3,
+        "n_best_effort": 1,
+        "frac": 0.3333333333333333
+      }
+    ]
+  }
+}

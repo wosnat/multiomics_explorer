@@ -17,8 +17,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_ontology_terms,
     build_gene_overview,
     build_gene_stub,
-    build_genes_by_ontology,
-    build_genes_by_ontology_summary,
     build_gene_details,
     build_gene_homologs,
     build_gene_homologs_summary,
@@ -606,192 +604,104 @@ class TestSearchOntologySummaryCorrectnessKG:
 
 @pytest.mark.kg
 class TestGenesByOntologyCorrectnessKG:
-    """Validate genes_by_ontology queries against live Neo4j."""
+    """Validate genes_by_ontology against live Neo4j.
 
-    def test_go_bp_hierarchy_expansion(self, conn):
-        """GO:BP by ID with hierarchy: nucleobase-containing compound metabolic process."""
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006139"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 10, (
-            f"Expected >= 10 genes for go:0006139 hierarchy, got {len(results)}"
-        )
+    Counts verified 2026-04-14 during Task 11 execution.
+    """
 
-    def test_go_bp_leaf_fewer_than_parent(self, conn):
-        """A specific leaf term should return fewer genes than a parent term."""
-        cypher_parent, params_parent = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006139"],
+    def test_mode2_go_bp_level1_med4(self):
+        r = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
         )
-        cypher_leaf, params_leaf = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
-        )
-        parent_results = conn.execute_query(cypher_parent, **params_parent)
-        leaf_results = conn.execute_query(cypher_leaf, **params_leaf)
-        assert len(leaf_results) <= len(parent_results), (
-            f"Leaf term go:0006260 ({len(leaf_results)} genes) should have "
-            f"<= parent go:0006139 ({len(parent_results)} genes)"
-        )
+        # Verified 2026-04-14 against live KG.
+        assert r["total_matching"] == 410
+        assert r["total_genes"] == 332
+        assert r["total_terms"] == 8
+        # by_level is a single entry at level 1
+        assert len(r["by_level"]) == 1
+        assert r["by_level"][0]["level"] == 1
+        assert r["by_level"][0]["n_genes"] == 332
+        assert r["by_level"][0]["row_count"] == 410
+        # All validation buckets empty (Mode 2)
+        assert r["not_found"] == []
+        assert r["wrong_ontology"] == []
+        assert r["wrong_level"] == []
+        assert r["filtered_out"] == []
 
-    def test_ec_hierarchy_top_level(self, conn):
-        """EC hierarchy: ec:1.-.-.- returns all oxidoreductases via tree walk."""
-        cypher, params = build_genes_by_ontology(
-            ontology="ec", term_ids=["ec:1.-.-.-"],
+    def test_mode1_mixed_levels(self):
+        # L1 (cellular process) and L6 (DNA replication)
+        r = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:0009987", "go:0006260"],
+            min_gene_set_size=5,
+            max_gene_set_size=2000,
         )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 10
+        assert r["total_matching"] == 1068  # 1038 + 30
+        levels_in_result = {e["level"] for e in r["by_level"]}
+        assert levels_in_result == {1, 6}
+        by_level = {e["level"]: e for e in r["by_level"]}
+        assert by_level[1]["n_genes"] == 1038
+        assert by_level[6]["n_genes"] == 30
 
-    def test_ec_leaf_direct(self, conn):
-        """EC leaf: ec:2.7.7.7 returns DNA polymerases."""
-        cypher, params = build_genes_by_ontology(
-            ontology="ec", term_ids=["ec:2.7.7.7"],
+    def test_mode3_wrong_level_bucket(self):
+        r = api.genes_by_ontology(
+            ontology="cyanorak_role",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=["cyanorak.role:A"],  # a level-0 root
         )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
+        assert "cyanorak.role:A" in r["wrong_level"]
 
-    def test_kegg_category_traversal(self, conn):
-        """KEGG Category: kegg.category:09100 (Metabolism) traverses to genes."""
-        cypher, params = build_genes_by_ontology(
-            ontology="kegg", term_ids=["kegg.category:09100"],
+    def test_validation_not_found(self):
+        r = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=3,
+            term_ids=["go:0006260", "fake:X"],
         )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 10
+        assert r["not_found"] == ["fake:X"]
 
-    def test_kegg_ko_direct(self, conn):
-        """KEGG KO direct: kegg.orthology:K00001 returns genes."""
-        cypher, params = build_genes_by_ontology(
-            ontology="kegg", term_ids=["kegg.orthology:K00001"],
+    def test_wrong_ontology_bucket(self):
+        r = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=3,
+            term_ids=["go:0006260", "kegg.orthology:K00001"],
         )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
+        assert r["wrong_ontology"] == ["kegg.orthology:K00001"]
 
-    def test_organism_filter(self, conn):
-        """Organism filter restricts results to matching organism."""
-        cypher_all, params_all = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006139"],
+    def test_summary_mode(self):
+        r = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            summary=True,
         )
-        cypher_filtered, params_filtered = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006139"],
-            organism="MED4",
-        )
-        all_results = conn.execute_query(cypher_all, **params_all)
-        filtered = conn.execute_query(cypher_filtered, **params_filtered)
-        assert len(filtered) < len(all_results), (
-            "Organism filter should reduce result count"
-        )
-        for r in filtered:
-            assert "MED4" in r["organism_name"]
+        assert r["results"] == []
+        assert r["total_matching"] > 0
+        assert r["truncated"] is True
 
-    def test_multiple_term_ids(self, conn):
-        """Multiple term IDs return union of results."""
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260", "go:0006139"],
+    def test_pfam_two_level(self):
+        # Level 1 = Pfam domains
+        r1 = api.genes_by_ontology(
+            ontology="pfam", organism="Prochlorococcus MED4", level=1,
         )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-
-    def test_go_mf_dna_binding(self, conn):
-        """GO:MF hierarchy: go:0003677 (DNA binding) finds genes."""
-        cypher, params = build_genes_by_ontology(
-            ontology="go_mf", term_ids=["go:0003677"],
+        assert r1["total_terms"] > 0
+        assert all(row["level"] == 1 for row in r1["results"])
+        # Level 0 = PfamClan
+        r0 = api.genes_by_ontology(
+            ontology="pfam", organism="Prochlorococcus MED4", level=0,
         )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1, "Expected genes for DNA binding (go:0003677)"
-
-    def test_go_cc_membrane(self, conn):
-        """GO:CC hierarchy: go:0016020 (membrane) finds genes."""
-        cypher, params = build_genes_by_ontology(
-            ontology="go_cc", term_ids=["go:0016020"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1, "Expected genes for membrane (go:0016020)"
-
-    def test_kegg_subcategory(self, conn):
-        """KEGG subcategory: kegg.subcategory:09101 traverses to genes."""
-        cypher, params = build_genes_by_ontology(
-            ontology="kegg", term_ids=["kegg.subcategory:09101"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-
-    def test_ec_intermediate_level(self, conn):
-        """EC intermediate: ec:1.1.-.- returns a subset of ec:1.-.-.-."""
-        cypher, params = build_genes_by_ontology(
-            ontology="ec", term_ids=["ec:1.1.-.-"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-
-    def test_cog_category_flat(self, conn):
-        """COG category C (Energy) -- flat ontology, no hierarchy expansion."""
-        cypher, params = build_genes_by_ontology(
-            ontology="cog_category", term_ids=["cog.category:C"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-        for r in results:
-            assert "locus_tag" in r
-            assert "organism_name" in r
-
-    def test_cyanorak_role_hierarchy(self, conn):
-        """CyanoRAK role hierarchy expansion returns genes."""
-        cypher, params = build_genes_by_ontology(
-            ontology="cyanorak_role", term_ids=["cyanorak.role:F"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-
-    def test_tigr_role_flat(self, conn):
-        """TIGR role (flat ontology) returns genes."""
-        cypher, params = build_genes_by_ontology(
-            ontology="tigr_role", term_ids=["tigr.role:120"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-
-    def test_cog_category_flat_summary(self, conn):
-        """Flat ontology summary query must not lose tid variable scope."""
-        cypher, params = build_genes_by_ontology_summary(
-            ontology="cog_category", term_ids=["cog.category:C"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) == 1
-        assert results[0]["total_matching"] >= 1
-        assert len(results[0]["by_term"]) >= 1
-
-    def test_tigr_role_flat_summary(self, conn):
-        """Flat ontology summary query must not lose tid variable scope."""
-        cypher, params = build_genes_by_ontology_summary(
-            ontology="tigr_role", term_ids=["tigr.role:120"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) == 1
-        assert results[0]["total_matching"] >= 1
-
-    def test_cog_category_flat_verbose(self, conn):
-        """Flat ontology verbose query must not lose tid variable scope."""
-        cypher, params = build_genes_by_ontology(
-            ontology="cog_category", term_ids=["cog.category:C"], verbose=True,
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-        assert "matched_terms" in results[0]
-
-    def test_pfam_domain(self, conn):
-        """Pfam domain PF00712 returns annotated genes."""
-        cypher, params = build_genes_by_ontology(
-            ontology="pfam", term_ids=["pfam:PF00712"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
-
-    def test_pfam_clan_hierarchy(self, conn):
-        """Pfam clan CL0060 with hierarchy expansion returns more genes than domain alone."""
-        cypher, params = build_genes_by_ontology(
-            ontology="pfam", term_ids=["pfam.clan:CL0060"],
-        )
-        results = conn.execute_query(cypher, **params)
-        assert len(results) >= 1
+        assert r0["total_terms"] > 0
+        assert all(row["level"] == 0 for row in r0["results"])
+        # Verified 2026-04-14: MED4 top clan is NADP_Rossmann
+        top_clan_names = {t["term_name"] for t in r0["top_terms"]}
+        assert "NADP_Rossmann" in top_clan_names
 
 
 # ---------------------------------------------------------------------------

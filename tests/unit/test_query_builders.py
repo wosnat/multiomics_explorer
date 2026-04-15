@@ -18,8 +18,6 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_stub,
     build_genes_by_function,
     build_genes_by_function_summary,
-    build_genes_by_ontology,
-    build_genes_by_ontology_summary,
     build_gene_details,
     build_gene_details_summary,
     build_list_gene_categories,
@@ -57,6 +55,72 @@ from multiomics_explorer.kg.queries_lib import (
     build_ontology_experiment_check,
     build_ontology_organism_gene_count,
 )
+from multiomics_explorer.kg.queries_lib import _hierarchy_walk
+
+
+class TestHierarchyWalk:
+    def test_go_bp_up(self):
+        frag = _hierarchy_walk("go_bp", direction="up")
+        assert frag["leaf_label"] == "BiologicalProcess"
+        assert frag["gene_rel"] == "Gene_involved_in_biological_process"
+        assert "Biological_process_is_a_biological_process" in frag["rel_union"]
+        assert "Biological_process_part_of_biological_process" in frag["rel_union"]
+        # Up walk binds gene → leaf, then leaf → ancestor
+        assert "(g:Gene {organism_name: $org})-[:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in frag["bind_up"]
+        assert "(leaf)-[:" in frag["walk_up"]
+        assert "]->(t:BiologicalProcess)" in frag["walk_up"]
+
+    def test_go_bp_down(self):
+        frag = _hierarchy_walk("go_bp", direction="down")
+        # Down walk: root matched first, then walk to descendants/leaves
+        assert "(t:BiologicalProcess)<-[:" in frag["walk_down"]
+        assert "]-(leaf:BiologicalProcess)" in frag["walk_down"]
+
+    def test_flat_ontology_has_no_walk(self):
+        frag = _hierarchy_walk("cog_category", direction="up")
+        # Flat: t = leaf; walk_up is empty; bind goes directly to t
+        assert frag["rel_union"] == ""
+        assert frag["walk_up"] == ""
+        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in frag["bind_up"]
+
+    def test_tigr_role_flat(self):
+        frag = _hierarchy_walk("tigr_role", direction="up")
+        assert frag["walk_up"] == ""
+        assert frag["leaf_label"] == "TigrRole"
+
+    def test_pfam_up_crosses_to_clan(self):
+        frag = _hierarchy_walk("pfam", direction="up")
+        # Pfam up: leaf=Pfam, walk via Pfam_in_pfam_clan *0..1, t can be Pfam or PfamClan
+        assert "(leaf:Pfam)" in frag["bind_up"]
+        assert "Pfam_in_pfam_clan" in frag["walk_up"]
+        assert "*0..1" in frag["walk_up"]
+        # target can be either label
+        assert "t:Pfam OR t:PfamClan" in frag["walk_up"] or "t:PfamClan OR t:Pfam" in frag["walk_up"]
+
+    def test_pfam_down_pfam_root(self):
+        """Pfam root (level 1): no walk — t is the leaf."""
+        frag = _hierarchy_walk("pfam", direction="down", root_label="Pfam")
+        assert frag["walk_down"] == ""  # Pfam root has no Pfam descendants
+
+    def test_pfam_down_pfamclan_root(self):
+        """PfamClan root (level 0): walk down via Pfam_in_pfam_clan."""
+        frag = _hierarchy_walk("pfam", direction="down", root_label="PfamClan")
+        assert "(t:PfamClan)<-[:Pfam_in_pfam_clan]-(leaf:Pfam)" in frag["walk_down"]
+
+    def test_kegg_single_label(self):
+        frag = _hierarchy_walk("kegg", direction="up")
+        assert frag["leaf_label"] == "KeggTerm"
+        assert "Kegg_term_is_a_kegg_term" in frag["rel_union"]
+
+    def test_unknown_ontology_raises(self):
+        import pytest
+        with pytest.raises(ValueError, match="Invalid ontology"):
+            _hierarchy_walk("not_a_real_ontology", direction="up")
+
+    def test_direction_required(self):
+        import pytest
+        with pytest.raises(ValueError, match="direction"):
+            _hierarchy_walk("go_bp", direction="sideways")
 
 
 class TestBuildResolveGene:
@@ -749,14 +813,12 @@ class TestOntologyConfig:
             assert "hierarchy_rels" in cfg, f"{key} missing 'hierarchy_rels'"
             assert "fulltext_index" in cfg, f"{key} missing 'fulltext_index'"
 
-    def test_only_kegg_has_gene_connects_to_level(self):
+    def test_no_gene_connects_to_level(self):
+        """gene_connects_to_level was removed — graph structure enforces KEGG's ko-leaf rule."""
         for key, cfg in ONTOLOGY_CONFIG.items():
-            if key == "kegg":
-                assert cfg.get("gene_connects_to_level") == "ko"
-            else:
-                assert "gene_connects_to_level" not in cfg, (
-                    f"{key} should not have 'gene_connects_to_level'"
-                )
+            assert "gene_connects_to_level" not in cfg, (
+                f"{key} should not have 'gene_connects_to_level' (removed)"
+            )
 
     def test_pfam_has_parent_fields(self):
         """Pfam config has parent_label and parent_fulltext_index."""
@@ -895,234 +957,371 @@ class TestBuildSearchOntologySummary:
         assert "$search_text" in cypher
 
 
-class TestBuildGenesByOntology:
-    def test_go_bp_hierarchy_expansion(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
+class TestBuildGenesByOntologyValidate:
+    def test_single_label_ontology(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
         )
-        assert "Biological_process_is_a_biological_process|Biological_process_part_of_biological_process" in cypher
-        assert "*0..15" in cypher
-        assert "BiologicalProcess" in cypher
-
-    def test_ec_hierarchy_expansion(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="ec", term_ids=["ec:1.-.-.-"],
+        cypher, params = build_genes_by_ontology_validate(
+            term_ids=["go:0006260", "go:0006412"],
+            ontology="go_bp",
+            level=3,
         )
-        assert "Ec_number_is_a_ec_number" in cypher
-        assert "*0..15" in cypher
+        assert params == {
+            "term_ids": ["go:0006260", "go:0006412"],
+            "expected_labels": ["BiologicalProcess"],
+            "level": 3,
+        }
+        assert "UNWIND $term_ids AS tid" in cypher
+        assert "OPTIONAL MATCH (t {id: tid})" in cypher
+        # Guards all 10 label options
+        assert "t:BiologicalProcess" in cypher
+        assert "t:PfamClan" in cypher
+        assert "ANY(L IN $expected_labels WHERE L IN labels(t))" in cypher
+        assert "matched_label" in cypher
 
-    def test_kegg_has_level_filter(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="kegg", term_ids=["kegg.category:09100"],
+    def test_pfam_accepts_both_labels(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
         )
-        assert "Kegg_term_is_a_kegg_term" in cypher
-        assert "*0..15" in cypher
-        assert "descendant.level = 'ko'" in cypher
-
-    def test_non_kegg_no_level_filter(self):
-        for ontology in ["go_bp", "go_mf", "go_cc", "ec"]:
-            cypher, _ = build_genes_by_ontology(
-                ontology=ontology, term_ids=["test:001"],
-            )
-            assert "level" not in cypher, f"{ontology} should not have level filter"
-
-    def test_organism_filter_in_where(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], organism="MED4",
+        _, params = build_genes_by_ontology_validate(
+            term_ids=["pfam:PF00005", "pfam.clan:CL0023"],
+            ontology="pfam",
+            level=None,
         )
-        assert params["organism"] == "MED4"
-        assert "toLower($organism)" in cypher
+        assert params["expected_labels"] == ["Pfam", "PfamClan"]
+        assert params["level"] is None
 
-    def test_term_ids_passed_as_parameter(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260", "go:0006139"],
+    def test_no_level_means_level_filter_skipped(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
         )
-        assert params["term_ids"] == ["go:0006260", "go:0006139"]
-        assert "$term_ids" in cypher
-
-    def test_returns_expected_columns(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
+        cypher, params = build_genes_by_ontology_validate(
+            term_ids=["go:0006260"],
+            ontology="go_bp",
+            level=None,
         )
-        for col in ["locus_tag", "gene_name", "product", "organism_name"]:
-            assert col in cypher
+        # Level check is conditional on $level — expression must guard on NULL
+        assert "$level IS NOT NULL AND t.level <> $level" in cypher
+        assert params["level"] is None
 
-    def test_invalid_ontology_raises_valueerror(self):
+    def test_unknown_ontology_raises(self):
+        import pytest
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
+        )
         with pytest.raises(ValueError, match="Invalid ontology"):
-            build_genes_by_ontology(ontology="bad", term_ids=["x"])
-
-    def test_go_mf_hierarchy_expansion(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_mf", term_ids=["go:0003677"],
-        )
-        assert "MolecularFunction" in cypher
-        assert "Molecular_function_is_a_molecular_function" in cypher
-
-    def test_go_cc_hierarchy_expansion(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_cc", term_ids=["go:0016020"],
-        )
-        assert "CellularComponent" in cypher
-        assert "Cellular_component_is_a_cellular_component" in cypher
-
-    def test_flat_ontology_no_hierarchy_expansion(self):
-        """Flat ontologies (empty hierarchy_rels) skip *0..15 traversal."""
-        cypher, _ = build_genes_by_ontology(
-            ontology="cog_category", term_ids=["cog.category:C"],
-        )
-        assert "*0..15" not in cypher
-        assert "root AS descendant" in cypher
-        assert "CogFunctionalCategory" in cypher
-        assert "Gene_in_cog_category" in cypher
-
-    def test_hierarchical_new_ontology(self):
-        """CyanorakRole has hierarchy and should use *0..15 traversal."""
-        cypher, _ = build_genes_by_ontology(
-            ontology="cyanorak_role", term_ids=["cyanorak.role:F"],
-        )
-        assert "Cyanorak_role_is_a_cyanorak_role" in cypher
-        assert "*0..15" in cypher
-
-    def test_pfam_multi_label_root(self):
-        """Pfam generates multi-label root match accepting both Pfam and PfamClan."""
-        cypher, _ = build_genes_by_ontology(
-            ontology="pfam", term_ids=["pfam:PF00712"],
-        )
-        assert "root:Pfam OR root:PfamClan" in cypher
-        assert "Pfam_in_pfam_clan" in cypher
-        assert "*0..15" in cypher
-        assert "Gene_has_pfam" in cypher
-
-    def test_non_pfam_single_label_root(self):
-        """Non-pfam ontologies use single-label root match."""
-        for ontology in ["go_bp", "go_mf", "go_cc", "ec", "kegg",
-                         "cog_category", "cyanorak_role", "tigr_role"]:
-            cypher, _ = build_genes_by_ontology(
-                ontology=ontology, term_ids=["test:001"],
+            build_genes_by_ontology_validate(
+                term_ids=["x"], ontology="nope", level=0,
             )
-            assert "OR root:" not in cypher, f"{ontology} should not have multi-label root"
 
-    def test_verbose_false_no_gene_summary(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], verbose=False,
+
+class TestBuildGenesByOntologyDetail:
+    def test_mode1_term_ids_only_walks_down(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
         )
-        assert "gene_summary" not in cypher
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            term_ids=["go:0006260"],
+            level=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert params["term_ids"] == ["go:0006260"]
+        assert params["org"] == "Prochlorococcus MED4"
+        assert params["min_gene_set_size"] == 5
+        assert params["max_gene_set_size"] == 500
+        # Mode 1: walk DOWN from each input term
+        assert "UNWIND $term_ids AS input_tid" in cypher
+        assert "(t:BiologicalProcess {id: input_tid})" in cypher
+        assert "<-[:" in cypher  # walk direction
+        assert "(leaf:BiologicalProcess)" in cypher
+        # Size filter
+        assert "size(term_genes) >= $min_gene_set_size" in cypher
+        assert "size(term_genes) <= $max_gene_set_size" in cypher
+        # Row return
+        assert "g.locus_tag AS locus_tag" in cypher
+        assert "t.id AS term_id" in cypher
+        assert "t.level AS level" in cypher
+        # Verbose fields omitted by default
         assert "function_description" not in cypher
-        assert "matched_terms" not in cypher
+        assert "level_is_best_effort" not in cypher
 
-    def test_verbose_true_adds_columns(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], verbose=True,
+    def test_mode2_level_only_walks_up(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
         )
-        assert "gene_summary" in cypher
-        assert "function_description" in cypher
-        assert "matched_terms" in cypher
-
-    def test_verbose_tid_survives_with_distinct(self):
-        """UNWIND-based verbose query must carry tid through WITH DISTINCT."""
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], verbose=True,
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
         )
-        for line in cypher.split("\n"):
-            if "WITH DISTINCT" in line and "descendant" in line:
-                assert "tid" in line, f"tid dropped from scope: {line}"
+        assert params["level"] == 1
+        assert "$term_ids" not in cypher  # no term_ids clause
+        # Mode 2: bind gene → leaf, walk leaf → ancestor
+        assert "(g:Gene {organism_name: $org})-[:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in cypher
+        assert "(leaf)-[:" in cypher
+        assert "]->(t:BiologicalProcess)" in cypher
+        assert "WHERE t.level = $level" in cypher
 
-    def test_limit_clause(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], limit=10,
+    def test_mode3_level_and_term_ids(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
         )
-        assert "LIMIT $limit" in cypher
-        assert params["limit"] == 10
-
-    def test_limit_none(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="cyanorak_role",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=["cyanorak.role:A.1"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
         )
-        assert "LIMIT" not in cypher
+        # Mode 3: same as Mode 2 but with term_ids scope
+        assert "WHERE t.level = $level AND t.id IN $term_ids" in cypher
 
-    def test_order_by_organism_then_locus(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
+    def test_verbose_adds_columns(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
         )
-        assert "ORDER BY g.organism_name, g.locus_tag" in cypher
-
-    def test_gene_category_in_compact(self):
-        cypher, _ = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"],
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+            verbose=True,
         )
-        assert "gene_category" in cypher
+        assert "g.function_description AS function_description" in cypher
+        assert "t.level_is_best_effort IS NOT NULL AS level_is_best_effort" in cypher
 
-    def test_offset_emits_skip(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], limit=10, offset=5,
+    def test_limit_and_offset(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+            limit=100,
+            offset=50,
         )
         assert "SKIP $offset" in cypher
-        assert params["offset"] == 5
-        assert cypher.index("SKIP") < cypher.index("LIMIT")
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 100
+        assert params["offset"] == 50
 
-    def test_offset_zero_no_skip(self):
-        cypher, params = build_genes_by_ontology(
-            ontology="go_bp", term_ids=["go:0006260"], limit=10, offset=0,
+    def test_order_by_stable(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
         )
-        assert "SKIP" not in cypher
-        assert "offset" not in params
-
-
-class TestBuildGenesByOntologySummary:
-    def test_returns_summary_keys(self):
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology="go_bp", term_ids=["go:0006260"],
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
         )
-        for key in ["total_matching", "by_organism", "by_category", "by_term"]:
-            assert key in cypher
+        assert "ORDER BY t.id, g.locus_tag" in cypher
 
-    def test_uses_apoc_frequencies(self):
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology="go_bp", term_ids=["go:0006260"],
+    def test_no_mode_raises(self):
+        import pytest
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
         )
+        with pytest.raises(ValueError, match="level.*term_ids"):
+            build_genes_by_ontology_detail(
+                ontology="go_bp",
+                organism="MED4",
+                level=None,
+                term_ids=None,
+                min_gene_set_size=5,
+                max_gene_set_size=500,
+            )
+
+    def test_flat_ontology_mode2(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="cog_category",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Flat: t = leaf; no walk between leaf and t
+        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        # No explicit leaf→t walk
+        assert "(leaf)-[:" not in cypher
+
+
+class TestBuildGenesByOntologyPerTerm:
+    def test_mode2_returns_per_term_aggregate(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, params = build_genes_by_ontology_per_term(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert params["level"] == 1
+        assert params["org"] == "Prochlorococcus MED4"
+        # Returns per-term aggregate
+        assert "t.id AS term_id" in cypher
+        assert "t.name AS term_name" in cypher
+        assert "t.level AS level" in cypher
+        assert "t.level_is_best_effort IS NOT NULL AS best_effort" in cypher
+        assert "size(gene_rows) AS n_genes" in cypher
         assert "apoc.coll.frequencies" in cypher
+        assert "AS cat_freqs" in cypher
+        assert "ORDER BY t.id" in cypher
+        # Pagination NOT applied to summary queries
+        assert "SKIP" not in cypher
+        assert "LIMIT" not in cypher
 
-    def test_organism_filter(self):
-        cypher, params = build_genes_by_ontology_summary(
-            ontology="go_bp", term_ids=["go:0006260"], organism="MED4",
+    def test_mode1_term_ids(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
         )
-        assert params["organism"] == "MED4"
-        assert "toLower($organism)" in cypher
-
-    def test_invalid_ontology_raises_valueerror(self):
-        with pytest.raises(ValueError, match="Invalid ontology"):
-            build_genes_by_ontology_summary(ontology="bad", term_ids=["x"])
-
-    def test_pfam_parent_label(self):
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology="pfam", term_ids=["PF00001"],
+        cypher, params = build_genes_by_ontology_per_term(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=None,
+            term_ids=["go:0006260"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
         )
-        assert "Pfam" in cypher
-        assert "PfamClan" in cypher
+        assert params["term_ids"] == ["go:0006260"]
+        assert "UNWIND $term_ids AS input_tid" in cypher
 
-    def test_tid_survives_with_distinct(self):
-        """UNWIND-based summary query must carry tid through WITH DISTINCT."""
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology="go_bp", term_ids=["go:0006260"],
+    def test_mode3_level_and_term_ids(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
         )
-        for line in cypher.split("\n"):
-            if "WITH DISTINCT" in line and "descendant" in line:
-                assert "tid" in line, f"tid dropped from scope: {line}"
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="cyanorak_role",
+            organism="MED4",
+            level=1,
+            term_ids=["cyanorak.role:A.1"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "t.level = $level" in cypher
+        assert "t.id IN $term_ids" in cypher
 
-    @pytest.mark.parametrize("ontology", [
-        "go_bp", "go_mf", "go_cc", "kegg", "ec",
-        "cog_category", "cyanorak_role", "tigr_role", "pfam",
-    ])
-    def test_tid_survives_all_ontologies(self, ontology):
-        """tid scoping must work for all ontology types (hierarchy + flat)."""
-        cypher, _ = build_genes_by_ontology_summary(
-            ontology=ontology, term_ids=["test:001"],
+    def test_pfam_mode1(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
         )
-        for line in cypher.split("\n"):
-            if "WITH DISTINCT" in line and "descendant" in line:
-                assert "tid" in line, (
-                    f"{ontology}: tid dropped from scope: {line}"
-                )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="pfam",
+            organism="Prochlorococcus MED4",
+            level=None,
+            term_ids=["pfam:PF00005"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "(tp:Pfam {id: input_tid})" in cypher
+        assert "coalesce(tp, tc) AS t" in cypher
+
+    def test_flat_ontology_mode2(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="tigr_role",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Flat ontology: t = leaf, no walk
+        assert "(g:Gene {organism_name: $org})-[:Gene_has_tigr_role]->(t:TigrRole)" in cypher
+        assert "(leaf)-[:" not in cypher
+
+
+class TestBuildGenesByOntologyPerGene:
+    def test_mode2_per_gene_shape(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "g.locus_tag AS locus_tag" in cypher
+        assert "coalesce(g.gene_category, 'Unknown') AS gene_category" in cypher
+        assert "size(gene_terms) AS n_terms" in cypher
+        assert "gene_levels AS levels_hit" in cypher
+        assert "ORDER BY g.locus_tag" in cypher
+
+    def test_mode1_per_gene(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        _, params = build_genes_by_ontology_per_gene(
+            ontology="go_bp",
+            organism="MED4",
+            level=None,
+            term_ids=["go:0006260"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert params["term_ids"] == ["go:0006260"]
+
+    def test_pfam_mode1(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="pfam",
+            organism="Prochlorococcus MED4",
+            level=None,
+            term_ids=["pfam:PF00005", "pfam.clan:CL0023"],
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Pfam Mode-1 dual-label coalesce path
+        assert "(tp:Pfam {id: input_tid})" in cypher
+        assert "(tc:PfamClan {id: input_tid})" in cypher
+        assert "coalesce(tp, tc) AS t" in cypher
+        assert "Pfam_in_pfam_clan*0..1" in cypher
+
+    def test_flat_ontology_mode2(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="cog_category",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Flat: t = leaf, no walk
+        assert "(g:Gene {organism_name: $org})-[:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        assert "(leaf)-[:" not in cypher
 
 
 class TestBuildGeneOntologyTerms:
@@ -1161,11 +1360,16 @@ class TestBuildGeneOntologyTerms:
         assert "Pfam" in cypher
 
     def test_leaf_filter_kegg(self):
-        """kegg has gene_connects_to_level, so NO NOT EXISTS."""
+        """kegg now emits NOT EXISTS like other hierarchical ontologies.
+
+        With gene_connects_to_level removed, the leaf filter is emitted
+        for KEGG too; it is a graph-structure no-op (genes only connect
+        at ko leaves) but kept for consistency with other ontologies.
+        """
         cypher, _ = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="kegg",
         )
-        assert "NOT EXISTS" not in cypher
+        assert "NOT EXISTS" in cypher
         assert "KeggTerm" in cypher
 
     def test_verbose_false(self):
@@ -3331,16 +3535,19 @@ class TestBuildOntologyLandscape:
         assert cypher.count("MATCH") == 1
         assert "*0.." not in cypher
 
-    def test_pfam_treated_as_flat_due_to_cross_label_hierarchy(self):
-        """pfam has hierarchy_rels but parent_label=PfamClan — must be treated as flat."""
+    def test_pfam_walks_cross_label_hierarchy_via_helper(self):
+        """pfam is 2-level: Pfam leaf (level=1) + PfamClan parent (level=0).
+
+        Post-helper refactor, landscape walks Pfam_in_pfam_clan *0..1 so
+        stats surface both levels.
+        """
         cypher, _ = build_ontology_landscape(
             ontology="pfam", organism_name="Prochlorococcus MED4",
         )
-        # The cross-label hierarchy cannot be walked with a single label constraint,
-        # so landscape stats are reported at the leaf (domain) level only.
-        assert cypher.count("MATCH") == 1
-        assert "*0.." not in cypher
-        assert "PfamClan" not in cypher
+        assert ":Gene_has_pfam" in cypher
+        assert "(leaf:Pfam)" in cypher
+        assert "Pfam_in_pfam_clan*0..1" in cypher
+        assert "(t:Pfam OR t:PfamClan)" in cypher
 
     def test_invalid_ontology_raises(self):
         with pytest.raises(ValueError, match="Invalid ontology"):
@@ -3398,6 +3605,20 @@ class TestBuildOntologyExpcov:
             build_ontology_expcov(
                 ontology="bogus",
                 organism_name="Prochlorococcus MED4",
+                experiment_ids=["e1"],
+            )
+
+    def test_asserts_when_hierarchy_walk_prefix_changes(self, monkeypatch):
+        from multiomics_explorer.kg import queries_lib
+
+        monkeypatch.setattr(
+            queries_lib, "_hierarchy_walk",
+            lambda *a, **kw: {"bind_up": "MATCH (g:Gene)", "walk_up": ""},
+        )
+        with pytest.raises(AssertionError, match="_hierarchy_walk bind_up format"):
+            build_ontology_expcov(
+                ontology="pfam",
+                organism_name="MED4",
                 experiment_ids=["e1"],
             )
 

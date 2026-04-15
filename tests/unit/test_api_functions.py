@@ -952,106 +952,229 @@ class TestSearchOntology:
 # genes_by_ontology
 # ---------------------------------------------------------------------------
 class TestGenesByOntology:
-    def _summary_result(self, total_matching=5):
-        """Helper: mock summary query result."""
-        return [{
-            "total_matching": total_matching,
-            "by_organism": [{"item": "Prochlorococcus MED4", "count": 3},
-                           {"item": "Alteromonas macleodii EZ55", "count": 2}],
-            "by_category": [{"item": "Replication and repair", "count": 4},
-                           {"item": "Unknown", "count": 1}],
-            "by_term": [{"item": "go:0006260", "count": 5}],
-        }]
+    """Tests the 4-query composer: Query V -> Per-term -> Per-gene -> Detail."""
 
-    def _detail_rows(self):
-        """Helper: mock detail query result rows."""
+    def _validate_rows(self, classifications):
+        """Build mock Query V output: [(tid, status, matched_label), ...]."""
         return [
-            {"locus_tag": "PMM0001", "gene_name": "dnaN",
-             "product": "DNA polymerase III", "organism_name": "Prochlorococcus MED4",
-             "gene_category": "Replication and repair"},
+            {"tid": tid, "status": status, "matched_label": lbl}
+            for tid, status, lbl in classifications
         ]
 
-    def test_returns_dict(self, mock_conn):
-        mock_conn.execute_query.side_effect = [
-            self._summary_result(),
-            self._detail_rows(),
+    def _per_term_rows(self, *terms):
+        """Mock Query A output. Each term = (id, name, level, be, n_genes, cat_freqs)."""
+        return [
+            {"term_id": tid, "term_name": name, "level": lvl,
+             "best_effort": be, "n_genes": n, "cat_freqs": freqs}
+            for tid, name, lvl, be, n, freqs in terms
         ]
-        result = api.genes_by_ontology(["go:0006260"], "go_bp", conn=mock_conn)
-        assert isinstance(result, dict)
-        assert "total_matching" in result
-        assert "by_organism" in result
-        assert "by_category" in result
-        assert "by_term" in result
-        assert "returned" in result
-        assert "truncated" in result
-        assert "results" in result
-        assert result["total_matching"] == 5
-        assert result["returned"] == 1
-        assert mock_conn.execute_query.call_count == 2
 
-    def test_summary_sets_limit_zero(self, mock_conn):
+    def _per_gene_rows(self, *genes):
+        """Mock Query B output. Each = (locus, cat, n_terms, levels_hit)."""
+        return [
+            {"locus_tag": lt, "gene_category": cat,
+             "n_terms": nt, "levels_hit": lh}
+            for lt, cat, nt, lh in genes
+        ]
+
+    def _detail_rows(self, n=3):
+        return [
+            {"locus_tag": f"PMM{i:04d}", "gene_name": None,
+             "product": None, "gene_category": "Unknown",
+             "term_id": "go:0022414", "term_name": "reproductive process",
+             "level": 1}
+            for i in range(n)
+        ]
+
+    def test_mode2_level_only_happy_path(self, mock_conn):
+        # No term_ids -> skip Query V. Runs A, B, D.
         mock_conn.execute_query.side_effect = [
-            self._summary_result(total_matching=5),
+            # Query A (per-term)
+            self._per_term_rows(
+                ("go:0022414", "reproductive process", 1, False, 7,
+                 [{"item": "Cell cycle", "count": 7}]),
+                ("go:0050896", "response to stimulus", 1, False, 152,
+                 [{"item": "Stress", "count": 100},
+                  {"item": "Transport", "count": 52}]),
+            ),
+            # Query B (per-gene)
+            self._per_gene_rows(
+                ("PMM0001", "Cell cycle", 1, [1]),
+                ("PMM0002", "Stress", 1, [1]),
+            ),
+            # Query D (detail)
+            self._detail_rows(n=2),
         ]
         result = api.genes_by_ontology(
-            ["go:0006260"], "go_bp", summary=True, conn=mock_conn,
+            ontology="go_bp",
+            organism="Prochlorococcus MED4",
+            level=1,
+            conn=mock_conn,
+        )
+        assert result["ontology"] == "go_bp"
+        assert result["organism_name"] == "Prochlorococcus MED4"
+        assert result["total_matching"] == 159  # 7 + 152
+        assert result["total_genes"] == 2
+        assert result["total_terms"] == 2
+        assert result["total_categories"] == 2
+        # by_level computed from per_gene (one level here, count = 2 genes)
+        assert result["by_level"] == [
+            {"level": 1, "n_terms": 2, "n_genes": 2, "row_count": 159}
+        ]
+        # by_category from per_gene
+        cats = {c["category"] for c in result["by_category"]}
+        assert cats == {"Cell cycle", "Stress"}
+        # top_terms sorted desc
+        assert result["top_terms"][0]["term_id"] == "go:0050896"
+        assert result["top_terms"][0]["count"] == 152
+        # validation buckets empty (no term_ids)
+        assert result["not_found"] == []
+        assert result["wrong_ontology"] == []
+        assert result["wrong_level"] == []
+        assert result["filtered_out"] == []
+        assert result["n_best_effort_terms"] == 0
+        # detail
+        assert len(result["results"]) == 2
+        assert result["returned"] == 2
+        assert mock_conn.execute_query.call_count == 3
+
+    def test_mode1_term_ids_only_runs_validate(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            # Query V
+            self._validate_rows([("go:0006260", "ok", "BiologicalProcess")]),
+            # Query A
+            self._per_term_rows(
+                ("go:0006260", "DNA replication", 6, False, 30,
+                 [{"item": "Replication", "count": 30}]),
+            ),
+            # Query B
+            self._per_gene_rows(
+                ("PMM0001", "Replication", 1, [6]),
+            ),
+            # Query D
+            self._detail_rows(n=1),
+        ]
+        result = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="MED4",
+            term_ids=["go:0006260"],
+            conn=mock_conn,
+        )
+        assert result["not_found"] == []
+        assert result["wrong_ontology"] == []
+        assert result["filtered_out"] == []
+        assert mock_conn.execute_query.call_count == 4
+
+    def test_validation_buckets(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            # Query V -- mixed statuses
+            self._validate_rows([
+                ("go:0006260", "ok", "BiologicalProcess"),
+                ("fake:X", "not_found", None),
+                ("kegg:K00001", "wrong_ontology", None),
+                ("go:0008150", "wrong_level", "BiologicalProcess"),  # root, level=0
+            ]),
+            # Query A (only "ok" terms survived to per-term query)
+            self._per_term_rows(
+                ("go:0006260", "DNA replication", 3, False, 30,
+                 [{"item": "Repl", "count": 30}]),
+            ),
+            # Query B
+            self._per_gene_rows(("PMM0001", "Repl", 1, [3])),
+            # Query D
+            self._detail_rows(n=1),
+        ]
+        result = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="MED4",
+            level=3,
+            term_ids=["go:0006260", "fake:X", "kegg:K00001", "go:0008150"],
+            conn=mock_conn,
+        )
+        assert result["not_found"] == ["fake:X"]
+        assert result["wrong_ontology"] == ["kegg:K00001"]
+        assert result["wrong_level"] == ["go:0008150"]
+
+    def test_filtered_out_bucket(self, mock_conn):
+        # ok term_ids that don't appear in Query A output -> filtered_out.
+        mock_conn.execute_query.side_effect = [
+            self._validate_rows([
+                ("go:0006260", "ok", "BiologicalProcess"),
+                ("go:0006412", "ok", "BiologicalProcess"),  # filtered out
+            ]),
+            # Only one term passed size filter
+            self._per_term_rows(
+                ("go:0006260", "DNA replication", 6, False, 30,
+                 [{"item": "Repl", "count": 30}]),
+            ),
+            self._per_gene_rows(("PMM0001", "Repl", 1, [6])),
+            self._detail_rows(n=1),
+        ]
+        result = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="MED4",
+            term_ids=["go:0006260", "go:0006412"],
+            conn=mock_conn,
+        )
+        assert result["filtered_out"] == ["go:0006412"]
+
+    def test_summary_mode_skips_detail(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._per_term_rows(
+                ("go:0022414", "reproductive process", 1, False, 7,
+                 [{"item": "Cell cycle", "count": 7}]),
+            ),
+            self._per_gene_rows(("PMM0001", "Cell cycle", 1, [1])),
+            # no detail
+        ]
+        result = api.genes_by_ontology(
+            ontology="go_bp",
+            organism="MED4",
+            level=1,
+            summary=True,
+            conn=mock_conn,
         )
         assert result["results"] == []
         assert result["returned"] == 0
-        assert result["truncated"] is True
-        assert mock_conn.execute_query.call_count == 1
+        assert result["truncated"] is True  # total_matching > 0 but returned=0
+        assert mock_conn.execute_query.call_count == 2  # no detail
 
-    def test_passes_params(self, mock_conn):
-        mock_conn.execute_query.side_effect = [
-            self._summary_result(),
-            self._detail_rows(),
-        ]
-        api.genes_by_ontology(
-            ["go:0006260"], "go_bp", organism="MED4",
-            verbose=True, limit=10, conn=mock_conn,
-        )
-        assert mock_conn.execute_query.call_count == 2
+    def test_missing_level_and_term_ids_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="level.*term_ids"):
+            api.genes_by_ontology(
+                ontology="go_bp", organism="MED4", conn=mock_conn,
+            )
 
-    def test_creates_conn_when_none(self, monkeypatch):
-        mock = MagicMock()
-        mock.execute_query.side_effect = [
-            self._summary_result(),
-            self._detail_rows(),
-        ]
-        monkeypatch.setattr("multiomics_explorer.api.functions._default_conn", lambda c: mock)
-        result = api.genes_by_ontology(["go:0006260"], "go_bp")
-        assert isinstance(result, dict)
-
-    def test_empty_term_ids_raises(self, mock_conn):
-        with pytest.raises(ValueError, match="term_ids must not be empty"):
-            api.genes_by_ontology([], "go_bp", conn=mock_conn)
-
-    def test_invalid_ontology_raises(self, mock_conn):
+    def test_bad_ontology_raises(self, mock_conn):
         with pytest.raises(ValueError, match="Invalid ontology"):
-            api.genes_by_ontology(["go:0006260"], "invalid", conn=mock_conn)
+            api.genes_by_ontology(
+                ontology="nope", organism="MED4", level=1, conn=mock_conn,
+            )
 
-    def test_importable_from_package(self):
-        from multiomics_explorer import genes_by_ontology as fn
-        assert callable(fn)
+    def test_bad_size_bounds_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="max_gene_set_size"):
+            api.genes_by_ontology(
+                ontology="go_bp", organism="MED4", level=1,
+                min_gene_set_size=10, max_gene_set_size=5,
+                conn=mock_conn,
+            )
 
-    def test_offset_passed_to_builder(self, mock_conn):
-        """offset is forwarded to the detail builder call."""
+    def test_best_effort_terms_counted(self, mock_conn):
         mock_conn.execute_query.side_effect = [
-            self._summary_result(),
-            self._detail_rows(),
+            self._per_term_rows(
+                ("go:A", "A", 1, True, 5, []),
+                ("go:B", "B", 1, False, 10, []),
+                ("go:C", "C", 1, True, 7, []),
+            ),
+            self._per_gene_rows(
+                ("PMM0001", "Unknown", 1, [1]),
+            ),
+            self._detail_rows(n=0),
         ]
-        api.genes_by_ontology(["go:0006260"], "go_bp", offset=5, conn=mock_conn)
-        detail_call = mock_conn.execute_query.call_args_list[1]
-        assert detail_call[1].get("offset") == 5
-
-    def test_offset_in_response(self, mock_conn):
-        """Result dict includes offset key."""
-        mock_conn.execute_query.side_effect = [
-            self._summary_result(),
-            self._detail_rows(),
-        ]
-        result = api.genes_by_ontology(["go:0006260"], "go_bp", offset=5, conn=mock_conn)
-        assert result["offset"] == 5
+        result = api.genes_by_ontology(
+            ontology="go_bp", organism="MED4", level=1, conn=mock_conn,
+        )
+        assert result["n_best_effort_terms"] == 2
 
 
 # ---------------------------------------------------------------------------

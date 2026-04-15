@@ -104,8 +104,9 @@ Step 1: gene_overview(locus_tags=["PMM0001"])
 Step 2: gene_ontology_terms(locus_tags=["PMM0001"], ontology="go_bp")
         → get actual GO BP terms
 
-Step 3: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
-        → find other genes with same term
+Step 3: genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
+        → find other (gene × term) pairs with same term in MED4
+        (ontology + organism are required)
 ```
 
 ## Chaining patterns
@@ -122,7 +123,7 @@ resolve_gene → gene_ontology_terms
 
 - returns only leaf (most specific) terms — ancestor terms like 'metabolic process' are excluded because they are implied by the more specific child terms
 
-- to check if a gene is connected to a broad term (e.g. 'DNA repair'), use genes_by_ontology which expands down the hierarchy — gene_ontology_terms only returns the leaf annotations
+- to check if a gene is connected to a broad term (e.g. 'DNA repair'), use genes_by_ontology(term_ids=[...], ontology=..., organism=...) which expands down the hierarchy — gene_ontology_terms only returns the leaf annotations
 
 ## Package import equivalent
 

@@ -1,0 +1,314 @@
+{
+  "organism": "Prochlorococcus MED4",
+  "n_experiments": 10,
+  "cyanorak_x_10_exp_ms": 147.4,
+  "cyanorak_x_10_exp_rows": [
+    {
+      "eid": "10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray",
+      "n_quant": 166,
+      "level": 0,
+      "n_terms_with_genes": 17,
+      "gene_term_pairs": 182,
+      "min_g": 1,
+      "median_g": 7.0,
+      "max_g": 36
+    },
+    {
+      "eid": "10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq",
+      "n_quant": 1714,
+      "level": 0,
+      "n_terms_with_genes": 19,
+      "gene_term_pairs": 1721,
+      "min_g": 1,
+      "median_g": 70.0,
+      "max_g": 312
+    },
+    {
+      "eid": "10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq",
+      "n_quant": 857,
+      "level": 0,
+      "n_terms_with_genes": 19,
+      "gene_term_pairs": 934,
+      "min_g": 1,
+      "median_g": 30.0,
+      "max_g": 169
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq",
+      "n_quant": 1849,
+      "level": 0,
+      "n_terms_with_genes": 19,
+      "gene_term_pairs": 1773,
+      "min_g": 1,
+      "median_g": 70.0,
+      "max_g": 378
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic",
+      "n_quant": 1424,
+      "level": 0,
+      "n_terms_with_genes": 19,
+      "gene_term_pairs": 1455,
+      "min_g": 1,
+      "median_g": 69.0,
+      "max_g": 210
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture",
+      "n_quant": 1424,
+      "level": 0,
+      "n_terms_with_genes": 19,
+      "gene_term_pairs": 1455,
+      "min_g": 1,
+      "median_g": 69.0,
+      "max_g": 210
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+      "n_quant": 1849,
+      "level": 0,
+      "n_terms_with_genes": 19,
+      "gene_term_pairs": 1773,
+      "min_g": 1,
+      "median_g": 70.0,
+      "max_g": 378
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture",
+      "n_quant": 1849,
+      "level": 0,
+      "n_terms_with_genes": 19,
+      "gene_term_pairs": 1773,
+      "min_g": 1,
+      "median_g": 70.0,
+      "max_g": 378
+    },
+    {
+      "eid": "10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark",
+      "n_quant": 32,
+      "level": 0,
+      "n_terms_with_genes": 15,
+      "gene_term_pairs": 40,
+      "min_g": 1,
+      "median_g": 2.0,
+      "max_g": 6
+    },
+    {
+      "eid": "10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq",
+      "n_quant": 28,
+      "level": 0,
+      "n_terms_with_genes": 9,
+      "gene_term_pairs": 23,
+      "min_g": 1,
+      "median_g": 2.0,
+      "max_g": 10
+    },
+    {
+      "eid": "10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray",
+      "n_quant": 166,
+      "level": 1,
+      "n_terms_with_genes": 57,
+      "gene_term_pairs": 176,
+      "min_g": 1,
+      "median_g": 2.0,
+      "max_g": 33
+    },
+    {
+      "eid": "10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq",
+      "n_quant": 1714,
+      "level": 1,
+      "n_terms_with_genes": 109,
+      "gene_term_pairs": 1734,
+      "min_g": 1,
+      "median_g": 9.0,
+      "max_g": 239
+    },
+    {
+      "eid": "10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq",
+      "n_quant": 857,
+      "level": 1,
+      "n_terms_with_genes": 95,
+      "gene_term_pairs": 931,
+      "min_g": 1,
+      "median_g": 5.0,
+      "max_g": 142
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq",
+      "n_quant": 1849,
+      "level": 1,
+      "n_terms_with_genes": 109,
+      "gene_term_pairs": 1793,
+      "min_g": 1,
+      "median_g": 9.0,
+      "max_g": 302
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic",
+      "n_quant": 1424,
+      "level": 1,
+      "n_terms_with_genes": 107,
+      "gene_term_pairs": 1483,
+      "min_g": 1,
+      "median_g": 7.0,
+      "max_g": 168
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture",
+      "n_quant": 1424,
+      "level": 1,
+      "n_terms_with_genes": 107,
+      "gene_term_pairs": 1483,
+      "min_g": 1,
+      "median_g": 7.0,
+      "max_g": 168
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+      "n_quant": 1849,
+      "level": 1,
+      "n_terms_with_genes": 109,
+      "gene_term_pairs": 1793,
+      "min_g": 1,
+      "median_g": 9.0,
+      "max_g": 302
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture",
+      "n_quant": 1849,
+      "level": 1,
+      "n_terms_with_genes": 109,
+      "gene_term_pairs": 1793,
+      "min_g": 1,
+      "median_g": 9.0,
+      "max_g": 302
+    },
+    {
+      "eid": "10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark",
+      "n_quant": 32,
+      "level": 1,
+      "n_terms_with_genes": 28,
+      "gene_term_pairs": 39,
+      "min_g": 1,
+      "median_g": 1.0,
+      "max_g": 4
+    },
+    {
+      "eid": "10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq",
+      "n_quant": 28,
+      "level": 1,
+      "n_terms_with_genes": 12,
+      "gene_term_pairs": 24,
+      "min_g": 1,
+      "median_g": 1.0,
+      "max_g": 10
+    },
+    {
+      "eid": "10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray",
+      "n_quant": 166,
+      "level": 2,
+      "n_terms_with_genes": 17,
+      "gene_term_pairs": 47,
+      "min_g": 1,
+      "median_g": 2.0,
+      "max_g": 8
+    },
+    {
+      "eid": "10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq",
+      "n_quant": 1714,
+      "level": 2,
+      "n_terms_with_genes": 26,
+      "gene_term_pairs": 396,
+      "min_g": 1,
+      "median_g": 11.5,
+      "max_g": 51
+    },
+    {
+      "eid": "10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq",
+      "n_quant": 857,
+      "level": 2,
+      "n_terms_with_genes": 22,
+      "gene_term_pairs": 206,
+      "min_g": 1,
+      "median_g": 5.5,
+      "max_g": 33
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq",
+      "n_quant": 1849,
+      "level": 2,
+      "n_terms_with_genes": 26,
+      "gene_term_pairs": 389,
+      "min_g": 1,
+      "median_g": 11.5,
+      "max_g": 51
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic",
+      "n_quant": 1424,
+      "level": 2,
+      "n_terms_with_genes": 26,
+      "gene_term_pairs": 338,
+      "min_g": 1,
+      "median_g": 10.5,
+      "max_g": 43
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture",
+      "n_quant": 1424,
+      "level": 2,
+      "n_terms_with_genes": 26,
+      "gene_term_pairs": 338,
+      "min_g": 1,
+      "median_g": 10.5,
+      "max_g": 43
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+      "n_quant": 1849,
+      "level": 2,
+      "n_terms_with_genes": 26,
+      "gene_term_pairs": 389,
+      "min_g": 1,
+      "median_g": 11.5,
+      "max_g": 51
+    },
+    {
+      "eid": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture",
+      "n_quant": 1849,
+      "level": 2,
+      "n_terms_with_genes": 26,
+      "gene_term_pairs": 389,
+      "min_g": 1,
+      "median_g": 11.5,
+      "max_g": 51
+    },
+    {
+      "eid": "10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark",
+      "n_quant": 32,
+      "level": 2,
+      "n_terms_with_genes": 6,
+      "gene_term_pairs": 6,
+      "min_g": 1,
+      "median_g": 1.0,
+      "max_g": 1
+    },
+    {
+      "eid": "10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq",
+      "n_quant": 28,
+      "level": 2,
+      "n_terms_with_genes": 5,
+      "gene_term_pairs": 5,
+      "min_g": 1,
+      "median_g": 1.0,
+      "max_g": 1
+    }
+  ],
+  "go_bp_x_10_exp_ms": 465.2,
+  "go_mf_x_10_exp_ms": 276.8,
+  "l2_orch_all_ontologies_ms": 436.3,
+  "l1_union_all_ontologies_ms": 403.7,
+  "l1_union_rows": 41,
+  "l1_union_warm_ms": 133.7,
+  "l2_orch_x_10_exp_all_ms": 1381.8
+}

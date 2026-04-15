@@ -1,5 +1,18 @@
 # Tool spec: genes_by_ontology
 
+> **HISTORICAL — SUPERSEDED 2026-04-14.** This spec describes the
+> pre-2026-04-14 shape (distinct-gene results, `by_organism` /
+> `by_category` envelope, `matched_terms` / `gene_summary` verbose
+> fields, `gene_connects_to_level` KEGG hack, optional `organism` /
+> `term_ids`). The tool was redefined on 2026-04-14 to return
+> `(gene × term)` pairs, require a single `organism`, support three
+> modes (`term_ids` only / `level` only / both), and drop
+> `gene_connects_to_level`. For the current shape see:
+> - Design: `docs/superpowers/specs/2026-04-12-genes-by-ontology-redefinition-design.md`
+> - Plan: `docs/superpowers/plans/2026-04-14-genes-by-ontology-redefinition.md`
+> - Live tool reference: `skills/multiomics-kg-guide/references/tools/genes_by_ontology.md`
+> - About content: `multiomics_explorer/inputs/tools/genes_by_ontology.yaml`
+
 ## Purpose
 
 Find genes annotated to ontology term IDs, with hierarchy expansion.

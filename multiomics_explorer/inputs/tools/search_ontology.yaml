@@ -29,8 +29,9 @@ examples:
       Step 1: search_ontology(search_text="replication", ontology="go_bp")
               → collect term IDs from results (e.g. "go:0006260")
 
-      Step 2: genes_by_ontology(term_ids=["go:0006260"], ontology="go_bp")
-              → find genes annotated to these terms (with hierarchy expansion)
+      Step 2: genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
+              → find (gene × term) pairs annotated to these terms in MED4
+              (with hierarchy expansion DOWN). Single organism is required.
 
       Step 3: gene_overview(locus_tags=["PMM0845", ...])
               → check data availability for discovered genes
@@ -40,7 +41,7 @@ chaining:
   - "search_ontology → genes_by_ontology → gene_overview"
 
 mistakes:
-  - "search_ontology finds term IDs — use genes_by_ontology to find genes annotated to those terms"
+  - "search_ontology finds term IDs — use genes_by_ontology to find (gene × term) pairs annotated to those terms (single organism required, hierarchy expanded DOWN by default)"
   - "This tool searches term names only — it does not traverse the ontology hierarchy"
   - wrong: "search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene"
     right: "resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups"

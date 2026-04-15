@@ -4,6 +4,8 @@ Each builder returns a (cypher, params) tuple. The caller is responsible
 for executing the query via GraphConnection.execute_query(cypher, **params).
 """
 
+from typing import Literal
+
 # Ontology type configuration — drives all three ontology query builders.
 ONTOLOGY_CONFIG = {
     "go_bp": {
@@ -44,7 +46,6 @@ ONTOLOGY_CONFIG = {
         "gene_rel": "Gene_has_kegg_ko",
         "hierarchy_rels": ["Kegg_term_is_a_kegg_term"],
         "fulltext_index": "keggFullText",
-        "gene_connects_to_level": "ko",  # genes only link to ko-level nodes
     },
     "cog_category": {
         "label": "CogFunctionalCategory",
@@ -73,6 +74,132 @@ ONTOLOGY_CONFIG = {
         "parent_fulltext_index": "pfamClanFullText",
     },
 }
+
+def _hierarchy_walk(
+    ontology: str,
+    direction: Literal["up", "down"],
+    root_label: str | None = None,
+) -> dict:
+    """Return Cypher fragments for ontology hierarchy walks.
+
+    Consumed by genes_by_ontology builders and (post-refactor)
+    ontology_landscape. Dispatches on ONTOLOGY_CONFIG + known special
+    cases (Pfam cross-label, flat ontologies).
+
+    Args:
+        ontology: one of ALL_ONTOLOGIES.
+        direction: 'up' = gene → leaf → ancestor at target level.
+                   'down' = root-at-input → descendants → genes.
+        root_label: used only when ontology='pfam' + direction='down';
+                    distinguishes Pfam root (no walk) vs PfamClan root
+                    (walk down via Pfam_in_pfam_clan).
+
+    Returns:
+        dict with keys:
+          - leaf_label: str — label for the gene-bound node.
+          - gene_rel: str — relationship from Gene to leaf.
+          - rel_union: str — '|'.join(hierarchy_rels) (empty for flat).
+          - bind_up: str — Cypher for gene→leaf binding (direction=up).
+          - walk_up: str — Cypher for leaf→ancestor walk (direction=up).
+          - walk_down: str — Cypher for root→leaf walk (direction=down).
+    """
+    if direction not in ("up", "down"):
+        raise ValueError(
+            f"direction must be 'up' or 'down', got '{direction}'"
+        )
+    if ontology not in ONTOLOGY_CONFIG:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. "
+            f"Valid: {sorted(ONTOLOGY_CONFIG)}"
+        )
+
+    cfg = ONTOLOGY_CONFIG[ontology]
+    leaf_label = cfg["label"]
+    gene_rel = cfg["gene_rel"]
+    hierarchy_rels = cfg["hierarchy_rels"]
+    rel_union = "|".join(hierarchy_rels)
+
+    # --- Pfam: cross-label two-level ontology ---
+    if ontology == "pfam":
+        bind_up = (
+            f"MATCH (g:Gene {{organism_name: $org}})"
+            f"-[:{gene_rel}]->(leaf:Pfam)"
+        )
+        # *0..1 because Pfam.level=1 (t=leaf) OR PfamClan.level=0 (t=clan)
+        walk_up = (
+            "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
+            "WHERE t:Pfam OR t:PfamClan"
+        )
+        if direction == "up":
+            # Parenthesize the label guard so downstream callers can safely
+            # append `AND ...` without altering operator precedence.
+            walk_up_safe = (
+                "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
+                "WHERE (t:Pfam OR t:PfamClan)"
+            )
+            return {
+                "leaf_label": leaf_label,
+                "gene_rel": gene_rel,
+                "rel_union": "Pfam_in_pfam_clan",
+                "bind_up": bind_up,
+                "walk_up": walk_up_safe,
+                "walk_down": "",
+            }
+        # direction == "down"
+        if root_label == "PfamClan":
+            walk_down = (
+                "MATCH (t:PfamClan)<-[:Pfam_in_pfam_clan]-(leaf:Pfam)"
+            )
+        elif root_label == "Pfam":
+            # Pfam root has no descendants in this 2-level ontology
+            walk_down = ""
+        else:
+            raise ValueError(
+                f"For ontology='pfam' direction='down', root_label must "
+                f"be 'Pfam' or 'PfamClan', got {root_label!r}"
+            )
+        return {
+            "leaf_label": leaf_label,
+            "gene_rel": gene_rel,
+            "rel_union": "Pfam_in_pfam_clan",
+            "bind_up": bind_up,
+            "walk_up": walk_up,
+            "walk_down": walk_down,
+        }
+
+    # --- Flat ontologies (no hierarchy_rels): t = leaf ---
+    if not hierarchy_rels:
+        bind_up = (
+            f"MATCH (g:Gene {{organism_name: $org}})"
+            f"-[:{gene_rel}]->(t:{leaf_label})"
+        )
+        return {
+            "leaf_label": leaf_label,
+            "gene_rel": gene_rel,
+            "rel_union": "",
+            "bind_up": bind_up,
+            "walk_up": "",
+            "walk_down": "",
+        }
+
+    # --- Single-label tree ontologies (GO BP/MF/CC, EC, KEGG, CyanoRak) ---
+    bind_up = (
+        f"MATCH (g:Gene {{organism_name: $org}})"
+        f"-[:{gene_rel}]->(leaf:{leaf_label})"
+    )
+    walk_up = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{leaf_label})"
+    walk_down = (
+        f"MATCH (t:{leaf_label})<-[:{rel_union}*0..]-(leaf:{leaf_label})"
+    )
+    return {
+        "leaf_label": leaf_label,
+        "gene_rel": gene_rel,
+        "rel_union": rel_union,
+        "bind_up": bind_up,
+        "walk_up": walk_up,
+        "walk_down": walk_down,
+    }
+
 
 def build_resolve_gene(
     *, identifier: str, organism: str | None = None
@@ -1124,161 +1251,300 @@ def build_search_ontology(
     return cypher, params
 
 
-def _genes_by_ontology_cfg(ontology: str) -> dict:
-    """Validate ontology and return ONTOLOGY_CONFIG entry + derived clauses."""
-    if ontology not in ONTOLOGY_CONFIG:
-        raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
-    cfg = ONTOLOGY_CONFIG[ontology]
-    label = cfg["label"]
-    gene_rel = cfg["gene_rel"]
-    hierarchy_rels = cfg["hierarchy_rels"]
-    level_filter = cfg.get("gene_connects_to_level")
-    parent_label = cfg.get("parent_label")
-
-    level_clause = (
-        f"\nWITH DISTINCT descendant\nWHERE descendant.level = '{level_filter}'"
-        if level_filter else "\nWITH DISTINCT descendant"
+# Ontology key → expected node label(s). Single-label ontologies get a
+# one-element list; pfam accepts both Pfam (level 1) and PfamClan (level 0).
+# Derived from ONTOLOGY_CONFIG so adding a new ontology is one-place.
+_ONTOLOGY_LABELS: dict[str, list[str]] = {
+    key: (
+        [cfg["label"], cfg["parent_label"]]
+        if "parent_label" in cfg else [cfg["label"]]
     )
-    # Variant that preserves tid for UNWIND-based queries (summary + verbose)
-    level_clause_tid = (
-        f"\nWITH DISTINCT descendant, tid\nWHERE descendant.level = '{level_filter}'"
-        if level_filter else "\nWITH DISTINCT descendant, tid"
+    for key, cfg in ONTOLOGY_CONFIG.items()
+}
+
+_ALL_ONTOLOGY_LABELS: list[str] = sorted({
+    label for labels in _ONTOLOGY_LABELS.values() for label in labels
+})
+_ONTOLOGY_LABEL_GUARD: str = " OR ".join(f"t:{L}" for L in _ALL_ONTOLOGY_LABELS)
+
+
+def build_genes_by_ontology_validate(
+    *,
+    term_ids: list[str],
+    ontology: str,
+    level: int | None,
+) -> tuple[str, dict]:
+    """Classify input term_ids into ok / not_found / wrong_ontology / wrong_level.
+
+    RETURN keys per row: tid, status, matched_label.
+    status ∈ {'ok','not_found','wrong_ontology','wrong_level'}.
+    matched_label is the expected-label the term carries when the term exists
+    and belongs to the requested ontology (status='ok' or 'wrong_level').
+    NULL when status='not_found' or 'wrong_ontology'.
+    """
+    if ontology not in _ONTOLOGY_LABELS:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. "
+            f"Valid: {sorted(_ONTOLOGY_LABELS)}"
+        )
+    expected_labels = _ONTOLOGY_LABELS[ontology]
+    cypher = (
+        "UNWIND $term_ids AS tid\n"
+        "OPTIONAL MATCH (t {id: tid})\n"
+        f"  WHERE {_ONTOLOGY_LABEL_GUARD}\n"
+        "WITH tid, head(collect(t)) AS t\n"
+        "RETURN tid,\n"
+        "  CASE\n"
+        "    WHEN t IS NULL THEN 'not_found'\n"
+        "    WHEN NOT ANY(L IN $expected_labels WHERE L IN labels(t)) "
+        "THEN 'wrong_ontology'\n"
+        "    WHEN $level IS NOT NULL AND t.level <> $level "
+        "THEN 'wrong_level'\n"
+        "    ELSE 'ok'\n"
+        "  END AS status,\n"
+        "  CASE WHEN t IS NOT NULL "
+        "THEN [L IN labels(t) WHERE L IN $expected_labels][0] "
+        "ELSE NULL END AS matched_label"
     )
-
-    if hierarchy_rels:
-        hierarchy = "|".join(hierarchy_rels)
-        expansion = f"MATCH (root)<-[:{hierarchy}*0..15]-(descendant)"
-        expansion_tid = expansion  # MATCH doesn't drop tid from scope
-    else:
-        expansion = "WITH root AS descendant"
-        expansion_tid = "WITH root AS descendant, tid"  # preserve tid for UNWIND queries
-
-    # Per-tid root match (for UNWIND-based queries: verbose + summary)
-    if parent_label:
-        per_tid_root = (
-            f"MATCH (root) WHERE (root:{label} OR root:{parent_label})\n"
-            "  AND root.id = tid"
-        )
-    else:
-        per_tid_root = f"MATCH (root:{label}) WHERE root.id = tid"
-
-    # Batch root match (for compact detail query)
-    if parent_label:
-        batch_root = (
-            f"MATCH (root) WHERE (root:{label} OR root:{parent_label})\n"
-            f"  AND root.id IN $term_ids"
-        )
-    else:
-        batch_root = f"MATCH (root:{label}) WHERE root.id IN $term_ids"
-
-    return {
-        "gene_rel": gene_rel,
-        "expansion": expansion,
-        "expansion_tid": expansion_tid,
-        "level_clause": level_clause,
-        "level_clause_tid": level_clause_tid,
-        "per_tid_root": per_tid_root,
-        "batch_root": batch_root,
+    return cypher, {
+        "term_ids": term_ids,
+        "expected_labels": expected_labels,
+        "level": level,
     }
 
 
-def build_genes_by_ontology_summary(
+def _genes_by_ontology_match_stage(
     *,
     ontology: str,
-    term_ids: list[str],
-    organism: str | None = None,
+    level: int | None,
+    term_ids: list[str] | None,
+    organism: str,
 ) -> tuple[str, dict]:
-    """Build summary Cypher for genes_by_ontology.
+    """Shared MATCH + size-filter-WITH for detail/per_term/per_gene builders.
 
-    RETURN keys: total_matching, by_organism, by_category, by_term.
+    Returns the Cypher fragment through `WITH t, collect(DISTINCT g) AS term_genes`
+    with the $min_gene_set_size / $max_gene_set_size filter applied,
+    plus the common params dict (org, term_ids/level as applicable).
+    Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
+    into params, and for appending their own UNWIND/RETURN tail.
     """
-    c = _genes_by_ontology_cfg(ontology)
+    params: dict = {"org": organism}
 
-    cypher = (
-        "UNWIND $term_ids AS tid\n"
-        f"{c['per_tid_root']}\n"
-        f"{c['expansion_tid']}"
-        f"{c['level_clause_tid']}\n"
-        f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
-        "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
-        "       WHERE toLower(g.organism_name) CONTAINS word))\n"
-        "WITH DISTINCT tid AS root_tid, g.locus_tag AS lt, g.organism_name AS org,\n"
-        "     coalesce(g.gene_category, 'Unknown') AS cat\n"
-        "WITH collect({lt: lt, org: org, cat: cat, tid: root_tid}) AS rows\n"
-        "WITH rows,\n"
-        "     size(apoc.coll.toSet([r IN rows | r.lt])) AS total_matching,\n"
-        "     apoc.coll.frequencies([r IN rows | r.tid]) AS by_term,\n"
-        "     apoc.coll.toSet([r IN rows | {lt: r.lt, org: r.org, cat: r.cat}]) AS unique_genes\n"
-        "RETURN total_matching, by_term,\n"
-        "       apoc.coll.frequencies([g IN unique_genes | g.org]) AS by_organism,\n"
-        "       apoc.coll.frequencies([g IN unique_genes | g.cat]) AS by_category"
+    if level is None:
+        # Mode 1 — walk DOWN from each input term.
+        params["term_ids"] = term_ids
+        # Pfam needs special handling because input may be Pfam OR PfamClan;
+        # caller-side validation (Query V) tells the apex label, but the
+        # builder must work without that. Use coalesce over both label MATCHes.
+        if ontology == "pfam":
+            cypher_head = (
+                "UNWIND $term_ids AS input_tid\n"
+                "OPTIONAL MATCH (tp:Pfam {id: input_tid})\n"
+                "OPTIONAL MATCH (tc:PfamClan {id: input_tid})\n"
+                "WITH input_tid, coalesce(tp, tc) AS t\n"
+                "OPTIONAL MATCH (t)<-[:Pfam_in_pfam_clan*0..1]-(leaf:Pfam)\n"
+                "WITH t, coalesce(leaf, t) AS leaf\n"
+                "MATCH (g:Gene {organism_name: $org})-[:Gene_has_pfam]->(leaf)\n"
+                "WHERE t:Pfam OR t:PfamClan\n"
+            )
+        else:
+            frag = _hierarchy_walk(ontology, direction="down")
+            leaf = frag["leaf_label"]
+            walk = frag["walk_down"]
+            # Single-label: walk DOWN from root to leaf to gene.
+            # Flat ontologies: no walk, leaf = t.
+            if walk:
+                cypher_head = (
+                    "UNWIND $term_ids AS input_tid\n"
+                    f"MATCH (t:{leaf} {{id: input_tid}})\n"
+                    f"{walk}\n"
+                    f"MATCH (g:Gene {{organism_name: $org}})"
+                    f"-[:{frag['gene_rel']}]->(leaf)\n"
+                )
+            else:
+                # Flat: t = leaf; still the "input term's genes"
+                cypher_head = (
+                    "UNWIND $term_ids AS input_tid\n"
+                    f"MATCH (t:{leaf} {{id: input_tid}})\n"
+                    f"MATCH (g:Gene {{organism_name: $org}})"
+                    f"-[:{frag['gene_rel']}]->(t)\n"
+                )
+    else:
+        # Mode 2/3 — walk UP, filter on level (and optionally term_ids).
+        params["level"] = level
+        frag = _hierarchy_walk(ontology, direction="up")
+        bind = frag["bind_up"]
+        walk = frag["walk_up"]
+        # Pfam's walk_up already carries a `WHERE t:Pfam OR t:PfamClan` guard
+        # — merge the level filter in via AND instead of opening a new WHERE.
+        walk_has_where = bool(walk) and "WHERE" in walk
+        level_keyword = "AND" if walk_has_where else "WHERE"
+        level_clause = f"{level_keyword} t.level = $level"
+        if term_ids is not None:
+            level_clause += " AND t.id IN $term_ids"
+            params["term_ids"] = term_ids
+        if walk:
+            cypher_head = f"{bind}\n{walk}\n{level_clause}\n"
+        else:
+            # Flat ontology: t = leaf; no walk; level filter on t directly.
+            cypher_head = f"{bind}\n{level_clause}\n"
+
+    # Size filter (common to all modes). Caller must add
+    # $min_gene_set_size and $max_gene_set_size to params.
+    size_filter = (
+        "WITH t, collect(DISTINCT g) AS term_genes\n"
+        "WHERE size(term_genes) >= $min_gene_set_size\n"
+        "  AND ($max_gene_set_size IS NULL OR "
+        "size(term_genes) <= $max_gene_set_size)"
     )
-    return cypher, {"term_ids": term_ids, "organism": organism}
+    return f"{cypher_head}\n{size_filter}", params
 
 
-def build_genes_by_ontology(
+def build_genes_by_ontology_detail(
     *,
     ontology: str,
-    term_ids: list[str],
-    organism: str | None = None,
+    organism: str,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[str, dict]:
-    """Build detail Cypher for genes_by_ontology.
+    """Build (gene × term) detail query. Dispatches on (level, term_ids).
 
-    RETURN keys (compact): locus_tag, gene_name, product,
-    organism_name, gene_category.
-    RETURN keys (verbose): adds matched_terms, gene_summary,
-    function_description.
+    `organism` is required (single-organism contract).
+
+    Mode 1: term_ids only — walk DOWN.
+    Mode 2: level only — walk UP, filter on level.
+    Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
+
+    RETURN keys (compact): locus_tag, gene_name, product, gene_category,
+    term_id, term_name, level.
+    RETURN keys (verbose): adds function_description, level_is_best_effort.
     """
-    c = _genes_by_ontology_cfg(ontology)
+    # Validation stays in the builder (helper would also need it, but the
+    # detail-builder tests expect `match="level.*term_ids"`).
+    if level is None and not term_ids:
+        raise ValueError(
+            "At least one of `level` or `term_ids` must be provided."
+        )
+    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
+        raise ValueError(
+            "max_gene_set_size must be >= min_gene_set_size."
+        )
 
-    params: dict = {"term_ids": term_ids, "organism": organism}
+    head, params = _genes_by_ontology_match_stage(
+        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+    )
+    params["min_gene_set_size"] = min_gene_set_size
+    params["max_gene_set_size"] = max_gene_set_size
+
+    # Row return
+    verbose_cols = (
+        ",\n       g.function_description AS function_description,\n"
+        "       t.level_is_best_effort IS NOT NULL AS level_is_best_effort"
+        if verbose else ""
+    )
+    return_block = (
+        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "       g.product AS product, g.gene_category AS gene_category,\n"
+        "       t.id AS term_id, t.name AS term_name, t.level AS level"
+        f"{verbose_cols}\n"
+        "ORDER BY t.id, g.locus_tag"
+    )
+
+    # Pagination
+    skip_clause = ""
+    limit_clause = ""
     if offset:
         skip_clause = "\nSKIP $offset"
         params["offset"] = offset
-    else:
-        skip_clause = ""
-    limit_clause = ""
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
 
-    if verbose:
-        cypher = (
-            "UNWIND $term_ids AS tid\n"
-            f"{c['per_tid_root']}\n"
-            f"{c['expansion_tid']}"
-            f"{c['level_clause_tid']}\n"
-            f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
-            "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
-            "       WHERE toLower(g.organism_name) CONTAINS word))\n"
-            "WITH DISTINCT tid, g\n"
-            "WITH g, collect(DISTINCT tid) AS matched_terms\n"
-            "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-            "       g.product AS product, g.organism_name AS organism_name,\n"
-            "       g.gene_category AS gene_category,\n"
-            "       matched_terms,\n"
-            "       g.gene_summary AS gene_summary,\n"
-            "       g.function_description AS function_description\n"
-            "ORDER BY g.organism_name, g.locus_tag" + skip_clause + limit_clause
-        )
-    else:
-        cypher = (
-            f"{c['batch_root']}\n"
-            f"{c['expansion']}"
-            f"{c['level_clause']}\n"
-            f"MATCH (g:Gene)-[:{c['gene_rel']}]->(descendant)\n"
-            "WHERE ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')\n"
-            "       WHERE toLower(g.organism_name) CONTAINS word))\n"
-            "RETURN DISTINCT g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
-            "       g.product AS product, g.organism_name AS organism_name,\n"
-            "       g.gene_category AS gene_category\n"
-            "ORDER BY g.organism_name, g.locus_tag" + skip_clause + limit_clause
-        )
-
+    cypher = (
+        f"{head}\n"
+        f"UNWIND term_genes AS g\n"
+        f"{return_block}{skip_clause}{limit_clause}"
+    )
     return cypher, params
+
+
+def build_genes_by_ontology_per_term(
+    *,
+    ontology: str,
+    organism: str,
+    level: int | None,
+    term_ids: list[str] | None,
+    min_gene_set_size: int,
+    max_gene_set_size: int | None,
+) -> tuple[str, dict]:
+    """Per-term aggregate. One row per surviving term.
+
+    `organism` is required (single-organism contract). Feeds summary fields
+    such as `top_terms`, `by_level.n_terms`, `by_level.row_count`,
+    `n_best_effort_terms`, and `filtered_out` detection.
+
+    Mode 1: term_ids only — walk DOWN.
+    Mode 2: level only — walk UP, filter on level.
+    Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
+
+    RETURN keys: term_id, term_name, level, best_effort, n_genes, cat_freqs.
+    """
+    head, params = _genes_by_ontology_match_stage(
+        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+    )
+    params["min_gene_set_size"] = min_gene_set_size
+    params["max_gene_set_size"] = max_gene_set_size
+
+    tail = (
+        "UNWIND term_genes AS g\n"
+        "WITH t, collect({lt: g.locus_tag, "
+        "cat: coalesce(g.gene_category, 'Unknown')}) AS gene_rows\n"
+        "RETURN t.id AS term_id, t.name AS term_name, t.level AS level,\n"
+        "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
+        "       size(gene_rows) AS n_genes,\n"
+        "       apoc.coll.frequencies("
+        "[r IN gene_rows | r.cat]) AS cat_freqs\n"
+        "ORDER BY t.id"
+    )
+    return f"{head}\n{tail}", params
+
+
+def build_genes_by_ontology_per_gene(
+    *,
+    ontology: str,
+    organism: str,
+    level: int | None,
+    term_ids: list[str] | None,
+    min_gene_set_size: int,
+    max_gene_set_size: int | None,
+) -> tuple[str, dict]:
+    """Per-gene aggregate. One row per surviving gene.
+
+    RETURN keys: locus_tag, gene_category, n_terms, levels_hit.
+    `levels_hit` is the distinct set of term levels each gene was reached
+    via — used by L2 to compute by_level.n_genes via set-union.
+    """
+    head, params = _genes_by_ontology_match_stage(
+        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+    )
+    params["min_gene_set_size"] = min_gene_set_size
+    params["max_gene_set_size"] = max_gene_set_size
+    tail = (
+        "UNWIND term_genes AS g\n"
+        "WITH g, collect(DISTINCT t.id) AS gene_terms, "
+        "collect(DISTINCT t.level) AS gene_levels\n"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       coalesce(g.gene_category, 'Unknown') AS gene_category,\n"
+        "       size(gene_terms) AS n_terms,\n"
+        "       gene_levels AS levels_hit\n"
+        "ORDER BY g.locus_tag"
+    )
+    return f"{head}\n{tail}", params
 
 
 def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
@@ -1288,14 +1554,15 @@ def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
     a child and its ancestor within the same label. Skipped for:
     - Flat ontologies (no hierarchy_rels): cog_category, tigr_role
     - Cross-label hierarchies (parent_label present): pfam (Pfam→PfamClan)
-    - Level-restricted ontologies (gene_connects_to_level): kegg (ko only)
+
+    For KEGG, gene→KeggTerm edges only terminate at ko leaves (enforced by
+    graph structure), so the NOT EXISTS clause is a no-op but still emitted
+    — the query optimizer handles it cheaply.
     """
     hierarchy_rels = cfg["hierarchy_rels"]
     if not hierarchy_rels:
         return ""
     if cfg.get("parent_label"):
-        return ""
-    if cfg.get("gene_connects_to_level"):
         return ""
     gene_rel = cfg["gene_rel"]
     label = cfg["label"]
@@ -3371,22 +3638,12 @@ def build_ontology_landscape(
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
-    cfg = ONTOLOGY_CONFIG[ontology]
-    gene_rel = cfg["gene_rel"]
-    label = cfg["label"]
-    hierarchy_rels = cfg["hierarchy_rels"]
 
-    # Hierarchy walk — flat ontologies bind t directly.
-    # Ontologies with parent_label (pfam: Pfam→PfamClan) are also treated as
-    # flat here: the cross-label hierarchy cannot be walked with a single label
-    # constraint, so landscape stats are reported at the leaf (domain) level only.
-    if hierarchy_rels and not cfg.get("parent_label"):
-        rel_union = "|".join(hierarchy_rels)
-        bind = f"-[:{gene_rel}]->(leaf:{label})"
-        walk = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
-    else:
-        bind = f"-[:{gene_rel}]->(t:{label})"
-        walk = ""
+    # Unified hierarchy walk via _hierarchy_walk helper.
+    # This corrects the previous flat-Pfam treatment: Pfam is actually 2-level
+    # (Pfam leaf + PfamClan parent), and the helper walks Pfam_in_pfam_clan.
+    frag = _hierarchy_walk(ontology, direction="up")
+    walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
 
     # Verbose clauses — Python string composition so compute is
     # short-circuited when verbose=False (see scoping D4).
@@ -3405,7 +3662,7 @@ def build_ontology_landscape(
     verbose_ret = ",\n       example_terms" if verbose else ""
 
     cypher = (
-        f"MATCH (g:Gene {{organism_name:$org}}){bind}\n"
+        f"{frag['bind_up']}\n"
         f"{walk}"
         "WITH t, count(DISTINCT g) AS n_g_per_term, "
         "collect(DISTINCT g) AS term_genes\n"
@@ -3459,20 +3716,18 @@ def build_ontology_expcov(
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
-    cfg = ONTOLOGY_CONFIG[ontology]
-    gene_rel = cfg["gene_rel"]
-    label = cfg["label"]
-    hierarchy_rels = cfg["hierarchy_rels"]
 
-    # Same flat-treatment rule as build_ontology_landscape: cross-label hierarchies
-    # (parent_label present, e.g. pfam) cannot be walked with a single label constraint.
-    if hierarchy_rels and not cfg.get("parent_label"):
-        rel_union = "|".join(hierarchy_rels)
-        bind = f"-[:{gene_rel}]->(leaf:{label})"
-        walk = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
-    else:
-        bind = f"-[:{gene_rel}]->(t:{label})"
-        walk = ""
+    # Unified hierarchy walk via _hierarchy_walk helper (shared with
+    # build_ontology_landscape). For expcov we strip the Gene-Match prefix
+    # from bind_up because `g` is already bound by the outer Experiment match.
+    frag = _hierarchy_walk(ontology, direction="up")
+    prefix = "MATCH (g:Gene {organism_name: $org})"
+    assert frag["bind_up"].startswith(prefix), (
+        f"_hierarchy_walk bind_up format changed; "
+        f"expcov prefix-stripping needs update. Got: {frag['bind_up']!r}"
+    )
+    bind_tail = frag["bind_up"][len(prefix):]
+    walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
 
     cypher = (
         "UNWIND $experiment_ids AS eid\n"
@@ -3481,7 +3736,7 @@ def build_ontology_expcov(
         "WITH eid, collect(DISTINCT g) AS quantified\n"
         "WITH eid, quantified, size(quantified) AS n_total\n"
         "UNWIND quantified AS g\n"
-        f"MATCH (g){bind}\n"
+        f"MATCH (g){bind_tail}\n"
         f"{walk}"
         "WITH eid, n_total, t, count(DISTINCT g) AS n_g_per_term_exp, "
         "collect(DISTINCT g) AS term_genes_exp\n"
