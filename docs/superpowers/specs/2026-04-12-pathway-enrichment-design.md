@@ -716,6 +716,15 @@ Each scenario function:
 - `tests/integration/test_examples.py` (new) parametrizes over scenarios and runs them against the live KG under `-m kg`. Serves as a smoke test.
 - `examples/README.md` (minimal) indexes the directory.
 
+**Serving via MCP resources.** The file is registered as a static MCP resource so agents and MCP callers can read it without checking out the repo:
+
+- Resource URI: `docs://examples/pathway_enrichment.py` — plain-text content, same file on disk (`examples/pathway_enrichment.py`).
+- Registered in `mcp_server/server.py` following the same pattern as `docs://analysis/enrichment` (both are static text resources served from package-relative paths).
+- The methodology doc (`docs://analysis/enrichment`) links to the resource URI in the "Code examples" section and in the final "References" entry so agents discover it while reading methodology.
+- Same project-backlog caveat: MCP resource templates don't list cleanly, so surface the resource in the methodology doc's text to compensate until static-resource listing lands.
+
+If we later add more example scripts (GSEA, different enrichment flavors), they get parallel URIs under `docs://examples/*.py` — a consistent namespace for runnable collateral.
+
 ## Tests
 
 ### Unit — new `tests/unit/test_enrichment.py`
