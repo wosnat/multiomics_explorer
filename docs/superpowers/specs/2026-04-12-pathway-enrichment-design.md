@@ -780,6 +780,106 @@ from multiomics_explorer.analysis.enrichment import (
 )
 ```
 
+### Docstring requirements
+
+These four names are user-facing Python API. For most Python callers (notebook users, research-repo analyses) the docstring IS the documentation — they won't read the methodology markdown. Docstrings must stand on their own.
+
+**Every public name has a NumPy-style docstring with:**
+
+1. **One-line summary** — what it does, in one sentence.
+2. **Extended description** — when to use it, what mental model applies. 2–5 lines for primitives like `fisher_ora`; 1–2 lines for simple utilities.
+3. **Parameters section** — every argument, with type, default, meaning. For enums (`direction`, `background`) spell out the valid values.
+4. **Returns section** — shape and meaning of the return value. For DataFrames, list the columns with their meanings; link to the spec's Output field reference table.
+5. **Raises section** — every exception the function raises, with the condition.
+6. **Examples section** — at least one runnable `>>> ...` block showing the common call pattern. Doctests are optional; readability is the goal.
+7. **See Also section** — cross-references to companion functions (`fisher_ora` ↔ `signed_enrichment_score`; `de_enrichment_inputs` ↔ `fisher_ora`; all four ↔ `docs://analysis/enrichment`).
+
+Example quality bar (`fisher_ora`):
+
+```python
+def fisher_ora(gene_sets, background, term2gene, min_gene_set_size=5, max_gene_set_size=500):
+    """Run Fisher-exact over-representation analysis for multiple gene sets against a TERM2GENE map.
+
+    The enrichment primitive. Direction-agnostic; gene-list-agnostic. Callers supply
+    the gene sets (one per cluster), per-cluster or shared backgrounds, and a
+    TERM2GENE DataFrame (from `genes_by_ontology` via `to_dataframe`, clusterProfiler,
+    or hand-built). Returns one row per (cluster × term) pair that passes the
+    per-cluster M size filter.
+
+    Does NOT compute `signed_score` — that requires direction information this
+    primitive doesn't know about. Attach a `direction` column and pass through
+    `signed_enrichment_score`, or compute inline (see methodology doc).
+
+    Parameters
+    ----------
+    gene_sets : dict[str, list[str]]
+        Cluster name -> foreground locus_tags. Convention for the DE path:
+        `"{experiment_id}|{timepoint}|{direction}"` keys.
+    background : dict[str, list[str]] | list[str]
+        Per-cluster background (dict keyed by cluster) or a single shared
+        universe (list). When given a list, it's broadcast to every cluster.
+    term2gene : pd.DataFrame
+        Columns `term_id` (str), `term_name` (str), `locus_tag` (str) required.
+        Extra columns pass through to result rows. The idiomatic source is
+        `to_dataframe(genes_by_ontology(...))`.
+    min_gene_set_size : int, default 5
+        Per-cluster M filter: drop (cluster, term) pairs where the pathway
+        has fewer than this many members in the cluster's background.
+    max_gene_set_size : int | None, default 500
+        Per-cluster M filter: drop pairs where M exceeds this. Pass `None`
+        to disable the upper bound.
+
+    Returns
+    -------
+    pd.DataFrame
+        Long-format, compareCluster-compatible. Columns: cluster, term_id,
+        term_name, gene_ratio, bg_ratio, rich_factor, fold_enrichment,
+        pvalue, p_adjust, count, bg_count, plus passthrough columns from
+        `term2gene`. See `docs://analysis/enrichment` for field meanings.
+
+    Raises
+    ------
+    ValueError
+        If `term2gene` is missing any of the required columns.
+    ValueError
+        If `max_gene_set_size` is set and less than `min_gene_set_size`.
+
+    Examples
+    --------
+    >>> from multiomics_explorer import fisher_ora
+    >>> from multiomics_explorer.api import genes_by_ontology
+    >>> from multiomics_explorer.analysis.frames import to_dataframe
+    >>> term2gene = to_dataframe(genes_by_ontology(
+    ...     ontology="cyanorak_role", organism="MED4", level=1,
+    ... ))
+    >>> gene_sets = {"treatment_up": ["PMM0123", "PMM0456"]}
+    >>> background = ["PMM0001", "PMM0002", ...]
+    >>> df = fisher_ora(gene_sets, background, term2gene)
+
+    See Also
+    --------
+    de_enrichment_inputs : Build `gene_sets` + `background` from DE results.
+    signed_enrichment_score : Collapse up/down cluster pairs into a signed score.
+    multiomics_explorer.api.genes_by_ontology : Canonical TERM2GENE source.
+    """
+```
+
+`de_enrichment_inputs`, `signed_enrichment_score`, and `EnrichmentInputs` follow the same quality bar (proportional to their complexity). Function-level docstrings for short utilities can be one paragraph + Parameters + Returns; no need to force Extended Description or Examples where the one-line summary already covers everything.
+
+### Docstring coverage test
+
+`tests/unit/test_enrichment.py` includes a coverage test that imports each public name and asserts:
+
+- Docstring is present, non-empty, and contains the minimum sections required for that name (Parameters, Returns, and for primitives: Examples + See Also).
+- Every parameter in the function signature appears in the Parameters section.
+- Every exception type raised inside the function (collected via AST) has a matching Raises entry.
+
+Keeps docstrings from silently drifting out of sync with the code.
+
+### Rendering
+
+Python users reading in a REPL / IDE / `help()` get the docstring directly. The methodology markdown doc (`docs://analysis/enrichment`) references each function by name but does NOT duplicate the docstring content — it frames the *methodology* (when to use, biological context), the docstrings cover the *call contract*. Duplication would rot; the two documents serve different questions.
+
 ## Out of scope
 
 - GSEA / rank-based methods — parent spec's deferred list.
