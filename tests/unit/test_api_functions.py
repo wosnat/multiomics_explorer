@@ -3684,3 +3684,162 @@ class TestOntologyLandscape:
         assert result["total_matching"] == total
         # No more rows after this page → truncated must be False
         assert result["truncated"] is False
+
+
+class TestPathwayEnrichment:
+    """Input validation + orchestration for api.pathway_enrichment."""
+
+    def test_importable_from_api(self):
+        from multiomics_explorer.api import pathway_enrichment
+        assert pathway_enrichment is not None
+
+    def test_invalid_ontology_raises(self):
+        from multiomics_explorer.api import pathway_enrichment
+        with pytest.raises(ValueError, match="ontology"):
+            pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="not_a_real_ontology", level=1,
+            )
+
+    def test_missing_level_and_term_ids_raises(self):
+        from multiomics_explorer.api import pathway_enrichment
+        with pytest.raises(ValueError, match="level|term_ids"):
+            pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role",
+            )
+
+    def test_bad_direction_raises(self):
+        from multiomics_explorer.api import pathway_enrichment
+        with pytest.raises(ValueError, match="direction"):
+            pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+                direction="sideways",
+            )
+
+    def test_bad_background_string_raises(self):
+        from multiomics_explorer.api import pathway_enrichment
+        with pytest.raises(ValueError, match="background"):
+            pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+                background="genome",
+            )
+
+    def test_max_less_than_min_raises(self):
+        from multiomics_explorer.api import pathway_enrichment
+        with pytest.raises(ValueError, match="max_gene_set_size"):
+            pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+                min_gene_set_size=50, max_gene_set_size=5,
+            )
+
+    def test_bad_pvalue_cutoff_raises(self):
+        from multiomics_explorer.api import pathway_enrichment
+        with pytest.raises(ValueError, match="pvalue_cutoff"):
+            pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", level=1,
+                pvalue_cutoff=1.5,
+            )
+
+    def test_empty_experiment_ids_raises(self):
+        from multiomics_explorer.api import pathway_enrichment
+        with pytest.raises(ValueError, match="experiment_id"):
+            pathway_enrichment(
+                organism="MED4", experiment_ids=[],
+                ontology="cyanorak_role", level=1,
+            )
+
+    @staticmethod
+    def _stub_de_result(rows=(), not_found=(), not_matched=(), no_expression=()):
+        return {
+            "organism_name": "MED4",
+            "results": list(rows),
+            "not_found": list(not_found),
+            "not_matched": list(not_matched),
+            "no_expression": list(no_expression),
+        }
+
+    @staticmethod
+    def _stub_gbo_result(rows=(), not_found=(), wrong_ontology=(),
+                        wrong_level=(), filtered_out=()):
+        return {
+            "ontology": "cyanorak_role",
+            "organism_name": "MED4",
+            "results": list(rows),
+            "not_found": list(not_found),
+            "wrong_ontology": list(wrong_ontology),
+            "wrong_level": list(wrong_level),
+            "filtered_out": list(filtered_out),
+        }
+
+    def test_vacuous_success_when_all_experiments_missing(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(not_found=["exp1"]),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: self._stub_gbo_result(),
+        )
+        out = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+        )
+        assert out["total_matching"] == 0
+        assert out["results"] == []
+        assert out["not_found"] == ["exp1"]
+        assert out["n_significant"] == 0
+
+    def test_term_validation_passthrough(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: self._stub_gbo_result(
+                not_found=["missing_term"],
+                wrong_level=["wrong_level_term"],
+            ),
+        )
+        out = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+            term_ids=["missing_term", "wrong_level_term"],
+        )
+        assert out["term_validation"]["not_found"] == ["missing_term"]
+        assert out["term_validation"]["wrong_level"] == ["wrong_level_term"]
+
+    def test_envelope_shape_echoes_inputs(self, monkeypatch):
+        from multiomics_explorer.api import pathway_enrichment
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: self._stub_de_result(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: self._stub_gbo_result(),
+        )
+        out = pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"],
+            ontology="cyanorak_role", level=1,
+        )
+        assert out["organism_name"] == "MED4"
+        assert out["ontology"] == "cyanorak_role"
+        assert out["level"] == 1
+        for key in ("total_matching", "returned", "truncated", "offset",
+                    "n_significant", "by_experiment", "by_direction",
+                    "by_omics_type", "cluster_summary",
+                    "top_clusters_by_min_padj", "top_pathways_by_padj",
+                    "not_found", "not_matched", "no_expression",
+                    "term_validation", "clusters_skipped", "results"):
+            assert key in out, f"envelope missing key: {key}"

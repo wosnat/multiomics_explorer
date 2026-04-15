@@ -1,0 +1,47 @@
+# Human-authored content for pathway_enrichment about page.
+# Auto-generated sections (params, response format, expected-keys) come from
+# Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Single experiment, default direction=both
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1)
+
+  - title: Multi-experiment compareCluster analog (10 experiments in one call)
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic", "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic", "10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics", "10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics", "10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics", "10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics", "10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq", "10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq", "10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark", "10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light"], ontology="cyanorak_role", level=1)
+
+  - title: Summary-only (envelope, no rows)
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, summary=True)
+
+  - title: Verbose with gene-id lists
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, verbose=True)
+
+  - title: Scope to specific pathways at a level
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, term_ids=["cyanorak.role:J", "cyanorak.role:K"])
+
+  - title: From landscape to enrichment
+    steps: |
+      Step 1: ontology_landscape(organism="MED4", experiment_ids=[...])
+              → pick an (ontology, level) by relevance_rank
+
+      Step 2: pathway_enrichment(organism="MED4", experiment_ids=[...], ontology=<picked>, level=<picked>)
+              → Fisher ORA results
+
+verbose_fields:
+  - foreground_gene_ids
+  - background_gene_ids
+
+chaining:
+  - "ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment"
+  - "pathway_enrichment → gene_overview"
+  - "differential_expression_by_gene → pathway_enrichment"
+
+mistakes:
+  - "Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note."
+  - "BH correction is per-cluster (experiment × timepoint × direction), NOT across clusters. Cross-experiment FDR is biological replication, not statistical."
+  - "Single-organism enforced. Run separate calls per organism."
+  - "Timepoints aren't comparable across experiments — `T0` in exp1 ≠ `T0` in exp2. That's why there's no `by_timepoint` breakdown."
+  - "For cluster-membership / ortholog-group / custom-list enrichment, use the Python `fisher_ora` primitive (see `docs://analysis/enrichment`). The MCP tool is the DE-wired convenience only. Idiom: `term2gene = to_dataframe(genes_by_ontology(...))` then `fisher_ora(gene_sets, background, term2gene)` — no manual column munging."
+  - "At least one of `level` or `term_ids` must be provided (matches `genes_by_ontology`)."
+  - "`min/max_gene_set_size` here means **M** — pathway size within each cluster's background (clusterProfiler semantics). This differs from `ontology_landscape`'s filter, which is organism-scoped. A pathway may be tested in one cluster and dropped in another when `background='table_scope'`."
+  - wrong: "pathway_enrichment(..., background='genome')  # not a valid string"
+    right: "pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list"

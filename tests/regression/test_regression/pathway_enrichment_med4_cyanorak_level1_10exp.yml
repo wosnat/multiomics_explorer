@@ -1,0 +1,6167 @@
+by_direction:
+- direction: down
+  n_significant: 0
+  n_tests: 92
+- direction: up
+  n_significant: 0
+  n_tests: 91
+by_experiment:
+- background_factors: null
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  is_time_course: null
+  n_clusters: 2
+  n_significant: 0
+  n_tests: 4
+  name: null
+  omics_type: null
+  table_scope: null
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
+  is_time_course: null
+  n_clusters: 1
+  n_significant: 0
+  n_tests: 2
+  name: null
+  omics_type: null
+  table_scope: null
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  is_time_course: null
+  n_clusters: 1
+  n_significant: 0
+  n_tests: 3
+  name: null
+  omics_type: null
+  table_scope: null
+  treatment_type:
+  - coculture
+- background_factors: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  is_time_course: null
+  n_clusters: 6
+  n_significant: 0
+  n_tests: 78
+  name: null
+  omics_type: null
+  table_scope: null
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  is_time_course: null
+  n_clusters: 10
+  n_significant: 0
+  n_tests: 49
+  name: null
+  omics_type: null
+  table_scope: null
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  is_time_course: null
+  n_clusters: 10
+  n_significant: 0
+  n_tests: 46
+  name: null
+  omics_type: null
+  table_scope: null
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
+  is_time_course: null
+  n_clusters: 1
+  n_significant: 0
+  n_tests: 1
+  name: null
+  omics_type: null
+  table_scope: null
+  treatment_type:
+  - carbon
+by_omics_type: []
+case_id: pathway_enrichment_med4_cyanorak_level1_10exp
+cluster_summary:
+  n_clusters: 31
+  n_significant_max: 0
+  n_significant_median: 0.0
+  n_significant_min: 0
+  n_tests_max: 19
+  n_tests_median: 4.0
+  n_tests_min: 1
+  universe_size_max: 295
+  universe_size_median: 111.0
+  universe_size_min: 14
+clusters_skipped:
+- cluster: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray|steady
+    state|down
+  reason: no_pathways_in_size_range
+- cluster: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics|darkness|up
+  reason: no_pathways_in_size_range
+- cluster: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics|darkness|down
+  reason: no_pathways_in_size_range
+- cluster: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics|stationary|up
+  reason: no_pathways_in_size_range
+- cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    11|down
+  reason: no_pathways_in_size_range
+level: 1
+n_significant: 0
+no_expression: []
+not_found: []
+not_matched: []
+offset: 0
+ontology: cyanorak_role
+organism_name: Prochlorococcus MED4
+results:
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/23
+  bg_ratio_numeric: 0.2174
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|down
+  count: 5
+  direction: down
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 5/23
+  gene_ratio_numeric: 0.2174
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: steady state
+  timepoint_hours: .nan
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/23
+  bg_ratio_numeric: 0.2174
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|down
+  count: 5
+  direction: down
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 5/23
+  gene_ratio_numeric: 0.2174
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem I assembly protein Ycf3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: steady state
+  timepoint_hours: .nan
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/20
+  bg_ratio_numeric: 0.65
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|up
+  count: 13
+  direction: up
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 13/20
+  gene_ratio_numeric: 0.65
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: steady state
+  timepoint_hours: .nan
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/20
+  bg_ratio_numeric: 0.35
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|up
+  count: 7
+  direction: up
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 7/20
+  gene_ratio_numeric: 0.35
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: steady state
+  timepoint_hours: .nan
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/18
+  bg_ratio_numeric: 0.5556
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray|steady
+    state|up
+  count: 10
+  direction: up
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 10/18
+  gene_ratio_numeric: 0.5556
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: steady state
+  timepoint_hours: .nan
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/18
+  bg_ratio_numeric: 0.3333
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray|steady
+    state|up
+  count: 6
+  direction: up
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 6/18
+  gene_ratio_numeric: 0.3333
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: steady state
+  timepoint_hours: .nan
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/59
+  bg_ratio_numeric: 0.1186
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    11|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 7/59
+  gene_ratio_numeric: 0.1186
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 11
+  timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/59
+  bg_ratio_numeric: 0.1356
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    11|up
+  count: 8
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 8/59
+  gene_ratio_numeric: 0.1356
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 11
+  timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 20
+  bg_ratio: 20/59
+  bg_ratio_numeric: 0.339
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    11|up
+  count: 20
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 20/59
+  gene_ratio_numeric: 0.339
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 11
+  timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/95
+  bg_ratio_numeric: 0.0526
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 5/95
+  gene_ratio_numeric: 0.0526
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 18
+  bg_ratio: 18/95
+  bg_ratio_numeric: 0.1895
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  count: 18
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 18/95
+  gene_ratio_numeric: 0.1895
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/95
+  bg_ratio_numeric: 0.0526
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 5/95
+  gene_ratio_numeric: 0.0526
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/95
+  bg_ratio_numeric: 0.1263
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  count: 12
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 12/95
+  gene_ratio_numeric: 0.1263
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/95
+  bg_ratio_numeric: 0.0526
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: queG
+  gene_ratio: 5/95
+  gene_ratio_numeric: 0.0526
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: epoxyqueuosine reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.3
+  term_name: Protein synthesis > tRNA and rRNA base modification
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/95
+  bg_ratio_numeric: 0.1158
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  count: 11
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 11/95
+  gene_ratio_numeric: 0.1158
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/95
+  bg_ratio_numeric: 0.0632
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 6/95
+  gene_ratio_numeric: 0.0632
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/40
+  bg_ratio_numeric: 0.2
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|up
+  count: 8
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 8/40
+  gene_ratio_numeric: 0.2
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/40
+  bg_ratio_numeric: 0.175
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 7/40
+  gene_ratio_numeric: 0.175
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/257
+  bg_ratio_numeric: 0.0545
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 14
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 14/257
+  gene_ratio_numeric: 0.0545
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/257
+  bg_ratio_numeric: 0.0272
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Cell wall and membrane
+  gene_name: murB
+  gene_ratio: 7/257
+  gene_ratio_numeric: 0.0272
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: UDP-N-acetylenolpyruvoylglucosamine reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:C.2
+  term_name: Cell envelope > Murein sacculus and peptidoglycan
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 28
+  bg_ratio: 28/257
+  bg_ratio_numeric: 0.1089
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 28
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 28/257
+  gene_ratio_numeric: 0.1089
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/257
+  bg_ratio_numeric: 0.0389
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 10
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 10/257
+  gene_ratio_numeric: 0.0389
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: NADPH-dependent FMN reductase family protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.2
+  term_name: Energy metabolism > Electron transport
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/257
+  bg_ratio_numeric: 0.0195
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Lipid metabolism
+  gene_name: accB
+  gene_ratio: 5/257
+  gene_ratio_numeric: 0.0195
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:H.2
+  term_name: Fatty acid, phospholipid and sterol metabolism > Fatty acid metabolism
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/257
+  bg_ratio_numeric: 0.0272
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 7/257
+  gene_ratio_numeric: 0.0272
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.3
+  term_name: Photosynthesis and respiration > Cytochrome b6/f complex
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/257
+  bg_ratio_numeric: 0.0195
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: ndhO
+  gene_ratio: 5/257
+  gene_ratio_numeric: 0.0195
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: NADH dehydrogenase I subunit NdhO
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.6
+  term_name: Photosynthesis and respiration > NADH dehydrogenase
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/257
+  bg_ratio_numeric: 0.0272
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 7/257
+  gene_ratio_numeric: 0.0272
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem I assembly protein Ycf3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/257
+  bg_ratio_numeric: 0.0506
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 13
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 13/257
+  gene_ratio_numeric: 0.0506
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/257
+  bg_ratio_numeric: 0.0272
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 7/257
+  gene_ratio_numeric: 0.0272
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/257
+  bg_ratio_numeric: 0.0195
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 5/257
+  gene_ratio_numeric: 0.0195
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:L.3
+  term_name: Protein fate > Protein folding and stabilization
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/257
+  bg_ratio_numeric: 0.0195
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Post-translational modification
+  gene_name: dap2
+  gene_ratio: 5/257
+  gene_ratio_numeric: 0.0195
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: prolyl oligopeptidase/peptidase S9-like domain containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:L.4
+  term_name: Protein fate > Degradation of proteins, peptides, and glycopeptides
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/257
+  bg_ratio_numeric: 0.0195
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: rbcR
+  gene_ratio: 5/257
+  gene_ratio_numeric: 0.0195
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: possible RuBisCO operon transcriptional regulator
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:N.1
+  term_name: Regulatory functions > DNA interactions
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/257
+  bg_ratio_numeric: 0.0195
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 5/257
+  gene_ratio_numeric: 0.0195
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/257
+  bg_ratio_numeric: 0.0233
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: mcyH
+  gene_ratio: 6/257
+  gene_ratio_numeric: 0.0233
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ABC transporter, ATPase component
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.7
+  term_name: Transport and binding proteins > Sugars
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/257
+  bg_ratio_numeric: 0.0195
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Lipid metabolism
+  gene_name: .nan
+  gene_ratio: 5/257
+  gene_ratio_numeric: 0.0195
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative 4^-phosphopantetheinyl transferase family domain protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.9
+  term_name: Transport and binding proteins > Unknown substrate
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 37
+  bg_ratio: 37/257
+  bg_ratio_numeric: 0.144
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 37
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 37/257
+  gene_ratio_numeric: 0.144
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/257
+  bg_ratio_numeric: 0.0428
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|down
+  count: 11
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 11/257
+  gene_ratio_numeric: 0.0428
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/264
+  bg_ratio_numeric: 0.0189
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Amino acid metabolism
+  gene_name: aroK
+  gene_ratio: 5/264
+  gene_ratio_numeric: 0.0189
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: shikimate kinase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.1
+  term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/264
+  bg_ratio_numeric: 0.0189
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Amino acid metabolism
+  gene_name: aspA
+  gene_ratio: 5/264
+  gene_ratio_numeric: 0.0189
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: aspartoacylase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.2
+  term_name: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile, Lys, Met,
+    Thr)
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/264
+  bg_ratio_numeric: 0.0265
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Amino acid metabolism
+  gene_name: argH
+  gene_ratio: 7/264
+  gene_ratio_numeric: 0.0265
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: argininosuccinate lyase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.3
+  term_name: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu, Pro)
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/264
+  bg_ratio_numeric: 0.0189
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Amino acid metabolism
+  gene_name: leuD
+  gene_ratio: 5/264
+  gene_ratio_numeric: 0.0189
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: 3-isopropylmalate dehydratase small subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.5
+  term_name: Amino acid biosynthesis > Pyruvate family (Ala, Val, Leu)
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/264
+  bg_ratio_numeric: 0.0379
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 10
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: rsgA
+  gene_ratio: 10/264
+  gene_ratio_numeric: 0.0379
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosome biogenesis GTPase / thiamine phosphate phosphatase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:B.10
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/264
+  bg_ratio_numeric: 0.0189
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Cell wall and membrane
+  gene_name: .nan
+  gene_ratio: 5/264
+  gene_ratio_numeric: 0.0189
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: lipid A disaccharide synthase family protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:C.3
+  term_name: Cell envelope > Surface polysaccharides and lipopolysaccharides
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 29
+  bg_ratio: 29/264
+  bg_ratio_numeric: 0.1098
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 29
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 29/264
+  gene_ratio_numeric: 0.1098
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/264
+  bg_ratio_numeric: 0.0303
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 8
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 8/264
+  gene_ratio_numeric: 0.0303
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/264
+  bg_ratio_numeric: 0.0417
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 11
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 11/264
+  gene_ratio_numeric: 0.0417
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/264
+  bg_ratio_numeric: 0.0189
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Lipid metabolism
+  gene_name: accB
+  gene_ratio: 5/264
+  gene_ratio_numeric: 0.0189
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:H.2
+  term_name: Fatty acid, phospholipid and sterol metabolism > Fatty acid metabolism
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/264
+  bg_ratio_numeric: 0.0189
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 5/264
+  gene_ratio_numeric: 0.0189
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/264
+  bg_ratio_numeric: 0.0417
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 11
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 11/264
+  gene_ratio_numeric: 0.0417
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/264
+  bg_ratio_numeric: 0.0189
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 5/264
+  gene_ratio_numeric: 0.0189
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.3
+  term_name: Protein fate > Protein folding and stabilization
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/264
+  bg_ratio_numeric: 0.0227
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Post-translational modification
+  gene_name: dap2
+  gene_ratio: 6/264
+  gene_ratio_numeric: 0.0227
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: prolyl oligopeptidase/peptidase S9-like domain containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.4
+  term_name: Protein fate > Degradation of proteins, peptides, and glycopeptides
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/264
+  bg_ratio_numeric: 0.0303
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 8
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Nucleotide metabolism
+  gene_name: purL
+  gene_ratio: 8/264
+  gene_ratio_numeric: 0.0303
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoribosylformylglycinamidine synthase, synthetase domain
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:M.3
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Purine ribonucleotide
+    biosynthesis
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/264
+  bg_ratio_numeric: 0.0265
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: rbcR
+  gene_ratio: 7/264
+  gene_ratio_numeric: 0.0265
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: possible RuBisCO operon transcriptional regulator
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:N.1
+  term_name: Regulatory functions > DNA interactions
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/264
+  bg_ratio_numeric: 0.0189
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 5/264
+  gene_ratio_numeric: 0.0189
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 24
+  bg_ratio: 24/264
+  bg_ratio_numeric: 0.0909
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    31|up
+  count: 24
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 24/264
+  gene_ratio_numeric: 0.0909
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/204
+  bg_ratio_numeric: 0.0294
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: rsgA
+  gene_ratio: 6/204
+  gene_ratio_numeric: 0.0294
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosome biogenesis GTPase / thiamine phosphate phosphatase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.10
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/204
+  bg_ratio_numeric: 0.0686
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 14
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 14/204
+  gene_ratio_numeric: 0.0686
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/204
+  bg_ratio_numeric: 0.0294
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Cell wall and membrane
+  gene_name: murB
+  gene_ratio: 6/204
+  gene_ratio_numeric: 0.0294
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: UDP-N-acetylenolpyruvoylglucosamine reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:C.2
+  term_name: Cell envelope > Murein sacculus and peptidoglycan
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/204
+  bg_ratio_numeric: 0.0245
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Cell wall and membrane
+  gene_name: .nan
+  gene_ratio: 5/204
+  gene_ratio_numeric: 0.0245
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: lipid A disaccharide synthase family protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:C.3
+  term_name: Cell envelope > Surface polysaccharides and lipopolysaccharides
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 20
+  bg_ratio: 20/204
+  bg_ratio_numeric: 0.098
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 20
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 20/204
+  gene_ratio_numeric: 0.098
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/204
+  bg_ratio_numeric: 0.0392
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 8
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 8/204
+  gene_ratio_numeric: 0.0392
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: NADPH-dependent FMN reductase family protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.2
+  term_name: Energy metabolism > Electron transport
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/204
+  bg_ratio_numeric: 0.0245
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 5/204
+  gene_ratio_numeric: 0.0245
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoglucomutase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.8
+  term_name: Energy metabolism > Glycogen and sugar metabolism
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/204
+  bg_ratio_numeric: 0.0294
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 6/204
+  gene_ratio_numeric: 0.0294
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.3
+  term_name: Photosynthesis and respiration > Cytochrome b6/f complex
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/204
+  bg_ratio_numeric: 0.0343
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 7/204
+  gene_ratio_numeric: 0.0343
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem I assembly protein Ycf3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/204
+  bg_ratio_numeric: 0.049
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 10
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 10/204
+  gene_ratio_numeric: 0.049
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/204
+  bg_ratio_numeric: 0.0245
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 5/204
+  gene_ratio_numeric: 0.0245
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/204
+  bg_ratio_numeric: 0.0245
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: mcyH
+  gene_ratio: 5/204
+  gene_ratio_numeric: 0.0245
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ABC transporter, ATPase component
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.7
+  term_name: Transport and binding proteins > Sugars
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 22
+  bg_ratio: 22/204
+  bg_ratio_numeric: 0.1078
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 22
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 22/204
+  gene_ratio_numeric: 0.1078
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/204
+  bg_ratio_numeric: 0.0392
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|down
+  count: 8
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 8/204
+  gene_ratio_numeric: 0.0392
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/295
+  bg_ratio_numeric: 0.0169
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Amino acid metabolism
+  gene_name: aspA
+  gene_ratio: 5/295
+  gene_ratio_numeric: 0.0169
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: aspartoacylase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.2
+  term_name: Amino acid biosynthesis > Aspartate family (Asp, Asn, Ile, Lys, Met,
+    Thr)
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/295
+  bg_ratio_numeric: 0.0169
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Amino acid metabolism
+  gene_name: argH
+  gene_ratio: 5/295
+  gene_ratio_numeric: 0.0169
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: argininosuccinate lyase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:A.3
+  term_name: Amino acid biosynthesis > Glutamate family (Arg, Gln, Glu, Pro)
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/295
+  bg_ratio_numeric: 0.0407
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 12
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: rsgA
+  gene_ratio: 12/295
+  gene_ratio_numeric: 0.0407
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosome biogenesis GTPase / thiamine phosphate phosphatase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:B.10
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/295
+  bg_ratio_numeric: 0.0203
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Cell wall and membrane
+  gene_name: .nan
+  gene_ratio: 6/295
+  gene_ratio_numeric: 0.0203
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: lipid A disaccharide synthase family protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:C.3
+  term_name: Cell envelope > Surface polysaccharides and lipopolysaccharides
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 37
+  bg_ratio: 37/295
+  bg_ratio_numeric: 0.1254
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 37
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 37/295
+  gene_ratio_numeric: 0.1254
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 12
+  bg_ratio: 12/295
+  bg_ratio_numeric: 0.0407
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 12
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 12/295
+  gene_ratio_numeric: 0.0407
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/295
+  bg_ratio_numeric: 0.0441
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 13
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 13/295
+  gene_ratio_numeric: 0.0441
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/295
+  bg_ratio_numeric: 0.0169
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Lipid metabolism
+  gene_name: accB
+  gene_ratio: 5/295
+  gene_ratio_numeric: 0.0169
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:H.2
+  term_name: Fatty acid, phospholipid and sterol metabolism > Fatty acid metabolism
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/295
+  bg_ratio_numeric: 0.0169
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: atpB
+  gene_ratio: 5/295
+  gene_ratio_numeric: 0.0169
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ATP synthase beta chain
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.1
+  term_name: Photosynthesis and respiration > ATP synthase
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 18
+  bg_ratio: 18/295
+  bg_ratio_numeric: 0.061
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 18
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 18/295
+  gene_ratio_numeric: 0.061
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/295
+  bg_ratio_numeric: 0.0169
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: efp
+  gene_ratio: 5/295
+  gene_ratio_numeric: 0.0169
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: translation elongation factor P
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:K.4
+  term_name: Protein synthesis > Translation factors
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/295
+  bg_ratio_numeric: 0.0237
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 7/295
+  gene_ratio_numeric: 0.0237
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.3
+  term_name: Protein fate > Protein folding and stabilization
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/295
+  bg_ratio_numeric: 0.0203
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Post-translational modification
+  gene_name: dap2
+  gene_ratio: 6/295
+  gene_ratio_numeric: 0.0203
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: prolyl oligopeptidase/peptidase S9-like domain containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.4
+  term_name: Protein fate > Degradation of proteins, peptides, and glycopeptides
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/295
+  bg_ratio_numeric: 0.0271
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 8
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Nucleotide metabolism
+  gene_name: purL
+  gene_ratio: 8/295
+  gene_ratio_numeric: 0.0271
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoribosylformylglycinamidine synthase, synthetase domain
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:M.3
+  term_name: Purines, pyrimidines, nucleosides, and nucleotides > Purine ribonucleotide
+    biosynthesis
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/295
+  bg_ratio_numeric: 0.0237
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: rbcR
+  gene_ratio: 7/295
+  gene_ratio_numeric: 0.0237
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: possible RuBisCO operon transcriptional regulator
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:N.1
+  term_name: Regulatory functions > DNA interactions
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/295
+  bg_ratio_numeric: 0.0169
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transcription
+  gene_name: rpoZ
+  gene_ratio: 5/295
+  gene_ratio_numeric: 0.0169
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA-directed RNA polymerase omega subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:P.2
+  term_name: Transcription > DNA-dependent RNA polymerase
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/295
+  bg_ratio_numeric: 0.0237
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 7/295
+  gene_ratio_numeric: 0.0237
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 20
+  bg_ratio: 20/295
+  bg_ratio_numeric: 0.0678
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 20
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 20/295
+  gene_ratio_numeric: 0.0678
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/295
+  bg_ratio_numeric: 0.0339
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    89|up
+  count: 10
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 10/295
+  gene_ratio_numeric: 0.0339
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/14
+  bg_ratio_numeric: 0.3571
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    18|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 5/14
+  gene_ratio_numeric: 0.3571
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/35
+  bg_ratio_numeric: 0.3143
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    18|up
+  count: 11
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 11/35
+  gene_ratio_numeric: 0.3143
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/35
+  bg_ratio_numeric: 0.4
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    18|up
+  count: 14
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 14/35
+  gene_ratio_numeric: 0.4
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/35
+  bg_ratio_numeric: 0.1429
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    18|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: ddpD
+  gene_ratio: 5/35
+  gene_ratio_numeric: 0.1429
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide/nickel ABC transport system, ATP-binding component
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.1
+  term_name: Transport and binding proteins > Amino acids, peptides and amines
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/137
+  bg_ratio_numeric: 0.0584
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|down
+  count: 8
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 8/137
+  gene_ratio_numeric: 0.0584
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/137
+  bg_ratio_numeric: 0.073
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|down
+  count: 10
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 10/137
+  gene_ratio_numeric: 0.073
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/137
+  bg_ratio_numeric: 0.0365
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 5/137
+  gene_ratio_numeric: 0.0365
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/137
+  bg_ratio_numeric: 0.0365
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 5/137
+  gene_ratio_numeric: 0.0365
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem I assembly protein Ycf3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/137
+  bg_ratio_numeric: 0.0511
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 7/137
+  gene_ratio_numeric: 0.0511
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 36
+  bg_ratio: 36/137
+  bg_ratio_numeric: 0.2628
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|down
+  count: 36
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 36/137
+  gene_ratio_numeric: 0.2628
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/137
+  bg_ratio_numeric: 0.0803
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|down
+  count: 11
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 11/137
+  gene_ratio_numeric: 0.0803
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 23
+  bg_ratio: 23/111
+  bg_ratio_numeric: 0.2072
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|up
+  count: 23
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 23/111
+  gene_ratio_numeric: 0.2072
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 18
+  bg_ratio: 18/111
+  bg_ratio_numeric: 0.1622
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|up
+  count: 18
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 18/111
+  gene_ratio_numeric: 0.1622
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/111
+  bg_ratio_numeric: 0.045
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gltA
+  gene_ratio: 5/111
+  gene_ratio_numeric: 0.045
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: citrate synthase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:G.9
+  term_name: Energy metabolism > TCA cycle
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/111
+  bg_ratio_numeric: 0.0631
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: ddpD
+  gene_ratio: 7/111
+  gene_ratio_numeric: 0.0631
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide/nickel ABC transport system, ATP-binding component
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.1
+  term_name: Transport and binding proteins > Amino acids, peptides and amines
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/111
+  bg_ratio_numeric: 0.0541
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 6/111
+  gene_ratio_numeric: 0.0541
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 17
+  bg_ratio: 17/111
+  bg_ratio_numeric: 0.1532
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    31|up
+  count: 17
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 17/111
+  gene_ratio_numeric: 0.1532
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/74
+  bg_ratio_numeric: 0.0946
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 7/74
+  gene_ratio_numeric: 0.0946
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/74
+  bg_ratio_numeric: 0.0811
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 6/74
+  gene_ratio_numeric: 0.0811
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/74
+  bg_ratio_numeric: 0.0676
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 5/74
+  gene_ratio_numeric: 0.0676
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/74
+  bg_ratio_numeric: 0.0676
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 5/74
+  gene_ratio_numeric: 0.0676
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 28
+  bg_ratio: 28/145
+  bg_ratio_numeric: 0.1931
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|up
+  count: 28
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 28/145
+  gene_ratio_numeric: 0.1931
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/145
+  bg_ratio_numeric: 0.1103
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|up
+  count: 16
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 16/145
+  gene_ratio_numeric: 0.1103
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/145
+  bg_ratio_numeric: 0.0552
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|up
+  count: 8
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 8/145
+  gene_ratio_numeric: 0.0552
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/145
+  bg_ratio_numeric: 0.0345
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 5/145
+  gene_ratio_numeric: 0.0345
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.3
+  term_name: Protein fate > Protein folding and stabilization
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/145
+  bg_ratio_numeric: 0.0414
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: ddpD
+  gene_ratio: 6/145
+  gene_ratio_numeric: 0.0414
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide/nickel ABC transport system, ATP-binding component
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.1
+  term_name: Transport and binding proteins > Amino acids, peptides and amines
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/145
+  bg_ratio_numeric: 0.0345
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 5/145
+  gene_ratio_numeric: 0.0345
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/145
+  bg_ratio_numeric: 0.0345
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Lipid metabolism
+  gene_name: .nan
+  gene_ratio: 5/145
+  gene_ratio_numeric: 0.0345
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative 4^-phosphopantetheinyl transferase family domain protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.9
+  term_name: Transport and binding proteins > Unknown substrate
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 24
+  bg_ratio: 24/145
+  bg_ratio_numeric: 0.1655
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    60|up
+  count: 24
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 24/145
+  gene_ratio_numeric: 0.1655
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 9
+  bg_ratio: 9/92
+  bg_ratio_numeric: 0.0978
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|down
+  count: 9
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 9/92
+  gene_ratio_numeric: 0.0978
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/92
+  bg_ratio_numeric: 0.0543
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Lipid metabolism
+  gene_name: accB
+  gene_ratio: 5/92
+  gene_ratio_numeric: 0.0543
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:H.2
+  term_name: Fatty acid, phospholipid and sterol metabolism > Fatty acid metabolism
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/92
+  bg_ratio_numeric: 0.0652
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 6/92
+  gene_ratio_numeric: 0.0652
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 29
+  bg_ratio: 29/161
+  bg_ratio_numeric: 0.1801
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|up
+  count: 29
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 29/161
+  gene_ratio_numeric: 0.1801
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/161
+  bg_ratio_numeric: 0.0994
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|up
+  count: 16
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 16/161
+  gene_ratio_numeric: 0.0994
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/161
+  bg_ratio_numeric: 0.0373
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 6/161
+  gene_ratio_numeric: 0.0373
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/161
+  bg_ratio_numeric: 0.0311
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 5/161
+  gene_ratio_numeric: 0.0311
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.3
+  term_name: Protein fate > Protein folding and stabilization
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/161
+  bg_ratio_numeric: 0.0373
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: ddpD
+  gene_ratio: 6/161
+  gene_ratio_numeric: 0.0373
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide/nickel ABC transport system, ATP-binding component
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.1
+  term_name: Transport and binding proteins > Amino acids, peptides and amines
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 31
+  bg_ratio: 31/161
+  bg_ratio_numeric: 0.1925
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|day
+    89|up
+  count: 31
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 31/161
+  gene_ratio_numeric: 0.1925
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/77
+  bg_ratio_numeric: 0.0779
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 6/77
+  gene_ratio_numeric: 0.0779
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/77
+  bg_ratio_numeric: 0.0649
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Lipid metabolism
+  gene_name: accB
+  gene_ratio: 5/77
+  gene_ratio_numeric: 0.0649
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:H.2
+  term_name: Fatty acid, phospholipid and sterol metabolism > Fatty acid metabolism
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/77
+  bg_ratio_numeric: 0.0779
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 6/77
+  gene_ratio_numeric: 0.0779
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/77
+  bg_ratio_numeric: 0.0779
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 6/77
+  gene_ratio_numeric: 0.0779
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/77
+  bg_ratio_numeric: 0.0649
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 5/77
+  gene_ratio_numeric: 0.0649
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 31
+  bg_ratio: 31/157
+  bg_ratio_numeric: 0.1975
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|up
+  count: 31
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 31/157
+  gene_ratio_numeric: 0.1975
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 17
+  bg_ratio: 17/157
+  bg_ratio_numeric: 0.1083
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|up
+  count: 17
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 17/157
+  gene_ratio_numeric: 0.1083
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/157
+  bg_ratio_numeric: 0.0446
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 7/157
+  gene_ratio_numeric: 0.0446
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/157
+  bg_ratio_numeric: 0.0318
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  gene_ratio: 5/157
+  gene_ratio_numeric: 0.0318
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: chaperone protein GrpE
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:L.3
+  term_name: Protein fate > Protein folding and stabilization
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/157
+  bg_ratio_numeric: 0.0446
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|up
+  count: 7
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: ddpD
+  gene_ratio: 7/157
+  gene_ratio_numeric: 0.0446
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide/nickel ABC transport system, ATP-binding component
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.1
+  term_name: Transport and binding proteins > Amino acids, peptides and amines
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 29
+  bg_ratio: 29/157
+  bg_ratio_numeric: 0.1847
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture|days
+    60+89|up
+  count: 29
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 29/157
+  gene_ratio_numeric: 0.1847
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/45
+  bg_ratio_numeric: 0.3556
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    18|down
+  count: 16
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 16/45
+  gene_ratio_numeric: 0.3556
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 14
+  bg_ratio: 14/39
+  bg_ratio_numeric: 0.359
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    18|up
+  count: 14
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 14/39
+  gene_ratio_numeric: 0.359
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 18
+  timepoint_hours: 432.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/235
+  bg_ratio_numeric: 0.0213
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Amino acid metabolism
+  gene_name: aroK
+  gene_ratio: 5/235
+  gene_ratio_numeric: 0.0213
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: shikimate kinase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:A.1
+  term_name: Amino acid biosynthesis > Aromatic amino acids family (Phe, Trp, Tyr)
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/235
+  bg_ratio_numeric: 0.0298
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 7/235
+  gene_ratio_numeric: 0.0298
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 28
+  bg_ratio: 28/235
+  bg_ratio_numeric: 0.1191
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 28
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 28/235
+  gene_ratio_numeric: 0.1191
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/235
+  bg_ratio_numeric: 0.0298
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 7/235
+  gene_ratio_numeric: 0.0298
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/235
+  bg_ratio_numeric: 0.0255
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 6/235
+  gene_ratio_numeric: 0.0255
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.4
+  term_name: Energy metabolism > Glycolysis/gluconeogenesis
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/235
+  bg_ratio_numeric: 0.0255
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 6/235
+  gene_ratio_numeric: 0.0255
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoglucomutase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.5
+  term_name: Energy metabolism > Pentose phosphate pathway
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/235
+  bg_ratio_numeric: 0.0255
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 6/235
+  gene_ratio_numeric: 0.0255
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoglucomutase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.8
+  term_name: Energy metabolism > Glycogen and sugar metabolism
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/235
+  bg_ratio_numeric: 0.0255
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 6/235
+  gene_ratio_numeric: 0.0255
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem I assembly protein Ycf3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/235
+  bg_ratio_numeric: 0.0298
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 7/235
+  gene_ratio_numeric: 0.0298
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 44
+  bg_ratio: 44/235
+  bg_ratio_numeric: 0.1872
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|down
+  count: 44
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 44/235
+  gene_ratio_numeric: 0.1872
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 29
+  bg_ratio: 29/156
+  bg_ratio_numeric: 0.1859
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|up
+  count: 29
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 29/156
+  gene_ratio_numeric: 0.1859
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/156
+  bg_ratio_numeric: 0.0321
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 5/156
+  gene_ratio_numeric: 0.0321
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 10
+  bg_ratio: 10/156
+  bg_ratio_numeric: 0.0641
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|up
+  count: 10
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Translation
+  gene_name: rimO
+  gene_ratio: 10/156
+  gene_ratio_numeric: 0.0641
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: ribosomal protein S12 methylthiotransferase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:K.2
+  term_name: 'Protein synthesis > Ribosomal proteins: synthesis and modification'
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 31
+  bg_ratio: 31/156
+  bg_ratio_numeric: 0.1987
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|up
+  count: 31
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 31/156
+  gene_ratio_numeric: 0.1987
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/156
+  bg_ratio_numeric: 0.0321
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    31|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 5/156
+  gene_ratio_numeric: 0.0321
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 31
+  timepoint_hours: 744.0
+  timepoint_order: 2
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/226
+  bg_ratio_numeric: 0.0265
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Coenzyme metabolism
+  gene_name: cbb3
+  gene_ratio: 6/226
+  gene_ratio_numeric: 0.0265
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: cofactor assembly of complex C subunit CBB3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 24
+  bg_ratio: 24/226
+  bg_ratio_numeric: 0.1062
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 24
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 24/226
+  gene_ratio_numeric: 0.1062
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 7
+  bg_ratio: 7/226
+  bg_ratio_numeric: 0.031
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 7
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 7/226
+  gene_ratio_numeric: 0.031
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/226
+  bg_ratio_numeric: 0.0221
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 5/226
+  gene_ratio_numeric: 0.0221
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: NADPH-dependent FMN reductase family protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.2
+  term_name: Energy metabolism > Electron transport
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/226
+  bg_ratio_numeric: 0.0221
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 5/226
+  gene_ratio_numeric: 0.0221
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoglucomutase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.8
+  term_name: Energy metabolism > Glycogen and sugar metabolism
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/226
+  bg_ratio_numeric: 0.0221
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Lipid metabolism
+  gene_name: accB
+  gene_ratio: 5/226
+  gene_ratio_numeric: 0.0221
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: acetyl-CoA carboxylase, biotin carboxyl carrier protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:H.2
+  term_name: Fatty acid, phospholipid and sterol metabolism > Fatty acid metabolism
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 8
+  bg_ratio: 8/226
+  bg_ratio_numeric: 0.0354
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 8
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 8/226
+  gene_ratio_numeric: 0.0354
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem I assembly protein Ycf3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 11
+  bg_ratio: 11/226
+  bg_ratio_numeric: 0.0487
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 11
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 11/226
+  gene_ratio_numeric: 0.0487
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/226
+  bg_ratio_numeric: 0.0221
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Transport
+  gene_name: citT
+  gene_ratio: 5/226
+  gene_ratio_numeric: 0.0221
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: putative sodium/potassium/sulfate transporter, DASS family
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:Q.4
+  term_name: Transport and binding proteins > Cations and iron carrying compounds
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 45
+  bg_ratio: 45/226
+  bg_ratio_numeric: 0.1991
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|down
+  count: 45
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 45/226
+  gene_ratio_numeric: 0.1991
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 25
+  bg_ratio: 25/134
+  bg_ratio_numeric: 0.1866
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|up
+  count: 25
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 25/134
+  gene_ratio_numeric: 0.1866
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/134
+  bg_ratio_numeric: 0.0373
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|up
+  count: 5
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 5/134
+  gene_ratio_numeric: 0.0373
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 30
+  bg_ratio: 30/134
+  bg_ratio_numeric: 0.2239
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    60|up
+  count: 30
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 30/134
+  gene_ratio_numeric: 0.2239
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 60
+  timepoint_hours: 1440.0
+  timepoint_order: 3
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 13
+  bg_ratio: 13/159
+  bg_ratio_numeric: 0.0818
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    89|down
+  count: 13
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 13/159
+  gene_ratio_numeric: 0.0818
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/159
+  bg_ratio_numeric: 0.0377
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Replication and repair
+  gene_name: dnaN
+  gene_ratio: 6/159
+  gene_ratio_numeric: 0.0377
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: DNA polymerase III, beta subunit
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:F.1
+  term_name: DNA metabolism > DNA replication, recombination, and repair
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 42
+  bg_ratio: 42/159
+  bg_ratio_numeric: 0.2642
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    89|down
+  count: 42
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 42/159
+  gene_ratio_numeric: 0.2642
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 17
+  bg_ratio: 17/108
+  bg_ratio_numeric: 0.1574
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    89|up
+  count: 17
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 17/108
+  gene_ratio_numeric: 0.1574
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/108
+  bg_ratio_numeric: 0.0556
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    89|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 6/108
+  gene_ratio_numeric: 0.0556
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 22
+  bg_ratio: 22/108
+  bg_ratio_numeric: 0.2037
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    89|up
+  count: 22
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 22/108
+  gene_ratio_numeric: 0.2037
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/108
+  bg_ratio_numeric: 0.0556
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|day
+    89|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: .nan
+  gene_ratio: 6/108
+  gene_ratio_numeric: 0.0556
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: uncharacterized conserved NADP-binding domain-containing protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.3
+  term_name: Other > Enzymes of unknown specificity
+  timepoint: day 89
+  timepoint_hours: 2136.0
+  timepoint_order: 4
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 16
+  bg_ratio: 16/169
+  bg_ratio_numeric: 0.0947
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|down
+  count: 16
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 16/169
+  gene_ratio_numeric: 0.0947
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/169
+  bg_ratio_numeric: 0.0355
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: ntcA
+  gene_ratio: 6/169
+  gene_ratio_numeric: 0.0355
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: global nitrogen regulatory protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/169
+  bg_ratio_numeric: 0.0296
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|down
+  count: 5
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  gene_ratio: 5/169
+  gene_ratio_numeric: 0.0296
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: phosphoglucomutase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:G.8
+  term_name: Energy metabolism > Glycogen and sugar metabolism
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/169
+  bg_ratio_numeric: 0.0355
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: ycf3
+  gene_ratio: 6/169
+  gene_ratio_numeric: 0.0355
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem I assembly protein Ycf3
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/169
+  bg_ratio_numeric: 0.0355
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|down
+  count: 6
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Photosynthesis
+  gene_name: psbX
+  gene_ratio: 6/169
+  gene_ratio_numeric: 0.0355
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: photosystem II PsbX protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:J.8
+  term_name: Photosynthesis and respiration > Photosystem II
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 43
+  bg_ratio: 43/169
+  bg_ratio_numeric: 0.2544
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|down
+  count: 43
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 43/169
+  gene_ratio_numeric: 0.2544
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 20
+  bg_ratio: 20/116
+  bg_ratio_numeric: 0.1724
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|up
+  count: 20
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 20/116
+  gene_ratio_numeric: 0.1724
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 6
+  bg_ratio: 6/116
+  bg_ratio_numeric: 0.0517
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|up
+  count: 6
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Carbohydrate metabolism
+  gene_name: gap2
+  gene_ratio: 6/116
+  gene_ratio_numeric: 0.0517
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: glyceraldehyde-3-phosphate dehydrogenase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 25
+  bg_ratio: 25/116
+  bg_ratio_numeric: 0.2155
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture|days
+    60+89|up
+  count: 25
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Unknown
+  gene_name: .nan
+  gene_ratio: 25/116
+  gene_ratio_numeric: 0.2155
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: conserved hypothetical protein
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: -0.0
+  table_scope: null
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+  timepoint: days 60+89
+  timepoint_hours: .nan
+  timepoint_order: 5
+  treatment_type:
+  - nitrogen
+- background_factors: null
+  bg_count: 5
+  bg_ratio: 5/18
+  bg_ratio_numeric: 0.2778
+  cluster: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics|stationary|down
+  count: 5
+  direction: down
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
+  experiment_name: null
+  fold_enrichment: 1.0
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  gene_ratio: 5/18
+  gene_ratio_numeric: 0.2778
+  is_time_course: null
+  level: 1
+  name: null
+  omics_type: null
+  p_adjust: 1.0
+  product: peptide methionine-R-sulfoxide reductase
+  pvalue: 1.0
+  rich_factor: 1.0
+  signed_score: 0.0
+  table_scope: null
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+  timepoint: stationary
+  timepoint_hours: .nan
+  timepoint_order: 1
+  treatment_type:
+  - carbon
+returned: 183
+row_count: 183
+term_validation:
+  filtered_out: []
+  not_found: []
+  wrong_level: []
+  wrong_ontology: []
+top_clusters_by_min_padj:
+- background_factors: null
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|down
+  direction: down
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  is_time_course: null
+  min_padj: 1.0
+  n_significant: 0
+  n_tests: 2
+  name: null
+  omics_type: null
+  table_scope: null
+  timepoint: steady state
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+  universe_size: 23
+- background_factors: null
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|up
+  direction: up
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
+  is_time_course: null
+  min_padj: 1.0
+  n_significant: 0
+  n_tests: 2
+  name: null
+  omics_type: null
+  table_scope: null
+  timepoint: steady state
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+  universe_size: 20
+- background_factors: null
+  cluster: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray|steady
+    state|up
+  direction: up
+  experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
+  is_time_course: null
+  min_padj: 1.0
+  n_significant: 0
+  n_tests: 2
+  name: null
+  omics_type: null
+  table_scope: null
+  timepoint: steady state
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+  universe_size: 18
+- background_factors: null
+  cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    11|up
+  direction: up
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+  is_time_course: null
+  min_padj: 1.0
+  n_significant: 0
+  n_tests: 3
+  name: null
+  omics_type: null
+  table_scope: null
+  timepoint: day 11
+  timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+  universe_size: 59
+- background_factors: null
+  cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  direction: down
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  is_time_course: null
+  min_padj: 1.0
+  n_significant: 0
+  n_tests: 7
+  name: null
+  omics_type: null
+  table_scope: null
+  timepoint: day 14
+  timepoint_hours: 336.0
+  timepoint_order: 1
+  treatment_type:
+  - nitrogen
+  universe_size: 95
+top_pathways_by_padj:
+- cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|down
+  p_adjust: 1.0
+  signed_score: 0.0
+  term_id: cyanorak.role:J.2
+  term_name: Photosynthesis and respiration > CO2 fixation
+- cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|down
+  p_adjust: 1.0
+  signed_score: 0.0
+  term_id: cyanorak.role:J.7
+  term_name: Photosynthesis and respiration > Photosystem I
+- cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|up
+  p_adjust: 1.0
+  signed_score: -0.0
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+- cluster: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray|steady
+    state|up
+  p_adjust: 1.0
+  signed_score: -0.0
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+- cluster: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray|steady
+    state|up
+  p_adjust: 1.0
+  signed_score: -0.0
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+- cluster: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray|steady
+    state|up
+  p_adjust: 1.0
+  signed_score: -0.0
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+- cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    11|up
+  p_adjust: 1.0
+  signed_score: -0.0
+  term_id: cyanorak.role:D.1
+  term_name: Cellular processes > Adaptation/acclimation to atypical conditions and
+    detoxification
+- cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    11|up
+  p_adjust: 1.0
+  signed_score: -0.0
+  term_id: cyanorak.role:E.4
+  term_name: Central intermediary metabolism > Nitrogen metabolism
+- cluster: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq|day
+    11|up
+  p_adjust: 1.0
+  signed_score: -0.0
+  term_id: cyanorak.role:R.2
+  term_name: Other > Conserved hypothetical proteins
+- cluster: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic|day
+    14|down
+  p_adjust: 1.0
+  signed_score: 0.0
+  term_id: cyanorak.role:B.5
+  term_name: Biosynthesis of cofactors, prosthetic groups, and carriers > Pigments
+total_matching: 183
+truncated: false

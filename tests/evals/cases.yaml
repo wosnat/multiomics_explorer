@@ -1165,3 +1165,26 @@
       - "10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark"
       - "10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray"
     limit: null
+
+# ── pathway_enrichment ───────────────────────────────────────────────────────
+
+- id: pathway_enrichment_med4_cyanorak_level1_10exp
+  tool: pathway_enrichment
+  desc: MED4 cyanorak_role level-1 ORA over 10 real experiments
+  params:
+    organism: MED4
+    ontology: cyanorak_role
+    level: 1
+    direction: both
+    significant_only: true
+    experiment_ids:
+      - "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture"
+      - "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture"
+      - "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic"
+      - "10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics"
+      - "10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics"
+      - "10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics"
+      - "10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics"
+      - "10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray"
+      - "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"
+      - "10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray"

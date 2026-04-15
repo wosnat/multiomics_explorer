@@ -70,7 +70,15 @@ _EXPECTED_TOOL_RESOURCES = {
 _EXPECTED_ANALYSIS_RESOURCES = {
     f"docs://analysis/{p.stem}" for p in (_SKILLS_DIR / "analysis").glob("*.md")
 }
-_EXPECTED_RESOURCES = _EXPECTED_TOOL_RESOURCES | _EXPECTED_ANALYSIS_RESOURCES
+# Example scripts served explicitly (not auto-discovered from .md files)
+_EXPECTED_EXAMPLE_RESOURCES = {
+    "docs://examples/pathway_enrichment.py",
+}
+_EXPECTED_RESOURCES = (
+    _EXPECTED_TOOL_RESOURCES
+    | _EXPECTED_ANALYSIS_RESOURCES
+    | _EXPECTED_EXAMPLE_RESOURCES
+)
 
 
 class TestDocResources:

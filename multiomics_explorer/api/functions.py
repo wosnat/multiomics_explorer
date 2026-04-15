@@ -2841,3 +2841,365 @@ def ontology_landscape(
         "truncated": total_matching > offset + len(results),
         "offset": offset,
     }
+
+
+# ---------------------------------------------------------------------------
+# pathway_enrichment helpers
+# ---------------------------------------------------------------------------
+
+
+def _build_pathway_enrichment_envelope(
+    *, df, inputs, gbo_result, ontology, level,
+    pvalue_cutoff, summary, verbose, limit, offset,
+) -> dict:
+    import pandas as pd
+
+    total_matching = int(len(df))
+    n_significant = int((df["p_adjust"] < pvalue_cutoff).sum()) if total_matching else 0
+
+    produced_clusters = set(df["cluster"]) if total_matching else set()
+    skipped: list[dict] = []
+    for cluster in inputs.cluster_metadata:
+        if cluster in produced_clusters:
+            continue
+        if cluster not in inputs.background or not inputs.background.get(cluster):
+            reason = "empty_background"
+        elif not inputs.gene_sets.get(cluster):
+            reason = "empty_gene_set"
+        else:
+            reason = "no_pathways_in_size_range"
+        skipped.append({"cluster": cluster, "reason": reason})
+
+    if summary:
+        returned_rows = []
+        returned = 0
+        truncated = total_matching > 0
+    else:
+        sliced = df.iloc[offset:offset + limit] if total_matching else df
+        if not verbose:
+            drop_cols = [c for c in ("foreground_gene_ids", "background_gene_ids") if c in sliced.columns]
+            sliced = sliced.drop(columns=drop_cols)
+        returned_rows = sliced.to_dict(orient="records")
+        returned = len(returned_rows)
+        truncated = (offset + returned) < total_matching
+
+    return {
+        "organism_name": inputs.organism_name,
+        "ontology": ontology,
+        "level": level,
+        "total_matching": total_matching,
+        "returned": returned,
+        "truncated": truncated,
+        "offset": offset,
+        "n_significant": n_significant,
+        "by_experiment": _envelope_by_experiment(df, inputs, pvalue_cutoff),
+        "by_direction": _envelope_by_direction(df, pvalue_cutoff),
+        "by_omics_type": _envelope_by_omics_type(df, pvalue_cutoff),
+        "cluster_summary": _envelope_cluster_summary(df, inputs),
+        "top_clusters_by_min_padj": _envelope_top_clusters(df, inputs),
+        "top_pathways_by_padj": _envelope_top_pathways(df),
+        "not_found": inputs.not_found,
+        "not_matched": inputs.not_matched,
+        "no_expression": inputs.no_expression,
+        "term_validation": {
+            "not_found": list(gbo_result.get("not_found", [])),
+            "wrong_ontology": list(gbo_result.get("wrong_ontology", [])),
+            "wrong_level": list(gbo_result.get("wrong_level", [])),
+            "filtered_out": list(gbo_result.get("filtered_out", [])),
+        },
+        "clusters_skipped": skipped,
+        "results": returned_rows,
+    }
+
+
+def _envelope_by_experiment(df, inputs, pvalue_cutoff):
+    if df.empty:
+        return []
+    out = []
+    for exp_id, sub in df.groupby("experiment_id", sort=True):
+        md_cluster = next(
+            (c for c, md in inputs.cluster_metadata.items() if md.get("experiment_id") == exp_id),
+            None,
+        )
+        md = inputs.cluster_metadata.get(md_cluster, {}) if md_cluster else {}
+        out.append({
+            "experiment_id": exp_id,
+            "name": md.get("name"),
+            "omics_type": md.get("omics_type"),
+            "table_scope": md.get("table_scope"),
+            "treatment_type": md.get("treatment_type"),
+            "background_factors": md.get("background_factors"),
+            "is_time_course": md.get("is_time_course"),
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+            "n_clusters": int(sub["cluster"].nunique()),
+        })
+    return out
+
+
+def _envelope_by_direction(df, pvalue_cutoff):
+    if df.empty:
+        return []
+    return [
+        {
+            "direction": direction,
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        }
+        for direction, sub in df.groupby("direction", sort=True)
+    ]
+
+
+def _envelope_by_omics_type(df, pvalue_cutoff):
+    if df.empty:
+        return []
+    return [
+        {
+            "omics_type": omics_type,
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        }
+        for omics_type, sub in df.groupby("omics_type", sort=True)
+    ]
+
+
+def _envelope_cluster_summary(df, inputs):
+    if df.empty:
+        return {
+            "n_clusters": 0,
+            "n_tests_min": 0, "n_tests_median": 0.0, "n_tests_max": 0,
+            "n_significant_min": 0, "n_significant_median": 0.0, "n_significant_max": 0,
+            "universe_size_min": 0, "universe_size_median": 0.0, "universe_size_max": 0,
+        }
+    import statistics
+    per_cluster = df.groupby("cluster").agg(n_tests=("term_id", "size"))
+    n_tests_vals = per_cluster["n_tests"].tolist()
+    universe_sizes = [
+        len(inputs.background.get(c, [])) for c in per_cluster.index
+    ]
+    sig_per_cluster = (
+        df[df["p_adjust"] < 0.05]
+        .groupby("cluster")
+        .size()
+        .reindex(per_cluster.index, fill_value=0)
+        .tolist()
+    )
+    return {
+        "n_clusters": len(per_cluster),
+        "n_tests_min": min(n_tests_vals),
+        "n_tests_median": float(statistics.median(n_tests_vals)),
+        "n_tests_max": max(n_tests_vals),
+        "n_significant_min": min(sig_per_cluster),
+        "n_significant_median": float(statistics.median(sig_per_cluster)),
+        "n_significant_max": max(sig_per_cluster),
+        "universe_size_min": min(universe_sizes) if universe_sizes else 0,
+        "universe_size_median": float(statistics.median(universe_sizes)) if universe_sizes else 0.0,
+        "universe_size_max": max(universe_sizes) if universe_sizes else 0,
+    }
+
+
+def _envelope_top_clusters(df, inputs, top_n=5):
+    if df.empty:
+        return []
+    per_cluster_min_padj = df.groupby("cluster")["p_adjust"].min()
+    top_clusters = (
+        per_cluster_min_padj.sort_values(ascending=True).head(top_n).index.tolist()
+    )
+    out = []
+    for cluster in top_clusters:
+        sub = df[df["cluster"] == cluster]
+        md = inputs.cluster_metadata.get(cluster, {})
+        out.append({
+            "cluster": cluster,
+            "experiment_id": md.get("experiment_id"),
+            "name": md.get("name"),
+            "timepoint": md.get("timepoint"),
+            "timepoint_hours": md.get("timepoint_hours"),
+            "timepoint_order": md.get("timepoint_order"),
+            "direction": md.get("direction"),
+            "omics_type": md.get("omics_type"),
+            "table_scope": md.get("table_scope"),
+            "treatment_type": md.get("treatment_type"),
+            "background_factors": md.get("background_factors"),
+            "is_time_course": md.get("is_time_course"),
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < 0.05).sum()),
+            "universe_size": len(inputs.background.get(cluster, [])),
+            "min_padj": float(per_cluster_min_padj[cluster]),
+        })
+    return out
+
+
+def _envelope_top_pathways(df, top_n=10):
+    if df.empty:
+        return []
+    top = df.sort_values(
+        ["p_adjust", "cluster", "term_id"], ascending=True
+    ).head(top_n)
+    return [
+        {
+            "cluster": r["cluster"],
+            "term_id": r["term_id"],
+            "term_name": r["term_name"],
+            "p_adjust": float(r["p_adjust"]),
+            "signed_score": float(r["signed_score"]) if "signed_score" in r else 0.0,
+        }
+        for _, r in top.iterrows()
+    ]
+
+
+# ---------------------------------------------------------------------------
+# pathway_enrichment public function
+# ---------------------------------------------------------------------------
+
+
+def pathway_enrichment(
+    organism: str,
+    experiment_ids: list[str],
+    ontology: str,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    direction: str = "both",
+    significant_only: bool = True,
+    background: str | list[str] = "table_scope",
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
+    pvalue_cutoff: float = 0.05,
+    timepoint_filter: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Pathway over-representation analysis from DE results.
+
+    See docs://analysis/enrichment for methodology.
+    See docs/superpowers/specs/2026-04-12-pathway-enrichment-design.md.
+    """
+    # --- Input validation (category 1) ---
+    if ontology not in ALL_ONTOLOGIES:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}"
+        )
+    if level is None and not term_ids:
+        raise ValueError(
+            "At least one of `level` or `term_ids` must be provided."
+        )
+    if direction not in {"up", "down", "both"}:
+        raise ValueError(
+            f"direction must be one of 'up', 'down', 'both'; got {direction!r}"
+        )
+    if isinstance(background, str):
+        if background not in {"table_scope", "organism"}:
+            raise ValueError(
+                f"background must be 'table_scope', 'organism', or a list; "
+                f"got {background!r}"
+            )
+    elif isinstance(background, list):
+        if not background:
+            raise ValueError("background list must be non-empty")
+    else:
+        raise ValueError(
+            f"background must be 'table_scope', 'organism', or a list; "
+            f"got {type(background).__name__}"
+        )
+    if min_gene_set_size < 0:
+        raise ValueError("min_gene_set_size must be >= 0.")
+    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
+        raise ValueError(
+            "max_gene_set_size must be >= min_gene_set_size."
+        )
+    if not (0 < pvalue_cutoff < 1):
+        raise ValueError(
+            f"pvalue_cutoff must be in (0, 1); got {pvalue_cutoff}"
+        )
+    if not experiment_ids:
+        raise ValueError("at least one experiment_id required")
+
+    from multiomics_explorer.analysis.enrichment import (
+        de_enrichment_inputs, fisher_ora,
+    )
+    import pandas as pd
+
+    conn = _default_conn(conn)
+
+    # Step 2: build EnrichmentInputs
+    inputs = de_enrichment_inputs(
+        experiment_ids=experiment_ids,
+        organism=organism,
+        direction=direction,
+        significant_only=significant_only,
+        timepoint_filter=timepoint_filter,
+        conn=conn,
+    )
+
+    # Step 3: resolve background
+    if background == "table_scope":
+        resolved_bg = inputs.background
+    elif background == "organism":
+        org_cypher = (
+            "MATCH (g:Gene {organism_name: $org}) "
+            "RETURN collect(g.locus_tag) AS locus_tags"
+        )
+        org_rows = conn.execute_query(org_cypher, org=inputs.organism_name)
+        org_locus_tags = org_rows[0]["locus_tags"] if org_rows else []
+        resolved_bg = {c: list(org_locus_tags) for c in inputs.gene_sets}
+    else:
+        resolved_bg = {c: list(background) for c in inputs.gene_sets}
+
+    # Step 4: TERM2GENE
+    gbo_result = genes_by_ontology(
+        ontology=ontology,
+        organism=inputs.organism_name,
+        level=level,
+        term_ids=term_ids,
+        min_gene_set_size=0,
+        max_gene_set_size=None,
+        summary=False,
+        verbose=False,
+        limit=None,
+        offset=0,
+        conn=conn,
+    )
+    from multiomics_explorer.analysis.frames import to_dataframe
+    term2gene = to_dataframe(gbo_result)
+
+    # Step 5: fisher_ora
+    if term2gene.empty or not inputs.gene_sets:
+        df = pd.DataFrame()
+    else:
+        df = fisher_ora(
+            gene_sets=inputs.gene_sets,
+            background=resolved_bg,
+            term2gene=term2gene,
+            min_gene_set_size=min_gene_set_size,
+            max_gene_set_size=max_gene_set_size,
+        )
+
+    # Step 6: attach metadata + signed_score
+    if not df.empty:
+        md_df = pd.DataFrame.from_dict(
+            inputs.cluster_metadata, orient="index"
+        ).reset_index().rename(columns={"index": "cluster"})
+        df = df.merge(md_df, on="cluster", how="left")
+        import numpy as np
+        sign = np.where(df["direction"] == "up", 1,
+                        np.where(df["direction"] == "down", -1, 0))
+        df["signed_score"] = sign * -np.log10(df["p_adjust"].clip(lower=1e-300))
+
+    # Step 7: envelope
+    envelope = _build_pathway_enrichment_envelope(
+        df=df,
+        inputs=inputs,
+        gbo_result=gbo_result,
+        ontology=ontology,
+        level=level,
+        pvalue_cutoff=pvalue_cutoff,
+        summary=summary,
+        verbose=verbose,
+        limit=limit if limit is not None else len(df),
+        offset=offset,
+    )
+    return envelope

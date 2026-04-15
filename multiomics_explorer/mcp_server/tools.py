@@ -21,6 +21,235 @@ def _conn(ctx: Context) -> GraphConnection:
 
 
 
+# ---------------------------------------------------------------------------
+# pathway_enrichment response models (module-level for direct importability)
+# ---------------------------------------------------------------------------
+
+class PathwayEnrichmentResult(BaseModel):
+    cluster: str = Field(
+        description="Cluster key '{experiment_id}|{timepoint}|{direction}'"
+    )
+    experiment_id: str = Field(description="Experiment identifier")
+    name: str | None = Field(
+        default=None, description="Experiment display name"
+    )
+    timepoint: str = Field(
+        description="Timepoint label; 'NA' for experiments without timepoints"
+    )
+    timepoint_hours: float | None = Field(
+        default=None,
+        description="Numeric time in hours",
+    )
+    timepoint_order: int | None = Field(
+        default=None, description="Integer ordinal of the timepoint"
+    )
+    direction: str = Field(
+        description="Expression direction: 'up' or 'down'"
+    )
+    omics_type: str | None = Field(
+        default=None,
+        description="Experiment omics type (transcriptomics, proteomics, ...)",
+    )
+    table_scope: str | None = Field(
+        default=None, description="Coarse table_scope classifier"
+    )
+    treatment_type: list[str] | None = Field(
+        default=None, description="Treatment-type tags"
+    )
+    background_factors: list[str] | None = Field(
+        default=None, description="Background-condition tags"
+    )
+    is_time_course: bool | None = Field(
+        default=None, description="True for time-course experiments"
+    )
+    term_id: str = Field(description="Ontology term ID")
+    term_name: str = Field(description="Ontology term display name")
+    level: int | None = Field(
+        default=None, description="Hierarchy depth of the term (0 = root)"
+    )
+    gene_ratio: str = Field(
+        description="'k/n' string — DE genes in pathway over total DE genes in cluster (clusterProfiler: GeneRatio)"
+    )
+    gene_ratio_numeric: float = Field(
+        description="k/n as float"
+    )
+    bg_ratio: str = Field(
+        description="'M/N' string — pathway members over background size (clusterProfiler: BgRatio)"
+    )
+    bg_ratio_numeric: float = Field(
+        description="M/N as float"
+    )
+    rich_factor: float = Field(
+        description="k/M — fraction of pathway's background members that are DE (clusterProfiler: RichFactor)"
+    )
+    fold_enrichment: float = Field(
+        description="(k/n) / (M/N) — observed over null (clusterProfiler: FoldEnrichment)"
+    )
+    pvalue: float = Field(
+        description="Fisher-exact p-value (one-sided enrichment)"
+    )
+    p_adjust: float = Field(
+        description="Benjamini-Hochberg FDR within cluster (clusterProfiler: p.adjust)"
+    )
+    count: int = Field(
+        description="k — DE genes in pathway (clusterProfiler: Count)"
+    )
+    bg_count: int = Field(
+        description="M — pathway members in cluster's background"
+    )
+    signed_score: float = Field(
+        description="sign * -log10(p_adjust); sign from direction (up: +, down: -)"
+    )
+    foreground_gene_ids: list[str] | None = Field(
+        default=None,
+        description="Verbose only: the k DE genes in this pathway (clusterProfiler: geneID split)",
+    )
+    background_gene_ids: list[str] | None = Field(
+        default=None,
+        description="Verbose only: pathway members in background NOT in DE set (non-overlapping complement)",
+    )
+
+
+class PathwayEnrichmentByExperiment(BaseModel):
+    experiment_id: str = Field(description="Experiment identifier")
+    name: str | None = Field(default=None, description="Experiment display name")
+    omics_type: str | None = Field(default=None, description="Omics type")
+    table_scope: str | None = Field(default=None, description="table_scope classifier")
+    treatment_type: list[str] | None = Field(default=None, description="Treatment tags")
+    background_factors: list[str] | None = Field(default=None, description="Background condition tags")
+    is_time_course: bool | None = Field(default=None, description="Time-course flag")
+    n_tests: int = Field(description="Total Fisher tests across this experiment's clusters")
+    n_significant: int = Field(description="Tests with p_adjust below cutoff")
+    n_clusters: int = Field(description="Distinct clusters contributed by this experiment")
+
+
+class PathwayEnrichmentByDirection(BaseModel):
+    direction: str = Field(description="Expression direction: 'up' or 'down'")
+    n_tests: int = Field(description="Total tests for this direction")
+    n_significant: int = Field(description="Significant tests for this direction")
+
+
+class PathwayEnrichmentByOmicsType(BaseModel):
+    omics_type: str = Field(description="Omics type")
+    n_tests: int = Field(description="Total tests for this omics type")
+    n_significant: int = Field(description="Significant tests for this omics type")
+
+
+class PathwayEnrichmentClusterSummary(BaseModel):
+    n_clusters: int = Field(description="Total clusters produced")
+    n_tests_min: int = Field(description="Min tests per cluster")
+    n_tests_median: float = Field(description="Median tests per cluster")
+    n_tests_max: int = Field(description="Max tests per cluster")
+    n_significant_min: int = Field(description="Min significant tests per cluster")
+    n_significant_median: float = Field(description="Median significant tests per cluster")
+    n_significant_max: int = Field(description="Max significant tests per cluster")
+    universe_size_min: int = Field(description="Min background size across clusters")
+    universe_size_median: float = Field(description="Median background size")
+    universe_size_max: int = Field(description="Max background size")
+
+
+class PathwayEnrichmentTopCluster(BaseModel):
+    cluster: str = Field(description="Cluster key")
+    experiment_id: str = Field(description="Experiment identifier")
+    name: str | None = Field(default=None, description="Experiment display name")
+    timepoint: str = Field(description="Timepoint label")
+    timepoint_hours: float | None = Field(default=None, description="Hours")
+    timepoint_order: int | None = Field(default=None, description="Ordinal")
+    direction: str = Field(description="Expression direction")
+    omics_type: str | None = Field(default=None, description="Omics type")
+    table_scope: str | None = Field(default=None, description="table_scope")
+    treatment_type: list[str] | None = Field(default=None, description="Treatment tags")
+    background_factors: list[str] | None = Field(default=None, description="Background tags")
+    is_time_course: bool | None = Field(default=None, description="Time-course flag")
+    n_tests: int = Field(description="Tests in this cluster")
+    n_significant: int = Field(description="Significant tests in this cluster")
+    universe_size: int = Field(description="Cluster's background size")
+    min_padj: float = Field(description="Smallest p_adjust within this cluster")
+
+
+class PathwayEnrichmentTopPathway(BaseModel):
+    cluster: str = Field(description="Cluster key")
+    term_id: str = Field(description="Ontology term ID")
+    term_name: str = Field(description="Ontology term name")
+    p_adjust: float = Field(description="BH-adjusted p-value")
+    signed_score: float = Field(description="Signed score")
+
+
+class PathwayEnrichmentTermValidation(BaseModel):
+    not_found: list[str] = Field(
+        default_factory=list,
+        description="term_ids absent from the KG entirely",
+    )
+    wrong_ontology: list[str] = Field(
+        default_factory=list,
+        description="term_ids present but in a different ontology label",
+    )
+    wrong_level: list[str] = Field(
+        default_factory=list,
+        description="term_ids in the ontology but at the wrong level",
+    )
+    filtered_out: list[str] = Field(
+        default_factory=list,
+        description="term_ids valid but excluded by size bounds (irrelevant here since wide bounds are used internally)",
+    )
+
+
+class PathwayEnrichmentClusterSkipped(BaseModel):
+    cluster: str = Field(description="Cluster key that was skipped")
+    reason: str = Field(
+        description="Skip reason: 'empty_gene_set' | 'no_pathways_in_size_range' | 'empty_background'"
+    )
+
+
+class PathwayEnrichmentResponse(BaseModel):
+    organism_name: str = Field(description="Single organism")
+    ontology: str = Field(description="Ontology used")
+    level: int | None = Field(default=None, description="Hierarchy level used (or None for term_ids-only)")
+    total_matching: int = Field(
+        description="Total (cluster x term) rows pre-pagination; equals Fisher tests run"
+    )
+    returned: int = Field(description="Rows in this response")
+    truncated: bool = Field(description="True when total_matching exceeds offset+returned")
+    offset: int = Field(default=0, description="Pagination offset")
+    n_significant: int = Field(description="Rows with p_adjust below pvalue_cutoff")
+    by_experiment: list[PathwayEnrichmentByExperiment] = Field(
+        default_factory=list, description="Per-experiment tests + significance"
+    )
+    by_direction: list[PathwayEnrichmentByDirection] = Field(
+        default_factory=list, description="Per-direction aggregates"
+    )
+    by_omics_type: list[PathwayEnrichmentByOmicsType] = Field(
+        default_factory=list, description="Per-omics-type aggregates"
+    )
+    cluster_summary: PathwayEnrichmentClusterSummary = Field(
+        description="Distribution stats across clusters"
+    )
+    top_clusters_by_min_padj: list[PathwayEnrichmentTopCluster] = Field(
+        default_factory=list, description="Top 5 clusters by smallest p_adjust"
+    )
+    top_pathways_by_padj: list[PathwayEnrichmentTopPathway] = Field(
+        default_factory=list, description="Top 10 pathways by p_adjust across all clusters"
+    )
+    not_found: list[str] = Field(
+        default_factory=list, description="Requested experiment_ids absent from KG"
+    )
+    not_matched: list[str] = Field(
+        default_factory=list, description="Experiment IDs found but wrong organism"
+    )
+    no_expression: list[str] = Field(
+        default_factory=list, description="Experiments matching organism but with no DE rows"
+    )
+    term_validation: PathwayEnrichmentTermValidation = Field(
+        description="Namespaced passthrough of term_id validation from genes_by_ontology"
+    )
+    clusters_skipped: list[PathwayEnrichmentClusterSkipped] = Field(
+        default_factory=list, description="Clusters that produced no rows, with reason"
+    )
+    results: list[PathwayEnrichmentResult] = Field(
+        default_factory=list, description="Long-format result rows (one Fisher test per row)"
+    )
+
+
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
@@ -3246,3 +3475,119 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"ontology_landscape unexpected error: {e}")
             raise ToolError(f"Error in ontology_landscape: {e}")
+
+    @mcp.tool(
+        tags={"enrichment", "ontology", "expression"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def pathway_enrichment(
+        ctx: Context,
+        organism: Annotated[str, Field(
+            description="Organism (case-insensitive fuzzy match, e.g. 'MED4'). Single-organism enforced.",
+        )],
+        experiment_ids: Annotated[list[str], Field(
+            description="Experiments to pull DE from. Get IDs from list_experiments.",
+        )],
+        ontology: Annotated[Literal[
+            "go_bp", "go_mf", "go_cc", "ec", "kegg",
+            "cog_category", "cyanorak_role", "tigr_role", "pfam",
+        ], Field(
+            description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
+        )],
+        level: Annotated[int | None, Field(
+            description="Hierarchy level (0 = root). At least one of level or term_ids required.",
+            ge=0,
+        )] = None,
+        term_ids: Annotated[list[str] | None, Field(
+            description="Specific term IDs to test. Combines with level to scope rollup.",
+        )] = None,
+        direction: Annotated[Literal["up", "down", "both"], Field(
+            description="DE direction(s) to include in gene_sets.",
+        )] = "both",
+        significant_only: Annotated[bool, Field(
+            description="If true, only significant DE rows count as foreground.",
+        )] = True,
+        background: Annotated[str | list[str], Field(
+            description="'table_scope' (default, per-cluster), 'organism', or explicit locus_tag list.",
+        )] = "table_scope",
+        min_gene_set_size: Annotated[int, Field(
+            description="Per-cluster M filter: drop pathways with fewer members in the background.",
+            ge=0,
+        )] = 5,
+        max_gene_set_size: Annotated[int | None, Field(
+            description="Per-cluster M filter upper bound. None disables.",
+            ge=1,
+        )] = 500,
+        pvalue_cutoff: Annotated[float, Field(
+            description="Significance threshold for `p_adjust`.",
+            gt=0, lt=1,
+        )] = 0.05,
+        timepoint_filter: Annotated[list[str] | None, Field(
+            description="Restrict to these timepoint labels. Useful for 10+ timepoint experiments.",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="If true, omit results (envelope only).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include foreground_gene_ids + background_gene_ids on rows.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows returned. Default 100 — top hits by p_adjust globally.",
+            ge=1,
+        )] = 100,
+        offset: Annotated[int, Field(
+            description="Skip N rows before limit.",
+            ge=0,
+        )] = 0,
+    ) -> PathwayEnrichmentResponse:
+        """Pathway over-representation analysis from DE results (Fisher + BH).
+
+        See docs://analysis/enrichment for methodology and examples.
+        """
+        await ctx.info(
+            f"pathway_enrichment organism={organism} experiments={len(experiment_ids)} "
+            f"ontology={ontology} level={level}"
+        )
+        try:
+            conn = _conn(ctx)
+            result = api.pathway_enrichment(
+                organism=organism,
+                experiment_ids=experiment_ids,
+                ontology=ontology,
+                level=level,
+                term_ids=term_ids,
+                direction=direction,
+                significant_only=significant_only,
+                background=background,
+                min_gene_set_size=min_gene_set_size,
+                max_gene_set_size=max_gene_set_size,
+                pvalue_cutoff=pvalue_cutoff,
+                timepoint_filter=timepoint_filter,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            raise ToolError(str(e)) from e
+
+        # Emit warnings on non-empty validation buckets
+        warnings = []
+        if result["not_found"]:
+            warnings.append(f"{len(result['not_found'])} experiment_ids not_found")
+        if result["not_matched"]:
+            warnings.append(f"{len(result['not_matched'])} not_matched (wrong organism)")
+        if result["no_expression"]:
+            warnings.append(f"{len(result['no_expression'])} no_expression (no DE rows)")
+        tv = result.get("term_validation", {})
+        for key in ("not_found", "wrong_ontology", "wrong_level"):
+            if tv.get(key):
+                warnings.append(f"{len(tv[key])} term_ids {key}")
+        if result.get("clusters_skipped"):
+            warnings.append(f"{len(result['clusters_skipped'])} clusters skipped")
+        if warnings:
+            await ctx.warning("; ".join(warnings))
+
+        return PathwayEnrichmentResponse(**result)
