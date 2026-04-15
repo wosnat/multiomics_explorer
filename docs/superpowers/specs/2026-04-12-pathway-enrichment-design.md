@@ -37,20 +37,48 @@ Counts via existing L1 builders; math in Python. Cyanobacterial genomes are smal
 
 Four public names, all importable from `multiomics_explorer`:
 
-### `EnrichmentInputs` (dataclass)
+### `EnrichmentInputs` (Pydantic model)
+
+Pydantic `BaseModel`, not a plain dataclass, so `Field(description=...)` gives free field documentation — same convention as the MCP response models. The spec's field-description coverage test (`tests/unit/test_tool_wrappers.py`) extends to this model too: no silently-undocumented fields.
 
 ```python
-@dataclass
-class EnrichmentInputs:
-    organism_name: str                       # single-organism (enforced)
-    gene_sets: dict[str, list[str]]          # cluster -> foreground locus_tags
-    background: dict[str, list[str]]         # cluster -> universe locus_tags (per-cluster)
-    cluster_metadata: dict[str, dict]        # cluster -> metadata dict (see fields below)
-    # Partial-failure buckets for the input `experiment_ids` (see Error handling):
-    not_found: list[str]                     # experiment_id absent from KG
-    not_matched: list[str]                   # experiment exists but wrong organism
-    no_expression: list[str]                 # matches organism but has no DE rows
+from pydantic import BaseModel, Field
+
+class EnrichmentInputs(BaseModel):
+    organism_name: str = Field(
+        description="Single organism for all clusters (single-organism enforced)."
+    )
+    gene_sets: dict[str, list[str]] = Field(
+        description="Cluster name -> foreground locus_tags "
+                    "(e.g. significant DE genes for that experiment/timepoint/direction)."
+    )
+    background: dict[str, list[str]] = Field(
+        description="Cluster name -> universe locus_tags. Per-cluster because "
+                    "table_scope backgrounds vary between experiments."
+    )
+    cluster_metadata: dict[str, dict] = Field(
+        description="Cluster name -> metadata dict "
+                    "(experiment_id, timepoint, direction, omics_type, table_scope, "
+                    "treatment_type, background_factors, is_time_course, etc.)."
+    )
+    # Partial-failure buckets for the input `experiment_ids` (see Error handling).
+    # Accumulated by de_enrichment_inputs; passed through to envelope by the wrapper.
+    not_found: list[str] = Field(
+        default_factory=list,
+        description="experiment_ids absent from the KG.",
+    )
+    not_matched: list[str] = Field(
+        default_factory=list,
+        description="experiment_ids that exist but belong to a different organism.",
+    )
+    no_expression: list[str] = Field(
+        default_factory=list,
+        description="experiment_ids matching the organism but with no DE rows "
+                    "(reuses differential_expression_by_gene's bucket name).",
+    )
 ```
+
+Why Pydantic over `@dataclass`: (1) matches the response-model pattern so the same tooling (field-description coverage test, auto-doc extraction) applies; (2) callers who want to `.model_dump()` for JSON serialization get it for free; (3) runtime validation at construction catches shape bugs early.
 
 `cluster_metadata[cluster]` carries the compact field set:
 
@@ -708,7 +736,7 @@ Each scenario function:
 ### Unit — `tests/unit/test_tool_wrappers.py`
 
 - MCP Pydantic round-trip; `limit=100` default; `summary=True` returns empty `results`; `verbose=True` includes gene_id lists; `ctx.warning` on non-empty validation buckets.
-- **Field-description coverage:** assert every field on the result-row model and envelope model has a non-empty `Field(description=...)` value (prevents silently shipping an undocumented field). Spot-check that clusterProfiler-named fields (`gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, `bg_count`) mention their clusterProfiler equivalent in the description.
+- **Field-description coverage:** assert every field on the result-row model, envelope model, and `EnrichmentInputs` has a non-empty `Field(description=...)` value (prevents silently shipping an undocumented field). Spot-check that clusterProfiler-named fields (`gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, `bg_count`) mention their clusterProfiler equivalent in the description.
 
 ### Unit — `tests/unit/test_frames.py`
 
@@ -733,7 +761,7 @@ Freeze the B1 reproduction in `tests/regression/`. Regenerate after KG rebuilds 
 ## Layer-rules compliance
 
 - **L1:** no new builders. `pathway_contingency_counts_query` is deleted from the earlier draft.
-- **L2 — package (`analysis/enrichment.py`):** `EnrichmentInputs` dataclass, `de_enrichment_inputs`, `fisher_ora`, `signed_enrichment_score`. Pure Python; pandas + scipy + statsmodels deps.
+- **L2 — package (`analysis/enrichment.py`):** `EnrichmentInputs` Pydantic model, `de_enrichment_inputs`, `fisher_ora`, `signed_enrichment_score`. Pure Python; pandas + scipy + statsmodels + pydantic deps (pydantic already in the dependency tree via FastMCP).
 - **L2 — api (`api/functions.py`):** new `pathway_enrichment()` composes `de_enrichment_inputs`, `genes_by_ontology`, `fisher_ora`. Validates inputs. Assembles envelope dict.
 - **L2 — frames (`analysis/frames.py`):** no bespoke framer expected. Result rows are scalars plus a few `list[str]` columns (`treatment_type`, `background_factors`, `foreground_gene_ids`, `background_gene_ids`), all of which the default `to_dataframe()` handles by joining with `" | "`. **Validated by test** (see Tests section). If the test surfaces nesting the default framer can't handle, add a dedicated converter — otherwise no new code in `frames.py`.
 - **L3 (`mcp_server/tools.py`):** thin wrapper. Pydantic response model. `limit=100` default. `ToolError` on invalid input. `await ctx.info` for DE / TERM2GENE fetches; `ctx.warning` when any validation bucket non-empty.
