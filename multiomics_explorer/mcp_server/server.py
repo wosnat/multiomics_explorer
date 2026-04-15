@@ -85,35 +85,18 @@ for uri_prefix, (doc_dir, desc_template) in _DOC_DIRS.items():
         )
         mcp.add_resource(resource)
 
-# --- Static resources: enrichment methodology doc and example script ---
-_ANALYSIS_DIR = Path(__file__).resolve().parent.parent / "analysis"
+# --- Static resources: example scripts (not auto-discovered from .md files) ---
 _EXAMPLES_DIR = Path(__file__).resolve().parent.parent.parent / "examples"
 
-for _uri, _path, _name, _desc, _mime in [
-    (
-        "docs://analysis/enrichment",
-        _ANALYSIS_DIR / "enrichment.md",
-        "enrichment",
-        "Methodology doc for pathway enrichment analysis",
-        "text/plain",
-    ),
-    (
-        "docs://examples/pathway_enrichment.py",
-        _EXAMPLES_DIR / "pathway_enrichment.py",
-        "pathway_enrichment.py",
-        "Runnable example script for pathway enrichment",
-        "text/x-python",
-    ),
-]:
-    mcp.add_resource(
-        FunctionResource.from_function(
-            fn=(lambda p: lambda: p.read_text())(_path),
-            uri=_uri,
-            name=_name,
-            description=_desc,
-            mime_type=_mime,
-        )
+mcp.add_resource(
+    FunctionResource.from_function(
+        fn=(lambda p: lambda: p.read_text())(_EXAMPLES_DIR / "pathway_enrichment.py"),
+        uri="docs://examples/pathway_enrichment.py",
+        name="pathway_enrichment.py",
+        description="Runnable example script for pathway enrichment",
+        mime_type="text/x-python",
     )
+)
 
 
 def main():
