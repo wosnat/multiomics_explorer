@@ -24,6 +24,7 @@ from multiomics_explorer.api.functions import (
     gene_response_profile,
     gene_clusters_by_gene,
     genes_in_cluster,
+    pathway_enrichment,
 )
 
 __all__ = [
@@ -50,4 +51,5 @@ __all__ = [
     "gene_response_profile",
     "gene_clusters_by_gene",
     "genes_in_cluster",
+    "pathway_enrichment",
 ]
