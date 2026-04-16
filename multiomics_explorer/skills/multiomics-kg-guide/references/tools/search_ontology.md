@@ -12,10 +12,12 @@ wildcards (*), exact phrases ("..."), boolean (AND, OR).
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string | — | Search query (Lucene syntax). E.g. 'replication', 'oxido*', 'transport AND membrane'. |
-| ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam'. |
+| ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite'. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
+| level | int \| None | None | Filter to terms at this hierarchy level. 0 = broadest. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 
 ## Response format
 
@@ -40,6 +42,9 @@ total_entries, total_matching, score_max, score_median, returned, offset, trunca
 | id | string | Term ID (e.g. 'go:0006260') |
 | name | string | Term name (e.g. 'DNA replication') |
 | score | float | Fulltext relevance score (e.g. 5.23) |
+| level | int | Hierarchy level of this term (0 = broadest) |
+| tree | string \| None | BRITE tree name (sparse: BRITE only) |
+| tree_code | string \| None | BRITE tree code (sparse: BRITE only) |
 
 ## Few-shot examples
 

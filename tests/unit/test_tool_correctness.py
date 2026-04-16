@@ -557,9 +557,9 @@ class TestSearchOntologyCorrectness:
                 "returned": 3,
                 "truncated": True,
                 "results": [
-                    {"id": "go:0006260", "name": "DNA replication", "score": 5.23},
-                    {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 4.1},
-                    {"id": "go:0006270", "name": "DNA replication initiation", "score": 2.1},
+                    {"id": "go:0006260", "name": "DNA replication", "score": 5.23, "level": 5},
+                    {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 4.1, "level": 6},
+                    {"id": "go:0006270", "name": "DNA replication initiation", "score": 2.1, "level": 6},
                 ],
             },
         ):
@@ -637,13 +637,70 @@ class TestSearchOntologyCorrectness:
                 "total_entries": 100, "total_matching": 1,
                 "score_max": 1.0, "score_median": 1.0,
                 "returned": 1, "truncated": False,
-                "results": [{"id": "test:001", "name": "test term", "score": 1.0}],
+                "results": [{"id": "test:001", "name": "test term", "score": 1.0, "level": 2}],
             },
         ):
             result = await tool_fns["search_ontology"](
                 mock_ctx, search_text="test", ontology=ontology,
             )
         assert result.total_matching == 1
+
+    @pytest.mark.asyncio
+    async def test_level_in_result_rows(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={
+                "total_entries": 100, "total_matching": 1,
+                "score_max": 3.0, "score_median": 3.0,
+                "returned": 1, "truncated": False,
+                "results": [
+                    {"id": "go:0006260", "name": "DNA replication", "score": 3.0, "level": 5},
+                ],
+            },
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp",
+            )
+        assert result.results[0].level == 5
+
+    @pytest.mark.asyncio
+    async def test_brite_result_has_tree(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={
+                "total_entries": 100, "total_matching": 1,
+                "score_max": 3.0, "score_median": 3.0,
+                "returned": 1, "truncated": False,
+                "results": [
+                    {"id": "kegg.brite:ko02000.A5", "name": "PTS", "score": 3.0,
+                     "level": 0, "tree": "transporters", "tree_code": "ko02000"},
+                ],
+            },
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="PTS", ontology="brite",
+            )
+        assert result.results[0].tree == "transporters"
+        assert result.results[0].tree_code == "ko02000"
+
+    @pytest.mark.asyncio
+    async def test_non_brite_result_no_tree(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            return_value={
+                "total_entries": 100, "total_matching": 1,
+                "score_max": 3.0, "score_median": 3.0,
+                "returned": 1, "truncated": False,
+                "results": [
+                    {"id": "go:0006260", "name": "DNA replication", "score": 3.0, "level": 5},
+                ],
+            },
+        ):
+            result = await tool_fns["search_ontology"](
+                mock_ctx, search_text="replication", ontology="go_bp",
+            )
+        assert result.results[0].tree is None
+        assert result.results[0].tree_code is None
 
 
 # ---------------------------------------------------------------------------

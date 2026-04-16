@@ -964,6 +964,9 @@ def register_tools(mcp: FastMCP):
         id: str = Field(description="Term ID (e.g. 'go:0006260')")
         name: str = Field(description="Term name (e.g. 'DNA replication')")
         score: float = Field(description="Fulltext relevance score (e.g. 5.23)")
+        level: int = Field(description="Hierarchy level of this term (0 = broadest)")
+        tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
+        tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
 
     class SearchOntologyResponse(BaseModel):
         total_entries: int = Field(description="Total terms in this ontology (e.g. 847)")
@@ -1000,6 +1003,14 @@ def register_tools(mcp: FastMCP):
         offset: Annotated[int, Field(
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
+        level: Annotated[int | None, Field(
+            description="Filter to terms at this hierarchy level. 0 = broadest.",
+            ge=0,
+        )] = None,
+        tree: Annotated[str | None, Field(
+            description="BRITE tree name filter (e.g. 'transporters'). "
+            "Only valid when ontology='brite'.",
+        )] = None,
     ) -> SearchOntologyResponse:
         """Browse ontology terms by text search (fuzzy, Lucene syntax).
 
@@ -1011,7 +1022,8 @@ def register_tools(mcp: FastMCP):
             conn = _conn(ctx)
             data = api.search_ontology(
                 search_text, ontology, summary=summary,
-                limit=limit, offset=offset, conn=conn,
+                limit=limit, offset=offset,
+                level=level, tree=tree, conn=conn,
             )
             results = [SearchOntologyResult(**r) for r in data["results"]]
             return SearchOntologyResponse(**{**data, "results": results})

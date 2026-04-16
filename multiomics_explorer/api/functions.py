@@ -887,6 +887,8 @@ def search_ontology(
     summary: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    level: int | None = None,
+    tree: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -894,7 +896,7 @@ def search_ontology(
 
     Returns dict with keys: total_entries, total_matching, score_max,
     score_median, returned, truncated, results.
-    Per result: id, name, score.
+    Per result: id, name, score, level, tree (sparse), tree_code (sparse).
     """
     if not search_text or not search_text.strip():
         raise ValueError("search_text must not be empty.")
@@ -913,6 +915,7 @@ def search_ontology(
     try:
         sum_cypher, sum_params = build_search_ontology_summary(
             ontology=ontology, search_text=effective_text,
+            level=level, tree=tree,
         )
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
     except Neo4jClientError:
@@ -920,6 +923,7 @@ def search_ontology(
         effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
         sum_cypher, sum_params = build_search_ontology_summary(
             ontology=ontology, search_text=effective_text,
+            level=level, tree=tree,
         )
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
@@ -942,6 +946,7 @@ def search_ontology(
     try:
         det_cypher, det_params = build_search_ontology(
             ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
+            level=level, tree=tree,
         )
         results = conn.execute_query(det_cypher, **det_params)
     except Neo4jClientError:
@@ -950,10 +955,17 @@ def search_ontology(
             effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
             det_cypher, det_params = build_search_ontology(
                 ontology=ontology, search_text=effective_text, limit=limit, offset=offset,
+                level=level, tree=tree,
             )
             results = conn.execute_query(det_cypher, **det_params)
         else:
             raise
+
+    # Strip sparse BRITE-only fields when absent
+    for r in results:
+        if r.get("tree") is None:
+            r.pop("tree", None)
+            r.pop("tree_code", None)
 
     envelope["returned"] = len(results)
     envelope["offset"] = offset

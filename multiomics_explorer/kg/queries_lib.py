@@ -1203,6 +1203,8 @@ def build_list_experiments_summary(
 
 def build_search_ontology_summary(
     *, ontology: str, search_text: str,
+    level: int | None = None,
+    tree: str | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for search_ontology.
 
@@ -1210,20 +1212,36 @@ def build_search_ontology_summary(
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
+
+    params: dict = {"search_text": search_text}
+
+    # Build optional WHERE predicates
+    where_parts: list[str] = []
+    if level is not None:
+        where_parts.append("t.level = $level")
+        params["level"] = level
+    if tree is not None:
+        where_parts.append("t.tree = $tree")
+        params["tree"] = tree
+    where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
 
     if parent_index:
         cypher = (
             "CALL {\n"
             f"  CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "  YIELD node AS t, score\n"
-            "  RETURN score\n"
+            + where_clause
+            + "  RETURN score\n"
             "  UNION ALL\n"
             f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
             "  YIELD node AS t, score\n"
-            "  RETURN score\n"
+            + where_clause
+            + "  RETURN score\n"
             "}\n"
             "WITH count(score) AS total_matching,\n"
             "     max(score) AS score_max,\n"
@@ -1238,26 +1256,31 @@ def build_search_ontology_summary(
         cypher = (
             f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "YIELD node AS t, score\n"
-            "WITH count(t) AS total_matching,\n"
+            + where_clause
+            + "WITH count(t) AS total_matching,\n"
             "     max(score) AS score_max,\n"
             "     percentileDisc(score, 0.5) AS score_median\n"
             f"CALL {{ MATCH (all_t:{label}) RETURN count(all_t) AS total_entries }}\n"
             "RETURN total_entries, total_matching, score_max, score_median"
         )
-    return cypher, {"search_text": search_text}
+    return cypher, params
 
 
 def build_search_ontology(
     *, ontology: str, search_text: str,
     limit: int | None = None,
     offset: int = 0,
+    level: int | None = None,
+    tree: str | None = None,
 ) -> tuple[str, dict]:
     """Build Cypher for search_ontology.
 
-    RETURN keys: id, name, score.
+    RETURN keys: id, name, score, level, tree, tree_code.
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
@@ -1272,26 +1295,42 @@ def build_search_ontology(
     if limit is not None:
         params["limit"] = limit
 
+    # Build optional WHERE predicates
+    where_parts: list[str] = []
+    if level is not None:
+        where_parts.append("t.level = $level")
+        params["level"] = level
+    if tree is not None:
+        where_parts.append("t.tree = $tree")
+        params["tree"] = tree
+    where_clause = "  WHERE " + " AND ".join(where_parts) + "\n" if where_parts else ""
+
     if parent_index:
         # UNION search across both indexes (e.g. Pfam domain + clan)
         cypher = (
             "CALL {\n"
             f"  CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "  YIELD node AS t, score\n"
-            "  RETURN t.id AS id, t.name AS name, score\n"
+            + where_clause
+            + "  RETURN t.id AS id, t.name AS name, score,\n"
+            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
             "  UNION ALL\n"
             f"  CALL db.index.fulltext.queryNodes('{parent_index}', $search_text)\n"
             "  YIELD node AS t, score\n"
-            "  RETURN t.id AS id, t.name AS name, score\n"
+            + where_clause
+            + "  RETURN t.id AS id, t.name AS name, score,\n"
+            "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
             "}\n"
-            "RETURN id, name, score\n"
+            "RETURN id, name, score, level, tree, tree_code\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     else:
         cypher = (
             f"CALL db.index.fulltext.queryNodes('{index_name}', $search_text)\n"
             "YIELD node AS t, score\n"
-            "RETURN t.id AS id, t.name AS name, score\n"
+            + where_clause
+            + "RETURN t.id AS id, t.name AS name, score,\n"
+            "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code\n"
             "ORDER BY score DESC, id" + skip_clause + limit_clause
         )
     return cypher, params

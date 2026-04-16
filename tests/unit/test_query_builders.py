@@ -974,6 +974,65 @@ class TestBuildSearchOntology:
         assert "SKIP" not in cypher
         assert "offset" not in params
 
+    def test_returns_level_column(self):
+        cypher, _ = build_search_ontology(ontology="go_bp", search_text="test")
+        assert "t.level AS level" in cypher
+
+    def test_returns_tree_columns(self):
+        cypher, _ = build_search_ontology(ontology="brite", search_text="test")
+        assert "t.tree AS tree" in cypher
+        assert "t.tree_code AS tree_code" in cypher
+
+    def test_level_filter_adds_where_clause(self):
+        cypher, params = build_search_ontology(
+            ontology="go_bp", search_text="test", level=2,
+        )
+        assert "t.level = $level" in cypher
+        assert params["level"] == 2
+
+    def test_tree_filter_adds_where_clause(self):
+        cypher, params = build_search_ontology(
+            ontology="brite", search_text="test", tree="transporters",
+        )
+        assert "t.tree = $tree" in cypher
+        assert params["tree"] == "transporters"
+
+    def test_tree_filter_with_non_brite_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_search_ontology(
+                ontology="go_bp", search_text="test", tree="transporters",
+            )
+
+    def test_pfam_union_level_filter_inside_branches(self):
+        cypher, params = build_search_ontology(
+            ontology="pfam", search_text="test", level=1,
+        )
+        # Level filter must appear inside each UNION branch
+        assert cypher.count("t.level = $level") == 2
+        assert params["level"] == 1
+
+
+class TestBuildSearchOntologySummaryLevelTree:
+    def test_level_filter(self):
+        cypher, params = build_search_ontology_summary(
+            ontology="go_bp", search_text="test", level=2,
+        )
+        assert "t.level = $level" in cypher
+        assert params["level"] == 2
+
+    def test_tree_filter(self):
+        cypher, params = build_search_ontology_summary(
+            ontology="brite", search_text="test", tree="transporters",
+        )
+        assert "t.tree = $tree" in cypher
+        assert params["tree"] == "transporters"
+
+    def test_tree_non_brite_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_search_ontology_summary(
+                ontology="go_bp", search_text="test", tree="x",
+            )
+
 
 class TestBuildSearchOntologySummary:
     def test_returns_summary_keys(self):

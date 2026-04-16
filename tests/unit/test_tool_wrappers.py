@@ -1118,8 +1118,8 @@ class TestSearchOntologyWrapper:
         "returned": 2,
         "truncated": False,
         "results": [
-            {"id": "go:0006260", "name": "DNA replication", "score": 5.0},
-            {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 3.2},
+            {"id": "go:0006260", "name": "DNA replication", "score": 5.0, "level": 5},
+            {"id": "go:0006261", "name": "DNA-templated DNA replication", "score": 3.2, "level": 6},
         ],
     }
 
