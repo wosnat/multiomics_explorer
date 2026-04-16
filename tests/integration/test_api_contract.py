@@ -246,7 +246,7 @@ class TestSearchOntologyContract:
 
     def test_result_keys(self, conn):
         result = api.search_ontology("DNA replication", "go_bp", conn=conn)
-        expected_keys = {"id", "name", "score"}
+        expected_keys = {"id", "name", "score", "level"}
         assert len(result["results"]) >= 1
         assert set(result["results"][0].keys()) == expected_keys
 
