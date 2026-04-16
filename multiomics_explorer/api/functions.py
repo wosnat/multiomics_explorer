@@ -559,10 +559,13 @@ def list_organisms(
     """List all organisms in the knowledge graph.
 
     Returns dict with keys: total_entries, returned, truncated,
-    by_cluster_type, results.
+    by_cluster_type, by_organism_type, results.
     Per result: organism_name, genus, species, strain, clade,
-    ncbi_taxon_id, gene_count, publication_count, experiment_count,
-    treatment_types, omics_types, clustering_analysis_count, cluster_types.
+    ncbi_taxon_id, organism_type, gene_count, publication_count,
+    experiment_count, treatment_types, omics_types,
+    clustering_analysis_count, cluster_types.
+    Sparse fields (omitted when null): reference_database,
+    reference_proteome.
     When verbose=True, also includes: family, order, tax_class, phylum,
     kingdom, superkingdom, lineage, cluster_count.
     """
@@ -577,7 +580,20 @@ def list_organisms(
         for ct in org.get("cluster_types", []):
             ct_counts[ct] = ct_counts.get(ct, 0) + 1
 
+    # Compute by_organism_type breakdown from all results
+    ot_counts: dict[str, int] = {}
+    for org in all_results:
+        ot = org.get("organism_type")
+        if ot:
+            ot_counts[ot] = ot_counts.get(ot, 0) + 1
+
     results = all_results[offset:offset + limit] if limit else all_results[offset:]
+
+    # Sparse-strip reference fields when null
+    for r in results:
+        if r.get("reference_database") is None:
+            r.pop("reference_database", None)
+            r.pop("reference_proteome", None)
 
     # Gate verbose-only fields
     if not verbose:
@@ -587,6 +603,11 @@ def list_organisms(
         "total_entries": total,
         "by_cluster_type": sorted(
             [{"cluster_type": k, "count": v} for k, v in ct_counts.items()],
+            key=lambda x: x["count"],
+            reverse=True,
+        ),
+        "by_organism_type": sorted(
+            [{"organism_type": k, "count": v} for k, v in ot_counts.items()],
             key=lambda x: x["count"],
             reverse=True,
         ),
