@@ -1597,6 +1597,8 @@ def _gene_ontology_terms_leaf_filter(cfg: dict) -> str:
         return ""
     if cfg.get("parent_label"):
         return ""
+    if cfg.get("bridge"):
+        return ""
     gene_rel = cfg["gene_rel"]
     label = cfg["label"]
     hierarchy = "|".join(hierarchy_rels)

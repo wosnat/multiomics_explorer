@@ -1506,6 +1506,52 @@ class TestBuildGeneOntologyTermsSummary:
             build_gene_ontology_terms_summary(locus_tags=["x"], ontology="bad")
 
 
+class TestGeneOntologyTermsLeafFilter:
+    def test_bridge_ontology_skips_leaf_filter(self):
+        from multiomics_explorer.kg.queries_lib import _gene_ontology_terms_leaf_filter, ONTOLOGY_CONFIG
+        result = _gene_ontology_terms_leaf_filter(ONTOLOGY_CONFIG["brite"])
+        assert result == "", "Bridge ontologies must skip leaf filter"
+
+    def test_parent_label_ontology_still_skips(self):
+        from multiomics_explorer.kg.queries_lib import _gene_ontology_terms_leaf_filter, ONTOLOGY_CONFIG
+        result = _gene_ontology_terms_leaf_filter(ONTOLOGY_CONFIG["pfam"])
+        assert result == ""
+
+    def test_hierarchical_ontology_emits_filter(self):
+        from multiomics_explorer.kg.queries_lib import _gene_ontology_terms_leaf_filter, ONTOLOGY_CONFIG
+        result = _gene_ontology_terms_leaf_filter(ONTOLOGY_CONFIG["go_bp"])
+        assert "NOT EXISTS" in result
+
+
+class TestBuildGeneOntologyTermsBrite:
+    def test_summary_uses_2hop_match(self):
+        cypher, params = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="brite",
+        )
+        assert params == {"locus_tags": ["PMM0001"]}
+        # Must have 2-hop: Gene → KeggTerm → BriteCategory
+        assert ":Gene_has_kegg_ko" in cypher
+        assert ":Kegg_term_in_brite_category" in cypher
+        assert ":BriteCategory" in cypher
+        # Must NOT have direct Gene→BriteCategory (which would be wrong)
+        assert "Gene_has_kegg_ko]->(t:BriteCategory)" not in cypher
+
+    def test_detail_uses_2hop_match(self):
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="brite",
+        )
+        assert ":Gene_has_kegg_ko" in cypher
+        assert ":Kegg_term_in_brite_category" in cypher
+        assert ":BriteCategory" in cypher
+
+    def test_detail_returns_expected_columns(self):
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="brite",
+        )
+        for col in ["locus_tag", "term_id", "term_name"]:
+            assert col in cypher
+
+
 class TestBuildGeneExistenceCheck:
     def test_returns_cypher(self):
         """Cypher uses OPTIONAL MATCH pattern."""
