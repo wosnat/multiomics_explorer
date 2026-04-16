@@ -853,6 +853,15 @@ class TestBuildListOrganisms:
         cypher, _ = build_list_organisms()
         assert "ORDER BY o.genus, o.preferred_name" in cypher
 
+    def test_returns_organism_type(self):
+        cypher, _ = build_list_organisms()
+        assert "o.organism_type AS organism_type" in cypher
+
+    def test_returns_reference_fields(self):
+        cypher, _ = build_list_organisms()
+        assert "o.reference_database AS reference_database" in cypher
+        assert "o.reference_proteome AS reference_proteome" in cypher
+
 
 class TestOntologyConfig:
     def test_all_keys_present(self):

@@ -898,10 +898,11 @@ def build_list_organisms(
 ) -> tuple[str, dict]:
     """Build Cypher for listing all organisms with data-availability signals.
 
-    RETURN keys (compact): organism_name, genus, species, strain, clade,
-    ncbi_taxon_id, gene_count, publication_count, experiment_count,
-    treatment_types, background_factors, omics_types,
-    clustering_analysis_count, cluster_types.
+    RETURN keys (compact): organism_name, organism_type, genus, species,
+    strain, clade, ncbi_taxon_id, gene_count, publication_count,
+    experiment_count, treatment_types, background_factors, omics_types,
+    clustering_analysis_count, cluster_types, reference_database,
+    reference_proteome.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count.
     """
@@ -920,6 +921,7 @@ def build_list_organisms(
     cypher = (
         "MATCH (o:OrganismTaxon)\n"
         "RETURN o.preferred_name AS organism_name,\n"
+        "       o.organism_type AS organism_type,\n"
         "       o.genus AS genus,\n"
         "       o.species AS species,\n"
         "       o.strain_name AS strain,\n"
@@ -932,7 +934,9 @@ def build_list_organisms(
         "       coalesce(o.background_factors, []) AS background_factors,\n"
         "       o.omics_types AS omics_types,\n"
         "       coalesce(o.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
-        "       coalesce(o.cluster_types, []) AS cluster_types"
+        "       coalesce(o.cluster_types, []) AS cluster_types,\n"
+        "       o.reference_database AS reference_database,\n"
+        "       o.reference_proteome AS reference_proteome"
         f"{verbose_cols}\n"
         "ORDER BY o.genus, o.preferred_name"
     )
