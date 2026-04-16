@@ -234,7 +234,8 @@ class TestListFilterValuesWrapper:
 # ---------------------------------------------------------------------------
 class TestListOrganismsWrapper:
     _SAMPLE_ORG = {
-        "organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
+        "organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
+        "genus": "Prochlorococcus",
         "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI",
         "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11,
         "experiment_count": 46,

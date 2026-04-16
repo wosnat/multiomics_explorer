@@ -1725,15 +1725,19 @@ class TestListOrganismsCorrectness:
                 "total_entries": 15,
                 "returned": 2,
                 "truncated": True,
+                "by_cluster_type": [],
+                "by_organism_type": [],
                 "results": [
-                    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus",
+                    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
+                     "genus": "Prochlorococcus",
                      "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI",
                      "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11,
                      "experiment_count": 46,
                      "treatment_types": ["coculture", "light_stress"],
                      "background_factors": [],
                      "omics_types": ["RNASEQ", "PROTEOMICS"]},
-                    {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas",
+                    {"organism_name": "Alteromonas macleodii EZ55", "organism_type": "genome_strain",
+                     "genus": "Alteromonas",
                      "species": "Alteromonas macleodii", "strain": "EZ55", "clade": None,
                      "ncbi_taxon_id": 28108, "gene_count": 4136, "publication_count": 2,
                      "experiment_count": 13,
@@ -1752,6 +1756,83 @@ class TestListOrganismsCorrectness:
         assert result.results[0].organism_name == "Prochlorococcus MED4"
         assert result.results[0].gene_count == 1976
         assert result.results[1].genus == "Alteromonas"
+
+    @pytest.mark.asyncio
+    async def test_organism_type_in_results(self, tool_fns, mock_ctx):
+        """Results include organism_type field."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 2,
+                "returned": 2,
+                "truncated": False,
+                "by_cluster_type": [],
+                "by_organism_type": [
+                    {"organism_type": "genome_strain", "count": 1},
+                    {"organism_type": "reference_proteome_match", "count": 1},
+                ],
+                "results": [
+                    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
+                     "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",
+                     "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919,
+                     "gene_count": 1976, "publication_count": 11, "experiment_count": 46,
+                     "treatment_types": ["coculture"], "background_factors": [],
+                     "omics_types": ["RNASEQ"]},
+                    {"organism_name": "Alteromonas (MarRef v6)",
+                     "organism_type": "reference_proteome_match",
+                     "genus": "Alteromonas", "species": None, "strain": "Alt_MarRef",
+                     "clade": None, "ncbi_taxon_id": 232, "gene_count": 500,
+                     "publication_count": 1, "experiment_count": 3,
+                     "treatment_types": ["coculture"], "background_factors": [],
+                     "omics_types": ["PROTEOMICS"],
+                     "reference_database": "MarRef v6",
+                     "reference_proteome": "UP000262181"},
+                ],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+
+        assert result.results[0].organism_type == "genome_strain"
+        assert result.results[0].reference_database is None
+        assert result.results[0].reference_proteome is None
+        assert result.results[1].organism_type == "reference_proteome_match"
+        assert result.results[1].reference_database == "MarRef v6"
+        assert result.results[1].reference_proteome == "UP000262181"
+
+    @pytest.mark.asyncio
+    async def test_by_organism_type_in_envelope(self, tool_fns, mock_ctx):
+        """Envelope includes by_organism_type breakdown."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 2,
+                "returned": 2,
+                "truncated": False,
+                "by_cluster_type": [],
+                "by_organism_type": [
+                    {"organism_type": "genome_strain", "count": 25},
+                    {"organism_type": "treatment", "count": 5},
+                    {"organism_type": "reference_proteome_match", "count": 2},
+                ],
+                "results": [
+                    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
+                     "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",
+                     "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919,
+                     "gene_count": 1976, "publication_count": 11, "experiment_count": 46,
+                     "treatment_types": [], "background_factors": [], "omics_types": []},
+                    {"organism_name": "Test Org", "organism_type": "treatment",
+                     "genus": "Test", "species": None, "strain": None, "clade": None,
+                     "ncbi_taxon_id": None, "gene_count": 0, "publication_count": 0,
+                     "experiment_count": 0,
+                     "treatment_types": [], "background_factors": [], "omics_types": []},
+                ],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+
+        assert len(result.by_organism_type) == 3
+        assert result.by_organism_type[0].organism_type == "genome_strain"
+        assert result.by_organism_type[0].count == 25
 
 
 # ---------------------------------------------------------------------------

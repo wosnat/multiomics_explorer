@@ -338,6 +338,7 @@ def register_tools(mcp: FastMCP):
 
     class OrganismResult(BaseModel):
         organism_name: str = Field(description="Display name (e.g. 'Prochlorococcus MED4'). Use for organism filters in other tools.")
+        organism_type: str = Field(description="Classification: 'genome_strain', 'treatment', or 'reference_proteome_match'")
         genus: str | None = Field(default=None, description="Genus (e.g. 'Prochlorococcus', 'Alteromonas')")
         species: str | None = Field(default=None, description="Binomial species name (e.g. 'Prochlorococcus marinus')")
         strain: str | None = Field(default=None, description="Strain identifier (e.g. 'MED4', 'EZ55')")
@@ -360,14 +361,22 @@ def register_tools(mcp: FastMCP):
         superkingdom: str | None = Field(default=None, description="Taxonomic superkingdom (e.g. 'Bacteria')")
         lineage: str | None = Field(default=None, description="Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus')")
         cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 35)")
+        # sparse reference fields (reference_proteome_match only)
+        reference_database: str | None = Field(default=None, description="Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms.")
+        reference_proteome: str | None = Field(default=None, description="Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms.")
 
     class OrgClusterTypeBreakdown(BaseModel):
         cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
         count: int = Field(description="Number of organisms with this cluster type (e.g. 4)")
 
+    class OrgTypeBreakdown(BaseModel):
+        organism_type: str = Field(description="Organism type (e.g. 'genome_strain')")
+        count: int = Field(description="Number of organisms of this type (e.g. 25)")
+
     class ListOrganismsResponse(BaseModel):
         total_entries: int = Field(description="Total organisms in the KG")
         by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type, sorted by count descending")
+        by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type, sorted by count descending")
         returned: int = Field(description="Number of results returned")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if results were truncated by limit")
@@ -390,9 +399,14 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListOrganismsResponse:
-        """List all organisms with sequenced genomes in the knowledge graph.
+        """List all organisms in the knowledge graph.
 
-        Returns taxonomy, gene counts, and publication counts for each organism.
+        Returns taxonomy, gene counts, publication counts, and organism_type
+        for each organism. organism_type classifies each organism as
+        'genome_strain', 'treatment', or 'reference_proteome_match'.
+        Reference proteome match organisms also include reference_database
+        and reference_proteome fields.
+
         Use the returned organism names as filter values in genes_by_function,
         resolve_gene, genes_by_ontology, list_publications, etc. The organism
         filter uses partial matching — "MED4", "Prochlorococcus MED4", and
@@ -404,9 +418,11 @@ def register_tools(mcp: FastMCP):
             result = api.list_organisms(verbose=verbose, limit=limit, offset=offset, conn=conn)
             organisms = [OrganismResult(**r) for r in result["results"]]
             by_cluster_type = [OrgClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
+            by_organism_type = [OrgTypeBreakdown(**b) for b in result.get("by_organism_type", [])]
             response = ListOrganismsResponse(
                 total_entries=result["total_entries"],
                 by_cluster_type=by_cluster_type,
+                by_organism_type=by_organism_type,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],

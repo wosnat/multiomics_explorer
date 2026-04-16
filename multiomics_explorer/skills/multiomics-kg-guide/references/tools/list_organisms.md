@@ -2,9 +2,13 @@
 
 ## What it does
 
-List all organisms with sequenced genomes in the knowledge graph.
+List all organisms in the knowledge graph.
 
-Returns taxonomy, gene counts, and publication counts for each organism.
+Returns taxonomy, gene counts, publication counts, and organism_type for each
+organism. organism_type classifies each organism as 'genome_strain',
+'treatment', or 'reference_proteome_match'. Reference proteome match organisms
+also include reference_database and reference_proteome fields.
+
 Use the returned organism names as filter values in genes_by_function,
 resolve_gene, genes_by_ontology, list_publications, etc. The organism
 filter uses partial matching — "MED4", "Prochlorococcus MED4", and
@@ -23,11 +27,12 @@ filter uses partial matching — "MED4", "Prochlorococcus MED4", and
 ### Envelope
 
 ```expected-keys
-total_entries, by_cluster_type, returned, offset, truncated, results
+total_entries, by_cluster_type, by_organism_type, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total organisms in the KG
 - **by_cluster_type** (list[OrgClusterTypeBreakdown]): Organism counts per cluster type, sorted by count descending
+- **by_organism_type** (list[OrgTypeBreakdown]): Organism counts per type, sorted by count descending
 - **returned** (int): Number of results returned
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if results were truncated by limit
@@ -37,6 +42,7 @@ total_entries, by_cluster_type, returned, offset, truncated, results
 | Field | Type | Description |
 |---|---|---|
 | organism_name | string | Display name (e.g. 'Prochlorococcus MED4'). Use for organism filters in other tools. |
+| organism_type | string | Classification: 'genome_strain', 'treatment', or 'reference_proteome_match' |
 | genus | string \| None (optional) | Genus (e.g. 'Prochlorococcus', 'Alteromonas') |
 | species | string \| None (optional) | Binomial species name (e.g. 'Prochlorococcus marinus') |
 | strain | string \| None (optional) | Strain identifier (e.g. 'MED4', 'EZ55') |
@@ -63,6 +69,8 @@ total_entries, by_cluster_type, returned, offset, truncated, results
 | superkingdom | string \| None (optional) | Taxonomic superkingdom (e.g. 'Bacteria') |
 | lineage | string \| None (optional) | Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus') |
 | cluster_count | int \| None (optional) | Total gene clusters across analyses (only with verbose=True, e.g. 35) |
+| reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
+| reference_proteome | string \| None (optional) | Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms. |
 
 ## Few-shot examples
 
