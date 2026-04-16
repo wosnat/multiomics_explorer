@@ -1,64 +1,102 @@
 version: 1
-captured_at: '2026-03-31T06:50:04.595545+00:00'
+captured_at: '2026-04-16T09:28:19.938280+00:00'
 schema:
   nodes:
     AnatomicalEntity:
       properties:
         id: string
+        level: int
+        level_is_best_effort: string
         name: string
         preferred_id: string
     BiologicalEntity:
       properties:
-        annotation_score: float
-        catalytic_activities: list
-        cofactor_names: list
-        ec_numbers: list
-        eggnog_ids: string
-        gene_names: list
-        gene_symbol: string
-        go_biological_processes: list
-        go_cellular_components: list
-        go_molecular_functions: list
+        all_identifiers: list
+        alternate_functional_descriptions: list
+        annotation_quality: int
+        annotation_types: list
+        closest_ortholog_genera: list
+        closest_ortholog_group_size: int
+        cluster_membership_count: int
+        cluster_types: list
+        end: int
+        expression_edge_count: int
+        function_description: string
+        gene_category: string
+        gene_name: string
+        gene_summary: string
         id: string
-        is_reviewed: string
-        keyword_ids: list
-        keywords: list
         locus_tag: string
-        molecular_mass: int
-        pfam_ids: list
+        organism_name: string
         preferred_id: string
-        protein_family: string
-        protein_synonyms: string
-        proteome_ids: list
-        refseq_ids: list
-        sequence_length: int
+        product: string
+        protein_id: string
         signal_peptide: string
-        transmembrane_regions: list
+        significant_down_count: int
+        significant_up_count: int
+        start: int
+        strand: string
     BiologicalProcess:
       properties:
         id: string
+        level: int
+        level_is_best_effort: string
         name: string
         preferred_id: string
     BiologicalProcessOrActivity:
       properties:
         id: string
+        level: int
+        level_is_best_effort: string
         name: string
         preferred_id: string
+    BriteCategory:
+      properties:
+        gene_count: int
+        id: string
+        level: int
+        level_kind: string
+        member_ko_count: int
+        name: string
+        organism_count: int
+        preferred_id: string
+        tree: string
+        tree_code: string
     CellularComponent:
       properties:
         id: string
+        level: int
+        level_is_best_effort: string
         name: string
         preferred_id: string
+    ClusteringAnalysis:
+      properties:
+        background_factors: list
+        cluster_count: int
+        cluster_method: string
+        cluster_type: string
+        experimental_context: string
+        id: string
+        light_condition: string
+        name: string
+        omics_type: string
+        organism_name: string
+        preferred_id: string
+        total_gene_count: int
+        treatment: string
+        treatment_type: list
     CogFunctionalCategory:
       properties:
         code: string
         id: string
+        level: int
         name: string
         preferred_id: string
     CyanorakRole:
       properties:
         code: string
         id: string
+        level: int
         name: string
         preferred_id: string
     EcNumber:
@@ -67,41 +105,36 @@ schema:
         catalytic_activity: list
         comments: list
         id: string
+        level: int
         name: string
         preferred_id: string
     Entity:
       properties:
-        annotation_score: float
-        catalytic_activities: list
-        cofactor_names: list
-        ec_numbers: list
-        eggnog_ids: string
-        gene_names: list
-        gene_symbol: string
-        go_biological_processes: list
-        go_cellular_components: list
-        go_molecular_functions: list
+        background_factors: list
+        cluster_count: int
+        cluster_method: string
+        cluster_type: string
+        experimental_context: string
         id: string
-        is_reviewed: string
-        keyword_ids: list
-        keywords: list
-        locus_tag: string
-        molecular_mass: int
-        pfam_ids: list
+        light_condition: string
+        name: string
+        omics_type: string
+        organism_name: string
         preferred_id: string
-        protein_family: string
-        protein_synonyms: string
-        proteome_ids: list
-        refseq_ids: list
-        sequence_length: int
-        signal_peptide: string
-        transmembrane_regions: list
+        total_gene_count: int
+        treatment: string
+        treatment_type: list
     Experiment:
       properties:
+        background_factors: list
+        cluster_count: int
+        cluster_types: list
+        clustering_analysis_count: int
         coculture_partner: string
         control: string
         experimental_context: string
         gene_count: int
+        growth_phases: list
         id: string
         is_time_course: string
         light_condition: string
@@ -125,79 +158,88 @@ schema:
         time_point_significant_up: list
         time_point_totals: list
         treatment: string
-        treatment_type: string
+        treatment_type: list
     Gene:
       properties:
         all_identifiers: list
         alternate_functional_descriptions: list
         annotation_quality: int
         annotation_types: list
-        catalytic_activities: list
         closest_ortholog_genera: list
         closest_ortholog_group_size: int
+        cluster_membership_count: int
+        cluster_types: list
         end: int
         expression_edge_count: int
         function_description: string
         gene_category: string
         gene_name: string
-        gene_name_synonyms: list
         gene_summary: string
         id: string
         locus_tag: string
         organism_name: string
         preferred_id: string
         product: string
-        protein_family: string
         protein_id: string
+        signal_peptide: string
         significant_down_count: int
         significant_up_count: int
         start: int
         strand: string
-        transmembrane_regions: list
+    GeneCluster:
+      properties:
+        expression_dynamics: string
+        functional_description: string
+        id: string
+        member_count: int
+        name: string
+        organism_name: string
+        preferred_id: string
+        temporal_pattern: string
     GeneOntology:
       properties:
         id: string
+        level: int
+        level_is_best_effort: string
         name: string
         preferred_id: string
     GroupingClass:
       properties:
-        consensus_gene_name: string
-        consensus_product: string
-        description: string
+        expression_dynamics: string
         functional_description: string
-        genera: list
-        has_cross_genus_members: string
         id: string
         member_count: int
         name: string
-        organism_count: int
+        organism_name: string
         preferred_id: string
-        source: string
-        specificity_rank: int
-        taxon_id: int
-        taxonomic_level: string
+        temporal_pattern: string
     InformationContentEntity:
       properties:
-        abstract: string
-        authors: list
-        description: string
-        doi: string
-        experiment_count: int
+        background_factors: list
+        cluster_count: int
+        cluster_method: string
+        cluster_type: string
+        experimental_context: string
         id: string
-        journal: string
-        omics_types: list
-        organisms: list
+        light_condition: string
+        name: string
+        omics_type: string
+        organism_name: string
         preferred_id: string
-        publication_year: int
-        study_type: string
-        title: string
-        treatment_types: list
+        total_gene_count: int
+        treatment: string
+        treatment_type: list
     InvestigativeProcess:
       properties:
+        background_factors: list
+        cluster_count: int
+        cluster_types: list
+        clustering_analysis_count: int
         coculture_partner: string
         control: string
         experimental_context: string
         gene_count: int
+        growth_phases: list
         id: string
         is_time_course: string
         light_condition: string
@@ -221,48 +263,44 @@ schema:
         time_point_significant_up: list
         time_point_totals: list
         treatment: string
-        treatment_type: string
+        treatment_type: list
     KeggTerm:
       properties:
         id: string
-        level: string
+        level: int
+        level_kind: string
         name: string
         preferred_id: string
     MolecularFunction:
       properties:
         id: string
+        level: int
+        level_is_best_effort: string
         name: string
         preferred_id: string
     NamedThing:
       properties:
-        annotation_score: float
-        catalytic_activities: list
-        cofactor_names: list
-        ec_numbers: list
-        eggnog_ids: string
-        gene_names: list
-        gene_symbol: string
-        go_biological_processes: list
-        go_cellular_components: list
-        go_molecular_functions: list
+        background_factors: list
+        cluster_count: int
+        cluster_method: string
+        cluster_type: string
+        experimental_context: string
         id: string
-        is_reviewed: string
-        keyword_ids: list
-        keywords: list
-        locus_tag: string
-        molecular_mass: int
-        pfam_ids: list
+        light_condition: string
+        name: string
+        omics_type: string
+        organism_name: string
         preferred_id: string
-        protein_family: string
-        protein_synonyms: string
-        proteome_ids: list
-        refseq_ids: list
-        sequence_length: int
-        signal_peptide: string
-        transmembrane_regions: list
+        total_gene_count: int
+        treatment: string
+        treatment_type: list
     OrganismTaxon:
       properties:
+        background_factors: list
         clade: string
+        cluster_count: int
+        cluster_types: list
+        clustering_analysis_count: int
         experiment_count: int
         family: string
         gene_count: int
@@ -286,6 +324,8 @@ schema:
     OrganismalEntity:
       properties:
         id: string
+        level: int
+        level_is_best_effort: string
         name: string
         preferred_id: string
     OrthologGroup:
@@ -308,12 +348,14 @@ schema:
     Pfam:
       properties:
         id: string
+        level: int
         name: string
         preferred_id: string
         short_name: string
     PfamClan:
       properties:
         id: string
+        level: int
         name: string
         preferred_id: string
     Polypeptide:
@@ -374,6 +416,10 @@ schema:
       properties:
         abstract: string
         authors: list
+        background_factors: list
+        cluster_count: int
+        cluster_types: list
+        clustering_analysis_count: int
         description: string
         doi: string
         experiment_count: int
@@ -395,6 +441,7 @@ schema:
       properties:
         code: string
         id: string
+        level: int
         name: string
         preferred_id: string
   relationships:
@@ -462,6 +509,17 @@ schema:
       - GeneOntology
       - NamedThing
       properties: {}
+    Brite_category_is_a_brite_category:
+      source_labels:
+      - BriteCategory
+      - Entity
+      - NamedThing
+      target_labels:
+      - BriteCategory
+      - Entity
+      - NamedThing
+      properties:
+        id: string
     Cellular_component_is_a_cellular_component:
       source_labels:
       - AnatomicalEntity
@@ -507,15 +565,38 @@ schema:
         adjusted_p_value: float
         expression_direction: string
         expression_status: string
+        growth_phase: string
         id: string
         log2_fold_change: float
         rank_by_effect: int
-        rank_down: int
         rank_up: int
         significant: string
         time_point: string
         time_point_hours: float
         time_point_order: int
+    ClusteringAnalysisHasGeneCluster:
+      source_labels:
+      - ClusteringAnalysis
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      target_labels:
+      - GeneCluster
+      - GroupingClass
+      properties:
+        id: string
+    ClusteringanalysisBelongsToOrganism:
+      source_labels:
+      - ClusteringAnalysis
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      target_labels:
+      - Entity
+      - NamedThing
+      - OrganismTaxon
+      properties:
+        id: string
     Cyanorak_role_is_a_cyanorak_role:
       source_labels:
       - CyanorakRole
@@ -537,6 +618,17 @@ schema:
       - Entity
       - NamedThing
       properties: {}
+    ExperimentHasClusteringAnalysis:
+      source_labels:
+      - Experiment
+      - InvestigativeProcess
+      target_labels:
+      - ClusteringAnalysis
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      properties:
+        id: string
     Gene_belongs_to_organism:
       source_labels:
       - BiologicalEntity
@@ -651,6 +743,17 @@ schema:
       - NamedThing
       properties:
         id: string
+    Gene_in_gene_cluster:
+      source_labels:
+      - GeneCluster
+      - GroupingClass
+      target_labels:
+      - BiologicalEntity
+      - Entity
+      - Gene
+      - NamedThing
+      properties:
+        id: string
     Gene_in_ortholog_group:
       source_labels:
       - BiologicalEntity
@@ -706,6 +809,17 @@ schema:
         licence: string
         source: string
         version: string
+    Kegg_term_in_brite_category:
+      source_labels:
+      - Entity
+      - KeggTerm
+      - NamedThing
+      target_labels:
+      - BriteCategory
+      - Entity
+      - NamedThing
+      properties:
+        id: string
     Kegg_term_is_a_kegg_term:
       source_labels:
       - Entity
@@ -791,6 +905,19 @@ schema:
         licence: string
         source: string
         version: string
+    PublicationHasClusteringAnalysis:
+      source_labels:
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      - Publication
+      target_labels:
+      - ClusteringAnalysis
+      - Entity
+      - InformationContentEntity
+      - NamedThing
+      properties:
+        id: string
     Tests_coculture_with:
       source_labels:
       - Experiment
