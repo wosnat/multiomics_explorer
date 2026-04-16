@@ -1222,6 +1222,11 @@ def genes_by_ontology(
 
     conn = _default_conn(conn)
 
+    # Resolve organism to canonical name (fuzzy → exact)
+    organism = _validate_organism_inputs(
+        organism=organism, locus_tags=None, experiment_ids=None, conn=conn,
+    )
+
     # --- Query V: validate term_ids (only when provided) ---
     not_found: list[str] = []
     wrong_ontology: list[str] = []

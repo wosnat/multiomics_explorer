@@ -954,6 +954,11 @@ class TestSearchOntology:
 class TestGenesByOntology:
     """Tests the 4-query composer: Query V -> Per-term -> Per-gene -> Detail."""
 
+    @staticmethod
+    def _org_resolve(name="Prochlorococcus MED4"):
+        """Mock organism resolution response (first query after conn)."""
+        return [{"organisms": [name]}]
+
     def _validate_rows(self, classifications):
         """Build mock Query V output: [(tid, status, matched_label), ...]."""
         return [
@@ -987,8 +992,9 @@ class TestGenesByOntology:
         ]
 
     def test_mode2_level_only_happy_path(self, mock_conn):
-        # No term_ids -> skip Query V. Runs A, B, D.
+        # No term_ids -> skip Query V. Runs Org-resolve, A, B, D.
         mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
             # Query A (per-term)
             self._per_term_rows(
                 ("go:0022414", "reproductive process", 1, False, 7,
@@ -1036,10 +1042,11 @@ class TestGenesByOntology:
         # detail
         assert len(result["results"]) == 2
         assert result["returned"] == 2
-        assert mock_conn.execute_query.call_count == 3
+        assert mock_conn.execute_query.call_count == 4
 
     def test_mode1_term_ids_only_runs_validate(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
             # Query V
             self._validate_rows([("go:0006260", "ok", "BiologicalProcess")]),
             # Query A
@@ -1063,10 +1070,11 @@ class TestGenesByOntology:
         assert result["not_found"] == []
         assert result["wrong_ontology"] == []
         assert result["filtered_out"] == []
-        assert mock_conn.execute_query.call_count == 4
+        assert mock_conn.execute_query.call_count == 5
 
     def test_validation_buckets(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
             # Query V -- mixed statuses
             self._validate_rows([
                 ("go:0006260", "ok", "BiologicalProcess"),
@@ -1098,6 +1106,7 @@ class TestGenesByOntology:
     def test_filtered_out_bucket(self, mock_conn):
         # ok term_ids that don't appear in Query A output -> filtered_out.
         mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
             self._validate_rows([
                 ("go:0006260", "ok", "BiologicalProcess"),
                 ("go:0006412", "ok", "BiologicalProcess"),  # filtered out
@@ -1120,6 +1129,7 @@ class TestGenesByOntology:
 
     def test_summary_mode_skips_detail(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
             self._per_term_rows(
                 ("go:0022414", "reproductive process", 1, False, 7,
                  [{"item": "Cell cycle", "count": 7}]),
@@ -1137,7 +1147,7 @@ class TestGenesByOntology:
         assert result["results"] == []
         assert result["returned"] == 0
         assert result["truncated"] is True  # total_matching > 0 but returned=0
-        assert mock_conn.execute_query.call_count == 2  # no detail
+        assert mock_conn.execute_query.call_count == 3  # org-resolve + A + B, no detail
 
     def test_missing_level_and_term_ids_raises(self, mock_conn):
         with pytest.raises(ValueError, match="level.*term_ids"):
@@ -1161,6 +1171,7 @@ class TestGenesByOntology:
 
     def test_best_effort_terms_counted(self, mock_conn):
         mock_conn.execute_query.side_effect = [
+            self._org_resolve(),
             self._per_term_rows(
                 ("go:A", "A", 1, True, 5, []),
                 ("go:B", "B", 1, False, 10, []),
