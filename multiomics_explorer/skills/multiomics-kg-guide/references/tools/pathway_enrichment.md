@@ -13,6 +13,7 @@ See docs://analysis/enrichment for methodology and examples.
 | organism | string | — | Organism (case-insensitive fuzzy match, e.g. 'MED4'). Single-organism enforced. |
 | experiment_ids | list[string] | — | Experiments to pull DE from. Get IDs from list_experiments. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam') | — | Ontology for pathway definitions. Run ontology_landscape first to rank by relevance. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of level or term_ids required. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. |
 | direction | string ('up', 'down', 'both') | both | DE direction(s) to include in gene_sets. |

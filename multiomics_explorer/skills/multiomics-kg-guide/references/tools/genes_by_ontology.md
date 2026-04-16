@@ -19,6 +19,7 @@ search_ontology. For per-gene ontology details, use gene_ontology_terms.
 |---|---|---|---|
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam') | — | Ontology for these term_ids / this level. |
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. Use list_organisms for valid values. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 | level | int \| None | None | Hierarchy level to roll UP to. 0 = broadest. At least one of `level` or `term_ids` must be provided. |
 | term_ids | list[string] \| None | None | Ontology term IDs (from search_ontology). Mode 1 (no `level`): expand DOWN from each input term. Mode 3 (with `level`): scope rollup to these level-N terms. |
 | min_gene_set_size | int | 5 | Exclude terms with fewer organism-scoped genes than this. |

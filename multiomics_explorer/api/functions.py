@@ -1210,6 +1210,7 @@ def genes_by_ontology(
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    tree: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -1232,6 +1233,8 @@ def genes_by_ontology(
         raise ValueError(
             "At least one of `level` or `term_ids` must be provided."
         )
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
     if min_gene_set_size < 0:
         raise ValueError("min_gene_set_size must be >= 0.")
     if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
@@ -1280,6 +1283,7 @@ def genes_by_ontology(
             level=level, term_ids=effective_term_ids,
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
+            tree=tree,
         )
         per_term = conn.execute_query(pt_cypher, **pt_params)
 
@@ -1289,6 +1293,7 @@ def genes_by_ontology(
             level=level, term_ids=effective_term_ids,
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
+            tree=tree,
         )
         per_gene = conn.execute_query(pg_cypher, **pg_params)
 
@@ -1392,6 +1397,7 @@ def genes_by_ontology(
         min_gene_set_size=min_gene_set_size,
         max_gene_set_size=max_gene_set_size,
         verbose=verbose, limit=limit, offset=offset,
+        tree=tree,
     )
     results = conn.execute_query(det_cypher, **det_params)
 
@@ -1400,6 +1406,12 @@ def genes_by_ontology(
         for r in results:
             if r.get("level_is_best_effort") is False:
                 r.pop("level_is_best_effort", None)
+
+    # Strip sparse tree/tree_code for non-BRITE results
+    for r in results:
+        if r.get("tree") is None:
+            r.pop("tree", None)
+            r.pop("tree_code", None)
 
     envelope["returned"] = len(results)
     envelope["truncated"] = total_matching > offset + len(results)
@@ -2732,6 +2744,7 @@ def ontology_landscape(
     offset: int = 0,
     min_gene_set_size: int = 5,
     max_gene_set_size: int = 500,
+    tree: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -2754,6 +2767,8 @@ def ontology_landscape(
             f"Invalid ontology '{ontology}'. "
             f"Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
     if summary:
         limit = 0
 
@@ -2795,6 +2810,7 @@ def ontology_landscape(
             ontology=ont, organism_name=canonical_org, verbose=verbose,
             min_gene_set_size=min_gene_set_size,
             max_gene_set_size=max_gene_set_size,
+            tree=tree if ont == "brite" else None,
         )
         stat_rows = conn.execute_query(ls_cypher, **ls_params)
         n_levels = len(stat_rows)
@@ -2815,6 +2831,7 @@ def ontology_landscape(
             )
 
         for r in stat_rows:
+            tree_val = r.get("tree")
             row: dict = {
                 "ontology_type": ont,
                 "level": r["level"],
@@ -2839,6 +2856,9 @@ def ontology_landscape(
                 )
             else:
                 row["best_effort_share"] = None
+            if tree_val is not None:
+                row["tree"] = tree_val
+                row["tree_code"] = r.get("tree_code")
             if verbose:
                 row["example_terms"] = r["example_terms"]
             if valid_eids:
@@ -2863,19 +2883,25 @@ def ontology_landscape(
         r["relevance_rank"] = i + 1
         r.pop("_score", None)
 
-    # by_ontology: summary keyed by ontology_type; first row per ontology
-    # (already sorted by rank) provides best_* fields.
+    # by_ontology: summary keyed by ontology_type (or "brite:tree_name"
+    # for BRITE with tree); first row per key (already sorted by rank)
+    # provides best_* fields.
     by_ontology: dict[str, dict] = {}
     for r in all_rows:
         ont = r["ontology_type"]
-        if ont not in by_ontology:
-            by_ontology[ont] = {
+        tree_val = r.get("tree")
+        key = f"{ont}:{tree_val}" if tree_val else ont
+        if key not in by_ontology:
+            by_ontology[key] = {
                 "best_level": r["level"],
                 "best_genome_coverage": r["genome_coverage"],
                 "best_relevance_rank": r["relevance_rank"],
                 "n_levels": 0,
             }
-        by_ontology[ont]["n_levels"] += 1
+            if tree_val:
+                by_ontology[key]["tree"] = tree_val
+                by_ontology[key]["tree_code"] = r.get("tree_code")
+        by_ontology[key]["n_levels"] += 1
 
     # Step 6: Paginate + envelope
     total_matching = len(all_rows)
@@ -2937,6 +2963,12 @@ def _build_pathway_enrichment_envelope(
             drop_cols = [c for c in ("foreground_gene_ids", "background_gene_ids") if c in sliced.columns]
             sliced = sliced.drop(columns=drop_cols)
         returned_rows = sliced.to_dict(orient="records")
+        # Strip sparse tree/tree_code for non-BRITE results
+        for r in returned_rows:
+            tree_v = r.get("tree")
+            if tree_v is None or (isinstance(tree_v, float) and pd.isna(tree_v)):
+                r.pop("tree", None)
+                r.pop("tree_code", None)
         returned = len(returned_rows)
         truncated = (offset + returned) < total_matching
 
@@ -3127,6 +3159,7 @@ def pathway_enrichment(
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    tree: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -3140,6 +3173,8 @@ def pathway_enrichment(
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}"
         )
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
     if level is None and not term_ids:
         raise ValueError(
             "At least one of `level` or `term_ids` must be provided."
@@ -3218,6 +3253,7 @@ def pathway_enrichment(
         verbose=False,
         limit=None,
         offset=0,
+        tree=tree,
         conn=conn,
     )
     from multiomics_explorer.analysis.frames import to_dataframe

@@ -1280,6 +1280,40 @@ class TestBuildGenesByOntologyDetail:
         # No explicit leaf→t walk
         assert "(leaf)-[:" not in cypher
 
+    def test_returns_tree_columns(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="brite", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+        )
+        assert "t.tree AS tree" in cypher
+        assert "t.tree_code AS tree_code" in cypher
+
+    def test_tree_filter(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, params = build_genes_by_ontology_detail(
+            ontology="brite", organism="Test Org",
+            level=1, min_gene_set_size=5, max_gene_set_size=500,
+            tree="transporters",
+        )
+        assert "t.tree = $tree" in cypher
+        assert params["tree"] == "transporters"
+
+    def test_tree_non_brite_raises(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_genes_by_ontology_detail(
+                ontology="go_bp", organism="Test Org",
+                level=2, min_gene_set_size=5, max_gene_set_size=500,
+                tree="x",
+            )
+
 
 class TestBuildGenesByOntologyPerTerm:
     def test_mode2_returns_per_term_aggregate(self):
@@ -3858,6 +3892,35 @@ class TestBuildOntologyLandscape:
         assert "ORDER BY n_g_per_term DESC" in cypher
         assert "[0..3] AS example_terms" in cypher
         assert "example_terms" in cypher.split("RETURN", 1)[1]  # in RETURN
+
+    def test_returns_tree_columns(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="brite", organism_name="Test Org",
+        )
+        assert "t.tree AS tree" in cypher
+        assert "t.tree_code AS tree_code" in cypher
+
+    def test_groups_by_tree(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="brite", organism_name="Test Org",
+        )
+        # Tree should be in grouping WITH clause
+        assert "tree" in cypher
+
+    def test_tree_filter(self):
+        cypher, params = build_ontology_landscape(
+            ontology="brite", organism_name="Test Org",
+            tree="transporters",
+        )
+        assert "t.tree = $tree" in cypher
+        assert params["tree"] == "transporters"
+
+    def test_tree_non_brite_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_ontology_landscape(
+                ontology="go_bp", organism_name="Test Org",
+                tree="transporters",
+            )
 
 
 # ---------------------------------------------------------------------------

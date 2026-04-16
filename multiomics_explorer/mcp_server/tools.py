@@ -67,6 +67,8 @@ class PathwayEnrichmentResult(BaseModel):
     level: int | None = Field(
         default=None, description="Hierarchy depth of the term (0 = root)"
     )
+    tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
+    tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
     gene_ratio: str = Field(
         description="'k/n' string — DE genes in pathway over total DE genes in cluster (clusterProfiler: GeneRatio)"
     )
@@ -1047,6 +1049,8 @@ def register_tools(mcp: FastMCP):
         term_id: str = Field(description="Ontology term ID (e.g. 'go:0050896')")
         term_name: str = Field(description="Term name (e.g. 'response to stimulus')")
         level: int = Field(description="Hierarchy level of this term (0 = broadest)")
+        tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
+        tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
         # verbose only
         function_description: str | None = Field(default=None,
             description="Curated functional description (verbose only)")
@@ -1123,6 +1127,9 @@ def register_tools(mcp: FastMCP):
             description="Organism (case-insensitive substring match, e.g. 'MED4'). "
                         "Required — single-valued. Use list_organisms for valid values.",
         )],
+        tree: Annotated[str | None, Field(
+            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+        )] = None,
         level: Annotated[int | None, Field(
             description="Hierarchy level to roll UP to. 0 = broadest. "
                         "At least one of `level` or `term_ids` must be provided.",
@@ -1178,7 +1185,8 @@ def register_tools(mcp: FastMCP):
                 min_gene_set_size=min_gene_set_size,
                 max_gene_set_size=max_gene_set_size,
                 summary=summary, verbose=verbose,
-                limit=limit, offset=offset, conn=conn,
+                limit=limit, offset=offset,
+                tree=tree, conn=conn,
             )
             if data["wrong_ontology"]:
                 await ctx.warning(
@@ -3407,6 +3415,8 @@ def register_tools(mcp: FastMCP):
     class OntologyLandscapeRow(BaseModel):
         ontology_type: str = Field(description="Ontology key (e.g. 'cyanorak_role')")
         level: int = Field(description="Hierarchy level; 0 = broadest")
+        tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
+        tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
         relevance_rank: int = Field(
             description="1-indexed rank by spec_score; stable under pagination",
         )
@@ -3442,6 +3452,8 @@ def register_tools(mcp: FastMCP):
         best_genome_coverage: float
         best_relevance_rank: int
         n_levels: int
+        tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
+        tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
 
     class OntologyLandscapeResponse(BaseModel):
         organism_name: str
@@ -3470,6 +3482,9 @@ def register_tools(mcp: FastMCP):
                     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite"] | None,
             Field(description="If None, surveys all 10 ontologies."),
         ] = None,
+        tree: Annotated[str | None, Field(
+            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+        )] = None,
         experiment_ids: Annotated[
             list[str] | None,
             Field(description="Restrict coverage computation to genes "
@@ -3510,7 +3525,7 @@ def register_tools(mcp: FastMCP):
                 limit=limit, offset=offset,
                 min_gene_set_size=min_gene_set_size,
                 max_gene_set_size=max_gene_set_size,
-                conn=conn,
+                tree=tree, conn=conn,
             )
             return OntologyLandscapeResponse(**data)
         except ValueError as e:
@@ -3539,6 +3554,9 @@ def register_tools(mcp: FastMCP):
         ], Field(
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
+        tree: Annotated[str | None, Field(
+            description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
+        )] = None,
         level: Annotated[int | None, Field(
             description="Hierarchy level (0 = root). At least one of level or term_ids required.",
             ge=0,
@@ -3612,6 +3630,7 @@ def register_tools(mcp: FastMCP):
                 verbose=verbose,
                 limit=limit,
                 offset=offset,
+                tree=tree,
                 conn=conn,
             )
         except ValueError as e:

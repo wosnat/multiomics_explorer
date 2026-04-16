@@ -16,6 +16,7 @@ experiments' quantified genes. See docs://tools/ontology_landscape.
 |---|---|---|---|
 | organism | string | — | Organism (fuzzy match, e.g. 'MED4'). |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam') \| None | None | If None, surveys all 9 ontologies. |
+| tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
 | verbose | bool | False | Include example_terms (top 3 terms per level). |

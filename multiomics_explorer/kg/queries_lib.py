@@ -1404,6 +1404,7 @@ def _genes_by_ontology_match_stage(
     level: int | None,
     term_ids: list[str] | None,
     organism: str,
+    tree: str | None = None,
 ) -> tuple[str, dict]:
     """Shared MATCH + size-filter-WITH for detail/per_term/per_gene builders.
 
@@ -1413,6 +1414,9 @@ def _genes_by_ontology_match_stage(
     Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
     into params, and for appending their own UNWIND/RETURN tail.
     """
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
+
     params: dict = {"org": organism}
 
     if level is None:
@@ -1468,6 +1472,9 @@ def _genes_by_ontology_match_stage(
         if term_ids is not None:
             level_clause += " AND t.id IN $term_ids"
             params["term_ids"] = term_ids
+        if tree is not None:
+            level_clause += " AND t.tree = $tree"
+            params["tree"] = tree
         if walk:
             cypher_head = f"{bind}\n{walk}\n{level_clause}\n"
         else:
@@ -1496,6 +1503,7 @@ def build_genes_by_ontology_detail(
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
+    tree: str | None = None,
 ) -> tuple[str, dict]:
     """Build (gene × term) detail query. Dispatches on (level, term_ids).
 
@@ -1522,6 +1530,7 @@ def build_genes_by_ontology_detail(
 
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+        tree=tree,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -1535,7 +1544,8 @@ def build_genes_by_ontology_detail(
     return_block = (
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
-        "       t.id AS term_id, t.name AS term_name, t.level AS level"
+        "       t.id AS term_id, t.name AS term_name, t.level AS level,\n"
+        "       t.tree AS tree, t.tree_code AS tree_code"
         f"{verbose_cols}\n"
         "ORDER BY t.id, g.locus_tag"
     )
@@ -1566,6 +1576,7 @@ def build_genes_by_ontology_per_term(
     term_ids: list[str] | None,
     min_gene_set_size: int,
     max_gene_set_size: int | None,
+    tree: str | None = None,
 ) -> tuple[str, dict]:
     """Per-term aggregate. One row per surviving term.
 
@@ -1581,6 +1592,7 @@ def build_genes_by_ontology_per_term(
     """
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+        tree=tree,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -1590,6 +1602,7 @@ def build_genes_by_ontology_per_term(
         "WITH t, collect({lt: g.locus_tag, "
         "cat: coalesce(g.gene_category, 'Unknown')}) AS gene_rows\n"
         "RETURN t.id AS term_id, t.name AS term_name, t.level AS level,\n"
+        "       t.tree AS tree, t.tree_code AS tree_code,\n"
         "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
         "       size(gene_rows) AS n_genes,\n"
         "       apoc.coll.frequencies("
@@ -1607,6 +1620,7 @@ def build_genes_by_ontology_per_gene(
     term_ids: list[str] | None,
     min_gene_set_size: int,
     max_gene_set_size: int | None,
+    tree: str | None = None,
 ) -> tuple[str, dict]:
     """Per-gene aggregate. One row per surviving gene.
 
@@ -1616,6 +1630,7 @@ def build_genes_by_ontology_per_gene(
     """
     head, params = _genes_by_ontology_match_stage(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+        tree=tree,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -3913,6 +3928,7 @@ def build_ontology_landscape(
     verbose: bool = False,
     min_gene_set_size: int = 5,
     max_gene_set_size: int = 500,
+    tree: str | None = None,
 ) -> tuple[str, dict]:
     """Per-(ontology, level) aggregated landscape stats for one ontology.
 
@@ -3933,12 +3949,20 @@ def build_ontology_landscape(
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
 
     # Unified hierarchy walk via _hierarchy_walk helper.
     # This corrects the previous flat-Pfam treatment: Pfam is actually 2-level
     # (Pfam leaf + PfamClan parent), and the helper walks Pfam_in_pfam_clan.
     frag = _hierarchy_walk(ontology, direction="up")
     walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
+
+    # Tree filter (BRITE only): applied after the hierarchy walk, before
+    # per-term aggregation.
+    tree_filter = ""
+    if tree is not None:
+        tree_filter = "WHERE t.tree = $tree\n"
 
     # Verbose clauses — Python string composition so compute is
     # short-circuited when verbose=False (see scoping D4).
@@ -3959,12 +3983,13 @@ def build_ontology_landscape(
     cypher = (
         f"{frag['bind_up']}\n"
         f"{walk}"
+        f"{tree_filter}"
         "WITH t, count(DISTINCT g) AS n_g_per_term, "
         "collect(DISTINCT g) AS term_genes\n"
         "WHERE n_g_per_term >= $min_gene_set_size "
         "AND n_g_per_term <= $max_gene_set_size\n"
         f"{pre_sort}"
-        "WITH t.level AS level,\n"
+        "WITH t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
         "     count(t) AS n_terms_with_genes,\n"
         "     min(n_g_per_term) AS min_genes_per_term,\n"
         "     percentileCont(toFloat(n_g_per_term), 0.25) AS q1_genes_per_term,\n"
@@ -3975,18 +4000,21 @@ def build_ontology_landscape(
         "     sum(CASE WHEN t.level_is_best_effort IS NOT NULL "
         "THEN 1 ELSE 0 END) AS n_best_effort"
         f"{verbose_agg}\n"
-        "RETURN level, n_terms_with_genes,\n"
+        "RETURN level, tree, tree_code, n_terms_with_genes,\n"
         "       size(all_genes) AS n_genes_at_level,\n"
         "       min_genes_per_term, q1_genes_per_term, median_genes_per_term,\n"
         "       q3_genes_per_term, max_genes_per_term,\n"
         f"       n_best_effort{verbose_ret}\n"
         "ORDER BY level"
     )
-    return cypher, {
+    params = {
         "org": organism_name,
         "min_gene_set_size": min_gene_set_size,
         "max_gene_set_size": max_gene_set_size,
     }
+    if tree is not None:
+        params["tree"] = tree
+    return cypher, params
 
 
 def build_ontology_expcov(
