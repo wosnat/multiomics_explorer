@@ -15,7 +15,7 @@ experiments' quantified genes. See docs://tools/ontology_landscape.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string | — | Organism (fuzzy match, e.g. 'MED4'). |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam') \| None | None | If None, surveys all 9 ontologies. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite') \| None | None | If None, surveys all 10 ontologies. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
@@ -52,6 +52,8 @@ organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_ma
 |---|---|---|
 | ontology_type | string | Ontology key (e.g. 'cyanorak_role') |
 | level | int | Hierarchy level; 0 = broadest |
+| tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
+| tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 | relevance_rank | int | 1-indexed rank by spec_score; stable under pagination |
 | n_terms_with_genes | int |  |
 | n_genes_at_level | int |  |
@@ -96,7 +98,13 @@ ontology_landscape(organism="MED4", ontology="go_bp", verbose=True)
 {"organism_name": "Prochlorococcus MED4", "n_ontologies": 1, "results": [{"ontology_type": "go_bp", "level": 2, "relevance_rank": 1, "example_terms": [{"term_id": "go:0044238", "name": "primary metabolic process", "n_genes": 657}]}]}
 ```
 
-### Example 3: Weight by experiments (coverage of quantified genes)
+### Example 3: BRITE landscape scoped to a specific tree
+
+```example-call
+ontology_landscape(organism="MED4", ontology="brite", tree="transporters")
+```
+
+### Example 4: Weight by experiments (coverage of quantified genes)
 
 ```
 Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])
@@ -136,6 +144,8 @@ results[0]['rank']  # AttributeError
 ```correction
 results[0]['relevance_rank']
 ```
+
+- BRITE stats at each level mix all trees together by default. Use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). BRITE rows are broken down per tree when `tree` is specified. Use `list_filter_values('brite_tree')` to discover available trees.
 
 ```mistake
 result['total_rows']  # KeyError

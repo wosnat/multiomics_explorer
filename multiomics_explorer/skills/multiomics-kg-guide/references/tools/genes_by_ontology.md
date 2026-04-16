@@ -17,7 +17,7 @@ search_ontology. For per-gene ontology details, use gene_ontology_terms.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam') | — | Ontology for these term_ids / this level. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite') | — | Ontology for these term_ids / this level. |
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. Use list_organisms for valid values. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 | level | int \| None | None | Hierarchy level to roll UP to. 0 = broadest. At least one of `level` or `term_ids` must be provided. |
@@ -74,6 +74,8 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 | term_id | string | Ontology term ID (e.g. 'go:0050896') |
 | term_name | string | Term name (e.g. 'response to stimulus') |
 | level | int | Hierarchy level of this term (0 = broadest) |
+| tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
+| tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -116,13 +118,19 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1, term_ids=[
 genes_by_ontology(ontology="go_bp", organism="MED4", level=1, summary=True)
 ```
 
-### Example 5: Inspect all terms (override size filter)
+### Example 5: BRITE tree-scoped rollup (transporters at category level)
+
+```example-call
+genes_by_ontology(ontology="brite", organism="MED4", level=1, tree="transporters")
+```
+
+### Example 6: Inspect all terms (override size filter)
 
 ```example-call
 genes_by_ontology(ontology="go_bp", organism="MED4", level=1, min_gene_set_size=0, max_gene_set_size=100000)
 ```
 
-### Example 6: From level-survey to pathway defs
+### Example 7: From level-survey to pathway defs
 
 ```
 Step 1: ontology_landscape(organism="MED4")
@@ -161,6 +169,8 @@ genes_by_ontology → gene_overview
 - Pfam is a 2-level ontology: `level=1` → Pfam domains (leaf), `level=0` → PfamClan (parent). Both kinds of IDs are accepted under `ontology='pfam'`.
 
 - KEGG: gene edges only hit the KO leaf (`level=3`). Passing `level=0/1/2` rolls up to category/subcategory/pathway via `is_a`.
+
+- BRITE: gene edges hit the KO leaf (`level=3`, same as KEGG). Passing `level=0/1/2` rolls up through BRITE tree hierarchy. Each BRITE tree is a separate functional classification — use `tree` to scope to a specific tree (e.g. `tree='transporters'`). Without `tree`, results mix all BRITE trees. Use `list_filter_values('brite_tree')` to discover available trees.
 
 - Flat ontologies (`cog_category`, `tigr_role`) have only `level=0`. Passing `level >= 1` in Mode 2 returns empty results; in Mode 3 the ids route to `wrong_level`.
 

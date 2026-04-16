@@ -43,8 +43,8 @@ total_entries, total_matching, score_max, score_median, returned, offset, trunca
 | name | string | Term name (e.g. 'DNA replication') |
 | score | float | Fulltext relevance score (e.g. 5.23) |
 | level | int | Hierarchy level of this term (0 = broadest) |
-| tree | string \| None | BRITE tree name (sparse: BRITE only) |
-| tree_code | string \| None | BRITE tree code (sparse: BRITE only) |
+| tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
+| tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 
 ## Few-shot examples
 
@@ -77,7 +77,35 @@ search_ontology(search_text="replication", ontology="go_bp")
 search_ontology(search_text="transport", ontology="go_bp", summary=True)
 ```
 
-### Example 3: From search to gene discovery
+### Example 3: BRITE search scoped to a specific tree
+
+```example-call
+search_ontology(search_text="transport", ontology="brite", tree="transporters")
+```
+
+```example-response
+{
+  "total_entries": 84,
+  "total_matching": 12,
+  "score_max": 3.1,
+  "score_median": 2.0,
+  "returned": 5,
+  "truncated": true,
+  "offset": 0,
+  "results": [
+    {"id": "brite:B99001", "name": "ABC transporters", "score": 3.1, "level": 1, "tree": "transporters", "tree_code": "ko02000"},
+    ...
+  ]
+}
+```
+
+### Example 4: Filter search results by hierarchy level
+
+```example-call
+search_ontology(search_text="oxido*", ontology="kegg", level=2)
+```
+
+### Example 5: From search to gene discovery
 
 ```
 Step 1: search_ontology(search_text="replication", ontology="go_bp")
@@ -103,6 +131,10 @@ search_ontology → genes_by_ontology → gene_overview
 - search_ontology finds term IDs — use genes_by_ontology to find (gene × term) pairs annotated to those terms (single organism required, hierarchy expanded DOWN by default)
 
 - This tool searches term names only — it does not traverse the ontology hierarchy
+
+- For brite: term IDs look like 'brite:ko00001' (tree root) or 'brite:K00001' (leaf KO). BRITE trees mix functional and taxonomic hierarchies — confirm the tree context before using term IDs in genes_by_ontology.
+
+- Use `level` to restrict results to a specific hierarchy depth (0 = broadest). Use `tree` to scope BRITE searches to a single tree (e.g. 'transporters'). Both filters are optional.
 
 ```mistake
 search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene

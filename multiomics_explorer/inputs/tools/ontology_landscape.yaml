@@ -13,6 +13,9 @@ examples:
     response: |
       {"organism_name": "Prochlorococcus MED4", "n_ontologies": 1, "results": [{"ontology_type": "go_bp", "level": 2, "relevance_rank": 1, "example_terms": [{"term_id": "go:0044238", "name": "primary metabolic process", "n_genes": 657}]}]}
 
+  - title: BRITE landscape scoped to a specific tree
+    call: ontology_landscape(organism="MED4", ontology="brite", tree="transporters")
+
   - title: Weight by experiments (coverage of quantified genes)
     steps: |
       Step 1: list_experiments(organism="MED4", table_scope=["all_detected_genes"])
@@ -40,6 +43,6 @@ mistakes:
   - "Stats reflect only terms with min_gene_set_size <= genes <= max_gene_set_size (default 5-500). If you pass min_gene_set_size=1, coverage and term counts will be higher but include terms too small or large for meaningful enrichment."
   - wrong: "results[0]['rank']  # AttributeError"
     right: "results[0]['relevance_rank']"
-  - "BRITE stats at each level mix all 12 trees together. For tree-specific analysis, use search_ontology to find term IDs in the target tree, then pass them to genes_by_ontology."
+  - "BRITE stats at each level mix all trees together by default. Use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). BRITE rows are broken down per tree when `tree` is specified. Use `list_filter_values('brite_tree')` to discover available trees."
   - wrong: "result['total_rows']  # KeyError"
     right: "result['total_matching']"

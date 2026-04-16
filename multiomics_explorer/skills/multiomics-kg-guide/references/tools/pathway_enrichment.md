@@ -12,7 +12,7 @@ See docs://analysis/enrichment for methodology and examples.
 |---|---|---|---|
 | organism | string | — | Organism (case-insensitive fuzzy match, e.g. 'MED4'). Single-organism enforced. |
 | experiment_ids | list[string] | — | Experiments to pull DE from. Get IDs from list_experiments. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam') | — | Ontology for pathway definitions. Run ontology_landscape first to rank by relevance. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite') | — | Ontology for pathway definitions. Run ontology_landscape first to rank by relevance. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of level or term_ids required. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. |
@@ -77,6 +77,8 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 | term_id | string | Ontology term ID |
 | term_name | string | Ontology term display name |
 | level | int \| None (optional) | Hierarchy depth of the term (0 = root) |
+| tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
+| tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 | gene_ratio | string | 'k/n' string — DE genes in pathway over total DE genes in cluster (clusterProfiler: GeneRatio) |
 | gene_ratio_numeric | float | k/n as float |
 | bg_ratio | string | 'M/N' string — pathway members over background size (clusterProfiler: BgRatio) |
@@ -128,7 +130,13 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
 pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, term_ids=["cyanorak.role:J", "cyanorak.role:K"])
 ```
 
-### Example 6: From landscape to enrichment
+### Example 6: BRITE tree-scoped enrichment (transporters)
+
+```example-call
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="brite", tree="transporters", level=1)
+```
+
+### Example 7: From landscape to enrichment
 
 ```
 Step 1: ontology_landscape(organism="MED4", experiment_ids=[...])
@@ -161,6 +169,8 @@ differential_expression_by_gene → pathway_enrichment
 - At least one of `level` or `term_ids` must be provided (matches `genes_by_ontology`).
 
 - `min/max_gene_set_size` here means **M** — pathway size within each cluster's background (clusterProfiler semantics). This differs from `ontology_landscape`'s filter, which is organism-scoped. A pathway may be tested in one cluster and dropped in another when `background='table_scope'`.
+
+- For brite enrichment, use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). Without `tree`, all-BRITE enrichment is dominated by enzymes (~1,776 terms at level 3). Pick a specific level: `level=1` (BRITE category) or `level=2` (BRITE sub-category) are the most useful. Use `list_filter_values('brite_tree')` to discover trees → `ontology_landscape(ontology='brite', tree=...)` to pick level → `pathway_enrichment(ontology='brite', tree=..., level=...)` for enrichment.
 
 ```mistake
 pathway_enrichment(..., background='genome')  # not a valid string

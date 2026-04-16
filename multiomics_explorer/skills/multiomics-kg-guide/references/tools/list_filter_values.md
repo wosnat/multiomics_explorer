@@ -12,7 +12,7 @@ Use the returned values as filter parameters in `genes_by_function`
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string | gene_category | Which filter's valid values to return. 'gene_category': values for the category filter in genes_by_function. |
+| filter_type | string ('gene_category', 'brite_tree') | gene_category | Which filter's valid values to return. 'gene_category': values for the category filter in genes_by_function. 'brite_tree': BRITE tree names for the tree filter in ontology tools. |
 
 ## Response format
 
@@ -33,6 +33,7 @@ filter_type, total_entries, returned, truncated, results
 |---|---|---|
 | value | string | Filter value (e.g. 'Photosynthesis', 'Transport', 'Unknown') |
 | count | int | Number of genes/items with this value (e.g. 770) |
+| tree_code | string \| None (optional) | BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000') |
 
 ## Few-shot examples
 
@@ -56,7 +57,27 @@ list_filter_values(filter_type="gene_category")
 }
 ```
 
-### Example 2: Find genes in a category
+### Example 2: List BRITE trees
+
+```example-call
+list_filter_values(filter_type="brite_tree")
+```
+
+```example-response
+{
+  "filter_type": "brite_tree",
+  "total_entries": 12,
+  "returned": 12,
+  "truncated": false,
+  "results": [
+    {"value": "enzymes", "tree_code": "ko01000", "count": 1776},
+    {"value": "transporters", "tree_code": "ko02000", "count": 84},
+    {"value": "protein families: signaling and cellular processes", "tree_code": "ko04131", "count": 150}
+  ]
+}
+```
+
+### Example 3: Find genes in a category
 
 ```
 Step 1: list_filter_values(filter_type="gene_category")
@@ -66,15 +87,31 @@ Step 2: genes_by_function(search_text="photosystem", category="Photosynthesis")
         → get photosynthesis genes matching "photosystem"
 ```
 
+### Example 4: Discover BRITE trees, then scope enrichment
+
+```
+Step 1: list_filter_values(filter_type="brite_tree")
+        → discover available trees (e.g. "transporters", "enzymes")
+
+Step 2: ontology_landscape(organism="MED4", ontology="brite", tree="transporters")
+        → check coverage and pick level
+
+Step 3: pathway_enrichment(organism="MED4", experiment_ids=[...], ontology="brite", tree="transporters", level=1)
+        → run enrichment scoped to transporter categories
+```
+
 ## Chaining patterns
 
 ```
 list_filter_values → genes_by_function(category=...)
+list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_enrichment(tree=...)
 ```
 
 ## Common mistakes
 
 - count is summed across all organisms — a category with count=770 may cover genes in 10+ organisms
+
+- For brite_tree: count is the number of ontology terms in the tree, not genes. Use ontology_landscape to check gene coverage.
 
 ```mistake
 list_filter_values(category='Photosynthesis')  # no such param

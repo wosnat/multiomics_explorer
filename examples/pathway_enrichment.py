@@ -10,6 +10,7 @@ Scenarios:
     cluster      — cluster-membership enrichment (non-DE)
     ortholog     — ortholog-group enrichment (non-DE)
     custom       — manual gene list
+    brite        — BRITE tree-scoped enrichment (transporters)
 
 Each scenario prints a short summary (top 5 pathways by p_adjust).
 """
@@ -30,6 +31,7 @@ from multiomics_explorer import (
 from multiomics_explorer.api import (
     genes_by_ontology,
     list_experiments,
+    list_filter_values,
     list_organisms,
     ontology_landscape,
     gene_clusters_by_gene,
@@ -168,12 +170,73 @@ def scenario_5_custom(args: argparse.Namespace) -> None:
     _print_top(df, title="Custom gene-list enrichment")
 
 
+def scenario_6_brite(args: argparse.Namespace) -> None:
+    """BRITE tree-scoped enrichment (transporters)."""
+    # Step 1: discover BRITE trees.
+    trees = list_filter_values("brite_tree")
+    print("Available BRITE trees:")
+    for t in trees["results"][:5]:
+        print(f"  {t['value']} ({t.get('tree_code', '?')}): {t['count']} terms")
+
+    # Step 2: check landscape for transporters.
+    landscape = ontology_landscape(
+        organism=args.organism,
+        ontology="brite",
+        tree="transporters",
+    )
+    df_landscape = to_dataframe(landscape)
+    if df_landscape.empty:
+        print("No BRITE transporter landscape rows.")
+        return
+    print("\nTransporter landscape:")
+    cols = [c for c in ["ontology", "level", "genome_coverage", "median_genes_per_term", "relevance_rank", "tree"] if c in df_landscape.columns]
+    print(df_landscape.sort_values("relevance_rank").head(5)[cols].to_string(index=False))
+
+    # Step 3: pick experiments and run enrichment.
+    experiments = list_experiments(organism=args.organism, limit=50)
+    exp_ids = []
+    for e in experiments["results"]:
+        if "coculture" not in (e.get("treatment_type") or []):
+            exp_ids.append(e["experiment_id"])
+        if len(exp_ids) >= 3:
+            break
+    if not exp_ids:
+        print(f"No non-coculture experiments for organism={args.organism}")
+        return
+
+    inputs = de_enrichment_inputs(
+        experiment_ids=exp_ids,
+        organism=args.organism,
+        direction="both",
+        significant_only=True,
+    )
+    if not inputs.gene_sets:
+        print("No clusters produced (no significant DE rows).")
+        return
+
+    term2gene = to_dataframe(
+        genes_by_ontology(
+            ontology="brite", organism=args.organism, level=1, tree="transporters",
+        )
+    )
+    if term2gene.empty:
+        print("No transporter TERM2GENE rows.")
+        return
+
+    df = fisher_ora(
+        inputs.gene_sets, inputs.background, term2gene,
+        min_gene_set_size=3, max_gene_set_size=500,
+    )
+    _print_top(df, title="BRITE transporter enrichment")
+
+
 _SCENARIOS = {
     "landscape": scenario_1_landscape,
     "de": scenario_2_de,
     "cluster": scenario_3_cluster,
     "ortholog": scenario_4_homolog,
     "custom": scenario_5_custom,
+    "brite": scenario_6_brite,
 }
 
 

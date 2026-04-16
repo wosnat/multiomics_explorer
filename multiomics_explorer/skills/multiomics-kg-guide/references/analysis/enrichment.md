@@ -55,7 +55,7 @@ Calls `differential_expression_by_gene` and partitions the result into clusters 
 - `gene_sets` — dict of cluster → significant DE locus_tags (respects `direction` and
   `significant_only`).
 - `background` — dict of cluster → all quantified locus_tags for that experiment/timepoint
-  (the `table_scope` universe; see §8).
+  (the `table_scope` universe; see §9).
 - `cluster_metadata` — dict of cluster → experiment context fields.
 - `not_found`, `not_matched`, `no_expression` — partial-failure buckets (individual
   experiments with problems do not raise; they are collected here).
@@ -67,7 +67,7 @@ not just DE results. `background` may be a per-cluster dict or a shared list. Re
 DataFrame (one row per cluster × term pair) with compareCluster-compatible columns.
 
 The size filter acts on **M** (pathway members within the cluster's background), not the global
-pathway size. See §11 Gotchas.
+pathway size. See §12 Gotchas.
 
 ### `signed_enrichment_score(df, direction_col='direction', padj_col='p_adjust')`
 
@@ -113,7 +113,7 @@ df_landscape.sort_values("relevance_rank").head(10)
 ```
 
 `relevance_rank` bakes in both genome coverage and median term size; experiment-specific
-coverage is incorporated when you supply `experiment_ids`. See §9 for the full narrative.
+coverage is incorporated when you supply `experiment_ids`. See §10 for the full narrative.
 
 ---
 
@@ -261,7 +261,70 @@ df = fisher_ora(gene_sets, background, term2gene)
 
 ---
 
-## 8. Choosing a background
+## 8. BRITE enrichment
+
+BRITE is a collection of hierarchical classification trees from KEGG. Unlike other ontologies,
+BRITE encompasses multiple independent trees (enzymes, transporters, protein families, etc.),
+each with its own hierarchy. Running all-BRITE enrichment without tree scoping is typically
+dominated by enzymes (~1,776 terms at level 3), drowning out signal from smaller trees.
+
+**Always scope BRITE enrichment to a specific tree using the `tree` parameter.**
+
+### Worked example: transporter enrichment
+
+```python
+from multiomics_explorer.api import (
+    list_filter_values, ontology_landscape, genes_by_ontology,
+)
+from multiomics_explorer import de_enrichment_inputs, fisher_ora
+from multiomics_explorer.analysis.frames import to_dataframe
+
+# Step 1: Discover available BRITE trees.
+trees = list_filter_values("brite_tree")
+# trees["results"] -> [{"value": "enzymes", "count": 1776},
+#                       {"value": "transporters", "count": 84}, ...]
+
+# Step 2: Check coverage for the target tree.
+landscape = ontology_landscape(
+    organism="MED4", ontology="brite", tree="transporters",
+)
+df_landscape = to_dataframe(landscape)
+# Pick a level with good coverage — level=1 is BRITE category.
+
+# Step 3: Build TERM2GENE scoped to transporters.
+term2gene = to_dataframe(
+    genes_by_ontology(
+        ontology="brite", organism="MED4", level=1, tree="transporters",
+    )
+)
+
+# Step 4: Run enrichment (same Fisher pipeline as any other ontology).
+inputs = de_enrichment_inputs(
+    experiment_ids=["exp1"], organism="MED4",
+    direction="both", significant_only=True,
+)
+df = fisher_ora(inputs.gene_sets, inputs.background, term2gene)
+```
+
+The MCP tool supports the same workflow in a single call:
+
+```
+pathway_enrichment(
+    organism="MED4",
+    experiment_ids=[...],
+    ontology="brite",
+    tree="transporters",
+    level=1,
+)
+```
+
+The `tree` parameter is accepted by `search_ontology`, `genes_by_ontology`, `gene_ontology_terms`,
+`ontology_landscape`, and `pathway_enrichment`. Use `list_filter_values("brite_tree")` to
+discover valid tree names.
+
+---
+
+## 9. Choosing a background
 
 The background defines the denominator of the test: which genes *could* have appeared in the
 foreground? Getting it right matters more than the choice of ontology.
@@ -297,7 +360,7 @@ that *could* have been selected for the foreground by the same process that prod
 
 ---
 
-## 9. Choosing an ontology and level (narrative)
+## 10. Choosing an ontology and level (narrative)
 
 Use `ontology_landscape` (§3) to scout before committing to an ontology and level. The key
 signals are:
@@ -324,7 +387,7 @@ level assignments as approximate.
 
 ---
 
-## 10. Interpretation
+## 11. Interpretation
 
 ### Signed enrichment score as a visualization scalar
 
@@ -366,7 +429,7 @@ collect the per-cluster `pvalue` values and apply BH across the full table manua
 
 ---
 
-## 11. Gotchas
+## 12. Gotchas
 
 - **`min/max_gene_set_size` means different things in different tools.** In `ontology_landscape`
   the filter is organism-scoped (pathway size across the whole genome; used to rank levels).
@@ -400,7 +463,7 @@ collect the per-cluster `pvalue` values and apply BH across the full table manua
 
 ---
 
-## 12. Divergences from clusterProfiler
+## 13. Divergences from clusterProfiler
 
 | Difference | This implementation | clusterProfiler |
 |---|---|---|
@@ -413,11 +476,11 @@ collect the per-cluster `pvalue` values and apply BH across the full table manua
 
 The column names `gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `count`, and
 `bg_count` are deliberately clusterProfiler-compatible; `cluster` maps to clusterProfiler's
-`Cluster`; `term_id` / `term_name` map to `ID` / `Description`. See §14 for the full mapping.
+`Cluster`; `term_id` / `term_name` map to `ID` / `Description`. See §15 for the full mapping.
 
 ---
 
-## 13. The MCP tool
+## 14. The MCP tool
 
 `pathway_enrichment` is the DE-path convenience wrapper. It runs the full pipeline
 (`de_enrichment_inputs` → `genes_by_ontology` → `fisher_ora` → attach direction →
@@ -431,7 +494,7 @@ Examples, parameter details, and chaining patterns are in `docs://tools/pathway_
 
 ---
 
-## 14. Output field reference
+## 15. Output field reference
 
 ### Fisher's 2×2 table
 
@@ -494,7 +557,7 @@ than expected under a uniform draw from the background.
 
 ---
 
-## 15. Deferred methodology
+## 16. Deferred methodology
 
 The following approaches are not implemented but are natural next steps:
 
@@ -509,7 +572,7 @@ The following approaches are not implemented but are natural next steps:
 
 ---
 
-## 16. References
+## 17. References
 
 - **yulab-smu biomedical knowledge mining book:**
   https://yulab-smu.top/biomedical-knowledge-mining-book/

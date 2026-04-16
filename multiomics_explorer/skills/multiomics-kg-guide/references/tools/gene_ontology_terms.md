@@ -74,7 +74,7 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 ### Example 1: GO biological process terms for a gene
 
 ```example-call
-gene_ontology_terms(locus_tags=["PMM0001"], ontology="go_bp")
+gene_ontology_terms(locus_tags=["PMM0001"], organism="MED4", ontology="go_bp")
 ```
 
 ```example-response
@@ -97,22 +97,28 @@ gene_ontology_terms(locus_tags=["PMM0001"], ontology="go_bp")
 ### Example 2: All ontology annotations for a gene
 
 ```example-call
-gene_ontology_terms(locus_tags=["PMM0001"])
+gene_ontology_terms(locus_tags=["PMM0001"], organism="MED4")
 ```
 
 ### Example 3: Batch annotations with summary only
 
 ```example-call
-gene_ontology_terms(locus_tags=["PMM0001", "PMM0845", "EZ55_00275"], summary=True)
+gene_ontology_terms(locus_tags=["PMM0001", "PMM0845"], organism="MED4", summary=True)
 ```
 
-### Example 4: From overview to ontology details
+### Example 4: Rollup to BRITE category level
+
+```example-call
+gene_ontology_terms(locus_tags=["PMM0001", "PMM0845"], organism="MED4", ontology="brite", mode="rollup", level=1, tree="transporters")
+```
+
+### Example 5: From overview to ontology details
 
 ```
 Step 1: gene_overview(locus_tags=["PMM0001"])
         → check annotation_types: ["go_bp", "go_mf", "kegg", "ec", ...]
 
-Step 2: gene_ontology_terms(locus_tags=["PMM0001"], ontology="go_bp")
+Step 2: gene_ontology_terms(locus_tags=["PMM0001"], organism="MED4", ontology="go_bp")
         → get actual GO BP terms
 
 Step 3: genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
@@ -130,13 +136,19 @@ resolve_gene → gene_ontology_terms
 
 ## Good to know
 
+- organism is required — single-valued. Locus tags must belong to the specified organism.
+
 - ontology=None returns ALL ontology types — use ontology filter when you only need one type
 
-- returns only leaf (most specific) terms — ancestor terms like 'metabolic process' are excluded because they are implied by the more specific child terms
+- Default mode='leaf' returns only leaf (most specific) terms — ancestor terms like 'metabolic process' are excluded because they are implied by the more specific child terms
+
+- mode='rollup' requires `level` (and optionally `ontology`). It walks UP the hierarchy from leaf annotations to the requested level, returning rolled-up (gene x ancestor-term) pairs.
 
 - to check if a gene is connected to a broad term (e.g. 'DNA repair'), use genes_by_ontology(term_ids=[...], ontology=..., organism=...) which expands down the hierarchy — gene_ontology_terms only returns the leaf annotations
 
 - For brite: leaf annotations are KO-level terms (same leaf as kegg). Use ontology='brite' to filter; the returned term_ids are KO IDs shared with the kegg ontology.
+
+- Use `tree` to scope BRITE rollup to a single tree (e.g. 'transporters'). Without it, rollup mixes all BRITE trees.
 
 ## Package import equivalent
 
