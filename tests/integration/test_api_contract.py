@@ -218,12 +218,14 @@ class TestListOrganismsContract:
     def test_result_keys(self, conn):
         result = api.list_organisms(conn=conn)
         expected_keys = {
-            "organism_name", "genus", "species", "strain", "clade",
-            "ncbi_taxon_id", "gene_count", "publication_count",
+            "organism_name", "organism_type", "genus", "species", "strain",
+            "clade", "ncbi_taxon_id", "gene_count", "publication_count",
             "experiment_count", "treatment_types", "omics_types",
             "background_factors", "clustering_analysis_count", "cluster_types",
         }
-        assert set(result["results"][0].keys()) == expected_keys
+        # Superset check: sparse fields (reference_database, reference_proteome)
+        # may be absent on most organisms
+        assert set(result["results"][0].keys()) >= expected_keys
 
 
 # ---------------------------------------------------------------------------
