@@ -553,69 +553,31 @@ git commit -m "feat: add brite to ontology Literal type hints in MCP tools"
 ### Task 7: Schema baseline
 
 **Files:**
-- Modify: `multiomics_explorer/config/schema_baseline.yaml`
+- Regenerate: `multiomics_explorer/config/schema_baseline.yaml`
 
-- [ ] **Step 1: Add BriteCategory node**
+The schema baseline is captured from the live KG via `schema-snapshot`, not hand-edited.
 
-In `multiomics_explorer/config/schema_baseline.yaml`, in the `nodes:` section (alphabetically after `BiologicalProcess`), add:
+- [ ] **Step 1: Regenerate schema baseline from live KG**
 
-```yaml
-    BriteCategory:
-      properties:
-        gene_count: int
-        id: string
-        level: int
-        level_kind: string
-        member_ko_count: int
-        name: string
-        organism_count: int
-        preferred_id: string
-        tree: string
-        tree_code: string
-```
+Run: `uv run multiomics-explorer schema-snapshot`
 
-- [ ] **Step 2: Add relationship types**
+This introspects the live Neo4j instance and overwrites `multiomics_explorer/config/schema_baseline.yaml` with the current schema (including the new `BriteCategory` node, `Brite_category_is_a_brite_category` and `Kegg_term_in_brite_category` edges).
 
-In the `relationships:` section, add (alphabetically):
+- [ ] **Step 2: Verify BriteCategory is captured**
 
-After `Biological_process_part_of_biological_process` and before `Cellular_component_is_a_cellular_component`:
-
-```yaml
-    Brite_category_is_a_brite_category:
-      source_labels:
-      - BriteCategory
-      target_labels:
-      - BriteCategory
-      properties:
-        id: string
-```
-
-Find the location between `Kegg_term_is_a_kegg_term` and `Molecular_function_is_a_molecular_function`, add:
-
-```yaml
-    Kegg_term_in_brite_category:
-      source_labels:
-      - Entity
-      - KeggTerm
-      - NamedThing
-      target_labels:
-      - BriteCategory
-      properties:
-        id: string
-```
+Run: `grep -A 2 'BriteCategory' multiomics_explorer/config/schema_baseline.yaml | head -10`
+Expected: `BriteCategory` node and both relationship types appear in the output.
 
 - [ ] **Step 3: Run schema validation**
 
-Run: `pytest tests/unit/ -v -k "schema"`
-Expected: PASS (or no schema tests exist — if so, verify manually that the YAML is valid):
-Run: `python -c "import yaml; yaml.safe_load(open('multiomics_explorer/config/schema_baseline.yaml'))"`
-Expected: No errors.
+Run: `uv run multiomics-explorer schema-validate`
+Expected: No drift (baseline matches live KG).
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add multiomics_explorer/config/schema_baseline.yaml
-git commit -m "chore: add BriteCategory node and edges to schema baseline"
+git commit -m "chore: regenerate schema baseline (adds BriteCategory)"
 ```
 
 ---
