@@ -1202,7 +1202,10 @@ def register_tools(mcp: FastMCP):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
         term_id: str = Field(description="Ontology term ID (e.g. 'go:0006260')")
         term_name: str = Field(description="Term name (e.g. 'DNA replication')")
+        level: int = Field(description="Hierarchy level of this term (0 = broadest)")
         ontology_type: str | None = Field(default=None, description="Ontology type when querying all (e.g. 'go_bp')")
+        tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
+        tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
         # verbose-only
         organism_name: str | None = Field(default=None, description="Organism (e.g. 'Prochlorococcus MED4')")
 
@@ -1210,10 +1213,13 @@ def register_tools(mcp: FastMCP):
         ontology_type: str = Field(description="Ontology type (e.g. 'go_bp', 'kegg')")
         term_count: int = Field(description="Total leaf terms in this ontology (e.g. 12)")
         gene_count: int = Field(description="Input genes with at least one term in this ontology (e.g. 8)")
+        tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
+        tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
 
     class TermBreakdown(BaseModel):
         term_id: str = Field(description="Ontology term ID (e.g. 'go:0015979')")
         term_name: str = Field(description="Term name (e.g. 'photosynthesis')")
+        level: int = Field(description="Hierarchy level of this term (0 = broadest)")
         ontology_type: str = Field(description="Ontology type (e.g. 'go_bp')")
         count: int = Field(description="Genes annotated to this term (e.g. 4)")
 
@@ -1243,11 +1249,26 @@ def register_tools(mcp: FastMCP):
             description="Gene locus tags to look up. "
             "E.g. ['PMM0001', 'PMM0845'].",
         )],
+        organism: Annotated[str, Field(
+            description="Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued.",
+        )],
         ontology: Annotated[
             Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
                     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite"] | None,
             Field(description="Filter to one ontology. None returns all."),
         ] = None,
+        mode: Annotated[Literal["leaf", "rollup"], Field(
+            description="'leaf' returns most-specific annotations (default). "
+                        "'rollup' walks up to ancestors at the given level.",
+        )] = "leaf",
+        level: Annotated[int | None, Field(
+            description="Hierarchy level. In leaf mode: filter to leaves at this level. "
+                        "In rollup mode: required — target ancestor level (0 = broadest).",
+            ge=0,
+        )] = None,
+        tree: Annotated[str | None, Field(
+            description="BRITE tree name filter. Only valid when ontology='brite'.",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
         )] = False,
@@ -1263,17 +1284,23 @@ def register_tools(mcp: FastMCP):
     ) -> GeneOntologyTermsResponse:
         """Get ontology annotations for genes. One row per gene × term.
 
-        Returns the most specific (leaf) terms only — redundant ancestor terms
-        are excluded. Use ontology param to filter to one type, or omit for all.
+        In leaf mode (default), returns the most specific annotations only —
+        redundant ancestor terms are excluded. In rollup mode, walks up to
+        ancestors at the given level.
 
+        Use ontology param to filter to one type, or omit for all.
         For the reverse direction (find genes annotated to a term, with hierarchy
         expansion), use genes_by_ontology. Use search_ontology to find terms by text.
         """
-        await ctx.info(f"gene_ontology_terms locus_tags={locus_tags} ontology={ontology}")
+        await ctx.info(
+            f"gene_ontology_terms locus_tags={locus_tags} organism={organism} "
+            f"ontology={ontology} mode={mode} level={level}"
+        )
         try:
             conn = _conn(ctx)
             data = api.gene_ontology_terms(
-                locus_tags, ontology=ontology,
+                locus_tags, organism=organism, ontology=ontology,
+                mode=mode, level=level, tree=tree,
                 summary=summary, verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             results = [OntologyTermRow(**r) for r in data["results"]]

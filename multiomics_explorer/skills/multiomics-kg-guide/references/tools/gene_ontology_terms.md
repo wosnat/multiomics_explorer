@@ -4,9 +4,11 @@
 
 Get ontology annotations for genes. One row per gene × term.
 
-Returns the most specific (leaf) terms only — redundant ancestor terms
-are excluded. Use ontology param to filter to one type, or omit for all.
+In leaf mode (default), returns the most specific annotations only —
+redundant ancestor terms are excluded. In rollup mode, walks up to
+ancestors at the given level.
 
+Use ontology param to filter to one type, or omit for all.
 For the reverse direction (find genes annotated to a term, with hierarchy
 expansion), use genes_by_ontology. Use search_ontology to find terms by text.
 
@@ -15,11 +17,17 @@ expansion), use genes_by_ontology. Use search_ontology to find terms by text.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam') \| None | None | Filter to one ontology. None returns all. |
+| organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite') \| None | None | Filter to one ontology. None returns all. |
+| mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
+| level | int \| None | None | Hierarchy level. In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level (0 = broadest). |
+| tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Include organism_name per row. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
+
+**Discovery:** use `list_organisms` for valid organism names.
 
 ## Response format
 
@@ -50,7 +58,10 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 | locus_tag | string | Gene locus tag (e.g. 'PMM0001') |
 | term_id | string | Ontology term ID (e.g. 'go:0006260') |
 | term_name | string | Term name (e.g. 'DNA replication') |
+| level | int | Hierarchy level of this term (0 = broadest) |
 | ontology_type | string \| None (optional) | Ontology type when querying all (e.g. 'go_bp') |
+| tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
+| tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -125,12 +136,14 @@ resolve_gene → gene_ontology_terms
 
 - to check if a gene is connected to a broad term (e.g. 'DNA repair'), use genes_by_ontology(term_ids=[...], ontology=..., organism=...) which expands down the hierarchy — gene_ontology_terms only returns the leaf annotations
 
+- For brite: leaf annotations are KO-level terms (same leaf as kegg). Use ontology='brite' to filter; the returned term_ids are KO IDs shared with the kegg ontology.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import gene_ontology_terms
 
-result = gene_ontology_terms(locus_tags=...)
+result = gene_ontology_terms(locus_tags=..., organism=...)
 # returns dict with keys: total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, offset, not_found, no_terms, results
 ```
 

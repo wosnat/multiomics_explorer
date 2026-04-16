@@ -1477,7 +1477,7 @@ class TestGeneOntologyTermsWrapper:
         "total_terms": 2,
         "by_ontology": [{"ontology_type": "go_bp", "term_count": 2, "gene_count": 1}],
         "by_term": [{"term_id": "go:0006260", "term_name": "DNA replication",
-                     "ontology_type": "go_bp", "count": 1}],
+                     "level": 5, "ontology_type": "go_bp", "count": 1}],
         "terms_per_gene_min": 2,
         "terms_per_gene_max": 2,
         "terms_per_gene_median": 2.0,
@@ -1487,9 +1487,9 @@ class TestGeneOntologyTermsWrapper:
         "no_terms": [],
         "results": [
             {"locus_tag": "PMM0001", "term_id": "go:0006260",
-             "term_name": "DNA replication"},
+             "term_name": "DNA replication", "level": 5},
             {"locus_tag": "PMM0001", "term_id": "go:0006271",
-             "term_name": "DNA strand elongation"},
+             "term_name": "DNA strand elongation", "level": 6},
         ],
     }
 
@@ -1501,7 +1501,7 @@ class TestGeneOntologyTermsWrapper:
             return_value=self._SAMPLE_API_RETURN,
         ):
             result = await tool_fns["gene_ontology_terms"](
-                mock_ctx, locus_tags=["PMM0001"],
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
             )
         assert type(result).__name__ == "GeneOntologyTermsResponse"
 
@@ -1513,7 +1513,7 @@ class TestGeneOntologyTermsWrapper:
             return_value=self._SAMPLE_API_RETURN,
         ):
             result = await tool_fns["gene_ontology_terms"](
-                mock_ctx, locus_tags=["PMM0001"],
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
             )
         assert result.total_matching == 2
         assert result.total_genes == 1
@@ -1527,6 +1527,7 @@ class TestGeneOntologyTermsWrapper:
         assert len(result.by_term) == 1
         assert result.by_term[0].term_id == "go:0006260"
         assert result.by_term[0].term_name == "DNA replication"
+        assert result.by_term[0].level == 5
         assert result.terms_per_gene_min == 2
         assert result.terms_per_gene_max == 2
         assert result.terms_per_gene_median == 2.0
@@ -1537,6 +1538,7 @@ class TestGeneOntologyTermsWrapper:
         assert r.locus_tag == "PMM0001"
         assert r.term_id == "go:0006260"
         assert r.term_name == "DNA replication"
+        assert r.level == 5
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
@@ -1548,7 +1550,11 @@ class TestGeneOntologyTermsWrapper:
             await tool_fns["gene_ontology_terms"](
                 mock_ctx,
                 locus_tags=["PMM0001"],
+                organism="MED4",
                 ontology="go_bp",
+                mode="leaf",
+                level=3,
+                tree=None,
                 summary=True,
                 verbose=True,
                 limit=10,
@@ -1556,7 +1562,10 @@ class TestGeneOntologyTermsWrapper:
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args
         assert call_kwargs.args[0] == ["PMM0001"]
+        assert call_kwargs.kwargs["organism"] == "MED4"
         assert call_kwargs.kwargs["ontology"] == "go_bp"
+        assert call_kwargs.kwargs["mode"] == "leaf"
+        assert call_kwargs.kwargs["level"] == 3
         assert call_kwargs.kwargs["summary"] is True
         assert call_kwargs.kwargs["verbose"] is True
         assert call_kwargs.kwargs["limit"] == 10
@@ -1584,7 +1593,7 @@ class TestGeneOntologyTermsWrapper:
             return_value=empty_return,
         ):
             result = await tool_fns["gene_ontology_terms"](
-                mock_ctx, locus_tags=["FAKE0001"],
+                mock_ctx, locus_tags=["FAKE0001"], organism="MED4",
             )
         assert result.total_matching == 0
         assert result.returned == 0
@@ -1605,7 +1614,7 @@ class TestGeneOntologyTermsWrapper:
             return_value=truncated_return,
         ):
             result = await tool_fns["gene_ontology_terms"](
-                mock_ctx, locus_tags=["PMM0001"],
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
             )
         assert result.total_matching == 50
         assert result.returned == 2
@@ -1622,7 +1631,7 @@ class TestGeneOntologyTermsWrapper:
         ):
             with pytest.raises(ToolError):
                 await tool_fns["gene_ontology_terms"](
-                    mock_ctx, locus_tags=["PMM0001"], ontology="go_bp",
+                    mock_ctx, locus_tags=["PMM0001"], organism="MED4", ontology="go_bp",
                 )
 
     @pytest.mark.asyncio
@@ -1636,7 +1645,7 @@ class TestGeneOntologyTermsWrapper:
         ):
             with pytest.raises(ToolError, match="Error in gene_ontology_terms"):
                 await tool_fns["gene_ontology_terms"](
-                    mock_ctx, locus_tags=["PMM0001"],
+                    mock_ctx, locus_tags=["PMM0001"], organism="MED4",
                 )
 
     @pytest.mark.asyncio
@@ -1645,7 +1654,7 @@ class TestGeneOntologyTermsWrapper:
             "multiomics_explorer.api.functions.gene_ontology_terms",
             return_value={**self._SAMPLE_API_RETURN, "offset": 5},
         ) as mock_api:
-            result = await tool_fns["gene_ontology_terms"](mock_ctx, locus_tags=["PMM0001"], offset=5)
+            result = await tool_fns["gene_ontology_terms"](mock_ctx, locus_tags=["PMM0001"], organism="MED4", offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
@@ -1793,7 +1802,7 @@ class TestErrorHandling:
         ):
             with pytest.raises(ToolError, match="Error in gene_ontology_terms"):
                 await tool_fns["gene_ontology_terms"](
-                    mock_ctx, locus_tags=["PMM0001"],
+                    mock_ctx, locus_tags=["PMM0001"], organism="MED4",
                 )
 
 

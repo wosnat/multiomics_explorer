@@ -1409,7 +1409,11 @@ def genes_by_ontology(
 
 def gene_ontology_terms(
     locus_tags: list[str],
+    organism: str,
     ontology: str | None = None,
+    mode: str = "leaf",
+    level: int | None = None,
+    tree: str | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -1423,9 +1427,10 @@ def gene_ontology_terms(
     by_ontology, by_term, terms_per_gene_min, terms_per_gene_max,
     terms_per_gene_median, returned, truncated, not_found, no_terms,
     results.
-    Per result: locus_tag, term_id, term_name.
+    Per result: locus_tag, term_id, term_name, level.
     Verbose adds: organism_name.
     All-ontology queries add: ontology_type.
+    BRITE results include sparse tree/tree_code fields.
 
     Raises ValueError if ontology is invalid or locus_tags is empty.
     """
@@ -1436,10 +1441,21 @@ def gene_ontology_terms(
             f"Invalid ontology '{ontology}'. "
             f"Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
+    if mode not in ("leaf", "rollup"):
+        raise ValueError(f"mode must be 'leaf' or 'rollup', got '{mode}'")
+    if mode == "rollup" and level is None:
+        raise ValueError("level is required when mode='rollup'")
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
     if summary:
         limit = 0
 
     conn = _default_conn(conn)
+
+    # Resolve organism
+    organism_name = _validate_organism_inputs(
+        organism=organism, locus_tags=None, experiment_ids=None, conn=conn,
+    )
 
     # Step 1: gene existence check
     exist_cypher, exist_params = build_gene_existence_check(locus_tags=locus_tags)
@@ -1463,6 +1479,8 @@ def gene_ontology_terms(
             for chunk in _chunk_locus_tags(found_tags):
                 sum_cypher, sum_params = build_gene_ontology_terms_summary(
                     locus_tags=chunk, ontology=ont,
+                    organism_name=organism_name,
+                    mode=mode, level=level, tree=tree,
                 )
                 rows = conn.execute_query(sum_cypher, **sum_params)
                 if not rows or rows[0]["gene_count"] == 0:
@@ -1473,10 +1491,17 @@ def gene_ontology_terms(
                 for bt in row["by_term"]:
                     key = bt["term_id"]
                     if key not in merged_by_term:
-                        merged_by_term[key] = {
+                        entry: dict = {
                             "term_id": key, "term_name": bt["term_name"],
+                            "level": bt.get("level"),
                             "count": 0,
                         }
+                        # Include sparse BRITE fields
+                        if bt.get("tree") is not None:
+                            entry["tree"] = bt["tree"]
+                        if bt.get("tree_code") is not None:
+                            entry["tree_code"] = bt["tree_code"]
+                        merged_by_term[key] = entry
                     merged_by_term[key]["count"] += bt["count"]
                 for gtc in row["gene_term_counts"]:
                     gene_term_counts[gtc["locus_tag"]] = (
@@ -1505,9 +1530,17 @@ def gene_ontology_terms(
                 for chunk in _chunk_locus_tags(found_tags):
                     det_cypher, det_params = build_gene_ontology_terms(
                         locus_tags=chunk, ontology=ont,
+                        organism_name=organism_name,
+                        mode=mode, level=level, tree=tree,
                         verbose=verbose, limit=None,
                     )
                     rows = conn.execute_query(det_cypher, **det_params)
+                    # Strip sparse tree/tree_code when None
+                    for r in rows:
+                        if r.get("tree") is None:
+                            r.pop("tree", None)
+                        if r.get("tree_code") is None:
+                            r.pop("tree_code", None)
                     if ontology is None:
                         for r in rows:
                             r["ontology_type"] = ont

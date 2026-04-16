@@ -1666,6 +1666,10 @@ def build_gene_ontology_terms_summary(
     *,
     locus_tags: list[str],
     ontology: str,
+    organism_name: str,
+    mode: str = "leaf",
+    level: int | None = None,
+    tree: str | None = None,
 ) -> tuple[str, dict]:
     """Build summary for gene_ontology_terms for ONE ontology.
 
@@ -1678,55 +1682,153 @@ def build_gene_ontology_terms_summary(
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    if mode == "rollup" and level is None:
+        raise ValueError("level is required when mode='rollup'")
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
     cfg = ONTOLOGY_CONFIG[ontology]
     gene_rel = cfg["gene_rel"]
     label = cfg["label"]
-    leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
+
+    params: dict = {"locus_tags": locus_tags, "org": organism_name}
 
     bridge = cfg.get("bridge")
-    if bridge:
-        match_line = (
-            f"MATCH (g:Gene {{locus_tag: lt}})"
-            f"-[:{gene_rel}]->(:{bridge['node_label']})"
-            f"-[:{bridge['edge']}]->(t:{label})\n"
+
+    if mode == "rollup":
+        # --- rollup: walk leaf → ancestor at target level ---
+        if bridge:
+            bridge_edge = bridge["edge"]
+            bridge_node = bridge["node_label"]
+            bind = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(ko:{bridge_node})"
+                f"-[:{bridge_edge}]->(leaf:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+            rel_union = "|".join(cfg["hierarchy_rels"])
+            walk = (
+                f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
+                "WHERE t.level = $level\n"
+            )
+        elif not cfg["hierarchy_rels"]:
+            # flat: leaf = term, walk is identity
+            bind = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(t:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+            walk = "WITH g, t\nWHERE t.level = $level\n"
+        elif ontology == "pfam":
+            bind = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(leaf:Pfam)\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+            walk = (
+                "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
+                "WHERE (t:Pfam OR t:PfamClan) AND t.level = $level\n"
+            )
+        else:
+            rel_union = "|".join(cfg["hierarchy_rels"])
+            bind = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(leaf:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+            walk = (
+                f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
+                "WHERE t.level = $level\n"
+            )
+        params["level"] = level
+        tree_filter = ""
+        if tree is not None:
+            tree_filter = "AND t.tree = $tree\n"
+            params["tree"] = tree
+        cypher = (
+            f"{bind}"
+            f"{walk}"
+            f"{tree_filter}"
+            "WITH g.locus_tag AS lt, collect(DISTINCT {id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
+            "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
+            "WITH genes,\n"
+            "     apoc.coll.flatten([g IN genes | g.terms]) AS all_terms,\n"
+            "     [g IN genes | {locus_tag: g.lt, term_count: g.cnt}] AS gene_term_counts\n"
+            "UNWIND all_terms AS t\n"
+            "WITH genes, gene_term_counts, t.id AS tid, t.name AS tname, t.level AS tlevel, t.tree AS ttree, t.tree_code AS ttree_code, count(*) AS cnt\n"
+            "WITH genes, gene_term_counts,\n"
+            "     collect({term_id: tid, term_name: tname, level: tlevel, tree: ttree, tree_code: ttree_code, count: cnt}) AS by_term\n"
+            "RETURN size(genes) AS gene_count,\n"
+            "       size(apoc.coll.flatten([g IN genes | g.terms])) AS term_count,\n"
+            "       by_term,\n"
+            "       gene_term_counts"
         )
     else:
-        match_line = (
-            f"MATCH (g:Gene {{locus_tag: lt}})-[:{gene_rel}]->(t:{label})\n"
-        )
+        # --- leaf mode ---
+        leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
 
-    cypher = (
-        "UNWIND $locus_tags AS lt\n"
-        f"{match_line}"
-        f"{leaf_filter}"
-        "WITH g.locus_tag AS lt, collect({id: t.id, name: t.name}) AS terms\n"
-        "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
-        "WITH genes,\n"
-        "     apoc.coll.flatten([g IN genes | g.terms]) AS all_terms,\n"
-        "     [g IN genes | {locus_tag: g.lt, term_count: g.cnt}] AS gene_term_counts\n"
-        "UNWIND all_terms AS t\n"
-        "WITH genes, gene_term_counts, t.id AS tid, t.name AS tname, count(*) AS cnt\n"
-        "WITH genes, gene_term_counts,\n"
-        "     collect({term_id: tid, term_name: tname, count: cnt}) AS by_term\n"
-        "RETURN size(genes) AS gene_count,\n"
-        "       size(apoc.coll.flatten([g IN genes | g.terms])) AS term_count,\n"
-        "       by_term,\n"
-        "       gene_term_counts"
-    )
-    return cypher, {"locus_tags": locus_tags}
+        if bridge:
+            match_line = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(:{bridge['node_label']})"
+                f"-[:{bridge['edge']}]->(t:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+        else:
+            match_line = (
+                f"MATCH (g:Gene {{organism_name: $org}})-[:{gene_rel}]->(t:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+
+        # Convert leaf_filter "WHERE NOT EXISTS ..." to "AND NOT EXISTS ..."
+        if leaf_filter:
+            leaf_filter = "AND " + leaf_filter.replace("WHERE ", "", 1)
+
+        level_filter = ""
+        if level is not None:
+            level_filter = "AND t.level = $level\n"
+            params["level"] = level
+        tree_filter = ""
+        if tree is not None:
+            tree_filter = "AND t.tree = $tree\n"
+            params["tree"] = tree
+
+        cypher = (
+            f"{match_line}"
+            f"{leaf_filter}"
+            f"{level_filter}"
+            f"{tree_filter}"
+            "WITH g.locus_tag AS lt, collect({id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
+            "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
+            "WITH genes,\n"
+            "     apoc.coll.flatten([g IN genes | g.terms]) AS all_terms,\n"
+            "     [g IN genes | {locus_tag: g.lt, term_count: g.cnt}] AS gene_term_counts\n"
+            "UNWIND all_terms AS t\n"
+            "WITH genes, gene_term_counts, t.id AS tid, t.name AS tname, t.level AS tlevel, t.tree AS ttree, t.tree_code AS ttree_code, count(*) AS cnt\n"
+            "WITH genes, gene_term_counts,\n"
+            "     collect({term_id: tid, term_name: tname, level: tlevel, tree: ttree, tree_code: ttree_code, count: cnt}) AS by_term\n"
+            "RETURN size(genes) AS gene_count,\n"
+            "       size(apoc.coll.flatten([g IN genes | g.terms])) AS term_count,\n"
+            "       by_term,\n"
+            "       gene_term_counts"
+        )
+    return cypher, params
 
 
 def build_gene_ontology_terms(
     *,
     locus_tags: list[str],
     ontology: str,
+    organism_name: str,
+    mode: str = "leaf",
+    level: int | None = None,
+    tree: str | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_ontology_terms for ONE ontology.
 
-    RETURN keys (compact): locus_tag, term_id, term_name.
+    RETURN keys (compact): locus_tag, term_id, term_name, level, tree, tree_code.
     RETURN keys (verbose): adds organism_name.
 
     Called by api/ — which adds ontology_type column and merges
@@ -1734,12 +1836,15 @@ def build_gene_ontology_terms(
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
+    if mode == "rollup" and level is None:
+        raise ValueError("level is required when mode='rollup'")
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
     cfg = ONTOLOGY_CONFIG[ontology]
     gene_rel = cfg["gene_rel"]
     label = cfg["label"]
-    leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
 
-    params: dict = {"locus_tags": locus_tags}
+    params: dict = {"locus_tags": locus_tags, "org": organism_name}
 
     verbose_cols = (
         ",\n       g.organism_name AS organism_name"
@@ -1758,25 +1863,104 @@ def build_gene_ontology_terms(
         limit_clause = ""
 
     bridge = cfg.get("bridge")
-    if bridge:
-        match_line = (
-            f"MATCH (g:Gene {{locus_tag: lt}})"
-            f"-[:{gene_rel}]->(:{bridge['node_label']})"
-            f"-[:{bridge['edge']}]->(t:{label})\n"
+
+    if mode == "rollup":
+        # --- rollup: walk leaf → ancestor at target level ---
+        params["level"] = level
+        if bridge:
+            bridge_edge = bridge["edge"]
+            bridge_node = bridge["node_label"]
+            bind = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(ko:{bridge_node})"
+                f"-[:{bridge_edge}]->(leaf:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+            rel_union = "|".join(cfg["hierarchy_rels"])
+            walk = (
+                f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
+                "WHERE t.level = $level\n"
+            )
+        elif not cfg["hierarchy_rels"]:
+            # flat: leaf = term
+            bind = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(t:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+            walk = "WITH g, t\nWHERE t.level = $level\n"
+        elif ontology == "pfam":
+            bind = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(leaf:Pfam)\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+            walk = (
+                "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
+                "WHERE (t:Pfam OR t:PfamClan) AND t.level = $level\n"
+            )
+        else:
+            rel_union = "|".join(cfg["hierarchy_rels"])
+            bind = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(leaf:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+            walk = (
+                f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
+                "WHERE t.level = $level\n"
+            )
+        tree_filter = ""
+        if tree is not None:
+            tree_filter = "AND t.tree = $tree\n"
+            params["tree"] = tree
+        cypher = (
+            f"{bind}"
+            f"{walk}"
+            f"{tree_filter}"
+            "RETURN DISTINCT g.locus_tag AS locus_tag, t.id AS term_id,\n"
+            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code{verbose_cols}\n"
+            f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
     else:
-        match_line = (
-            f"MATCH (g:Gene {{locus_tag: lt}})-[:{gene_rel}]->(t:{label})\n"
-        )
+        # --- leaf mode ---
+        leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
 
-    cypher = (
-        "UNWIND $locus_tags AS lt\n"
-        f"{match_line}"
-        f"{leaf_filter}"
-        "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
-        f"       t.name AS term_name{verbose_cols}\n"
-        f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
-    )
+        if bridge:
+            match_line = (
+                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"-[:{gene_rel}]->(:{bridge['node_label']})"
+                f"-[:{bridge['edge']}]->(t:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+        else:
+            match_line = (
+                f"MATCH (g:Gene {{organism_name: $org}})-[:{gene_rel}]->(t:{label})\n"
+                "WHERE g.locus_tag IN $locus_tags\n"
+            )
+
+        # Convert leaf_filter "WHERE NOT EXISTS ..." to "AND NOT EXISTS ..."
+        if leaf_filter:
+            leaf_filter = "AND " + leaf_filter.replace("WHERE ", "", 1)
+
+        level_filter = ""
+        if level is not None:
+            level_filter = "AND t.level = $level\n"
+            params["level"] = level
+        tree_filter = ""
+        if tree is not None:
+            tree_filter = "AND t.tree = $tree\n"
+            params["tree"] = tree
+
+        cypher = (
+            f"{match_line}"
+            f"{leaf_filter}"
+            f"{level_filter}"
+            f"{tree_filter}"
+            "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
+            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code{verbose_cols}\n"
+            f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
+        )
     return cypher, params
 
 

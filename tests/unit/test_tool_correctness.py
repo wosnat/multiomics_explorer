@@ -11,6 +11,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastmcp import FastMCP
+from fastmcp.exceptions import ToolError
 
 from multiomics_explorer.mcp_server.tools import register_tools
 from tests.fixtures.gene_data import (
@@ -855,7 +856,7 @@ class TestGeneOntologyTermsCorrectness:
                 ],
                 "by_term": [
                     {"term_id": "go:0006260", "term_name": "DNA replication",
-                     "ontology_type": "go_bp", "count": 1},
+                     "level": 5, "ontology_type": "go_bp", "count": 1},
                 ],
                 "terms_per_gene_min": 3,
                 "terms_per_gene_max": 3,
@@ -865,16 +866,16 @@ class TestGeneOntologyTermsCorrectness:
                 "not_found": [],
                 "results": [
                     {"locus_tag": "PMM0001", "term_id": "go:0006260",
-                     "term_name": "DNA replication", "ontology_type": "go_bp"},
+                     "term_name": "DNA replication", "level": 5, "ontology_type": "go_bp"},
                     {"locus_tag": "PMM0001", "term_id": "go:0006261",
-                     "term_name": "DNA-templated DNA replication", "ontology_type": "go_bp"},
+                     "term_name": "DNA-templated DNA replication", "level": 6, "ontology_type": "go_bp"},
                     {"locus_tag": "PMM0001", "term_id": "go:0003887",
-                     "term_name": "DNA-directed DNA polymerase activity", "ontology_type": "go_mf"},
+                     "term_name": "DNA-directed DNA polymerase activity", "level": 4, "ontology_type": "go_mf"},
                 ],
             },
         ):
             result = await tool_fns["gene_ontology_terms"](
-                mock_ctx, locus_tags=["PMM0001"],
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
             )
 
         assert result.total_matching == 3
@@ -903,18 +904,18 @@ class TestGeneOntologyTermsCorrectness:
                 "not_found": [],
                 "results": [
                     {"locus_tag": "PMM0001", "term_id": "go:0006260",
-                     "term_name": "DNA replication", "ontology_type": "go_bp"},
+                     "term_name": "DNA replication", "level": 5, "ontology_type": "go_bp"},
                     {"locus_tag": "PMM0001", "term_id": "go:0006261",
-                     "term_name": "DNA-templated DNA replication", "ontology_type": "go_bp"},
+                     "term_name": "DNA-templated DNA replication", "level": 6, "ontology_type": "go_bp"},
                     {"locus_tag": "PMM0845", "term_id": "go:0015979",
-                     "term_name": "photosynthesis", "ontology_type": "go_bp"},
+                     "term_name": "photosynthesis", "level": 3, "ontology_type": "go_bp"},
                     {"locus_tag": "PMM0845", "term_id": "go:0009765",
-                     "term_name": "photosynthesis, light harvesting", "ontology_type": "go_bp"},
+                     "term_name": "photosynthesis, light harvesting", "level": 4, "ontology_type": "go_bp"},
                 ],
             },
         ):
             result = await tool_fns["gene_ontology_terms"](
-                mock_ctx, locus_tags=["PMM0001", "PMM0845"],
+                mock_ctx, locus_tags=["PMM0001", "PMM0845"], organism="MED4",
             )
 
         loci = {r.locus_tag for r in result.results}
@@ -940,11 +941,70 @@ class TestGeneOntologyTermsCorrectness:
             },
         ):
             result = await tool_fns["gene_ontology_terms"](
-                mock_ctx, locus_tags=["FAKE_GENE"],
+                mock_ctx, locus_tags=["FAKE_GENE"], organism="MED4",
             )
 
         assert result.not_found == ["FAKE_GENE"]
         assert result.results == []
+
+    @pytest.mark.asyncio
+    async def test_level_in_result_rows(self, tool_fns, mock_ctx):
+        """Result rows include level field."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            return_value={
+                "total_matching": 1,
+                "total_genes": 1,
+                "total_terms": 1,
+                "by_ontology": [{"ontology_type": "go_bp", "term_count": 1, "gene_count": 1}],
+                "by_term": [
+                    {"term_id": "go:0006260", "term_name": "DNA replication",
+                     "level": 5, "ontology_type": "go_bp", "count": 1},
+                ],
+                "terms_per_gene_min": 1,
+                "terms_per_gene_max": 1,
+                "terms_per_gene_median": 1.0,
+                "returned": 1,
+                "truncated": False,
+                "not_found": [],
+                "results": [
+                    {"locus_tag": "PMM0001", "term_id": "go:0006260",
+                     "term_name": "DNA replication", "level": 5, "ontology_type": "go_bp"},
+                ],
+            },
+        ):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001"], organism="MED4",
+            )
+
+        assert result.results[0].level == 5
+        assert result.by_term[0].level == 5
+
+    @pytest.mark.asyncio
+    async def test_mode_rollup_without_level_raises(self, tool_fns, mock_ctx):
+        """Rollup mode without level raises ToolError."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            side_effect=ValueError("level is required when mode='rollup'"),
+        ):
+            with pytest.raises(ToolError, match="level is required"):
+                await tool_fns["gene_ontology_terms"](
+                    mock_ctx, locus_tags=["PMM0001"], organism="MED4",
+                    mode="rollup",
+                )
+
+    @pytest.mark.asyncio
+    async def test_tree_with_non_brite_raises(self, tool_fns, mock_ctx):
+        """Tree filter with non-brite ontology raises ToolError."""
+        with patch(
+            "multiomics_explorer.api.functions.gene_ontology_terms",
+            side_effect=ValueError("tree filter is only valid for ontology='brite'"),
+        ):
+            with pytest.raises(ToolError, match="tree filter is only valid"):
+                await tool_fns["gene_ontology_terms"](
+                    mock_ctx, locus_tags=["PMM0001"], organism="MED4",
+                    ontology="go_bp", tree="Enzymes",
+                )
 
 
 # ---------------------------------------------------------------------------

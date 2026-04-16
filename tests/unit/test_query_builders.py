@@ -1443,7 +1443,7 @@ class TestBuildGeneOntologyTerms:
     def test_single_ontology_returns_expected_columns(self):
         """go_bp returns locus_tag, term_id, term_name in RETURN."""
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp",
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
         )
         assert "locus_tag" in cypher
         assert "term_id" in cypher
@@ -1452,7 +1452,7 @@ class TestBuildGeneOntologyTerms:
     def test_leaf_filter_hierarchical(self):
         """go_bp has hierarchy_rels, so NOT EXISTS clause is present."""
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp",
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
         )
         assert "NOT EXISTS" in cypher
         assert "Biological_process_is_a_biological_process" in cypher
@@ -1461,7 +1461,7 @@ class TestBuildGeneOntologyTerms:
     def test_leaf_filter_flat_ontology(self):
         """cog_category is flat (no hierarchy_rels), so NO NOT EXISTS clause."""
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="cog_category",
+            locus_tags=["PMM0001"], ontology="cog_category", organism_name="Test Org",
         )
         assert "NOT EXISTS" not in cypher
         assert "CogFunctionalCategory" in cypher
@@ -1469,7 +1469,7 @@ class TestBuildGeneOntologyTerms:
     def test_leaf_filter_pfam(self):
         """pfam has cross-label hierarchy (parent_label), so NO NOT EXISTS."""
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="pfam",
+            locus_tags=["PMM0001"], ontology="pfam", organism_name="Test Org",
         )
         assert "NOT EXISTS" not in cypher
         assert "Pfam" in cypher
@@ -1482,29 +1482,29 @@ class TestBuildGeneOntologyTerms:
         at ko leaves) but kept for consistency with other ontologies.
         """
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="kegg",
+            locus_tags=["PMM0001"], ontology="kegg", organism_name="Test Org",
         )
         assert "NOT EXISTS" in cypher
         assert "KeggTerm" in cypher
 
     def test_verbose_false(self):
-        """Compact mode does not include organism_name in RETURN."""
+        """Compact mode does not include organism_name AS organism_name in RETURN."""
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp", verbose=False,
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org", verbose=False,
         )
-        assert "organism_name" not in cypher
+        assert "AS organism_name" not in cypher
 
     def test_verbose_true(self):
-        """Verbose mode includes organism_name in RETURN."""
+        """Verbose mode includes organism_name AS organism_name in RETURN."""
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp", verbose=True,
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org", verbose=True,
         )
-        assert "organism_name" in cypher
+        assert "AS organism_name" in cypher
 
     def test_limit_clause(self):
         """LIMIT is added when limit is provided."""
         cypher, params = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp", limit=10,
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org", limit=10,
         )
         assert "LIMIT $limit" in cypher
         assert params["limit"] == 10
@@ -1512,32 +1512,32 @@ class TestBuildGeneOntologyTerms:
     def test_limit_none(self):
         """No LIMIT when limit is None."""
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp", limit=None,
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org", limit=None,
         )
         assert "LIMIT" not in cypher
 
     def test_order_by(self):
         """Results are ordered by locus_tag then term id."""
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp",
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
         )
         assert "ORDER BY g.locus_tag, t.id" in cypher
 
     def test_invalid_ontology_raises(self):
         """Invalid ontology raises ValueError."""
         with pytest.raises(ValueError, match="Invalid ontology"):
-            build_gene_ontology_terms(locus_tags=["x"], ontology="bad")
+            build_gene_ontology_terms(locus_tags=["x"], ontology="bad", organism_name="Test Org")
 
     def test_params_include_locus_tags(self):
         """params dict has locus_tags key."""
         _, params = build_gene_ontology_terms(
-            locus_tags=["PMM0001", "PMM0002"], ontology="go_bp",
+            locus_tags=["PMM0001", "PMM0002"], ontology="go_bp", organism_name="Test Org",
         )
         assert params["locus_tags"] == ["PMM0001", "PMM0002"]
 
     def test_offset_emits_skip(self):
         cypher, params = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp", limit=10, offset=5,
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org", limit=10, offset=5,
         )
         assert "SKIP $offset" in cypher
         assert params["offset"] == 5
@@ -1545,7 +1545,7 @@ class TestBuildGeneOntologyTerms:
 
     def test_offset_zero_no_skip(self):
         cypher, params = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="go_bp", limit=10, offset=0,
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org", limit=10, offset=0,
         )
         assert "SKIP" not in cypher
         assert "offset" not in params
@@ -1555,7 +1555,7 @@ class TestBuildGeneOntologyTermsSummary:
     def test_returns_cypher_and_params(self):
         """Basic call returns cypher and params."""
         cypher, params = build_gene_ontology_terms_summary(
-            locus_tags=["PMM0001"], ontology="go_bp",
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
         )
         assert "gene_count" in cypher
         assert "term_count" in cypher
@@ -1565,14 +1565,14 @@ class TestBuildGeneOntologyTermsSummary:
     def test_params_include_locus_tags(self):
         """params dict has locus_tags key."""
         _, params = build_gene_ontology_terms_summary(
-            locus_tags=["PMM0001", "PMM0002"], ontology="go_bp",
+            locus_tags=["PMM0001", "PMM0002"], ontology="go_bp", organism_name="Test Org",
         )
         assert params["locus_tags"] == ["PMM0001", "PMM0002"]
 
     def test_invalid_ontology_raises(self):
         """Invalid ontology raises ValueError."""
         with pytest.raises(ValueError, match="Invalid ontology"):
-            build_gene_ontology_terms_summary(locus_tags=["x"], ontology="bad")
+            build_gene_ontology_terms_summary(locus_tags=["x"], ontology="bad", organism_name="Test Org")
 
 
 class TestGeneOntologyTermsLeafFilter:
@@ -1595,9 +1595,10 @@ class TestGeneOntologyTermsLeafFilter:
 class TestBuildGeneOntologyTermsBrite:
     def test_summary_uses_2hop_match(self):
         cypher, params = build_gene_ontology_terms_summary(
-            locus_tags=["PMM0001"], ontology="brite",
+            locus_tags=["PMM0001"], ontology="brite", organism_name="Test Org",
         )
-        assert params == {"locus_tags": ["PMM0001"]}
+        assert params["locus_tags"] == ["PMM0001"]
+        assert params["org"] == "Test Org"
         # Must have 2-hop: Gene → KeggTerm → BriteCategory
         assert ":Gene_has_kegg_ko" in cypher
         assert ":Kegg_term_in_brite_category" in cypher
@@ -1607,7 +1608,7 @@ class TestBuildGeneOntologyTermsBrite:
 
     def test_detail_uses_2hop_match(self):
         cypher, params = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="brite",
+            locus_tags=["PMM0001"], ontology="brite", organism_name="Test Org",
         )
         assert ":Gene_has_kegg_ko" in cypher
         assert ":Kegg_term_in_brite_category" in cypher
@@ -1615,10 +1616,127 @@ class TestBuildGeneOntologyTermsBrite:
 
     def test_detail_returns_expected_columns(self):
         cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0001"], ontology="brite",
+            locus_tags=["PMM0001"], ontology="brite", organism_name="Test Org",
         )
         for col in ["locus_tag", "term_id", "term_name"]:
             assert col in cypher
+
+
+class TestBuildGeneOntologyTermsLevelTree:
+    """Tests for organism, mode, level, tree parameters."""
+
+    def test_leaf_mode_returns_level_column(self):
+        """Leaf mode returns t.level AS level in RETURN."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+        )
+        assert "t.level AS level" in cypher
+
+    def test_leaf_mode_with_level_filter(self):
+        """Leaf mode with level adds t.level = $level."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+            level=2,
+        )
+        assert "t.level = $level" in cypher
+        assert params["level"] == 2
+
+    def test_leaf_mode_returns_tree_columns_brite(self):
+        """Leaf mode for BRITE returns tree/tree_code columns."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="brite", organism_name="Test Org",
+        )
+        assert "t.tree AS tree" in cypher
+        assert "t.tree_code AS tree_code" in cypher
+
+    def test_tree_filter_adds_clause(self):
+        """tree filter adds t.tree = $tree."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="brite", organism_name="Test Org",
+            tree="Enzymes",
+        )
+        assert "t.tree = $tree" in cypher
+        assert params["tree"] == "Enzymes"
+
+    def test_tree_with_non_brite_raises(self):
+        """tree filter with non-brite ontology raises ValueError."""
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_gene_ontology_terms(
+                locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+                tree="Enzymes",
+            )
+
+    def test_organism_scoped_match(self):
+        """MATCH uses organism_name: $org and locus_tag IN $locus_tags."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+        )
+        assert "organism_name: $org" in cypher
+        assert "locus_tag IN $locus_tags" in cypher
+        assert params["org"] == "Test Org"
+
+    def test_rollup_mode_uses_hierarchy_walk(self):
+        """Rollup mode uses *0.., t.level = $level, DISTINCT, no NOT EXISTS."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+            mode="rollup", level=1,
+        )
+        assert "*0.." in cypher
+        assert "t.level = $level" in cypher
+        assert "DISTINCT" in cypher
+        assert "NOT EXISTS" not in cypher
+        assert params["level"] == 1
+
+    def test_rollup_without_level_raises(self):
+        """Rollup mode without level raises ValueError."""
+        with pytest.raises(ValueError, match="level is required"):
+            build_gene_ontology_terms(
+                locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+                mode="rollup",
+            )
+
+    def test_rollup_brite_bridge(self):
+        """Rollup with BRITE uses 2-hop bridge pattern."""
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="brite", organism_name="Test Org",
+            mode="rollup", level=0,
+        )
+        assert ":Gene_has_kegg_ko" in cypher
+        assert "KeggTerm" in cypher
+        assert ":Kegg_term_in_brite_category" in cypher
+        assert ":Brite_category_is_a_brite_category*0.." in cypher
+        assert "t.level = $level" in cypher
+        assert params["level"] == 0
+
+
+class TestBuildGeneOntologyTermsSummaryLevelTree:
+    """Tests for organism, mode, level, tree in summary builder."""
+
+    def test_leaf_mode_collects_level_tree(self):
+        """Leaf mode collects level/tree/tree_code in term objects."""
+        cypher, _ = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+        )
+        assert "t.level" in cypher
+        assert "t.tree" in cypher
+
+    def test_rollup_mode_walks_hierarchy(self):
+        """Rollup mode uses hierarchy walk with *0.. and level filter."""
+        cypher, params = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+            mode="rollup", level=1,
+        )
+        assert "*0.." in cypher
+        assert "t.level = $level" in cypher
+        assert params["level"] == 1
+
+    def test_rollup_without_level_raises(self):
+        """Rollup mode without level raises ValueError."""
+        with pytest.raises(ValueError, match="level is required"):
+            build_gene_ontology_terms_summary(
+                locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
+                mode="rollup",
+            )
 
 
 class TestBuildGeneExistenceCheck:
