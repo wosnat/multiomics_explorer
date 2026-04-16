@@ -48,10 +48,10 @@ rows:
   - '{''count'': 1, ''item'': ''growth_phase''}'
   - '{''count'': 1, ''item'': ''phosphorus''}'
   - '{''count'': 1, ''item'': ''salt''}'
+  - '{''count'': 11, ''item'': ''coculture''}'
   - '{''count'': 16, ''item'': ''carbon''}'
   - '{''count'': 3, ''item'': ''iron''}'
   - '{''count'': 3, ''item'': ''viral''}'
-  - '{''count'': 7, ''item'': ''coculture''}'
   - '{''count'': 8, ''item'': ''light''}'
   - '{''count'': 8, ''item'': ''nitrogen''}'
   time_course_count: 12

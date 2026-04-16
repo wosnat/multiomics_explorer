@@ -69,6 +69,7 @@ rows:
   - '{''count'': 3, ''item'': ''10.1038/ismej.2017.189''}'
   - '{''count'': 3, ''item'': ''10.1038/nmicrobiol.2017.100''}'
   - '{''count'': 3, ''item'': ''10.1128/mSystems.00040-18''}'
+  - '{''count'': 3, ''item'': ''10.1186/2046-9063-8-7''}'
   - '{''count'': 4, ''item'': ''10.1038/ismej.2015.36''}'
   - '{''count'': 4, ''item'': ''10.1038/s42003-019-0410-x''}'
   - '{''count'': 4, ''item'': ''10.1038/s42003-024-06098-5''}'
@@ -96,9 +97,9 @@ rows:
   - '{''count'': 4, ''item'': ''viral''}'
   - '{''count'': 5, ''item'': ''darkness''}'
   - '{''count'': 5, ''item'': ''iron''}'
-  - '{''count'': 57, ''item'': ''coculture''}'
   - '{''count'': 7, ''item'': ''phosphorus''}'
   - '{''count'': 75, ''item'': ''carbon''}'
+  - '{''count'': 77, ''item'': ''coculture''}'
   - '{''count'': 9, ''item'': ''light''}'
   time_course_count: 32
   total_matching: 166

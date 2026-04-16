@@ -45,6 +45,7 @@ rows:
     of replication as well as for processivity of DNA replication'
   annotation_quality: 3
   annotation_types:
+  - brite
   - cog_category
   - cyanorak_role
   - ec

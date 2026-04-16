@@ -148,7 +148,7 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
     (control)'
-  gene_count: 2
+  gene_count: 343
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Marinobacter adhaerens DSM 23420 / HP15
@@ -169,9 +169,10 @@ rows:
   time_point_significant_up:
   - '0'
   time_point_totals:
-  - '2'
+  - '343'
   treatment_type:
   - carbon
+  - coculture
 - background_factors:
   - coculture
   - darkness
@@ -181,13 +182,13 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
     (control)'
-  gene_count: 2
+  gene_count: 343
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Marinobacter adhaerens DSM 23420 / HP15
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 17
+  significant_up_count: 44
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -198,13 +199,14 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '17'
   time_point_significant_up:
-  - '0'
+  - '44'
   time_point_totals:
-  - '2'
+  - '343'
   treatment_type:
   - carbon
+  - coculture
 - background_factors:
   - coculture
   - light
@@ -214,13 +216,13 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
     (control)'
-  gene_count: 2
+  gene_count: 343
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Marinobacter adhaerens DSM 23420 / HP15
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 6
+  significant_up_count: 3
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -231,13 +233,14 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '6'
   time_point_significant_up:
-  - '0'
+  - '3'
   time_point_totals:
-  - '2'
+  - '343'
   treatment_type:
   - carbon
+  - coculture
 - background_factors:
   - coculture
   - light
@@ -246,13 +249,13 @@ rows:
   coculture_partner: Prochlorococcus MED4
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 2
+  gene_count: 343
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Marinobacter adhaerens DSM 23420 / HP15
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 7
+  significant_up_count: 34
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -263,13 +266,14 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '7'
   time_point_significant_up:
-  - '0'
+  - '34'
   time_point_totals:
-  - '2'
+  - '343'
   treatment_type:
   - carbon
+  - coculture
 - background_factors:
   - light
   cluster_types: []

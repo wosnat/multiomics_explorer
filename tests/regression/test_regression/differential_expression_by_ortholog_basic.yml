@@ -581,7 +581,7 @@ rows:
   coculture_partner: null
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: pub_Comparative quantitative prote_pi_limitation_mit9312_itraq
+  experiment_id: 10.1186/2046-9063-8-7_pi_limitation_mit9312_itraq
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   not_significant: 1

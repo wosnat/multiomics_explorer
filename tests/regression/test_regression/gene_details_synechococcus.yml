@@ -33,6 +33,7 @@ rows:
     membrane proteins'
   annotation_quality: 3
   annotation_types:
+  - brite
   - cog_category
   - cyanorak_role
   - ec

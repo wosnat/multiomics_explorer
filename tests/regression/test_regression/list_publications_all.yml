@@ -736,7 +736,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  doi: null
+  doi: 10.1186/2046-9063-8-7
   experiment_count: 3
   journal: Aquatic Biosystems
   omics_types:
