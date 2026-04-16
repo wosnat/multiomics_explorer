@@ -73,6 +73,16 @@ ONTOLOGY_CONFIG = {
         "parent_label": "PfamClan",
         "parent_fulltext_index": "pfamClanFullText",
     },
+    "brite": {
+        "label": "BriteCategory",
+        "gene_rel": "Gene_has_kegg_ko",
+        "hierarchy_rels": ["Brite_category_is_a_brite_category"],
+        "fulltext_index": "briteCategoryFullText",
+        "bridge": {
+            "node_label": "KeggTerm",
+            "edge": "Kegg_term_in_brite_category",
+        },
+    },
 }
 
 def _hierarchy_walk(

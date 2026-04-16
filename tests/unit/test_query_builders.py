@@ -123,6 +123,25 @@ class TestHierarchyWalk:
             _hierarchy_walk("go_bp", direction="sideways")
 
 
+class TestOntologyConfigBrite:
+    def test_brite_in_ontology_config(self):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        assert "brite" in ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG["brite"]
+        assert cfg["label"] == "BriteCategory"
+        assert cfg["gene_rel"] == "Gene_has_kegg_ko"
+        assert cfg["hierarchy_rels"] == ["Brite_category_is_a_brite_category"]
+        assert cfg["fulltext_index"] == "briteCategoryFullText"
+        assert cfg["bridge"] == {
+            "node_label": "KeggTerm",
+            "edge": "Kegg_term_in_brite_category",
+        }
+
+    def test_brite_in_all_ontologies(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert "brite" in ALL_ONTOLOGIES
+
+
 class TestBuildResolveGene:
     def test_basic(self):
         cypher, params = build_resolve_gene(identifier="PMM0001")
@@ -804,6 +823,7 @@ class TestOntologyConfig:
         assert set(ONTOLOGY_CONFIG.keys()) == {
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam",
+            "brite",
         }
 
     def test_required_fields_present(self):
@@ -3478,6 +3498,7 @@ def test_all_ontologies_matches_config_keys():
     assert ALL_ONTOLOGIES == [
         "go_bp", "go_mf", "go_cc", "ec", "kegg",
         "cog_category", "cyanorak_role", "tigr_role", "pfam",
+        "brite",
     ]
 
 
