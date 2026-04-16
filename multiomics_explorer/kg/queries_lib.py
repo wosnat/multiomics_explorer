@@ -1631,9 +1631,21 @@ def build_gene_ontology_terms_summary(
     label = cfg["label"]
     leaf_filter = _gene_ontology_terms_leaf_filter(cfg)
 
+    bridge = cfg.get("bridge")
+    if bridge:
+        match_line = (
+            f"MATCH (g:Gene {{locus_tag: lt}})"
+            f"-[:{gene_rel}]->(:{bridge['node_label']})"
+            f"-[:{bridge['edge']}]->(t:{label})\n"
+        )
+    else:
+        match_line = (
+            f"MATCH (g:Gene {{locus_tag: lt}})-[:{gene_rel}]->(t:{label})\n"
+        )
+
     cypher = (
         "UNWIND $locus_tags AS lt\n"
-        f"MATCH (g:Gene {{locus_tag: lt}})-[:{gene_rel}]->(t:{label})\n"
+        f"{match_line}"
         f"{leaf_filter}"
         "WITH g.locus_tag AS lt, collect({id: t.id, name: t.name}) AS terms\n"
         "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
@@ -1693,9 +1705,21 @@ def build_gene_ontology_terms(
     else:
         limit_clause = ""
 
+    bridge = cfg.get("bridge")
+    if bridge:
+        match_line = (
+            f"MATCH (g:Gene {{locus_tag: lt}})"
+            f"-[:{gene_rel}]->(:{bridge['node_label']})"
+            f"-[:{bridge['edge']}]->(t:{label})\n"
+        )
+    else:
+        match_line = (
+            f"MATCH (g:Gene {{locus_tag: lt}})-[:{gene_rel}]->(t:{label})\n"
+        )
+
     cypher = (
         "UNWIND $locus_tags AS lt\n"
-        f"MATCH (g:Gene {{locus_tag: lt}})-[:{gene_rel}]->(t:{label})\n"
+        f"{match_line}"
         f"{leaf_filter}"
         "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
         f"       t.name AS term_name{verbose_cols}\n"
