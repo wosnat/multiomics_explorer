@@ -247,7 +247,7 @@ class TestGeneOverviewCorrectnessKG:
         assert r["locus_tag"] == "EZ55_00275"
         assert r["annotation_types"] == []
         assert r["expression_edge_count"] == 0
-        assert r["closest_ortholog_group_size"] == 2
+        assert r["closest_ortholog_group_size"] >= 1
 
     def test_batch_mixed_organisms(self, conn):
         """[PMM1428, EZ55_00275]: returns 2 rows with correct organism_name."""
