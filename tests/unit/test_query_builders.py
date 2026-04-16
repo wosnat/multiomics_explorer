@@ -122,6 +122,32 @@ class TestHierarchyWalk:
         with pytest.raises(ValueError, match="direction"):
             _hierarchy_walk("go_bp", direction="sideways")
 
+    def test_brite_up_uses_bridge(self):
+        frag = _hierarchy_walk("brite", direction="up")
+        assert frag["leaf_label"] == "BriteCategory"
+        assert frag["gene_rel"] == "Gene_has_kegg_ko"
+        assert "Brite_category_is_a_brite_category" in frag["rel_union"]
+        # 2-hop bind: Gene → KeggTerm → BriteCategory
+        assert ":Gene_has_kegg_ko" in frag["bind_up"]
+        assert ":KeggTerm" in frag["bind_up"]
+        assert ":Kegg_term_in_brite_category" in frag["bind_up"]
+        assert "(leaf:BriteCategory)" in frag["bind_up"]
+        # Walk up within BriteCategory hierarchy
+        assert "Brite_category_is_a_brite_category*0.." in frag["walk_up"]
+        assert "(t:BriteCategory)" in frag["walk_up"]
+
+    def test_brite_down_uses_bridge(self):
+        frag = _hierarchy_walk("brite", direction="down")
+        # Walk down: root → descendants within BriteCategory
+        assert "(t:BriteCategory)<-[:Brite_category_is_a_brite_category*0..]-(leaf:BriteCategory)" in frag["walk_down"]
+
+    def test_brite_bind_up_starts_with_standard_prefix(self):
+        """bind_up must start with standard Gene prefix for expcov prefix-stripping."""
+        frag = _hierarchy_walk("brite", direction="up")
+        assert frag["bind_up"].startswith(
+            "MATCH (g:Gene {organism_name: $org})"
+        )
+
 
 class TestOntologyConfigBrite:
     def test_brite_in_ontology_config(self):

@@ -177,6 +177,29 @@ def _hierarchy_walk(
             "walk_down": walk_down,
         }
 
+    # --- Bridge ontologies (2-hop gene → intermediate → leaf) ---
+    bridge = cfg.get("bridge")
+    if bridge:
+        bridge_edge = bridge["edge"]
+        bridge_node = bridge["node_label"]
+        bind_up = (
+            f"MATCH (g:Gene {{organism_name: $org}})"
+            f"-[:{gene_rel}]->(ko:{bridge_node})"
+            f"-[:{bridge_edge}]->(leaf:{leaf_label})"
+        )
+        walk_up = f"MATCH (leaf)-[:{rel_union}*0..]->(t:{leaf_label})"
+        walk_down = (
+            f"MATCH (t:{leaf_label})<-[:{rel_union}*0..]-(leaf:{leaf_label})"
+        )
+        return {
+            "leaf_label": leaf_label,
+            "gene_rel": gene_rel,
+            "rel_union": rel_union,
+            "bind_up": bind_up,
+            "walk_up": walk_up,
+            "walk_down": walk_down,
+        }
+
     # --- Flat ontologies (no hierarchy_rels): t = leaf ---
     if not hierarchy_rels:
         bind_up = (
