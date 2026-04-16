@@ -40,5 +40,6 @@ mistakes:
   - "Stats reflect only terms with min_gene_set_size <= genes <= max_gene_set_size (default 5-500). If you pass min_gene_set_size=1, coverage and term counts will be higher but include terms too small or large for meaningful enrichment."
   - wrong: "results[0]['rank']  # AttributeError"
     right: "results[0]['relevance_rank']"
+  - "BRITE stats at each level mix all 12 trees together. For tree-specific analysis, use search_ontology to find term IDs in the target tree, then pass them to genes_by_ontology."
   - wrong: "result['total_rows']  # KeyError"
     right: "result['total_matching']"

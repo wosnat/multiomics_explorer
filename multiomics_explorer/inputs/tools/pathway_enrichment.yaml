@@ -43,5 +43,6 @@ mistakes:
   - "For cluster-membership / ortholog-group / custom-list enrichment, use the Python `fisher_ora` primitive (see `docs://analysis/enrichment`). The MCP tool is the DE-wired convenience only. Idiom: `term2gene = to_dataframe(genes_by_ontology(...))` then `fisher_ora(gene_sets, background, term2gene)` — no manual column munging."
   - "At least one of `level` or `term_ids` must be provided (matches `genes_by_ontology`)."
   - "`min/max_gene_set_size` here means **M** — pathway size within each cluster's background (clusterProfiler semantics). This differs from `ontology_landscape`'s filter, which is organism-scoped. A pathway may be tested in one cluster and dropped in another when `background='table_scope'`."
+  - "For brite enrichment, pick a specific tree level: `level=1` (BRITE category) or `level=2` (BRITE sub-category) are the most useful. `level=3` is KO-leaf — identical coverage to kegg level=3 but organized by BRITE tree membership. Use `ontology_landscape` to compare coverage across BRITE levels before committing."
   - wrong: "pathway_enrichment(..., background='genome')  # not a valid string"
     right: "pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list"
