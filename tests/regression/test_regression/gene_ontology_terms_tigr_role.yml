@@ -1,6 +1,9 @@
 case_id: gene_ontology_terms_tigr_role
 row_count: 1
 rows:
-- locus_tag: PMM0001
+- level: 0
+  locus_tag: PMM0001
   term_id: tigr.role:132
   term_name: DNA metabolism / DNA replication, recombination, and repair
+  tree: null
+  tree_code: null

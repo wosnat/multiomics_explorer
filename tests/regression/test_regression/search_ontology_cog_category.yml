@@ -2,5 +2,8 @@ case_id: search_ontology_cog_category
 row_count: 1
 rows:
 - id: cog.category:C
+  level: 0
   name: Energy production and conversion
   score: 1.2872
+  tree: null
+  tree_code: null

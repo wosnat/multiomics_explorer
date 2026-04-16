@@ -20,8 +20,8 @@ rows:
   by_organism:
   - '{''count'': 1, ''item'': ''Alteromonas macleodii HOT1A3''}'
   - '{''count'': 36, ''item'': ''Prochlorococcus MED4''}'
-  - '{''count'': 4, ''item'': ''Alteromonas mediterranea DE''}'
-  - '{''count'': 4, ''item'': ''Marinobacter adhaerens DSM 23420 / HP15''}'
+  - '{''count'': 4, ''item'': ''Alteromonas (MarRef v6)''}'
+  - '{''count'': 4, ''item'': ''Marinobacter (MarRef v6)''}'
   by_publication:
   - '{''count'': 1, ''item'': ''10.1038/ismej.2016.70''}'
   - '{''count'': 1, ''item'': ''10.1038/ismej.2017.88''}'

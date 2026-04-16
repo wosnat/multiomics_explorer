@@ -71,7 +71,7 @@ class TestAPIInputValidation:
 
     def test_gene_ontology_terms_empty_locus_tags(self, conn):
         with pytest.raises(ValueError, match="locus_tags"):
-            api.gene_ontology_terms([], conn=conn)
+            api.gene_ontology_terms([], organism="MED4", conn=conn)
 
     def test_genes_by_ontology_empty_term_ids(self, conn):
         # With no level and no term_ids, API requires at least one.
@@ -111,7 +111,7 @@ class TestAPIInputValidation:
 
     def test_gene_ontology_terms_invalid_ontology(self, conn):
         with pytest.raises(ValueError, match="Invalid ontology"):
-            api.gene_ontology_terms(["PMM0001"], ontology="invalid_ont", conn=conn)
+            api.gene_ontology_terms(["PMM0001"], organism="MED4", ontology="invalid_ont", conn=conn)
 
 
 # ---------------------------------------------------------------------------
@@ -343,14 +343,14 @@ class TestGeneOntologyTermsEdgeCases:
         """Gene with no terms for a specific ontology appears in no_terms."""
         # Use a gene unlikely to have Pfam annotations
         result = api.gene_ontology_terms(
-            locus_tags=["PMT9312_0342"], ontology="pfam", conn=conn,
+            locus_tags=["PMT9312_0342"], organism="9312", ontology="pfam", conn=conn,
         )
         if result["total_matching"] == 0:
             assert "PMT9312_0342" in result["no_terms"]
 
     def test_all_ontology_mode(self, conn):
         result = api.gene_ontology_terms(
-            locus_tags=[KNOWN_GENE], ontology=None, conn=conn,
+            locus_tags=[KNOWN_GENE], organism="MED4", ontology=None, conn=conn,
         )
         assert result["total_matching"] >= 1
         # Multiple ontology types in results
@@ -359,7 +359,7 @@ class TestGeneOntologyTermsEdgeCases:
 
     def test_summary_mode(self, conn):
         result = api.gene_ontology_terms(
-            locus_tags=[KNOWN_GENE], ontology="go_bp", summary=True, conn=conn,
+            locus_tags=[KNOWN_GENE], organism="MED4", ontology="go_bp", summary=True, conn=conn,
         )
         assert result["total_matching"] >= 1
         assert result["results"] == []

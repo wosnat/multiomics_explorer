@@ -16,6 +16,26 @@ rows:
   strain: null
   treatment_types: []
 - background_factors:
+  - coculture
+  - darkness
+  - light
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  experiment_count: 60
+  gene_count: 4305
+  genus: Alteromonas
+  ncbi_taxon_id: 232
+  omics_types:
+  - PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_count: 1
+  species: null
+  strain: Alt_MarRef
+  treatment_types:
+  - carbon
+  - coculture
+- background_factors:
   - axenic
   - coculture
   - diel
@@ -80,26 +100,6 @@ rows:
   - coculture
   - darkness
 - background_factors:
-  - coculture
-  - darkness
-  - light
-  clade: null
-  cluster_types: []
-  clustering_analysis_count: 0
-  experiment_count: 60
-  gene_count: 3817
-  genus: Alteromonas
-  ncbi_taxon_id: 1774373
-  omics_types:
-  - PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_count: 1
-  species: Alteromonas mediterranea
-  strain: AltMedDE
-  treatment_types:
-  - carbon
-  - coculture
-- background_factors:
   - light
   clade: null
   cluster_types: []
@@ -130,7 +130,7 @@ rows:
   ncbi_taxon_id: 225937
   omics_types:
   - PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_count: 1
   species: Marinobacter adhaerens
   strain: HP15

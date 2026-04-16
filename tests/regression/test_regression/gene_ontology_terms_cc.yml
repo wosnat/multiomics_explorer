@@ -1,9 +1,15 @@
 case_id: gene_ontology_terms_cc
 row_count: 2
 rows:
-- locus_tag: MIT1002_03493
+- level: 0
+  locus_tag: MIT1002_03493
   term_id: go:0005575
   term_name: cellular_component
-- locus_tag: MIT1002_03493
+  tree: null
+  tree_code: null
+- level: 2
+  locus_tag: MIT1002_03493
   term_id: go:0005737
   term_name: cytoplasm
+  tree: null
+  tree_code: null

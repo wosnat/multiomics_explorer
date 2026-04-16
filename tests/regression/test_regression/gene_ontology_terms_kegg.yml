@@ -1,6 +1,9 @@
 case_id: gene_ontology_terms_kegg
 row_count: 1
 rows:
-- locus_tag: MIT1002_03493
+- level: 3
+  locus_tag: MIT1002_03493
   term_id: kegg.orthology:K03402
   term_name: argR, ahrC; transcriptional regulator of arginine metabolism
+  tree: null
+  tree_code: null

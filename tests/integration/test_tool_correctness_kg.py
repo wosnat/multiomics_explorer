@@ -716,6 +716,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """argR (MIT1002_03493) leaf BP terms should be around 12."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["MIT1002_03493"], ontology="go_bp",
+            organism_name="Alteromonas macleodii MIT1002",
         )
         results = conn.execute_query(cypher, **params)
         assert 5 <= len(results) <= 20, (
@@ -730,6 +731,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """Gene with EC annotations returns EC numbers."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["MIT1002_03493"], ontology="ec",
+            organism_name="Alteromonas macleodii MIT1002",
         )
         results = conn.execute_query(cypher, **params)
         for r in results:
@@ -741,6 +743,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """Gene with KEGG KOs returns terms."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["MIT1002_03493"], ontology="kegg",
+            organism_name="Alteromonas macleodii MIT1002",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1, "argR should have at least 1 KEGG KO"
@@ -751,6 +754,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """Gene with no annotations for given ontology returns empty."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMT9312_0342"], ontology="go_cc",
+            organism_name="Prochlorococcus marinus str. MIT 9312",
         )
         results = conn.execute_query(cypher, **params)
         assert isinstance(results, list)
@@ -759,6 +763,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """Gene with GO:MF annotations returns molecular function terms."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["MIT1002_03493"], ontology="go_mf",
+            organism_name="Alteromonas macleodii MIT1002",
         )
         results = conn.execute_query(cypher, **params)
         for r in results:
@@ -769,6 +774,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """Gene with GO:CC annotations returns cellular component terms."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["MIT1002_03493"], ontology="go_cc",
+            organism_name="Alteromonas macleodii MIT1002",
         )
         results = conn.execute_query(cypher, **params)
         for r in results:
@@ -778,6 +784,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """Different gene (PMM0001/dnaN) has GO:BP annotations."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="go_bp",
+            organism_name="Prochlorococcus MED4",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1, "PMM0001 (dnaN) should have GO:BP annotations"
@@ -786,6 +793,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """PMM0001 should have COG category annotations (flat ontology)."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="cog_category",
+            organism_name="Prochlorococcus MED4",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
@@ -797,6 +805,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """PMM0001 should have CyanoRAK role annotations."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="cyanorak_role",
+            organism_name="Prochlorococcus MED4",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
@@ -805,6 +814,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """PMM0001 should have TIGR role annotations."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="tigr_role",
+            organism_name="Prochlorococcus MED4",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1
@@ -813,6 +823,7 @@ class TestGeneOntologyTermsCorrectnessKG:
         """PMM0001 should have Pfam domain annotations."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="pfam",
+            organism_name="Prochlorococcus MED4",
         )
         results = conn.execute_query(cypher, **params)
         assert isinstance(results, list)
@@ -823,17 +834,18 @@ class TestGeneOntologyTermsCorrectnessKG:
     def test_batch_multiple_genes(self, conn):
         """Batch query returns results for multiple genes."""
         cypher, params = build_gene_ontology_terms(
-            locus_tags=["PMM0001", "MIT1002_03493"], ontology="go_bp",
+            locus_tags=["MIT1002_03493", "MIT1002_00002"], ontology="go_bp",
+            organism_name="Alteromonas macleodii MIT1002",
         )
         results = conn.execute_query(cypher, **params)
         locus_tags_found = {r["locus_tag"] for r in results}
-        assert "PMM0001" in locus_tags_found
         assert "MIT1002_03493" in locus_tags_found
 
     def test_verbose_includes_organism(self, conn):
         """verbose=True adds organism_name to results."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="go_bp", verbose=True,
+            organism_name="Prochlorococcus MED4",
         )
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 1

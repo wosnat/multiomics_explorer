@@ -2,43 +2,79 @@ case_id: search_ontology_cyanorak_role
 row_count: 12
 rows:
 - id: cyanorak.role:F
+  level: 0
   name: DNA metabolism
   score: 1.6618
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.1
+  level: 1
   name: DNA metabolism > DNA replication, recombination, and repair
   score: 1.5978
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.1.1
+  level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Base excision
     repair
   score: 1.4145
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.1.2
+  level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Nucleotide excision
     repair
   score: 1.4145
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.1.3
+  level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Mismatch excision
     repair
   score: 1.4145
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.1.4
+  level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Homologous recombination
   score: 1.4708
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.1.5
+  level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Non-homologous
     end-joining
   score: 1.3625
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.1.6
+  level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Reversal of
     damage
   score: 1.4145
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.2
+  level: 1
   name: DNA metabolism > Restriction/modification
   score: 1.4087
+  tree: null
+  tree_code: null
 - id: cyanorak.role:F.3
+  level: 1
   name: DNA metabolism > Other
   score: 1.5248
+  tree: null
+  tree_code: null
 - id: cyanorak.role:N.1
+  level: 1
   name: Regulatory functions > DNA interactions
   score: 1.4087
+  tree: null
+  tree_code: null
 - id: cyanorak.role:P.2
+  level: 1
   name: Transcription > DNA-dependent RNA polymerase
   score: 1.3091
+  tree: null
+  tree_code: null

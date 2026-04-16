@@ -1,9 +1,15 @@
 case_id: gene_ontology_terms_different_gene
 row_count: 2
 rows:
-- locus_tag: PMM0001
+- level: 6
+  locus_tag: PMM0001
   term_id: go:0006260
   term_name: DNA replication
-- locus_tag: PMM0001
+  tree: null
+  tree_code: null
+- level: 7
+  locus_tag: PMM0001
   term_id: go:0006271
   term_name: DNA strand elongation involved in DNA replication
+  tree: null
+  tree_code: null

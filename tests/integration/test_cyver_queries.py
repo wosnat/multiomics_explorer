@@ -354,12 +354,14 @@ for _ont_key in ONTOLOGY_CONFIG:
         (
             f"gene_ontology_terms_summary_{_ont_key}",
             build_gene_ontology_terms_summary,
-            {"ontology": _ont_key, "locus_tags": _LOCUS},
+            {"ontology": _ont_key, "locus_tags": _LOCUS,
+             "organism_name": "Prochlorococcus MED4"},
         ),
         (
             f"gene_ontology_terms_{_ont_key}",
             build_gene_ontology_terms,
-            {"ontology": _ont_key, "locus_tags": _LOCUS},
+            {"ontology": _ont_key, "locus_tags": _LOCUS,
+             "organism_name": "Prochlorococcus MED4"},
         ),
         (
             f"ontology_landscape_{_ont_key}",

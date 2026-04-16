@@ -320,7 +320,7 @@ class TestGenesByOntologyContract:
 class TestGeneOntologyTermsContract:
     def test_returns_dict_envelope(self, conn):
         result = api.gene_ontology_terms(
-            locus_tags=[KNOWN_GENE], ontology="go_bp", conn=conn,
+            locus_tags=[KNOWN_GENE], organism="MED4", ontology="go_bp", conn=conn,
         )
         assert isinstance(result, dict)
         expected_keys = {
@@ -336,7 +336,7 @@ class TestGeneOntologyTermsContract:
 
     def test_results_have_expected_columns(self, conn):
         result = api.gene_ontology_terms(
-            locus_tags=[KNOWN_GENE], ontology="go_bp", conn=conn,
+            locus_tags=[KNOWN_GENE], organism="MED4", ontology="go_bp", conn=conn,
         )
         assert len(result["results"]) >= 1
         row = result["results"][0]
@@ -345,14 +345,14 @@ class TestGeneOntologyTermsContract:
 
     def test_not_found(self, conn):
         result = api.gene_ontology_terms(
-            locus_tags=[KNOWN_GENE, "FAKE_GENE_999"], ontology="go_bp",
-            conn=conn,
+            locus_tags=[KNOWN_GENE, "FAKE_GENE_999"], organism="MED4",
+            ontology="go_bp", conn=conn,
         )
         assert "FAKE_GENE_999" in result["not_found"]
 
     def test_all_ontology(self, conn):
         result = api.gene_ontology_terms(
-            locus_tags=[KNOWN_GENE], ontology=None, conn=conn,
+            locus_tags=[KNOWN_GENE], organism="MED4", ontology=None, conn=conn,
         )
         assert isinstance(result, dict)
         assert result["total_matching"] >= 1
@@ -361,7 +361,7 @@ class TestGeneOntologyTermsContract:
 
     def test_single_ontology_filter(self, conn):
         result = api.gene_ontology_terms(
-            locus_tags=[KNOWN_GENE], ontology="go_bp", conn=conn,
+            locus_tags=[KNOWN_GENE], organism="MED4", ontology="go_bp", conn=conn,
         )
         assert isinstance(result, dict)
         assert result["total_matching"] >= 1

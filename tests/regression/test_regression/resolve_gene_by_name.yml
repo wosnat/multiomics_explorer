@@ -18,6 +18,10 @@ rows:
   organism_name: Prochlorococcus RSP50
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
+  locus_tag: DEH24_01275
+  organism_name: Alteromonas (MarRef v6)
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
   locus_tag: EZ55_00002
   organism_name: Alteromonas macleodii EZ55
   product: DNA polymerase III subunit beta
@@ -27,7 +31,7 @@ rows:
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
   locus_tag: HP15_3703
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
   locus_tag: M744_03100
@@ -36,10 +40,6 @@ rows:
 - gene_name: dnaN
   locus_tag: M8001_00055
   organism_name: Pseudomonas putida KT2440
-  product: DNA polymerase III subunit beta
-- gene_name: dnaN
-  locus_tag: MADE_1000015
-  organism_name: Alteromonas mediterranea DE
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
   locus_tag: MIT1002_00002

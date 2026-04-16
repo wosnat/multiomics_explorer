@@ -4,18 +4,18 @@ rows:
 - by_level:
   - '{''count'': 1, ''item'': ''Alteromonadaceae''}'
   - '{''count'': 2, ''item'': ''Proteobacteria''}'
-  - '{''count'': 303, ''item'': ''Bacteria''}'
+  - '{''count'': 304, ''item'': ''Bacteria''}'
   - '{''count'': 352, ''item'': ''Synechococcus''}'
   - '{''count'': 395, ''item'': ''Prochloraceae''}'
   - '{''count'': 420, ''item'': ''curated''}'
   - '{''count'': 498, ''item'': ''Cyanobacteria''}'
   by_source:
-  - '{''count'': 1551, ''item'': ''eggnog''}'
+  - '{''count'': 1552, ''item'': ''eggnog''}'
   - '{''count'': 420, ''item'': ''cyanorak''}'
-  score_max: 6.6553
-  score_median: 1.0711
+  score_max: 6.663
+  score_median: 1.0719
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 615, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 619, ''name'': ''Energy production and
     conversion''}'
   - '{''id'': ''cog.category:K'', ''count'': 29, ''name'': ''Transcription''}'
   - '{''id'': ''cog.category:N'', ''count'': 11, ''name'': ''Cell motility''}'
@@ -23,7 +23,7 @@ rows:
   - '{''id'': ''cog.category:U'', ''count'': 67, ''name'': ''Intracellular trafficking,
     secretion, and vesicular transport''}'
   top_cyanorak_roles:
-  - '{''id'': ''cyanorak.role:D.1.1'', ''count'': 88, ''name'': ''Cellular processes
+  - '{''id'': ''cyanorak.role:D.1.1'', ''count'': 89, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Iron''}'
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 235, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
@@ -33,5 +33,5 @@ rows:
     respiration > Photosystem II''}'
   - '{''id'': ''cyanorak.role:L.3'', ''count'': 26, ''name'': ''Protein fate > Protein
     folding and stabilization''}'
-  total_entries: 45048
-  total_matching: 1125
+  total_entries: 45438
+  total_matching: 1126

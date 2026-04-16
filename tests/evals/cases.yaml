@@ -525,7 +525,7 @@
     ontology: go_bp
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: search_ontology_kegg
   tool: search_ontology
@@ -535,7 +535,7 @@
     ontology: kegg
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: search_ontology_ec
   tool: search_ontology
@@ -545,7 +545,7 @@
     ontology: ec
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: search_ontology_go_mf
   tool: search_ontology
@@ -555,7 +555,7 @@
     ontology: go_mf
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: search_ontology_go_cc
   tool: search_ontology
@@ -565,7 +565,7 @@
     ontology: go_cc
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: search_ontology_lucene_wildcard
   tool: search_ontology
@@ -575,7 +575,7 @@
     ontology: ec
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: search_ontology_cog_category
   tool: search_ontology
@@ -585,7 +585,7 @@
     ontology: cog_category
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: search_ontology_cyanorak_role
   tool: search_ontology
@@ -595,7 +595,7 @@
     ontology: cyanorak_role
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: search_ontology_tigr_role
   tool: search_ontology
@@ -605,7 +605,7 @@
     ontology: tigr_role
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 # ── Genes by ontology ──────────────────────────────────────
 # All four cases exercise the new long-format (gene × term) signature.
@@ -664,10 +664,11 @@
   params:
     locus_tags: ["MIT1002_03493"]
     ontology: go_bp
+    organism_name: "Alteromonas macleodii MIT1002"
   expect:
     min_rows: 5
     max_rows: 20
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_bp_all
   tool: gene_ontology_terms
@@ -675,10 +676,11 @@
   params:
     locus_tags: ["MIT1002_03493"]
     ontology: go_bp
+    organism_name: "Alteromonas macleodii MIT1002"
     verbose: true
   expect:
     min_rows: 5
-    columns: [locus_tag, term_id, term_name, organism_name]
+    columns: [locus_tag, term_id, term_name, level, organism_name]
 
 - id: gene_ontology_terms_kegg
   tool: gene_ontology_terms
@@ -686,9 +688,10 @@
   params:
     locus_tags: ["MIT1002_03493"]
     ontology: kegg
+    organism_name: "Alteromonas macleodii MIT1002"
   expect:
     min_rows: 1
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_ec
   tool: gene_ontology_terms
@@ -696,6 +699,7 @@
   params:
     locus_tags: ["MIT1002_03493"]
     ontology: ec
+    organism_name: "Alteromonas macleodii MIT1002"
   expect:
     min_rows: 0
 
@@ -705,9 +709,10 @@
   params:
     locus_tags: ["MIT1002_03493"]
     ontology: go_mf
+    organism_name: "Alteromonas macleodii MIT1002"
   expect:
     min_rows: 0
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_cc
   tool: gene_ontology_terms
@@ -715,9 +720,10 @@
   params:
     locus_tags: ["MIT1002_03493"]
     ontology: go_cc
+    organism_name: "Alteromonas macleodii MIT1002"
   expect:
     min_rows: 0
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_ec_leaf
   tool: gene_ontology_terms
@@ -725,9 +731,10 @@
   params:
     locus_tags: ["PMM0001"]
     ontology: ec
+    organism_name: "Prochlorococcus MED4"
   expect:
     min_rows: 0
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_bp_limited
   tool: gene_ontology_terms
@@ -735,11 +742,12 @@
   params:
     locus_tags: ["MIT1002_03493"]
     ontology: go_bp
+    organism_name: "Alteromonas macleodii MIT1002"
     limit: 5
   expect:
     min_rows: 1
     max_rows: 5
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_different_gene
   tool: gene_ontology_terms
@@ -747,9 +755,10 @@
   params:
     locus_tags: ["PMM0001"]
     ontology: go_bp
+    organism_name: "Prochlorococcus MED4"
   expect:
     min_rows: 1
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_cog_category
   tool: gene_ontology_terms
@@ -757,9 +766,10 @@
   params:
     locus_tags: ["PMM0001"]
     ontology: cog_category
+    organism_name: "Prochlorococcus MED4"
   expect:
     min_rows: 1
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_cyanorak_role
   tool: gene_ontology_terms
@@ -767,9 +777,10 @@
   params:
     locus_tags: ["PMM0001"]
     ontology: cyanorak_role
+    organism_name: "Prochlorococcus MED4"
   expect:
     min_rows: 1
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 - id: gene_ontology_terms_tigr_role
   tool: gene_ontology_terms
@@ -777,9 +788,10 @@
   params:
     locus_tags: ["PMM0001"]
     ontology: tigr_role
+    organism_name: "Prochlorococcus MED4"
   expect:
     min_rows: 1
-    columns: [locus_tag, term_id, term_name]
+    columns: [locus_tag, term_id, term_name, level]
 
 # ── Pfam ontology ──────────────────────────────────────────
 
@@ -791,7 +803,7 @@
     search_text: "polymerase"
   expect:
     min_rows: 1
-    columns: [id, name, score]
+    columns: [id, name, score, level]
 
 - id: gene_ontology_terms_pfam
   tool: gene_ontology_terms
@@ -799,6 +811,7 @@
   params:
     ontology: pfam
     locus_tags: ["PMM0001"]
+    organism_name: "Prochlorococcus MED4"
   expect:
     min_rows: 0
     columns: [locus_tag, term_id, term_name]

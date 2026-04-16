@@ -168,8 +168,8 @@ rows:
   omics_types:
   - PROTEOMICS
   organisms:
-  - Alteromonas mediterranea DE
-  - Marinobacter adhaerens DSM 23420 / HP15
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   - Prochlorococcus MED4
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   - Synechococcus WH7803

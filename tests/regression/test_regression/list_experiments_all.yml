@@ -2,6 +2,663 @@ case_id: list_experiments_all
 row_count: 166
 rows:
 - background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus sp. BL107
+  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_bl107_proteomics
+  experiment_name: 'Alteromonas in BL107 coculture: darkness +100 nM glucose vs darkness
+    (control)'
+  gene_count: 11
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 3
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '3'
+  time_point_totals:
+  - '11'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus sp. BL107
+  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_bl107_proteomics
+  experiment_name: 'Alteromonas in BL107 coculture: darkness +5 mM glucose vs darkness
+    (control)'
+  gene_count: 11
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 5
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '5'
+  time_point_totals:
+  - '11'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus sp. BL107
+  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_bl107_proteomics
+  experiment_name: 'Alteromonas in BL107 coculture: light +100 nM glucose vs light
+    (control)'
+  gene_count: 11
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 1
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '1'
+  time_point_totals:
+  - '11'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus sp. BL107
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_bl107_proteomics
+  experiment_name: 'Alteromonas in BL107 coculture: light +5 mM glucose vs light (control)'
+  gene_count: 11
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 6
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '6'
+  time_point_totals:
+  - '11'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus MED4
+  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_med4_proteomics
+  experiment_name: 'Alteromonas in MED4 coculture: darkness +100 nM glucose vs darkness
+    (control)'
+  gene_count: 16
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '0'
+  time_point_totals:
+  - '16'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus MED4
+  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_med4_proteomics
+  experiment_name: 'Alteromonas in MED4 coculture: darkness +5 mM glucose vs darkness
+    (control)'
+  gene_count: 16
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 5
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '5'
+  time_point_totals:
+  - '16'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus MED4
+  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_med4_proteomics
+  experiment_name: 'Alteromonas in MED4 coculture: light +100 nM glucose vs light
+    (control)'
+  gene_count: 16
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '0'
+  time_point_totals:
+  - '16'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus MED4
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_med4_proteomics
+  experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
+  gene_count: 16
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 5
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '5'
+  time_point_totals:
+  - '16'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_ss120_proteomics
+  experiment_name: 'Alteromonas in SS120 coculture: darkness +100 nM glucose vs darkness
+    (control)'
+  gene_count: 54
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 2
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '2'
+  time_point_totals:
+  - '54'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_ss120_proteomics
+  experiment_name: 'Alteromonas in SS120 coculture: darkness +5 mM glucose vs darkness
+    (control)'
+  gene_count: 54
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 20
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '20'
+  time_point_totals:
+  - '54'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_ss120_proteomics
+  experiment_name: 'Alteromonas in SS120 coculture: light +100 nM glucose vs light
+    (control)'
+  gene_count: 54
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 2
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '2'
+  time_point_significant_up:
+  - '0'
+  time_point_totals:
+  - '54'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_ss120_proteomics
+  experiment_name: 'Alteromonas in SS120 coculture: light +5 mM glucose vs light (control)'
+  gene_count: 54
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 1
+  significant_up_count: 16
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '1'
+  time_point_significant_up:
+  - '16'
+  time_point_totals:
+  - '54'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH7803
+  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh7803_proteomics
+  experiment_name: 'Alteromonas in WH7803 coculture: darkness +100 nM glucose vs darkness
+    (control)'
+  gene_count: 4
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '0'
+  time_point_totals:
+  - '4'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH7803
+  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh7803_proteomics
+  experiment_name: 'Alteromonas in WH7803 coculture: darkness +5 mM glucose vs darkness
+    (control)'
+  gene_count: 4
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '0'
+  time_point_totals:
+  - '4'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH7803
+  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh7803_proteomics
+  experiment_name: 'Alteromonas in WH7803 coculture: light +100 nM glucose vs light
+    (control)'
+  gene_count: 4
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '0'
+  time_point_totals:
+  - '4'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH7803
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh7803_proteomics
+  experiment_name: 'Alteromonas in WH7803 coculture: light +5 mM glucose vs light
+    (control)'
+  gene_count: 4
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '0'
+  time_point_totals:
+  - '4'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH8102
+  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh8102_proteomics
+  experiment_name: 'Alteromonas in WH8102 coculture: darkness +100 nM glucose vs darkness
+    (control)'
+  gene_count: 78
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 2
+  significant_up_count: 1
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '2'
+  time_point_significant_up:
+  - '1'
+  time_point_totals:
+  - '78'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH8102
+  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh8102_proteomics
+  experiment_name: 'Alteromonas in WH8102 coculture: darkness +5 mM glucose vs darkness
+    (control)'
+  gene_count: 78
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 26
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - darkness
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '26'
+  time_point_totals:
+  - '78'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH8102
+  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh8102_proteomics
+  experiment_name: 'Alteromonas in WH8102 coculture: light +100 nM glucose vs light
+    (control)'
+  gene_count: 78
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 2
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '2'
+  time_point_totals:
+  - '78'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: Synechococcus WH8102
+  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh8102_proteomics
+  experiment_name: 'Alteromonas in WH8102 coculture: light +5 mM glucose vs light
+    (control)'
+  gene_count: 78
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas (MarRef v6)
+  publication_doi: 10.1128/spectrum.03275-22
+  significant_down_count: 0
+  significant_up_count: 27
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - stationary
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '27'
+  time_point_totals:
+  - '78'
+  treatment_type:
+  - carbon
+  - coculture
+- background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -744,543 +1401,6 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_bl107_proteomics
-  experiment_name: 'Alteromonas in BL107 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_bl107_proteomics
-  experiment_name: 'Alteromonas in BL107 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_bl107_proteomics
-  experiment_name: 'Alteromonas in BL107 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_bl107_proteomics
-  experiment_name: 'Alteromonas in BL107 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_med4_proteomics
-  experiment_name: 'Alteromonas in MED4 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_med4_proteomics
-  experiment_name: 'Alteromonas in MED4 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_med4_proteomics
-  experiment_name: 'Alteromonas in MED4 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_med4_proteomics
-  experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_ss120_proteomics
-  experiment_name: 'Alteromonas in SS120 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_ss120_proteomics
-  experiment_name: 'Alteromonas in SS120 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_ss120_proteomics
-  experiment_name: 'Alteromonas in SS120 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_ss120_proteomics
-  experiment_name: 'Alteromonas in SS120 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh7803_proteomics
-  experiment_name: 'Alteromonas in WH7803 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh7803_proteomics
-  experiment_name: 'Alteromonas in WH7803 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh7803_proteomics
-  experiment_name: 'Alteromonas in WH7803 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh7803_proteomics
-  experiment_name: 'Alteromonas in WH7803 coculture: light +5 mM glucose vs light
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh8102_proteomics
-  experiment_name: 'Alteromonas in WH8102 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh8102_proteomics
-  experiment_name: 'Alteromonas in WH8102 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh8102_proteomics
-  experiment_name: 'Alteromonas in WH8102 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh8102_proteomics
-  experiment_name: 'Alteromonas in WH8102 coculture: light +5 mM glucose vs light
-    (control)'
-  gene_count: 0
-  is_time_course: 'false'
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas mediterranea DE
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 0
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
-  treatment_type:
-  - carbon
-  - coculture
-- background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1292,7 +1412,7 @@ rows:
   gene_count: 85
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 8
   significant_up_count: 3
@@ -1326,7 +1446,7 @@ rows:
   gene_count: 85
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 10
   significant_up_count: 1
@@ -1360,7 +1480,7 @@ rows:
   gene_count: 85
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 10
   significant_up_count: 2
@@ -1394,7 +1514,7 @@ rows:
   gene_count: 85
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 7
   significant_up_count: 1
@@ -1428,7 +1548,7 @@ rows:
   gene_count: 343
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 0
   significant_up_count: 0
@@ -1462,7 +1582,7 @@ rows:
   gene_count: 343
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 17
   significant_up_count: 44
@@ -1496,7 +1616,7 @@ rows:
   gene_count: 343
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 6
   significant_up_count: 3
@@ -1529,7 +1649,7 @@ rows:
   gene_count: 343
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 7
   significant_up_count: 34
@@ -1563,7 +1683,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 2
   significant_up_count: 1
@@ -1597,7 +1717,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 12
   significant_up_count: 76
@@ -1631,7 +1751,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 6
   significant_up_count: 2
@@ -1665,7 +1785,7 @@ rows:
   gene_count: 198
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 19
   significant_up_count: 46
@@ -1699,7 +1819,7 @@ rows:
   gene_count: 148
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 2
   significant_up_count: 1
@@ -1733,7 +1853,7 @@ rows:
   gene_count: 147
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 2
   significant_up_count: 17
@@ -1767,7 +1887,7 @@ rows:
   gene_count: 147
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 0
   significant_up_count: 0
@@ -1801,7 +1921,7 @@ rows:
   gene_count: 148
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 3
   significant_up_count: 9
@@ -1835,7 +1955,7 @@ rows:
   gene_count: 487
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 25
   significant_up_count: 5
@@ -1869,7 +1989,7 @@ rows:
   gene_count: 488
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 3
   significant_up_count: 24
@@ -1903,7 +2023,7 @@ rows:
   gene_count: 488
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 7
   significant_up_count: 6
@@ -1937,7 +2057,7 @@ rows:
   gene_count: 488
   is_time_course: 'false'
   omics_type: PROTEOMICS
-  organism_name: Marinobacter adhaerens DSM 23420 / HP15
+  organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 33
   significant_up_count: 55

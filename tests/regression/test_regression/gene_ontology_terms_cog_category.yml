@@ -1,6 +1,9 @@
 case_id: gene_ontology_terms_cog_category
 row_count: 1
 rows:
-- locus_tag: PMM0001
+- level: 0
+  locus_tag: PMM0001
   term_id: cog.category:L
   term_name: Replication, recombination and repair
+  tree: null
+  tree_code: null

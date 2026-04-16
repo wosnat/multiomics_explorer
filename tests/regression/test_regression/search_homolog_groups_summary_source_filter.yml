@@ -5,8 +5,8 @@ rows:
   - '{''count'': 420, ''item'': ''curated''}'
   by_source:
   - '{''count'': 420, ''item'': ''cyanorak''}'
-  score_max: 3.8962
-  score_median: 1.0711
+  score_max: 3.8878
+  score_median: 1.0719
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 153, ''name'': ''Energy production and
     conversion''}'
@@ -27,5 +27,5 @@ rows:
     respiration > Photosystem II''}'
   - '{''id'': ''cyanorak.role:P.3'', ''count'': 1, ''name'': ''Transcription > Transcription
     factors''}'
-  total_entries: 45048
+  total_entries: 45438
   total_matching: 239
