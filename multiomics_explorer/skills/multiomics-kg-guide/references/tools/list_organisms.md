@@ -4,10 +4,11 @@
 
 List all organisms in the knowledge graph.
 
-Returns taxonomy, gene counts, publication counts, and organism_type for each
-organism. organism_type classifies each organism as 'genome_strain',
-'treatment', or 'reference_proteome_match'. Reference proteome match organisms
-also include reference_database and reference_proteome fields.
+Returns taxonomy, gene counts, publication counts, and organism_type
+for each organism. organism_type classifies each organism as
+'genome_strain', 'treatment', or 'reference_proteome_match'.
+Reference proteome match organisms also include reference_database
+and reference_proteome fields.
 
 Use the returned organism names as filter values in genes_by_function,
 resolve_gene, genes_by_ontology, list_publications, etc. The organism
@@ -56,6 +57,8 @@ total_entries, by_cluster_type, by_organism_type, returned, offset, truncated, r
 | omics_types | list[string] (optional) | Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']) |
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this organism (e.g. 4) |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']) |
+| reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
+| reference_proteome | string \| None (optional) | Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -69,8 +72,6 @@ total_entries, by_cluster_type, by_organism_type, returned, offset, truncated, r
 | superkingdom | string \| None (optional) | Taxonomic superkingdom (e.g. 'Bacteria') |
 | lineage | string \| None (optional) | Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus') |
 | cluster_count | int \| None (optional) | Total gene clusters across analyses (only with verbose=True, e.g. 35) |
-| reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
-| reference_proteome | string \| None (optional) | Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms. |
 
 ## Few-shot examples
 
@@ -82,13 +83,18 @@ list_organisms()
 
 ```example-response
 {
-  "total_entries": 15,
-  "returned": 15,
-  "truncated": false,
+  "total_entries": 32,
+  "by_organism_type": [
+    {"organism_type": "genome_strain", "count": 25},
+    {"organism_type": "treatment", "count": 5},
+    {"organism_type": "reference_proteome_match", "count": 2}
+  ],
+  "returned": 5,
+  "truncated": true,
   "offset": 0,
   "results": [
-    {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel", "classification"]},
-    {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas", "gene_count": 4136, "publication_count": 2, ...}
+    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel", "classification"]},
+    {"organism_name": "Alteromonas (MarRef v6)", "organism_type": "reference_proteome_match", "genus": "Alteromonas", "gene_count": 500, "reference_database": "MarRef v6", "reference_proteome": "UP000262181", ...}
   ]
 }
 ```
@@ -130,13 +136,17 @@ list_organisms → list_clustering_analyses(organism=...)
 
 - The organism filter in other tools uses partial matching — 'MED4', 'Prochlorococcus MED4', and 'Prochlorococcus' all work
 
+- reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others
+
+- organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching)
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import list_organisms
 
 result = list_organisms()
-# returns dict with keys: total_entries, by_cluster_type, offset, results
+# returns dict with keys: total_entries, by_cluster_type, by_organism_type, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

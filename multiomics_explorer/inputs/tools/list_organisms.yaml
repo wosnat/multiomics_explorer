@@ -7,13 +7,18 @@ examples:
     call: list_organisms()
     response: |
       {
-        "total_entries": 15,
-        "returned": 15,
-        "truncated": false,
+        "total_entries": 32,
+        "by_organism_type": [
+          {"organism_type": "genome_strain", "count": 25},
+          {"organism_type": "treatment", "count": 5},
+          {"organism_type": "reference_proteome_match", "count": 2}
+        ],
+        "returned": 5,
+        "truncated": true,
         "offset": 0,
         "results": [
-          {"organism_name": "Prochlorococcus MED4", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel", "classification"]},
-          {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas", "gene_count": 4136, "publication_count": 2, ...}
+          {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel", "classification"]},
+          {"organism_name": "Alteromonas (MarRef v6)", "organism_type": "reference_proteome_match", "genus": "Alteromonas", "gene_count": 500, "reference_database": "MarRef v6", "reference_proteome": "UP000262181", ...}
         ]
       }
 
@@ -52,3 +57,5 @@ mistakes:
   - "gene_count and publication_count are counts of data in the KG, not biological totals"
   - "Organisms with gene_count=0 are parent/umbrella taxonomy nodes (e.g. genus-level 'Alteromonas')"
   - "The organism filter in other tools uses partial matching — 'MED4', 'Prochlorococcus MED4', and 'Prochlorococcus' all work"
+  - "reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others"
+  - "organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching)"
