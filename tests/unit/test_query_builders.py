@@ -3648,6 +3648,21 @@ class TestBuildOntologyLandscape:
                 ontology="NOT_REAL", organism_name="Prochlorococcus MED4",
             )
 
+    def test_brite_uses_2hop_bridge(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="brite", organism_name="Prochlorococcus MED4",
+        )
+        # 2-hop bind
+        assert ":Gene_has_kegg_ko" in cypher
+        assert ":KeggTerm" in cypher
+        assert ":Kegg_term_in_brite_category" in cypher
+        assert "(leaf:BriteCategory)" in cypher
+        # Hierarchy walk
+        assert "Brite_category_is_a_brite_category*0.." in cypher
+        assert "(t:BriteCategory)" in cypher
+        # Two MATCH clauses (bind + walk)
+        assert cypher.count("MATCH") == 2
+
     def test_verbose_adds_example_terms_and_pre_sort(self):
         cypher, _ = build_ontology_landscape(
             ontology="go_bp", organism_name="Prochlorococcus MED4",
@@ -3700,6 +3715,17 @@ class TestBuildOntologyExpcov:
                 organism_name="Prochlorococcus MED4",
                 experiment_ids=["e1"],
             )
+
+    def test_brite_uses_2hop_bridge(self):
+        cypher, _ = build_ontology_expcov(
+            ontology="brite",
+            organism_name="Prochlorococcus MED4",
+            experiment_ids=["e1"],
+        )
+        assert ":Gene_has_kegg_ko" in cypher
+        assert ":Kegg_term_in_brite_category" in cypher
+        assert "(leaf:BriteCategory)" in cypher
+        assert "Brite_category_is_a_brite_category*0.." in cypher
 
     def test_asserts_when_hierarchy_walk_prefix_changes(self, monkeypatch):
         from multiomics_explorer.kg import queries_lib
