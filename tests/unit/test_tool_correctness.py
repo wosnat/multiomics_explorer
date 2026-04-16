@@ -1669,3 +1669,29 @@ class TestListFilterValuesCorrectness:
         assert len(result.results) == 3
         assert result.results[0].value == "Photosynthesis"
         assert result.results[0].count == 770
+
+    @pytest.mark.asyncio
+    async def test_brite_tree_filter_type(self, tool_fns, mock_ctx):
+        """brite_tree returns trees with tree_code."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value={
+                "filter_type": "brite_tree",
+                "total_entries": 12,
+                "returned": 12,
+                "truncated": False,
+                "results": [
+                    {"value": "enzymes", "tree_code": "ko01000", "count": 2057},
+                    {"value": "transporters", "tree_code": "ko02000", "count": 184},
+                ],
+            },
+        ):
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="brite_tree",
+            )
+        assert result.filter_type == "brite_tree"
+        assert result.total_entries == 12
+        assert len(result.results) == 2
+        assert result.results[0].value == "enzymes"
+        assert result.results[0].tree_code == "ko01000"
+        assert result.results[0].count == 2057

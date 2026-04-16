@@ -289,6 +289,10 @@ def register_tools(mcp: FastMCP):
         count: int = Field(
             description="Number of genes/items with this value (e.g. 770)"
         )
+        tree_code: str | None = Field(
+            default=None,
+            description="BRITE tree code (sparse: only for brite_tree filter, e.g. 'ko01000')",
+        )
 
     class ListFilterValuesResponse(BaseModel):
         filter_type: str = Field(description="The filter type returned (e.g. 'gene_category')")
@@ -303,9 +307,10 @@ def register_tools(mcp: FastMCP):
     )
     async def list_filter_values(
         ctx: Context,
-        filter_type: Annotated[Literal["gene_category"], Field(
+        filter_type: Annotated[Literal["gene_category", "brite_tree"], Field(
             description="Which filter's valid values to return. "
-            "'gene_category': values for the category filter in genes_by_function.",
+            "'gene_category': values for the category filter in genes_by_function. "
+            "'brite_tree': BRITE tree names for the tree filter in ontology tools.",
         )] = "gene_category",
     ) -> ListFilterValuesResponse:
         """List valid values for categorical filters used across tools.

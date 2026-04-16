@@ -796,6 +796,16 @@ class TestBuildListGeneCategories:
         assert params == {}
 
 
+class TestBuildListBriteTrees:
+    def test_returns_tree_and_tree_code_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_brite_trees
+        cypher, params = build_list_brite_trees()
+        assert "b.tree AS tree" in cypher
+        assert "b.tree_code AS tree_code" in cypher
+        assert "count(*) AS term_count" in cypher
+        assert "ORDER BY b.tree" in cypher
+        assert params == {}
+
 
 class TestBuildListOrganisms:
     def test_cypher_structure(self):

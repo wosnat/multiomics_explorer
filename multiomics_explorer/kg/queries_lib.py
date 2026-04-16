@@ -878,6 +878,19 @@ def build_list_gene_categories() -> tuple[str, dict]:
     return cypher, {}
 
 
+def build_list_brite_trees() -> tuple[str, dict]:
+    """List BRITE trees with term counts.
+
+    RETURN keys: tree, tree_code, term_count.
+    """
+    cypher = (
+        "MATCH (b:BriteCategory)\n"
+        "RETURN b.tree AS tree, b.tree_code AS tree_code, "
+        "count(*) AS term_count\n"
+        "ORDER BY b.tree"
+    )
+    return cypher, {}
+
 
 def build_list_organisms(
     *,

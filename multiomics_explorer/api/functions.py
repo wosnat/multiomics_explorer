@@ -42,6 +42,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_details_summary,
     build_gene_homologs,
     build_gene_homologs_summary,
+    build_list_brite_trees,
     build_list_gene_categories,
     build_list_organisms,
     build_list_publications,
@@ -527,11 +528,17 @@ def list_filter_values(
     conn = _default_conn(conn)
     if filter_type == "gene_category":
         cypher, params = build_list_gene_categories()
+        rows = conn.execute_query(cypher, **params)
+        results = [{"value": r["category"], "count": r["gene_count"]} for r in rows]
+    elif filter_type == "brite_tree":
+        cypher, params = build_list_brite_trees()
+        rows = conn.execute_query(cypher, **params)
+        results = [
+            {"value": r["tree"], "tree_code": r["tree_code"], "count": r["term_count"]}
+            for r in rows
+        ]
     else:
         raise ValueError(f"Unknown filter_type: {filter_type!r}")
-    rows = conn.execute_query(cypher, **params)
-    # Normalise to generic {value, count} shape
-    results = [{"value": r["category"], "count": r["gene_count"]} for r in rows]
     total = len(results)
     return {
         "filter_type": filter_type,
