@@ -50,6 +50,15 @@ New model `OrgTypeBreakdown`:
 | `organism_type` | `str` | e.g. `genome_strain` |
 | `count` | `int` | Number of organisms of this type |
 
+### Tool docstring (`tools.py`)
+
+Update the `list_organisms` tool docstring to mention `organism_type` classification and sparse reference fields.
+
+### Documentation
+
+- **YAML** (`inputs/tools/list_organisms.yaml`): document `organism_type`, `reference_database`, `reference_proteome` output fields and `by_organism_type` summary.
+- **Regenerate MCP resource markdown**: run `build_about_content.py` to update the generated docs.
+
 ### Tests
 
 - **Unit (query builder)**: verify new columns appear in generated Cypher.
