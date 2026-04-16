@@ -984,7 +984,7 @@ def register_tools(mcp: FastMCP):
         )],
         ontology: Annotated[str, Field(
             description="Ontology to search: 'go_bp', 'go_mf', 'go_cc', "
-            "'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam'.",
+            "'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite'.",
         )],
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
@@ -1098,7 +1098,7 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         ontology: Annotated[Literal[
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
-            "cog_category", "cyanorak_role", "tigr_role", "pfam",
+            "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
         ], Field(
             description="Ontology for these term_ids / this level.",
         )],
@@ -1228,7 +1228,7 @@ def register_tools(mcp: FastMCP):
         )],
         ontology: Annotated[
             Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
-                    "cog_category", "cyanorak_role", "tigr_role", "pfam"] | None,
+                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite"] | None,
             Field(description="Filter to one ontology. None returns all."),
         ] = None,
         summary: Annotated[bool, Field(
@@ -3423,8 +3423,8 @@ def register_tools(mcp: FastMCP):
         )],
         ontology: Annotated[
             Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
-                    "cog_category", "cyanorak_role", "tigr_role", "pfam"] | None,
-            Field(description="If None, surveys all 9 ontologies."),
+                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite"] | None,
+            Field(description="If None, surveys all 10 ontologies."),
         ] = None,
         experiment_ids: Annotated[
             list[str] | None,
@@ -3491,7 +3491,7 @@ def register_tools(mcp: FastMCP):
         )],
         ontology: Annotated[Literal[
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
-            "cog_category", "cyanorak_role", "tigr_role", "pfam",
+            "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
         ], Field(
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
