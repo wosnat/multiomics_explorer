@@ -11,7 +11,10 @@ rows:
   ncbi_taxon_id: 28108
   omics_types: []
   organism_name: Alteromonas
+  organism_type: treatment
   publication_count: 0
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: null
   treatment_types: []
@@ -29,7 +32,10 @@ rows:
   omics_types:
   - PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
+  organism_type: reference_proteome_match
   publication_count: 1
+  reference_database: MarRef v6
+  reference_proteome: UP000262181
   species: null
   strain: Alt_MarRef
   treatment_types:
@@ -50,7 +56,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Alteromonas macleodii EZ55
+  organism_type: genome_strain
   publication_count: 2
+  reference_database: null
+  reference_proteome: null
   species: Alteromonas macleodii
   strain: EZ55
   treatment_types:
@@ -71,7 +80,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
+  organism_type: genome_strain
   publication_count: 2
+  reference_database: null
+  reference_proteome: null
   species: Alteromonas macleodii
   strain: HOT1A3
   treatment_types:
@@ -93,7 +105,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Alteromonas macleodii MIT1002
+  organism_type: genome_strain
   publication_count: 3
+  reference_database: null
+  reference_proteome: null
   species: Alteromonas macleodii
   strain: MIT1002
   treatment_types:
@@ -112,7 +127,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Escherichia coli
+  organism_type: treatment
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: null
   treatment_types:
@@ -131,7 +149,10 @@ rows:
   omics_types:
   - PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
+  organism_type: reference_proteome_match
   publication_count: 1
+  reference_database: MarRef v6
+  reference_proteome: GCF_000166295.1
   species: Marinobacter adhaerens
   strain: HP15
   treatment_types:
@@ -148,7 +169,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Meiothermus ruber
+  organism_type: treatment
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: null
   treatment_types:
@@ -166,7 +190,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Meiothermus ruber
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: MruberA
   treatment_types:
@@ -188,7 +215,10 @@ rows:
   - MICROARRAY
   - RNASEQ
   organism_name: Phage
+  organism_type: treatment
   publication_count: 3
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: null
   treatment_types:
@@ -207,7 +237,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus AS9601
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: AS9601
   treatment_types:
@@ -235,7 +268,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus MED4
+  organism_type: genome_strain
   publication_count: 14
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: MED4
   treatment_types:
@@ -264,7 +300,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
+  organism_type: genome_strain
   publication_count: 2
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9301
   treatment_types:
@@ -283,7 +322,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus MIT9303
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9303
   treatment_types:
@@ -304,7 +346,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9312
+  organism_type: genome_strain
   publication_count: 4
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9312
   treatment_types:
@@ -327,7 +372,10 @@ rows:
   - MICROARRAY
   - RNASEQ
   organism_name: Prochlorococcus MIT9313
+  organism_type: genome_strain
   publication_count: 6
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9313
   treatment_types:
@@ -350,7 +398,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus NATL1A
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: NATL1A
   treatment_types:
@@ -374,7 +425,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus NATL2A
+  organism_type: genome_strain
   publication_count: 6
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: NATL2A
   treatment_types:
@@ -392,7 +446,10 @@ rows:
   ncbi_taxon_id: 1924285
   omics_types: []
   organism_name: Prochlorococcus RSP50
+  organism_type: genome_strain
   publication_count: 0
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: RSP50
   treatment_types: []
@@ -411,7 +468,10 @@ rows:
   omics_types:
   - PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  organism_type: genome_strain
   publication_count: 3
+  reference_database: null
+  reference_proteome: null
   species: Prochlorococcus marinus
   strain: SS120
   treatment_types:
@@ -432,7 +492,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Pseudomonas putida KT2440
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Pseudomonas putida
   strain: KT2440
   treatment_types:
@@ -449,7 +512,10 @@ rows:
   omics_types:
   - EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
+  organism_type: genome_strain
   publication_count: 2
+  reference_database: null
+  reference_proteome: null
   species: Ruegeria pomeroyi
   strain: DSS-3
   treatment_types:
@@ -466,7 +532,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Shewanella sp. W3-18-1
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Shewanella sp.
   strain: W3-18-1
   treatment_types:
@@ -486,7 +555,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Synechococcus CC9311
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: CC9311
   treatment_types:
@@ -504,7 +576,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Synechococcus PCC 7002
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: PCC7002
   treatment_types:
@@ -525,7 +600,10 @@ rows:
   - EXOPROTEOMICS
   - PROTEOMICS
   organism_name: Synechococcus WH7803
+  organism_type: genome_strain
   publication_count: 3
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: WH7803
   treatment_types:
@@ -548,7 +626,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH8102
+  organism_type: genome_strain
   publication_count: 3
+  reference_database: null
+  reference_proteome: null
   species: Parasynechococcus marenigrum
   strain: WH8102
   treatment_types:
@@ -567,7 +648,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus elongatus PCC 7942
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Synechococcus elongatus
   strain: PCC7942
   treatment_types:
@@ -585,7 +669,10 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus elongatus UTEX 2973
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Synechococcus elongatus
   strain: UTEX2973
   treatment_types:
@@ -604,7 +691,10 @@ rows:
   omics_types:
   - PROTEOMICS
   organism_name: Synechococcus sp. BL107
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Synechococcus sp.
   strain: BL107
   treatment_types:
@@ -622,7 +712,10 @@ rows:
   omics_types:
   - RNASEQ
   organism_name: Thermosynechococcus vestitus BP-1
+  organism_type: genome_strain
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: Thermosynechococcus vestitus
   strain: BP1
   treatment_types:
@@ -640,7 +733,10 @@ rows:
   omics_types:
   - MICROARRAY
   organism_name: Vibrio parahaemolyticus
+  organism_type: treatment
   publication_count: 1
+  reference_database: null
+  reference_proteome: null
   species: null
   strain: null
   treatment_types:
