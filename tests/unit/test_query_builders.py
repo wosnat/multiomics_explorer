@@ -2089,6 +2089,21 @@ class TestBuildListExperiments:
         assert "toLower($organism)" in cypher
         assert " AND " in cypher
 
+    def test_growth_phases_filter(self):
+        where, params = build_list_experiments(growth_phases=["exponential", "nutrient_limited"])
+        assert "growth_phases" in where
+        assert "toLower(gp) IN $growth_phases" in where
+        assert params["growth_phases"] == ["exponential", "nutrient_limited"]
+
+    def test_growth_phases_case_insensitive(self):
+        _, params = build_list_experiments(growth_phases=["Exponential"])
+        assert params["growth_phases"] == ["exponential"]
+
+    def test_returns_growth_phases(self):
+        cypher, _ = build_list_experiments()
+        assert "growth_phases" in cypher
+        assert "time_point_growth_phases" in cypher
+
 
 class TestBuildGeneStub:
     def test_returns_cypher_and_params(self):
@@ -2176,6 +2191,10 @@ class TestBuildListExperimentsSummary:
         """table_scope=None does not add filter to summary."""
         cypher, _ = build_list_experiments_summary(table_scope=None)
         assert "table_scopes" not in cypher
+
+    def test_summary_returns_by_growth_phase(self):
+        cypher, _ = build_list_experiments_summary()
+        assert "by_growth_phase" in cypher
 
 
 # ---------------------------------------------------------------------------

@@ -954,6 +954,7 @@ def _list_experiments_where(
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
     background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for experiment queries.
 
@@ -989,6 +990,13 @@ def _list_experiments_where(
             " WHERE toLower(bf) IN $background_factors)"
         )
         params["background_factors"] = [bf.lower() for bf in background_factors]
+
+    if growth_phases:
+        conditions.append(
+            "ANY(gp IN coalesce(e.growth_phases, [])"
+            " WHERE toLower(gp) IN $growth_phases)"
+        )
+        params["growth_phases"] = [gp.lower() for gp in growth_phases]
 
     if omics_type:
         conditions.append("toUpper(e.omics_type) IN $omics_types")
@@ -1026,6 +1034,7 @@ def build_list_experiments(
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
     background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -1038,7 +1047,8 @@ def build_list_experiments(
     gene_count, significant_up_count, significant_down_count,
     time_point_count, time_point_labels, time_point_orders, time_point_hours,
     time_point_totals, time_point_significant_up, time_point_significant_down,
-    clustering_analysis_count, cluster_types.
+    clustering_analysis_count, cluster_types, growth_phases,
+    time_point_growth_phases.
     RETURN keys (verbose): adds publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context, cluster_count.
@@ -1049,7 +1059,7 @@ def build_list_experiments(
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
-        background_factors=background_factors,
+        background_factors=background_factors, growth_phases=growth_phases,
     )
 
     verbose_cols = (
@@ -1101,6 +1111,8 @@ def build_list_experiments(
         "       e.time_point_significant_down AS time_point_significant_down,\n"
         "       coalesce(e.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
         "       coalesce(e.cluster_types, []) AS cluster_types"
+        ",\n       coalesce(e.growth_phases, []) AS growth_phases"
+        ",\n       coalesce(e.time_point_growth_phases, []) AS time_point_growth_phases"
     )
 
     if search_text:
@@ -1137,16 +1149,17 @@ def build_list_experiments_summary(
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
     background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_experiments.
 
     Returns breakdowns by organism, treatment type, omics type,
-    publication, table_scope, background_factors, and cluster_type
-    using apoc.coll.frequencies.
+    publication, table_scope, background_factors, cluster_type,
+    and growth_phase using apoc.coll.frequencies.
 
     RETURN keys: total_matching, time_course_count, by_organism,
     by_treatment_type, by_background_factors, by_omics_type, by_publication,
-    by_table_scope, by_cluster_type.
+    by_table_scope, by_cluster_type, by_growth_phase.
     RETURN keys (search_text): adds score_max, score_median.
     """
     where_block, params = _list_experiments_where(
@@ -1154,7 +1167,7 @@ def build_list_experiments_summary(
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
-        background_factors=background_factors,
+        background_factors=background_factors, growth_phases=growth_phases,
     )
 
     collect_cols = (
@@ -1166,6 +1179,7 @@ def build_list_experiments_summary(
         "     collect(e.is_time_course) AS tc,\n"
         "     collect(e.table_scope) AS scopes,\n"
         "     apoc.coll.flatten(collect(coalesce(e.cluster_types, []))) AS ctypes"
+        ",\n     apoc.coll.flatten(collect(coalesce(e.growth_phases, []))) AS gps"
     )
 
     return_cols = (
@@ -1178,6 +1192,7 @@ def build_list_experiments_summary(
         "       apoc.coll.frequencies(dois) AS by_publication,\n"
         "       apoc.coll.frequencies(scopes) AS by_table_scope,\n"
         "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
+        ",\n       apoc.coll.frequencies(gps) AS by_growth_phase"
     )
 
     if search_text:
