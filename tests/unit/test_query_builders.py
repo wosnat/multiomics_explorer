@@ -2090,16 +2090,24 @@ class TestBuildListExperiments:
         assert " AND " in cypher
 
     def test_growth_phases_filter(self):
-        where, params = build_list_experiments(growth_phases=["exponential", "nutrient_limited"])
-        assert "growth_phases" in where
-        assert "toLower(gp) IN $growth_phases" in where
+        """growth_phases filter adds ANY-match condition with lowercased params."""
+        cypher, params = build_list_experiments(growth_phases=["exponential", "nutrient_limited"])
+        assert "growth_phases" in cypher
+        assert "toLower(gp) IN $growth_phases" in cypher
         assert params["growth_phases"] == ["exponential", "nutrient_limited"]
 
     def test_growth_phases_case_insensitive(self):
+        """growth_phases values are lowercased for case-insensitive matching."""
         _, params = build_list_experiments(growth_phases=["Exponential"])
         assert params["growth_phases"] == ["exponential"]
 
+    def test_growth_phases_none_no_filter(self):
+        """growth_phases=None does not add filter."""
+        cypher, _ = build_list_experiments(growth_phases=None)
+        assert "$growth_phases" not in cypher
+
     def test_returns_growth_phases(self):
+        """Returns growth_phases and time_point_growth_phases columns."""
         cypher, _ = build_list_experiments()
         assert "growth_phases" in cypher
         assert "time_point_growth_phases" in cypher
@@ -2193,6 +2201,7 @@ class TestBuildListExperimentsSummary:
         assert "table_scopes" not in cypher
 
     def test_summary_returns_by_growth_phase(self):
+        """Summary includes by_growth_phase frequency breakdown."""
         cypher, _ = build_list_experiments_summary()
         assert "by_growth_phase" in cypher
 
