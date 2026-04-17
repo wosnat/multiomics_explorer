@@ -517,7 +517,7 @@ def de_enrichment_inputs(
 def cluster_enrichment_inputs(
     analysis_id: str,
     organism: str,
-    min_cluster_size: int = 1,
+    min_cluster_size: int = 3,
     max_cluster_size: int | None = None,
     *,
     conn=None,

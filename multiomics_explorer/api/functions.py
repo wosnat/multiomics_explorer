@@ -3379,7 +3379,7 @@ def pathway_enrichment(
 
 def _build_cluster_enrichment_envelope(
     *, df, inputs, gbo_result, ontology, level, tree,
-    pvalue_cutoff, summary, verbose, limit, offset,
+    background_mode, pvalue_cutoff, summary, verbose, limit, offset,
 ) -> dict:
     import pandas as pd
 
@@ -3441,8 +3441,10 @@ def _build_cluster_enrichment_envelope(
     bg_sizes = [len(v) for v in inputs.background.values()] if inputs.background else []
     background_size = max(bg_sizes) if bg_sizes else 0
 
-    # --- total_terms_tested ---
-    total_terms_tested = int(df["term_id"].nunique()) if total_matching else 0
+    # --- total_terms_tested: count unique terms in TERM2GENE, not just Fisher output ---
+    total_terms_tested = len({
+        r["term_id"] for r in gbo_result.get("results", [])
+    }) if gbo_result else 0
 
     # --- slice results ---
     if summary:
@@ -3487,7 +3489,7 @@ def _build_cluster_enrichment_envelope(
         "ontology": ontology,
         "level": level,
         "tree": tree,
-        "background_mode": "cluster_union",  # overridden by caller if needed
+        "background_mode": background_mode,
         "background_size": background_size,
         "total_matching": total_matching,
         "returned": returned,
@@ -3580,7 +3582,7 @@ def cluster_enrichment(
         raise ValueError(
             "max_cluster_size must be >= min_cluster_size."
         )
-    if not (0 < pvalue_cutoff <= 1):
+    if not (0 < pvalue_cutoff < 1):
         raise ValueError(
             f"pvalue_cutoff must be in (0, 1]; got {pvalue_cutoff}"
         )
@@ -3609,23 +3611,20 @@ def cluster_enrichment(
             "not_found": [], "wrong_ontology": [],
             "wrong_level": [], "filtered_out": [],
         }
-        envelope = _build_cluster_enrichment_envelope(
+        return _build_cluster_enrichment_envelope(
             df=pd.DataFrame(),
             inputs=inputs,
             gbo_result=empty_gbo,
             ontology=ontology,
             level=level,
             tree=tree,
+            background_mode=background if isinstance(background, str) else "explicit",
             pvalue_cutoff=pvalue_cutoff,
             summary=summary,
             verbose=verbose,
             limit=0,
             offset=offset,
         )
-        envelope["background_mode"] = (
-            background if isinstance(background, str) else "explicit"
-        )
-        return envelope
 
     # Step 3: resolve background
     if background == "cluster_union":
@@ -3679,19 +3678,17 @@ def cluster_enrichment(
         df = df.merge(md_df, on="cluster", how="left")
 
     # Step 7: envelope
-    bg_mode = background if isinstance(background, str) else "explicit"
-    envelope = _build_cluster_enrichment_envelope(
+    return _build_cluster_enrichment_envelope(
         df=df,
         inputs=inputs,
         gbo_result=gbo_result,
         ontology=ontology,
         level=level,
         tree=tree,
+        background_mode=background if isinstance(background, str) else "explicit",
         pvalue_cutoff=pvalue_cutoff,
         summary=summary,
         verbose=verbose,
         limit=limit if limit is not None else len(df),
         offset=offset,
     )
-    envelope["background_mode"] = bg_mode
-    return envelope

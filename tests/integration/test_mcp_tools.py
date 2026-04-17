@@ -1008,7 +1008,7 @@ class TestClusterEnrichmentIntegration:
             organism=analysis["organism_name"],
             ontology="cyanorak_role",
             level=1,
-            pvalue_cutoff=1.0,
+            pvalue_cutoff=0.99,
             limit=5,
             conn=conn,
         )

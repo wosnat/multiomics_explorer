@@ -357,6 +357,9 @@ class ClusterEnrichmentResponse(BaseModel):
     clusters_skipped: list[ClusterEnrichmentClusterSkipped] = Field(
         default_factory=list, description="Clusters filtered out or producing no rows"
     )
+    term_validation: PathwayEnrichmentTermValidation = Field(
+        description="Namespaced passthrough of term_id validation from genes_by_ontology"
+    )
     results: list[ClusterEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows"
     )

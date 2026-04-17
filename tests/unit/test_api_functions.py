@@ -3928,7 +3928,7 @@ class TestClusterEnrichmentInputs:
         monkeypatch.setattr(f, "genes_in_cluster", lambda **_: self._CLUSTER_RESULT)
         monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
         inputs = enr.cluster_enrichment_inputs(
-            analysis_id="ca:test", organism="MED4")
+            analysis_id="ca:test", organism="MED4", min_cluster_size=1)
         assert "Cluster A" in inputs.gene_sets
         assert "Cluster B" in inputs.gene_sets
         assert sorted(inputs.gene_sets["Cluster A"]) == ["PMM0001", "PMM0002", "PMM0003", "PMM0004"]
@@ -3963,7 +3963,8 @@ class TestClusterEnrichmentInputs:
         monkeypatch.setattr(f, "genes_in_cluster", lambda **_: self._CLUSTER_RESULT)
         monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
         inputs = enr.cluster_enrichment_inputs(
-            analysis_id="ca:test", organism="MED4", max_cluster_size=3)
+            analysis_id="ca:test", organism="MED4",
+            min_cluster_size=1, max_cluster_size=3)
         assert "Cluster A" not in inputs.gene_sets
         assert "Cluster B" in inputs.gene_sets
         assert "Cluster C" in inputs.gene_sets
@@ -4152,7 +4153,7 @@ class TestClusterEnrichment:
         result = cluster_enrichment(
             analysis_id="ca:test", organism="MED4",
             ontology="cyanorak_role", level=1,
-            pvalue_cutoff=1.0,
+            pvalue_cutoff=0.99,
         )
         assert "total_matching" in result
         assert "returned" in result

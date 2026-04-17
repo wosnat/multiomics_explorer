@@ -37,7 +37,7 @@ See docs://analysis/enrichment for methodology.
 ### Envelope
 
 ```expected-keys
-analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, background_mode, background_size, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, total_terms_tested, not_found, not_matched, clusters_skipped, results
+analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, background_mode, background_size, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, total_terms_tested, not_found, not_matched, clusters_skipped, term_validation, results
 ```
 
 - **analysis_id** (string | None): Clustering analysis ID
@@ -67,6 +67,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 - **not_found** (list[string]): Analysis IDs absent from KG
 - **not_matched** (list[string]): Analysis IDs wrong organism
 - **clusters_skipped** (list[ClusterEnrichmentClusterSkipped]): Clusters filtered out or producing no rows
+- **term_validation** (PathwayEnrichmentTermValidation): Namespaced passthrough of term_id validation from genes_by_ontology
 
 ### Per-result fields
 
@@ -183,7 +184,7 @@ cluster_enrichment(..., background='cluster_union')  # or 'organism', or a locus
 from multiomics_explorer import cluster_enrichment
 
 result = cluster_enrichment(analysis_id=..., organism=..., ontology=...)
-# returns dict with keys: analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, background_mode, background_size, total_matching, offset, n_significant, by_cluster, by_term, clusters_tested, total_terms_tested, not_found, not_matched, clusters_skipped, results
+# returns dict with keys: analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, background_mode, background_size, total_matching, offset, n_significant, by_cluster, by_term, clusters_tested, total_terms_tested, not_found, not_matched, clusters_skipped, term_validation, results
 ```
 
 Use package import for bulk data extraction in scripts.
