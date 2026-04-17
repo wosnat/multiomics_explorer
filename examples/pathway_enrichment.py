@@ -115,7 +115,10 @@ def scenario_2_de(args: argparse.Namespace) -> None:
 
 
 def scenario_3_cluster(args: argparse.Namespace) -> None:
-    """Cluster-membership enrichment (non-DE)."""
+    """Cluster-membership enrichment (non-DE).
+
+    For the MCP convenience wrapper, use cluster_enrichment(analysis_id=...).
+    """
     analyses = list_clustering_analyses(organism=args.organism, limit=1)
     if not analyses["results"]:
         print("No clustering analyses available.")

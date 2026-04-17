@@ -1,0 +1,51 @@
+# Human-authored content for cluster_enrichment about page.
+
+examples:
+  - title: Single analysis, CyanoRak level 1
+    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1)
+
+  - title: Summary-only (envelope, no rows)
+    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, summary=True)
+
+  - title: Verbose with cluster descriptions
+    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, verbose=True)
+
+  - title: BRITE tree-scoped
+    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="brite", tree="transporters", level=1)
+
+  - title: Organism background instead of cluster union
+    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
+
+  - title: From landscape to cluster enrichment
+    steps: |
+      Step 1: list_clustering_analyses(organism="MED4")
+              → pick an analysis_id
+
+      Step 2: ontology_landscape(organism="MED4")
+              → pick (ontology, level) by relevance_rank
+
+      Step 3: cluster_enrichment(analysis_id=<picked>, organism="MED4", ontology=<picked>, level=<picked>)
+              → Fisher ORA results per cluster
+
+verbose_fields:
+  - cluster_functional_description
+  - cluster_expression_dynamics
+  - cluster_temporal_pattern
+  - cluster_member_count
+
+chaining:
+  - "list_clustering_analyses → cluster_enrichment"
+  - "ontology_landscape → cluster_enrichment"
+  - "cluster_enrichment → gene_overview"
+  - "cluster_enrichment → genes_in_cluster"
+
+mistakes:
+  - "Default background is `cluster_union` (union of all clustered genes, including size-filtered). Use `'organism'` only when clustering covers the full genome."
+  - "BH correction is per-cluster, NOT across clusters."
+  - "Single-organism enforced."
+  - "No signed_score — clusters aren't directional. For direction-aware enrichment, use pathway_enrichment with DE experiments."
+  - "At least one of `level` or `term_ids` must be provided."
+  - "`min/max_gene_set_size` is the pathway M filter (per-cluster, clusterProfiler semantics). `min/max_cluster_size` is the cluster membership filter."
+  - "For BRITE, scope to a specific tree with `tree=`. Use `list_filter_values('brite_tree')` to discover trees."
+  - wrong: "cluster_enrichment(..., background='table_scope')  # not valid"
+    right: "cluster_enrichment(..., background='cluster_union')  # or 'organism', or a locus_tag list"

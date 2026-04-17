@@ -199,6 +199,10 @@ term2gene = to_dataframe(
 df = fisher_ora(gene_sets, background, term2gene)
 ```
 
+**MCP convenience:** The `cluster_enrichment` tool automates this pipeline in a single
+call — pass `analysis_id`, `organism`, `ontology`, and `level`. Background defaults to
+`cluster_union` (all clustered genes). See `docs://tools/cluster_enrichment`.
+
 ---
 
 ## 6. Code example — ortholog-group enrichment (non-DE)
@@ -487,8 +491,9 @@ The column names `gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `co
 `signed_enrichment_score`) in a single MCP call. It is the right choice when you want DE-driven
 ORA from experiment IDs without writing Python.
 
-For any other gene-list source (cluster membership, ortholog groups, custom lists), use the
-Python primitives directly — the MCP tool is wired exclusively to the DE path.
+For cluster-membership enrichment, use the `cluster_enrichment` MCP tool — it automates the
+pattern from §5 in a single call. For ortholog groups or custom gene lists, use the Python
+primitives directly.
 
 Examples, parameter details, and chaining patterns are in `docs://tools/pathway_enrichment`.
 
