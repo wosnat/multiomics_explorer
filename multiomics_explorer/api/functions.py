@@ -3379,7 +3379,7 @@ def pathway_enrichment(
 
 def _build_cluster_enrichment_envelope(
     *, df, inputs, gbo_result, ontology, level, tree,
-    pvalue_cutoff, verbose, limit, offset,
+    pvalue_cutoff, summary, verbose, limit, offset,
 ) -> dict:
     import pandas as pd
 
@@ -3445,25 +3445,30 @@ def _build_cluster_enrichment_envelope(
     total_terms_tested = int(df["term_id"].nunique()) if total_matching else 0
 
     # --- slice results ---
-    sliced = df.iloc[offset:offset + limit] if total_matching else df
-    if not verbose:
-        drop_cols = [
-            c for c in (
-                "foreground_gene_ids", "background_gene_ids",
-                "cluster_functional_description", "cluster_expression_dynamics",
-                "cluster_temporal_pattern", "cluster_member_count",
-            ) if c in sliced.columns
-        ]
-        sliced = sliced.drop(columns=drop_cols)
-    returned_rows = sliced.to_dict(orient="records")
-    # Strip sparse tree/tree_code for non-BRITE results
-    for r in returned_rows:
-        tree_v = r.get("tree")
-        if tree_v is None or (isinstance(tree_v, float) and pd.isna(tree_v)):
-            r.pop("tree", None)
-            r.pop("tree_code", None)
-    returned = len(returned_rows)
-    truncated = (offset + returned) < total_matching
+    if summary:
+        returned_rows = []
+        returned = 0
+        truncated = total_matching > 0
+    else:
+        sliced = df.iloc[offset:offset + limit] if total_matching else df
+        if not verbose:
+            drop_cols = [
+                c for c in (
+                    "foreground_gene_ids", "background_gene_ids",
+                    "cluster_functional_description", "cluster_expression_dynamics",
+                    "cluster_temporal_pattern", "cluster_member_count",
+                ) if c in sliced.columns
+            ]
+            sliced = sliced.drop(columns=drop_cols)
+        returned_rows = sliced.to_dict(orient="records")
+        # Strip sparse tree/tree_code for non-BRITE results
+        for r in returned_rows:
+            tree_v = r.get("tree")
+            if tree_v is None or (isinstance(tree_v, float) and pd.isna(tree_v)):
+                r.pop("tree", None)
+                r.pop("tree_code", None)
+        returned = len(returned_rows)
+        truncated = (offset + returned) < total_matching
 
     # --- analysis metadata ---
     a_md = inputs.analysis_metadata
@@ -3524,9 +3529,10 @@ def cluster_enrichment(
     background: str | list[str] = "cluster_union",
     min_gene_set_size: int = 5,
     max_gene_set_size: int | None = 500,
-    min_cluster_size: int = 1,
+    min_cluster_size: int = 3,
     max_cluster_size: int | None = None,
     pvalue_cutoff: float = 0.05,
+    summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -3613,6 +3619,7 @@ def cluster_enrichment(
             level=level,
             tree=tree,
             pvalue_cutoff=pvalue_cutoff,
+            summary=summary,
             verbose=verbose,
             limit=0,
             offset=offset,
@@ -3683,6 +3690,7 @@ def cluster_enrichment(
         level=level,
         tree=tree,
         pvalue_cutoff=pvalue_cutoff,
+        summary=summary,
         verbose=verbose,
         limit=limit if limit is not None else len(df),
         offset=offset,
