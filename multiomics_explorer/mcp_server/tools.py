@@ -1564,7 +1564,7 @@ def register_tools(mcp: FastMCP):
         count: int = Field(description="Number of experiments with this cluster type (e.g. 7)")
 
     class GrowthPhaseBreakdown(BaseModel):
-        growth_phase: str = Field(description="Growth phase (e.g. 'exponential')")
+        growth_phase: str = Field(description="Growth phase (e.g. 'exponential'). Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
         count: int = Field(description="Number of experiments with this growth phase")
 
     class ListExperimentsResponse(BaseModel):

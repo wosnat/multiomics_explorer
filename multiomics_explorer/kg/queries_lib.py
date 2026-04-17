@@ -2791,7 +2791,7 @@ def build_differential_expression_by_ortholog_summary_global(
         "     r.expression_status AS status, e.treatment_type AS tt,\n"
         "     e.background_factors AS bfs, e.table_scope AS ts, e.id AS eid,\n"
         "     r.log2_fold_change AS log2fc, r.growth_phase AS gp\n"
-        "With collect({gid: gid, lt: lt, org: org,\n"
+        "WITH collect({gid: gid, lt: lt, org: org,\n"
         "              status: status, tt: tt, bfs: bfs, ts: ts,\n"
         "              eid: eid, log2fc: log2fc, gp: gp}) AS rows\n"
         "RETURN size(rows) AS total_matching,\n"

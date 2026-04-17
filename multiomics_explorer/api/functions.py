@@ -2161,6 +2161,7 @@ def differential_expression_by_ortholog(
             group_ids=group_ids, organisms=organisms,
             experiment_ids=experiment_ids,
             direction=direction, significant_only=significant_only,
+            growth_phases=growth_phases,
         )
         not_found_organisms = []
         not_matched_organisms = []
