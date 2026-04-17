@@ -4141,3 +4141,61 @@ class TestBuildOntologyOrganismGeneCount:
         assert "MATCH (g:Gene {organism_name:$org})" in cypher
         assert "count(g)" in cypher
         assert "AS total_genes" in cypher
+
+
+# ---------------------------------------------------------------------------
+# TestDEGrowthPhases
+# ---------------------------------------------------------------------------
+
+
+class TestDEGrowthPhases:
+    """growth_phase integration across DE builders."""
+
+    def test_de_by_gene_growth_phases_filter(self):
+        """Edge-level growth_phases filter on r.growth_phase."""
+        cypher, params = build_differential_expression_by_gene(
+            organism="MED4", growth_phases=["exponential"]
+        )
+        assert "r.growth_phase" in cypher
+        assert params["growth_phases"] == ["exponential"]
+
+    def test_de_by_gene_returns_growth_phase(self):
+        """Returns growth_phase column from edge."""
+        cypher, _ = build_differential_expression_by_gene(organism="MED4")
+        assert "r.growth_phase AS growth_phase" in cypher
+
+    def test_de_by_gene_summary_global_rows_by_growth_phase(self):
+        """Summary includes rows_by_growth_phase."""
+        cypher, _ = build_differential_expression_by_gene_summary_global(
+            organism="MED4"
+        )
+        assert "rows_by_growth_phase" in cypher
+
+    def test_de_by_gene_summary_by_experiment_growth_phase(self):
+        """Per-experiment summary includes growth_phase at timepoint level."""
+        cypher, _ = build_differential_expression_by_gene_summary_by_experiment(
+            organism="MED4"
+        )
+        assert "growth_phase" in cypher
+
+    def test_de_by_ortholog_growth_phases_filter(self):
+        """Edge-level growth_phases filter in ortholog DE."""
+        cypher, params = build_differential_expression_by_ortholog_results(
+            group_ids=["OG1"], growth_phases=["diel"]
+        )
+        assert "r.growth_phase" in cypher
+        assert params["growth_phases"] == ["diel"]
+
+    def test_de_by_ortholog_results_returns_growth_phase(self):
+        """Ortholog results include growth_phase column."""
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["OG1"]
+        )
+        assert "growth_phase" in cypher
+
+    def test_de_by_ortholog_summary_global_rows_by_growth_phase(self):
+        """Ortholog summary includes rows_by_growth_phase."""
+        cypher, _ = build_differential_expression_by_ortholog_summary_global(
+            group_ids=["OG1"]
+        )
+        assert "rows_by_growth_phase" in cypher
