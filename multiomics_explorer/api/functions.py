@@ -44,6 +44,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_homologs_summary,
     build_list_brite_trees,
     build_list_gene_categories,
+    build_list_growth_phases,
     build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
@@ -524,6 +525,11 @@ def list_filter_values(
 
     Returns dict with keys: filter_type, total_entries, returned, truncated, results.
     Per result: value, count.
+
+    filter_type options:
+      - ``gene_category``: gene functional categories.
+      - ``brite_tree``: KEGG BRITE hierarchy trees.
+      - ``growth_phase``: growth phase values on Experiment nodes.
     """
     conn = _default_conn(conn)
     if filter_type == "gene_category":
@@ -537,6 +543,10 @@ def list_filter_values(
             {"value": r["tree"], "tree_code": r["tree_code"], "count": r["term_count"]}
             for r in rows
         ]
+    elif filter_type == "growth_phase":
+        cypher, params = build_list_growth_phases()
+        rows = conn.execute_query(cypher, **params)
+        results = [{"value": r["phase"], "count": r["experiment_count"]} for r in rows]
     else:
         raise ValueError(f"Unknown filter_type: {filter_type!r}")
     total = len(results)
@@ -622,6 +632,7 @@ def list_publications(
     organism: str | None = None,
     treatment_type: str | None = None,
     background_factors: str | None = None,
+    growth_phases: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
     verbose: bool = False,
@@ -637,14 +648,18 @@ def list_publications(
     by_cluster_type, results.
     Per result: doi, title, authors, year, journal, study_type, organisms,
     experiment_count, treatment_types, background_factors, omics_types,
-    clustering_analysis_count, cluster_types.
+    clustering_analysis_count, cluster_types, growth_phases.
     When verbose=True, also includes abstract, description, cluster_count.
     When search_text is provided, also includes score.
+
+    growth_phases: if provided, restricts to publications whose growth_phases
+    array contains the specified value (case-insensitive).
     """
     conn = _default_conn(conn)
     filter_kwargs = dict(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors,
+        growth_phases=growth_phases,
         search_text=search_text, author=author,
     )
 
@@ -726,6 +741,7 @@ def list_experiments(
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -737,7 +753,7 @@ def list_experiments(
 
     Always returns: total_entries, total_matching, by_organism,
     by_treatment_type, by_background_factors, by_omics_type,
-    by_publication, by_table_scope, by_cluster_type,
+    by_publication, by_table_scope, by_cluster_type, by_growth_phase,
     time_course_count, returned, truncated, results.
 
     summary=True is sugar for limit=0: results is empty list,
@@ -747,11 +763,15 @@ def list_experiments(
     organism_name, treatment_type, background_factors, coculture_partner,
     omics_type, is_time_course (bool), table_scope, table_scope_detail,
     gene_count, genes_by_status (dict), clustering_analysis_count,
-    cluster_types, timepoints (list, omitted if not time-course).
+    cluster_types, growth_phases, time_point_growth_phases,
+    timepoints (list, omitted if not time-course).
     When verbose=True, also includes: publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context.
     When search_text is provided, detail results include score.
+
+    growth_phases: if provided, restricts to experiments whose growth_phases
+    array contains any of the specified values (case-insensitive).
     """
     if summary:
         limit = 0
@@ -763,6 +783,7 @@ def list_experiments(
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
+        growth_phases=growth_phases,
     )
 
     def _run_summary(st=search_text):
@@ -813,6 +834,7 @@ def list_experiments(
         "by_publication": _rename_freq(raw_summary["by_publication"], "publication_doi"),
         "by_table_scope": _rename_freq(raw_summary["by_table_scope"], "table_scope"),
         "by_cluster_type": _rename_freq(raw_summary["by_cluster_type"], "cluster_type"),
+        "by_growth_phase": _rename_freq(raw_summary.get("by_growth_phase", []), "growth_phase"),
         "time_course_count": raw_summary["time_course_count"],
     }
 
@@ -1804,6 +1826,7 @@ def differential_expression_by_gene(
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
+    growth_phases: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -1825,8 +1848,11 @@ def differential_expression_by_gene(
         dict with keys: organism_name, matching_genes, total_matching,
         rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count,
         rows_by_treatment_type, rows_by_background_factors, by_table_scope,
-        top_categories, experiments,
+        rows_by_growth_phase, top_categories, experiments,
         returned, truncated, not_found, no_expression, results.
+
+    growth_phases: if provided, restricts DE rows to those whose edge-level
+    growth_phase property matches any of the specified values (case-insensitive).
     """
     conn = _default_conn(conn)
 
@@ -1854,6 +1880,7 @@ def differential_expression_by_gene(
         experiment_ids=experiment_ids,
         direction=direction,
         significant_only=significant_only,
+        growth_phases=growth_phases,
     )
 
     # Pre-validate single organism
@@ -1878,6 +1905,9 @@ def differential_expression_by_gene(
     )
     by_table_scope = _apoc_freq_to_treatment_dict(
         global_raw["by_table_scope"]
+    )
+    rows_by_growth_phase = _apoc_freq_to_treatment_dict(
+        global_raw.get("rows_by_growth_phase") or []
     )
 
     # --- Summary query 2: per-experiment with nested timepoints ---
@@ -1953,6 +1983,7 @@ def differential_expression_by_gene(
         "rows_by_treatment_type": rows_by_treatment_type,
         "rows_by_background_factors": rows_by_background_factors,
         "by_table_scope": by_table_scope,
+        "rows_by_growth_phase": rows_by_growth_phase,
         "top_categories": top_categories,
         "experiments": experiments,
         "not_found": not_found,
@@ -1971,6 +2002,7 @@ def differential_expression_by_ortholog(
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
+    growth_phases: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -1987,7 +2019,7 @@ def differential_expression_by_ortholog(
     Returns dict with keys: total_matching, matching_genes, matching_groups,
     experiment_count, median_abs_log2fc, max_abs_log2fc,
     by_organism, rows_by_status, rows_by_treatment_type,
-    rows_by_background_factors, by_table_scope,
+    rows_by_background_factors, by_table_scope, rows_by_growth_phase,
     top_groups, top_experiments,
     not_found_groups, not_matched_groups,
     not_found_organisms, not_matched_organisms,
@@ -2003,6 +2035,9 @@ def differential_expression_by_ortholog(
 
     Raises:
         ValueError: if group_ids is empty or direction is invalid.
+
+    growth_phases: if provided, restricts DE rows to those whose edge-level
+    growth_phase property matches any of the specified values (case-insensitive).
     """
     if not group_ids:
         raise ValueError("group_ids must not be empty.")
@@ -2023,6 +2058,7 @@ def differential_expression_by_ortholog(
         experiment_ids=experiment_ids,
         direction=direction,
         significant_only=significant_only,
+        growth_phases=growth_phases,
     )
 
     # --- Q1a: group existence check ---
@@ -2072,6 +2108,9 @@ def differential_expression_by_ortholog(
     )
     by_table_scope = _apoc_freq_to_treatment_dict(
         global_raw["by_table_scope"]
+    )
+    rows_by_growth_phase = _apoc_freq_to_treatment_dict(
+        global_raw.get("rows_by_growth_phase") or []
     )
 
     sig_log2fcs = global_raw.get("sig_log2fcs") or []
@@ -2164,6 +2203,7 @@ def differential_expression_by_ortholog(
         "rows_by_treatment_type": rows_by_treatment_type,
         "rows_by_background_factors": rows_by_background_factors,
         "by_table_scope": by_table_scope,
+        "rows_by_growth_phase": rows_by_growth_phase,
         "top_groups": (
             top_groups_raw[0]["top_groups"] if top_groups_raw else []
         ),
@@ -2374,6 +2414,7 @@ def list_clustering_analyses(
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     omics_type: str | None = None,
     publication_doi: list[str] | None = None,
     experiment_ids: list[str] | None = None,
@@ -2389,7 +2430,7 @@ def list_clustering_analyses(
 
     Returns dict with keys: total_entries, total_matching,
     by_organism, by_cluster_type, by_treatment_type, by_background_factors,
-    by_omics_type, returned, offset, truncated, results.
+    by_omics_type, by_growth_phase, returned, offset, truncated, results.
     When search_text provided: adds score_max, score_median.
     Per result (compact): analysis_id, name, organism_name, cluster_method,
     cluster_type, cluster_count, total_gene_count, treatment_type,
@@ -2397,6 +2438,9 @@ def list_clustering_analyses(
     Per result (verbose): adds treatment, light_condition, experimental_context.
 
     summary=True: results=[], summary fields only.
+
+    growth_phases: if provided, restricts to analyses whose growth_phases
+    array contains any of the specified values (case-insensitive).
     """
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty.")
@@ -2408,6 +2452,7 @@ def list_clustering_analyses(
     filter_kwargs = dict(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, background_factors=background_factors,
+        growth_phases=growth_phases,
         omics_type=omics_type, publication_doi=publication_doi,
         experiment_ids=experiment_ids, analysis_ids=analysis_ids,
     )
@@ -2448,6 +2493,8 @@ def list_clustering_analyses(
         "by_background_factors": _rename_freq(
             raw_summary["by_background_factors"], "background_factor"),
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
+        "by_growth_phase": _rename_freq(
+            raw_summary.get("by_growth_phase", []), "growth_phase"),
     }
 
     if search_text is not None:
@@ -3176,6 +3223,7 @@ def pathway_enrichment(
     max_gene_set_size: int | None = 500,
     pvalue_cutoff: float = 0.05,
     timepoint_filter: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -3188,6 +3236,9 @@ def pathway_enrichment(
 
     See docs://analysis/enrichment for methodology.
     See docs/superpowers/specs/2026-04-12-pathway-enrichment-design.md.
+
+    growth_phases: if provided, restricts DE rows to those whose edge-level
+    growth_phase property matches any of the specified values (case-insensitive).
     """
     # --- Input validation (category 1) ---
     if ontology not in ALL_ONTOLOGIES:
@@ -3245,6 +3296,7 @@ def pathway_enrichment(
         direction=direction,
         significant_only=significant_only,
         timepoint_filter=timepoint_filter,
+        growth_phases=growth_phases,
         conn=conn,
     )
 

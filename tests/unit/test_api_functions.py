@@ -1744,6 +1744,7 @@ class TestListExperiments:
             "by_publication": [{"item": "10.1038/ismej.2016.70", "count": 5}],
             "by_table_scope": [{"item": "gene_level", "count": 40}],
             "by_cluster_type": [{"item": "condition_comparison", "count": 3}],
+            "by_growth_phase": [{"item": "exponential", "count": 20}],
         }]
 
     def _detail_row(self, **overrides):

@@ -324,7 +324,7 @@ _METADATA_FIELDS = (
     "timepoint", "timepoint_hours", "timepoint_order",
     "direction",
     "omics_type", "table_scope",
-    "treatment_type", "background_factors",
+    "treatment_type", "background_factors", "growth_phase",
     "is_time_course",
 )
 
@@ -354,6 +354,7 @@ def de_enrichment_inputs(
     direction: str = "both",
     significant_only: bool = True,
     timepoint_filter: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     *,
     conn=None,
 ) -> EnrichmentInputs:
@@ -381,6 +382,11 @@ def de_enrichment_inputs(
     timepoint_filter : list[str] or None, default None
         If provided, restrict clusters to these timepoint labels. Useful
         for experiments with 10+ timepoints.
+    growth_phases : list[str] or None, default None
+        If provided, restrict DE rows to those whose edge-level ``growth_phase``
+        property matches any of the specified values (case-insensitive). Rows
+        with non-matching growth_phase are excluded from both foreground and
+        background.
     conn : GraphConnection, optional
         Passed through to the DE call. Default: module default.
 
@@ -425,6 +431,7 @@ def de_enrichment_inputs(
         significant_only=False,
         summary=False,
         limit=None,
+        growth_phases=growth_phases,
         conn=conn,
     )
 
@@ -441,10 +448,16 @@ def de_enrichment_inputs(
         "down": "down",
     }
 
+    _gp_filter = {g.lower() for g in growth_phases} if growth_phases else None
+
     for row in de_full.get("results", []):
         tp = _normalize_timepoint(row.get("timepoint"))
         if timepoint_filter is not None and tp not in set(timepoint_filter):
             continue
+        if _gp_filter is not None:
+            gp = (row.get("growth_phase") or "").lower()
+            if gp not in _gp_filter:
+                continue
         # Support both `direction` (unit-test mocks) and `expression_status`
         # (real DE query output).
         row_direction = row.get("direction") or _STATUS_TO_DIR.get(
