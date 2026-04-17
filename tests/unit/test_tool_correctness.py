@@ -1105,6 +1105,8 @@ class TestListExperimentsCorrectness:
         "by_omics_type": [{"omics_type": "RNASEQ", "count": 2}],
         "by_publication": [{"publication_doi": "10.1038/test", "count": 2}],
         "by_table_scope": [{"table_scope": "all_detected_genes", "count": 2}],
+        "by_cluster_type": [],
+        "by_growth_phase": [{"growth_phase": "exponential", "count": 2}],
         "time_course_count": 1,
         "score_max": None,
         "score_median": None,
@@ -1123,6 +1125,8 @@ class TestListExperimentsCorrectness:
              "table_scope": "all_detected_genes",
              "table_scope_detail": None,
              "gene_count": 1696,
+             "growth_phases": ["exponential"],
+             "time_point_growth_phases": [],
              "genes_by_status": {"significant_up": 245, "significant_down": 178, "not_significant": 1273}},
             {"experiment_id": "exp_002",
              "experiment_name": "MED4 Light Stress Time Course",
@@ -1136,6 +1140,8 @@ class TestListExperimentsCorrectness:
              "table_scope": "all_detected_genes",
              "table_scope_detail": None,
              "gene_count": 1696,
+             "growth_phases": ["exponential"],
+             "time_point_growth_phases": ["exponential", "exponential"],
              "genes_by_status": {"significant_up": 450, "significant_down": 320, "not_significant": 926},
              "timepoints": [
                  {"timepoint": "2h", "timepoint_order": 1, "timepoint_hours": 2.0,
@@ -1181,6 +1187,24 @@ class TestListExperimentsCorrectness:
         assert tc.timepoints[0].timepoint == "2h"
         assert tc.timepoints[1].genes_by_status.significant_up == 400
 
+    @pytest.mark.asyncio
+    async def test_growth_phases_in_experiment_result(self, tool_fns, mock_ctx):
+        """ExperimentResult includes growth_phases and by_growth_phase breakdown."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._make_api_return(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+
+        # growth_phases on the experiment result
+        assert result.results[0].growth_phases == ["exponential"]
+        assert result.results[1].growth_phases == ["exponential"]
+        assert result.results[1].time_point_growth_phases == ["exponential", "exponential"]
+        # by_growth_phase breakdown on the response envelope
+        assert len(result.by_growth_phase) == 1
+        assert result.by_growth_phase[0].growth_phase == "exponential"
+        assert result.by_growth_phase[0].count == 2
+
 
 # ---------------------------------------------------------------------------
 # TestDiffExprByGeneCorrectness
@@ -1203,6 +1227,7 @@ class TestDiffExprByGeneCorrectness:
                 "experiment_count": 2,
                 "rows_by_treatment_type": {"coculture": 2, "light_stress": 1},
                 "rows_by_background_factors": {},
+                "rows_by_growth_phase": {"exponential": 3},
                 "by_table_scope": {"all_detected_genes": 3},
                 "top_categories": [{"category": "DNA replication", "total_genes": 1, "significant_genes": 1}],
                 "experiments": [
@@ -1229,18 +1254,21 @@ class TestDiffExprByGeneCorrectness:
                      "timepoint": "2h", "timepoint_hours": 2.0, "timepoint_order": 1,
                      "log2fc": 2.5, "padj": 0.001, "rank": 1,
                      "expression_status": "significant_up",
+                     "growth_phase": "exponential",
                      "gene_name": "dnaN", "treatment_type": ["coculture"],
                      "gene_category": "DNA replication"},
                     {"locus_tag": "PMM0001", "experiment_id": "exp1",
                      "timepoint": "24h", "timepoint_hours": 24.0, "timepoint_order": 2,
                      "log2fc": -1.8, "padj": 0.01, "rank": 2,
                      "expression_status": "significant_down",
+                     "growth_phase": "exponential",
                      "gene_name": "dnaN", "treatment_type": ["coculture"],
                      "gene_category": "DNA replication"},
                     {"locus_tag": "PMM0001", "experiment_id": "exp2",
                      "timepoint": None, "timepoint_hours": None, "timepoint_order": 1,
                      "log2fc": 0.3, "padj": 0.45, "rank": 1,
                      "expression_status": "not_significant",
+                     "growth_phase": "exponential",
                      "gene_name": "dnaN", "treatment_type": ["light_stress"],
                      "gene_category": "DNA replication"},
                 ],
@@ -1261,6 +1289,56 @@ class TestDiffExprByGeneCorrectness:
         assert r.expression_status == "significant_up"
 
     @pytest.mark.asyncio
+    async def test_growth_phase_in_expression_row(self, tool_fns, mock_ctx):
+        """ExpressionRow includes growth_phase and response has rows_by_growth_phase."""
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value={
+                "organism_name": "Prochlorococcus MED4",
+                "matching_genes": 1,
+                "total_matching": 1,
+                "rows_by_status": {"significant_up": 1, "significant_down": 0, "not_significant": 0},
+                "median_abs_log2fc": 2.5,
+                "max_abs_log2fc": 2.5,
+                "experiment_count": 1,
+                "rows_by_treatment_type": {"coculture": 1},
+                "rows_by_background_factors": {},
+                "rows_by_growth_phase": {"exponential": 1},
+                "by_table_scope": {"all_detected_genes": 1},
+                "top_categories": [],
+                "experiments": [
+                    {"experiment_id": "exp1", "experiment_name": "Test",
+                     "treatment_type": ["coculture"], "background_factors": [], "omics_type": "RNASEQ",
+                     "coculture_partner": None, "is_time_course": "false",
+                     "table_scope": "all_detected_genes",
+                     "matching_genes": 1,
+                     "rows_by_status": {"significant_up": 1, "significant_down": 0, "not_significant": 0},
+                     "total_rows": 1, "significant_rows": 1,
+                     "timepoints": None},
+                ],
+                "not_found": [],
+                "no_expression": [],
+                "returned": 1,
+                "truncated": False,
+                "results": [
+                    {"locus_tag": "PMM0001", "experiment_id": "exp1",
+                     "timepoint": None, "timepoint_hours": None, "timepoint_order": 1,
+                     "log2fc": 2.5, "padj": 0.001, "rank": 1,
+                     "expression_status": "significant_up",
+                     "growth_phase": "exponential",
+                     "gene_name": "dnaN", "treatment_type": ["coculture"],
+                     "gene_category": "DNA replication"},
+                ],
+            },
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, locus_tags=["PMM0001"],
+            )
+
+        assert result.results[0].growth_phase == "exponential"
+        assert result.rows_by_growth_phase == {"exponential": 1}
+
+    @pytest.mark.asyncio
     async def test_not_found_and_no_expression(self, tool_fns, mock_ctx):
         """not_found and no_expression populated for missing genes."""
         with patch(
@@ -1275,6 +1353,7 @@ class TestDiffExprByGeneCorrectness:
                 "experiment_count": 0,
                 "rows_by_treatment_type": {},
                 "rows_by_background_factors": {},
+                "rows_by_growth_phase": {},
                 "by_table_scope": {},
                 "top_categories": [],
                 "experiments": [],
@@ -1630,6 +1709,7 @@ class TestDiffExprByOrthologCorrectness:
                 "rows_by_status": {"significant_up": 1, "significant_down": 0, "not_significant": 1},
                 "rows_by_treatment_type": {"coculture": 2},
                 "rows_by_background_factors": {},
+                "rows_by_growth_phase": {},
                 "by_table_scope": {"all_detected_genes": 2},
                 "top_groups": [{"group_id": "cyanorak:CK_00000570",
                                 "consensus_gene_name": "psaA",
@@ -1691,6 +1771,7 @@ class TestDiffExprByOrthologCorrectness:
                 "by_organism": [],
                 "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
                 "rows_by_treatment_type": {}, "rows_by_background_factors": {},
+                "rows_by_growth_phase": {},
                 "by_table_scope": {},
                 "top_groups": [], "top_experiments": [],
                 "not_found_groups": ["fake:group"],
@@ -1893,3 +1974,29 @@ class TestListFilterValuesCorrectness:
         assert result.results[0].value == "enzymes"
         assert result.results[0].tree_code == "ko01000"
         assert result.results[0].count == 2057
+
+    @pytest.mark.asyncio
+    async def test_growth_phase_filter_type(self, tool_fns, mock_ctx):
+        """growth_phase filter_type returns physiological state values."""
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value={
+                "filter_type": "growth_phase",
+                "total_entries": 3,
+                "returned": 3,
+                "truncated": False,
+                "results": [
+                    {"value": "exponential", "count": 45},
+                    {"value": "nutrient_limited", "count": 12},
+                    {"value": "stationary", "count": 5},
+                ],
+            },
+        ):
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="growth_phase",
+            )
+        assert result.filter_type == "growth_phase"
+        assert result.total_entries == 3
+        assert len(result.results) == 3
+        assert result.results[0].value == "exponential"
+        assert result.results[0].count == 45

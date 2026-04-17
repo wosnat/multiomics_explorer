@@ -62,6 +62,10 @@ class PathwayEnrichmentResult(BaseModel):
     is_time_course: bool | None = Field(
         default=None, description="True for time-course experiments"
     )
+    growth_phase: str | None = Field(
+        default=None,
+        description="Physiological state of the culture at this timepoint. Timepoint-level, not gene-specific.",
+    )
     term_id: str = Field(description="Ontology term ID")
     term_name: str = Field(description="Ontology term display name")
     level: int | None = Field(
@@ -309,10 +313,12 @@ def register_tools(mcp: FastMCP):
     )
     async def list_filter_values(
         ctx: Context,
-        filter_type: Annotated[Literal["gene_category", "brite_tree"], Field(
+        filter_type: Annotated[Literal["gene_category", "brite_tree", "growth_phase"], Field(
             description="Which filter's valid values to return. "
             "'gene_category': values for the category filter in genes_by_function. "
-            "'brite_tree': BRITE tree names for the tree filter in ontology tools.",
+            "'brite_tree': BRITE tree names for the tree filter in ontology tools. "
+            "'growth_phase': physiological states of the culture at sampling time "
+            "(timepoint-level condition, not gene-specific).",
         )] = "gene_category",
     ) -> ListFilterValuesResponse:
         """List valid values for categorical filters used across tools.
@@ -352,6 +358,7 @@ def register_tools(mcp: FastMCP):
         omics_types: list[str] = Field(default_factory=list, description="Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS'])")
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this organism (e.g. 4)")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel'])")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
         # verbose-only fields
         family: str | None = Field(default=None, description="Taxonomic family (e.g. 'Prochlorococcaceae')")
         order: str | None = Field(default=None, description="Taxonomic order (e.g. 'Synechococcales')")
@@ -1354,6 +1361,7 @@ def register_tools(mcp: FastMCP):
         omics_types: list[str] = Field(default=[], description="Omics data types (e.g. RNASEQ, PROTEOMICS)")
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication (e.g. 4)")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
         score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
 
         abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
@@ -1411,6 +1419,10 @@ def register_tools(mcp: FastMCP):
             description="Filter by background factor (case-insensitive exact match). "
             "E.g. 'axenic'.",
         )] = None,
+        growth_phases: Annotated[str | None, Field(
+            description="Filter by growth phase (case-insensitive). "
+            "E.g. 'exponential', 'nutrient_limited'.",
+        )] = None,
         search_text: Annotated[str | None, Field(
             description="Free-text search on title, abstract, and description "
             "(Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'.",
@@ -1437,12 +1449,13 @@ def register_tools(mcp: FastMCP):
         specific experiments with list_experiments or genes with genes_by_function.
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
-                       f"search_text={search_text} author={author} offset={offset}")
+                       f"growth_phases={growth_phases} search_text={search_text} author={author} offset={offset}")
         try:
             conn = _conn(ctx)
             result = api.list_publications(
                 organism=organism, treatment_type=treatment_type,
                 background_factors=background_factors,
+                growth_phases=growth_phases,
                 search_text=search_text, author=author,
                 verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
@@ -1507,6 +1520,8 @@ def register_tools(mcp: FastMCP):
         timepoints: list[TimePoint] | None = Field(default=None, description="Per-timepoint gene counts. Omitted for non-time-course experiments.")
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this experiment (e.g. 4)")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
+        time_point_growth_phases: list[str] = Field(default_factory=list, description="Growth phase per timepoint, parallel to timepoints array. Same phase for all genes at each timepoint.")
         score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
         # verbose-only fields
         publication_title: str | None = Field(default=None, description="Publication title")
@@ -1548,6 +1563,10 @@ def register_tools(mcp: FastMCP):
         cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
         count: int = Field(description="Number of experiments with this cluster type (e.g. 7)")
 
+    class GrowthPhaseBreakdown(BaseModel):
+        growth_phase: str = Field(description="Growth phase (e.g. 'exponential')")
+        count: int = Field(description="Number of experiments with this growth phase")
+
     class ListExperimentsResponse(BaseModel):
         total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
         total_matching: int = Field(description="Experiments matching filters")
@@ -1561,6 +1580,7 @@ def register_tools(mcp: FastMCP):
         by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted by count descending")
         by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted by count descending")
         by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted by count descending")
+        by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted by count descending")
         time_course_count: int = Field(description="Number of time-course experiments in matching set")
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
@@ -1586,6 +1606,11 @@ def register_tools(mcp: FastMCP):
             description="Filter by background experimental factors (case-insensitive exact match). "
             "E.g. ['axenic', 'diel_cycle']. "
             "Background factors describe experimental context beyond the primary treatment.",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Filter by growth phase(s) (case-insensitive). "
+            "Physiological state of the culture at sampling time. "
+            "E.g. ['exponential', 'nutrient_limited'].",
         )] = None,
         omics_type: Annotated[list[str] | None, Field(
             description="Filter by omics platform(s) (case-insensitive). "
@@ -1652,6 +1677,7 @@ def register_tools(mcp: FastMCP):
             result = api.list_experiments(
                 organism=organism, treatment_type=treatment_type,
                 background_factors=background_factors,
+                growth_phases=growth_phases,
                 omics_type=omics_type, publication_doi=publication_doi,
                 coculture_partner=coculture_partner, search_text=search_text,
                 time_course_only=time_course_only, table_scope=table_scope,
@@ -1667,6 +1693,7 @@ def register_tools(mcp: FastMCP):
             by_publication = [PublicationBreakdown(**b) for b in result["by_publication"]]
             by_table_scope = [TableScopeBreakdown(**b) for b in result["by_table_scope"]]
             by_cluster_type = [ClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
+            by_growth_phase = [GrowthPhaseBreakdown(**b) for b in result.get("by_growth_phase", [])]
 
             # Build result models (empty list when summary=True)
             experiments = []
@@ -1697,6 +1724,7 @@ def register_tools(mcp: FastMCP):
                 by_publication=by_publication,
                 by_table_scope=by_table_scope,
                 by_cluster_type=by_cluster_type,
+                by_growth_phase=by_growth_phase,
                 time_course_count=result["time_course_count"],
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),
@@ -1747,6 +1775,10 @@ def register_tools(mcp: FastMCP):
         )
         rows_by_status: ExpressionStatusBreakdown = Field(
             description="Row counts by expression_status at this timepoint",
+        )
+        growth_phase: str | None = Field(
+            default=None,
+            description="Physiological state at this timepoint. Timepoint-level, not gene-specific.",
         )
 
     class ExpressionByExperiment(BaseModel):
@@ -1864,6 +1896,12 @@ def register_tools(mcp: FastMCP):
             description="Significance call using publication-specific"
             " threshold (e.g. 'significant_up')",
         )
+        growth_phase: str | None = Field(
+            default=None,
+            description="Physiological state of the culture at this timepoint "
+            "(e.g. 'exponential', 'nutrient_limited'). "
+            "Timepoint-level condition — not gene-specific.",
+        )
         # Verbose (present when verbose=True)
         product: str | None = Field(
             default=None,
@@ -1942,6 +1980,10 @@ def register_tools(mcp: FastMCP):
             description="Row counts by background factor"
             " (e.g. {'axenic': 10, 'diel_cycle': 5})",
         )
+        rows_by_growth_phase: dict[str, int] = Field(
+            default_factory=dict,
+            description="Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.",
+        )
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope"
             " (e.g. {'all_detected_genes': 100, 'significant_only': 50})."
@@ -2000,6 +2042,11 @@ def register_tools(mcp: FastMCP):
             description="If true, return only statistically significant"
                         " results.",
         )] = False,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Filter by growth phase(s) at sampling time (case-insensitive, edge-level). "
+            "Isolates specific-phase rows from multi-phase experiments. "
+            "E.g. ['exponential'].",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields"
                         " (results=[]).",
@@ -2048,6 +2095,7 @@ def register_tools(mcp: FastMCP):
                 experiment_ids=experiment_ids,
                 direction=direction,
                 significant_only=significant_only,
+                growth_phases=growth_phases,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -2104,6 +2152,7 @@ def register_tools(mcp: FastMCP):
                 offset=data.get("offset", 0),
                 rows_by_treatment_type=data["rows_by_treatment_type"],
                 rows_by_background_factors=data["rows_by_background_factors"],
+                rows_by_growth_phase=data.get("rows_by_growth_phase", {}),
                 by_table_scope=data["by_table_scope"],
                 top_categories=top_cat_models,
                 experiments=exp_models,
@@ -2498,6 +2547,12 @@ def register_tools(mcp: FastMCP):
         not_significant: int = Field(
             description="Genes not meeting significance threshold",
         )
+        growth_phase: str | None = Field(
+            default=None,
+            description="Physiological state of the culture at this timepoint "
+            "(e.g. 'exponential', 'nutrient_limited'). "
+            "Timepoint-level condition — not gene-specific.",
+        )
         # --- verbose only ---
         experiment_name: str | None = Field(
             default=None,
@@ -2610,6 +2665,10 @@ def register_tools(mcp: FastMCP):
         rows_by_background_factors: dict[str, int] = Field(
             description="Row counts by background factor",
         )
+        rows_by_growth_phase: dict[str, int] = Field(
+            default_factory=dict,
+            description="Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.",
+        )
         by_table_scope: dict[str, int] = Field(
             description="Row counts by experiment table_scope",
         )
@@ -2675,6 +2734,11 @@ def register_tools(mcp: FastMCP):
             description="If true, return only statistically significant"
             " rows.",
         )] = False,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Filter by growth phase(s) at sampling time (case-insensitive, edge-level). "
+            "Isolates specific-phase rows from multi-phase experiments. "
+            "E.g. ['exponential'].",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary fields"
             " (results=[]).",
@@ -2721,6 +2785,7 @@ def register_tools(mcp: FastMCP):
                 experiment_ids=experiment_ids,
                 direction=direction,
                 significant_only=significant_only,
+                growth_phases=growth_phases,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -2756,6 +2821,7 @@ def register_tools(mcp: FastMCP):
                 rows_by_status=data["rows_by_status"],
                 rows_by_treatment_type=data["rows_by_treatment_type"],
                 rows_by_background_factors=data["rows_by_background_factors"],
+                rows_by_growth_phase=data.get("rows_by_growth_phase", {}),
                 by_table_scope=data["by_table_scope"],
                 top_groups=top_groups,
                 top_experiments=top_experiments,
@@ -2946,6 +3012,7 @@ def register_tools(mcp: FastMCP):
             description="Total genes across all clusters")
         treatment_type: list[str] = Field(
             description="Treatment types (e.g. ['nitrogen_stress'])")
+        growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
         background_factors: list[str] = Field(default_factory=list,
             description="Background experimental factors (e.g. ['axenic', 'continuous_light'])")
         omics_type: str | None = Field(default=None,
@@ -2979,6 +3046,8 @@ def register_tools(mcp: FastMCP):
             description="Analyses per background factor")
         by_omics_type: list["GeneClusterOmicsBreakdown"] = Field(
             description="Analyses per omics type")
+        by_growth_phase: list["GrowthPhaseBreakdown"] = Field(
+            default_factory=list, description="Analysis counts per growth phase, sorted by count descending")
         score_max: float | None = Field(default=None,
             description="Highest Lucene score (search only)")
         score_median: float | None = Field(default=None,
@@ -3014,6 +3083,11 @@ def register_tools(mcp: FastMCP):
         background_factors: Annotated[list[str] | None, Field(
             description="Filter by background factors. "
             "E.g. ['axenic', 'diel_cycle'].",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Filter by growth phase(s) (case-insensitive). "
+            "Physiological state of the culture at sampling time. "
+            "E.g. ['exponential', 'nutrient_limited'].",
         )] = None,
         omics_type: Annotated[str | None, Field(
             description="Filter: " + ", ".join(f"'{v}'" for v in sorted(VALID_OMICS_TYPES)) + ".",
@@ -3053,6 +3127,7 @@ def register_tools(mcp: FastMCP):
                 search_text=search_text, organism=organism,
                 cluster_type=cluster_type, treatment_type=treatment_type,
                 background_factors=background_factors,
+                growth_phases=growth_phases,
                 omics_type=omics_type, publication_doi=publication_doi,
                 experiment_ids=experiment_ids, analysis_ids=analysis_ids,
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
@@ -3068,6 +3143,8 @@ def register_tools(mcp: FastMCP):
                                      for b in data["by_background_factors"]]
             by_omics_type = [GeneClusterOmicsBreakdown(**b)
                              for b in data["by_omics_type"]]
+            by_growth_phase = [GrowthPhaseBreakdown(**b)
+                               for b in data.get("by_growth_phase", [])]
             results = [
                 ListClusteringAnalysesResult(
                     **{k: v for k, v in r.items() if k != "clusters"},
@@ -3083,6 +3160,7 @@ def register_tools(mcp: FastMCP):
                 by_treatment_type=by_treatment_type,
                 by_background_factors=by_background_factors,
                 by_omics_type=by_omics_type,
+                by_growth_phase=by_growth_phase,
                 score_max=data.get("score_max"),
                 score_median=data.get("score_median"),
                 returned=data["returned"],
@@ -3604,6 +3682,10 @@ def register_tools(mcp: FastMCP):
         timepoint_filter: Annotated[list[str] | None, Field(
             description="Restrict to these timepoint labels. Useful for 10+ timepoint experiments.",
         )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Filter DE results by growth phase(s) before enrichment (case-insensitive). "
+            "E.g. ['exponential'].",
+        )] = None,
         summary: Annotated[bool, Field(
             description="If true, omit results (envelope only).",
         )] = False,
@@ -3642,6 +3724,7 @@ def register_tools(mcp: FastMCP):
                 max_gene_set_size=max_gene_set_size,
                 pvalue_cutoff=pvalue_cutoff,
                 timepoint_filter=timepoint_filter,
+                growth_phases=growth_phases,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
