@@ -6,7 +6,9 @@
 
 ## Background
 
-The KG build repo is adding `growth_phase` (string) on `Changes_expression_of` edges and `growth_phases` (string[]) on `Experiment` nodes (see `2026-04-12-timepoint-growth-phase-backfill-design.md` in `multiomics_biocypher_kg`). This property captures the physiological state at sampling — `exponential`, `nutrient_limited`, `acclimated_steady_state`, `diel`, etc. (11-value enum plus `other:<slug>` escape hatch).
+The KG build repo is adding `growth_phase` (string) on `Changes_expression_of` edges and `growth_phases` (string[]) on `Experiment` nodes (see `2026-04-12-timepoint-growth-phase-backfill-design.md` in `multiomics_biocypher_kg`). This property captures the physiological state of the culture at the time of sampling — `exponential`, `nutrient_limited`, `acclimated_steady_state`, `diel`, etc. (11-value enum plus `other:<slug>` escape hatch).
+
+**Key semantic:** `growth_phase` is a **timepoint-level property of the experimental condition**, not a gene-level property. It describes the physiological state of the entire culture at the moment RNA/protein was harvested. Every gene measured at a given timepoint shares the same `growth_phase`. In the KG, it lives on the `Changes_expression_of` edge (one value per experiment×timepoint), not on the Gene node. When aggregated to the Experiment level, `growth_phases` is the set of distinct phases across all timepoints in that experiment (e.g., a nitrogen starvation time-course may span `["exponential", "nutrient_limited"]`).
 
 The explorer currently has no code referencing `growth_phase`. The properties exist in `schema_baseline.yaml` and appear in regression fixtures (passively returned via property maps), but are not explicitly surfaced, filterable, or summarized.
 
@@ -159,7 +161,7 @@ Parameters normalized to lowercase.
 **Return column** (`build_differential_expression_by_gene`): Add:
 - `r.growth_phase AS growth_phase`
 
-This appears in both compact and verbose modes (it's a core expression property like `timepoint`).
+This appears in both compact and verbose modes. It is a timepoint-level experimental condition (like `timepoint` and `timepoint_hours`), not a gene property — every gene at the same experiment×timepoint has the same `growth_phase`.
 
 **Summary global** (`build_differential_expression_by_gene_summary_global`): Add:
 ```cypher
@@ -175,7 +177,7 @@ WITH e, r.time_point AS tp, r.time_point_order AS tpo,
               timepoint_order: tpo, growth_phase: gp, ...}) AS timepoints
 ```
 
-**MCP/API**: Add `growth_phases` filter parameter. Add `growth_phase` to result model. Add `rows_by_growth_phase` to summary. Thread filter through all summary builders.
+**MCP/API**: Add `growth_phases` filter parameter. Add `growth_phase` to result model. Add `rows_by_growth_phase` to summary. Thread filter through all summary builders. MCP field description: `"Physiological state of the culture at this timepoint (e.g. 'exponential', 'nutrient_limited'). Timepoint-level condition, not gene-specific."`.
 
 #### 6. `differential_expression_by_ortholog`
 
@@ -184,7 +186,7 @@ WITH e, r.time_point AS tp, r.time_point_order AS tpo,
 toLower(r.growth_phase) IN $growth_phases
 ```
 
-**Return columns**: Add `r.growth_phase` to the result builders. In `build_differential_expression_by_ortholog_results`, the edge properties are aggregated at group×experiment×timepoint granularity — `growth_phase` aligns with timepoint (one phase per timepoint), so it appears as a scalar per result row.
+**Return columns**: Add `r.growth_phase` to the result builders. In `build_differential_expression_by_ortholog_results`, the edge properties are aggregated at group×experiment×timepoint granularity — `growth_phase` is a timepoint-level condition (one value per experiment×timepoint, shared by all genes), so it appears as a scalar per result row.
 
 **Summary**: Add `rows_by_growth_phase` to `build_differential_expression_by_ortholog_summary_global`.
 
@@ -260,3 +262,4 @@ Implementation order within the explorer:
 - **`time_point_growth_phases` parallel array on Experiment.** Aligns with existing `time_point_*` convention. More useful than flat `growth_phases` for experiment browsing — shows which phase each timepoint is in.
 - **Case-insensitive matching.** All growth_phase filters use `toLower()`, matching `background_factors` and `treatment_type` patterns.
 - **`list_filter_values` counts by experiment.** `experiment_count` is more meaningful than edge count for a discovery tool — "how many experiments have exponential-phase data" vs "how many DE rows."
+- **`growth_phase` is a timepoint-level experimental condition, not a gene property.** All descriptions, docstrings, and YAML docs must make this clear. It describes the physiological state of the culture at the moment of sampling — every gene measured at a given experiment×timepoint shares the same `growth_phase`. Pydantic field descriptions should say "Physiological state of the culture at this timepoint" (not "growth phase of this gene").
