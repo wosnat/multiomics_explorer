@@ -184,9 +184,7 @@ One row per (cluster × term) passing `pvalue_cutoff`. compareCluster-compatible
 | `p_adjust` | BH-corrected | yes |
 | `count` | k (hits) | yes |
 | `bg_count` | M (pathway size in background) | yes |
-| `gene_ids` | locus_tags in hit set | yes |
-
-No `signed_score`, no `direction`.
+No `signed_score`, no `direction`, no `gene_ids`.
 
 ### Verbose additions per row
 
@@ -196,7 +194,6 @@ No `signed_score`, no `direction`.
 | `cluster_expression_dynamics` | GeneCluster node |
 | `cluster_temporal_pattern` | GeneCluster node |
 | `cluster_member_count` | GeneCluster node |
-| `background_gene_ids` | pathway members in background not in hit set |
 
 ### Envelope (always returned)
 
