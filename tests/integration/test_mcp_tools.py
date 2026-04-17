@@ -991,3 +991,46 @@ class TestPathwayEnrichmentIntegration:
             conn=conn,
         )
         assert result["clusters_skipped"], "expected clusters skipped under impossible min filter"
+
+
+@pytest.mark.kg
+class TestClusterEnrichmentIntegration:
+    """Live-KG integration for cluster_enrichment."""
+
+    def test_basic_call(self, conn):
+        from multiomics_explorer.api import list_clustering_analyses, cluster_enrichment
+        analyses = list_clustering_analyses(limit=1, conn=conn)
+        if not analyses["results"]:
+            pytest.skip("No clustering analyses in KG")
+        analysis = analyses["results"][0]
+        result = cluster_enrichment(
+            analysis_id=analysis["analysis_id"],
+            organism=analysis["organism_name"],
+            ontology="cyanorak_role",
+            level=1,
+            pvalue_cutoff=1.0,
+            limit=5,
+            conn=conn,
+        )
+        assert isinstance(result["results"], list)
+        assert result["background_mode"] == "cluster_union"
+
+    def test_organism_background_differs(self, conn):
+        from multiomics_explorer.api import list_clustering_analyses, cluster_enrichment
+        analyses = list_clustering_analyses(limit=1, conn=conn)
+        if not analyses["results"]:
+            pytest.skip("No clustering analyses in KG")
+        analysis = analyses["results"][0]
+        r_union = cluster_enrichment(
+            analysis_id=analysis["analysis_id"],
+            organism=analysis["organism_name"],
+            ontology="cyanorak_role", level=1,
+            background="cluster_union", summary=True, conn=conn,
+        )
+        r_org = cluster_enrichment(
+            analysis_id=analysis["analysis_id"],
+            organism=analysis["organism_name"],
+            ontology="cyanorak_role", level=1,
+            background="organism", summary=True, conn=conn,
+        )
+        assert r_org["background_size"] >= r_union["background_size"]

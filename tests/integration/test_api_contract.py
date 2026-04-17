@@ -987,3 +987,53 @@ class TestGenesInClusterContract:
         result = api.genes_in_cluster(
             cluster_ids=["cluster:fake:id"], conn=conn)
         assert "cluster:fake:id" in result["not_found_clusters"]
+
+
+@pytest.mark.kg
+class TestClusterEnrichmentContract:
+    """Verify cluster_enrichment return shape against live KG."""
+
+    def test_envelope_keys(self, conn):
+        from multiomics_explorer.api import list_clustering_analyses, cluster_enrichment
+        analyses = list_clustering_analyses(limit=1, conn=conn)
+        if not analyses["results"]:
+            pytest.skip("No clustering analyses in KG")
+        analysis = analyses["results"][0]
+        result = cluster_enrichment(
+            analysis_id=analysis["analysis_id"],
+            organism=analysis["organism_name"],
+            ontology="cyanorak_role",
+            level=1,
+            pvalue_cutoff=1.0,
+            limit=5,
+            conn=conn,
+        )
+        assert isinstance(result, dict)
+        for key in ("analysis_id", "organism_name", "ontology", "total_matching",
+                     "returned", "truncated", "not_found", "not_matched",
+                     "clusters_skipped", "results", "background_mode",
+                     "background_size", "n_significant"):
+            assert key in result, f"Missing key: {key}"
+
+    def test_result_row_keys(self, conn):
+        from multiomics_explorer.api import list_clustering_analyses, cluster_enrichment
+        analyses = list_clustering_analyses(limit=1, conn=conn)
+        if not analyses["results"]:
+            pytest.skip("No clustering analyses in KG")
+        analysis = analyses["results"][0]
+        result = cluster_enrichment(
+            analysis_id=analysis["analysis_id"],
+            organism=analysis["organism_name"],
+            ontology="cyanorak_role",
+            level=1,
+            pvalue_cutoff=1.0,
+            limit=5,
+            conn=conn,
+        )
+        if not result["results"]:
+            pytest.skip("No enrichment results (insufficient data)")
+        row = result["results"][0]
+        for key in ("cluster", "cluster_id", "term_id", "term_name",
+                     "gene_ratio", "bg_ratio", "pvalue", "p_adjust",
+                     "count", "bg_count", "fold_enrichment"):
+            assert key in row, f"Missing row key: {key}"
