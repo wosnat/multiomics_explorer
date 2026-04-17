@@ -4018,3 +4018,144 @@ class TestClusterEnrichmentInputs:
         md = inputs.cluster_metadata["Cluster A"]
         assert md["cluster_id"] == "gc:1"
         assert md["member_count"] == 4
+
+
+# ---------------------------------------------------------------------------
+# cluster_enrichment  (L2 API)
+# ---------------------------------------------------------------------------
+
+
+class TestClusterEnrichment:
+    """Input validation + orchestration for api.cluster_enrichment."""
+
+    def test_importable_from_api(self):
+        from multiomics_explorer.api import cluster_enrichment
+        assert cluster_enrichment is not None
+
+    def test_invalid_ontology_raises(self):
+        from multiomics_explorer.api import cluster_enrichment
+        with pytest.raises(ValueError, match="ontology"):
+            cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="not_real", level=1,
+            )
+
+    def test_missing_level_and_term_ids_raises(self):
+        from multiomics_explorer.api import cluster_enrichment
+        with pytest.raises(ValueError, match="level|term_ids"):
+            cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="cyanorak_role",
+            )
+
+    def test_bad_background_string_raises(self):
+        from multiomics_explorer.api import cluster_enrichment
+        with pytest.raises(ValueError, match="background"):
+            cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="cyanorak_role", level=1,
+                background="genome",
+            )
+
+    def test_bad_pvalue_cutoff_raises(self):
+        from multiomics_explorer.api import cluster_enrichment
+        with pytest.raises(ValueError, match="pvalue_cutoff"):
+            cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="cyanorak_role", level=1,
+                pvalue_cutoff=1.5,
+            )
+
+    def test_max_less_than_min_gene_set_size_raises(self):
+        from multiomics_explorer.api import cluster_enrichment
+        with pytest.raises(ValueError, match="max_gene_set_size"):
+            cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="cyanorak_role", level=1,
+                min_gene_set_size=50, max_gene_set_size=5,
+            )
+
+    def test_max_less_than_min_cluster_size_raises(self):
+        from multiomics_explorer.api import cluster_enrichment
+        with pytest.raises(ValueError, match="max_cluster_size"):
+            cluster_enrichment(
+                analysis_id="ca:1", organism="MED4",
+                ontology="cyanorak_role", level=1,
+                min_cluster_size=20, max_cluster_size=5,
+            )
+
+    @staticmethod
+    def _stub_inputs(gene_sets=None, not_found=(), not_matched=()):
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+        return EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets=gene_sets or {"Cluster A": ["PMM0001", "PMM0002"]},
+            background={"Cluster A": ["PMM0001", "PMM0002", "PMM0003"]},
+            cluster_metadata={"Cluster A": {
+                "cluster_id": "gc:1", "cluster_name": "Cluster A",
+                "member_count": 2,
+            }},
+            not_found=list(not_found),
+            not_matched=list(not_matched),
+            no_expression=[],
+            clusters_skipped=[],
+            analysis_metadata={
+                "analysis_id": "ca:test", "analysis_name": "Test",
+                "cluster_method": "kmeans", "cluster_type": "diel_cycle",
+                "omics_type": "transcriptomics",
+                "treatment_type": ["light_dark"],
+                "background_factors": [], "growth_phases": [],
+                "experiment_ids": ["exp:1"],
+            },
+        )
+
+    @staticmethod
+    def _stub_gbo_result(rows=()):
+        return {
+            "ontology": "cyanorak_role", "organism_name": "MED4",
+            "results": list(rows),
+            "not_found": [], "wrong_ontology": [],
+            "wrong_level": [], "filtered_out": [],
+        }
+
+    def test_early_return_when_not_found(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(gene_sets={}, not_found=["ca:missing"]),
+        )
+        result = cluster_enrichment(
+            analysis_id="ca:missing", organism="MED4",
+            ontology="cyanorak_role", level=1,
+        )
+        assert result["not_found"] == ["ca:missing"]
+        assert result["results"] == []
+
+    def test_orchestration_produces_envelope(self, monkeypatch):
+        from multiomics_explorer.api import cluster_enrichment
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+
+        monkeypatch.setattr(
+            enr, "cluster_enrichment_inputs",
+            lambda **_: self._stub_inputs(),
+        )
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: self._stub_gbo_result([
+                {"term_id": "CR:A", "term_name": "Cat A", "locus_tag": "PMM0001", "level": 1},
+                {"term_id": "CR:A", "term_name": "Cat A", "locus_tag": "PMM0002", "level": 1},
+                {"term_id": "CR:B", "term_name": "Cat B", "locus_tag": "PMM0003", "level": 1},
+            ]),
+        )
+        result = cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            pvalue_cutoff=1.0,
+        )
+        assert "total_matching" in result
+        assert "returned" in result
+        assert "analysis_id" in result
+        assert "organism_name" in result
+        assert isinstance(result["results"], list)

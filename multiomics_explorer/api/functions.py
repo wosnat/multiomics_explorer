@@ -3370,3 +3370,322 @@ def pathway_enrichment(
         offset=offset,
     )
     return envelope
+
+
+# ---------------------------------------------------------------------------
+# cluster_enrichment envelope helper
+# ---------------------------------------------------------------------------
+
+
+def _build_cluster_enrichment_envelope(
+    *, df, inputs, gbo_result, ontology, level, tree,
+    pvalue_cutoff, verbose, limit, offset,
+) -> dict:
+    import pandas as pd
+
+    total_matching = int(len(df))
+    n_significant = int((df["p_adjust"] < pvalue_cutoff).sum()) if total_matching else 0
+
+    # --- clusters_skipped: combine size-filtered + no-Fisher-row clusters ---
+    produced_clusters = set(df["cluster"]) if total_matching else set()
+    skipped: list[dict] = list(inputs.clusters_skipped)  # from size filter
+    skipped_ids = {s.get("cluster_id") for s in skipped}
+    for cluster in inputs.cluster_metadata:
+        if cluster in produced_clusters:
+            continue
+        cid = inputs.cluster_metadata[cluster].get("cluster_id")
+        if cid in skipped_ids:
+            continue
+        if cluster not in inputs.background or not inputs.background.get(cluster):
+            reason = "empty_background"
+        elif not inputs.gene_sets.get(cluster):
+            reason = "empty_gene_set"
+        else:
+            reason = "no_pathways_in_size_range"
+        skipped.append({
+            "cluster_id": cid,
+            "cluster_name": cluster,
+            "member_count": inputs.cluster_metadata[cluster].get("member_count"),
+            "reason": reason,
+        })
+
+    # --- by_cluster ---
+    by_cluster = []
+    for cluster_name, md in inputs.cluster_metadata.items():
+        if cluster_name not in produced_clusters:
+            continue
+        sub = df[df["cluster"] == cluster_name]
+        by_cluster.append({
+            "cluster_id": md.get("cluster_id"),
+            "cluster_name": cluster_name,
+            "member_count": md.get("member_count"),
+            "significant_terms": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        })
+
+    # --- by_term: top 10 terms by number of clusters they appear in as significant ---
+    by_term: list[dict] = []
+    if total_matching:
+        sig_df = df[df["p_adjust"] < pvalue_cutoff]
+        if not sig_df.empty:
+            term_counts = (
+                sig_df.groupby(["term_id", "term_name"])["cluster"]
+                .nunique()
+                .reset_index()
+                .rename(columns={"cluster": "n_clusters"})
+                .sort_values("n_clusters", ascending=False)
+                .head(10)
+            )
+            by_term = term_counts.to_dict(orient="records")
+
+    # --- background_size: representative ---
+    bg_sizes = [len(v) for v in inputs.background.values()] if inputs.background else []
+    background_size = max(bg_sizes) if bg_sizes else 0
+
+    # --- total_terms_tested ---
+    total_terms_tested = int(df["term_id"].nunique()) if total_matching else 0
+
+    # --- slice results ---
+    sliced = df.iloc[offset:offset + limit] if total_matching else df
+    if not verbose:
+        drop_cols = [
+            c for c in (
+                "foreground_gene_ids", "background_gene_ids",
+                "cluster_functional_description", "cluster_expression_dynamics",
+                "cluster_temporal_pattern", "cluster_member_count",
+            ) if c in sliced.columns
+        ]
+        sliced = sliced.drop(columns=drop_cols)
+    returned_rows = sliced.to_dict(orient="records")
+    # Strip sparse tree/tree_code for non-BRITE results
+    for r in returned_rows:
+        tree_v = r.get("tree")
+        if tree_v is None or (isinstance(tree_v, float) and pd.isna(tree_v)):
+            r.pop("tree", None)
+            r.pop("tree_code", None)
+    returned = len(returned_rows)
+    truncated = (offset + returned) < total_matching
+
+    # --- analysis metadata ---
+    a_md = inputs.analysis_metadata
+
+    envelope = {
+        "analysis_id": a_md.get("analysis_id"),
+        "analysis_name": a_md.get("analysis_name"),
+        "organism_name": inputs.organism_name,
+        "cluster_method": a_md.get("cluster_method"),
+        "cluster_type": a_md.get("cluster_type"),
+        "omics_type": a_md.get("omics_type"),
+        "treatment_type": a_md.get("treatment_type"),
+        "background_factors": a_md.get("background_factors"),
+        "growth_phases": a_md.get("growth_phases"),
+        "experiment_ids": a_md.get("experiment_ids"),
+        "ontology": ontology,
+        "level": level,
+        "tree": tree,
+        "background_mode": "cluster_union",  # overridden by caller if needed
+        "background_size": background_size,
+        "total_matching": total_matching,
+        "returned": returned,
+        "truncated": truncated,
+        "offset": offset,
+        "n_significant": n_significant,
+        "by_cluster": by_cluster,
+        "by_term": by_term,
+        "clusters_tested": len(produced_clusters),
+        "total_terms_tested": total_terms_tested,
+        "not_found": inputs.not_found,
+        "not_matched": inputs.not_matched,
+        "clusters_skipped": skipped,
+        "term_validation": {
+            "not_found": list(gbo_result.get("not_found", [])),
+            "wrong_ontology": list(gbo_result.get("wrong_ontology", [])),
+            "wrong_level": list(gbo_result.get("wrong_level", [])),
+            "filtered_out": list(gbo_result.get("filtered_out", [])),
+        },
+        "results": returned_rows,
+    }
+    # Drop tree from envelope if not BRITE
+    if tree is None:
+        envelope.pop("tree", None)
+    return envelope
+
+
+# ---------------------------------------------------------------------------
+# cluster_enrichment public function
+# ---------------------------------------------------------------------------
+
+
+def cluster_enrichment(
+    analysis_id: str,
+    organism: str,
+    ontology: str,
+    level: int | None = None,
+    term_ids: list[str] | None = None,
+    background: str | list[str] = "cluster_union",
+    min_gene_set_size: int = 5,
+    max_gene_set_size: int | None = 500,
+    min_cluster_size: int = 1,
+    max_cluster_size: int | None = None,
+    pvalue_cutoff: float = 0.05,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    tree: str | None = None,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Cluster-based over-representation analysis.
+
+    Runs Fisher ORA per gene cluster from a clustering analysis,
+    testing enrichment of ontology terms among cluster members.
+    """
+    # --- Input validation ---
+    if ontology not in ALL_ONTOLOGIES:
+        raise ValueError(
+            f"Invalid ontology '{ontology}'. Valid: {ALL_ONTOLOGIES}"
+        )
+    if tree is not None and ontology != "brite":
+        raise ValueError("tree filter is only valid for ontology='brite'")
+    if level is None and not term_ids:
+        raise ValueError(
+            "At least one of `level` or `term_ids` must be provided."
+        )
+    if isinstance(background, str):
+        if background not in {"cluster_union", "organism"}:
+            raise ValueError(
+                f"background must be 'cluster_union', 'organism', or a list; "
+                f"got {background!r}"
+            )
+    elif isinstance(background, list):
+        if not background:
+            raise ValueError("background list must be non-empty")
+    else:
+        raise ValueError(
+            f"background must be 'cluster_union', 'organism', or a list; "
+            f"got {type(background).__name__}"
+        )
+    if min_gene_set_size < 0:
+        raise ValueError("min_gene_set_size must be >= 0.")
+    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
+        raise ValueError(
+            "max_gene_set_size must be >= min_gene_set_size."
+        )
+    if min_cluster_size < 0:
+        raise ValueError("min_cluster_size must be >= 0.")
+    if max_cluster_size is not None and max_cluster_size < min_cluster_size:
+        raise ValueError(
+            "max_cluster_size must be >= min_cluster_size."
+        )
+    if not (0 < pvalue_cutoff <= 1):
+        raise ValueError(
+            f"pvalue_cutoff must be in (0, 1]; got {pvalue_cutoff}"
+        )
+
+    from multiomics_explorer.analysis.enrichment import (
+        cluster_enrichment_inputs, fisher_ora,
+    )
+    import pandas as pd
+
+    conn = _default_conn(conn)
+
+    # Step 2: build EnrichmentInputs from clustering analysis
+    inputs = cluster_enrichment_inputs(
+        analysis_id=analysis_id,
+        organism=organism,
+        min_cluster_size=min_cluster_size,
+        max_cluster_size=max_cluster_size,
+        conn=conn,
+    )
+
+    # Early return if analysis not found or no gene sets
+    if not inputs.gene_sets:
+        empty_gbo = {
+            "ontology": ontology, "organism_name": inputs.organism_name,
+            "results": [],
+            "not_found": [], "wrong_ontology": [],
+            "wrong_level": [], "filtered_out": [],
+        }
+        envelope = _build_cluster_enrichment_envelope(
+            df=pd.DataFrame(),
+            inputs=inputs,
+            gbo_result=empty_gbo,
+            ontology=ontology,
+            level=level,
+            tree=tree,
+            pvalue_cutoff=pvalue_cutoff,
+            verbose=verbose,
+            limit=0,
+            offset=offset,
+        )
+        envelope["background_mode"] = (
+            background if isinstance(background, str) else "explicit"
+        )
+        return envelope
+
+    # Step 3: resolve background
+    if background == "cluster_union":
+        resolved_bg = inputs.background
+    elif background == "organism":
+        org_cypher = (
+            "MATCH (g:Gene {organism_name: $org}) "
+            "RETURN collect(g.locus_tag) AS locus_tags"
+        )
+        org_rows = conn.execute_query(org_cypher, org=inputs.organism_name)
+        org_locus_tags = org_rows[0]["locus_tags"] if org_rows else []
+        resolved_bg = {c: list(org_locus_tags) for c in inputs.gene_sets}
+    else:
+        resolved_bg = {c: list(background) for c in inputs.gene_sets}
+
+    # Step 4: TERM2GENE
+    gbo_result = genes_by_ontology(
+        ontology=ontology,
+        organism=inputs.organism_name,
+        level=level,
+        term_ids=term_ids,
+        min_gene_set_size=0,
+        max_gene_set_size=None,
+        summary=False,
+        verbose=False,
+        limit=None,
+        offset=0,
+        tree=tree,
+        conn=conn,
+    )
+    from multiomics_explorer.analysis.frames import to_dataframe
+    term2gene = to_dataframe(gbo_result)
+
+    # Step 5: fisher_ora
+    if term2gene.empty or not inputs.gene_sets:
+        df = pd.DataFrame()
+    else:
+        df = fisher_ora(
+            gene_sets=inputs.gene_sets,
+            background=resolved_bg,
+            term2gene=term2gene,
+            min_gene_set_size=min_gene_set_size,
+            max_gene_set_size=max_gene_set_size,
+        )
+
+    # Step 6: attach cluster metadata
+    if not df.empty:
+        md_df = pd.DataFrame.from_dict(
+            inputs.cluster_metadata, orient="index"
+        ).reset_index().rename(columns={"index": "cluster"})
+        df = df.merge(md_df, on="cluster", how="left")
+
+    # Step 7: envelope
+    bg_mode = background if isinstance(background, str) else "explicit"
+    envelope = _build_cluster_enrichment_envelope(
+        df=df,
+        inputs=inputs,
+        gbo_result=gbo_result,
+        ontology=ontology,
+        level=level,
+        tree=tree,
+        pvalue_cutoff=pvalue_cutoff,
+        verbose=verbose,
+        limit=limit if limit is not None else len(df),
+        offset=offset,
+    )
+    envelope["background_mode"] = bg_mode
+    return envelope
