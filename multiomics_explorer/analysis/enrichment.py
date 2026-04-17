@@ -63,6 +63,17 @@ class EnrichmentInputs(BaseModel):
             "(reuses differential_expression_by_gene's bucket name)."
         ),
     )
+    clusters_skipped: list[dict] = Field(
+        default_factory=list,
+        description=(
+            "Clusters filtered out by size constraints. Each entry: "
+            "{cluster_id, cluster_name, member_count, reason}."
+        ),
+    )
+    analysis_metadata: dict = Field(
+        default_factory=dict,
+        description="Analysis-level metadata (analysis_id, name, cluster_type, etc.).",
+    )
 
 
 _REQUIRED_TERM2GENE_COLS = ("term_id", "term_name", "locus_tag")
@@ -500,4 +511,153 @@ def de_enrichment_inputs(
         not_found=list(de_full.get("not_found", []) or []),
         not_matched=list(de_full.get("not_matched", []) or []),
         no_expression=list(de_full.get("no_expression", []) or []),
+    )
+
+
+def cluster_enrichment_inputs(
+    analysis_id: str,
+    organism: str,
+    min_cluster_size: int = 1,
+    max_cluster_size: int | None = None,
+    *,
+    conn=None,
+) -> EnrichmentInputs:
+    """Build EnrichmentInputs from cluster memberships in a clustering analysis.
+
+    Calls ``genes_in_cluster(analysis_id=...)`` to get all cluster members,
+    groups them by cluster_name, applies size filters, and builds a
+    ``cluster_union`` background from ALL clusters (including filtered ones).
+
+    Parameters
+    ----------
+    analysis_id : str
+        Clustering analysis identifier (e.g. ``"ca:..."``) to pull from.
+    organism : str
+        Single organism name (fuzzy-matched).
+    min_cluster_size : int, default 1
+        Clusters with fewer members are moved to ``clusters_skipped``.
+    max_cluster_size : int or None, default None
+        Clusters with more members are moved to ``clusters_skipped``.
+    conn : GraphConnection, optional
+        Passed through to API calls.
+
+    Returns
+    -------
+    EnrichmentInputs
+        Includes ``gene_sets``, ``background`` (cluster_union per cluster),
+        ``cluster_metadata``, ``clusters_skipped``, and ``analysis_metadata``.
+    """
+    from multiomics_explorer.api.functions import (
+        genes_in_cluster as _genes_in_cluster,
+        list_clustering_analyses as _list_analyses,
+    )
+
+    cluster_result = _genes_in_cluster(
+        analysis_id=analysis_id, organism=organism,
+        verbose=True, limit=None, conn=conn,
+    )
+
+    analysis_meta_result = _list_analyses(
+        analysis_ids=[analysis_id], limit=1, conn=conn,
+    )
+    analysis_meta = (
+        analysis_meta_result["results"][0]
+        if analysis_meta_result.get("results")
+        else {}
+    )
+
+    # --- Partial-failure buckets ---
+    not_found: list[str] = []
+    not_matched: list[str] = []
+    if not cluster_result.get("results") and cluster_result.get("total_matching", 0) == 0:
+        if cluster_result.get("not_matched_organism"):
+            not_matched = [analysis_id]
+        elif not analysis_meta:
+            not_found = [analysis_id]
+        else:
+            not_found = [analysis_id]
+
+    # --- Group rows by cluster_name ---
+    all_cluster_genes: dict[str, list[str]] = {}
+    cluster_ids_map: dict[str, str] = {}
+    cluster_verbose: dict[str, dict] = {}
+    for row in cluster_result.get("results", []):
+        cname = row["cluster_name"]
+        all_cluster_genes.setdefault(cname, []).append(row["locus_tag"])
+        if cname not in cluster_ids_map:
+            cluster_ids_map[cname] = row["cluster_id"]
+            cluster_verbose[cname] = {
+                k: row.get(k)
+                for k in (
+                    "cluster_functional_description",
+                    "cluster_expression_dynamics",
+                    "cluster_temporal_pattern",
+                )
+            }
+
+    # Union background: ALL genes from ALL clusters (including filtered ones).
+    all_genes = sorted({
+        lt for genes in all_cluster_genes.values() for lt in genes
+    })
+
+    # --- Apply size filters ---
+    gene_sets: dict[str, list[str]] = {}
+    clusters_skipped: list[dict] = []
+    for cname, genes in all_cluster_genes.items():
+        count = len(genes)
+        if count < min_cluster_size:
+            clusters_skipped.append({
+                "cluster_id": cluster_ids_map[cname],
+                "cluster_name": cname,
+                "member_count": count,
+                "reason": f"below min_cluster_size ({min_cluster_size})",
+            })
+            continue
+        if max_cluster_size is not None and count > max_cluster_size:
+            clusters_skipped.append({
+                "cluster_id": cluster_ids_map[cname],
+                "cluster_name": cname,
+                "member_count": count,
+                "reason": f"above max_cluster_size ({max_cluster_size})",
+            })
+            continue
+        gene_sets[cname] = genes
+
+    # Per-cluster background is the full union.
+    background = {cname: list(all_genes) for cname in gene_sets}
+
+    # --- Cluster metadata ---
+    cluster_metadata: dict[str, dict] = {}
+    for cname in gene_sets:
+        cluster_metadata[cname] = {
+            "cluster_id": cluster_ids_map[cname],
+            "cluster_name": cname,
+            "member_count": len(gene_sets[cname]),
+            **cluster_verbose.get(cname, {}),
+        }
+
+    # --- Analysis-level metadata ---
+    analysis_md = {
+        "analysis_id": analysis_id,
+        "analysis_name": analysis_meta.get("name")
+            or cluster_result.get("analysis_name"),
+        "cluster_method": analysis_meta.get("cluster_method"),
+        "cluster_type": analysis_meta.get("cluster_type"),
+        "omics_type": analysis_meta.get("omics_type"),
+        "treatment_type": analysis_meta.get("treatment_type", []),
+        "background_factors": analysis_meta.get("background_factors", []),
+        "growth_phases": analysis_meta.get("growth_phases", []),
+        "experiment_ids": analysis_meta.get("experiment_ids", []),
+    }
+
+    return EnrichmentInputs(
+        organism_name=organism,
+        gene_sets=gene_sets,
+        background=background,
+        cluster_metadata=cluster_metadata,
+        not_found=not_found,
+        not_matched=not_matched,
+        no_expression=[],
+        clusters_skipped=clusters_skipped,
+        analysis_metadata=analysis_md,
     )

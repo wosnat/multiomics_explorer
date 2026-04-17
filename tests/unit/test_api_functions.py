@@ -3857,3 +3857,164 @@ class TestPathwayEnrichment:
                     "not_found", "not_matched", "no_expression",
                     "term_validation", "clusters_skipped", "results"):
             assert key in out, f"envelope missing key: {key}"
+
+
+# ---------------------------------------------------------------------------
+# cluster_enrichment_inputs
+# ---------------------------------------------------------------------------
+class TestClusterEnrichmentInputs:
+    """Tests for cluster_enrichment_inputs helper."""
+
+    _CLUSTER_RESULT = {
+        "total_matching": 7,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 7}],
+        "by_cluster": [
+            {"cluster_id": "gc:1", "cluster_name": "Cluster A", "count": 4},
+            {"cluster_id": "gc:2", "cluster_name": "Cluster B", "count": 2},
+            {"cluster_id": "gc:3", "cluster_name": "Cluster C", "count": 1},
+        ],
+        "top_categories": [],
+        "genes_per_cluster_max": 4,
+        "genes_per_cluster_median": 2,
+        "not_found_clusters": [],
+        "not_matched_clusters": [],
+        "not_matched_organism": None,
+        "analysis_name": "Test Analysis",
+        "returned": 7,
+        "truncated": False,
+        "offset": 0,
+        "results": [
+            {"locus_tag": "PMM0001", "cluster_id": "gc:1", "cluster_name": "Cluster A",
+             "organism_name": "Prochlorococcus MED4"},
+            {"locus_tag": "PMM0002", "cluster_id": "gc:1", "cluster_name": "Cluster A",
+             "organism_name": "Prochlorococcus MED4"},
+            {"locus_tag": "PMM0003", "cluster_id": "gc:1", "cluster_name": "Cluster A",
+             "organism_name": "Prochlorococcus MED4"},
+            {"locus_tag": "PMM0004", "cluster_id": "gc:1", "cluster_name": "Cluster A",
+             "organism_name": "Prochlorococcus MED4"},
+            {"locus_tag": "PMM0005", "cluster_id": "gc:2", "cluster_name": "Cluster B",
+             "organism_name": "Prochlorococcus MED4"},
+            {"locus_tag": "PMM0006", "cluster_id": "gc:2", "cluster_name": "Cluster B",
+             "organism_name": "Prochlorococcus MED4"},
+            {"locus_tag": "PMM0007", "cluster_id": "gc:3", "cluster_name": "Cluster C",
+             "organism_name": "Prochlorococcus MED4"},
+        ],
+    }
+
+    _ANALYSIS_META = {
+        "results": [{
+            "analysis_id": "ca:test",
+            "name": "Test Analysis",
+            "organism_name": "Prochlorococcus MED4",
+            "cluster_method": "kmeans",
+            "cluster_type": "diel_cycle",
+            "cluster_count": 3,
+            "total_gene_count": 7,
+            "treatment_type": ["light_dark"],
+            "background_factors": [],
+            "growth_phases": [],
+            "omics_type": "transcriptomics",
+            "experiment_ids": ["exp:1"],
+            "clusters": [],
+        }],
+        "total_matching": 1,
+        "returned": 1,
+        "truncated": False,
+    }
+
+    def test_builds_gene_sets_grouped_by_cluster(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: self._CLUSTER_RESULT)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:test", organism="MED4")
+        assert "Cluster A" in inputs.gene_sets
+        assert "Cluster B" in inputs.gene_sets
+        assert sorted(inputs.gene_sets["Cluster A"]) == ["PMM0001", "PMM0002", "PMM0003", "PMM0004"]
+        assert sorted(inputs.gene_sets["Cluster B"]) == ["PMM0005", "PMM0006"]
+
+    def test_cluster_union_background_includes_all_genes(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: self._CLUSTER_RESULT)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:test", organism="MED4", min_cluster_size=3)
+        # Cluster C (1 gene) filtered out but its gene still in background
+        all_bg_genes = set(inputs.background["Cluster A"])
+        assert "PMM0007" in all_bg_genes
+        assert len(all_bg_genes) == 7
+
+    def test_min_cluster_size_filters_small_clusters(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: self._CLUSTER_RESULT)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:test", organism="MED4", min_cluster_size=3)
+        assert "Cluster A" in inputs.gene_sets
+        assert "Cluster B" not in inputs.gene_sets
+        assert "Cluster C" not in inputs.gene_sets
+
+    def test_max_cluster_size_filters_large_clusters(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: self._CLUSTER_RESULT)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:test", organism="MED4", max_cluster_size=3)
+        assert "Cluster A" not in inputs.gene_sets
+        assert "Cluster B" in inputs.gene_sets
+        assert "Cluster C" in inputs.gene_sets
+
+    def test_clusters_skipped_populated(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: self._CLUSTER_RESULT)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:test", organism="MED4", min_cluster_size=3)
+        assert len(inputs.clusters_skipped) == 2
+        skipped_names = {s["cluster_name"] for s in inputs.clusters_skipped}
+        assert skipped_names == {"Cluster B", "Cluster C"}
+
+    def test_not_found_when_analysis_missing(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        empty_result = {
+            **self._CLUSTER_RESULT,
+            "total_matching": 0, "results": [], "returned": 0,
+            "analysis_name": None,
+        }
+        empty_meta = {**self._ANALYSIS_META, "total_matching": 0, "results": [], "returned": 0}
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: empty_result)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: empty_meta)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:missing", organism="MED4")
+        assert "ca:missing" in inputs.not_found
+
+    def test_not_matched_when_organism_wrong(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        wrong_org_result = {
+            **self._CLUSTER_RESULT,
+            "not_matched_organism": "SomeOtherOrg",
+            "total_matching": 0, "results": [], "returned": 0,
+        }
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: wrong_org_result)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:test", organism="SomeOtherOrg")
+        assert "ca:test" in inputs.not_matched
+
+    def test_cluster_metadata_populated(self, monkeypatch):
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(f, "genes_in_cluster", lambda **_: self._CLUSTER_RESULT)
+        monkeypatch.setattr(f, "list_clustering_analyses", lambda **_: self._ANALYSIS_META)
+        inputs = enr.cluster_enrichment_inputs(
+            analysis_id="ca:test", organism="MED4")
+        md = inputs.cluster_metadata["Cluster A"]
+        assert md["cluster_id"] == "gc:1"
+        assert md["member_count"] == 4
