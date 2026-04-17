@@ -904,6 +904,22 @@ def build_list_brite_trees() -> tuple[str, dict]:
     return cypher, {}
 
 
+def build_list_growth_phases() -> tuple[str, dict]:
+    """List distinct growth_phase values with experiment counts.
+
+    RETURN keys: phase, experiment_count.
+    """
+    cypher = (
+        "MATCH (e:Experiment)-[r:Changes_expression_of]->(:Gene)\n"
+        "WITH r.growth_phase AS phase, e.id AS eid\n"
+        "WITH phase, count(DISTINCT eid) AS experiment_count\n"
+        "WHERE phase IS NOT NULL\n"
+        "RETURN phase, experiment_count\n"
+        "ORDER BY experiment_count DESC, phase"
+    )
+    return cypher, {}
+
+
 def build_list_organisms(
     *,
     verbose: bool = False,

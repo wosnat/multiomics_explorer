@@ -21,6 +21,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_details,
     build_gene_details_summary,
     build_list_gene_categories,
+    build_list_growth_phases,
     build_list_organisms,
     build_list_publications,
     build_list_publications_summary,
@@ -3897,6 +3898,15 @@ class TestGrowthPhases:
         from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
         cypher, _ = build_list_clustering_analyses_summary()
         assert "by_growth_phase" in cypher
+
+    # --- list_filter_values: growth_phase ---
+
+    def test_build_list_growth_phases(self):
+        """build_list_growth_phases returns phase and experiment_count."""
+        cypher, params = build_list_growth_phases()
+        assert "r.growth_phase" in cypher
+        assert "experiment_count" in cypher
+        assert params == {}
 
 
 # ---------------------------------------------------------------------------
