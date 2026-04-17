@@ -104,31 +104,31 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 ### Example 1: Single analysis, CyanoRak level 1
 
 ```example-call
-cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1)
+cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1)
 ```
 
 ### Example 2: Summary-only (envelope, no rows)
 
 ```example-call
-cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, summary=True)
+cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, summary=True)
 ```
 
 ### Example 3: Verbose with cluster descriptions
 
 ```example-call
-cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, verbose=True)
+cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, verbose=True)
 ```
 
 ### Example 4: BRITE tree-scoped
 
 ```example-call
-cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="brite", tree="transporters", level=1)
+cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="brite", tree="transporters", level=1)
 ```
 
 ### Example 5: Organism background instead of cluster union
 
 ```example-call
-cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
+cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
 ```
 
 ### Example 6: From landscape to cluster enrichment

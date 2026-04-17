@@ -3509,9 +3509,7 @@ def _build_cluster_enrichment_envelope(
         },
         "results": returned_rows,
     }
-    # Drop tree from envelope if not BRITE
-    if tree is None:
-        envelope.pop("tree", None)
+    # tree is always in envelope (Pydantic model has default=None)
     return envelope
 
 

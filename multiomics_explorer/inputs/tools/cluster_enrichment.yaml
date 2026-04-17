@@ -2,19 +2,19 @@
 
 examples:
   - title: Single analysis, CyanoRak level 1
-    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1)
+    call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1)
 
   - title: Summary-only (envelope, no rows)
-    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, summary=True)
+    call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, summary=True)
 
   - title: Verbose with cluster descriptions
-    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, verbose=True)
+    call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, verbose=True)
 
   - title: BRITE tree-scoped
-    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="brite", tree="transporters", level=1)
+    call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="brite", tree="transporters", level=1)
 
   - title: Organism background instead of cluster union
-    call: cluster_enrichment(analysis_id="<analysis_id>", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
+    call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
 
   - title: From landscape to cluster enrichment
     steps: |
