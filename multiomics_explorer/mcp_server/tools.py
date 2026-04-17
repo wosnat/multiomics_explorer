@@ -256,6 +256,112 @@ class PathwayEnrichmentResponse(BaseModel):
     )
 
 
+# ---------------------------------------------------------------------------
+# cluster_enrichment response models (module-level for direct importability)
+# ---------------------------------------------------------------------------
+
+class ClusterEnrichmentResult(BaseModel):
+    cluster: str = Field(description="Cluster name from the clustering analysis")
+    cluster_id: str = Field(description="Cluster ID from KG")
+    term_id: str = Field(description="Ontology term ID")
+    term_name: str = Field(description="Ontology term display name")
+    level: int | None = Field(default=None, description="Hierarchy depth (0 = root)")
+    tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
+    tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+    gene_ratio: str = Field(
+        description="'k/n' string — cluster genes in pathway over total cluster genes (clusterProfiler: GeneRatio)"
+    )
+    gene_ratio_numeric: float = Field(description="k/n as float")
+    bg_ratio: str = Field(
+        description="'M/N' string — pathway members over background size (clusterProfiler: BgRatio)"
+    )
+    bg_ratio_numeric: float = Field(description="M/N as float")
+    rich_factor: float = Field(
+        description="k/M — fraction of pathway's background members in cluster (clusterProfiler: RichFactor)"
+    )
+    fold_enrichment: float = Field(
+        description="(k/n) / (M/N) — observed over null (clusterProfiler: FoldEnrichment)"
+    )
+    pvalue: float = Field(description="Fisher-exact p-value (one-sided enrichment)")
+    p_adjust: float = Field(
+        description="Benjamini-Hochberg FDR within cluster (clusterProfiler: p.adjust)"
+    )
+    count: int = Field(description="k — cluster genes in pathway (clusterProfiler: Count)")
+    bg_count: int = Field(description="M — pathway members in cluster's background")
+    # Verbose fields
+    cluster_functional_description: str | None = Field(
+        default=None, description="Verbose: functional description of cluster"
+    )
+    cluster_expression_dynamics: str | None = Field(
+        default=None, description="Verbose: expression dynamics of cluster"
+    )
+    cluster_temporal_pattern: str | None = Field(
+        default=None, description="Verbose: temporal pattern of cluster"
+    )
+    cluster_member_count: int | None = Field(
+        default=None, description="Verbose: total genes in this cluster"
+    )
+
+
+class ClusterEnrichmentByCluster(BaseModel):
+    cluster_id: str = Field(description="Cluster ID")
+    cluster_name: str = Field(description="Cluster name")
+    member_count: int = Field(description="Genes in cluster")
+    significant_terms: int = Field(description="Terms with p_adjust below cutoff")
+
+
+class ClusterEnrichmentByTerm(BaseModel):
+    term_id: str = Field(description="Term ID")
+    term_name: str = Field(description="Term name")
+    n_clusters: int = Field(description="Clusters where this term is significant")
+
+
+class ClusterEnrichmentClusterSkipped(BaseModel):
+    cluster_id: str = Field(description="Cluster ID")
+    cluster_name: str = Field(description="Cluster name")
+    member_count: int | None = Field(default=None, description="Genes in cluster")
+    reason: str = Field(description="Why skipped")
+
+
+class ClusterEnrichmentResponse(BaseModel):
+    analysis_id: str | None = Field(default=None, description="Clustering analysis ID")
+    analysis_name: str | None = Field(default=None, description="Clustering analysis name")
+    organism_name: str = Field(description="Single organism")
+    cluster_method: str | None = Field(default=None, description="Clustering method")
+    cluster_type: str | None = Field(default=None, description="Cluster type")
+    omics_type: str | None = Field(default=None, description="Omics type")
+    treatment_type: list[str] = Field(default_factory=list, description="Treatment types")
+    background_factors: list[str] = Field(default_factory=list, description="Background factors")
+    growth_phases: list[str] = Field(default_factory=list, description="Growth phases")
+    experiment_ids: list[str] = Field(default_factory=list, description="Linked experiment IDs")
+    ontology: str = Field(description="Ontology used")
+    level: int | None = Field(default=None, description="Hierarchy level")
+    tree: str | None = Field(default=None, description="BRITE tree (if applicable)")
+    background_mode: str = Field(description="Background mode: cluster_union, organism, explicit")
+    background_size: int = Field(description="N — genes in background")
+    total_matching: int = Field(description="Total Fisher tests run")
+    returned: int = Field(description="Rows in this response")
+    truncated: bool = Field(description="True when total_matching exceeds offset+returned")
+    offset: int = Field(default=0, description="Pagination offset")
+    n_significant: int = Field(description="Rows with p_adjust below cutoff")
+    by_cluster: list[ClusterEnrichmentByCluster] = Field(
+        default_factory=list, description="Per-cluster significance counts"
+    )
+    by_term: list[ClusterEnrichmentByTerm] = Field(
+        default_factory=list, description="Top terms by number of clusters"
+    )
+    clusters_tested: int = Field(description="Clusters passing size filter")
+    total_terms_tested: int = Field(description="Unique terms in TERM2GENE")
+    not_found: list[str] = Field(default_factory=list, description="Analysis IDs absent from KG")
+    not_matched: list[str] = Field(default_factory=list, description="Analysis IDs wrong organism")
+    clusters_skipped: list[ClusterEnrichmentClusterSkipped] = Field(
+        default_factory=list, description="Clusters filtered out or producing no rows"
+    )
+    results: list[ClusterEnrichmentResult] = Field(
+        default_factory=list, description="Long-format result rows"
+    )
+
+
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
@@ -3753,3 +3859,78 @@ def register_tools(mcp: FastMCP):
             await ctx.warning("; ".join(warnings))
 
         return PathwayEnrichmentResponse(**result)
+
+    @mcp.tool(
+        tags={"enrichment", "clustering", "ontology"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def cluster_enrichment(
+        ctx: Context,
+        analysis_id: Annotated[str, Field(description="Clustering analysis ID. Get from list_clustering_analyses.")],
+        organism: Annotated[str, Field(description="Organism (case-insensitive fuzzy match). Single-organism enforced.")],
+        ontology: Annotated[Literal[
+            "go_bp", "go_mf", "go_cc", "ec", "kegg",
+            "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+        ], Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
+        tree: Annotated[str | None, Field(description="BRITE tree name filter. Only valid when ontology='brite'.")] = None,
+        level: Annotated[int | None, Field(description="Hierarchy level (0 = root). At least one of level or term_ids required.", ge=0)] = None,
+        term_ids: Annotated[list[str] | None, Field(description="Specific term IDs to test.")] = None,
+        background: Annotated[str | list[str], Field(description="'cluster_union' (default), 'organism', or explicit locus_tag list.")] = "cluster_union",
+        min_gene_set_size: Annotated[int, Field(description="Per-cluster M filter: drop pathways with fewer members.", ge=0)] = 5,
+        max_gene_set_size: Annotated[int | None, Field(description="Per-cluster M filter upper bound. None disables.", ge=1)] = 500,
+        min_cluster_size: Annotated[int, Field(description="Skip clusters with fewer members than this.", ge=0)] = 3,
+        max_cluster_size: Annotated[int | None, Field(description="Skip clusters with more members. None disables.", ge=1)] = None,
+        pvalue_cutoff: Annotated[float, Field(description="Significance threshold for p_adjust.", gt=0, lt=1)] = 0.05,
+        summary: Annotated[bool, Field(description="If true, omit results (envelope only).")] = False,
+        verbose: Annotated[bool, Field(description="Include cluster description fields on rows.")] = False,
+        limit: Annotated[int, Field(description="Max rows returned.", ge=1)] = 5,
+        offset: Annotated[int, Field(description="Skip N rows before limit.", ge=0)] = 0,
+    ) -> ClusterEnrichmentResponse:
+        """Cluster-membership over-representation analysis (Fisher + BH).
+
+        Runs ORA on every cluster in a clustering analysis. Use
+        list_clustering_analyses to find analysis IDs. Background
+        defaults to the union of all clustered genes.
+        See docs://analysis/enrichment for methodology.
+        """
+        await ctx.info(
+            f"cluster_enrichment analysis_id={analysis_id} "
+            f"ontology={ontology} level={level}"
+        )
+        try:
+            conn = _conn(ctx)
+            result = api.cluster_enrichment(
+                analysis_id=analysis_id,
+                organism=organism,
+                ontology=ontology,
+                level=level,
+                term_ids=term_ids,
+                tree=tree,
+                background=background,
+                min_gene_set_size=min_gene_set_size,
+                max_gene_set_size=max_gene_set_size,
+                min_cluster_size=min_cluster_size,
+                max_cluster_size=max_cluster_size,
+                pvalue_cutoff=pvalue_cutoff,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            raise ToolError(str(e)) from e
+
+        # Emit warnings
+        warnings = []
+        if result["not_found"]:
+            warnings.append(f"{len(result['not_found'])} analysis_ids not_found")
+        if result["not_matched"]:
+            warnings.append(f"{len(result['not_matched'])} not_matched (wrong organism)")
+        if result.get("clusters_skipped"):
+            warnings.append(f"{len(result['clusters_skipped'])} clusters skipped")
+        if warnings:
+            await ctx.warning("; ".join(warnings))
+
+        return ClusterEnrichmentResponse(**result)

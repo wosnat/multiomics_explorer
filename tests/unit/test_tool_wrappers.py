@@ -62,6 +62,7 @@ EXPECTED_TOOLS = [
     "genes_in_cluster",
     "ontology_landscape",
     "pathway_enrichment",
+    "cluster_enrichment",
 ]
 
 
@@ -3341,3 +3342,42 @@ class TestPathwayEnrichmentWrapper:
     # Default limit=100 is asserted in the Task 16 integration test, not here —
     # introspecting FastMCP's tool registry for signature defaults is brittle, and
     # the default is verified by end-to-end calling behavior in integration.
+
+
+class TestClusterEnrichmentWrapper:
+    def test_response_model_imports(self):
+        from multiomics_explorer.mcp_server.tools import (
+            ClusterEnrichmentResult,
+            ClusterEnrichmentResponse,
+        )
+        assert ClusterEnrichmentResult is not None
+        assert ClusterEnrichmentResponse is not None
+
+    def test_every_result_field_has_description(self):
+        from multiomics_explorer.mcp_server.tools import ClusterEnrichmentResult
+        for name, field in ClusterEnrichmentResult.model_fields.items():
+            assert field.description, (
+                f"ClusterEnrichmentResult.{name} missing Field(description=...)"
+            )
+
+    def test_every_envelope_field_has_description(self):
+        from multiomics_explorer.mcp_server.tools import ClusterEnrichmentResponse
+        for name, field in ClusterEnrichmentResponse.model_fields.items():
+            assert field.description, (
+                f"ClusterEnrichmentResponse.{name} missing Field(description=...)"
+            )
+
+    def test_clusterprofiler_names_mention_equivalent(self):
+        from multiomics_explorer.mcp_server.tools import ClusterEnrichmentResult
+        expected_mentions = {
+            "gene_ratio": "GeneRatio",
+            "bg_ratio": "BgRatio",
+            "rich_factor": "RichFactor",
+            "fold_enrichment": "FoldEnrichment",
+            "count": "Count",
+        }
+        for field_name, cp_name in expected_mentions.items():
+            field = ClusterEnrichmentResult.model_fields[field_name]
+            assert cp_name in field.description, (
+                f"{field_name} description should mention clusterProfiler name {cp_name}"
+            )
