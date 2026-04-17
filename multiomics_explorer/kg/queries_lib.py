@@ -705,6 +705,7 @@ def _list_publications_where(
     organism: str | None = None,
     treatment_type: str | None = None,
     background_factors: str | None = None,
+    growth_phases: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
 ) -> tuple[str, dict]:
@@ -737,6 +738,13 @@ def _list_publications_where(
         )
         params["background_factors"] = background_factors
 
+    if growth_phases:
+        conditions.append(
+            "ANY(gp IN coalesce(p.growth_phases, [])"
+            " WHERE toLower(gp) = toLower($growth_phases))"
+        )
+        params["growth_phases"] = growth_phases
+
     if author:
         conditions.append(
             "ANY(a IN p.authors WHERE toLower(a) CONTAINS toLower($author))"
@@ -752,6 +760,7 @@ def build_list_publications(
     organism: str | None = None,
     treatment_type: str | None = None,
     background_factors: str | None = None,
+    growth_phases: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
     verbose: bool = False,
@@ -761,13 +770,13 @@ def build_list_publications(
 
     RETURN keys (compact): doi, title, authors, year, journal, study_type,
     organisms, experiment_count, treatment_types, background_factors, omics_types,
-    clustering_analysis_count, cluster_types.
+    clustering_analysis_count, cluster_types, growth_phases.
     When search_text is provided, also: score.
     RETURN keys (verbose): adds abstract, description, cluster_count.
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
-        background_factors=background_factors,
+        background_factors=background_factors, growth_phases=growth_phases,
         search_text=search_text, author=author,
     )
 
@@ -800,6 +809,7 @@ def build_list_publications(
             "       p.omics_types AS omics_types,\n"
             "       coalesce(p.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
             "       coalesce(p.cluster_types, []) AS cluster_types,\n"
+            "       coalesce(p.growth_phases, []) AS growth_phases,\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
             f"{limit_clause}"
@@ -820,7 +830,8 @@ def build_list_publications(
             "       coalesce(p.background_factors, []) AS background_factors,\n"
             "       p.omics_types AS omics_types,\n"
             "       coalesce(p.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
-            f"       coalesce(p.cluster_types, []) AS cluster_types{verbose_cols}\n"
+            "       coalesce(p.cluster_types, []) AS cluster_types,\n"
+            f"       coalesce(p.growth_phases, []) AS growth_phases{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, p.title\n"
             f"{limit_clause}"
         )
@@ -833,6 +844,7 @@ def build_list_publications_summary(
     organism: str | None = None,
     treatment_type: str | None = None,
     background_factors: str | None = None,
+    growth_phases: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
 ) -> tuple[str, dict]:
@@ -844,7 +856,7 @@ def build_list_publications_summary(
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
-        background_factors=background_factors,
+        background_factors=background_factors, growth_phases=growth_phases,
         search_text=search_text, author=author,
     )
 
@@ -902,7 +914,7 @@ def build_list_organisms(
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, background_factors, omics_types,
     clustering_analysis_count, cluster_types, reference_database,
-    reference_proteome.
+    reference_proteome, growth_phases.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count.
     """
@@ -936,7 +948,8 @@ def build_list_organisms(
         "       coalesce(o.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
         "       coalesce(o.cluster_types, []) AS cluster_types,\n"
         "       o.reference_database AS reference_database,\n"
-        "       o.reference_proteome AS reference_proteome"
+        "       o.reference_proteome AS reference_proteome,\n"
+        "       coalesce(o.growth_phases, []) AS growth_phases"
         f"{verbose_cols}\n"
         "ORDER BY o.genus, o.preferred_name"
     )
@@ -3352,6 +3365,7 @@ def _clustering_analysis_where(
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
     background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Build ClusteringAnalysis filter conditions + params."""
     conditions: list[str] = []
@@ -3379,6 +3393,12 @@ def _clustering_analysis_where(
             " WHERE bf IN $background_factors)"
         )
         params["background_factors"] = background_factors
+    if growth_phases is not None:
+        conditions.append(
+            "ANY(gp IN coalesce(ca.growth_phases, [])"
+            " WHERE toLower(gp) IN $growth_phases)"
+        )
+        params["growth_phases"] = [gp.lower() for gp in growth_phases]
     return conditions, params
 
 
@@ -3390,6 +3410,7 @@ def build_list_clustering_analyses_summary(
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
     background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     publication_doi: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     analysis_ids: list[str] | None = None,
@@ -3398,13 +3419,13 @@ def build_list_clustering_analyses_summary(
 
     RETURN keys: total_entries, total_matching, by_organism,
     by_cluster_type, by_treatment_type, by_background_factors,
-    by_omics_type.
+    by_omics_type, by_growth_phase.
     When search_text: adds score_max, score_median.
     """
     conditions, params = _clustering_analysis_where(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, omics_type=omics_type,
-        background_factors=background_factors,
+        background_factors=background_factors, growth_phases=growth_phases,
     )
 
     if search_text is not None:
@@ -3447,6 +3468,7 @@ def build_list_clustering_analyses_summary(
         "     apoc.coll.flatten(collect(coalesce(ca.treatment_type, []))) AS treatment_types,\n"
         "     apoc.coll.flatten(collect(coalesce(ca.background_factors, []))) AS background_factors_flat,\n"
         "     collect(ca.omics_type) AS omics_types,\n"
+        "     apoc.coll.flatten(collect(coalesce(ca.growth_phases, []))) AS growth_phases_flat,\n"
         f"     count(ca) AS total_matching{score_cols}\n"
         "CALL { MATCH (all_ca:ClusteringAnalysis) RETURN count(all_ca) AS total_entries }\n"
         "RETURN total_entries, total_matching,\n"
@@ -3454,7 +3476,8 @@ def build_list_clustering_analyses_summary(
         "       apoc.coll.frequencies(cluster_types) AS by_cluster_type,\n"
         "       apoc.coll.frequencies(treatment_types) AS by_treatment_type,\n"
         "       apoc.coll.frequencies(background_factors_flat) AS by_background_factors,\n"
-        f"       apoc.coll.frequencies(omics_types) AS by_omics_type{score_return}"
+        "       apoc.coll.frequencies(omics_types) AS by_omics_type,\n"
+        f"       apoc.coll.frequencies(growth_phases_flat) AS by_growth_phase{score_return}"
     )
     return cypher, params
 
@@ -3467,6 +3490,7 @@ def build_list_clustering_analyses(
     treatment_type: list[str] | None = None,
     omics_type: str | None = None,
     background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
     publication_doi: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     analysis_ids: list[str] | None = None,
@@ -3478,7 +3502,7 @@ def build_list_clustering_analyses(
 
     RETURN keys (compact): analysis_id, name, organism_name, cluster_method,
     cluster_type, cluster_count, total_gene_count, treatment_type,
-    background_factors, omics_type, experiment_ids, clusters.
+    background_factors, growth_phases, omics_type, experiment_ids, clusters.
     When search_text: adds score.
     RETURN keys (verbose): adds treatment, light_condition, experimental_context.
     Inline clusters (compact): cluster_id, name, member_count.
@@ -3488,7 +3512,7 @@ def build_list_clustering_analyses(
     conditions, params = _clustering_analysis_where(
         organism=organism, cluster_type=cluster_type,
         treatment_type=treatment_type, omics_type=omics_type,
-        background_factors=background_factors,
+        background_factors=background_factors, growth_phases=growth_phases,
     )
 
     if search_text is not None:
@@ -3575,6 +3599,7 @@ def build_list_clustering_analyses(
         "       ca.total_gene_count AS total_gene_count,\n"
         "       ca.treatment_type AS treatment_type,\n"
         "       coalesce(ca.background_factors, []) AS background_factors,\n"
+        "       coalesce(ca.growth_phases, []) AS growth_phases,\n"
         "       ca.omics_type AS omics_type,\n"
         f"       experiment_ids, clusters{score_col}{verbose_cols}\n"
         f"ORDER BY {order_prefix}ca.organism_name, ca.name{skip_clause}{limit_clause}"

@@ -3818,6 +3818,87 @@ class TestBackgroundFactors:
         assert "background_factors" in cypher
 
 
+class TestGrowthPhases:
+    """Tests for growth_phases filter, return, and aggregation across builders."""
+
+    # --- Publications ---
+
+    def test_list_publications_returns_growth_phases(self):
+        """Returns growth_phases column."""
+        cypher, _ = build_list_publications()
+        assert "growth_phases" in cypher
+
+    def test_list_publications_search_returns_growth_phases(self):
+        """search_text variant also returns growth_phases."""
+        cypher, _ = build_list_publications(search_text="light")
+        assert "growth_phases" in cypher
+
+    def test_list_publications_growth_phases_filter(self):
+        """growth_phases filter adds ANY-match condition."""
+        cypher, params = build_list_publications(growth_phases="exponential")
+        assert "growth_phases" in cypher
+        assert "growth_phases" in params
+
+    def test_list_publications_growth_phases_filter_cypher(self):
+        """growth_phases filter uses ANY on coalesce(p.growth_phases, []) with toLower."""
+        cypher, params = build_list_publications(growth_phases="exponential")
+        assert "ANY(gp IN coalesce(p.growth_phases, [])" in cypher
+        assert "toLower(gp) = toLower($growth_phases)" in cypher
+        assert params["growth_phases"] == "exponential"
+
+    def test_list_publications_growth_phases_none_no_filter(self):
+        """growth_phases=None does not add filter."""
+        cypher, _ = build_list_publications(growth_phases=None)
+        assert "$growth_phases" not in cypher
+
+    def test_list_publications_summary_accepts_growth_phases(self):
+        """Summary builder threads growth_phases through to where clause."""
+        cypher, params = build_list_publications_summary(growth_phases="exponential")
+        assert "growth_phases" in cypher
+        assert params["growth_phases"] == "exponential"
+
+    # --- Organisms ---
+
+    def test_list_organisms_returns_growth_phases(self):
+        """Returns growth_phases column."""
+        cypher, _ = build_list_organisms()
+        assert "growth_phases" in cypher
+
+    # --- Clustering ---
+
+    def test_list_clustering_analyses_returns_growth_phases(self):
+        """Returns growth_phases column."""
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, _ = build_list_clustering_analyses()
+        assert "growth_phases" in cypher
+
+    def test_list_clustering_analyses_growth_phases_filter(self):
+        """growth_phases filter adds ANY-match condition."""
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, params = build_list_clustering_analyses(growth_phases=["diel"])
+        assert "growth_phases" in cypher
+        assert "growth_phases" in params
+
+    def test_list_clustering_analyses_growth_phases_filter_cypher(self):
+        """growth_phases filter uses ANY on coalesce(ca.growth_phases, []) with lowercased list."""
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses, _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(growth_phases=["Diel", "Exponential"])
+        assert any("growth_phases" in c for c in conditions)
+        assert params["growth_phases"] == ["diel", "exponential"]
+
+    def test_list_clustering_analyses_growth_phases_none_no_filter(self):
+        """growth_phases=None does not add filter."""
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses
+        cypher, _ = build_list_clustering_analyses(growth_phases=None)
+        assert "$growth_phases" not in cypher
+
+    def test_list_clustering_analyses_summary_returns_by_growth_phase(self):
+        """Summary includes by_growth_phase breakdown."""
+        from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
+        cypher, _ = build_list_clustering_analyses_summary()
+        assert "by_growth_phase" in cypher
+
+
 # ---------------------------------------------------------------------------
 # Constants sanity checks
 # ---------------------------------------------------------------------------
