@@ -4,6 +4,7 @@ rows:
 - experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: exponential
   locus_tag: PMM0001
   log2fc: -2.8863
   padj: 0.0311
@@ -18,6 +19,7 @@ rows:
 - experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   expression_status: significant_up
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 2.23
   padj: 0.0
@@ -32,6 +34,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   expression_status: significant_up
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 1.885
   padj: 0.0
@@ -46,6 +49,7 @@ rows:
 - experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 1.1985
   padj: 1.0
@@ -60,6 +64,7 @@ rows:
 - experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: stationary
   locus_tag: PMM0001
   log2fc: -1.1726
   padj: 0.1017
@@ -74,6 +79,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: significant_up
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 1.1005
   padj: 0.0007
@@ -88,6 +94,7 @@ rows:
 - experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 1.008
   padj: 1.0
@@ -102,6 +109,7 @@ rows:
 - experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 0.89
   padj: 0.54
@@ -116,6 +124,7 @@ rows:
 - experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 0.87
   padj: 0.49
@@ -130,6 +139,7 @@ rows:
 - experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 0.8628
   padj: 1.0
@@ -144,6 +154,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 0.7135
   padj: 0.036
@@ -158,6 +169,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: exponential
   locus_tag: PMM0001
   log2fc: 0.7087
   padj: 0.2466
@@ -172,6 +184,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 0.6172
   padj: 0.028
@@ -186,6 +199,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 0.5893
   padj: 0.0135
@@ -200,6 +214,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 0.5614
   padj: 0.0484
@@ -214,6 +229,7 @@ rows:
 - experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 0.5111
   padj: 1.0
@@ -228,6 +244,7 @@ rows:
 - experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: darkness
   locus_tag: PMM0001
   log2fc: -0.5071
   padj: 0.1863
@@ -242,6 +259,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 0.3774
   padj: 0.191
@@ -256,6 +274,7 @@ rows:
 - experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: exponential
   locus_tag: PMM0001
   log2fc: 0.334
   padj: 1.0
@@ -270,6 +289,7 @@ rows:
 - experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: darkness
   locus_tag: PMM0001
   log2fc: -0.2314
   padj: 0.2832
@@ -284,6 +304,7 @@ rows:
 - experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: exponential
   locus_tag: PMM0001
   log2fc: 0.2121
   padj: 1.0
@@ -298,6 +319,7 @@ rows:
 - experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 0.1577
   padj: 1.0
@@ -312,6 +334,7 @@ rows:
 - experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 0.1564
   padj: 1.0
@@ -326,6 +349,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: -0.1452
   padj: 0.7754
@@ -340,6 +364,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: -0.1271
   padj: 0.8007
@@ -354,6 +379,7 @@ rows:
 - experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: stationary
   locus_tag: PMM0001
   log2fc: 0.121
   padj: 0.4309
@@ -368,6 +394,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: death
   locus_tag: PMM0001
   log2fc: 0.1087
   padj: 0.6459
@@ -382,6 +409,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: death
   locus_tag: PMM0001
   log2fc: 0.1035
   padj: 0.665
@@ -396,6 +424,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: -0.0794
   padj: 0.8653
@@ -410,6 +439,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: -0.0714
   padj: 0.9335
@@ -424,6 +454,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   expression_status: not_significant
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: -0.0161
   padj: 0.9762

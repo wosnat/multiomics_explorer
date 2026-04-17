@@ -16,6 +16,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1101/2025.08.05.668435
   experiment_count: 1
+  growth_phases:
+  - exponential
   journal: bioRxiv
   omics_types:
   - RNASEQ
@@ -47,6 +49,8 @@ rows:
   clustering_analysis_count: 2
   doi: 10.1093/ismeco/ycae131
   experiment_count: 2
+  growth_phases:
+  - diel
   journal: ISME Communications
   omics_types:
   - RNASEQ
@@ -85,6 +89,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1073/pnas.2213271120
   experiment_count: 2
+  growth_phases:
+  - exponential
   journal: Proceedings of the National Academy of Sciences
   omics_types:
   - RNASEQ
@@ -111,6 +117,8 @@ rows:
   clustering_analysis_count: 3
   doi: 10.1128/mSystems.00040-18
   experiment_count: 3
+  growth_phases:
+  - darkness
   journal: mSystems
   omics_types:
   - RNASEQ
@@ -138,6 +146,9 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2017.88
   experiment_count: 1
+  growth_phases:
+  - acute_stress
+  - nutrient_limited
   journal: The ISME Journal
   omics_types:
   - RNASEQ
@@ -162,6 +173,9 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1371/journal.pone.0165375
   experiment_count: 4
+  growth_phases:
+  - acute_stress
+  - infected
   journal: PLOS ONE
   omics_types:
   - RNASEQ
@@ -185,6 +199,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2016.82
   experiment_count: 3
+  growth_phases:
+  - exponential
   journal: The ISME Journal
   omics_types:
   - RNASEQ
@@ -207,6 +223,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
+  growth_phases:
+  - acute_stress
   journal: ISME Journal
   omics_types:
   - MICROARRAY
@@ -229,6 +247,10 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
+  growth_phases:
+  - acute_stress
+  - nutrient_limited
+  - recovery
   journal: The ISME Journal
   omics_types:
   - MICROARRAY
@@ -262,6 +284,7 @@ rows:
   clustering_analysis_count: 1
   doi: 10.1371/journal.pone.0005135
   experiment_count: 1
+  growth_phases: []
   journal: PLOS ONE
   omics_types:
   - MICROARRAY
@@ -293,6 +316,8 @@ rows:
   clustering_analysis_count: 1
   doi: 10.1038/nature06130
   experiment_count: 1
+  growth_phases:
+  - infected
   journal: Nature
   omics_types:
   - MICROARRAY
@@ -318,6 +343,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1128/JB.01097-06
   experiment_count: 6
+  growth_phases:
+  - acute_stress
   journal: Journal of Bacteriology
   omics_types:
   - MICROARRAY
@@ -345,6 +372,9 @@ rows:
   clustering_analysis_count: 2
   doi: 10.1038/msb4100087
   experiment_count: 6
+  growth_phases:
+  - acute_stress
+  - exponential
   journal: Molecular Systems Biology
   omics_types:
   - MICROARRAY
@@ -368,6 +398,10 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1073/pnas.0601301103
   experiment_count: 2
+  growth_phases:
+  - acute_stress
+  - exponential
+  - nutrient_limited
   journal: PNAS
   omics_types:
   - MICROARRAY

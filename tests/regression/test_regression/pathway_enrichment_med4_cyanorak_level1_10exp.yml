@@ -133,6 +133,7 @@ results:
   gene_name: gap2
   gene_ratio: 5/23
   gene_ratio_numeric: 0.2174
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -165,6 +166,7 @@ results:
   gene_name: ycf3
   gene_ratio: 5/23
   gene_ratio_numeric: 0.2174
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -197,6 +199,7 @@ results:
   gene_name: msrB
   gene_ratio: 13/20
   gene_ratio_numeric: 0.65
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -230,6 +233,7 @@ results:
   gene_name: .nan
   gene_ratio: 7/20
   gene_ratio_numeric: 0.35
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -262,6 +266,7 @@ results:
   gene_name: msrB
   gene_ratio: 10/18
   gene_ratio_numeric: 0.5556
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -295,6 +300,7 @@ results:
   gene_name: .nan
   gene_ratio: 6/18
   gene_ratio_numeric: 0.3333
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -327,6 +333,7 @@ results:
   gene_name: msrB
   gene_ratio: 7/59
   gene_ratio_numeric: 0.1186
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -360,6 +367,7 @@ results:
   gene_name: ntcA
   gene_ratio: 8/59
   gene_ratio_numeric: 0.1356
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -392,6 +400,7 @@ results:
   gene_name: .nan
   gene_ratio: 20/59
   gene_ratio_numeric: 0.339
+  growth_phase: exponential
   is_time_course: null
   level: 1
   name: null
@@ -424,6 +433,7 @@ results:
   gene_name: cbb3
   gene_ratio: 5/95
   gene_ratio_numeric: 0.0526
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -456,6 +466,7 @@ results:
   gene_name: msrB
   gene_ratio: 18/95
   gene_ratio_numeric: 0.1895
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -489,6 +500,7 @@ results:
   gene_name: dnaN
   gene_ratio: 5/95
   gene_ratio_numeric: 0.0526
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -521,6 +533,7 @@ results:
   gene_name: rimO
   gene_ratio: 12/95
   gene_ratio_numeric: 0.1263
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -553,6 +566,7 @@ results:
   gene_name: queG
   gene_ratio: 5/95
   gene_ratio_numeric: 0.0526
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -585,6 +599,7 @@ results:
   gene_name: .nan
   gene_ratio: 11/95
   gene_ratio_numeric: 0.1158
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -617,6 +632,7 @@ results:
   gene_name: .nan
   gene_ratio: 6/95
   gene_ratio_numeric: 0.0632
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -649,6 +665,7 @@ results:
   gene_name: msrB
   gene_ratio: 8/40
   gene_ratio_numeric: 0.2
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -682,6 +699,7 @@ results:
   gene_name: ntcA
   gene_ratio: 7/40
   gene_ratio_numeric: 0.175
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -714,6 +732,7 @@ results:
   gene_name: cbb3
   gene_ratio: 14/257
   gene_ratio_numeric: 0.0545
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -746,6 +765,7 @@ results:
   gene_name: murB
   gene_ratio: 7/257
   gene_ratio_numeric: 0.0272
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -778,6 +798,7 @@ results:
   gene_name: msrB
   gene_ratio: 28/257
   gene_ratio_numeric: 0.1089
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -811,6 +832,7 @@ results:
   gene_name: .nan
   gene_ratio: 10/257
   gene_ratio_numeric: 0.0389
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -843,6 +865,7 @@ results:
   gene_name: accB
   gene_ratio: 5/257
   gene_ratio_numeric: 0.0195
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -875,6 +898,7 @@ results:
   gene_name: cbb3
   gene_ratio: 7/257
   gene_ratio_numeric: 0.0272
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -907,6 +931,7 @@ results:
   gene_name: ndhO
   gene_ratio: 5/257
   gene_ratio_numeric: 0.0195
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -939,6 +964,7 @@ results:
   gene_name: ycf3
   gene_ratio: 7/257
   gene_ratio_numeric: 0.0272
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -971,6 +997,7 @@ results:
   gene_name: psbX
   gene_ratio: 13/257
   gene_ratio_numeric: 0.0506
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1003,6 +1030,7 @@ results:
   gene_name: rimO
   gene_ratio: 7/257
   gene_ratio_numeric: 0.0272
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1035,6 +1063,7 @@ results:
   gene_name: grpE
   gene_ratio: 5/257
   gene_ratio_numeric: 0.0195
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1067,6 +1096,7 @@ results:
   gene_name: dap2
   gene_ratio: 5/257
   gene_ratio_numeric: 0.0195
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1099,6 +1129,7 @@ results:
   gene_name: rbcR
   gene_ratio: 5/257
   gene_ratio_numeric: 0.0195
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1131,6 +1162,7 @@ results:
   gene_name: citT
   gene_ratio: 5/257
   gene_ratio_numeric: 0.0195
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1163,6 +1195,7 @@ results:
   gene_name: mcyH
   gene_ratio: 6/257
   gene_ratio_numeric: 0.0233
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1195,6 +1228,7 @@ results:
   gene_name: .nan
   gene_ratio: 5/257
   gene_ratio_numeric: 0.0195
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1227,6 +1261,7 @@ results:
   gene_name: .nan
   gene_ratio: 37/257
   gene_ratio_numeric: 0.144
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1259,6 +1294,7 @@ results:
   gene_name: .nan
   gene_ratio: 11/257
   gene_ratio_numeric: 0.0428
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1291,6 +1327,7 @@ results:
   gene_name: aroK
   gene_ratio: 5/264
   gene_ratio_numeric: 0.0189
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1323,6 +1360,7 @@ results:
   gene_name: aspA
   gene_ratio: 5/264
   gene_ratio_numeric: 0.0189
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1356,6 +1394,7 @@ results:
   gene_name: argH
   gene_ratio: 7/264
   gene_ratio_numeric: 0.0265
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1388,6 +1427,7 @@ results:
   gene_name: leuD
   gene_ratio: 5/264
   gene_ratio_numeric: 0.0189
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1420,6 +1460,7 @@ results:
   gene_name: rsgA
   gene_ratio: 10/264
   gene_ratio_numeric: 0.0379
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1452,6 +1493,7 @@ results:
   gene_name: .nan
   gene_ratio: 5/264
   gene_ratio_numeric: 0.0189
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1484,6 +1526,7 @@ results:
   gene_name: msrB
   gene_ratio: 29/264
   gene_ratio_numeric: 0.1098
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1517,6 +1560,7 @@ results:
   gene_name: ntcA
   gene_ratio: 8/264
   gene_ratio_numeric: 0.0303
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1549,6 +1593,7 @@ results:
   gene_name: dnaN
   gene_ratio: 11/264
   gene_ratio_numeric: 0.0417
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1581,6 +1626,7 @@ results:
   gene_name: accB
   gene_ratio: 5/264
   gene_ratio_numeric: 0.0189
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1613,6 +1659,7 @@ results:
   gene_name: gap2
   gene_ratio: 5/264
   gene_ratio_numeric: 0.0189
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1645,6 +1692,7 @@ results:
   gene_name: rimO
   gene_ratio: 11/264
   gene_ratio_numeric: 0.0417
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1677,6 +1725,7 @@ results:
   gene_name: grpE
   gene_ratio: 5/264
   gene_ratio_numeric: 0.0189
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1709,6 +1758,7 @@ results:
   gene_name: dap2
   gene_ratio: 6/264
   gene_ratio_numeric: 0.0227
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1741,6 +1791,7 @@ results:
   gene_name: purL
   gene_ratio: 8/264
   gene_ratio_numeric: 0.0303
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1774,6 +1825,7 @@ results:
   gene_name: rbcR
   gene_ratio: 7/264
   gene_ratio_numeric: 0.0265
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1806,6 +1858,7 @@ results:
   gene_name: citT
   gene_ratio: 5/264
   gene_ratio_numeric: 0.0189
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1838,6 +1891,7 @@ results:
   gene_name: .nan
   gene_ratio: 24/264
   gene_ratio_numeric: 0.0909
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1870,6 +1924,7 @@ results:
   gene_name: rsgA
   gene_ratio: 6/204
   gene_ratio_numeric: 0.0294
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1902,6 +1957,7 @@ results:
   gene_name: cbb3
   gene_ratio: 14/204
   gene_ratio_numeric: 0.0686
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1934,6 +1990,7 @@ results:
   gene_name: murB
   gene_ratio: 6/204
   gene_ratio_numeric: 0.0294
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1966,6 +2023,7 @@ results:
   gene_name: .nan
   gene_ratio: 5/204
   gene_ratio_numeric: 0.0245
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -1998,6 +2056,7 @@ results:
   gene_name: msrB
   gene_ratio: 20/204
   gene_ratio_numeric: 0.098
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2031,6 +2090,7 @@ results:
   gene_name: .nan
   gene_ratio: 8/204
   gene_ratio_numeric: 0.0392
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2063,6 +2123,7 @@ results:
   gene_name: pgmA2
   gene_ratio: 5/204
   gene_ratio_numeric: 0.0245
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2095,6 +2156,7 @@ results:
   gene_name: cbb3
   gene_ratio: 6/204
   gene_ratio_numeric: 0.0294
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2127,6 +2189,7 @@ results:
   gene_name: ycf3
   gene_ratio: 7/204
   gene_ratio_numeric: 0.0343
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2159,6 +2222,7 @@ results:
   gene_name: psbX
   gene_ratio: 10/204
   gene_ratio_numeric: 0.049
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2191,6 +2255,7 @@ results:
   gene_name: citT
   gene_ratio: 5/204
   gene_ratio_numeric: 0.0245
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2223,6 +2288,7 @@ results:
   gene_name: mcyH
   gene_ratio: 5/204
   gene_ratio_numeric: 0.0245
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2255,6 +2321,7 @@ results:
   gene_name: .nan
   gene_ratio: 22/204
   gene_ratio_numeric: 0.1078
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2287,6 +2354,7 @@ results:
   gene_name: .nan
   gene_ratio: 8/204
   gene_ratio_numeric: 0.0392
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2319,6 +2387,7 @@ results:
   gene_name: aspA
   gene_ratio: 5/295
   gene_ratio_numeric: 0.0169
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2352,6 +2421,7 @@ results:
   gene_name: argH
   gene_ratio: 5/295
   gene_ratio_numeric: 0.0169
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2384,6 +2454,7 @@ results:
   gene_name: rsgA
   gene_ratio: 12/295
   gene_ratio_numeric: 0.0407
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2416,6 +2487,7 @@ results:
   gene_name: .nan
   gene_ratio: 6/295
   gene_ratio_numeric: 0.0203
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2448,6 +2520,7 @@ results:
   gene_name: msrB
   gene_ratio: 37/295
   gene_ratio_numeric: 0.1254
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2481,6 +2554,7 @@ results:
   gene_name: ntcA
   gene_ratio: 12/295
   gene_ratio_numeric: 0.0407
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2513,6 +2587,7 @@ results:
   gene_name: dnaN
   gene_ratio: 13/295
   gene_ratio_numeric: 0.0441
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2545,6 +2620,7 @@ results:
   gene_name: accB
   gene_ratio: 5/295
   gene_ratio_numeric: 0.0169
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2577,6 +2653,7 @@ results:
   gene_name: atpB
   gene_ratio: 5/295
   gene_ratio_numeric: 0.0169
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2609,6 +2686,7 @@ results:
   gene_name: rimO
   gene_ratio: 18/295
   gene_ratio_numeric: 0.061
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2641,6 +2719,7 @@ results:
   gene_name: efp
   gene_ratio: 5/295
   gene_ratio_numeric: 0.0169
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2673,6 +2752,7 @@ results:
   gene_name: grpE
   gene_ratio: 7/295
   gene_ratio_numeric: 0.0237
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2705,6 +2785,7 @@ results:
   gene_name: dap2
   gene_ratio: 6/295
   gene_ratio_numeric: 0.0203
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2737,6 +2818,7 @@ results:
   gene_name: purL
   gene_ratio: 8/295
   gene_ratio_numeric: 0.0271
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2770,6 +2852,7 @@ results:
   gene_name: rbcR
   gene_ratio: 7/295
   gene_ratio_numeric: 0.0237
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2802,6 +2885,7 @@ results:
   gene_name: rpoZ
   gene_ratio: 5/295
   gene_ratio_numeric: 0.0169
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2834,6 +2918,7 @@ results:
   gene_name: citT
   gene_ratio: 7/295
   gene_ratio_numeric: 0.0237
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2866,6 +2951,7 @@ results:
   gene_name: .nan
   gene_ratio: 20/295
   gene_ratio_numeric: 0.0678
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2898,6 +2984,7 @@ results:
   gene_name: .nan
   gene_ratio: 10/295
   gene_ratio_numeric: 0.0339
+  growth_phase: death
   is_time_course: null
   level: 1
   name: null
@@ -2930,6 +3017,7 @@ results:
   gene_name: rimO
   gene_ratio: 5/14
   gene_ratio_numeric: 0.3571
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -2962,6 +3050,7 @@ results:
   gene_name: msrB
   gene_ratio: 11/35
   gene_ratio_numeric: 0.3143
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -2995,6 +3084,7 @@ results:
   gene_name: ntcA
   gene_ratio: 14/35
   gene_ratio_numeric: 0.4
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3027,6 +3117,7 @@ results:
   gene_name: ddpD
   gene_ratio: 5/35
   gene_ratio_numeric: 0.1429
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3059,6 +3150,7 @@ results:
   gene_name: cbb3
   gene_ratio: 8/137
   gene_ratio_numeric: 0.0584
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3091,6 +3183,7 @@ results:
   gene_name: msrB
   gene_ratio: 10/137
   gene_ratio_numeric: 0.073
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3124,6 +3217,7 @@ results:
   gene_name: dnaN
   gene_ratio: 5/137
   gene_ratio_numeric: 0.0365
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3156,6 +3250,7 @@ results:
   gene_name: ycf3
   gene_ratio: 5/137
   gene_ratio_numeric: 0.0365
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3188,6 +3283,7 @@ results:
   gene_name: psbX
   gene_ratio: 7/137
   gene_ratio_numeric: 0.0511
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3220,6 +3316,7 @@ results:
   gene_name: rimO
   gene_ratio: 36/137
   gene_ratio_numeric: 0.2628
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3252,6 +3349,7 @@ results:
   gene_name: .nan
   gene_ratio: 11/137
   gene_ratio_numeric: 0.0803
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3284,6 +3382,7 @@ results:
   gene_name: msrB
   gene_ratio: 23/111
   gene_ratio_numeric: 0.2072
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3317,6 +3416,7 @@ results:
   gene_name: ntcA
   gene_ratio: 18/111
   gene_ratio_numeric: 0.1622
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3349,6 +3449,7 @@ results:
   gene_name: gltA
   gene_ratio: 5/111
   gene_ratio_numeric: 0.045
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3381,6 +3482,7 @@ results:
   gene_name: ddpD
   gene_ratio: 7/111
   gene_ratio_numeric: 0.0631
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3413,6 +3515,7 @@ results:
   gene_name: citT
   gene_ratio: 6/111
   gene_ratio_numeric: 0.0541
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3445,6 +3548,7 @@ results:
   gene_name: .nan
   gene_ratio: 17/111
   gene_ratio_numeric: 0.1532
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3477,6 +3581,7 @@ results:
   gene_name: cbb3
   gene_ratio: 7/74
   gene_ratio_numeric: 0.0946
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3509,6 +3614,7 @@ results:
   gene_name: psbX
   gene_ratio: 6/74
   gene_ratio_numeric: 0.0811
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3541,6 +3647,7 @@ results:
   gene_name: rimO
   gene_ratio: 5/74
   gene_ratio_numeric: 0.0676
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3573,6 +3680,7 @@ results:
   gene_name: .nan
   gene_ratio: 5/74
   gene_ratio_numeric: 0.0676
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3605,6 +3713,7 @@ results:
   gene_name: msrB
   gene_ratio: 28/145
   gene_ratio_numeric: 0.1931
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3638,6 +3747,7 @@ results:
   gene_name: ntcA
   gene_ratio: 16/145
   gene_ratio_numeric: 0.1103
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3670,6 +3780,7 @@ results:
   gene_name: gap2
   gene_ratio: 8/145
   gene_ratio_numeric: 0.0552
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3702,6 +3813,7 @@ results:
   gene_name: grpE
   gene_ratio: 5/145
   gene_ratio_numeric: 0.0345
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3734,6 +3846,7 @@ results:
   gene_name: ddpD
   gene_ratio: 6/145
   gene_ratio_numeric: 0.0414
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3766,6 +3879,7 @@ results:
   gene_name: citT
   gene_ratio: 5/145
   gene_ratio_numeric: 0.0345
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3798,6 +3912,7 @@ results:
   gene_name: .nan
   gene_ratio: 5/145
   gene_ratio_numeric: 0.0345
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3830,6 +3945,7 @@ results:
   gene_name: .nan
   gene_ratio: 24/145
   gene_ratio_numeric: 0.1655
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3862,6 +3978,7 @@ results:
   gene_name: cbb3
   gene_ratio: 9/92
   gene_ratio_numeric: 0.0978
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3894,6 +4011,7 @@ results:
   gene_name: accB
   gene_ratio: 5/92
   gene_ratio_numeric: 0.0543
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3926,6 +4044,7 @@ results:
   gene_name: psbX
   gene_ratio: 6/92
   gene_ratio_numeric: 0.0652
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3958,6 +4077,7 @@ results:
   gene_name: msrB
   gene_ratio: 29/161
   gene_ratio_numeric: 0.1801
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -3991,6 +4111,7 @@ results:
   gene_name: ntcA
   gene_ratio: 16/161
   gene_ratio_numeric: 0.0994
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4023,6 +4144,7 @@ results:
   gene_name: gap2
   gene_ratio: 6/161
   gene_ratio_numeric: 0.0373
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4055,6 +4177,7 @@ results:
   gene_name: grpE
   gene_ratio: 5/161
   gene_ratio_numeric: 0.0311
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4087,6 +4210,7 @@ results:
   gene_name: ddpD
   gene_ratio: 6/161
   gene_ratio_numeric: 0.0373
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4119,6 +4243,7 @@ results:
   gene_name: .nan
   gene_ratio: 31/161
   gene_ratio_numeric: 0.1925
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4151,6 +4276,7 @@ results:
   gene_name: cbb3
   gene_ratio: 6/77
   gene_ratio_numeric: 0.0779
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4183,6 +4309,7 @@ results:
   gene_name: accB
   gene_ratio: 5/77
   gene_ratio_numeric: 0.0649
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4215,6 +4342,7 @@ results:
   gene_name: psbX
   gene_ratio: 6/77
   gene_ratio_numeric: 0.0779
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4247,6 +4375,7 @@ results:
   gene_name: rimO
   gene_ratio: 6/77
   gene_ratio_numeric: 0.0779
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4279,6 +4408,7 @@ results:
   gene_name: .nan
   gene_ratio: 5/77
   gene_ratio_numeric: 0.0649
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4311,6 +4441,7 @@ results:
   gene_name: msrB
   gene_ratio: 31/157
   gene_ratio_numeric: 0.1975
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4344,6 +4475,7 @@ results:
   gene_name: ntcA
   gene_ratio: 17/157
   gene_ratio_numeric: 0.1083
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4376,6 +4508,7 @@ results:
   gene_name: gap2
   gene_ratio: 7/157
   gene_ratio_numeric: 0.0446
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4408,6 +4541,7 @@ results:
   gene_name: grpE
   gene_ratio: 5/157
   gene_ratio_numeric: 0.0318
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4440,6 +4574,7 @@ results:
   gene_name: ddpD
   gene_ratio: 7/157
   gene_ratio_numeric: 0.0446
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4472,6 +4607,7 @@ results:
   gene_name: .nan
   gene_ratio: 29/157
   gene_ratio_numeric: 0.1847
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4504,6 +4640,7 @@ results:
   gene_name: .nan
   gene_ratio: 16/45
   gene_ratio_numeric: 0.3556
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4536,6 +4673,7 @@ results:
   gene_name: .nan
   gene_ratio: 14/39
   gene_ratio_numeric: 0.359
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4568,6 +4706,7 @@ results:
   gene_name: aroK
   gene_ratio: 5/235
   gene_ratio_numeric: 0.0213
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4600,6 +4739,7 @@ results:
   gene_name: cbb3
   gene_ratio: 7/235
   gene_ratio_numeric: 0.0298
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4632,6 +4772,7 @@ results:
   gene_name: msrB
   gene_ratio: 28/235
   gene_ratio_numeric: 0.1191
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4665,6 +4806,7 @@ results:
   gene_name: dnaN
   gene_ratio: 7/235
   gene_ratio_numeric: 0.0298
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4697,6 +4839,7 @@ results:
   gene_name: gap2
   gene_ratio: 6/235
   gene_ratio_numeric: 0.0255
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4729,6 +4872,7 @@ results:
   gene_name: pgmA2
   gene_ratio: 6/235
   gene_ratio_numeric: 0.0255
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4761,6 +4905,7 @@ results:
   gene_name: pgmA2
   gene_ratio: 6/235
   gene_ratio_numeric: 0.0255
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4793,6 +4938,7 @@ results:
   gene_name: ycf3
   gene_ratio: 6/235
   gene_ratio_numeric: 0.0255
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4825,6 +4971,7 @@ results:
   gene_name: psbX
   gene_ratio: 7/235
   gene_ratio_numeric: 0.0298
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4857,6 +5004,7 @@ results:
   gene_name: .nan
   gene_ratio: 44/235
   gene_ratio_numeric: 0.1872
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4889,6 +5037,7 @@ results:
   gene_name: msrB
   gene_ratio: 29/156
   gene_ratio_numeric: 0.1859
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4922,6 +5071,7 @@ results:
   gene_name: gap2
   gene_ratio: 5/156
   gene_ratio_numeric: 0.0321
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4954,6 +5104,7 @@ results:
   gene_name: rimO
   gene_ratio: 10/156
   gene_ratio_numeric: 0.0641
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -4986,6 +5137,7 @@ results:
   gene_name: .nan
   gene_ratio: 31/156
   gene_ratio_numeric: 0.1987
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5018,6 +5170,7 @@ results:
   gene_name: .nan
   gene_ratio: 5/156
   gene_ratio_numeric: 0.0321
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5050,6 +5203,7 @@ results:
   gene_name: cbb3
   gene_ratio: 6/226
   gene_ratio_numeric: 0.0265
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5082,6 +5236,7 @@ results:
   gene_name: msrB
   gene_ratio: 24/226
   gene_ratio_numeric: 0.1062
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5115,6 +5270,7 @@ results:
   gene_name: ntcA
   gene_ratio: 7/226
   gene_ratio_numeric: 0.031
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5147,6 +5303,7 @@ results:
   gene_name: .nan
   gene_ratio: 5/226
   gene_ratio_numeric: 0.0221
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5179,6 +5336,7 @@ results:
   gene_name: pgmA2
   gene_ratio: 5/226
   gene_ratio_numeric: 0.0221
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5211,6 +5369,7 @@ results:
   gene_name: accB
   gene_ratio: 5/226
   gene_ratio_numeric: 0.0221
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5243,6 +5402,7 @@ results:
   gene_name: ycf3
   gene_ratio: 8/226
   gene_ratio_numeric: 0.0354
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5275,6 +5435,7 @@ results:
   gene_name: psbX
   gene_ratio: 11/226
   gene_ratio_numeric: 0.0487
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5307,6 +5468,7 @@ results:
   gene_name: citT
   gene_ratio: 5/226
   gene_ratio_numeric: 0.0221
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5339,6 +5501,7 @@ results:
   gene_name: .nan
   gene_ratio: 45/226
   gene_ratio_numeric: 0.1991
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5371,6 +5534,7 @@ results:
   gene_name: msrB
   gene_ratio: 25/134
   gene_ratio_numeric: 0.1866
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5404,6 +5568,7 @@ results:
   gene_name: dnaN
   gene_ratio: 5/134
   gene_ratio_numeric: 0.0373
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5436,6 +5601,7 @@ results:
   gene_name: .nan
   gene_ratio: 30/134
   gene_ratio_numeric: 0.2239
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5468,6 +5634,7 @@ results:
   gene_name: msrB
   gene_ratio: 13/159
   gene_ratio_numeric: 0.0818
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5501,6 +5668,7 @@ results:
   gene_name: dnaN
   gene_ratio: 6/159
   gene_ratio_numeric: 0.0377
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5533,6 +5701,7 @@ results:
   gene_name: .nan
   gene_ratio: 42/159
   gene_ratio_numeric: 0.2642
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5565,6 +5734,7 @@ results:
   gene_name: msrB
   gene_ratio: 17/108
   gene_ratio_numeric: 0.1574
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5598,6 +5768,7 @@ results:
   gene_name: gap2
   gene_ratio: 6/108
   gene_ratio_numeric: 0.0556
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5630,6 +5801,7 @@ results:
   gene_name: .nan
   gene_ratio: 22/108
   gene_ratio_numeric: 0.2037
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5662,6 +5834,7 @@ results:
   gene_name: .nan
   gene_ratio: 6/108
   gene_ratio_numeric: 0.0556
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5694,6 +5867,7 @@ results:
   gene_name: msrB
   gene_ratio: 16/169
   gene_ratio_numeric: 0.0947
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5727,6 +5901,7 @@ results:
   gene_name: ntcA
   gene_ratio: 6/169
   gene_ratio_numeric: 0.0355
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5759,6 +5934,7 @@ results:
   gene_name: pgmA2
   gene_ratio: 5/169
   gene_ratio_numeric: 0.0296
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5791,6 +5967,7 @@ results:
   gene_name: ycf3
   gene_ratio: 6/169
   gene_ratio_numeric: 0.0355
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5823,6 +6000,7 @@ results:
   gene_name: psbX
   gene_ratio: 6/169
   gene_ratio_numeric: 0.0355
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5855,6 +6033,7 @@ results:
   gene_name: .nan
   gene_ratio: 43/169
   gene_ratio_numeric: 0.2544
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5887,6 +6066,7 @@ results:
   gene_name: msrB
   gene_ratio: 20/116
   gene_ratio_numeric: 0.1724
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5920,6 +6100,7 @@ results:
   gene_name: gap2
   gene_ratio: 6/116
   gene_ratio_numeric: 0.0517
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5952,6 +6133,7 @@ results:
   gene_name: .nan
   gene_ratio: 25/116
   gene_ratio_numeric: 0.2155
+  growth_phase: nutrient_limited
   is_time_course: null
   level: 1
   name: null
@@ -5983,6 +6165,7 @@ results:
   gene_name: msrB
   gene_ratio: 5/18
   gene_ratio_numeric: 0.2778
+  growth_phase: stationary
   is_time_course: null
   level: 1
   name: null

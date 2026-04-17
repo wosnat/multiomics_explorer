@@ -9,6 +9,8 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   gene_count: 1849
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -18,6 +20,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '264.0'
   time_point_labels:
@@ -41,6 +45,8 @@ rows:
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
     (RNASEQ)
   gene_count: 1714
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -50,6 +56,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '20.0'
   time_point_labels:
@@ -73,6 +81,8 @@ rows:
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
     conditions (RNASEQ)
   gene_count: 2267
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
@@ -82,6 +92,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '20.0'
   time_point_labels:
@@ -105,6 +117,8 @@ rows:
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
     conditions (RNASEQ)
   gene_count: 2268
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
@@ -114,6 +128,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '20.0'
   time_point_labels:
@@ -137,6 +153,8 @@ rows:
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
     Prochlorococcus NATL2A (RNASEQ)
   gene_count: 2471
+  growth_phases:
+  - exponential
   is_time_course: 'true'
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
@@ -146,6 +164,14 @@ rows:
   table_scope: significant_any_timepoint
   table_scope_detail: ''
   time_point_count: 7
+  time_point_growth_phases:
+  - exponential
+  - exponential
+  - exponential
+  - exponential
+  - exponential
+  - exponential
+  - exponential
   time_point_hours:
   - '-12.0'
   - '12.0'

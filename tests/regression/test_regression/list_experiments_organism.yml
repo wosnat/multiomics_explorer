@@ -10,6 +10,8 @@ rows:
   experiment_name: 'Alteromonas in MED4 coculture: darkness +100 nM glucose vs darkness
     (control)'
   gene_count: 16
+  growth_phases:
+  - darkness
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
@@ -19,6 +21,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - darkness
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -43,6 +47,8 @@ rows:
   experiment_name: 'Alteromonas in MED4 coculture: darkness +5 mM glucose vs darkness
     (control)'
   gene_count: 16
+  growth_phases:
+  - darkness
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
@@ -52,6 +58,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - darkness
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -76,6 +84,8 @@ rows:
   experiment_name: 'Alteromonas in MED4 coculture: light +100 nM glucose vs light
     (control)'
   gene_count: 16
+  growth_phases:
+  - stationary
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
@@ -85,6 +95,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - stationary
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -108,6 +120,8 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 16
+  growth_phases:
+  - stationary
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
@@ -117,6 +131,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - stationary
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -140,6 +156,8 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
   gene_count: 3950
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
@@ -149,6 +167,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '264.0'
   time_point_labels:
@@ -173,6 +193,8 @@ rows:
   experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
     (control)'
   gene_count: 343
+  growth_phases:
+  - darkness
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
@@ -182,6 +204,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - darkness
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -207,6 +231,8 @@ rows:
   experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
     (control)'
   gene_count: 343
+  growth_phases:
+  - darkness
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
@@ -216,6 +242,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - darkness
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -241,6 +269,8 @@ rows:
   experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
     (control)'
   gene_count: 343
+  growth_phases:
+  - stationary
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
@@ -250,6 +280,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - stationary
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -274,6 +306,8 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 343
+  growth_phases:
+  - stationary
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
@@ -283,6 +317,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - stationary
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -306,6 +342,8 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   gene_count: 1849
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -315,6 +353,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '264.0'
   time_point_labels:
@@ -339,6 +379,8 @@ rows:
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
   gene_count: 7120
+  growth_phases:
+  - nutrient_limited
   is_time_course: 'true'
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
@@ -348,6 +390,12 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 5
+  time_point_growth_phases:
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
   time_point_hours:
   - '-1.0'
   - '1440.0'
@@ -396,6 +444,9 @@ rows:
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
   gene_count: 4272
+  growth_phases:
+  - death
+  - nutrient_limited
   is_time_course: 'true'
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
@@ -405,6 +456,10 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 3
+  time_point_growth_phases:
+  - death
+  - death
+  - nutrient_limited
   time_point_hours:
   - '2136.0'
   - '336.0'
@@ -441,6 +496,8 @@ rows:
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (RNASEQ)
   gene_count: 9245
+  growth_phases:
+  - nutrient_limited
   is_time_course: 'true'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -450,6 +507,12 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 5
+  time_point_growth_phases:
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
   time_point_hours:
   - '-1.0'
   - '1440.0'
@@ -498,6 +561,8 @@ rows:
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (RNASEQ)
   gene_count: 1849
+  growth_phases:
+  - nutrient_limited
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -507,6 +572,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - nutrient_limited
   time_point_hours:
   - '336.0'
   time_point_labels:
@@ -530,6 +597,8 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
   gene_count: 327
+  growth_phases:
+  - darkness
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
@@ -539,6 +608,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - darkness
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -562,6 +633,8 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
   gene_count: 327
+  growth_phases:
+  - darkness
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
@@ -571,6 +644,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - darkness
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -594,6 +669,8 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 327
+  growth_phases:
+  - stationary
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
@@ -603,6 +680,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - stationary
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -626,6 +705,8 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 327
+  growth_phases:
+  - stationary
   is_time_course: 'false'
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
@@ -635,6 +716,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - stationary
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -659,6 +742,8 @@ rows:
   experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
     (34 psu) (RNASEQ)
   gene_count: 28
+  growth_phases:
+  - acclimated_steady_state
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -668,6 +753,8 @@ rows:
   table_scope: significant_only
   table_scope_detail: p < 0.05 and ,logFC, > 1
   time_point_count: 1
+  time_point_growth_phases:
+  - acclimated_steady_state
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -691,6 +778,9 @@ rows:
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   gene_count: 2534
+  growth_phases:
+  - acute_stress
+  - nutrient_limited
   is_time_course: 'true'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -700,6 +790,10 @@ rows:
   table_scope: filtered_subset
   table_scope_detail: Top 50% of genes by expression level
   time_point_count: 3
+  time_point_growth_phases:
+  - acute_stress
+  - acute_stress
+  - nutrient_limited
   time_point_hours:
   - '12.0'
   - '24.0'
@@ -735,6 +829,8 @@ rows:
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
     (RNASEQ)
   gene_count: 1714
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -744,6 +840,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '20.0'
   time_point_labels:
@@ -766,6 +864,8 @@ rows:
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
   gene_count: 49
+  growth_phases:
+  - acute_stress
   is_time_course: 'true'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -775,6 +875,11 @@ rows:
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 4
+  time_point_growth_phases:
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  - acute_stress
   time_point_hours:
   - '1.5'
   - '2.5'
@@ -815,6 +920,8 @@ rows:
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
   gene_count: 52
+  growth_phases:
+  - infected
   is_time_course: 'true'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -824,6 +931,12 @@ rows:
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 5
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
   time_point_hours:
   - '0.5'
   - '1.5'
@@ -871,6 +984,8 @@ rows:
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in dark
     (RNASEQ)
   gene_count: 33
+  growth_phases:
+  - infected
   is_time_course: 'true'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -880,6 +995,10 @@ rows:
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 3
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
   time_point_hours:
   - '2.5'
   - '4.5'
@@ -915,6 +1034,8 @@ rows:
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in light
     (RNASEQ)
   gene_count: 34
+  growth_phases:
+  - infected
   is_time_course: 'true'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -924,6 +1045,12 @@ rows:
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 5
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
   time_point_hours:
   - '0.5'
   - '1.5'
@@ -971,6 +1098,8 @@ rows:
   experiment_id: 10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray
   experiment_name: MED4 Air (0.036% CO2 / 21% O2) vs Time 0 (pre-shock) (MICROARRAY)
   gene_count: 166
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -981,6 +1110,8 @@ rows:
   table_scope_detail: Genes significant in any of 4 gas conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -1005,6 +1136,8 @@ rows:
   experiment_name: MED4 Ambient CO2, no O2 (0.036% CO2 / 0% O2) vs Air (0.036% CO2
     / 21% O2) (MICROARRAY)
   gene_count: 4
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1015,6 +1148,8 @@ rows:
   table_scope_detail: Genes significant in any of 4 gas conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -1039,6 +1174,8 @@ rows:
   experiment_name: MED4 Low CO2 (0.004% CO2 / 21% O2) vs Air (0.036% CO2 / 21% O2)
     (MICROARRAY)
   gene_count: 285
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1049,6 +1186,8 @@ rows:
   table_scope_detail: Genes significant in any of 4 gas conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -1073,6 +1212,8 @@ rows:
   experiment_name: MED4 Low CO2 and no O2 (0.004% CO2 / 0% O2) vs Air (0.036% CO2
     / 21% O2) (MICROARRAY)
   gene_count: 252
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1083,6 +1224,8 @@ rows:
   table_scope_detail: Genes significant in any of 4 gas conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -1107,6 +1250,7 @@ rows:
   experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
   experiment_name: MED4 steady-state expression profiling across growth conditions
   gene_count: 0
+  growth_phases: []
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
@@ -1116,6 +1260,7 @@ rows:
   table_scope: ''
   table_scope_detail: ''
   time_point_count: 0
+  time_point_growth_phases: []
   time_point_hours: []
   time_point_labels: []
   time_point_orders: []
@@ -1133,6 +1278,8 @@ rows:
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light_2
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
   gene_count: 112
+  growth_phases:
+  - nutrient_limited
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1142,6 +1289,8 @@ rows:
   table_scope: significant_any_timepoint
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - nutrient_limited
   time_point_hours:
   - '48.0'
   time_point_labels:
@@ -1165,6 +1314,8 @@ rows:
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
   gene_count: 224
+  growth_phases:
+  - acute_stress
   is_time_course: 'true'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1174,6 +1325,9 @@ rows:
   table_scope: significant_any_timepoint
   table_scope_detail: ''
   time_point_count: 2
+  time_point_growth_phases:
+  - acute_stress
+  - acute_stress
   time_point_hours:
   - '12.0'
   - '24.0'
@@ -1203,6 +1357,8 @@ rows:
   experiment_id: 10.1038/ismej.2011.49_growth_medium_ironreplete_control_med4_med4_microarray
   experiment_name: MED4 Iron-replete control (MED4) vs Iron starvation (MED4) (MICROARRAY)
   gene_count: 112
+  growth_phases:
+  - recovery
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1212,6 +1368,8 @@ rows:
   table_scope: significant_any_timepoint
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - recovery
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -1236,6 +1394,7 @@ rows:
   experiment_id: 10.1371/journal.pone.0005135_diel_cycling_med4_microarray
   experiment_name: MED4 diel gene expression profiling over 48h light-dark cycle
   gene_count: 0
+  growth_phases: []
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1245,6 +1404,7 @@ rows:
   table_scope: ''
   table_scope_detail: ''
   time_point_count: 0
+  time_point_growth_phases: []
   time_point_hours: []
   time_point_labels: []
   time_point_orders: []
@@ -1262,6 +1422,8 @@ rows:
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
   experiment_name: MED4 Phage infected vs Pro99 medium phage infection baseline (MICROARRAY)
   gene_count: 360
+  growth_phases:
+  - infected
   is_time_course: 'true'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1271,6 +1433,15 @@ rows:
   table_scope: significant_only
   table_scope_detail: Upregulated genes only
   time_point_count: 8
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
   time_point_hours:
   - '1.0'
   - '2.0'
@@ -1335,6 +1506,8 @@ rows:
   experiment_id: 10.1128/JB.01097-06_light_stress_blue_light_13_umol_med4_microarray
   experiment_name: MED4 Blue light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
   gene_count: 198
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1345,6 +1518,8 @@ rows:
   table_scope_detail: Genes significant in any of 6 light conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '0.75'
   time_point_labels:
@@ -1369,6 +1544,8 @@ rows:
   experiment_name: MED4 DCMU + white light (13 umol photons m-2 s-1) vs White light
     (13 umol photons m-2 s-1) (MICROARRAY)
   gene_count: 198
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1379,6 +1556,8 @@ rows:
   table_scope_detail: Genes significant in any of 6 light conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '0.75'
   time_point_labels:
@@ -1402,6 +1581,8 @@ rows:
   experiment_name: MED4 Green light (13 umol photons m-2 s-1) vs Darkness control
     (MICROARRAY)
   gene_count: 198
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1412,6 +1593,8 @@ rows:
   table_scope_detail: Genes significant in any of 6 light conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '0.75'
   time_point_labels:
@@ -1436,6 +1619,8 @@ rows:
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
   gene_count: 1697
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1445,6 +1630,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -1469,6 +1656,8 @@ rows:
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
   gene_count: 1697
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1478,6 +1667,8 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
+  time_point_growth_phases:
+  - exponential
   time_point_hours:
   - '-1.0'
   time_point_labels:
@@ -1501,6 +1692,8 @@ rows:
   experiment_name: MED4 High white light (55 umol photons m-2 s-1) vs Darkness control
     (MICROARRAY)
   gene_count: 198
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1511,6 +1704,8 @@ rows:
   table_scope_detail: Genes significant in any of 6 light conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '0.75'
   time_point_labels:
@@ -1536,6 +1731,8 @@ rows:
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
   gene_count: 10182
+  growth_phases:
+  - acute_stress
   is_time_course: 'true'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1545,6 +1742,13 @@ rows:
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 6
+  time_point_growth_phases:
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  - acute_stress
   time_point_hours:
   - '0.0'
   - '12.0'
@@ -1598,6 +1802,10 @@ rows:
   experiment_id: 10.1073/pnas.0601301103_phosphorus_phosphate_starvation_med4_microarray
   experiment_name: MED4 Phosphate starvation vs P-replete Pro99 medium (MICROARRAY)
   gene_count: 170
+  growth_phases:
+  - acute_stress
+  - exponential
+  - nutrient_limited
   is_time_course: 'true'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1607,6 +1815,12 @@ rows:
   table_scope: filtered_subset
   table_scope_detail: Genes with q < 0.05 at t=48h, all timepoints reported
   time_point_count: 5
+  time_point_growth_phases:
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  - exponential
+  - nutrient_limited
   time_point_hours:
   - '0.0'
   - '12.0'
@@ -1653,6 +1867,8 @@ rows:
   experiment_id: 10.1128/JB.01097-06_light_stress_red_light_13_umol_med4_microarray
   experiment_name: MED4 Red light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
   gene_count: 198
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1663,6 +1879,8 @@ rows:
   table_scope_detail: Genes significant in any of 6 light conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '0.75'
   time_point_labels:
@@ -1686,6 +1904,8 @@ rows:
   experiment_name: MED4 White light (13 umol photons m-2 s-1) vs Darkness control
     (MICROARRAY)
   gene_count: 198
+  growth_phases:
+  - acute_stress
   is_time_course: 'false'
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
@@ -1696,6 +1916,8 @@ rows:
   table_scope_detail: Genes significant in any of 6 light conditions, all conditions
     in single table
   time_point_count: 1
+  time_point_growth_phases:
+  - acute_stress
   time_point_hours:
   - '0.75'
   time_point_labels:

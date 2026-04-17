@@ -8,6 +8,7 @@ rows:
   experiment_count: 0
   gene_count: 0
   genus: Alteromonas
+  growth_phases: []
   ncbi_taxon_id: 28108
   omics_types: []
   organism_name: Alteromonas
@@ -28,6 +29,9 @@ rows:
   experiment_count: 60
   gene_count: 4305
   genus: Alteromonas
+  growth_phases:
+  - darkness
+  - stationary
   ncbi_taxon_id: 232
   omics_types:
   - PROTEOMICS
@@ -52,6 +56,9 @@ rows:
   experiment_count: 13
   gene_count: 4136
   genus: Alteromonas
+  growth_phases:
+  - acclimated_steady_state
+  - exponential
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
@@ -75,6 +82,10 @@ rows:
   experiment_count: 15
   gene_count: 4031
   genus: Alteromonas
+  growth_phases:
+  - death
+  - exponential
+  - nutrient_limited
   ncbi_taxon_id: 28108
   omics_types:
   - PROTEOMICS
@@ -101,6 +112,10 @@ rows:
   experiment_count: 8
   gene_count: 4028
   genus: Alteromonas
+  growth_phases:
+  - darkness
+  - diel
+  - exponential
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
@@ -122,6 +137,8 @@ rows:
   experiment_count: 2
   gene_count: 0
   genus: Escherichia
+  growth_phases:
+  - acclimated_steady_state
   ncbi_taxon_id: 562
   omics_types:
   - PROTEOMICS
@@ -145,6 +162,9 @@ rows:
   experiment_count: 60
   gene_count: 4240
   genus: Marinobacter
+  growth_phases:
+  - darkness
+  - stationary
   ncbi_taxon_id: 225937
   omics_types:
   - PROTEOMICS
@@ -165,6 +185,7 @@ rows:
   experiment_count: 1
   gene_count: 0
   genus: Deinococcus
+  growth_phases: []
   ncbi_taxon_id: 1299
   omics_types:
   - RNASEQ
@@ -186,6 +207,7 @@ rows:
   experiment_count: 1
   gene_count: 2884
   genus: Meiothermus
+  growth_phases: []
   ncbi_taxon_id: 172827
   omics_types:
   - RNASEQ
@@ -210,6 +232,10 @@ rows:
   experiment_count: 6
   gene_count: 0
   genus: null
+  growth_phases:
+  - acute_stress
+  - exponential
+  - infected
   ncbi_taxon_id: 10239
   omics_types:
   - MICROARRAY
@@ -233,6 +259,8 @@ rows:
   experiment_count: 1
   gene_count: 1951
   genus: Prochlorococcus
+  growth_phases:
+  - acclimated_steady_state
   ncbi_taxon_id: 146891
   omics_types:
   - RNASEQ
@@ -262,6 +290,16 @@ rows:
   experiment_count: 108
   gene_count: 1976
   genus: Prochlorococcus
+  growth_phases:
+  - acclimated_steady_state
+  - acute_stress
+  - darkness
+  - death
+  - exponential
+  - infected
+  - nutrient_limited
+  - recovery
+  - stationary
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -296,6 +334,8 @@ rows:
   experiment_count: 2
   gene_count: 1935
   genus: Prochlorococcus
+  growth_phases:
+  - exponential
   ncbi_taxon_id: 167546
   omics_types:
   - RNASEQ
@@ -318,6 +358,8 @@ rows:
   experiment_count: 2
   gene_count: 3114
   genus: Prochlorococcus
+  growth_phases:
+  - exponential
   ncbi_taxon_id: 59922
   omics_types:
   - RNASEQ
@@ -341,6 +383,11 @@ rows:
   experiment_count: 20
   gene_count: 1978
   genus: Prochlorococcus
+  growth_phases:
+  - acclimated_steady_state
+  - acute_stress
+  - exponential
+  - stationary
   ncbi_taxon_id: 74546
   omics_types:
   - PROTEOMICS
@@ -367,6 +414,11 @@ rows:
   experiment_count: 21
   gene_count: 2948
   genus: Prochlorococcus
+  growth_phases:
+  - acute_stress
+  - exponential
+  - nutrient_limited
+  - recovery
   ncbi_taxon_id: 74547
   omics_types:
   - MICROARRAY
@@ -394,6 +446,8 @@ rows:
   experiment_count: 2
   gene_count: 2226
   genus: Prochlorococcus
+  growth_phases:
+  - acclimated_steady_state
   ncbi_taxon_id: 167555
   omics_types:
   - RNASEQ
@@ -420,6 +474,14 @@ rows:
   experiment_count: 17
   gene_count: 2214
   genus: Prochlorococcus
+  growth_phases:
+  - acute_stress
+  - darkness
+  - diel
+  - exponential
+  - nutrient_limited
+  - recovery
+  - stationary
   ncbi_taxon_id: 59920
   omics_types:
   - PROTEOMICS
@@ -443,6 +505,7 @@ rows:
   experiment_count: 0
   gene_count: 1870
   genus: Prochlorococcus
+  growth_phases: []
   ncbi_taxon_id: 1924285
   omics_types: []
   organism_name: Prochlorococcus RSP50
@@ -464,6 +527,11 @@ rows:
   experiment_count: 64
   gene_count: 1964
   genus: Prochlorococcus
+  growth_phases:
+  - acute_stress
+  - darkness
+  - exponential
+  - stationary
   ncbi_taxon_id: 167539
   omics_types:
   - PROTEOMICS
@@ -487,6 +555,8 @@ rows:
   experiment_count: 4
   gene_count: 5487
   genus: Pseudomonas
+  growth_phases:
+  - exponential
   ncbi_taxon_id: 160488
   omics_types:
   - PROTEOMICS
@@ -508,6 +578,8 @@ rows:
   experiment_count: 7
   gene_count: 4368
   genus: Ruegeria
+  growth_phases:
+  - acclimated_steady_state
   ncbi_taxon_id: 89184
   omics_types:
   - EXOPROTEOMICS
@@ -528,6 +600,8 @@ rows:
   experiment_count: 6
   gene_count: 4058
   genus: Shewanella
+  growth_phases:
+  - acclimated_steady_state
   ncbi_taxon_id: 351745
   omics_types:
   - RNASEQ
@@ -551,6 +625,8 @@ rows:
   experiment_count: 10
   gene_count: 3052
   genus: Synechococcus
+  growth_phases:
+  - exponential
   ncbi_taxon_id: 64471
   omics_types:
   - RNASEQ
@@ -572,6 +648,8 @@ rows:
   experiment_count: 6
   gene_count: 3207
   genus: Picosynechococcus
+  growth_phases:
+  - acclimated_steady_state
   ncbi_taxon_id: 32049
   omics_types:
   - RNASEQ
@@ -595,6 +673,10 @@ rows:
   experiment_count: 67
   gene_count: 2621
   genus: Synechococcus
+  growth_phases:
+  - acclimated_steady_state
+  - darkness
+  - stationary
   ncbi_taxon_id: 32051
   omics_types:
   - EXOPROTEOMICS
@@ -620,6 +702,10 @@ rows:
   experiment_count: 71
   gene_count: 2881
   genus: Parasynechococcus
+  growth_phases:
+  - darkness
+  - exponential
+  - stationary
   ncbi_taxon_id: 84588
   omics_types:
   - MICROARRAY
@@ -643,6 +729,8 @@ rows:
   experiment_count: 4
   gene_count: 2714
   genus: Synechococcus
+  growth_phases:
+  - exponential
   ncbi_taxon_id: 1140
   omics_types:
   - PROTEOMICS
@@ -664,6 +752,8 @@ rows:
   experiment_count: 2
   gene_count: 2714
   genus: Synechococcus
+  growth_phases:
+  - acclimated_steady_state
   ncbi_taxon_id: 1350461
   omics_types:
   - PROTEOMICS
@@ -687,6 +777,9 @@ rows:
   experiment_count: 60
   gene_count: 2595
   genus: Synechococcus
+  growth_phases:
+  - darkness
+  - stationary
   ncbi_taxon_id: 313625
   omics_types:
   - PROTEOMICS
@@ -708,6 +801,7 @@ rows:
   experiment_count: 1
   gene_count: 2449
   genus: Thermosynechococcus
+  growth_phases: []
   ncbi_taxon_id: 197221
   omics_types:
   - RNASEQ
@@ -729,6 +823,8 @@ rows:
   experiment_count: 1
   gene_count: 0
   genus: Vibrio
+  growth_phases:
+  - exponential
   ncbi_taxon_id: 670
   omics_types:
   - MICROARRAY

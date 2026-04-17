@@ -4,6 +4,7 @@ rows:
 - experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   expression_status: significant_up
   gene_name: dnaN
+  growth_phase: acute_stress
   locus_tag: PMM0001
   log2fc: 2.23
   padj: 0.0
@@ -18,6 +19,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   expression_status: significant_up
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 1.885
   padj: 0.0
@@ -32,6 +34,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: significant_up
   gene_name: dnaN
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 1.1005
   padj: 0.0007

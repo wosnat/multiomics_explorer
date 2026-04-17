@@ -16,6 +16,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1101/2025.08.05.668435
   experiment_count: 1
+  growth_phases:
+  - exponential
   journal: bioRxiv
   omics_types:
   - RNASEQ
@@ -38,6 +40,10 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1101/2025.11.24.690089
   experiment_count: 10
+  growth_phases:
+  - death
+  - exponential
+  - nutrient_limited
   journal: bioRxiv
   omics_types:
   - PROTEOMICS
@@ -73,6 +79,8 @@ rows:
   clustering_analysis_count: 2
   doi: 10.1093/ismeco/ycae131
   experiment_count: 2
+  growth_phases:
+  - diel
   journal: ISME Communications
   omics_types:
   - RNASEQ
@@ -100,6 +108,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/s42003-024-06098-5
   experiment_count: 4
+  growth_phases:
+  - exponential
   journal: Communications Biology
   omics_types:
   - PROTEOMICS
@@ -139,6 +149,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1073/pnas.2213271120
   experiment_count: 2
+  growth_phases:
+  - exponential
   journal: Proceedings of the National Academy of Sciences
   omics_types:
   - RNASEQ
@@ -164,6 +176,9 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1128/spectrum.03275-22
   experiment_count: 60
+  growth_phases:
+  - darkness
+  - stationary
   journal: Microbiology Spectrum
   omics_types:
   - PROTEOMICS
@@ -198,6 +213,7 @@ rows:
   clustering_analysis_count: 1
   doi: 10.1128/mbio.03425-22
   experiment_count: 1
+  growth_phases: []
   journal: mBio
   omics_types:
   - RNASEQ
@@ -221,6 +237,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.3389/fmicb.2022.1038136
   experiment_count: 2
+  growth_phases:
+  - acclimated_steady_state
   journal: Frontiers in Microbiology
   omics_types:
   - RNASEQ
@@ -245,6 +263,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/s43705-022-00197-2
   experiment_count: 10
+  growth_phases:
+  - exponential
   journal: ISME Communications
   omics_types:
   - RNASEQ
@@ -273,6 +293,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1186/s13068-022-02163-5
   experiment_count: 2
+  growth_phases:
+  - acclimated_steady_state
   journal: Biotechnology for Biofuels and Bioproducts
   omics_types:
   - PROTEOMICS
@@ -302,6 +324,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/s42003-019-0410-x
   experiment_count: 4
+  growth_phases:
+  - acute_stress
   journal: Communications Biology
   omics_types:
   - RNASEQ
@@ -332,6 +356,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1111/1462-2920.14513
   experiment_count: 1
+  growth_phases:
+  - exponential
   journal: Environmental Microbiology
   omics_types:
   - RNASEQ
@@ -356,6 +382,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1111/1462-2920.14012
   experiment_count: 4
+  growth_phases:
+  - acclimated_steady_state
   journal: Environmental Microbiology
   omics_types:
   - EXOPROTEOMICS
@@ -382,6 +410,8 @@ rows:
   clustering_analysis_count: 3
   doi: 10.1128/mSystems.00040-18
   experiment_count: 3
+  growth_phases:
+  - darkness
   journal: mSystems
   omics_types:
   - RNASEQ
@@ -411,6 +441,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2017.189
   experiment_count: 3
+  growth_phases:
+  - acclimated_steady_state
   journal: The ISME Journal
   omics_types:
   - RNASEQ
@@ -442,6 +474,7 @@ rows:
   clustering_analysis_count: 4
   doi: 10.1128/mSystems.00181-16
   experiment_count: 1
+  growth_phases: []
   journal: mSystems
   omics_types:
   - RNASEQ
@@ -470,6 +503,9 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2017.88
   experiment_count: 1
+  growth_phases:
+  - acute_stress
+  - nutrient_limited
   journal: The ISME Journal
   omics_types:
   - RNASEQ
@@ -493,6 +529,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/nmicrobiol.2017.100
   experiment_count: 3
+  growth_phases:
+  - acclimated_steady_state
   journal: Nature Microbiology
   omics_types:
   - EXOPROTEOMICS
@@ -519,6 +557,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1128/mSystems.00008-17
   experiment_count: 1
+  growth_phases:
+  - acute_stress
   journal: mSystems
   omics_types:
   - PROTEOMICS
@@ -543,6 +583,9 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1371/journal.pone.0165375
   experiment_count: 4
+  growth_phases:
+  - acute_stress
+  - infected
   journal: PLOS ONE
   omics_types:
   - RNASEQ
@@ -566,6 +609,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2016.82
   experiment_count: 3
+  growth_phases:
+  - exponential
   journal: The ISME Journal
   omics_types:
   - RNASEQ
@@ -587,6 +632,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2016.70
   experiment_count: 5
+  growth_phases:
+  - exponential
   journal: The ISME Journal
   omics_types:
   - RNASEQ
@@ -612,6 +659,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1016/j.micres.2015.04.006
   experiment_count: 1
+  growth_phases:
+  - acclimated_steady_state
   journal: Microbiological Research
   omics_types:
   - RNASEQ
@@ -632,6 +681,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
+  growth_phases:
+  - acute_stress
   journal: ISME Journal
   omics_types:
   - MICROARRAY
@@ -654,6 +705,9 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1111/1462-2920.13104
   experiment_count: 2
+  growth_phases:
+  - nutrient_limited
+  - recovery
   journal: Environmental Microbiology
   omics_types:
   - RNASEQ
@@ -687,6 +741,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2014.69
   experiment_count: 6
+  growth_phases:
+  - acclimated_steady_state
   journal: The ISME Journal
   omics_types:
   - RNASEQ
@@ -716,6 +772,7 @@ rows:
   clustering_analysis_count: 1
   doi: 10.1186/1471-2180-14-11
   experiment_count: 1
+  growth_phases: []
   journal: BMC Microbiology
   omics_types:
   - RNASEQ
@@ -738,6 +795,9 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1186/2046-9063-8-7
   experiment_count: 3
+  growth_phases:
+  - exponential
+  - stationary
   journal: Aquatic Biosystems
   omics_types:
   - PROTEOMICS
@@ -763,6 +823,10 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
+  growth_phases:
+  - acute_stress
+  - nutrient_limited
+  - recovery
   journal: The ISME Journal
   omics_types:
   - MICROARRAY
@@ -796,6 +860,7 @@ rows:
   clustering_analysis_count: 1
   doi: 10.1371/journal.pone.0005135
   experiment_count: 1
+  growth_phases: []
   journal: PLOS ONE
   omics_types:
   - MICROARRAY
@@ -819,6 +884,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1111/j.1462-2920.2009.01997.x
   experiment_count: 1
+  growth_phases:
+  - exponential
   journal: Environmental Microbiology
   omics_types:
   - MICROARRAY
@@ -850,6 +917,8 @@ rows:
   clustering_analysis_count: 1
   doi: 10.1038/nature06130
   experiment_count: 1
+  growth_phases:
+  - infected
   journal: Nature
   omics_types:
   - MICROARRAY
@@ -875,6 +944,8 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1128/JB.01097-06
   experiment_count: 6
+  growth_phases:
+  - acute_stress
   journal: Journal of Bacteriology
   omics_types:
   - MICROARRAY
@@ -902,6 +973,9 @@ rows:
   clustering_analysis_count: 2
   doi: 10.1038/msb4100087
   experiment_count: 6
+  growth_phases:
+  - acute_stress
+  - exponential
   journal: Molecular Systems Biology
   omics_types:
   - MICROARRAY
@@ -925,6 +999,10 @@ rows:
   clustering_analysis_count: 0
   doi: 10.1073/pnas.0601301103
   experiment_count: 2
+  growth_phases:
+  - acute_stress
+  - exponential
+  - nutrient_limited
   journal: PNAS
   omics_types:
   - MICROARRAY

@@ -13,6 +13,16 @@ rows:
   - '{''count'': 1, ''item'': ''condition_comparison''}'
   - '{''count'': 1, ''item'': ''diel''}'
   - '{''count'': 2, ''item'': ''time_course''}'
+  by_growth_phase:
+  - '{''count'': 1, ''item'': ''acclimated_steady_state''}'
+  - '{''count'': 1, ''item'': ''death''}'
+  - '{''count'': 1, ''item'': ''recovery''}'
+  - '{''count'': 15, ''item'': ''acute_stress''}'
+  - '{''count'': 4, ''item'': ''infected''}'
+  - '{''count'': 6, ''item'': ''darkness''}'
+  - '{''count'': 6, ''item'': ''exponential''}'
+  - '{''count'': 6, ''item'': ''stationary''}'
+  - '{''count'': 7, ''item'': ''nutrient_limited''}'
   by_omics_type:
   - '{''count'': 12, ''item'': ''RNASEQ''}'
   - '{''count'': 14, ''item'': ''PROTEOMICS''}'
