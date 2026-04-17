@@ -49,3 +49,4 @@ mistakes:
   - "For brite enrichment, use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). Without `tree`, all-BRITE enrichment is dominated by enzymes (~1,776 terms at level 3). Pick a specific level: `level=1` (BRITE category) or `level=2` (BRITE sub-category) are the most useful. Use `list_filter_values('brite_tree')` to discover trees → `ontology_landscape(ontology='brite', tree=...)` to pick level → `pathway_enrichment(ontology='brite', tree=..., level=...)` for enrichment."
   - wrong: "pathway_enrichment(..., background='genome')  # not a valid string"
     right: "pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list"
+  - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"

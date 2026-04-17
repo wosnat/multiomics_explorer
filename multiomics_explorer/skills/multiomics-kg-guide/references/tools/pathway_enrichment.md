@@ -23,6 +23,7 @@ See docs://analysis/enrichment for methodology and examples.
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for `p_adjust`. |
 | timepoint_filter | list[string] \| None | None | Restrict to these timepoint labels. Useful for 10+ timepoint experiments. |
+| growth_phases | list[string] \| None | None | Filter DE results by growth phase(s) before enrichment (case-insensitive). E.g. ['exponential']. |
 | summary | bool | False | If true, omit results (envelope only). |
 | verbose | bool | False | Include foreground_gene_ids + background_gene_ids on rows. |
 | limit | int | 100 | Max rows returned. Default 100 — top hits by p_adjust globally. |
@@ -74,6 +75,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 | treatment_type | list[string] \| None (optional) | Treatment-type tags |
 | background_factors | list[string] \| None (optional) | Background-condition tags |
 | is_time_course | bool \| None (optional) | True for time-course experiments |
+| growth_phase | string \| None (optional) | Physiological state of the culture at this timepoint. Timepoint-level, not gene-specific. |
 | term_id | string | Ontology term ID |
 | term_name | string | Ontology term display name |
 | level | int \| None (optional) | Hierarchy depth of the term (0 = root) |
@@ -179,6 +181,8 @@ pathway_enrichment(..., background='genome')  # not a valid string
 ```correction
 pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list
 ```
+
+- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 ## Package import equivalent
 

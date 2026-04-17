@@ -12,7 +12,7 @@ Use the returned values as filter parameters in `genes_by_function`
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree') | gene_category | Which filter's valid values to return. 'gene_category': values for the category filter in genes_by_function. 'brite_tree': BRITE tree names for the tree filter in ontology tools. |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase') | gene_category | Which filter's valid values to return. 'gene_category': values for the category filter in genes_by_function. 'brite_tree': BRITE tree names for the tree filter in ontology tools. 'growth_phase': physiological states of the culture at sampling time (timepoint-level condition, not gene-specific). |
 
 ## Response format
 
@@ -120,6 +120,8 @@ list_filter_values(category='Photosynthesis')  # no such param
 ```correction
 list_filter_values(filter_type='gene_category')  # then pass value to genes_by_function
 ```
+
+- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 ## Package import equivalent
 

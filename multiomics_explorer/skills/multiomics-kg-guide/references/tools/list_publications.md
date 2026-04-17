@@ -15,6 +15,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 | organism | string \| None | None | Filter by organism name (case-insensitive). E.g. 'MED4', 'HOT1A3'. |
 | treatment_type | string \| None | None | Filter by experiment treatment type. Use list_filter_values for valid values. |
 | background_factors | string \| None | None | Filter by background factor (case-insensitive exact match). E.g. 'axenic'. |
+| growth_phases | string \| None | None | Filter by growth phase (case-insensitive). E.g. 'exponential', 'nutrient_limited'. |
 | search_text | string \| None | None | Free-text search on title, abstract, and description (Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'. |
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
 | verbose | bool | False | Include abstract and description. Default compact for routing. |
@@ -59,6 +60,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | omics_types | list[string] (optional) | Omics data types (e.g. RNASEQ, PROTEOMICS) |
 | clustering_analysis_count | int (optional) | Number of clustering analyses from this publication (e.g. 4) |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
+| growth_phases | list[string] (optional) | Distinct growth phases across experiments. Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
 | score | float \| None (optional) | Lucene relevance score (only with search_text) |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -134,6 +136,8 @@ list_experiments(publication='Biller 2018')
 ```correction
 list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])
 ```
+
+- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 ## Package import equivalent
 

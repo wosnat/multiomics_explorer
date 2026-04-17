@@ -43,3 +43,4 @@ mistakes:
     right: "list_clustering_analyses(search_text='nitrogen')  # search first, then use analysis_id"
   - wrong: "len(results)  # actual count"
     right: "response['total_matching']  # use total, not len — results may be truncated"
+  - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"

@@ -57,6 +57,7 @@ total_entries, by_cluster_type, by_organism_type, returned, offset, truncated, r
 | omics_types | list[string] (optional) | Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']) |
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this organism (e.g. 4) |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']) |
+| growth_phases | list[string] (optional) | Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
 | reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
 | reference_proteome | string \| None (optional) | Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms. |
 
@@ -139,6 +140,8 @@ list_organisms → list_clustering_analyses(organism=...)
 - reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others
 
 - organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching)
+
+- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 ## Package import equivalent
 

@@ -30,6 +30,7 @@ For per-gene expression, use differential_expression_by_gene.
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
 | direction | string ('up', 'down') \| None | None | Filter by expression direction. |
 | significant_only | bool | False | If true, return only statistically significant rows. |
+| growth_phases | list[string] \| None | None | Filter by growth phase(s) at sampling time (case-insensitive, edge-level). Isolates specific-phase rows from multi-phase experiments. E.g. ['exponential']. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Add experiment_name, treatment, omics_type, table_scope, table_scope_detail to each row. |
 | limit | int | 5 | Max result rows. |
@@ -40,7 +41,7 @@ For per-gene expression, use differential_expression_by_gene.
 ### Envelope
 
 ```expected-keys
-total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
 - **total_matching** (int): Gene x experiment x timepoint rows matching all filters
@@ -56,6 +57,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 - **rows_by_status** (object): {significant_up, significant_down, not_significant}
 - **rows_by_treatment_type** (object): Row counts by treatment type
 - **rows_by_background_factors** (object): Row counts by background factor
+- **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
 - **by_table_scope** (object): Row counts by experiment table_scope
 - **top_groups** (list[DifferentialExpressionByOrthologTopGroup]): Top 5 groups by significant gene count
 - **top_experiments** (list[DifferentialExpressionByOrthologTopExperiment]): Top 5 experiments by significant gene count
@@ -86,6 +88,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 | significant_up | int | Genes significantly upregulated |
 | significant_down | int | Genes significantly downregulated |
 | not_significant | int | Genes not meeting significance threshold |
+| growth_phase | string \| None (optional) | Physiological state of the culture at this timepoint (e.g. 'exponential', 'nutrient_limited'). Timepoint-level condition — not gene-specific. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -143,13 +146,15 @@ differential_expression_by_ortholog → scripts/expression_by_ortholog.py (detai
 
 - Results are group × experiment × timepoint (gene counts), not individual genes. Use the script for per-gene detail.
 
+- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import differential_expression_by_ortholog
 
 result = differential_expression_by_ortholog(group_ids=...)
-# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, offset, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
+# returns dict with keys: total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, offset, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, results
 ```
 
 Use package import for bulk data extraction in scripts.

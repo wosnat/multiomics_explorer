@@ -59,3 +59,4 @@ mistakes:
   - "The organism filter in other tools uses partial matching — 'MED4', 'Prochlorococcus MED4', and 'Prochlorococcus' all work"
   - "reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others"
   - "organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching)"
+  - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"

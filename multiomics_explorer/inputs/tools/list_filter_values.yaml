@@ -61,3 +61,4 @@ mistakes:
   - "For brite_tree: count is the number of ontology terms in the tree, not genes. Use ontology_landscape to check gene coverage."
   - wrong: "list_filter_values(category='Photosynthesis')  # no such param"
     right: "list_filter_values(filter_type='gene_category')  # then pass value to genes_by_function"
+  - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"

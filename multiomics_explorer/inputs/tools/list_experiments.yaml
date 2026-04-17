@@ -70,5 +70,6 @@ mistakes:
   - "timepoints is omitted for non-time-course experiments, not an empty list"
   - "When summary=true, verbose and limit have no effect"
   - "Check table_scope before interpreting missing genes — some experiments only include significant genes"
+  - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
   - wrong: "list_experiments(publication='Biller 2018')"
     right: "list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])"

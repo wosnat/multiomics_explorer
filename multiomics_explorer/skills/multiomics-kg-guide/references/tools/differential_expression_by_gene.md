@@ -30,6 +30,7 @@ differential_expression_by_ortholog.
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
 | direction | string ('up', 'down') \| None | None | Filter by expression direction. |
 | significant_only | bool | False | If true, return only statistically significant results. |
+| growth_phases | list[string] \| None | None | Filter by growth phase(s) at sampling time (case-insensitive, edge-level). Isolates specific-phase rows from multi-phase experiments. E.g. ['exponential']. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | verbose | bool | False | Add product, experiment_name, treatment, gene_category, omics_type, coculture_partner to each row. |
 | limit | int | 5 | Max results. |
@@ -42,7 +43,7 @@ differential_expression_by_ortholog.
 ### Envelope
 
 ```expected-keys
-organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, by_table_scope, top_categories, experiments, not_found, no_expression, returned, offset, truncated, results
+organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, returned, offset, truncated, results
 ```
 
 - **organism_name** (string): Single organism for all results (e.g. 'Alteromonas macleodii HOT1A3')
@@ -54,6 +55,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **experiment_count** (int): Number of experiments in results (e.g. 1)
 - **rows_by_treatment_type** (object): Row counts by treatment type (e.g. {'nitrogen_stress': 15})
 - **rows_by_background_factors** (object): Row counts by background factor (e.g. {'axenic': 10, 'diel_cycle': 5})
+- **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
 - **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). Shows data completeness across experiments.
 - **top_categories** (list[ExpressionTopCategory]): Top gene categories by significant gene count, max 5
 - **experiments** (list[ExpressionByExperiment]): Per-experiment summary with nested timepoint breakdown, sorted by significant row count desc
@@ -80,6 +82,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 | rank_up | int \| None (optional) | Rank by |log2FC| among significant_up genes within experiment x timepoint. Null if not significant_up. 1 = strongest. |
 | rank_down | int \| None (optional) | Rank by |log2FC| among significant_down genes within experiment x timepoint. Null if not significant_down. 1 = strongest. |
 | expression_status | string ('significant_up', 'significant_down', 'not_significant') | Significance call using publication-specific threshold (e.g. 'significant_up') |
+| growth_phase | string \| None (optional) | Physiological state of the culture at this timepoint (e.g. 'exponential', 'nutrient_limited'). Timepoint-level condition — not gene-specific. |
 | background_factors | list[string] (optional) | Background experimental factors. Verbose only. |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -191,13 +194,15 @@ Call once per organism — tool enforces single-organism constraint
 
 - Check by_table_scope in the summary to understand data completeness before drawing conclusions
 
+- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import differential_expression_by_gene
 
 result = differential_expression_by_gene()
-# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, by_table_scope, top_categories, experiments, not_found, no_expression, offset, results
+# returns dict with keys: organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

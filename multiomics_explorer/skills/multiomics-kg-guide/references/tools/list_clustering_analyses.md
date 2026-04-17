@@ -17,6 +17,7 @@ Inline clusters included — use genes_in_cluster to drill into members.
 | cluster_type | string \| None | None | Filter: 'classification', 'condition_comparison', 'diel', 'time_course'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen_stress']. |
 | background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel_cycle']. |
+| growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
 | omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'MICROARRAY', 'PROTEOMICS', 'RNASEQ'. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
 | experiment_ids | list[string] \| None | None | Filter by experiment IDs. |
@@ -33,7 +34,7 @@ Inline clusters included — use genes_in_cluster to drill into members.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, score_max, score_median, returned, offset, truncated, results
+total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, by_growth_phase, score_max, score_median, returned, offset, truncated, results
 ```
 
 - **total_entries** (int): Total analyses in KG (before filters)
@@ -43,6 +44,7 @@ total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, 
 - **by_treatment_type** (list[GeneClusterTreatmentBreakdown]): Analyses per treatment type
 - **by_background_factors** (list[GeneClusterBackgroundFactorBreakdown]): Analyses per background factor
 - **by_omics_type** (list[GeneClusterOmicsBreakdown]): Analyses per omics type
+- **by_growth_phase** (list[GrowthPhaseBreakdown]): Analysis counts per growth phase, sorted by count descending
 - **score_max** (float | None): Highest Lucene score (search only)
 - **score_median** (float | None): Median Lucene score (search only)
 - **returned** (int): Results in this response
@@ -61,6 +63,7 @@ total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, 
 | cluster_count | int | Number of clusters in this analysis |
 | total_gene_count | int | Total genes across all clusters |
 | treatment_type | list[string] | Treatment types (e.g. ['nitrogen_stress']) |
+| growth_phases | list[string] (optional) | Distinct growth phases. Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
 | background_factors | list[string] (optional) | Background experimental factors (e.g. ['axenic', 'continuous_light']) |
 | omics_type | string \| None (optional) | Omics data type (e.g. 'MICROARRAY') |
 | experiment_ids | list[string] (optional) | Linked experiment IDs |
@@ -138,13 +141,15 @@ len(results)  # actual count
 response['total_matching']  # use total, not len — results may be truncated
 ```
 
+- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import list_clustering_analyses
 
 result = list_clustering_analyses()
-# returns dict with keys: total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, score_max, score_median, offset, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_cluster_type, by_treatment_type, by_background_factors, by_omics_type, by_growth_phase, score_max, score_median, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

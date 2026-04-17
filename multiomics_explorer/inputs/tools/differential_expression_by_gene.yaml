@@ -58,3 +58,4 @@ mistakes:
   - "expression_status uses publication-specific thresholds, not a uniform padj<0.05"
   - "Use summary=True first to see the landscape, then drill into specific genes/experiments"
   - "Check by_table_scope in the summary to understand data completeness before drawing conclusions"
+  - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"

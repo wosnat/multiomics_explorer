@@ -20,6 +20,7 @@ report all assayed genes (fair for cross-experiment comparison).
 | organism | string \| None | None | Filter by organism name (case-insensitive partial match on profiled organism and coculture partner). E.g. 'MED4', 'Alteromonas'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s) (case-insensitive exact match). E.g. ['coculture', 'nitrogen_stress']. Use list_filter_values to see valid values. |
 | background_factors | list[string] \| None | None | Filter by background experimental factors (case-insensitive exact match). E.g. ['axenic', 'diel_cycle']. Background factors describe experimental context beyond the primary treatment. |
+| growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
 | omics_type | list[string] \| None | None | Filter by omics platform(s) (case-insensitive). E.g. ['RNASEQ', 'PROTEOMICS']. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s) (case-insensitive exact match). Get DOIs from list_publications. E.g. ['10.1038/ismej.2016.70']. |
 | coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive partial match). Narrows coculture experiments. E.g. 'Alteromonas', 'HOT1A3'. |
@@ -38,7 +39,7 @@ report all assayed genes (fair for cross-experiment comparison).
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, time_course_count, score_max, score_median, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, time_course_count, score_max, score_median, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered)
@@ -53,6 +54,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **by_publication** (list[PublicationBreakdown]): Experiment counts per publication, sorted by count descending
 - **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted by count descending
 - **by_cluster_type** (list[ClusterTypeBreakdown]): Experiment counts per cluster type, sorted by count descending
+- **by_growth_phase** (list[GrowthPhaseBreakdown]): Experiment counts per growth phase, sorted by count descending
 - **time_course_count** (int): Number of time-course experiments in matching set
 - **score_max** (float | None): Max Lucene relevance score, present only when search_text is used (e.g. 4.52)
 - **score_median** (float | None): Median Lucene relevance score, present only when search_text is used (e.g. 1.23)
@@ -77,6 +79,8 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | timepoints | list[TimePoint] \| None (optional) | Per-timepoint gene counts. Omitted for non-time-course experiments. |
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this experiment (e.g. 4) |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
+| growth_phases | list[string] (optional) | Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
+| time_point_growth_phases | list[string] (optional) | Growth phase per timepoint, parallel to timepoints array. Same phase for all genes at each timepoint. |
 | score | float \| None (optional) | Lucene relevance score, present only when search_text is used (e.g. 2.45) |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -178,6 +182,8 @@ list_experiments → list_clustering_analyses(experiment_ids=[...])
 
 - Check table_scope before interpreting missing genes — some experiments only include significant genes
 
+- growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
 ```mistake
 list_experiments(publication='Biller 2018')
 ```
@@ -192,7 +198,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, time_course_count, score_max, score_median, results
+# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, time_course_count, score_max, score_median, results
 ```
 
 Use package import for bulk data extraction in scripts.
