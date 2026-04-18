@@ -4091,9 +4091,11 @@ class TestClusterEnrichment:
     @staticmethod
     def _stub_inputs(gene_sets=None, not_found=(), not_matched=()):
         from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+        if gene_sets is None:
+            gene_sets = {"Cluster A": ["PMM0001", "PMM0002"]}
         return EnrichmentInputs(
             organism_name="MED4",
-            gene_sets=gene_sets or {"Cluster A": ["PMM0001", "PMM0002"]},
+            gene_sets=gene_sets,
             background={"Cluster A": ["PMM0001", "PMM0002", "PMM0003"]},
             cluster_metadata={"Cluster A": {
                 "cluster_id": "gc:1", "cluster_name": "Cluster A",
@@ -4133,8 +4135,9 @@ class TestClusterEnrichment:
             analysis_id="ca:missing", organism="MED4",
             ontology="cyanorak_role", level=1,
         )
-        assert result["not_found"] == ["ca:missing"]
-        assert result["results"] == []
+        envelope = result.to_envelope()
+        assert envelope["not_found"] == ["ca:missing"]
+        assert envelope["results"] == []
 
     def test_orchestration_produces_envelope(self, monkeypatch):
         from multiomics_explorer.api import cluster_enrichment
@@ -4158,8 +4161,9 @@ class TestClusterEnrichment:
             ontology="cyanorak_role", level=1,
             pvalue_cutoff=0.99,
         )
-        assert "total_matching" in result
-        assert "returned" in result
-        assert "analysis_id" in result
-        assert "organism_name" in result
-        assert isinstance(result["results"], list)
+        envelope = result.to_envelope()
+        assert "total_matching" in envelope
+        assert "returned" in envelope
+        assert "analysis_id" in envelope
+        assert "organism_name" in envelope
+        assert isinstance(envelope["results"], list)
