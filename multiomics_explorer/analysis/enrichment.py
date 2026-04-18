@@ -1297,3 +1297,41 @@ class EnrichmentResult:
                 "clusters_tested": int(df["cluster"].nunique()) if total_matching else 0,
             })
         return base
+
+    def to_envelope(
+        self,
+        *,
+        summary: bool = False,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> dict:
+        """MCP-compatible envelope: summary fields + paginated scalar results rows."""
+        env = self.generate_summary()
+        total = int(len(self.results))
+
+        if summary:
+            env["results"] = []
+            env["returned"] = 0
+            env["truncated"] = total > 0
+            env["offset"] = offset
+            return env
+
+        eff_limit = limit if limit is not None else total
+        sliced = self.results.iloc[offset:offset + eff_limit] if total else self.results
+        returned_rows = sliced.to_dict(orient="records")
+        # Strip sparse tree/tree_code columns for non-BRITE rows and remove list/array values
+        for r in returned_rows:
+            tv = r.get("tree")
+            if tv is None or (isinstance(tv, float) and pd.isna(tv)):
+                r.pop("tree", None)
+                r.pop("tree_code", None)
+            # Remove list/array-valued columns to ensure scalar-only rows
+            for key in list(r.keys()):
+                if isinstance(r[key], list):
+                    r.pop(key)
+
+        env["results"] = returned_rows
+        env["returned"] = len(returned_rows)
+        env["truncated"] = (offset + len(returned_rows)) < total
+        env["offset"] = offset
+        return env

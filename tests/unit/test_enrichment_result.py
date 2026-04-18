@@ -484,3 +484,122 @@ class TestGenerateSummary:
         assert "by_cluster" in summary
         assert "by_term" in summary
         assert "by_experiment" not in summary
+
+
+class TestToEnvelope:
+    def test_envelope_default_has_results(self):
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora
+        import pandas as pd
+
+        t2g = pd.DataFrame([
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g1"},
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g2"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"exp1__up": ["g1"]},
+            background={"exp1__up": ["g1", "g2", "g3"]},
+            cluster_metadata={"exp1__up": {
+                "experiment_id": "exp1",
+                "omics_type": "transcriptomics",
+                "direction": "up",
+                "table_scope": "DE",
+                "treatment_type": ["light"],
+                "background_factors": None,
+                "is_time_course": False,
+            }},
+        )
+        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
+        # Merge cluster metadata into results df to simulate what pathway_enrichment does
+        if not result.results.empty:
+            md_df = pd.DataFrame.from_dict(
+                inputs.cluster_metadata, orient="index"
+            ).reset_index().rename(columns={"index": "cluster"})
+            result.results = result.results.merge(md_df, on="cluster", how="left")
+        result.kind = "pathway"
+        result.ontology = "go"
+        result.level = 1
+        result.params = {"pvalue_cutoff": 0.05}
+        env = result.to_envelope()
+        assert "results" in env
+        assert "returned" in env
+        assert "truncated" in env
+        assert "offset" in env
+        assert env["returned"] == len(env["results"])
+        if env["results"]:
+            row = env["results"][0]
+            for v in row.values():
+                assert not isinstance(v, list), f"unexpected list in row: {row}"
+
+    def test_envelope_summary_true(self):
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora
+        import pandas as pd
+
+        t2g = pd.DataFrame([
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g1"},
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g2"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"exp1__up": ["g1"]},
+            background={"exp1__up": ["g1", "g2", "g3"]},
+            cluster_metadata={"exp1__up": {
+                "experiment_id": "exp1",
+                "omics_type": "transcriptomics",
+                "direction": "up",
+                "table_scope": "DE",
+                "treatment_type": ["light"],
+                "background_factors": None,
+                "is_time_course": False,
+            }},
+        )
+        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
+        # Merge cluster metadata into results df to simulate what pathway_enrichment does
+        if not result.results.empty:
+            md_df = pd.DataFrame.from_dict(
+                inputs.cluster_metadata, orient="index"
+            ).reset_index().rename(columns={"index": "cluster"})
+            result.results = result.results.merge(md_df, on="cluster", how="left")
+        result.kind = "pathway"
+        result.params = {"pvalue_cutoff": 0.05}
+        env = result.to_envelope(summary=True)
+        assert env["results"] == []
+        assert env["returned"] == 0
+        assert "by_experiment" in env
+        assert "total_matching" in env
+
+    def test_envelope_pagination(self):
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora
+        import pandas as pd
+
+        t2g = pd.DataFrame([
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g1"},
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g2"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"exp1__up": ["g1"]},
+            background={"exp1__up": ["g1", "g2", "g3"]},
+            cluster_metadata={"exp1__up": {
+                "experiment_id": "exp1",
+                "omics_type": "transcriptomics",
+                "direction": "up",
+                "table_scope": "DE",
+                "treatment_type": ["light"],
+                "background_factors": None,
+                "is_time_course": False,
+            }},
+        )
+        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
+        # Merge cluster metadata into results df to simulate what pathway_enrichment does
+        if not result.results.empty:
+            md_df = pd.DataFrame.from_dict(
+                inputs.cluster_metadata, orient="index"
+            ).reset_index().rename(columns={"index": "cluster"})
+            result.results = result.results.merge(md_df, on="cluster", how="left")
+        result.kind = "pathway"
+        result.params = {"pvalue_cutoff": 0.05}
+        total = len(result.results)
+        env = result.to_envelope(limit=1, offset=0)
+        assert env["returned"] == 1
+        assert env["truncated"] is (total > 1)
