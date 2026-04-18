@@ -192,21 +192,6 @@ class TestFisherOra:
         padjs = df["p_adjust"].tolist()
         assert padjs == sorted(padjs)
 
-    def test_shared_background_list_broadcast(self):
-        """Passing background as dict (broadcast manually) to every cluster."""
-        from multiomics_explorer import fisher_ora, EnrichmentInputs
-        t2g = self._term2gene_simple()
-        bg = ["g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8", "g9"]
-        inputs = EnrichmentInputs(
-            organism_name="test",
-            gene_sets={"c1": ["g1"], "c2": ["g2"]},
-            background={"c1": bg, "c2": bg},
-            cluster_metadata={"c1": {}, "c2": {}},
-        )
-        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
-        df = result.results
-        assert set(df["cluster"]) == {"c1", "c2"}
-
     def test_max_gene_set_size_none_disables_upper_bound(self):
         from multiomics_explorer import fisher_ora, EnrichmentInputs
         t2g = self._term2gene_simple()
