@@ -125,3 +125,31 @@ class TestEnrichmentExplanation:
         from multiomics_explorer import EnrichmentExplanation
         for name, field in EnrichmentExplanation.model_fields.items():
             assert field.description, f"EnrichmentExplanation.{name} missing description"
+
+
+import pandas as pd
+
+
+class TestFisherOraReturnsResult:
+    def test_returns_enrichment_result(self):
+        from multiomics_explorer import (
+            EnrichmentInputs, EnrichmentResult, fisher_ora,
+        )
+        t2g = pd.DataFrame([
+            {"term_id": "P", "term_name": "P", "locus_tag": "g1"},
+            {"term_id": "P", "term_name": "P", "locus_tag": "g2"},
+            {"term_id": "P", "term_name": "P", "locus_tag": "g3"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"c1": ["g1", "g2"]},
+            background={"c1": ["g1", "g2", "g3", "g4", "g5"]},
+            cluster_metadata={"c1": {}},
+        )
+        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
+        assert isinstance(result, EnrichmentResult)
+        assert result.kind == "pathway"
+        assert result.organism_name == "MED4"
+        assert not result.results.empty
+        assert result.inputs is inputs
+        assert result.term2gene is t2g

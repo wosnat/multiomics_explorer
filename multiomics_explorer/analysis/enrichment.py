@@ -220,37 +220,28 @@ _REQUIRED_TERM2GENE_COLS = ("term_id", "term_name", "locus_tag")
 
 
 def fisher_ora(
-    gene_sets: dict[str, list[str]],
-    background: dict[str, list[str]] | list[str],
+    inputs: "EnrichmentInputs",
     term2gene: pd.DataFrame,
+    *,
     min_gene_set_size: int = 5,
     max_gene_set_size: int | None = 500,
-) -> pd.DataFrame:
-    """Run Fisher-exact over-representation analysis (ORA) per (cluster, term).
+) -> "EnrichmentResult":
+    """Run Fisher-exact ORA and return an EnrichmentResult.
 
-    The enrichment primitive. Direction-agnostic; gene-list-agnostic. Callers
-    supply gene sets (one per cluster), per-cluster or shared backgrounds,
-    and a TERM2GENE DataFrame (from genes_by_ontology via to_dataframe, from
-    clusterProfiler, or hand-built). Returns one row per (cluster x term)
-    pair that passes the per-cluster M size filter.
-
-    Does NOT compute ``signed_score`` — that requires direction information
-    this primitive doesn't know about. Attach a ``direction`` column and
-    pass through ``signed_enrichment_score`` or compute ``sign * -log10(p)``
-    directly.
+    See docs://analysis/enrichment for methodology. Users can construct an
+    EnrichmentInputs directly (passing gene_sets, background, organism_name,
+    optional gene_stats) — no KG required. Gene name/product for accessors
+    comes from term2gene rows.
 
     Parameters
     ----------
-    gene_sets : dict[str, list[str]]
-        Cluster name -> foreground locus_tags. Convention for the DE path is
-        ``"{experiment_id}|{timepoint}|{direction}"`` keys.
-    background : dict[str, list[str]] | list[str]
-        Per-cluster background (dict keyed by cluster) or a single shared
-        universe (list, broadcast to every cluster).
+    inputs : EnrichmentInputs
+        Gene sets + per-cluster backgrounds + cluster metadata + optional
+        gene_stats (DE-specific).
     term2gene : pandas.DataFrame
-        Required columns: ``term_id``, ``term_name``, ``locus_tag``. Extra
-        columns pass through to result rows. Idiomatic source is
-        ``to_dataframe(genes_by_ontology(...))``.
+        Required columns: term_id, term_name, locus_tag.
+        Optional: gene_name, product (used by GeneRef accessors).
+        Extra columns pass through to result rows.
     min_gene_set_size : int, default 5
         Per-cluster M filter: drop (cluster, term) pairs where the pathway
         has fewer than this many members in the cluster's background.
@@ -260,13 +251,8 @@ def fisher_ora(
 
     Returns
     -------
-    pandas.DataFrame
-        Long-format, compareCluster-compatible. Columns: ``cluster``,
-        ``term_id``, ``term_name``, ``gene_ratio``, ``gene_ratio_numeric``,
-        ``bg_ratio``, ``bg_ratio_numeric``, ``rich_factor``,
-        ``fold_enrichment``, ``pvalue``, ``p_adjust``, ``count``,
-        ``bg_count``, plus passthrough columns from ``term2gene``. See
-        docs://analysis/enrichment for field meanings.
+    EnrichmentResult
+        Holds the Fisher DataFrame plus inputs and term2gene for accessor use.
 
     Raises
     ------
@@ -277,19 +263,23 @@ def fisher_ora(
 
     Examples
     --------
-    >>> from multiomics_explorer import fisher_ora
+    >>> from multiomics_explorer import fisher_ora, EnrichmentInputs
     >>> from multiomics_explorer.api import genes_by_ontology
     >>> from multiomics_explorer.analysis.frames import to_dataframe
     >>> term2gene = to_dataframe(genes_by_ontology(
     ...     ontology="cyanorak_role", organism="MED4", level=1,
     ... ))
-    >>> gene_sets = {"treatment_up": ["PMM0123", "PMM0456"]}
-    >>> background = ["PMM0001", "PMM0002"]  # truncated
-    >>> df = fisher_ora(gene_sets, background, term2gene)  # doctest: +SKIP
+    >>> inputs = EnrichmentInputs(
+    ...     organism_name="MED4",
+    ...     gene_sets={"treatment_up": ["PMM0123", "PMM0456"]},
+    ...     background={"treatment_up": ["PMM0001", "PMM0002"]},
+    ...     cluster_metadata={"treatment_up": {}},
+    ... )
+    >>> result = fisher_ora(inputs, term2gene)  # doctest: +SKIP
 
     See Also
     --------
-    de_enrichment_inputs : Build gene_sets + background from DE results.
+    de_enrichment_inputs : Build EnrichmentInputs from DE results.
     signed_enrichment_score : Collapse up/down cluster pairs into a signed score.
     multiomics_explorer.api.genes_by_ontology : Canonical TERM2GENE source.
     """
@@ -304,14 +294,21 @@ def fisher_ora(
             f"max_gene_set_size ({max_gene_set_size}) must be >= "
             f"min_gene_set_size ({min_gene_set_size})."
         )
-    if isinstance(background, list):
-        background = {c: list(background) for c in gene_sets}
-    return _fisher_ora_impl(
-        gene_sets=gene_sets,
-        background=background,
+    df = _fisher_ora_impl(
+        gene_sets=inputs.gene_sets,
+        background=inputs.background,
         term2gene=term2gene,
         min_gene_set_size=min_gene_set_size,
         max_gene_set_size=max_gene_set_size,
+    )
+    return EnrichmentResult(
+        kind="pathway",
+        organism_name=inputs.organism_name,
+        ontology=None,
+        level=None,
+        results=df,
+        inputs=inputs,
+        term2gene=term2gene,
     )
 
 
@@ -801,3 +798,24 @@ def cluster_enrichment_inputs(
         clusters_skipped=clusters_skipped,
         analysis_metadata=analysis_md,
     )
+
+
+from dataclasses import dataclass, field
+
+
+@dataclass
+class EnrichmentResult:
+    """Rich wrapper around Fisher ORA output. See docs://analysis/enrichment."""
+
+    kind: Literal["pathway", "cluster"]
+    organism_name: str
+    ontology: str | None
+    level: int | None
+
+    results: pd.DataFrame
+    inputs: EnrichmentInputs
+    term2gene: pd.DataFrame
+
+    term_validation: dict = field(default_factory=dict)
+    clusters_skipped: list[dict] = field(default_factory=list)
+    params: dict = field(default_factory=dict)

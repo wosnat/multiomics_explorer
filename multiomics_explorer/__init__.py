@@ -2,6 +2,7 @@
 
 from multiomics_explorer.analysis.enrichment import (
     EnrichmentInputs,
+    EnrichmentResult,
     de_enrichment_inputs,
     fisher_ora,
     signed_enrichment_score,
@@ -38,6 +39,7 @@ from multiomics_explorer.api.functions import (
 
 __all__ = [
     "EnrichmentInputs",
+    "EnrichmentResult",
     "de_enrichment_inputs",
     "fisher_ora",
     "signed_enrichment_score",
