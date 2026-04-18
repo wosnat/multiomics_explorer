@@ -923,9 +923,10 @@ class TestPathwayEnrichmentIntegration:
             background="organism",
             conn=conn,
         )
-        assert result["total_matching"] > 0
-        assert result["n_significant"] > 0
-        top_terms = {p["term_id"] for p in result["top_pathways_by_padj"]}
+        envelope = result.to_envelope()
+        assert envelope["total_matching"] > 0
+        assert envelope["n_significant"] > 0
+        top_terms = {p["term_id"] for p in envelope["top_pathways_by_padj"]}
         expected_family_prefixes = ("cyanorak.role:E.", "cyanorak.role:J.", "cyanorak.role:K.")
         assert any(any(t.startswith(p) for p in expected_family_prefixes) for t in top_terms), (
             f"Expected at least one E./J./K. pathway; got {top_terms}"
@@ -948,7 +949,7 @@ class TestPathwayEnrichmentIntegration:
             background="organism",
             conn=conn,
         )
-        assert result["total_matching"] >= 0
+        assert result.to_envelope()["total_matching"] >= 0
 
     def test_explicit_background_list(self, conn):
         """`background=<list>` uses caller's universe."""
@@ -969,7 +970,7 @@ class TestPathwayEnrichmentIntegration:
             background=custom_bg,
             conn=conn,
         )
-        assert result["cluster_summary"]["universe_size_max"] <= len(custom_bg)
+        assert result.to_envelope()["cluster_summary"]["universe_size_max"] <= len(custom_bg)
 
     def test_clusters_skipped_for_undersized(self, conn):
         """Very high min_gene_set_size forces all clusters to be skipped."""
@@ -990,7 +991,7 @@ class TestPathwayEnrichmentIntegration:
             max_gene_set_size=None,
             conn=conn,
         )
-        assert result["clusters_skipped"], "expected clusters skipped under impossible min filter"
+        assert result.to_envelope()["clusters_skipped"], "expected clusters skipped under impossible min filter"
 
 
 @pytest.mark.kg
@@ -1009,11 +1010,11 @@ class TestClusterEnrichmentIntegration:
             ontology="cyanorak_role",
             level=1,
             pvalue_cutoff=0.99,
-            limit=5,
             conn=conn,
         )
-        assert isinstance(result["results"], list)
-        assert result["background_mode"] == "cluster_union"
+        envelope = result.to_envelope()
+        assert isinstance(envelope["results"], list)
+        assert result.params["background_mode"] == "cluster_union"
 
     def test_organism_background_differs(self, conn):
         from multiomics_explorer.api import list_clustering_analyses, cluster_enrichment
@@ -1025,12 +1026,15 @@ class TestClusterEnrichmentIntegration:
             analysis_id=analysis["analysis_id"],
             organism=analysis["organism_name"],
             ontology="cyanorak_role", level=1,
-            background="cluster_union", summary=True, conn=conn,
+            background="cluster_union", conn=conn,
         )
         r_org = cluster_enrichment(
             analysis_id=analysis["analysis_id"],
             organism=analysis["organism_name"],
             ontology="cyanorak_role", level=1,
-            background="organism", summary=True, conn=conn,
+            background="organism", conn=conn,
         )
-        assert r_org["background_size"] >= r_union["background_size"]
+        # organism background must be >= cluster_union background per cluster
+        union_max = max((len(v) for v in r_union.inputs.background.values()), default=0)
+        org_max = max((len(v) for v in r_org.inputs.background.values()), default=0)
+        assert org_max >= union_max

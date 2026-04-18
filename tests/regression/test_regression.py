@@ -155,7 +155,7 @@ def test_regression(conn, case, data_regression):
     elif tool == "pathway_enrichment":
         # Capture full envelope — shape changes (new summary fields, etc.)
         # should surface cleanly in the golden file diff.
-        data = api.pathway_enrichment(**params, conn=conn)
+        data = api.pathway_enrichment(**params, conn=conn).to_envelope()
         normalized_rows = _normalize(data.get("results", []))
         envelope = {k: v for k, v in data.items() if k != "results"}
         envelope["results"] = normalized_rows

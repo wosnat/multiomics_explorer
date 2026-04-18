@@ -1005,15 +1005,16 @@ class TestClusterEnrichmentContract:
             ontology="cyanorak_role",
             level=1,
             pvalue_cutoff=0.99,
-            limit=5,
             conn=conn,
         )
-        assert isinstance(result, dict)
+        envelope = result.to_envelope()
+        assert isinstance(envelope, dict)
         for key in ("analysis_id", "organism_name", "ontology", "total_matching",
                      "returned", "truncated", "not_found", "not_matched",
-                     "clusters_skipped", "results", "background_mode",
-                     "background_size", "n_significant"):
-            assert key in result, f"Missing key: {key}"
+                     "clusters_skipped", "results", "n_significant"):
+            assert key in envelope, f"Missing key: {key}"
+        # background_mode moved to enrichment_params
+        assert "background_mode" in envelope["enrichment_params"]
 
     def test_result_row_keys(self, conn):
         from multiomics_explorer.api import list_clustering_analyses, cluster_enrichment
@@ -1027,12 +1028,12 @@ class TestClusterEnrichmentContract:
             ontology="cyanorak_role",
             level=1,
             pvalue_cutoff=0.99,
-            limit=5,
             conn=conn,
         )
-        if not result["results"]:
+        envelope = result.to_envelope()
+        if not envelope["results"]:
             pytest.skip("No enrichment results (insufficient data)")
-        row = result["results"][0]
+        row = envelope["results"][0]
         for key in ("cluster", "cluster_id", "term_id", "term_name",
                      "gene_ratio", "bg_ratio", "pvalue", "p_adjust",
                      "count", "bg_count", "fold_enrichment"):
