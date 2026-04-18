@@ -884,6 +884,183 @@ def _sort_gene_refs(refs: list["GeneRef"]) -> list["GeneRef"]:
     return named + unnamed
 
 
+# ---------------------------------------------------------------------------
+# Envelope summary helpers — used by EnrichmentResult.generate_summary()
+# (Copied from api/functions.py; originals remain there until Tasks 10/11.)
+# ---------------------------------------------------------------------------
+
+
+def _envelope_by_experiment(df, inputs, pvalue_cutoff):
+    if df.empty:
+        return []
+    out = []
+    for exp_id, sub in df.groupby("experiment_id", sort=True):
+        md_cluster = next(
+            (c for c, md in inputs.cluster_metadata.items() if md.get("experiment_id") == exp_id),
+            None,
+        )
+        md = inputs.cluster_metadata.get(md_cluster, {}) if md_cluster else {}
+        out.append({
+            "experiment_id": exp_id,
+            "name": md.get("name"),
+            "omics_type": md.get("omics_type"),
+            "table_scope": md.get("table_scope"),
+            "treatment_type": md.get("treatment_type"),
+            "background_factors": md.get("background_factors"),
+            "is_time_course": md.get("is_time_course"),
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+            "n_clusters": int(sub["cluster"].nunique()),
+        })
+    return out
+
+
+def _envelope_by_direction(df, pvalue_cutoff):
+    if df.empty:
+        return []
+    return [
+        {
+            "direction": direction,
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        }
+        for direction, sub in df.groupby("direction", sort=True)
+    ]
+
+
+def _envelope_by_omics_type(df, pvalue_cutoff):
+    if df.empty:
+        return []
+    return [
+        {
+            "omics_type": omics_type,
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        }
+        for omics_type, sub in df.groupby("omics_type", sort=True)
+    ]
+
+
+def _envelope_cluster_summary(df, inputs):
+    if df.empty:
+        return {
+            "n_clusters": 0,
+            "n_tests_min": 0, "n_tests_median": 0.0, "n_tests_max": 0,
+            "n_significant_min": 0, "n_significant_median": 0.0, "n_significant_max": 0,
+            "universe_size_min": 0, "universe_size_median": 0.0, "universe_size_max": 0,
+        }
+    import statistics
+    per_cluster = df.groupby("cluster").agg(n_tests=("term_id", "size"))
+    n_tests_vals = per_cluster["n_tests"].tolist()
+    universe_sizes = [
+        len(inputs.background.get(c, [])) for c in per_cluster.index
+    ]
+    sig_per_cluster = (
+        df[df["p_adjust"] < 0.05]
+        .groupby("cluster")
+        .size()
+        .reindex(per_cluster.index, fill_value=0)
+        .tolist()
+    )
+    return {
+        "n_clusters": len(per_cluster),
+        "n_tests_min": min(n_tests_vals),
+        "n_tests_median": float(statistics.median(n_tests_vals)),
+        "n_tests_max": max(n_tests_vals),
+        "n_significant_min": min(sig_per_cluster),
+        "n_significant_median": float(statistics.median(sig_per_cluster)),
+        "n_significant_max": max(sig_per_cluster),
+        "universe_size_min": min(universe_sizes) if universe_sizes else 0,
+        "universe_size_median": float(statistics.median(universe_sizes)) if universe_sizes else 0.0,
+        "universe_size_max": max(universe_sizes) if universe_sizes else 0,
+    }
+
+
+def _envelope_top_clusters(df, inputs, top_n=5):
+    if df.empty:
+        return []
+    per_cluster_min_padj = df.groupby("cluster")["p_adjust"].min()
+    top_clusters = (
+        per_cluster_min_padj.sort_values(ascending=True).head(top_n).index.tolist()
+    )
+    out = []
+    for cluster in top_clusters:
+        sub = df[df["cluster"] == cluster]
+        md = inputs.cluster_metadata.get(cluster, {})
+        out.append({
+            "cluster": cluster,
+            "experiment_id": md.get("experiment_id"),
+            "name": md.get("name"),
+            "timepoint": md.get("timepoint"),
+            "timepoint_hours": md.get("timepoint_hours"),
+            "timepoint_order": md.get("timepoint_order"),
+            "direction": md.get("direction"),
+            "omics_type": md.get("omics_type"),
+            "table_scope": md.get("table_scope"),
+            "treatment_type": md.get("treatment_type"),
+            "background_factors": md.get("background_factors"),
+            "is_time_course": md.get("is_time_course"),
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < 0.05).sum()),
+            "universe_size": len(inputs.background.get(cluster, [])),
+            "min_padj": float(per_cluster_min_padj[cluster]),
+        })
+    return out
+
+
+def _envelope_top_pathways(df, top_n=10):
+    if df.empty:
+        return []
+    top = df.sort_values(
+        ["p_adjust", "cluster", "term_id"], ascending=True
+    ).head(top_n)
+    return [
+        {
+            "cluster": r["cluster"],
+            "term_id": r["term_id"],
+            "term_name": r["term_name"],
+            "p_adjust": float(r["p_adjust"]),
+            "signed_score": float(r["signed_score"]) if "signed_score" in r else 0.0,
+        }
+        for _, r in top.iterrows()
+    ]
+
+
+def _envelope_by_cluster(df, inputs, pvalue_cutoff):
+    """Cluster-kind: per-cluster significant-term counts."""
+    produced_clusters = set(df["cluster"]) if not df.empty else set()
+    out = []
+    for cluster_name, md in inputs.cluster_metadata.items():
+        if cluster_name not in produced_clusters:
+            continue
+        sub = df[df["cluster"] == cluster_name]
+        out.append({
+            "cluster_id": md.get("cluster_id"),
+            "cluster_name": cluster_name,
+            "member_count": md.get("member_count"),
+            "significant_terms": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        })
+    return out
+
+
+def _envelope_by_term(df, pvalue_cutoff):
+    """Cluster-kind: top 10 terms by number of clusters they appear in as significant."""
+    if df.empty:
+        return []
+    sig_df = df[df["p_adjust"] < pvalue_cutoff]
+    if sig_df.empty:
+        return []
+    term_counts = (
+        sig_df.groupby(["term_id", "term_name"])["cluster"]
+        .nunique()
+        .reset_index()
+        .rename(columns={"cluster": "n_clusters"})
+        .sort_values("n_clusters", ascending=False)
+        .head(10)
+    )
+    return term_counts.to_dict(orient="records")
+
+
 @dataclass
 class EnrichmentResult:
     """Rich wrapper around Fisher ORA output. See docs://analysis/enrichment."""
@@ -1071,3 +1248,52 @@ class EnrichmentResult:
                 "geneID": "/".join(overlap_lts),
             })
         return pd.DataFrame(rows)
+
+    def generate_summary(self) -> dict:
+        """Aggregate view — no per-row results, no pagination.
+
+        Pathway kind emits by_experiment/by_direction/by_omics_type;
+        cluster kind emits by_cluster/by_term.
+        """
+        df = self.results
+        pvc = self.params.get("pvalue_cutoff", 0.05)
+        total_matching = int(len(df))
+        n_significant = int((df["p_adjust"] < pvc).sum()) if total_matching else 0
+
+        base = {
+            "organism_name": self.organism_name,
+            "ontology": self.ontology,
+            "level": self.level,
+            "total_matching": total_matching,
+            "n_significant": n_significant,
+            "not_found": list(self.inputs.not_found),
+            "not_matched": list(self.inputs.not_matched),
+            "term_validation": self.missing_terms(),
+            "clusters_skipped": list(self.clusters_skipped),
+            "enrichment_params": dict(self.params),
+        }
+
+        if self.kind == "pathway":
+            base.update({
+                "no_expression": list(self.inputs.no_expression),
+                "by_experiment": _envelope_by_experiment(df, self.inputs, pvc),
+                "by_direction": _envelope_by_direction(df, pvc),
+                "by_omics_type": _envelope_by_omics_type(df, pvc),
+                "cluster_summary": _envelope_cluster_summary(df, self.inputs),
+                "top_clusters_by_min_padj": _envelope_top_clusters(df, self.inputs),
+                "top_pathways_by_padj": _envelope_top_pathways(df),
+            })
+        else:  # cluster kind
+            base.update({
+                "analysis_id": self.inputs.analysis_metadata.get("analysis_id"),
+                "analysis_name": self.inputs.analysis_metadata.get("analysis_name"),
+                "cluster_method": self.inputs.analysis_metadata.get("cluster_method"),
+                "cluster_type": self.inputs.analysis_metadata.get("cluster_type"),
+                "omics_type": self.inputs.analysis_metadata.get("omics_type"),
+                "treatment_type": self.inputs.analysis_metadata.get("treatment_type"),
+                "background_factors": self.inputs.analysis_metadata.get("background_factors"),
+                "by_cluster": _envelope_by_cluster(df, self.inputs, pvc),
+                "by_term": _envelope_by_term(df, pvc),
+                "clusters_tested": int(df["cluster"].nunique()) if total_matching else 0,
+            })
+        return base

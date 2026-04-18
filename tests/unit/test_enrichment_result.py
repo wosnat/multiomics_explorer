@@ -410,3 +410,77 @@ class TestNiceAccessors:
             "pvalue", "p.adjust", "geneID",
         }
         assert expected.issubset(set(df.columns))
+
+
+class TestGenerateSummary:
+    def test_summary_pathway_kind_shape(self):
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora
+        import pandas as pd
+
+        t2g = pd.DataFrame([
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g1"},
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g2"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"exp1__up": ["g1"]},
+            background={"exp1__up": ["g1", "g2", "g3"]},
+            cluster_metadata={"exp1__up": {
+                "experiment_id": "exp1",
+                "omics_type": "transcriptomics",
+                "direction": "up",
+                "table_scope": "DE",
+                "treatment_type": ["light"],
+                "background_factors": None,
+                "is_time_course": False,
+            }},
+        )
+        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
+        # Merge cluster metadata into results df to simulate what pathway_enrichment does
+        if not result.results.empty:
+            md_df = pd.DataFrame.from_dict(
+                inputs.cluster_metadata, orient="index"
+            ).reset_index().rename(columns={"index": "cluster"})
+            result.results = result.results.merge(md_df, on="cluster", how="left")
+        result.kind = "pathway"
+        result.ontology = "go"
+        result.level = 1
+        result.params = {"pvalue_cutoff": 0.05}
+        summary = result.generate_summary()
+        assert "organism_name" in summary
+        assert "ontology" in summary
+        assert "total_matching" in summary
+        assert "n_significant" in summary
+        assert "by_experiment" in summary
+        assert "by_direction" in summary
+        assert "cluster_summary" in summary
+        assert "top_clusters_by_min_padj" in summary
+        assert "top_pathways_by_padj" in summary
+        assert "term_validation" in summary
+        assert "clusters_skipped" in summary
+        assert "enrichment_params" in summary
+        assert "results" not in summary
+        assert "returned" not in summary
+        assert "truncated" not in summary
+
+    def test_summary_cluster_kind_dispatches(self):
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora
+        import pandas as pd
+
+        t2g = pd.DataFrame([
+            {"term_id": "GO:0001", "term_name": "transport", "locus_tag": "g1"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"cluster1": ["g1"]},
+            background={"cluster1": ["g1", "g2"]},
+            cluster_metadata={"cluster1": {}},
+            analysis_metadata={"analysis_id": "a1", "analysis_name": "MyAnalysis"},
+        )
+        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
+        result.kind = "cluster"
+        result.params = {"pvalue_cutoff": 0.05}
+        summary = result.generate_summary()
+        assert "by_cluster" in summary
+        assert "by_term" in summary
+        assert "by_experiment" not in summary
