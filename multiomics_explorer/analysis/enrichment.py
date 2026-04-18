@@ -10,6 +10,8 @@ See docs://analysis/enrichment for methodology.
 """
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 import pandas as pd
@@ -74,6 +76,135 @@ class EnrichmentInputs(BaseModel):
         default_factory=dict,
         description="Analysis-level metadata (analysis_id, name, cluster_type, etc.).",
     )
+
+
+class DEStats(BaseModel):
+    """Differential-expression statistics for one gene in one experiment × timepoint."""
+
+    log2fc: float = Field(
+        description="log2 fold change from DE analysis."
+    )
+    padj: float = Field(
+        description="BH-adjusted p-value from the source DE table."
+    )
+    rank: int | None = Field(
+        default=None,
+        description=(
+            "Rank by |log2FC| within the experiment × timepoint. 1 = strongest. "
+            "None when the source DE tool didn't emit a rank."
+        ),
+    )
+    direction: Literal["up", "down", "none"] = Field(
+        description="'up', 'down', or 'none' (not significant)."
+    )
+    significant: bool = Field(
+        description="Whether the gene meets the experiment's significance threshold."
+    )
+
+
+class GeneRef(BaseModel):
+    """A gene referenced in an enrichment result — locus_tag plus optional name/product/DE stats."""
+
+    locus_tag: str = Field(
+        description="Primary gene identifier, e.g. 'PMM0712'."
+    )
+    gene_name: str | None = Field(
+        default=None,
+        description=(
+            "Short gene name (e.g. 'pstS') from term2gene's gene_name column. "
+            "None when term2gene lacks the column or the cell is null."
+        ),
+    )
+    product: str | None = Field(
+        default=None,
+        description=(
+            "Gene product description (e.g. 'phosphate ABC transporter'). "
+            "None when term2gene lacks the column or the cell is null."
+        ),
+    )
+    log2fc: float | None = Field(
+        default=None, description="log2 fold change; None outside the DE path."
+    )
+    padj: float | None = Field(
+        default=None, description="BH-adjusted p-value; None outside the DE path."
+    )
+    rank: int | None = Field(
+        default=None,
+        description="Rank by |log2FC| within experiment × timepoint; None outside the DE path.",
+    )
+    direction: Literal["up", "down", "none"] | None = Field(
+        default=None, description="DE direction; None outside the DE path."
+    )
+    significant: bool | None = Field(
+        default=None, description="DE significance flag; None outside the DE path."
+    )
+
+
+class EnrichmentExplanation(BaseModel):
+    """Single (cluster, term_id) pair explained: Fisher numbers, ranking, gene lists, narrative."""
+
+    cluster: str = Field(description="Cluster identifier from EnrichmentInputs.gene_sets.")
+    term_id: str = Field(description="Ontology term identifier (e.g. 'GO:0006810').")
+    term_name: str = Field(description="Human-readable term name (e.g. 'transport').")
+    cluster_kind: Literal["pathway", "cluster"] = Field(
+        description=(
+            "Which enrichment path produced this result — dispatches the narrative "
+            "wording. 'pathway' = DE-driven; 'cluster' = clustering-analysis-driven."
+        ),
+    )
+    cluster_metadata: dict = Field(
+        description=(
+            "Cluster-specific context. For pathway kind: experiment_id, timepoint, "
+            "direction, omics_type, table_scope, treatment_type, background_factors. "
+            "For cluster kind: analysis_id, analysis_name, cluster_type, treatment, "
+            "experimental_context."
+        ),
+    )
+
+    count: int = Field(description="k — genes in foreground ∩ background ∩ term.")
+    n_foreground: int = Field(description="n — genes in foreground ∩ background.")
+    bg_count: int = Field(description="M — genes in background ∩ term.")
+    n_background: int = Field(description="N — total genes in background.")
+    gene_ratio: str = Field(description="Pretty 'k/n' string (e.g. '12/87').")
+    bg_ratio: str = Field(description="Pretty 'M/N' string (e.g. '210/2340').")
+    fold_enrichment: float = Field(description="(k/n) / (M/N) — observed over expected.")
+    rich_factor: float = Field(
+        description="k / M — fraction of the term's background that landed in foreground."
+    )
+    pvalue: float = Field(description="Fisher's exact test one-sided p-value (greater).")
+    p_adjust: float = Field(description="BH-adjusted p-value within this cluster's tests.")
+
+    rank_in_cluster: int = Field(
+        description=(
+            "Rank of this term among all terms tested in this cluster, by p_adjust "
+            "ascending. 1 = most significant."
+        ),
+    )
+    n_terms_in_cluster: int = Field(
+        description="Total terms tested in this cluster (denominator for rank_in_cluster)."
+    )
+
+    overlap_genes: list[GeneRef] = Field(
+        description=(
+            "The k locus_tags (foreground ∩ background ∩ term) as GeneRef objects, "
+            "sorted: named genes first (by rank if present, else gene_name), then "
+            "unnamed (by rank if present, else locus_tag)."
+        ),
+    )
+    background_genes: list[GeneRef] = Field(
+        description=(
+            "The M locus_tags (background ∩ term) as GeneRef objects, same sort. "
+            "DE fields populated for any locus_tag present in inputs.gene_stats."
+        ),
+    )
+    overlap_preview_n: int = Field(
+        default=10,
+        description="Max number of overlap genes to inline in the _repr_markdown_ narrative.",
+    )
+
+    def _repr_markdown_(self) -> str:
+        """Rendered in Jupyter; implementation added in Task 5."""
+        raise NotImplementedError("Implemented in Task 5")
 
 
 _REQUIRED_TERM2GENE_COLS = ("term_id", "term_name", "locus_tag")
