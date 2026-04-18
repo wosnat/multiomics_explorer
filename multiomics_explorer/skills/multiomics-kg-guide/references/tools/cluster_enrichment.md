@@ -26,7 +26,6 @@ See docs://analysis/enrichment for methodology.
 | max_cluster_size | int \| None | None | Skip clusters with more members. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for p_adjust. |
 | summary | bool | False | If true, omit results (envelope only). |
-| verbose | bool | False | Include cluster description fields on rows. |
 | limit | int | 5 | Max rows returned. |
 | offset | int | 0 | Skip N rows before limit. |
 
@@ -91,7 +90,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 | count | int | k — cluster genes in pathway (clusterProfiler: Count) |
 | bg_count | int | M — pathway members in cluster's background |
 
-**Verbose-only fields** (included when `verbose=True`):
+**Optional cluster-description fields** (sparse, when cluster metadata is available):
 
 | Field | Type | Description |
 |---|---|---|
@@ -114,25 +113,19 @@ cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_di
 cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, summary=True)
 ```
 
-### Example 3: Verbose with cluster descriptions
-
-```example-call
-cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, verbose=True)
-```
-
-### Example 4: BRITE tree-scoped
+### Example 3: BRITE tree-scoped
 
 ```example-call
 cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="brite", tree="transporters", level=1)
 ```
 
-### Example 5: Organism background instead of cluster union
+### Example 4: Organism background instead of cluster union
 
 ```example-call
 cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1, background="organism")
 ```
 
-### Example 6: From landscape to cluster enrichment
+### Example 5: From landscape to cluster enrichment
 
 ```
 Step 1: list_clustering_analyses(organism="MED4")

@@ -25,7 +25,6 @@ See docs://analysis/enrichment for methodology and examples.
 | timepoint_filter | list[string] \| None | None | Restrict to these timepoint labels. Useful for 10+ timepoint experiments. |
 | growth_phases | list[string] \| None | None | Filter DE results by growth phase(s) before enrichment (case-insensitive). E.g. ['exponential']. |
 | summary | bool | False | If true, omit results (envelope only). |
-| verbose | bool | False | Include foreground_gene_ids + background_gene_ids on rows. |
 | limit | int | 100 | Max rows returned. Default 100 — top hits by p_adjust globally. |
 | offset | int | 0 | Skip N rows before limit. |
 
@@ -93,12 +92,12 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 | bg_count | int | M — pathway members in cluster's background |
 | signed_score | float | sign * -log10(p_adjust); sign from direction (up: +, down: -) |
 
-**Verbose-only fields** (included when `verbose=True`):
+**Optional gene-list fields** (sparse, populated by higher-level callers):
 
 | Field | Type | Description |
 |---|---|---|
-| foreground_gene_ids | list[string] \| None (optional) | Verbose only: the k DE genes in this pathway (clusterProfiler: geneID split) |
-| background_gene_ids | list[string] \| None (optional) | Verbose only: pathway members in background NOT in DE set (non-overlapping complement) |
+| foreground_gene_ids | list[string] \| None (optional) | The k DE genes in this pathway (clusterProfiler: geneID split) |
+| background_gene_ids | list[string] \| None (optional) | Pathway members in background NOT in DE set (non-overlapping complement) |
 
 ## Few-shot examples
 
@@ -120,25 +119,19 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
 pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, summary=True)
 ```
 
-### Example 4: Verbose with gene-id lists
-
-```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, verbose=True)
-```
-
-### Example 5: Scope to specific pathways at a level
+### Example 4: Scope to specific pathways at a level
 
 ```example-call
 pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, term_ids=["cyanorak.role:J", "cyanorak.role:K"])
 ```
 
-### Example 6: BRITE tree-scoped enrichment (transporters)
+### Example 5: BRITE tree-scoped enrichment (transporters)
 
 ```example-call
 pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="brite", tree="transporters", level=1)
 ```
 
-### Example 7: From landscape to enrichment
+### Example 6: From landscape to enrichment
 
 ```
 Step 1: ontology_landscape(organism="MED4", experiment_ids=[...])
