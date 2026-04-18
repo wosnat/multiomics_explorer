@@ -199,6 +199,10 @@ term2gene = to_dataframe(
 df = fisher_ora(gene_sets, background, term2gene)
 ```
 
+**MCP convenience:** The `cluster_enrichment` tool automates this pipeline in a single
+call — pass `analysis_id`, `organism`, `ontology`, and `level`. Background defaults to
+`cluster_union` (all clustered genes). See `docs://tools/cluster_enrichment`.
+
 ---
 
 ## 6. Code example — ortholog-group enrichment (non-DE)
@@ -487,8 +491,9 @@ The column names `gene_ratio`, `bg_ratio`, `rich_factor`, `fold_enrichment`, `co
 `signed_enrichment_score`) in a single MCP call. It is the right choice when you want DE-driven
 ORA from experiment IDs without writing Python.
 
-For any other gene-list source (cluster membership, ortholog groups, custom lists), use the
-Python primitives directly — the MCP tool is wired exclusively to the DE path.
+For cluster-membership enrichment, use the `cluster_enrichment` MCP tool — it automates the
+pattern from §5 in a single call. For ortholog groups or custom gene lists, use the Python
+primitives directly.
 
 Examples, parameter details, and chaining patterns are in `docs://tools/pathway_enrichment`.
 
@@ -572,7 +577,64 @@ The following approaches are not implemented but are natural next steps:
 
 ---
 
-## 17. References
+## 18. `EnrichmentResult` — rich return type
+
+Both `pathway_enrichment` and `cluster_enrichment` return an `EnrichmentResult`
+object (not a dict). `fisher_ora` also returns one when called directly.
+
+**Attributes:**
+- `result.results` — pandas DataFrame, one row per (cluster × term).
+- `result.inputs` — `EnrichmentInputs` (gene_sets, background, cluster_metadata,
+  optional `gene_stats`).
+- `result.term2gene` — DataFrame used for overlap computation and GeneRef data.
+- `result.params` — dict of ORA parameters for reproducibility.
+- `result.kind` — `"pathway"` or `"cluster"`.
+
+**Accessors** (only methods that join results + inputs or compute something
+non-trivial; pure slicing uses `result.results` directly):
+- `explain(cluster, term_id) -> EnrichmentExplanation` — full narrative +
+  Fisher numbers + sorted gene refs. `_repr_markdown_` renders in Jupyter.
+- `overlap_genes(cluster, term_id) -> list[GeneRef]` — the k genes.
+- `background_genes(cluster, term_id) -> list[GeneRef]` — the M genes.
+- `cluster_context(cluster) -> dict` — metadata + n_tests + n_significant.
+- `why_skipped(cluster) -> str | None` — reason from clusters_skipped.
+- `to_compare_cluster_frame() -> pd.DataFrame` — clusterProfiler convention
+  (`Cluster`, `ID`, `Description`, `GeneRatio`, `BgRatio`, `pvalue`, `p.adjust`, `geneID`).
+- `missing_terms() -> dict[str, list[str]]` — term_validation buckets.
+- `generate_summary() -> dict` — aggregate view (no rows, no pagination).
+- `to_envelope(*, summary=False, limit=None, offset=0) -> dict` —
+  MCP-compatible dict. Called internally by MCP tool wrappers; Python
+  callers rarely need it.
+
+**Pydantic models:** `DEStats`, `GeneRef`, `EnrichmentExplanation` — see
+module docstrings for field semantics.
+
+**`term2gene` required vs optional columns:**
+
+| Column | Status | Used by |
+|---|---|---|
+| `term_id` | required | Fisher math |
+| `term_name` | required | Narrative |
+| `locus_tag` | required | Fisher math |
+| `gene_name` | *optional* | `GeneRef.gene_name` (None if absent) |
+| `product` | *optional* | `GeneRef.product` (None if absent) |
+
+Custom-built term2gene works — missing optional columns just yield `None`
+GeneRef fields.
+
+**`fisher_ora` signature change:** takes `EnrichmentInputs` + `term2gene` and
+returns `EnrichmentResult`. Callers without a KG construct `EnrichmentInputs`
+with just `gene_sets`, `background`, `organism_name`; `gene_stats` defaults
+to empty.
+
+**MCP schema change:** the `verbose` parameter was removed from
+`pathway_enrichment` and `cluster_enrichment` tool schemas (it was phantom
+— stripping columns that were never populated). Rich per-row overlap lives
+in the Python API (`.explain()` / accessors).
+
+---
+
+## 19. References
 
 - **yulab-smu biomedical knowledge mining book:**
   https://yulab-smu.top/biomedical-knowledge-mining-book/
