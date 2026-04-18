@@ -876,7 +876,7 @@ class EnrichmentResult:
         )
 
     def _assert_cluster(self, cluster: str) -> None:
-        if cluster not in self.inputs.gene_sets and cluster not in self.inputs.background:
+        if cluster not in self.inputs.gene_sets:
             raise KeyError(
                 f"Cluster {cluster!r} not found. Known: {sorted(self.inputs.gene_sets)}"
             )
