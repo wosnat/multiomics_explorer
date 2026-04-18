@@ -212,8 +212,45 @@ class EnrichmentExplanation(BaseModel):
     )
 
     def _repr_markdown_(self) -> str:
-        """Rendered in Jupyter; implementation added in Task 5."""
-        raise NotImplementedError("Implemented in Task 5")
+        def _fmt_gene(g: "GeneRef") -> str:
+            if g.gene_name:
+                return f"{g.gene_name} ({g.locus_tag})"
+            return g.locus_tag
+
+        md = self.cluster_metadata or {}
+        if self.cluster_kind == "pathway":
+            parts = []
+            if md.get("experiment_id"):
+                parts.append(f"experiment {md['experiment_id']}")
+            if md.get("direction"):
+                parts.append(f"{md['direction']}-regulated")
+            if md.get("timepoint"):
+                parts.append(f"at {md['timepoint']}")
+            context = f" ({', '.join(parts)})" if parts else ""
+        else:
+            parts = []
+            if md.get("analysis_id") or md.get("analysis_name"):
+                parts.append(
+                    f"analysis {md.get('analysis_name') or md.get('analysis_id')}"
+                )
+            if md.get("cluster_type"):
+                parts.append(f"cluster_type={md['cluster_type']}")
+            context = f" ({', '.join(parts)})" if parts else ""
+
+        preview = self.overlap_genes[: self.overlap_preview_n]
+        remainder = max(0, len(self.overlap_genes) - self.overlap_preview_n)
+        overlap_str = ", ".join(_fmt_gene(g) for g in preview)
+        if remainder:
+            overlap_str += f", ... (+{remainder} more)"
+
+        return (
+            f"**{self.term_id}** ({self.term_name}) is enriched in `{self.cluster}`{context}. "
+            f"{self.count} of {self.n_foreground} foreground genes hit this term; "
+            f"{self.bg_count} of {self.n_background} background genes carry it "
+            f"(fold {self.fold_enrichment:.2f}, p.adjust {self.p_adjust:.2e}, "
+            f"rank {self.rank_in_cluster} of {self.n_terms_in_cluster}). "
+            f"Overlap: {overlap_str}."
+        )
 
 
 _REQUIRED_TERM2GENE_COLS = ("term_id", "term_name", "locus_tag")
@@ -903,6 +940,57 @@ class EnrichmentResult:
         term_set = self._term_members(term_id)
         locus_tags = bg & term_set
         return self._build_gene_refs(cluster, locus_tags, term_id)
+
+    def explain(self, cluster: str, term_id: str) -> "EnrichmentExplanation":
+        """Build a full EnrichmentExplanation for (cluster, term_id)."""
+        self._assert_cluster(cluster)
+        self._assert_term(term_id)
+        rows = self.results[
+            (self.results["cluster"] == cluster)
+            & (self.results["term_id"] == term_id)
+        ]
+        if rows.empty:
+            raise KeyError(
+                f"No enrichment row for cluster={cluster!r}, term_id={term_id!r}."
+            )
+        row = rows.iloc[0].to_dict()
+
+        cluster_rows = self.results[self.results["cluster"] == cluster]
+        sorted_cluster = cluster_rows.sort_values("p_adjust").reset_index(drop=True)
+        rank = int(
+            sorted_cluster.index[sorted_cluster["term_id"] == term_id][0] + 1
+        )
+        n_terms = int(len(cluster_rows))
+
+        overlap = self.overlap_genes(cluster, term_id)
+        background = self.background_genes(cluster, term_id)
+
+        fg = set(self.inputs.gene_sets.get(cluster, []))
+        bg = set(self.inputs.background.get(cluster, []))
+        n_fg = len(fg & bg)
+        N = len(bg)
+
+        return EnrichmentExplanation(
+            cluster=cluster,
+            term_id=term_id,
+            term_name=row["term_name"],
+            cluster_kind=self.kind,
+            cluster_metadata=self.inputs.cluster_metadata.get(cluster, {}),
+            count=int(row["count"]),
+            n_foreground=n_fg,
+            bg_count=int(row["bg_count"]),
+            n_background=N,
+            gene_ratio=row["gene_ratio"],
+            bg_ratio=row["bg_ratio"],
+            fold_enrichment=float(row["fold_enrichment"]),
+            rich_factor=float(row["rich_factor"]),
+            pvalue=float(row["pvalue"]),
+            p_adjust=float(row["p_adjust"]),
+            rank_in_cluster=rank,
+            n_terms_in_cluster=n_terms,
+            overlap_genes=overlap,
+            background_genes=background,
+        )
 
     def _build_gene_refs(
         self, cluster: str, locus_tags: set[str], term_id: str,

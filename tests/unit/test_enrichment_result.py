@@ -286,3 +286,71 @@ class TestOverlapAndBackgroundGenes:
         overlap = result.overlap_genes("c1", "P")
         assert all(g.gene_name is None for g in overlap)
         assert all(g.product is None for g in overlap)
+
+
+class TestExplain:
+    def test_explain_returns_explanation(self):
+        from multiomics_explorer import EnrichmentExplanation
+        inputs, t2g, result = _build_simple_result()
+        exp = result.explain("c1", "P")
+        assert isinstance(exp, EnrichmentExplanation)
+        assert exp.cluster == "c1"
+        assert exp.term_id == "P"
+        assert exp.cluster_kind == "pathway"
+
+    def test_explain_fisher_numbers(self):
+        inputs, t2g, result = _build_simple_result()
+        exp = result.explain("c1", "P")
+        assert exp.count == 2
+        assert exp.n_foreground == 2
+        assert exp.bg_count == 3
+        assert exp.n_background == 6
+        assert exp.gene_ratio == "2/2"
+        assert exp.bg_ratio == "3/6"
+
+    def test_explain_overlap_gene_lists_populated(self):
+        inputs, t2g, result = _build_simple_result()
+        exp = result.explain("c1", "P")
+        overlap_lts = [g.locus_tag for g in exp.overlap_genes]
+        assert set(overlap_lts) == {"g1", "g2"}
+        bg_lts = [g.locus_tag for g in exp.background_genes]
+        assert set(bg_lts) == {"g1", "g2", "g3"}
+
+    def test_explain_rank_in_cluster(self):
+        inputs, t2g, result = _build_simple_result()
+        exp_p = result.explain("c1", "P")
+        assert exp_p.rank_in_cluster >= 1
+        assert exp_p.n_terms_in_cluster >= 1
+
+    def test_explain_missing_pair_raises(self):
+        inputs, t2g, result = _build_simple_result()
+        with pytest.raises(KeyError):
+            result.explain("c1", "NOTERM")
+
+    def test_explain_narrative_pathway_substrings(self):
+        inputs, t2g, result = _build_simple_result()
+        exp = result.explain("c1", "P")
+        md = exp._repr_markdown_()
+        assert "P" in md
+        assert "Pathway P" in md
+        assert "geneA" in md
+        assert "2 of 2" in md or "2/2" in md
+        assert "experiment EXP042" in md or "EXP042" in md
+
+    def test_explain_narrative_falls_back_to_locus_tag_when_unnamed(self):
+        from multiomics_explorer import EnrichmentInputs, fisher_ora
+        minimal = pd.DataFrame([
+            {"term_id": "P", "term_name": "P", "locus_tag": "g1"},
+            {"term_id": "P", "term_name": "P", "locus_tag": "g2"},
+            {"term_id": "P", "term_name": "P", "locus_tag": "g3"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"c1": ["g1", "g2"]},
+            background={"c1": ["g1", "g2", "g3", "g4", "g5"]},
+            cluster_metadata={"c1": {"experiment_id": "EXP01"}},
+        )
+        result = fisher_ora(inputs, minimal, min_gene_set_size=0)
+        exp = result.explain("c1", "P")
+        md = exp._repr_markdown_()
+        assert "g1" in md
