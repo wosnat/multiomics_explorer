@@ -3344,7 +3344,13 @@ def cluster_enrichment(
             reason = "empty_gene_set"
         else:
             reason = "no_pathways_in_size_range"
-        skipped.append({"cluster_name": cluster, "reason": reason})
+        md = inputs.cluster_metadata.get(cluster, {})
+        skipped.append({
+            "cluster_id": md.get("cluster_id"),
+            "cluster_name": cluster,
+            "member_count": md.get("member_count"),
+            "reason": reason,
+        })
     result.clusters_skipped = skipped
 
     result.params = _cluster_enrichment_params_dict(
