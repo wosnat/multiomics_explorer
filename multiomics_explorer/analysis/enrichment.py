@@ -76,6 +76,15 @@ class EnrichmentInputs(BaseModel):
         default_factory=dict,
         description="Analysis-level metadata (analysis_id, name, cluster_type, etc.).",
     )
+    gene_stats: dict[str, dict[str, DEStats]] = Field(
+        default_factory=dict,
+        description=(
+            "cluster -> locus_tag -> DEStats. Populated by de_enrichment_inputs "
+            "for every measured gene (not just foreground/significant). Empty for "
+            "cluster_enrichment_inputs. Consumed by GeneRef construction in "
+            "EnrichmentResult accessors."
+        ),
+    )
 
 
 class DEStats(BaseModel):

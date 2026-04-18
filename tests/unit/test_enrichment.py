@@ -37,6 +37,31 @@ class TestEnrichmentInputs:
         assert obj.not_matched == ["wrong_org_exp"]
         assert obj.no_expression == ["empty_de_exp"]
 
+    def test_gene_stats_default_empty(self):
+        from multiomics_explorer import EnrichmentInputs
+        obj = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={}, background={}, cluster_metadata={},
+        )
+        assert obj.gene_stats == {}
+
+    def test_gene_stats_populated(self):
+        from multiomics_explorer import EnrichmentInputs, DEStats
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"c1": ["PMM0001"]},
+            background={"c1": ["PMM0001"]},
+            cluster_metadata={"c1": {}},
+            gene_stats={
+                "c1": {
+                    "PMM0001": DEStats(
+                        log2fc=1.5, padj=0.01, direction="up", significant=True,
+                    ),
+                },
+            },
+        )
+        assert inputs.gene_stats["c1"]["PMM0001"].log2fc == 1.5
+
 
 import math
 import pandas as pd
