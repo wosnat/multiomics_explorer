@@ -251,6 +251,10 @@ class PathwayEnrichmentResponse(BaseModel):
     clusters_skipped: list[PathwayEnrichmentClusterSkipped] = Field(
         default_factory=list, description="Clusters that produced no rows, with reason"
     )
+    enrichment_params: dict | None = Field(
+        default=None,
+        description="ORA parameters used for this call. See docs://analysis/enrichment.",
+    )
     results: list[PathwayEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows (one Fisher test per row)"
     )
@@ -337,8 +341,6 @@ class ClusterEnrichmentResponse(BaseModel):
     ontology: str = Field(description="Ontology used")
     level: int | None = Field(default=None, description="Hierarchy level")
     tree: str | None = Field(default=None, description="BRITE tree (if applicable)")
-    background_mode: str | None = Field(default=None, description="Background mode: cluster_union, organism, explicit")
-    background_size: int | None = Field(default=None, description="N — genes in background")
     total_matching: int = Field(description="Total Fisher tests run")
     returned: int = Field(description="Rows in this response")
     truncated: bool = Field(description="True when total_matching exceeds offset+returned")
@@ -351,7 +353,6 @@ class ClusterEnrichmentResponse(BaseModel):
         default_factory=list, description="Top terms by number of clusters"
     )
     clusters_tested: int = Field(description="Clusters passing size filter")
-    total_terms_tested: int | None = Field(default=None, description="Unique terms in TERM2GENE")
     not_found: list[str] = Field(default_factory=list, description="Analysis IDs absent from KG")
     not_matched: list[str] = Field(default_factory=list, description="Analysis IDs wrong organism")
     clusters_skipped: list[ClusterEnrichmentClusterSkipped] = Field(
@@ -359,6 +360,10 @@ class ClusterEnrichmentResponse(BaseModel):
     )
     term_validation: PathwayEnrichmentTermValidation = Field(
         description="Namespaced passthrough of term_id validation from genes_by_ontology"
+    )
+    enrichment_params: dict | None = Field(
+        default=None,
+        description="ORA parameters used for this call. See docs://analysis/enrichment.",
     )
     results: list[ClusterEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows"

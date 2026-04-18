@@ -35,7 +35,7 @@ See docs://analysis/enrichment for methodology and examples.
 ### Envelope
 
 ```expected-keys
-organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, results
+organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, enrichment_params, results
 ```
 
 - **organism_name** (string): Single organism
@@ -57,6 +57,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 - **no_expression** (list[string]): Experiments matching organism but with no DE rows
 - **term_validation** (PathwayEnrichmentTermValidation): Namespaced passthrough of term_id validation from genes_by_ontology
 - **clusters_skipped** (list[PathwayEnrichmentClusterSkipped]): Clusters that produced no rows, with reason
+- **enrichment_params** (object | None): ORA parameters used for this call. See docs://analysis/enrichment.
 
 ### Per-result fields
 
@@ -92,12 +93,12 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 | bg_count | int | M — pathway members in cluster's background |
 | signed_score | float | sign * -log10(p_adjust); sign from direction (up: +, down: -) |
 
-**Optional gene-list fields** (sparse, populated by higher-level callers):
+**Verbose-only fields** (included when `verbose=True`):
 
 | Field | Type | Description |
 |---|---|---|
-| foreground_gene_ids | list[string] \| None (optional) | The k DE genes in this pathway (clusterProfiler: geneID split) |
-| background_gene_ids | list[string] \| None (optional) | Pathway members in background NOT in DE set (non-overlapping complement) |
+| foreground_gene_ids | list[string] \| None (optional) | Verbose only: the k DE genes in this pathway (clusterProfiler: geneID split) |
+| background_gene_ids | list[string] \| None (optional) | Verbose only: pathway members in background NOT in DE set (non-overlapping complement) |
 
 ## Few-shot examples
 
@@ -183,7 +184,7 @@ pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or
 from multiomics_explorer import pathway_enrichment
 
 result = pathway_enrichment(organism=..., experiment_ids=..., ontology=...)
-# returns dict with keys: organism_name, ontology, level, total_matching, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, results
+# returns dict with keys: organism_name, ontology, level, total_matching, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, enrichment_params, results
 ```
 
 Use package import for bulk data extraction in scripts.
