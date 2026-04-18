@@ -10,6 +10,7 @@ See docs://analysis/enrichment for methodology.
 """
 from __future__ import annotations
 
+import statistics
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -949,7 +950,6 @@ def _envelope_cluster_summary(df, inputs):
             "n_significant_min": 0, "n_significant_median": 0.0, "n_significant_max": 0,
             "universe_size_min": 0, "universe_size_median": 0.0, "universe_size_max": 0,
         }
-    import statistics
     per_cluster = df.groupby("cluster").agg(n_tests=("term_id", "size"))
     n_tests_vals = per_cluster["n_tests"].tolist()
     universe_sizes = [
