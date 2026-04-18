@@ -803,6 +803,50 @@ def cluster_enrichment_inputs(
 from dataclasses import dataclass, field
 
 
+def _gene_ref_from_row(
+    locus_tag: str,
+    t2g_row: dict | None,
+    de_stats: "DEStats | None",
+) -> "GeneRef":
+    """Build a GeneRef from a term2gene row + optional DE stats."""
+    gene_name = None
+    product = None
+    if t2g_row is not None:
+        gn = t2g_row.get("gene_name")
+        if gn is not None and not (isinstance(gn, float) and pd.isna(gn)):
+            gene_name = gn
+        pr = t2g_row.get("product")
+        if pr is not None and not (isinstance(pr, float) and pd.isna(pr)):
+            product = pr
+    kwargs = {"locus_tag": locus_tag, "gene_name": gene_name, "product": product}
+    if de_stats is not None:
+        kwargs.update({
+            "log2fc": de_stats.log2fc,
+            "padj": de_stats.padj,
+            "rank": de_stats.rank,
+            "direction": de_stats.direction,
+            "significant": de_stats.significant,
+        })
+    return GeneRef(**kwargs)
+
+
+def _sort_gene_refs(refs: list["GeneRef"]) -> list["GeneRef"]:
+    """Named genes first; within each group, rank ascending if present, else
+    gene_name (named) / locus_tag (unnamed) alphabetical.
+    """
+    def named_key(r):
+        rank = r.rank if r.rank is not None else 10**9
+        return (rank, (r.gene_name or "").lower())
+
+    def unnamed_key(r):
+        rank = r.rank if r.rank is not None else 10**9
+        return (rank, r.locus_tag)
+
+    named = sorted([r for r in refs if r.gene_name], key=named_key)
+    unnamed = sorted([r for r in refs if not r.gene_name], key=unnamed_key)
+    return named + unnamed
+
+
 @dataclass
 class EnrichmentResult:
     """Rich wrapper around Fisher ORA output. See docs://analysis/enrichment."""
@@ -819,3 +863,64 @@ class EnrichmentResult:
     term_validation: dict = field(default_factory=dict)
     clusters_skipped: list[dict] = field(default_factory=list)
     params: dict = field(default_factory=dict)
+
+    def _term_row(self, term_id: str) -> dict | None:
+        rows = self.term2gene[self.term2gene["term_id"] == term_id]
+        if rows.empty:
+            return None
+        return rows.iloc[0].to_dict()
+
+    def _term_members(self, term_id: str) -> set[str]:
+        return set(
+            self.term2gene[self.term2gene["term_id"] == term_id]["locus_tag"]
+        )
+
+    def _assert_cluster(self, cluster: str) -> None:
+        if cluster not in self.inputs.gene_sets and cluster not in self.inputs.background:
+            raise KeyError(
+                f"Cluster {cluster!r} not found. Known: {sorted(self.inputs.gene_sets)}"
+            )
+
+    def _assert_term(self, term_id: str) -> None:
+        if term_id not in set(self.term2gene["term_id"]):
+            raise KeyError(f"Term {term_id!r} not found in term2gene.")
+
+    def overlap_genes(self, cluster: str, term_id: str) -> list["GeneRef"]:
+        """Return k genes: foreground ∩ background ∩ term, as GeneRefs, sorted."""
+        self._assert_cluster(cluster)
+        self._assert_term(term_id)
+        fg = set(self.inputs.gene_sets.get(cluster, []))
+        bg = set(self.inputs.background.get(cluster, []))
+        term_set = self._term_members(term_id)
+        locus_tags = fg & bg & term_set
+        return self._build_gene_refs(cluster, locus_tags, term_id)
+
+    def background_genes(self, cluster: str, term_id: str) -> list["GeneRef"]:
+        """Return M genes: background ∩ term, as GeneRefs, sorted."""
+        self._assert_cluster(cluster)
+        self._assert_term(term_id)
+        bg = set(self.inputs.background.get(cluster, []))
+        term_set = self._term_members(term_id)
+        locus_tags = bg & term_set
+        return self._build_gene_refs(cluster, locus_tags, term_id)
+
+    def _build_gene_refs(
+        self, cluster: str, locus_tags: set[str], term_id: str,
+    ) -> list["GeneRef"]:
+        t2g_sub = self.term2gene[
+            (self.term2gene["term_id"] == term_id)
+            & (self.term2gene["locus_tag"].isin(locus_tags))
+        ]
+        row_by_lt = {
+            r["locus_tag"]: r.to_dict() for _, r in t2g_sub.iterrows()
+        }
+        cluster_stats = self.inputs.gene_stats.get(cluster, {})
+        refs = [
+            _gene_ref_from_row(
+                lt,
+                row_by_lt.get(lt),
+                cluster_stats.get(lt),
+            )
+            for lt in locus_tags
+        ]
+        return _sort_gene_refs(refs)

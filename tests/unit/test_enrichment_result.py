@@ -153,3 +153,136 @@ class TestFisherOraReturnsResult:
         assert not result.results.empty
         assert result.inputs is inputs
         assert result.term2gene is t2g
+
+
+def _build_simple_result():
+    """Tiny hand-rolled EnrichmentResult with 2 clusters, 2 terms.
+
+    Clusters:
+      c1: foreground = [g1, g2]; background = [g1, g2, g3, g4, g5, g6] (6 genes)
+      c2: foreground = [g1];     background = [g1, g2, g3, g4, g5, g6]
+
+    Terms:
+      P: members = [g1, g2, g3]  -- enriched in c1 (overlap: g1, g2)
+      Q: members = [g4, g5]      -- no overlap with c1 foreground
+
+    gene_name / product populated for g1 (named 'geneA') and g3 (named 'geneC');
+    g2, g4, g5, g6 are unnamed.
+
+    gene_stats populated for c1 only (pathway-kind demo).
+    """
+    from multiomics_explorer import (
+        EnrichmentInputs, EnrichmentResult, fisher_ora, DEStats,
+    )
+
+    term2gene = pd.DataFrame([
+        {"term_id": "P", "term_name": "Pathway P", "locus_tag": "g1",
+         "gene_name": "geneA", "product": "productA"},
+        {"term_id": "P", "term_name": "Pathway P", "locus_tag": "g2",
+         "gene_name": None, "product": None},
+        {"term_id": "P", "term_name": "Pathway P", "locus_tag": "g3",
+         "gene_name": "geneC", "product": "productC"},
+        {"term_id": "Q", "term_name": "Pathway Q", "locus_tag": "g4",
+         "gene_name": None, "product": None},
+        {"term_id": "Q", "term_name": "Pathway Q", "locus_tag": "g5",
+         "gene_name": None, "product": None},
+    ])
+
+    inputs = EnrichmentInputs(
+        organism_name="MED4",
+        gene_sets={"c1": ["g1", "g2"], "c2": ["g1"]},
+        background={
+            "c1": ["g1", "g2", "g3", "g4", "g5", "g6"],
+            "c2": ["g1", "g2", "g3", "g4", "g5", "g6"],
+        },
+        cluster_metadata={
+            "c1": {"experiment_id": "EXP042", "timepoint": "24h", "direction": "up"},
+            "c2": {"experiment_id": "EXP042", "timepoint": "48h", "direction": "up"},
+        },
+        gene_stats={
+            "c1": {
+                "g1": DEStats(log2fc=2.0, padj=0.001, direction="up",
+                              significant=True, rank=1),
+                "g2": DEStats(log2fc=1.5, padj=0.01, direction="up",
+                              significant=True, rank=2),
+                "g3": DEStats(log2fc=0.2, padj=0.8, direction="none",
+                              significant=False),
+            },
+        },
+    )
+
+    result = fisher_ora(inputs, term2gene, min_gene_set_size=0)
+    return inputs, term2gene, result
+
+
+class TestOverlapAndBackgroundGenes:
+    def test_overlap_genes_intersection_and_content(self):
+        inputs, t2g, result = _build_simple_result()
+        overlap = result.overlap_genes("c1", "P")
+        lts = [g.locus_tag for g in overlap]
+        assert set(lts) == {"g1", "g2"}
+
+    def test_overlap_genes_sort_named_first(self):
+        inputs, t2g, result = _build_simple_result()
+        overlap = result.overlap_genes("c1", "P")
+        assert overlap[0].locus_tag == "g1"
+        assert overlap[0].gene_name == "geneA"
+        assert overlap[1].locus_tag == "g2"
+        assert overlap[1].gene_name is None
+
+    def test_background_genes_intersection(self):
+        inputs, t2g, result = _build_simple_result()
+        bg = result.background_genes("c1", "P")
+        lts = [g.locus_tag for g in bg]
+        assert set(lts) == {"g1", "g2", "g3"}
+
+    def test_background_genes_sort_named_by_rank(self):
+        inputs, t2g, result = _build_simple_result()
+        bg = result.background_genes("c1", "P")
+        # Named genes: g1 (rank 1), g3 (no rank in gene_stats -> falls back to name)
+        named = [g for g in bg if g.gene_name is not None]
+        assert named[0].locus_tag == "g1"
+        assert named[1].locus_tag == "g3"
+
+    def test_gene_stats_populated_for_measured_gene(self):
+        inputs, t2g, result = _build_simple_result()
+        overlap = result.overlap_genes("c1", "P")
+        g1 = next(g for g in overlap if g.locus_tag == "g1")
+        assert g1.log2fc == 2.0
+        assert g1.rank == 1
+        assert g1.direction == "up"
+
+    def test_gene_stats_none_for_unmeasured_gene(self):
+        inputs, t2g, result = _build_simple_result()
+        overlap = result.overlap_genes("c2", "P")
+        g1 = next(g for g in overlap if g.locus_tag == "g1")
+        assert g1.log2fc is None
+        assert g1.rank is None
+
+    def test_nonexistent_cluster_raises(self):
+        inputs, t2g, result = _build_simple_result()
+        with pytest.raises(KeyError, match="nonexistent"):
+            result.overlap_genes("nonexistent", "P")
+
+    def test_nonexistent_term_raises(self):
+        inputs, t2g, result = _build_simple_result()
+        with pytest.raises(KeyError, match="NOTERM"):
+            result.overlap_genes("c1", "NOTERM")
+
+    def test_missing_optional_columns(self):
+        from multiomics_explorer import EnrichmentInputs, fisher_ora
+        minimal = pd.DataFrame([
+            {"term_id": "P", "term_name": "P", "locus_tag": "g1"},
+            {"term_id": "P", "term_name": "P", "locus_tag": "g2"},
+            {"term_id": "P", "term_name": "P", "locus_tag": "g3"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"c1": ["g1", "g2"]},
+            background={"c1": ["g1", "g2", "g3", "g4", "g5"]},
+            cluster_metadata={"c1": {}},
+        )
+        result = fisher_ora(inputs, minimal, min_gene_set_size=0)
+        overlap = result.overlap_genes("c1", "P")
+        assert all(g.gene_name is None for g in overlap)
+        assert all(g.product is None for g in overlap)
