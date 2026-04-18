@@ -1012,3 +1012,62 @@ class EnrichmentResult:
             for lt in locus_tags
         ]
         return _sort_gene_refs(refs)
+
+    def cluster_context(self, cluster: str) -> dict:
+        """inputs.cluster_metadata[cluster] + n_tests/n_significant from results."""
+        self._assert_cluster(cluster)
+        md = dict(self.inputs.cluster_metadata.get(cluster, {}))
+        sub = self.results[self.results["cluster"] == cluster]
+        md["n_tests"] = int(len(sub))
+        pvc = self.params.get("pvalue_cutoff", 0.05)
+        md["n_significant"] = int((sub["p_adjust"] < pvc).sum()) if not sub.empty else 0
+        return md
+
+    def why_skipped(self, cluster: str) -> str | None:
+        """Reason from clusters_skipped, or None if cluster produced results."""
+        for entry in self.clusters_skipped:
+            if (
+                entry.get("cluster_name") == cluster
+                or entry.get("cluster") == cluster
+                or entry.get("cluster_id") == cluster
+            ):
+                return entry.get("reason")
+        return None
+
+    def missing_terms(self) -> dict[str, list[str]]:
+        """Return term_validation buckets."""
+        return {
+            "not_found": list(self.term_validation.get("not_found", [])),
+            "wrong_ontology": list(self.term_validation.get("wrong_ontology", [])),
+            "wrong_level": list(self.term_validation.get("wrong_level", [])),
+            "filtered_out": list(self.term_validation.get("filtered_out", [])),
+        }
+
+    def to_compare_cluster_frame(self) -> pd.DataFrame:
+        """Rename columns to clusterProfiler compareCluster convention.
+
+        Columns: Cluster, ID, Description, GeneRatio, BgRatio, pvalue,
+        p.adjust, geneID. geneID is '/'-joined locus_tags of the overlap.
+        """
+        if self.results.empty:
+            return pd.DataFrame(columns=[
+                "Cluster", "ID", "Description", "GeneRatio", "BgRatio",
+                "pvalue", "p.adjust", "geneID",
+            ])
+
+        rows = []
+        for _, row in self.results.iterrows():
+            overlap_lts = [
+                g.locus_tag for g in self.overlap_genes(row["cluster"], row["term_id"])
+            ]
+            rows.append({
+                "Cluster": row["cluster"],
+                "ID": row["term_id"],
+                "Description": row["term_name"],
+                "GeneRatio": row["gene_ratio"],
+                "BgRatio": row["bg_ratio"],
+                "pvalue": row["pvalue"],
+                "p.adjust": row["p_adjust"],
+                "geneID": "/".join(overlap_lts),
+            })
+        return pd.DataFrame(rows)

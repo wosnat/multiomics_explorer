@@ -354,3 +354,59 @@ class TestExplain:
         exp = result.explain("c1", "P")
         md = exp._repr_markdown_()
         assert "g1" in md
+
+
+class TestNiceAccessors:
+    def test_cluster_context_returns_metadata_plus_counts(self):
+        inputs, t2g, result = _build_simple_result()
+        ctx = result.cluster_context("c1")
+        assert ctx["experiment_id"] == "EXP042"
+        assert "n_tests" in ctx
+        assert "n_significant" in ctx
+        assert ctx["n_tests"] >= 1
+
+    def test_why_skipped_none_for_active_cluster(self):
+        inputs, t2g, result = _build_simple_result()
+        assert result.why_skipped("c1") is None
+
+    def test_why_skipped_returns_reason_for_skipped(self):
+        from multiomics_explorer import (
+            EnrichmentInputs, EnrichmentResult, fisher_ora,
+        )
+        t2g = pd.DataFrame([
+            {"term_id": "P", "term_name": "P", "locus_tag": "g1"},
+            {"term_id": "P", "term_name": "P", "locus_tag": "g2"},
+            {"term_id": "P", "term_name": "P", "locus_tag": "g3"},
+        ])
+        inputs = EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"c1": ["g1"]},
+            background={"c1": ["g1", "g2", "g3"]},
+            cluster_metadata={"c1": {}, "c_skipped": {}},
+            clusters_skipped=[
+                {"cluster_name": "c_skipped", "reason": "below min_cluster_size"},
+            ],
+        )
+        result = fisher_ora(inputs, t2g, min_gene_set_size=0)
+        result.clusters_skipped = inputs.clusters_skipped
+        assert result.why_skipped("c_skipped") == "below min_cluster_size"
+
+    def test_missing_terms(self):
+        inputs, t2g, result = _build_simple_result()
+        result.term_validation = {
+            "not_found": ["GO:FAKE"],
+            "wrong_ontology": [],
+            "wrong_level": [],
+            "filtered_out": [],
+        }
+        missing = result.missing_terms()
+        assert missing["not_found"] == ["GO:FAKE"]
+
+    def test_to_compare_cluster_frame_columns(self):
+        inputs, t2g, result = _build_simple_result()
+        df = result.to_compare_cluster_frame()
+        expected = {
+            "Cluster", "ID", "Description", "GeneRatio", "BgRatio",
+            "pvalue", "p.adjust", "geneID",
+        }
+        assert expected.issubset(set(df.columns))
