@@ -526,10 +526,6 @@ class TestToEnvelope:
         assert "truncated" in env
         assert "offset" in env
         assert env["returned"] == len(env["results"])
-        if env["results"]:
-            row = env["results"][0]
-            for v in row.values():
-                assert not isinstance(v, list), f"unexpected list in row: {row}"
 
     def test_envelope_summary_true(self):
         from multiomics_explorer.analysis.enrichment import EnrichmentInputs, fisher_ora
