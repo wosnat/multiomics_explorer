@@ -678,6 +678,43 @@ def de_enrichment_inputs(
     for cluster in background:
         gene_sets.setdefault(cluster, [])
 
+    # Build gene_stats: cluster -> locus_tag -> DEStats (every measured gene).
+    gene_stats: dict[str, dict[str, DEStats]] = {}
+    for row in de_full.get("results", []):
+        tp = _normalize_timepoint(row.get("timepoint"))
+        if timepoint_filter is not None and tp not in set(timepoint_filter):
+            continue
+        if _gp_filter is not None:
+            gp = (row.get("growth_phase") or "").lower()
+            if gp not in _gp_filter:
+                continue
+        row_direction = row.get("direction") or _STATUS_TO_DIR.get(
+            row.get("expression_status", ""), None
+        )
+        if row_direction not in ("up", "down"):
+            continue
+        exp_id = row.get("experiment_id")
+        cluster = f"{exp_id}|{tp}|{row_direction}"
+        locus_tag = row.get("locus_tag")
+        if not locus_tag:
+            continue
+        log2fc = row.get("log2fc") if row.get("log2fc") is not None else row.get("log2_fc")
+        padj = row.get("padj") if row.get("padj") is not None else row.get("p_adjust")
+        if log2fc is None or padj is None:
+            continue
+        is_significant = bool(
+            row.get("significant")
+            or (row.get("expression_status", "") not in ("not_significant", ""))
+        )
+        de_direction = row_direction if is_significant else "none"
+        gene_stats.setdefault(cluster, {})[locus_tag] = DEStats(
+            log2fc=float(log2fc),
+            padj=float(padj),
+            rank=row.get("rank"),
+            direction=de_direction,
+            significant=is_significant,
+        )
+
     return EnrichmentInputs(
         organism_name=de_full.get("organism_name", organism),
         gene_sets=gene_sets,
@@ -686,6 +723,7 @@ def de_enrichment_inputs(
         not_found=list(de_full.get("not_found", []) or []),
         not_matched=list(de_full.get("not_matched", []) or []),
         no_expression=list(de_full.get("no_expression", []) or []),
+        gene_stats=gene_stats,
     )
 
 

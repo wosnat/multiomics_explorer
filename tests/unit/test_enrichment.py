@@ -392,6 +392,39 @@ class TestDeEnrichmentInputs:
         )
         assert set(out.gene_sets.keys()) == {"exp1|T4|up"}
 
+    def test_gene_stats_populated_for_all_measured_genes(self, monkeypatch):
+        """gene_stats includes measured genes regardless of significance."""
+        from multiomics_explorer import de_enrichment_inputs
+        from multiomics_explorer.analysis import enrichment as _mod
+
+        fake_rows = [
+            {"locus_tag": "g1", "experiment_id": "E1", "timepoint": "T0",
+             "direction": "up", "significant": True,
+             "log2fc": 2.0, "padj": 0.001, "rank": 1,
+             "organism_name": "MED4"},
+            {"locus_tag": "g2", "experiment_id": "E1", "timepoint": "T0",
+             "direction": "up", "significant": False,
+             "log2fc": 0.5, "padj": 0.8, "rank": 50,
+             "organism_name": "MED4"},
+        ]
+        monkeypatch.setattr(_mod, "_call_de", lambda **_: {
+            "organism_name": "MED4", "results": fake_rows,
+            "not_found": [], "not_matched": [], "no_expression": [],
+        })
+        out = de_enrichment_inputs(
+            experiment_ids=["E1"],
+            organism="MED4",
+            direction="both",
+            significant_only=True,
+        )
+        cluster = "E1|T0|up"
+        assert cluster in out.gene_stats
+        assert "g1" in out.gene_stats[cluster]
+        assert "g2" in out.gene_stats[cluster]
+        assert out.gene_stats[cluster]["g1"].log2fc == 2.0
+        assert out.gene_stats[cluster]["g1"].significant is True
+        assert out.gene_stats[cluster]["g2"].significant is False
+
 
 import inspect
 import re
