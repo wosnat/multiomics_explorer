@@ -25,7 +25,6 @@ See docs://analysis/enrichment for methodology and examples.
 | timepoint_filter | list[string] \| None | None | Restrict to these timepoint labels. Useful for 10+ timepoint experiments. |
 | growth_phases | list[string] \| None | None | Filter DE results by growth phase(s) before enrichment (case-insensitive). E.g. ['exponential']. |
 | summary | bool | False | If true, omit results (envelope only). |
-| verbose | bool | False | Include foreground_gene_ids + background_gene_ids on rows. |
 | limit | int | 100 | Max rows returned. Default 100 — top hits by p_adjust globally. |
 | offset | int | 0 | Skip N rows before limit. |
 
@@ -36,7 +35,7 @@ See docs://analysis/enrichment for methodology and examples.
 ### Envelope
 
 ```expected-keys
-organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, results
+organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, enrichment_params, results
 ```
 
 - **organism_name** (string): Single organism
@@ -58,6 +57,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 - **no_expression** (list[string]): Experiments matching organism but with no DE rows
 - **term_validation** (PathwayEnrichmentTermValidation): Namespaced passthrough of term_id validation from genes_by_ontology
 - **clusters_skipped** (list[PathwayEnrichmentClusterSkipped]): Clusters that produced no rows, with reason
+- **enrichment_params** (object | None): ORA parameters used for this call. See docs://analysis/enrichment.
 
 ### Per-result fields
 
@@ -120,25 +120,19 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
 pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, summary=True)
 ```
 
-### Example 4: Verbose with gene-id lists
-
-```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, verbose=True)
-```
-
-### Example 5: Scope to specific pathways at a level
+### Example 4: Scope to specific pathways at a level
 
 ```example-call
 pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, term_ids=["cyanorak.role:J", "cyanorak.role:K"])
 ```
 
-### Example 6: BRITE tree-scoped enrichment (transporters)
+### Example 5: BRITE tree-scoped enrichment (transporters)
 
 ```example-call
 pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="brite", tree="transporters", level=1)
 ```
 
-### Example 7: From landscape to enrichment
+### Example 6: From landscape to enrichment
 
 ```
 Step 1: ontology_landscape(organism="MED4", experiment_ids=[...])
@@ -190,7 +184,7 @@ pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or
 from multiomics_explorer import pathway_enrichment
 
 result = pathway_enrichment(organism=..., experiment_ids=..., ontology=...)
-# returns dict with keys: organism_name, ontology, level, total_matching, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, results
+# returns dict with keys: organism_name, ontology, level, total_matching, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, enrichment_params, results
 ```
 
 Use package import for bulk data extraction in scripts.

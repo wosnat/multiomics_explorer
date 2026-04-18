@@ -3801,10 +3801,11 @@ class TestPathwayEnrichment:
             f, "genes_by_ontology",
             lambda **_: self._stub_gbo_result(),
         )
-        out = pathway_enrichment(
+        result = pathway_enrichment(
             organism="MED4", experiment_ids=["exp1"],
             ontology="cyanorak_role", level=1,
         )
+        out = result.to_envelope()
         assert out["total_matching"] == 0
         assert out["results"] == []
         assert out["not_found"] == ["exp1"]
@@ -3824,11 +3825,12 @@ class TestPathwayEnrichment:
                 wrong_level=["wrong_level_term"],
             ),
         )
-        out = pathway_enrichment(
+        result = pathway_enrichment(
             organism="MED4", experiment_ids=["exp1"],
             ontology="cyanorak_role", level=1,
             term_ids=["missing_term", "wrong_level_term"],
         )
+        out = result.to_envelope()
         assert out["term_validation"]["not_found"] == ["missing_term"]
         assert out["term_validation"]["wrong_level"] == ["wrong_level_term"]
 
@@ -3843,10 +3845,11 @@ class TestPathwayEnrichment:
             f, "genes_by_ontology",
             lambda **_: self._stub_gbo_result(),
         )
-        out = pathway_enrichment(
+        result = pathway_enrichment(
             organism="MED4", experiment_ids=["exp1"],
             ontology="cyanorak_role", level=1,
         )
+        out = result.to_envelope()
         assert out["organism_name"] == "MED4"
         assert out["ontology"] == "cyanorak_role"
         assert out["level"] == 1
@@ -4088,9 +4091,11 @@ class TestClusterEnrichment:
     @staticmethod
     def _stub_inputs(gene_sets=None, not_found=(), not_matched=()):
         from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+        if gene_sets is None:
+            gene_sets = {"Cluster A": ["PMM0001", "PMM0002"]}
         return EnrichmentInputs(
             organism_name="MED4",
-            gene_sets=gene_sets or {"Cluster A": ["PMM0001", "PMM0002"]},
+            gene_sets=gene_sets,
             background={"Cluster A": ["PMM0001", "PMM0002", "PMM0003"]},
             cluster_metadata={"Cluster A": {
                 "cluster_id": "gc:1", "cluster_name": "Cluster A",
@@ -4130,8 +4135,9 @@ class TestClusterEnrichment:
             analysis_id="ca:missing", organism="MED4",
             ontology="cyanorak_role", level=1,
         )
-        assert result["not_found"] == ["ca:missing"]
-        assert result["results"] == []
+        envelope = result.to_envelope()
+        assert envelope["not_found"] == ["ca:missing"]
+        assert envelope["results"] == []
 
     def test_orchestration_produces_envelope(self, monkeypatch):
         from multiomics_explorer.api import cluster_enrichment
@@ -4155,8 +4161,79 @@ class TestClusterEnrichment:
             ontology="cyanorak_role", level=1,
             pvalue_cutoff=0.99,
         )
-        assert "total_matching" in result
-        assert "returned" in result
-        assert "analysis_id" in result
-        assert "organism_name" in result
-        assert isinstance(result["results"], list)
+        envelope = result.to_envelope()
+        assert "total_matching" in envelope
+        assert "returned" in envelope
+        assert "analysis_id" in envelope
+        assert "organism_name" in envelope
+        assert isinstance(envelope["results"], list)
+
+    def test_cluster_skip_dict_shape_matches_pydantic_model(self):
+        """Regression: post-Fisher skip dicts must include cluster_id (required
+        by ClusterEnrichmentClusterSkipped) so ClusterEnrichmentResponse(**envelope)
+        doesn't raise ValidationError."""
+        from multiomics_explorer.mcp_server.tools import ClusterEnrichmentClusterSkipped
+
+        skip = {
+            "cluster_id": "gc:1",
+            "cluster_name": "Cluster A",
+            "member_count": 5,
+            "reason": "no_pathways_in_size_range",
+        }
+        model = ClusterEnrichmentClusterSkipped(**skip)
+        assert model.cluster_id == "gc:1"
+        assert model.cluster_name == "Cluster A"
+        assert model.reason == "no_pathways_in_size_range"
+
+    def test_post_fisher_skip_populates_cluster_id(self, monkeypatch):
+        """Regression: when a cluster passes size filter but yields no Fisher rows,
+        the post-Fisher skip must include cluster_id so the Pydantic envelope
+        roundtrip succeeds."""
+        from multiomics_explorer.api import cluster_enrichment
+        from multiomics_explorer.mcp_server.tools import ClusterEnrichmentResponse
+        import multiomics_explorer.analysis.enrichment as enr
+        import multiomics_explorer.api.functions as f
+
+        # Cluster B has members in gene_sets and background but no matching
+        # ontology terms → yields no Fisher rows → falls into post-Fisher skip.
+        def _stub_inputs(**_):
+            from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+            return EnrichmentInputs(
+                organism_name="MED4",
+                gene_sets={"Cluster B": ["PMM0010", "PMM0011"]},
+                background={"Cluster B": ["PMM0010", "PMM0011", "PMM0012"]},
+                cluster_metadata={"Cluster B": {
+                    "cluster_id": "gc:99", "cluster_name": "Cluster B",
+                    "member_count": 2,
+                }},
+                not_found=[], not_matched=[], no_expression=[],
+                clusters_skipped=[],
+                analysis_metadata={
+                    "analysis_id": "ca:test2", "analysis_name": "Test2",
+                    "cluster_method": "kmeans", "cluster_type": "diel_cycle",
+                    "omics_type": "transcriptomics",
+                    "treatment_type": ["light_dark"],
+                    "background_factors": [], "growth_phases": [],
+                    "experiment_ids": ["exp:1"],
+                },
+            )
+
+        monkeypatch.setattr(enr, "cluster_enrichment_inputs", _stub_inputs)
+        # Return empty term2gene rows — no Fisher rows produced for Cluster B.
+        monkeypatch.setattr(
+            f, "genes_by_ontology",
+            lambda **_: self._stub_gbo_result([]),
+        )
+
+        result = cluster_enrichment(
+            analysis_id="ca:test2", organism="MED4",
+            ontology="cyanorak_role", level=1,
+            pvalue_cutoff=0.99,
+        )
+        envelope = result.to_envelope()
+        # Before the fix this would raise pydantic ValidationError (missing cluster_id).
+        response = ClusterEnrichmentResponse(**envelope)
+        skips = response.clusters_skipped
+        assert len(skips) == 1
+        assert skips[0].cluster_id == "gc:99"
+        assert skips[0].cluster_name == "Cluster B"

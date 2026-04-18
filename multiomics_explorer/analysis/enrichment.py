@@ -10,6 +10,9 @@ See docs://analysis/enrichment for methodology.
 """
 from __future__ import annotations
 
+import statistics
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 import pandas as pd
@@ -74,43 +77,209 @@ class EnrichmentInputs(BaseModel):
         default_factory=dict,
         description="Analysis-level metadata (analysis_id, name, cluster_type, etc.).",
     )
+    gene_stats: dict[str, dict[str, DEStats]] = Field(
+        default_factory=dict,
+        description=(
+            "cluster -> locus_tag -> DEStats. Populated by de_enrichment_inputs "
+            "for every measured gene (not just foreground/significant). Empty for "
+            "cluster_enrichment_inputs. Consumed by GeneRef construction in "
+            "EnrichmentResult accessors."
+        ),
+    )
+
+
+class DEStats(BaseModel):
+    """Differential-expression statistics for one gene in one experiment × timepoint."""
+
+    log2fc: float = Field(
+        description="log2 fold change from DE analysis."
+    )
+    padj: float = Field(
+        description="BH-adjusted p-value from the source DE table."
+    )
+    rank: int | None = Field(
+        default=None,
+        description=(
+            "Rank by |log2FC| within the experiment × timepoint. 1 = strongest. "
+            "None when the source DE tool didn't emit a rank."
+        ),
+    )
+    direction: Literal["up", "down", "none"] = Field(
+        description="'up', 'down', or 'none' (not significant)."
+    )
+    significant: bool = Field(
+        description="Whether the gene meets the experiment's significance threshold."
+    )
+
+
+class GeneRef(BaseModel):
+    """A gene referenced in an enrichment result — locus_tag plus optional name/product/DE stats."""
+
+    locus_tag: str = Field(
+        description="Primary gene identifier, e.g. 'PMM0712'."
+    )
+    gene_name: str | None = Field(
+        default=None,
+        description=(
+            "Short gene name (e.g. 'pstS') from term2gene's gene_name column. "
+            "None when term2gene lacks the column or the cell is null."
+        ),
+    )
+    product: str | None = Field(
+        default=None,
+        description=(
+            "Gene product description (e.g. 'phosphate ABC transporter'). "
+            "None when term2gene lacks the column or the cell is null."
+        ),
+    )
+    log2fc: float | None = Field(
+        default=None, description="log2 fold change; None outside the DE path."
+    )
+    padj: float | None = Field(
+        default=None, description="BH-adjusted p-value; None outside the DE path."
+    )
+    rank: int | None = Field(
+        default=None,
+        description="Rank by |log2FC| within experiment × timepoint; None outside the DE path.",
+    )
+    direction: Literal["up", "down", "none"] | None = Field(
+        default=None, description="DE direction; None outside the DE path."
+    )
+    significant: bool | None = Field(
+        default=None, description="DE significance flag; None outside the DE path."
+    )
+
+
+class EnrichmentExplanation(BaseModel):
+    """Single (cluster, term_id) pair explained: Fisher numbers, ranking, gene lists, narrative."""
+
+    cluster: str = Field(description="Cluster identifier from EnrichmentInputs.gene_sets.")
+    term_id: str = Field(description="Ontology term identifier (e.g. 'GO:0006810').")
+    term_name: str = Field(description="Human-readable term name (e.g. 'transport').")
+    cluster_kind: Literal["pathway", "cluster"] = Field(
+        description=(
+            "Which enrichment path produced this result — dispatches the narrative "
+            "wording. 'pathway' = DE-driven; 'cluster' = clustering-analysis-driven."
+        ),
+    )
+    cluster_metadata: dict = Field(
+        description=(
+            "Cluster-specific context. For pathway kind: experiment_id, timepoint, "
+            "direction, omics_type, table_scope, treatment_type, background_factors. "
+            "For cluster kind: analysis_id, analysis_name, cluster_type, treatment, "
+            "experimental_context."
+        ),
+    )
+
+    count: int = Field(description="k — genes in foreground ∩ background ∩ term.")
+    n_foreground: int = Field(description="n — genes in foreground ∩ background.")
+    bg_count: int = Field(description="M — genes in background ∩ term.")
+    n_background: int = Field(description="N — total genes in background.")
+    gene_ratio: str = Field(description="Pretty 'k/n' string (e.g. '12/87').")
+    bg_ratio: str = Field(description="Pretty 'M/N' string (e.g. '210/2340').")
+    fold_enrichment: float = Field(description="(k/n) / (M/N) — observed over expected.")
+    rich_factor: float = Field(
+        description="k / M — fraction of the term's background that landed in foreground."
+    )
+    pvalue: float = Field(description="Fisher's exact test one-sided p-value (greater).")
+    p_adjust: float = Field(description="BH-adjusted p-value within this cluster's tests.")
+
+    rank_in_cluster: int = Field(
+        description=(
+            "Rank of this term among all terms tested in this cluster, by p_adjust "
+            "ascending. 1 = most significant."
+        ),
+    )
+    n_terms_in_cluster: int = Field(
+        description="Total terms tested in this cluster (denominator for rank_in_cluster)."
+    )
+
+    overlap_genes: list[GeneRef] = Field(
+        description=(
+            "The k locus_tags (foreground ∩ background ∩ term) as GeneRef objects, "
+            "sorted: named genes first (by rank if present, else gene_name), then "
+            "unnamed (by rank if present, else locus_tag)."
+        ),
+    )
+    background_genes: list[GeneRef] = Field(
+        description=(
+            "The M locus_tags (background ∩ term) as GeneRef objects, same sort. "
+            "DE fields populated for any locus_tag present in inputs.gene_stats."
+        ),
+    )
+    overlap_preview_n: int = Field(
+        default=10,
+        description="Max number of overlap genes to inline in the _repr_markdown_ narrative.",
+    )
+
+    def _repr_markdown_(self) -> str:
+        def _fmt_gene(g: "GeneRef") -> str:
+            if g.gene_name:
+                return f"{g.gene_name} ({g.locus_tag})"
+            return g.locus_tag
+
+        md = self.cluster_metadata or {}
+        if self.cluster_kind == "pathway":
+            parts = []
+            if md.get("experiment_id"):
+                parts.append(f"experiment {md['experiment_id']}")
+            if md.get("direction"):
+                parts.append(f"{md['direction']}-regulated")
+            if md.get("timepoint"):
+                parts.append(f"at {md['timepoint']}")
+            context = f" ({', '.join(parts)})" if parts else ""
+        else:
+            parts = []
+            if md.get("analysis_id") or md.get("analysis_name"):
+                parts.append(
+                    f"analysis {md.get('analysis_name') or md.get('analysis_id')}"
+                )
+            if md.get("cluster_type"):
+                parts.append(f"cluster_type={md['cluster_type']}")
+            context = f" ({', '.join(parts)})" if parts else ""
+
+        preview = self.overlap_genes[: self.overlap_preview_n]
+        remainder = max(0, len(self.overlap_genes) - self.overlap_preview_n)
+        overlap_str = ", ".join(_fmt_gene(g) for g in preview)
+        if remainder:
+            overlap_str += f", ... (+{remainder} more)"
+
+        return (
+            f"**{self.term_id}** ({self.term_name}) is enriched in `{self.cluster}`{context}. "
+            f"{self.count} of {self.n_foreground} foreground genes hit this term; "
+            f"{self.bg_count} of {self.n_background} background genes carry it "
+            f"(fold {self.fold_enrichment:.2f}, p.adjust {self.p_adjust:.2e}, "
+            f"rank {self.rank_in_cluster} of {self.n_terms_in_cluster}). "
+            f"Overlap: {overlap_str}."
+        )
 
 
 _REQUIRED_TERM2GENE_COLS = ("term_id", "term_name", "locus_tag")
 
 
 def fisher_ora(
-    gene_sets: dict[str, list[str]],
-    background: dict[str, list[str]] | list[str],
+    inputs: "EnrichmentInputs",
     term2gene: pd.DataFrame,
+    *,
     min_gene_set_size: int = 5,
     max_gene_set_size: int | None = 500,
-) -> pd.DataFrame:
-    """Run Fisher-exact over-representation analysis (ORA) per (cluster, term).
+) -> "EnrichmentResult":
+    """Run Fisher-exact ORA and return an EnrichmentResult.
 
-    The enrichment primitive. Direction-agnostic; gene-list-agnostic. Callers
-    supply gene sets (one per cluster), per-cluster or shared backgrounds,
-    and a TERM2GENE DataFrame (from genes_by_ontology via to_dataframe, from
-    clusterProfiler, or hand-built). Returns one row per (cluster x term)
-    pair that passes the per-cluster M size filter.
-
-    Does NOT compute ``signed_score`` — that requires direction information
-    this primitive doesn't know about. Attach a ``direction`` column and
-    pass through ``signed_enrichment_score`` or compute ``sign * -log10(p)``
-    directly.
+    See docs://analysis/enrichment for methodology. Users can construct an
+    EnrichmentInputs directly (passing gene_sets, background, organism_name,
+    optional gene_stats) — no KG required. Gene name/product for accessors
+    comes from term2gene rows.
 
     Parameters
     ----------
-    gene_sets : dict[str, list[str]]
-        Cluster name -> foreground locus_tags. Convention for the DE path is
-        ``"{experiment_id}|{timepoint}|{direction}"`` keys.
-    background : dict[str, list[str]] | list[str]
-        Per-cluster background (dict keyed by cluster) or a single shared
-        universe (list, broadcast to every cluster).
+    inputs : EnrichmentInputs
+        Gene sets + per-cluster backgrounds + cluster metadata + optional
+        gene_stats (DE-specific).
     term2gene : pandas.DataFrame
-        Required columns: ``term_id``, ``term_name``, ``locus_tag``. Extra
-        columns pass through to result rows. Idiomatic source is
-        ``to_dataframe(genes_by_ontology(...))``.
+        Required columns: term_id, term_name, locus_tag.
+        Optional: gene_name, product (used by GeneRef accessors).
+        Extra columns pass through to result rows.
     min_gene_set_size : int, default 5
         Per-cluster M filter: drop (cluster, term) pairs where the pathway
         has fewer than this many members in the cluster's background.
@@ -120,13 +289,8 @@ def fisher_ora(
 
     Returns
     -------
-    pandas.DataFrame
-        Long-format, compareCluster-compatible. Columns: ``cluster``,
-        ``term_id``, ``term_name``, ``gene_ratio``, ``gene_ratio_numeric``,
-        ``bg_ratio``, ``bg_ratio_numeric``, ``rich_factor``,
-        ``fold_enrichment``, ``pvalue``, ``p_adjust``, ``count``,
-        ``bg_count``, plus passthrough columns from ``term2gene``. See
-        docs://analysis/enrichment for field meanings.
+    EnrichmentResult
+        Holds the Fisher DataFrame plus inputs and term2gene for accessor use.
 
     Raises
     ------
@@ -137,19 +301,23 @@ def fisher_ora(
 
     Examples
     --------
-    >>> from multiomics_explorer import fisher_ora
+    >>> from multiomics_explorer import fisher_ora, EnrichmentInputs
     >>> from multiomics_explorer.api import genes_by_ontology
     >>> from multiomics_explorer.analysis.frames import to_dataframe
     >>> term2gene = to_dataframe(genes_by_ontology(
     ...     ontology="cyanorak_role", organism="MED4", level=1,
     ... ))
-    >>> gene_sets = {"treatment_up": ["PMM0123", "PMM0456"]}
-    >>> background = ["PMM0001", "PMM0002"]  # truncated
-    >>> df = fisher_ora(gene_sets, background, term2gene)  # doctest: +SKIP
+    >>> inputs = EnrichmentInputs(
+    ...     organism_name="MED4",
+    ...     gene_sets={"treatment_up": ["PMM0123", "PMM0456"]},
+    ...     background={"treatment_up": ["PMM0001", "PMM0002"]},
+    ...     cluster_metadata={"treatment_up": {}},
+    ... )
+    >>> result = fisher_ora(inputs, term2gene)  # doctest: +SKIP
 
     See Also
     --------
-    de_enrichment_inputs : Build gene_sets + background from DE results.
+    de_enrichment_inputs : Build EnrichmentInputs from DE results.
     signed_enrichment_score : Collapse up/down cluster pairs into a signed score.
     multiomics_explorer.api.genes_by_ontology : Canonical TERM2GENE source.
     """
@@ -164,14 +332,21 @@ def fisher_ora(
             f"max_gene_set_size ({max_gene_set_size}) must be >= "
             f"min_gene_set_size ({min_gene_set_size})."
         )
-    if isinstance(background, list):
-        background = {c: list(background) for c in gene_sets}
-    return _fisher_ora_impl(
-        gene_sets=gene_sets,
-        background=background,
+    df = _fisher_ora_impl(
+        gene_sets=inputs.gene_sets,
+        background=inputs.background,
         term2gene=term2gene,
         min_gene_set_size=min_gene_set_size,
         max_gene_set_size=max_gene_set_size,
+    )
+    return EnrichmentResult(
+        kind="pathway",
+        organism_name=inputs.organism_name,
+        ontology=None,
+        level=None,
+        results=df,
+        inputs=inputs,
+        term2gene=term2gene,
     )
 
 
@@ -503,6 +678,43 @@ def de_enrichment_inputs(
     for cluster in background:
         gene_sets.setdefault(cluster, [])
 
+    # Build gene_stats: cluster -> locus_tag -> DEStats (every measured gene).
+    gene_stats: dict[str, dict[str, DEStats]] = {}
+    for row in de_full.get("results", []):
+        tp = _normalize_timepoint(row.get("timepoint"))
+        if timepoint_filter is not None and tp not in set(timepoint_filter):
+            continue
+        if _gp_filter is not None:
+            gp = (row.get("growth_phase") or "").lower()
+            if gp not in _gp_filter:
+                continue
+        row_direction = row.get("direction") or _STATUS_TO_DIR.get(
+            row.get("expression_status", ""), None
+        )
+        if row_direction not in ("up", "down"):
+            continue
+        exp_id = row.get("experiment_id")
+        cluster = f"{exp_id}|{tp}|{row_direction}"
+        locus_tag = row.get("locus_tag")
+        if not locus_tag:
+            continue
+        log2fc = row.get("log2fc") if row.get("log2fc") is not None else row.get("log2_fc")
+        padj = row.get("padj") if row.get("padj") is not None else row.get("p_adjust")
+        if log2fc is None or padj is None:
+            continue
+        is_significant = bool(
+            row.get("significant")
+            or (row.get("expression_status", "") not in ("not_significant", ""))
+        )
+        de_direction = row_direction if is_significant else "none"
+        gene_stats.setdefault(cluster, {})[locus_tag] = DEStats(
+            log2fc=float(log2fc),
+            padj=float(padj),
+            rank=row.get("rank"),
+            direction=de_direction,
+            significant=is_significant,
+        )
+
     return EnrichmentInputs(
         organism_name=de_full.get("organism_name", organism),
         gene_sets=gene_sets,
@@ -511,6 +723,7 @@ def de_enrichment_inputs(
         not_found=list(de_full.get("not_found", []) or []),
         not_matched=list(de_full.get("not_matched", []) or []),
         no_expression=list(de_full.get("no_expression", []) or []),
+        gene_stats=gene_stats,
     )
 
 
@@ -661,3 +874,498 @@ def cluster_enrichment_inputs(
         clusters_skipped=clusters_skipped,
         analysis_metadata=analysis_md,
     )
+
+
+from dataclasses import dataclass, field
+
+
+def _gene_ref_from_row(
+    locus_tag: str,
+    t2g_row: dict | None,
+    de_stats: "DEStats | None",
+) -> "GeneRef":
+    """Build a GeneRef from a term2gene row + optional DE stats."""
+    gene_name = None
+    product = None
+    if t2g_row is not None:
+        gn = t2g_row.get("gene_name")
+        if gn is not None and not (isinstance(gn, float) and pd.isna(gn)):
+            gene_name = gn
+        pr = t2g_row.get("product")
+        if pr is not None and not (isinstance(pr, float) and pd.isna(pr)):
+            product = pr
+    kwargs = {"locus_tag": locus_tag, "gene_name": gene_name, "product": product}
+    if de_stats is not None:
+        kwargs.update({
+            "log2fc": de_stats.log2fc,
+            "padj": de_stats.padj,
+            "rank": de_stats.rank,
+            "direction": de_stats.direction,
+            "significant": de_stats.significant,
+        })
+    return GeneRef(**kwargs)
+
+
+def _sort_gene_refs(refs: list["GeneRef"]) -> list["GeneRef"]:
+    """Named genes first; within each group, rank ascending if present, else
+    gene_name (named) / locus_tag (unnamed) alphabetical.
+    """
+    def named_key(r):
+        rank = r.rank if r.rank is not None else 10**9
+        return (rank, (r.gene_name or "").lower())
+
+    def unnamed_key(r):
+        rank = r.rank if r.rank is not None else 10**9
+        return (rank, r.locus_tag)
+
+    named = sorted([r for r in refs if r.gene_name], key=named_key)
+    unnamed = sorted([r for r in refs if not r.gene_name], key=unnamed_key)
+    return named + unnamed
+
+
+# ---------------------------------------------------------------------------
+# Envelope summary helpers — used by EnrichmentResult.generate_summary()
+# (Copied from api/functions.py; originals remain there until Tasks 10/11.)
+# ---------------------------------------------------------------------------
+
+
+def _envelope_by_experiment(df, inputs, pvalue_cutoff):
+    if df.empty:
+        return []
+    out = []
+    for exp_id, sub in df.groupby("experiment_id", sort=True):
+        md_cluster = next(
+            (c for c, md in inputs.cluster_metadata.items() if md.get("experiment_id") == exp_id),
+            None,
+        )
+        md = inputs.cluster_metadata.get(md_cluster, {}) if md_cluster else {}
+        out.append({
+            "experiment_id": exp_id,
+            "name": md.get("name"),
+            "omics_type": md.get("omics_type"),
+            "table_scope": md.get("table_scope"),
+            "treatment_type": md.get("treatment_type"),
+            "background_factors": md.get("background_factors"),
+            "is_time_course": md.get("is_time_course"),
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+            "n_clusters": int(sub["cluster"].nunique()),
+        })
+    return out
+
+
+def _envelope_by_direction(df, pvalue_cutoff):
+    if df.empty:
+        return []
+    return [
+        {
+            "direction": direction,
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        }
+        for direction, sub in df.groupby("direction", sort=True)
+    ]
+
+
+def _envelope_by_omics_type(df, pvalue_cutoff):
+    if df.empty:
+        return []
+    return [
+        {
+            "omics_type": omics_type,
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        }
+        for omics_type, sub in df.groupby("omics_type", sort=True)
+    ]
+
+
+def _envelope_cluster_summary(df, inputs):
+    if df.empty:
+        return {
+            "n_clusters": 0,
+            "n_tests_min": 0, "n_tests_median": 0.0, "n_tests_max": 0,
+            "n_significant_min": 0, "n_significant_median": 0.0, "n_significant_max": 0,
+            "universe_size_min": 0, "universe_size_median": 0.0, "universe_size_max": 0,
+        }
+    per_cluster = df.groupby("cluster").agg(n_tests=("term_id", "size"))
+    n_tests_vals = per_cluster["n_tests"].tolist()
+    universe_sizes = [
+        len(inputs.background.get(c, [])) for c in per_cluster.index
+    ]
+    sig_per_cluster = (
+        df[df["p_adjust"] < 0.05]
+        .groupby("cluster")
+        .size()
+        .reindex(per_cluster.index, fill_value=0)
+        .tolist()
+    )
+    return {
+        "n_clusters": len(per_cluster),
+        "n_tests_min": min(n_tests_vals),
+        "n_tests_median": float(statistics.median(n_tests_vals)),
+        "n_tests_max": max(n_tests_vals),
+        "n_significant_min": min(sig_per_cluster),
+        "n_significant_median": float(statistics.median(sig_per_cluster)),
+        "n_significant_max": max(sig_per_cluster),
+        "universe_size_min": min(universe_sizes) if universe_sizes else 0,
+        "universe_size_median": float(statistics.median(universe_sizes)) if universe_sizes else 0.0,
+        "universe_size_max": max(universe_sizes) if universe_sizes else 0,
+    }
+
+
+def _envelope_top_clusters(df, inputs, top_n=5):
+    if df.empty:
+        return []
+    per_cluster_min_padj = df.groupby("cluster")["p_adjust"].min()
+    top_clusters = (
+        per_cluster_min_padj.sort_values(ascending=True).head(top_n).index.tolist()
+    )
+    out = []
+    for cluster in top_clusters:
+        sub = df[df["cluster"] == cluster]
+        md = inputs.cluster_metadata.get(cluster, {})
+        out.append({
+            "cluster": cluster,
+            "experiment_id": md.get("experiment_id"),
+            "name": md.get("name"),
+            "timepoint": md.get("timepoint"),
+            "timepoint_hours": md.get("timepoint_hours"),
+            "timepoint_order": md.get("timepoint_order"),
+            "direction": md.get("direction"),
+            "omics_type": md.get("omics_type"),
+            "table_scope": md.get("table_scope"),
+            "treatment_type": md.get("treatment_type"),
+            "background_factors": md.get("background_factors"),
+            "is_time_course": md.get("is_time_course"),
+            "n_tests": int(len(sub)),
+            "n_significant": int((sub["p_adjust"] < 0.05).sum()),
+            "universe_size": len(inputs.background.get(cluster, [])),
+            "min_padj": float(per_cluster_min_padj[cluster]),
+        })
+    return out
+
+
+def _envelope_top_pathways(df, top_n=10):
+    if df.empty:
+        return []
+    top = df.sort_values(
+        ["p_adjust", "cluster", "term_id"], ascending=True
+    ).head(top_n)
+    return [
+        {
+            "cluster": r["cluster"],
+            "term_id": r["term_id"],
+            "term_name": r["term_name"],
+            "p_adjust": float(r["p_adjust"]),
+            "signed_score": float(r["signed_score"]) if "signed_score" in r else 0.0,
+        }
+        for _, r in top.iterrows()
+    ]
+
+
+def _envelope_by_cluster(df, inputs, pvalue_cutoff):
+    """Cluster-kind: per-cluster significant-term counts."""
+    produced_clusters = set(df["cluster"]) if not df.empty else set()
+    out = []
+    for cluster_name, md in inputs.cluster_metadata.items():
+        if cluster_name not in produced_clusters:
+            continue
+        sub = df[df["cluster"] == cluster_name]
+        out.append({
+            "cluster_id": md.get("cluster_id"),
+            "cluster_name": cluster_name,
+            "member_count": md.get("member_count"),
+            "significant_terms": int((sub["p_adjust"] < pvalue_cutoff).sum()),
+        })
+    return out
+
+
+def _envelope_by_term(df, pvalue_cutoff):
+    """Cluster-kind: top 10 terms by number of clusters they appear in as significant."""
+    if df.empty:
+        return []
+    sig_df = df[df["p_adjust"] < pvalue_cutoff]
+    if sig_df.empty:
+        return []
+    term_counts = (
+        sig_df.groupby(["term_id", "term_name"])["cluster"]
+        .nunique()
+        .reset_index()
+        .rename(columns={"cluster": "n_clusters"})
+        .sort_values("n_clusters", ascending=False)
+        .head(10)
+    )
+    return term_counts.to_dict(orient="records")
+
+
+@dataclass
+class EnrichmentResult:
+    """Rich wrapper around Fisher ORA output. See docs://analysis/enrichment."""
+
+    kind: Literal["pathway", "cluster"]
+    organism_name: str
+    ontology: str | None
+    level: int | None
+
+    results: pd.DataFrame
+    inputs: EnrichmentInputs
+    term2gene: pd.DataFrame
+
+    term_validation: dict = field(default_factory=dict)
+    clusters_skipped: list[dict] = field(default_factory=list)
+    params: dict = field(default_factory=dict)
+
+    def _term_row(self, term_id: str) -> dict | None:
+        rows = self.term2gene[self.term2gene["term_id"] == term_id]
+        if rows.empty:
+            return None
+        return rows.iloc[0].to_dict()
+
+    def _term_members(self, term_id: str) -> set[str]:
+        return set(
+            self.term2gene[self.term2gene["term_id"] == term_id]["locus_tag"]
+        )
+
+    def _assert_cluster(self, cluster: str) -> None:
+        if cluster not in self.inputs.gene_sets:
+            raise KeyError(
+                f"Cluster {cluster!r} not found. Known: {sorted(self.inputs.gene_sets)}"
+            )
+
+    def _assert_term(self, term_id: str) -> None:
+        if term_id not in set(self.term2gene["term_id"]):
+            raise KeyError(f"Term {term_id!r} not found in term2gene.")
+
+    def overlap_genes(self, cluster: str, term_id: str) -> list["GeneRef"]:
+        """Return k genes: foreground ∩ background ∩ term, as GeneRefs, sorted."""
+        self._assert_cluster(cluster)
+        self._assert_term(term_id)
+        fg = set(self.inputs.gene_sets.get(cluster, []))
+        bg = set(self.inputs.background.get(cluster, []))
+        term_set = self._term_members(term_id)
+        locus_tags = fg & bg & term_set
+        return self._build_gene_refs(cluster, locus_tags, term_id)
+
+    def background_genes(self, cluster: str, term_id: str) -> list["GeneRef"]:
+        """Return M genes: background ∩ term, as GeneRefs, sorted."""
+        self._assert_cluster(cluster)
+        self._assert_term(term_id)
+        bg = set(self.inputs.background.get(cluster, []))
+        term_set = self._term_members(term_id)
+        locus_tags = bg & term_set
+        return self._build_gene_refs(cluster, locus_tags, term_id)
+
+    def explain(self, cluster: str, term_id: str) -> "EnrichmentExplanation":
+        """Build a full EnrichmentExplanation for (cluster, term_id)."""
+        self._assert_cluster(cluster)
+        self._assert_term(term_id)
+        rows = self.results[
+            (self.results["cluster"] == cluster)
+            & (self.results["term_id"] == term_id)
+        ]
+        if rows.empty:
+            raise KeyError(
+                f"No enrichment row for cluster={cluster!r}, term_id={term_id!r}."
+            )
+        row = rows.iloc[0].to_dict()
+
+        cluster_rows = self.results[self.results["cluster"] == cluster]
+        sorted_cluster = cluster_rows.sort_values("p_adjust").reset_index(drop=True)
+        rank = int(
+            sorted_cluster.index[sorted_cluster["term_id"] == term_id][0] + 1
+        )
+        n_terms = int(len(cluster_rows))
+
+        overlap = self.overlap_genes(cluster, term_id)
+        background = self.background_genes(cluster, term_id)
+
+        fg = set(self.inputs.gene_sets.get(cluster, []))
+        bg = set(self.inputs.background.get(cluster, []))
+        n_fg = len(fg & bg)
+        N = len(bg)
+
+        return EnrichmentExplanation(
+            cluster=cluster,
+            term_id=term_id,
+            term_name=row["term_name"],
+            cluster_kind=self.kind,
+            cluster_metadata=self.inputs.cluster_metadata.get(cluster, {}),
+            count=int(row["count"]),
+            n_foreground=n_fg,
+            bg_count=int(row["bg_count"]),
+            n_background=N,
+            gene_ratio=row["gene_ratio"],
+            bg_ratio=row["bg_ratio"],
+            fold_enrichment=float(row["fold_enrichment"]),
+            rich_factor=float(row["rich_factor"]),
+            pvalue=float(row["pvalue"]),
+            p_adjust=float(row["p_adjust"]),
+            rank_in_cluster=rank,
+            n_terms_in_cluster=n_terms,
+            overlap_genes=overlap,
+            background_genes=background,
+        )
+
+    def _build_gene_refs(
+        self, cluster: str, locus_tags: set[str], term_id: str,
+    ) -> list["GeneRef"]:
+        t2g_sub = self.term2gene[
+            (self.term2gene["term_id"] == term_id)
+            & (self.term2gene["locus_tag"].isin(locus_tags))
+        ]
+        row_by_lt = {
+            r["locus_tag"]: r.to_dict() for _, r in t2g_sub.iterrows()
+        }
+        cluster_stats = self.inputs.gene_stats.get(cluster, {})
+        refs = [
+            _gene_ref_from_row(
+                lt,
+                row_by_lt.get(lt),
+                cluster_stats.get(lt),
+            )
+            for lt in locus_tags
+        ]
+        return _sort_gene_refs(refs)
+
+    def cluster_context(self, cluster: str) -> dict:
+        """inputs.cluster_metadata[cluster] + n_tests/n_significant from results."""
+        self._assert_cluster(cluster)
+        md = dict(self.inputs.cluster_metadata.get(cluster, {}))
+        sub = self.results[self.results["cluster"] == cluster]
+        md["n_tests"] = int(len(sub))
+        pvc = self.params.get("pvalue_cutoff", 0.05)
+        md["n_significant"] = int((sub["p_adjust"] < pvc).sum()) if not sub.empty else 0
+        return md
+
+    def why_skipped(self, cluster: str) -> str | None:
+        """Reason from clusters_skipped, or None if cluster produced results."""
+        for entry in self.clusters_skipped:
+            if (
+                entry.get("cluster_name") == cluster
+                or entry.get("cluster") == cluster
+                or entry.get("cluster_id") == cluster
+            ):
+                return entry.get("reason")
+        return None
+
+    def missing_terms(self) -> dict[str, list[str]]:
+        """Return term_validation buckets."""
+        return {
+            "not_found": list(self.term_validation.get("not_found", [])),
+            "wrong_ontology": list(self.term_validation.get("wrong_ontology", [])),
+            "wrong_level": list(self.term_validation.get("wrong_level", [])),
+            "filtered_out": list(self.term_validation.get("filtered_out", [])),
+        }
+
+    def to_compare_cluster_frame(self) -> pd.DataFrame:
+        """Rename columns to clusterProfiler compareCluster convention.
+
+        Columns: Cluster, ID, Description, GeneRatio, BgRatio, pvalue,
+        p.adjust, geneID. geneID is '/'-joined locus_tags of the overlap.
+        """
+        if self.results.empty:
+            return pd.DataFrame(columns=[
+                "Cluster", "ID", "Description", "GeneRatio", "BgRatio",
+                "pvalue", "p.adjust", "geneID",
+            ])
+
+        rows = []
+        for _, row in self.results.iterrows():
+            overlap_lts = [
+                g.locus_tag for g in self.overlap_genes(row["cluster"], row["term_id"])
+            ]
+            rows.append({
+                "Cluster": row["cluster"],
+                "ID": row["term_id"],
+                "Description": row["term_name"],
+                "GeneRatio": row["gene_ratio"],
+                "BgRatio": row["bg_ratio"],
+                "pvalue": row["pvalue"],
+                "p.adjust": row["p_adjust"],
+                "geneID": "/".join(overlap_lts),
+            })
+        return pd.DataFrame(rows)
+
+    def generate_summary(self) -> dict:
+        """Aggregate view — no per-row results, no pagination.
+
+        Pathway kind emits by_experiment/by_direction/by_omics_type;
+        cluster kind emits by_cluster/by_term.
+        """
+        df = self.results
+        pvc = self.params.get("pvalue_cutoff", 0.05)
+        total_matching = int(len(df))
+        n_significant = int((df["p_adjust"] < pvc).sum()) if total_matching else 0
+
+        base = {
+            "organism_name": self.organism_name,
+            "ontology": self.ontology,
+            "level": self.level,
+            "total_matching": total_matching,
+            "n_significant": n_significant,
+            "not_found": list(self.inputs.not_found),
+            "not_matched": list(self.inputs.not_matched),
+            "term_validation": self.missing_terms(),
+            "clusters_skipped": list(self.clusters_skipped),
+            "enrichment_params": dict(self.params),
+        }
+
+        if self.kind == "pathway":
+            base.update({
+                "no_expression": list(self.inputs.no_expression),
+                "by_experiment": _envelope_by_experiment(df, self.inputs, pvc),
+                "by_direction": _envelope_by_direction(df, pvc),
+                "by_omics_type": _envelope_by_omics_type(df, pvc),
+                "cluster_summary": _envelope_cluster_summary(df, self.inputs),
+                "top_clusters_by_min_padj": _envelope_top_clusters(df, self.inputs),
+                "top_pathways_by_padj": _envelope_top_pathways(df),
+            })
+        else:  # cluster kind
+            base.update({
+                "analysis_id": self.inputs.analysis_metadata.get("analysis_id"),
+                "analysis_name": self.inputs.analysis_metadata.get("analysis_name"),
+                "cluster_method": self.inputs.analysis_metadata.get("cluster_method"),
+                "cluster_type": self.inputs.analysis_metadata.get("cluster_type"),
+                "omics_type": self.inputs.analysis_metadata.get("omics_type"),
+                "treatment_type": self.inputs.analysis_metadata.get("treatment_type"),
+                "background_factors": self.inputs.analysis_metadata.get("background_factors"),
+                "by_cluster": _envelope_by_cluster(df, self.inputs, pvc),
+                "by_term": _envelope_by_term(df, pvc),
+                "clusters_tested": int(df["cluster"].nunique()) if total_matching else 0,
+            })
+        return base
+
+    def to_envelope(
+        self,
+        *,
+        summary: bool = False,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> dict:
+        """MCP-compatible envelope: summary fields + paginated scalar results rows."""
+        env = self.generate_summary()
+        total = int(len(self.results))
+
+        if summary:
+            env["results"] = []
+            env["returned"] = 0
+            env["truncated"] = total > 0
+            env["offset"] = offset
+            return env
+
+        eff_limit = limit if limit is not None else total
+        sliced = self.results.iloc[offset:offset + eff_limit] if total else self.results
+        returned_rows = sliced.to_dict(orient="records")
+        # Strip sparse tree/tree_code columns for non-BRITE rows
+        for r in returned_rows:
+            tv = r.get("tree")
+            if tv is None or (isinstance(tv, float) and pd.isna(tv)):
+                r.pop("tree", None)
+                r.pop("tree_code", None)
+
+        env["results"] = returned_rows
+        env["returned"] = len(returned_rows)
+        env["truncated"] = (offset + len(returned_rows)) < total
+        env["offset"] = offset
+        return env

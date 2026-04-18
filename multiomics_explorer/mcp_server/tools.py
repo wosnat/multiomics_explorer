@@ -251,6 +251,10 @@ class PathwayEnrichmentResponse(BaseModel):
     clusters_skipped: list[PathwayEnrichmentClusterSkipped] = Field(
         default_factory=list, description="Clusters that produced no rows, with reason"
     )
+    enrichment_params: dict | None = Field(
+        default=None,
+        description="ORA parameters used for this call. See docs://analysis/enrichment.",
+    )
     results: list[PathwayEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows (one Fisher test per row)"
     )
@@ -337,8 +341,6 @@ class ClusterEnrichmentResponse(BaseModel):
     ontology: str = Field(description="Ontology used")
     level: int | None = Field(default=None, description="Hierarchy level")
     tree: str | None = Field(default=None, description="BRITE tree (if applicable)")
-    background_mode: str = Field(description="Background mode: cluster_union, organism, explicit")
-    background_size: int = Field(description="N — genes in background")
     total_matching: int = Field(description="Total Fisher tests run")
     returned: int = Field(description="Rows in this response")
     truncated: bool = Field(description="True when total_matching exceeds offset+returned")
@@ -351,7 +353,6 @@ class ClusterEnrichmentResponse(BaseModel):
         default_factory=list, description="Top terms by number of clusters"
     )
     clusters_tested: int = Field(description="Clusters passing size filter")
-    total_terms_tested: int = Field(description="Unique terms in TERM2GENE")
     not_found: list[str] = Field(default_factory=list, description="Analysis IDs absent from KG")
     not_matched: list[str] = Field(default_factory=list, description="Analysis IDs wrong organism")
     clusters_skipped: list[ClusterEnrichmentClusterSkipped] = Field(
@@ -359,6 +360,10 @@ class ClusterEnrichmentResponse(BaseModel):
     )
     term_validation: PathwayEnrichmentTermValidation = Field(
         description="Namespaced passthrough of term_id validation from genes_by_ontology"
+    )
+    enrichment_params: dict | None = Field(
+        default=None,
+        description="ORA parameters used for this call. See docs://analysis/enrichment.",
     )
     results: list[ClusterEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows"
@@ -3798,9 +3803,6 @@ def register_tools(mcp: FastMCP):
         summary: Annotated[bool, Field(
             description="If true, omit results (envelope only).",
         )] = False,
-        verbose: Annotated[bool, Field(
-            description="Include foreground_gene_ids + background_gene_ids on rows.",
-        )] = False,
         limit: Annotated[int, Field(
             description="Max rows returned. Default 100 — top hits by p_adjust globally.",
             ge=1,
@@ -3834,34 +3836,32 @@ def register_tools(mcp: FastMCP):
                 pvalue_cutoff=pvalue_cutoff,
                 timepoint_filter=timepoint_filter,
                 growth_phases=growth_phases,
-                summary=summary,
-                verbose=verbose,
-                limit=limit,
-                offset=offset,
                 tree=tree,
                 conn=conn,
             )
         except ValueError as e:
             raise ToolError(str(e)) from e
 
+        envelope = result.to_envelope(summary=summary, limit=limit, offset=offset)
+
         # Emit warnings on non-empty validation buckets
         warnings = []
-        if result["not_found"]:
-            warnings.append(f"{len(result['not_found'])} experiment_ids not_found")
-        if result["not_matched"]:
-            warnings.append(f"{len(result['not_matched'])} not_matched (wrong organism)")
-        if result["no_expression"]:
-            warnings.append(f"{len(result['no_expression'])} no_expression (no DE rows)")
-        tv = result.get("term_validation", {})
+        if envelope["not_found"]:
+            warnings.append(f"{len(envelope['not_found'])} experiment_ids not_found")
+        if envelope["not_matched"]:
+            warnings.append(f"{len(envelope['not_matched'])} not_matched (wrong organism)")
+        if envelope.get("no_expression"):
+            warnings.append(f"{len(envelope['no_expression'])} no_expression (no DE rows)")
+        tv = envelope.get("term_validation", {})
         for key in ("not_found", "wrong_ontology", "wrong_level"):
             if tv.get(key):
                 warnings.append(f"{len(tv[key])} term_ids {key}")
-        if result.get("clusters_skipped"):
-            warnings.append(f"{len(result['clusters_skipped'])} clusters skipped")
+        if envelope.get("clusters_skipped"):
+            warnings.append(f"{len(envelope['clusters_skipped'])} clusters skipped")
         if warnings:
             await ctx.warning("; ".join(warnings))
 
-        return PathwayEnrichmentResponse(**result)
+        return PathwayEnrichmentResponse(**envelope)
 
     @mcp.tool(
         tags={"enrichment", "clustering", "ontology"},
@@ -3886,7 +3886,6 @@ def register_tools(mcp: FastMCP):
         max_cluster_size: Annotated[int | None, Field(description="Skip clusters with more members. None disables.", ge=1)] = None,
         pvalue_cutoff: Annotated[float, Field(description="Significance threshold for p_adjust.", gt=0, lt=1)] = 0.05,
         summary: Annotated[bool, Field(description="If true, omit results (envelope only).")] = False,
-        verbose: Annotated[bool, Field(description="Include cluster description fields on rows.")] = False,
         limit: Annotated[int, Field(description="Max rows returned.", ge=1)] = 5,
         offset: Annotated[int, Field(description="Skip N rows before limit.", ge=0)] = 0,
     ) -> ClusterEnrichmentResponse:
@@ -3916,24 +3915,26 @@ def register_tools(mcp: FastMCP):
                 min_cluster_size=min_cluster_size,
                 max_cluster_size=max_cluster_size,
                 pvalue_cutoff=pvalue_cutoff,
-                summary=summary,
-                verbose=verbose,
-                limit=limit,
-                offset=offset,
                 conn=conn,
             )
         except ValueError as e:
             raise ToolError(str(e)) from e
 
+        envelope = result.to_envelope(summary=summary, limit=limit, offset=offset)
+
         # Emit warnings
         warnings = []
-        if result["not_found"]:
-            warnings.append(f"{len(result['not_found'])} analysis_ids not_found")
-        if result["not_matched"]:
-            warnings.append(f"{len(result['not_matched'])} not_matched (wrong organism)")
-        if result.get("clusters_skipped"):
-            warnings.append(f"{len(result['clusters_skipped'])} clusters skipped")
+        if envelope.get("not_found"):
+            warnings.append(f"{len(envelope['not_found'])} not_found")
+        if envelope.get("not_matched"):
+            warnings.append(f"{len(envelope['not_matched'])} not_matched (wrong organism)")
+        tv = envelope.get("term_validation", {})
+        for key in ("not_found", "wrong_ontology", "wrong_level"):
+            if tv.get(key):
+                warnings.append(f"{len(tv[key])} term_ids {key}")
+        if envelope.get("clusters_skipped"):
+            warnings.append(f"{len(envelope['clusters_skipped'])} clusters skipped")
         if warnings:
             await ctx.warning("; ".join(warnings))
 
-        return ClusterEnrichmentResponse(**result)
+        return ClusterEnrichmentResponse(**envelope)

@@ -114,7 +114,7 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         api_params = {k: v for k, v in params.items() if k != "limit"}
         if limit is not None:
             api_params["limit"] = limit
-        return api.pathway_enrichment(**api_params, conn=conn).get("results", [])
+        return api.pathway_enrichment(**api_params, conn=conn).to_envelope().get("results", [])
 
     builder = TOOL_BUILDERS[tool]
     limit = params.get("limit")
