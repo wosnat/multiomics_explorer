@@ -3801,10 +3801,11 @@ class TestPathwayEnrichment:
             f, "genes_by_ontology",
             lambda **_: self._stub_gbo_result(),
         )
-        out = pathway_enrichment(
+        result = pathway_enrichment(
             organism="MED4", experiment_ids=["exp1"],
             ontology="cyanorak_role", level=1,
         )
+        out = result.to_envelope()
         assert out["total_matching"] == 0
         assert out["results"] == []
         assert out["not_found"] == ["exp1"]
@@ -3824,11 +3825,12 @@ class TestPathwayEnrichment:
                 wrong_level=["wrong_level_term"],
             ),
         )
-        out = pathway_enrichment(
+        result = pathway_enrichment(
             organism="MED4", experiment_ids=["exp1"],
             ontology="cyanorak_role", level=1,
             term_ids=["missing_term", "wrong_level_term"],
         )
+        out = result.to_envelope()
         assert out["term_validation"]["not_found"] == ["missing_term"]
         assert out["term_validation"]["wrong_level"] == ["wrong_level_term"]
 
@@ -3843,10 +3845,11 @@ class TestPathwayEnrichment:
             f, "genes_by_ontology",
             lambda **_: self._stub_gbo_result(),
         )
-        out = pathway_enrichment(
+        result = pathway_enrichment(
             organism="MED4", experiment_ids=["exp1"],
             ontology="cyanorak_role", level=1,
         )
+        out = result.to_envelope()
         assert out["organism_name"] == "MED4"
         assert out["ontology"] == "cyanorak_role"
         assert out["level"] == 1
