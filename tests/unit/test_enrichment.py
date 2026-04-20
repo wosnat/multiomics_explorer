@@ -390,7 +390,228 @@ class TestDeEnrichmentInputs:
             experiment_ids=["exp1"], organism="MED4",
             timepoint_filter=["T4"],
         )
-        assert set(out.gene_sets.keys()) == {"exp1|T4|up"}
+        # direction="both" (default) creates clusters for both directions at T4.
+        assert set(out.gene_sets.keys()) == {"exp1|T4|up", "exp1|T4|down"}
+        assert out.gene_sets["exp1|T4|up"] == ["PMM0002"]
+        assert out.gene_sets["exp1|T4|down"] == []
+
+    def test_background_includes_not_significant_rows(self, monkeypatch):
+        """Background is the full quantified set — must include not_significant rows."""
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "g_up", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "significant_up",
+                 "log2fc": 2.0, "padj": 0.001,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N_stress"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+                {"locus_tag": "g_down", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "significant_down",
+                 "log2fc": -2.0, "padj": 0.002,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N_stress"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+                {"locus_tag": "g_ns", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "not_significant",
+                 "log2fc": 0.1, "padj": 0.9,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N_stress"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+            direction="both", significant_only=True,
+        )
+        for cluster in ("exp1|T0|up", "exp1|T0|down"):
+            assert "g_ns" in out.background[cluster], (
+                f"not_significant gene missing from background[{cluster}]"
+            )
+
+    def test_up_and_down_share_background(self, monkeypatch):
+        """At same (exp, tp), up and down cluster backgrounds must be identical."""
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "g_up", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "significant_up",
+                 "log2fc": 2.0, "padj": 0.001,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N_stress"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+                {"locus_tag": "g_down", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "significant_down",
+                 "log2fc": -2.0, "padj": 0.002,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N_stress"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+                {"locus_tag": "g_ns1", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "not_significant",
+                 "log2fc": 0.1, "padj": 0.9,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N_stress"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+                {"locus_tag": "g_ns2", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "not_significant",
+                 "log2fc": -0.1, "padj": 0.8,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N_stress"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+            direction="both", significant_only=True,
+        )
+        assert set(out.background["exp1|T0|up"]) == set(out.background["exp1|T0|down"])
+        assert set(out.background["exp1|T0|up"]) == {"g_up", "g_down", "g_ns1", "g_ns2"}
+
+    def test_background_invariant_bg_ge_fg(self, monkeypatch):
+        """For every cluster, |background| >= |gene_set|."""
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": f"g_sig_{i}", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "significant_up",
+                 "log2fc": 2.0, "padj": 0.001,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"}
+                for i in range(5)
+            ] + [
+                {"locus_tag": f"g_ns_{i}", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "not_significant",
+                 "log2fc": 0.1, "padj": 0.9,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"}
+                for i in range(20)
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+            direction="both", significant_only=True,
+        )
+        for cluster, genes in out.gene_sets.items():
+            bg = out.background.get(cluster, [])
+            assert len(bg) >= len(genes), (
+                f"{cluster}: bg={len(bg)} < fg={len(genes)}"
+            )
+            assert len(bg) == 25  # all 25 measured genes
+
+    def test_background_unchanged_by_significant_only(self, monkeypatch):
+        """Toggling significant_only must NOT change background."""
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "g_up", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "significant_up",
+                 "log2fc": 2.0, "padj": 0.001,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+                {"locus_tag": "g_ns", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "not_significant",
+                 "log2fc": 0.1, "padj": 0.9,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out_true = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+            direction="both", significant_only=True,
+        )
+        out_false = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+            direction="both", significant_only=False,
+        )
+        for cluster in set(out_true.background) | set(out_false.background):
+            assert set(out_true.background[cluster]) == set(out_false.background[cluster])
+
+    def test_empty_direction_cluster_has_background(self, monkeypatch):
+        """When one direction has zero significant genes, the cluster still exists with full bg."""
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "g_up", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "significant_up",
+                 "log2fc": 2.0, "padj": 0.001,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+                {"locus_tag": "g_ns", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "not_significant",
+                 "log2fc": 0.1, "padj": 0.9,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+            direction="both", significant_only=True,
+        )
+        # `down` has no significant genes, but the cluster should exist with empty fg and full bg.
+        assert "exp1|T0|down" in out.background
+        assert set(out.background["exp1|T0|down"]) == {"g_up", "g_ns"}
+        assert out.gene_sets.get("exp1|T0|down", []) == []
+
+    def test_gene_stats_includes_not_significant_rows(self, monkeypatch):
+        """gene_stats must include not_significant genes (docstring says 'every measured gene')."""
+        from multiomics_explorer import de_enrichment_inputs
+        de_result = {
+            "organism_name": "MED4",
+            "results": [
+                {"locus_tag": "g_up", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "significant_up",
+                 "log2fc": 2.0, "padj": 0.001, "rank": 1,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+                {"locus_tag": "g_ns", "experiment_id": "exp1", "timepoint": "T0",
+                 "direction": None, "expression_status": "not_significant",
+                 "log2fc": 0.1, "padj": 0.9, "rank": 500,
+                 "omics_type": "transcriptomics", "table_scope": "all_detected_genes",
+                 "treatment_type": ["N"], "background_factors": None,
+                 "is_time_course": True, "experiment_name": "n1"},
+            ],
+            "not_found": [], "no_expression": [],
+        }
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "_call_de", lambda **_: de_result)
+        out = de_enrichment_inputs(
+            experiment_ids=["exp1"], organism="MED4",
+            direction="both", significant_only=True,
+        )
+        # g_ns must appear in gene_stats — at minimum for one of the clusters at (exp1, T0).
+        found_in = [c for c, m in out.gene_stats.items() if "g_ns" in m]
+        assert found_in, "g_ns missing from every cluster's gene_stats"
+        # Its direction should be 'none' and significant=False.
+        cluster = found_in[0]
+        assert out.gene_stats[cluster]["g_ns"].significant is False
+        assert out.gene_stats[cluster]["g_ns"].direction == "none"
 
     def test_gene_stats_populated_for_all_measured_genes(self, monkeypatch):
         """gene_stats includes measured genes regardless of significance."""

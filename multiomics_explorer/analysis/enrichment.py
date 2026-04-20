@@ -636,84 +636,109 @@ def de_enrichment_inputs(
 
     _gp_filter = {g.lower() for g in growth_phases} if growth_phases else None
 
-    for row in de_full.get("results", []):
+    def _passes_filters(row: dict) -> bool:
         tp = _normalize_timepoint(row.get("timepoint"))
         if timepoint_filter is not None and tp not in set(timepoint_filter):
-            continue
+            return False
         if _gp_filter is not None:
             gp = (row.get("growth_phase") or "").lower()
             if gp not in _gp_filter:
-                continue
-        # Support both `direction` (unit-test mocks) and `expression_status`
-        # (real DE query output).
-        row_direction = row.get("direction") or _STATUS_TO_DIR.get(
-            row.get("expression_status", ""), None
-        )
-        if row_direction not in ("up", "down"):
+                return False
+        return True
+
+    # Pass 1: build per-(experiment, timepoint) quantified universe from ALL rows
+    # (including not_significant) so backgrounds reflect the full table_scope.
+    quantified_by_ept: dict[tuple[str, str], list[str]] = {}
+    sample_row_by_ept: dict[tuple[str, str], dict] = {}
+    for row in de_full.get("results", []):
+        if not _passes_filters(row):
             continue
         exp_id = row.get("experiment_id")
-        cluster = f"{exp_id}|{tp}|{row_direction}"
+        locus_tag = row.get("locus_tag")
+        if not exp_id or not locus_tag:
+            continue
+        tp = _normalize_timepoint(row.get("timepoint"))
+        key = (exp_id, tp)
+        quantified_by_ept.setdefault(key, []).append(locus_tag)
+        sample_row_by_ept.setdefault(key, row)
 
-        background.setdefault(cluster, []).append(row["locus_tag"])
-        if cluster not in cluster_metadata:
+    # Initialize clusters for every (exp, tp) × allowed_dirs combination. Up and
+    # down clusters at the same (exp, tp) share the same background.
+    for (exp_id, tp), bg_list in quantified_by_ept.items():
+        sample_row = sample_row_by_ept[(exp_id, tp)]
+        for d in allowed_dirs:
+            cluster = f"{exp_id}|{tp}|{d}"
+            background[cluster] = list(bg_list)
+            gene_sets.setdefault(cluster, [])
             md: dict = {}
             for field in _METADATA_FIELDS:
-                md[field] = row.get(field)
-            # Backfill direction from expression_status when not present directly.
-            if md.get("direction") is None:
-                md["direction"] = row_direction
-            md["name"] = row.get("experiment_name") or row.get("name")
+                md[field] = sample_row.get(field)
+            md["direction"] = d
+            md["name"] = sample_row.get("experiment_name") or sample_row.get("name")
             md["timepoint"] = tp
             cluster_metadata[cluster] = md
 
-        if row_direction in allowed_dirs:
-            is_significant = (
-                row.get("significant")
-                or (row.get("expression_status", "") not in ("not_significant", ""))
-            )
-            if significant_only and not is_significant:
-                continue
-            gene_sets.setdefault(cluster, []).append(row["locus_tag"])
-
-    for cluster in background:
-        gene_sets.setdefault(cluster, [])
-
-    # Build gene_stats: cluster -> locus_tag -> DEStats (every measured gene).
-    gene_stats: dict[str, dict[str, DEStats]] = {}
+    # Pass 2: populate foregrounds from significant rows.
     for row in de_full.get("results", []):
-        tp = _normalize_timepoint(row.get("timepoint"))
-        if timepoint_filter is not None and tp not in set(timepoint_filter):
+        if not _passes_filters(row):
             continue
-        if _gp_filter is not None:
-            gp = (row.get("growth_phase") or "").lower()
-            if gp not in _gp_filter:
-                continue
         row_direction = row.get("direction") or _STATUS_TO_DIR.get(
             row.get("expression_status", ""), None
         )
-        if row_direction not in ("up", "down"):
+        if row_direction not in allowed_dirs:
             continue
         exp_id = row.get("experiment_id")
-        cluster = f"{exp_id}|{tp}|{row_direction}"
         locus_tag = row.get("locus_tag")
-        if not locus_tag:
+        if not exp_id or not locus_tag:
+            continue
+        tp = _normalize_timepoint(row.get("timepoint"))
+        cluster = f"{exp_id}|{tp}|{row_direction}"
+        is_significant = bool(
+            row.get("significant")
+            or (row.get("expression_status", "") not in ("not_significant", ""))
+        )
+        if significant_only and not is_significant:
+            continue
+        gene_sets.setdefault(cluster, []).append(locus_tag)
+
+    # Build gene_stats: cluster -> locus_tag -> DEStats (every measured gene).
+    # Every measured gene contributes to every allowed-direction cluster at its
+    # (exp, tp), mirroring the shared-background invariant.
+    gene_stats: dict[str, dict[str, DEStats]] = {}
+    for row in de_full.get("results", []):
+        if not _passes_filters(row):
+            continue
+        exp_id = row.get("experiment_id")
+        locus_tag = row.get("locus_tag")
+        if not exp_id or not locus_tag:
             continue
         log2fc = row.get("log2fc") if row.get("log2fc") is not None else row.get("log2_fc")
         padj = row.get("padj") if row.get("padj") is not None else row.get("p_adjust")
         if log2fc is None or padj is None:
             continue
+        row_direction = row.get("direction") or _STATUS_TO_DIR.get(
+            row.get("expression_status", ""), None
+        )
         is_significant = bool(
             row.get("significant")
             or (row.get("expression_status", "") not in ("not_significant", ""))
         )
-        de_direction = row_direction if is_significant else "none"
-        gene_stats.setdefault(cluster, {})[locus_tag] = DEStats(
+        de_direction = (
+            row_direction if is_significant and row_direction in ("up", "down") else "none"
+        )
+        stats = DEStats(
             log2fc=float(log2fc),
             padj=float(padj),
             rank=row.get("rank"),
             direction=de_direction,
             significant=is_significant,
         )
+        tp = _normalize_timepoint(row.get("timepoint"))
+        for d in allowed_dirs:
+            cluster = f"{exp_id}|{tp}|{d}"
+            if cluster not in background:
+                continue
+            gene_stats.setdefault(cluster, {})[locus_tag] = stats
 
     return EnrichmentInputs(
         organism_name=de_full.get("organism_name", organism),
@@ -747,7 +772,7 @@ def cluster_enrichment_inputs(
         Clustering analysis identifier (e.g. ``"ca:..."``) to pull from.
     organism : str
         Single organism name (fuzzy-matched).
-    min_cluster_size : int, default 1
+    min_cluster_size : int, default 3
         Clusters with fewer members are moved to ``clusters_skipped``.
     max_cluster_size : int or None, default None
         Clusters with more members are moved to ``clusters_skipped``.
