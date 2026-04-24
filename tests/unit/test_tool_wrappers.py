@@ -3501,3 +3501,14 @@ class TestListDerivedMetricsWrapper:
         ):
             with pytest.raises(ToolError, match="search_text must not be empty"):
                 await tool_fns["list_derived_metrics"](mock_ctx, search_text="")
+        mock_ctx.warning.assert_awaited()
+
+    @pytest.mark.asyncio
+    async def test_generic_exception_becomes_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_derived_metrics",
+            side_effect=RuntimeError("unexpected db failure"),
+        ):
+            with pytest.raises(ToolError, match="Error in list_derived_metrics"):
+                await tool_fns["list_derived_metrics"](mock_ctx)
+        mock_ctx.error.assert_awaited()

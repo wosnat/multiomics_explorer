@@ -3617,11 +3617,13 @@ def register_tools(mcp: FastMCP):
         verbose: Annotated[bool, Field(
             description=(
                 "Include detailed text fields per result: treatment, "
-                "light_condition, experimental_context, p_value_threshold."
+                "light_condition, experimental_context. "
+                "(p_value_threshold is reserved for future DMs with "
+                "statistical significance; always null in current data.)"
             ),
         )] = False,
         limit: Annotated[int, Field(
-            description="Max results to return. Paginate with offset.", ge=0,
+            description="Max results to return. Paginate with offset.", ge=1,
         )] = 20,
         offset: Annotated[int, Field(
             description="Pagination offset (starting row, 0-indexed).", ge=0,
@@ -3640,6 +3642,9 @@ def register_tools(mcp: FastMCP):
         will raise if you pass filters that the selected DM set doesn't
         support.
         """
+        await ctx.info(f"list_derived_metrics search_text={search_text!r} "
+                       f"organism={organism} limit={limit}")
+        conn = _conn(ctx)
         try:
             data = api.list_derived_metrics(
                 search_text=search_text, organism=organism,
@@ -3653,10 +3658,14 @@ def register_tools(mcp: FastMCP):
                 rankable=rankable, has_p_value=has_p_value,
                 summary=summary, verbose=verbose,
                 limit=limit, offset=offset,
+                conn=conn,
             )
         except ValueError as exc:
+            await ctx.warning(f"list_derived_metrics error: {exc}")
             raise ToolError(str(exc)) from exc
-
+        except Exception as exc:
+            await ctx.error(f"Error in list_derived_metrics: {exc}")
+            raise ToolError(f"Error in list_derived_metrics: {exc}") from exc
         return ListDerivedMetricsResponse(**data)
 
     # ── gene_clusters_by_gene ──────────────────────────────────────────
