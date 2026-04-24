@@ -1055,6 +1055,7 @@ class TestListDerivedMetrics:
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
         assert out["total_matching"] == 6
+        assert all(r["value_kind"] == "numeric" for r in out["results"])
         assert all(r["compartment"] == "whole_cell" for r in out["results"])
 
     def test_value_kind_boolean_6(self, conn):
@@ -1082,7 +1083,7 @@ class TestListDerivedMetrics:
         assert out["total_matching"] == 4
         assert all(r["rankable"] == "true" for r in out["results"])
 
-    def test_rankable_false_2(self, conn):
+    def test_rankable_false_9(self, conn):
         """Sanity-checks bool→'false' string coercion path.
         Baseline updated from plan's 2 to 9: boolean DMs (periodic_*, darkness_survival_class)
         also carry rankable='false', giving 2 numeric + 6 boolean + 1 categorical = 9.
