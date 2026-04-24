@@ -4305,10 +4305,3 @@ def register_tools(mcp: FastMCP):
             await ctx.warning("; ".join(warnings))
 
         return ClusterEnrichmentResponse(**envelope)
-
-
-# ---------------------------------------------------------------------------
-# Module-level FastMCP instance (used by tests via tools_mod.mcp)
-# ---------------------------------------------------------------------------
-mcp = FastMCP("multiomics-kg-tools")
-register_tools(mcp)

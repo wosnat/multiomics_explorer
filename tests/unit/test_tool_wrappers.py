@@ -3385,98 +3385,119 @@ class TestClusterEnrichmentWrapper:
 
 
 class TestListDerivedMetricsWrapper:
-    """Tests for the list_derived_metrics MCP wrapper."""
+    """Tests for list_derived_metrics MCP wrapper."""
 
-    _MINIMAL_ENVELOPE = {
+    _SAMPLE_API_RETURN = {
         "total_entries": 13,
-        "total_matching": 0,
-        "by_organism": [],
-        "by_value_kind": [],
-        "by_metric_type": [],
-        "by_compartment": [],
-        "by_omics_type": [],
-        "by_treatment_type": [],
+        "total_matching": 2,
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
+        "by_value_kind": [{"value_kind": "numeric", "count": 2}],
+        "by_metric_type": [{"metric_type": "diel_amplitude_protein_log2", "count": 2}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 2}],
+        "by_omics_type": [{"omics_type": "PAIRED_RNASEQ_PROTEOME", "count": 2}],
+        "by_treatment_type": [{"treatment_type": "diel", "count": 2}],
         "by_background_factors": [],
         "by_growth_phase": [],
         "score_max": None,
         "score_median": None,
-        "returned": 0,
+        "returned": 1,
         "offset": 0,
-        "truncated": False,
-        "results": [],
+        "truncated": True,
+        "results": [
+            {
+                "derived_metric_id": "dm:10.1038/s41396-020-0597-6:med4:diel_amplitude_protein_log2",
+                "name": "Protein diel amplitude (log2)",
+                "metric_type": "diel_amplitude_protein_log2",
+                "value_kind": "numeric",
+                "rankable": True,
+                "has_p_value": False,
+                "unit": "log2",
+                "allowed_categories": None,
+                "field_description": "Log2 amplitude of the diel protein oscillation.",
+                "organism_name": "Prochlorococcus MED4",
+                "experiment_id": "exp:10.1038/s41396-020-0597-6:diel_med4",
+                "publication_doi": "10.1038/s41396-020-0597-6",
+                "compartment": "whole_cell",
+                "omics_type": "PAIRED_RNASEQ_PROTEOME",
+                "treatment_type": ["diel"],
+                "background_factors": [],
+                "total_gene_count": 1200,
+                "growth_phases": [],
+            },
+        ],
     }
 
     @pytest.mark.asyncio
-    async def test_returns_response_envelope(self, monkeypatch):
-        from multiomics_explorer.mcp_server import tools as tools_mod
-        from fastmcp import Client
-        from unittest.mock import MagicMock
-        monkeypatch.setattr(
-            tools_mod.api, "list_derived_metrics",
-            MagicMock(return_value=self._MINIMAL_ENVELOPE),
+    async def test_returns_response_model(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_derived_metrics",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_derived_metrics"](mock_ctx)
+        assert result.total_entries == 13
+        assert result.total_matching == 2
+        assert result.returned == 1
+        assert len(result.results) == 1
+        r = result.results[0]
+        assert r.derived_metric_id == (
+            "dm:10.1038/s41396-020-0597-6:med4:diel_amplitude_protein_log2"
         )
-        async with Client(tools_mod.mcp) as client:
-            result = await client.call_tool("list_derived_metrics", {})
-        envelope = result.structured_content
-        assert envelope["total_entries"] == 13
-        assert envelope["total_matching"] == 0
-        assert envelope["results"] == []
-        assert envelope["truncated"] is False
+        assert r.value_kind == "numeric"
+        assert r.rankable is True
+        assert r.has_p_value is False
 
     @pytest.mark.asyncio
-    async def test_summary_mode(self, monkeypatch):
-        from multiomics_explorer.mcp_server import tools as tools_mod
-        from fastmcp import Client
-        from unittest.mock import MagicMock
-        summary_env = {**self._MINIMAL_ENVELOPE, "total_matching": 13, "truncated": True}
-        monkeypatch.setattr(
-            tools_mod.api, "list_derived_metrics",
-            MagicMock(return_value=summary_env),
-        )
-        async with Client(tools_mod.mcp) as client:
-            result = await client.call_tool("list_derived_metrics", {"summary": True})
-        envelope = result.structured_content
-        assert envelope["total_matching"] == 13
-        assert envelope["truncated"] is True
-        assert envelope["results"] == []
+    async def test_summary_mode(self, tool_fns, mock_ctx):
+        summary_return = {**self._SAMPLE_API_RETURN, "results": [], "truncated": True}
+        with patch(
+            "multiomics_explorer.api.functions.list_derived_metrics",
+            return_value=summary_return,
+        ):
+            result = await tool_fns["list_derived_metrics"](mock_ctx, summary=True)
+        assert result.results == []
+        assert result.truncated is True
+        assert result.total_matching > 0
 
     @pytest.mark.asyncio
-    async def test_bool_params_forwarded(self, monkeypatch):
-        from multiomics_explorer.mcp_server import tools as tools_mod
-        from fastmcp import Client
-        from unittest.mock import MagicMock
-        mock_api = MagicMock(return_value=self._MINIMAL_ENVELOPE)
-        monkeypatch.setattr(tools_mod.api, "list_derived_metrics", mock_api)
-        async with Client(tools_mod.mcp) as client:
-            await client.call_tool(
-                "list_derived_metrics",
-                {"rankable": True, "has_p_value": False},
+    async def test_bool_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_derived_metrics",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["list_derived_metrics"](
+                mock_ctx, rankable=True, has_p_value=False,
             )
-        _, kwargs = mock_api.call_args
+        mock_api.assert_called_once()
+        kwargs = mock_api.call_args.kwargs
         assert kwargs["rankable"] is True
         assert kwargs["has_p_value"] is False
 
-    @pytest.mark.asyncio
-    async def test_value_kind_literal_enforced(self, monkeypatch):
-        from multiomics_explorer.mcp_server import tools as tools_mod
-        from fastmcp import Client
-        from fastmcp.exceptions import ToolError
-        async with Client(tools_mod.mcp) as client:
-            with pytest.raises(ToolError):
-                await client.call_tool(
-                    "list_derived_metrics", {"value_kind": "invalid"},
-                )
+    def test_value_kind_literal_enforced(self, tool_fns):
+        """Verify the Literal['numeric','boolean','categorical'] annotation is present.
+
+        Calling tool_fns[...] invokes the raw function and bypasses FastMCP's
+        Pydantic validation layer, so we cannot trigger a ToolError here.
+        Instead we introspect the type hint — FastMCP uses it to build the JSON
+        schema that enforces the constraint at the MCP protocol boundary.
+        """
+        import inspect
+        import typing
+        fn = tool_fns["list_derived_metrics"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        vk_hint = hints.get("value_kind")
+        assert vk_hint is not None, "value_kind parameter not found in type hints"
+        hint_str = str(vk_hint)
+        assert "Literal" in hint_str, f"Expected Literal in value_kind hint, got: {hint_str}"
+        for valid in ("numeric", "boolean", "categorical"):
+            assert valid in hint_str, (
+                f"Expected '{valid}' in value_kind Literal, got: {hint_str}"
+            )
 
     @pytest.mark.asyncio
-    async def test_value_error_becomes_tool_error(self, monkeypatch):
-        from multiomics_explorer.mcp_server import tools as tools_mod
-        from fastmcp import Client
-        from fastmcp.exceptions import ToolError
-        from unittest.mock import MagicMock
-        monkeypatch.setattr(
-            tools_mod.api, "list_derived_metrics",
-            MagicMock(side_effect=ValueError("search_text must not be empty.")),
-        )
-        async with Client(tools_mod.mcp) as client:
-            with pytest.raises(ToolError):
-                await client.call_tool("list_derived_metrics", {"search_text": ""})
+    async def test_value_error_becomes_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_derived_metrics",
+            side_effect=ValueError("search_text must not be empty."),
+        ):
+            with pytest.raises(ToolError, match="search_text must not be empty"):
+                await tool_fns["list_derived_metrics"](mock_ctx, search_text="")
