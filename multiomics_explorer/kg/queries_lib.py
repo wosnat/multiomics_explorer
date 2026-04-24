@@ -4230,6 +4230,12 @@ def _list_derived_metrics_where(
     Organism uses space-split CONTAINS (mirrors _list_experiments_where).
     rankable / has_p_value bool params are coerced to string "true"/"false"
     for comparison against KG-stored strings.
+    omics_type is scalar on DerivedMetric (unlike list-valued on Experiment);
+    filter is exact-match after toUpper normalization.
+    treatment_type / background_factors / growth_phases are wrapped in
+    coalesce(..., []) defensively — the KG convention guarantees non-null
+    lists, but the coalesce keeps the ANY() filter null-safe against
+    schema drift.
     """
     conditions: list[str] = []
     params: dict = {}
