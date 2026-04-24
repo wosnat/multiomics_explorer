@@ -4319,3 +4319,67 @@ class TestListDerivedMetricsWhere:
             organism="NATL2A", value_kind="boolean", rankable=False)
         assert len(conditions) == 3
         assert params.keys() == {"organism", "value_kind", "rankable_str"}
+
+
+class TestBuildListDerivedMetricsSummary:
+    """Tests for build_list_derived_metrics_summary."""
+
+    def test_no_filters_no_search(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics_summary
+        cypher, params = build_list_derived_metrics_summary()
+        assert "MATCH (dm:DerivedMetric)" in cypher
+        assert "CALL db.index.fulltext.queryNodes" not in cypher
+        assert "WHERE" not in cypher
+        assert "count(dm) AS total_matching" in cypher
+        assert "apoc.coll.frequencies(organisms) AS by_organism" in cypher
+        assert "apoc.coll.frequencies(value_kinds) AS by_value_kind" in cypher
+        assert "apoc.coll.frequencies(metric_types) AS by_metric_type" in cypher
+        assert "apoc.coll.frequencies(compartments) AS by_compartment" in cypher
+        assert "apoc.coll.frequencies(omics_types) AS by_omics_type" in cypher
+        assert (
+            "apoc.coll.frequencies(treatment_types_flat) AS by_treatment_type"
+            in cypher
+        )
+        assert (
+            "apoc.coll.frequencies(background_factors_flat) AS by_background_factors"
+            in cypher
+        )
+        assert (
+            "apoc.coll.frequencies(growth_phases_flat) AS by_growth_phase"
+            in cypher
+        )
+        assert "MATCH (all_dm:DerivedMetric) RETURN count(all_dm) AS total_entries" in cypher
+        assert params == {}
+
+    def test_search_text_uses_fulltext_index(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics_summary
+        cypher, params = build_list_derived_metrics_summary(search_text="diel")
+        assert (
+            "CALL db.index.fulltext.queryNodes('derivedMetricFullText', $search_text)"
+            in cypher
+        )
+        assert "YIELD node AS dm, score" in cypher
+        assert "max(score) AS score_max" in cypher
+        assert "percentileDisc(score, 0.5) AS score_median" in cypher
+        assert params == {"search_text": "diel"}
+
+    def test_shares_where_clause(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics_summary
+        cypher, params = build_list_derived_metrics_summary(
+            organism="MED4", value_kind="numeric", rankable=True)
+        assert "WHERE" in cypher
+        assert "dm.value_kind = $value_kind" in cypher
+        assert "dm.rankable = $rankable_str" in cypher
+        assert params == {
+            "organism": "MED4",
+            "value_kind": "numeric",
+            "rankable_str": "true",
+        }
+
+    def test_null_safe_flatten(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics_summary
+        cypher, _ = build_list_derived_metrics_summary()
+        # All three list-typed aggregations must tolerate null via coalesce(..., [])
+        assert "apoc.coll.flatten(collect(coalesce(dm.treatment_type, [])))" in cypher
+        assert "apoc.coll.flatten(collect(coalesce(dm.background_factors, [])))" in cypher
+        assert "apoc.coll.flatten(collect(coalesce(dm.growth_phases, [])))" in cypher

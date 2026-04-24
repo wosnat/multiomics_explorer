@@ -4305,3 +4305,80 @@ def _list_derived_metrics_where(
         params["has_p_value_str"] = "true" if has_p_value else "false"
 
     return conditions, params
+
+
+def build_list_derived_metrics_summary(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    omics_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    has_p_value: bool | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for list_derived_metrics.
+
+    RETURN keys: total_entries, total_matching, by_organism, by_value_kind,
+    by_metric_type, by_compartment, by_omics_type, by_treatment_type,
+    by_background_factors, by_growth_phase.
+    When search_text: adds score_max, score_median.
+    """
+    conditions, params = _list_derived_metrics_where(
+        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, omics_type=omics_type,
+        treatment_type=treatment_type, background_factors=background_factors,
+        growth_phases=growth_phases, publication_doi=publication_doi,
+        experiment_ids=experiment_ids, derived_metric_ids=derived_metric_ids,
+        rankable=rankable, has_p_value=has_p_value,
+    )
+
+    if search_text is not None:
+        params["search_text"] = search_text
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('derivedMetricFullText', $search_text)\n"
+            "YIELD node AS dm, score\n"
+        )
+        score_cols = (
+            ",\n     max(score) AS score_max"
+            ",\n     percentileDisc(score, 0.5) AS score_median"
+        )
+        score_return = ", score_max, score_median"
+    else:
+        match_block = "MATCH (dm:DerivedMetric)\n"
+        score_cols = ""
+        score_return = ""
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    cypher = (
+        f"{match_block}"
+        f"{where_block}"
+        "WITH collect(dm.organism_name) AS organisms,\n"
+        "     collect(dm.value_kind) AS value_kinds,\n"
+        "     collect(dm.metric_type) AS metric_types,\n"
+        "     collect(dm.compartment) AS compartments,\n"
+        "     collect(dm.omics_type) AS omics_types,\n"
+        "     apoc.coll.flatten(collect(coalesce(dm.treatment_type, []))) AS treatment_types_flat,\n"
+        "     apoc.coll.flatten(collect(coalesce(dm.background_factors, []))) AS background_factors_flat,\n"
+        "     apoc.coll.flatten(collect(coalesce(dm.growth_phases, []))) AS growth_phases_flat,\n"
+        f"     count(dm) AS total_matching{score_cols}\n"
+        "CALL { MATCH (all_dm:DerivedMetric) RETURN count(all_dm) AS total_entries }\n"
+        "RETURN total_entries, total_matching,\n"
+        "       apoc.coll.frequencies(organisms) AS by_organism,\n"
+        "       apoc.coll.frequencies(value_kinds) AS by_value_kind,\n"
+        "       apoc.coll.frequencies(metric_types) AS by_metric_type,\n"
+        "       apoc.coll.frequencies(compartments) AS by_compartment,\n"
+        "       apoc.coll.frequencies(omics_types) AS by_omics_type,\n"
+        "       apoc.coll.frequencies(treatment_types_flat) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(background_factors_flat) AS by_background_factors,\n"
+        f"       apoc.coll.frequencies(growth_phases_flat) AS by_growth_phase{score_return}"
+    )
+    return cypher, params
