@@ -4403,3 +4403,112 @@ class TestBuildListDerivedMetricsSummary:
         assert "score_max" in cypher
         assert "score_median" in cypher
         assert params == {"search_text": "diel", "organism": "MED4", "value_kind": "numeric"}
+
+
+class TestBuildListDerivedMetrics:
+    """Tests for build_list_derived_metrics (detail)."""
+
+    def test_no_filters_compact_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, params = build_list_derived_metrics()
+        # Compact RETURN — all 18 columns present with aliases
+        assert "dm.id AS derived_metric_id" in cypher
+        assert "dm.name AS name" in cypher
+        assert "dm.metric_type AS metric_type" in cypher
+        assert "dm.value_kind AS value_kind" in cypher
+        assert "dm.rankable AS rankable" in cypher
+        assert "dm.has_p_value AS has_p_value" in cypher
+        assert "dm.unit AS unit" in cypher
+        assert "CASE WHEN dm.value_kind = 'categorical'" in cypher
+        assert "THEN dm.allowed_categories ELSE null END AS allowed_categories" in cypher
+        assert "dm.field_description AS field_description" in cypher
+        assert "dm.organism_name AS organism_name" in cypher
+        assert "dm.experiment_id AS experiment_id" in cypher
+        assert "dm.publication_doi AS publication_doi" in cypher
+        assert "dm.compartment AS compartment" in cypher
+        assert "dm.omics_type AS omics_type" in cypher
+        assert "coalesce(dm.treatment_type, []) AS treatment_type" in cypher
+        assert "coalesce(dm.background_factors, []) AS background_factors" in cypher
+        assert "dm.total_gene_count AS total_gene_count" in cypher
+        assert "coalesce(dm.growth_phases, []) AS growth_phases" in cypher
+        # p_value_threshold is intentionally absent (property doesn't exist)
+        assert "p_value_threshold" not in cypher
+        assert params == {}
+
+    def test_order_by_default(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, _ = build_list_derived_metrics()
+        assert (
+            "ORDER BY dm.organism_name ASC, dm.value_kind ASC, dm.id ASC"
+            in cypher
+        )
+
+    def test_search_text_adds_score_and_sort(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, params = build_list_derived_metrics(search_text="diel")
+        assert (
+            "CALL db.index.fulltext.queryNodes('derivedMetricFullText', $search_text)"
+            in cypher
+        )
+        assert "       score" in cypher
+        assert (
+            "ORDER BY score DESC, dm.organism_name ASC, dm.value_kind ASC, dm.id ASC"
+            in cypher
+        )
+        assert params == {"search_text": "diel"}
+
+    def test_verbose_adds_three_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, _ = build_list_derived_metrics(verbose=True)
+        assert "dm.treatment AS treatment" in cypher
+        assert "dm.light_condition AS light_condition" in cypher
+        assert "dm.experimental_context AS experimental_context" in cypher
+        # p_value_threshold still NOT in Cypher — see spec §Verbose adds
+        assert "p_value_threshold" not in cypher
+
+    def test_verbose_false_omits_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, _ = build_list_derived_metrics(verbose=False)
+        assert "dm.treatment AS treatment" not in cypher
+        assert "dm.light_condition" not in cypher
+        assert "dm.experimental_context" not in cypher
+
+    def test_limit_and_offset(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, params = build_list_derived_metrics(limit=5, offset=10)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params == {"limit": 5, "offset": 10}
+
+    def test_limit_none_omits_clause(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, params = build_list_derived_metrics(limit=None, offset=0)
+        assert "LIMIT" not in cypher
+        assert "SKIP" not in cypher
+        assert params == {}
+
+    def test_combined_filters(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, params = build_list_derived_metrics(
+            organism="NATL2A", value_kind="boolean", rankable=False, limit=10)
+        assert "WHERE" in cypher
+        assert "dm.value_kind = $value_kind" in cypher
+        assert "dm.rankable = $rankable_str" in cypher
+        assert params == {
+            "organism": "NATL2A",
+            "value_kind": "boolean",
+            "rankable_str": "false",
+            "limit": 10,
+        }
+
+    def test_allowed_categories_case_gated(self):
+        """Defensive CASE-gating: allowed_categories null unless value_kind='categorical'."""
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
+        cypher, _ = build_list_derived_metrics()
+        # Must use CASE, not raw dm.allowed_categories
+        assert "dm.allowed_categories AS allowed_categories" not in cypher
+        assert (
+            "CASE WHEN dm.value_kind = 'categorical'"
+            "\n            THEN dm.allowed_categories ELSE null END AS allowed_categories"
+            in cypher
+        )
