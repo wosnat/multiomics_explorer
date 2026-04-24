@@ -1,5 +1,5 @@
 # Tool spec: list_derived_metrics
-
+ 
 **Design spec:** [`docs/superpowers/specs/2026-04-23-derived-metric-mcp-tools-design.md`](../superpowers/specs/2026-04-23-derived-metric-mcp-tools-design.md) — shared slice-1 contract (KG invariants, gate logic, envelope conventions). This file adds tool-specific verified Cypher and Pydantic surface.
 
 ## Purpose
@@ -222,7 +222,8 @@ metric_types        → dm.metric_type IN $metric_types
 value_kind          → dm.value_kind = $value_kind
 compartment         → dm.compartment = $compartment
 omics_type          → toUpper(dm.omics_type) = $omics_type_upper
-treatment_type      → ANY(t IN dm.treatment_type WHERE toLower(t) IN $treatment_types_lower)
+treatment_type      → ANY(t IN coalesce(dm.treatment_type, [])
+                           WHERE toLower(t) IN $treatment_types_lower)
 background_factors  → ANY(bf IN coalesce(dm.background_factors, [])
                            WHERE toLower(bf) IN $bfs_lower)
 growth_phases       → ANY(gp IN coalesce(dm.growth_phases, [])
