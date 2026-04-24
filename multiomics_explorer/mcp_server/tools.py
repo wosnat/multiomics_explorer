@@ -3292,6 +3292,373 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"list_clustering_analyses unexpected error: {e}")
             raise ToolError(f"Error in list_clustering_analyses: {e}")
 
+    # -----------------------------------------------------------------
+    # list_derived_metrics
+    # -----------------------------------------------------------------
+
+    class ListDerivedMetricsResult(BaseModel):
+        derived_metric_id: str = Field(
+            description=(
+                "Unique id for this DerivedMetric. Pass to `derived_metric_ids` "
+                "on drill-down tools (gene_derived_metrics, genes_by_*_metric) "
+                "to select this exact DM."
+            ),
+        )
+        name: str = Field(
+            description=(
+                "Human-readable DM name "
+                "(e.g. 'Transcript:protein amplitude ratio')."
+            ),
+        )
+        metric_type: str = Field(
+            description=(
+                "Category tag identifying what is measured "
+                "(e.g. 'diel_amplitude_protein_log2'). The same metric_type may "
+                "appear across organisms / publications — pair with organism or "
+                "publication_doi when that matters, or use derived_metric_id to "
+                "pin one specific DM."
+            ),
+        )
+        value_kind: Literal["numeric", "boolean", "categorical"] = Field(
+            description=(
+                "Routes to the correct drill-down tool: 'numeric' → "
+                "genes_by_numeric_metric, 'boolean' → genes_by_boolean_metric, "
+                "'categorical' → genes_by_categorical_metric."
+            ),
+        )
+        rankable: bool = Field(
+            description=(
+                "True if this DM supports rank / percentile / bucket analysis "
+                "on genes_by_numeric_metric. When False, the `bucket`, "
+                "`min_percentile`, `max_percentile`, and `max_rank` filters on "
+                "that drill-down do not apply — passing them with only "
+                "non-rankable DMs raises; mixing rankable + non-rankable drops "
+                "the non-rankable ones and lists them in the drill-down's "
+                "`excluded_derived_metrics`."
+            ),
+        )
+        has_p_value: bool = Field(
+            description=(
+                "True if this DM carries statistical p-values, enabling "
+                "`significant_only` and `max_adjusted_p_value` on drill-downs. "
+                "No DM in the current KG has p-values."
+            ),
+        )
+        unit: str = Field(
+            description=(
+                "Measurement unit for numeric DMs (e.g. 'hours', 'log2'). "
+                "Empty string for boolean and categorical DMs."
+            ),
+        )
+        allowed_categories: list[str] | None = Field(
+            description=(
+                "Valid category strings for this DM. Non-null only when "
+                "value_kind='categorical'; pass a subset as `categories` to "
+                "genes_by_categorical_metric."
+            ),
+        )
+        field_description: str = Field(
+            description=(
+                "Detailed explanation of what this DM measures and how to "
+                "interpret its values."
+            ),
+        )
+        organism_name: str = Field(
+            description=(
+                "Full organism name (e.g. 'Prochlorococcus MED4', "
+                "'Alteromonas macleodii MIT1002')."
+            ),
+        )
+        experiment_id: str = Field(
+            description=(
+                "Parent Experiment node id. Look up context via list_experiments."
+            ),
+        )
+        publication_doi: str = Field(
+            description="Parent publication DOI (e.g. '10.1128/mSystems.00040-18').",
+        )
+        compartment: str = Field(
+            description=(
+                "Sample compartment or scope (e.g. 'whole_cell', 'vesicle', "
+                "'exoproteome', 'spent_medium', 'lysate')."
+            ),
+        )
+        omics_type: str = Field(
+            description=(
+                "Omics assay type (e.g. 'RNASEQ', 'PROTEOME', "
+                "'PAIRED_RNASEQ_PROTEOME')."
+            ),
+        )
+        treatment_type: list[str] = Field(
+            description="Treatment type(s) (e.g. ['diel'], ['darkness']).",
+        )
+        background_factors: list[str] = Field(
+            description=(
+                "Background experimental factors (e.g. ['axenic'], "
+                "['coculture', 'diel']). May be empty."
+            ),
+        )
+        total_gene_count: int = Field(
+            description=(
+                "Number of distinct genes with at least one measurement for "
+                "this DM."
+            ),
+        )
+        growth_phases: list[str] = Field(
+            description=(
+                "Growth phase(s) this DM pertains to (e.g. ['darkness']). "
+                "May be empty."
+            ),
+        )
+        score: float | None = Field(
+            default=None,
+            description=(
+                "Full-text relevance score; present only when search_text was "
+                "provided."
+            ),
+        )
+        treatment: str | None = Field(
+            default=None,
+            description="Treatment description in plain language (verbose mode only).",
+        )
+        light_condition: str | None = Field(
+            default=None,
+            description="Light regime (e.g. 'light:dark cycle'; verbose mode only).",
+        )
+        experimental_context: str | None = Field(
+            default=None,
+            description=(
+                "Longer description of the experimental setup that produced "
+                "this DM (verbose mode only)."
+            ),
+        )
+        p_value_threshold: float | None = Field(
+            default=None,
+            description=(
+                "Threshold that defines statistical significance for this DM. "
+                "Non-null only when has_p_value=True (verbose mode only; no DM "
+                "in current KG has a threshold)."
+            ),
+        )
+
+    class ListDerivedMetricsResponse(BaseModel):
+        total_entries: int = Field(description="Total DMs in the KG (unfiltered baseline).")
+        total_matching: int = Field(description="DMs matching all applied filters.")
+        by_organism: list[dict] = Field(
+            description=(
+                "Counts per organism (list of {organism_name, count}, "
+                "sorted by count desc)."
+            ),
+        )
+        by_value_kind: list[dict] = Field(
+            description="Counts per value_kind (list of {value_kind, count}).",
+        )
+        by_metric_type: list[dict] = Field(
+            description="Counts per metric_type (list of {metric_type, count}).",
+        )
+        by_compartment: list[dict] = Field(
+            description="Counts per compartment (list of {compartment, count}).",
+        )
+        by_omics_type: list[dict] = Field(
+            description="Counts per omics_type (list of {omics_type, count}).",
+        )
+        by_treatment_type: list[dict] = Field(
+            description=(
+                "Counts per treatment_type (list of {treatment_type, count}; "
+                "DM treatment_type lists are flattened before counting)."
+            ),
+        )
+        by_background_factors: list[dict] = Field(
+            description=(
+                "Counts per background_factor (list of "
+                "{background_factor, count}; flattened)."
+            ),
+        )
+        by_growth_phase: list[dict] = Field(
+            description=(
+                "Counts per growth_phase (list of {growth_phase, count}; "
+                "flattened)."
+            ),
+        )
+        score_max: float | None = Field(
+            default=None,
+            description=(
+                "Max relevance score; present only when search_text was provided."
+            ),
+        )
+        score_median: float | None = Field(
+            default=None,
+            description=(
+                "Median relevance score; present only when search_text was "
+                "provided."
+            ),
+        )
+        returned: int = Field(description="Number of rows in results.")
+        offset: int = Field(description="Pagination offset used for this call.")
+        truncated: bool = Field(
+            description=(
+                "True when total_matching > returned (more rows available — "
+                "paginate with offset)."
+            ),
+        )
+        results: list["ListDerivedMetricsResult"] = Field(
+            description="Matching DerivedMetric entries. Empty when summary=True.",
+        )
+
+    @mcp.tool(
+        tags={"derived-metrics", "discovery", "catalog"},
+        annotations={"readOnlyHint": True},
+    )
+    async def list_derived_metrics(
+        ctx: Context,
+        search_text: Annotated[str | None, Field(
+            description=(
+                "Full-text search over DM name and field_description. "
+                "Examples: 'diel amplitude', 'darkness survival', 'peak time'."
+            ),
+        )] = None,
+        organism: Annotated[str | None, Field(
+            description=(
+                "Organism to filter by. Accepts short strain code "
+                "('MED4', 'NATL2A', 'MIT1002') or full name "
+                "('Prochlorococcus MED4'). Case-insensitive substring match."
+            ),
+        )] = None,
+        metric_types: Annotated[list[str] | None, Field(
+            description=(
+                "Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2', "
+                "'periodic_in_coculture_LD'). The same metric_type may appear "
+                "across organisms / publications — use derived_metric_ids to "
+                "pin one specific DM when that matters."
+            ),
+        )] = None,
+        value_kind: Annotated[Literal["numeric", "boolean", "categorical"] | None, Field(
+            description=(
+                "Filter by value kind. Determines which drill-down tool "
+                "applies: 'numeric' → genes_by_numeric_metric, 'boolean' → "
+                "genes_by_boolean_metric, 'categorical' → "
+                "genes_by_categorical_metric."
+            ),
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description=(
+                "Sample compartment / scope. Current values: 'whole_cell', "
+                "'vesicle', 'exoproteome', 'spent_medium', 'lysate'."
+            ),
+        )] = None,
+        omics_type: Annotated[str | None, Field(
+            description=(
+                "Omics assay type. Examples: 'RNASEQ', 'PROTEOME', "
+                "'PAIRED_RNASEQ_PROTEOME'. Case-insensitive."
+            ),
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description=(
+                "Treatment type(s) to match. Returns DMs whose treatment_type "
+                "list overlaps ANY of the given values (e.g. 'diel', "
+                "'darkness', 'nitrogen_starvation'). Case-insensitive."
+            ),
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description=(
+                "Background experimental factor(s) to match (e.g. 'axenic', "
+                "'coculture', 'diel'). Returns DMs overlapping ANY given "
+                "value. Case-insensitive."
+            ),
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description=(
+                "Growth phase(s) to match (e.g. 'darkness', 'exponential'). "
+                "Case-insensitive."
+            ),
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description=(
+                "Filter by one or more publication DOIs "
+                "(e.g. '10.1128/mSystems.00040-18'). Exact match."
+            ),
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Filter by one or more Experiment node ids.",
+        )] = None,
+        derived_metric_ids: Annotated[list[str] | None, Field(
+            description=(
+                "Look up specific DMs by their unique id (matches "
+                "`derived_metric_id` on each result). Use to pin one DM when "
+                "the same metric_type appears across publications or "
+                "organisms."
+            ),
+        )] = None,
+        rankable: Annotated[bool | None, Field(
+            description=(
+                "Filter to DMs that support rank / percentile / bucket "
+                "analysis. Set to True before calling genes_by_numeric_metric "
+                "with `bucket`, `min_percentile`, `max_percentile`, or "
+                "`max_rank` — those filters require rankable=True on every "
+                "selected DM."
+            ),
+        )] = None,
+        has_p_value: Annotated[bool | None, Field(
+            description=(
+                "Filter to DMs that carry statistical p-values. Set to True "
+                "before using `significant_only` or `max_adjusted_p_value` on "
+                "drill-downs. No DM in the current KG carries p-values, so "
+                "has_p_value=True returns zero rows today — kept available "
+                "because the drill-down p-value filters raise when no "
+                "selected DM supports them."
+            ),
+        )] = None,
+        summary: Annotated[bool, Field(
+            description=(
+                "Return summary fields only (counts and breakdowns, no "
+                "individual results). Use for quick orientation."
+            ),
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description=(
+                "Include detailed text fields per result: treatment, "
+                "light_condition, experimental_context, p_value_threshold."
+            ),
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results to return. Paginate with offset.", ge=0,
+        )] = 20,
+        offset: Annotated[int, Field(
+            description="Pagination offset (starting row, 0-indexed).", ge=0,
+        )] = 0,
+    ) -> ListDerivedMetricsResponse:
+        """Discover DerivedMetric (DM) nodes — column-level scalar summaries
+        of gene behavior (e.g. rhythmicity flags, diel amplitudes,
+        darkness-survival class) that sit alongside DE and gene clusters as
+        non-DE evidence.
+
+        Call this first, before `gene_derived_metrics` or the three
+        `genes_by_{kind}_metric` drill-downs. Inspect `value_kind` (routes
+        you to the right drill-down), `rankable` (gates bucket / percentile
+        / rank filters), `has_p_value` (gates significance filters), and
+        `allowed_categories` (for categorical DMs) here — drill-down tools
+        will raise if you pass filters that the selected DM set doesn't
+        support.
+        """
+        try:
+            data = api.list_derived_metrics(
+                search_text=search_text, organism=organism,
+                metric_types=metric_types, value_kind=value_kind,
+                compartment=compartment, omics_type=omics_type,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases, publication_doi=publication_doi,
+                experiment_ids=experiment_ids,
+                derived_metric_ids=derived_metric_ids,
+                rankable=rankable, has_p_value=has_p_value,
+                summary=summary, verbose=verbose,
+                limit=limit, offset=offset,
+            )
+        except ValueError as exc:
+            raise ToolError(str(exc)) from exc
+
+        return ListDerivedMetricsResponse(**data)
+
     # ── gene_clusters_by_gene ──────────────────────────────────────────
 
     class GeneClusterAnalysisBreakdown(BaseModel):
@@ -3938,3 +4305,10 @@ def register_tools(mcp: FastMCP):
             await ctx.warning("; ".join(warnings))
 
         return ClusterEnrichmentResponse(**envelope)
+
+
+# ---------------------------------------------------------------------------
+# Module-level FastMCP instance (used by tests via tools_mod.mcp)
+# ---------------------------------------------------------------------------
+mcp = FastMCP("multiomics-kg-tools")
+register_tools(mcp)

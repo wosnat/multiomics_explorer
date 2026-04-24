@@ -58,6 +58,7 @@ EXPECTED_TOOLS = [
     "differential_expression_by_ortholog",
     "gene_response_profile",
     "list_clustering_analyses",
+    "list_derived_metrics",
     "gene_clusters_by_gene",
     "genes_in_cluster",
     "ontology_landscape",
@@ -3381,3 +3382,101 @@ class TestClusterEnrichmentWrapper:
             assert cp_name in field.description, (
                 f"{field_name} description should mention clusterProfiler name {cp_name}"
             )
+
+
+class TestListDerivedMetricsWrapper:
+    """Tests for the list_derived_metrics MCP wrapper."""
+
+    _MINIMAL_ENVELOPE = {
+        "total_entries": 13,
+        "total_matching": 0,
+        "by_organism": [],
+        "by_value_kind": [],
+        "by_metric_type": [],
+        "by_compartment": [],
+        "by_omics_type": [],
+        "by_treatment_type": [],
+        "by_background_factors": [],
+        "by_growth_phase": [],
+        "score_max": None,
+        "score_median": None,
+        "returned": 0,
+        "offset": 0,
+        "truncated": False,
+        "results": [],
+    }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, monkeypatch):
+        from multiomics_explorer.mcp_server import tools as tools_mod
+        from fastmcp import Client
+        from unittest.mock import MagicMock
+        monkeypatch.setattr(
+            tools_mod.api, "list_derived_metrics",
+            MagicMock(return_value=self._MINIMAL_ENVELOPE),
+        )
+        async with Client(tools_mod.mcp) as client:
+            result = await client.call_tool("list_derived_metrics", {})
+        envelope = result.structured_content
+        assert envelope["total_entries"] == 13
+        assert envelope["total_matching"] == 0
+        assert envelope["results"] == []
+        assert envelope["truncated"] is False
+
+    @pytest.mark.asyncio
+    async def test_summary_mode(self, monkeypatch):
+        from multiomics_explorer.mcp_server import tools as tools_mod
+        from fastmcp import Client
+        from unittest.mock import MagicMock
+        summary_env = {**self._MINIMAL_ENVELOPE, "total_matching": 13, "truncated": True}
+        monkeypatch.setattr(
+            tools_mod.api, "list_derived_metrics",
+            MagicMock(return_value=summary_env),
+        )
+        async with Client(tools_mod.mcp) as client:
+            result = await client.call_tool("list_derived_metrics", {"summary": True})
+        envelope = result.structured_content
+        assert envelope["total_matching"] == 13
+        assert envelope["truncated"] is True
+        assert envelope["results"] == []
+
+    @pytest.mark.asyncio
+    async def test_bool_params_forwarded(self, monkeypatch):
+        from multiomics_explorer.mcp_server import tools as tools_mod
+        from fastmcp import Client
+        from unittest.mock import MagicMock
+        mock_api = MagicMock(return_value=self._MINIMAL_ENVELOPE)
+        monkeypatch.setattr(tools_mod.api, "list_derived_metrics", mock_api)
+        async with Client(tools_mod.mcp) as client:
+            await client.call_tool(
+                "list_derived_metrics",
+                {"rankable": True, "has_p_value": False},
+            )
+        _, kwargs = mock_api.call_args
+        assert kwargs["rankable"] is True
+        assert kwargs["has_p_value"] is False
+
+    @pytest.mark.asyncio
+    async def test_value_kind_literal_enforced(self, monkeypatch):
+        from multiomics_explorer.mcp_server import tools as tools_mod
+        from fastmcp import Client
+        from fastmcp.exceptions import ToolError
+        async with Client(tools_mod.mcp) as client:
+            with pytest.raises(ToolError):
+                await client.call_tool(
+                    "list_derived_metrics", {"value_kind": "invalid"},
+                )
+
+    @pytest.mark.asyncio
+    async def test_value_error_becomes_tool_error(self, monkeypatch):
+        from multiomics_explorer.mcp_server import tools as tools_mod
+        from fastmcp import Client
+        from fastmcp.exceptions import ToolError
+        from unittest.mock import MagicMock
+        monkeypatch.setattr(
+            tools_mod.api, "list_derived_metrics",
+            MagicMock(side_effect=ValueError("search_text must not be empty.")),
+        )
+        async with Client(tools_mod.mcp) as client:
+            with pytest.raises(ToolError):
+                await client.call_tool("list_derived_metrics", {"search_text": ""})
