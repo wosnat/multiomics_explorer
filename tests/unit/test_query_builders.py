@@ -4350,6 +4350,8 @@ class TestBuildListDerivedMetricsSummary:
         )
         assert "MATCH (all_dm:DerivedMetric) RETURN count(all_dm) AS total_entries" in cypher
         assert params == {}
+        assert "score_max" not in cypher
+        assert "score_median" not in cypher
 
     def test_search_text_uses_fulltext_index(self):
         from multiomics_explorer.kg.queries_lib import build_list_derived_metrics_summary
@@ -4383,3 +4385,21 @@ class TestBuildListDerivedMetricsSummary:
         assert "apoc.coll.flatten(collect(coalesce(dm.treatment_type, [])))" in cypher
         assert "apoc.coll.flatten(collect(coalesce(dm.background_factors, [])))" in cypher
         assert "apoc.coll.flatten(collect(coalesce(dm.growth_phases, [])))" in cypher
+
+    def test_search_text_with_filters(self):
+        from multiomics_explorer.kg.queries_lib import build_list_derived_metrics_summary
+        cypher, params = build_list_derived_metrics_summary(
+            search_text="diel", organism="MED4", value_kind="numeric")
+        # Both fulltext MATCH and WHERE present
+        assert (
+            "CALL db.index.fulltext.queryNodes('derivedMetricFullText', $search_text)"
+            in cypher
+        )
+        assert "WHERE" in cypher
+        assert "dm.value_kind = $value_kind" in cypher
+        # WHERE clause must come AFTER the YIELD line
+        assert cypher.index("YIELD node AS dm, score") < cypher.index("WHERE")
+        # Score columns only when search_text — present here
+        assert "score_max" in cypher
+        assert "score_median" in cypher
+        assert params == {"search_text": "diel", "organism": "MED4", "value_kind": "numeric"}
