@@ -4209,3 +4209,113 @@ class TestDEGrowthPhases:
             group_ids=["OG1"]
         )
         assert "rows_by_growth_phase" in cypher
+
+
+class TestListDerivedMetricsWhere:
+    """Tests for the shared WHERE-clause helper."""
+
+    def test_no_filters_returns_empty(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where()
+        assert conditions == []
+        assert params == {}
+
+    def test_organism_space_split_contains(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(organism="MED4")
+        assert len(conditions) == 1
+        assert "ALL(word IN split(toLower($organism), ' ')" in conditions[0]
+        assert "toLower(dm.organism_name) CONTAINS word" in conditions[0]
+        assert params == {"organism": "MED4"}
+
+    def test_metric_types_list(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(
+            metric_types=["damping_ratio", "peak_time_protein_h"])
+        assert conditions == ["dm.metric_type IN $metric_types"]
+        assert params == {"metric_types": ["damping_ratio", "peak_time_protein_h"]}
+
+    def test_value_kind(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(value_kind="numeric")
+        assert conditions == ["dm.value_kind = $value_kind"]
+        assert params == {"value_kind": "numeric"}
+
+    def test_compartment(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(compartment="whole_cell")
+        assert conditions == ["dm.compartment = $compartment"]
+        assert params == {"compartment": "whole_cell"}
+
+    def test_omics_type_upper(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(omics_type="rnaseq")
+        assert conditions == ["toUpper(dm.omics_type) = $omics_type_upper"]
+        assert params == {"omics_type_upper": "RNASEQ"}
+
+    def test_treatment_type_any_lowered(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(treatment_type=["Diel", "DARKNESS"])
+        assert len(conditions) == 1
+        assert "ANY(t IN coalesce(dm.treatment_type, [])" in conditions[0]
+        assert "toLower(t) IN $treatment_types_lower" in conditions[0]
+        assert params == {"treatment_types_lower": ["diel", "darkness"]}
+
+    def test_background_factors_any_lowered_null_safe(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(background_factors=["Axenic"])
+        assert len(conditions) == 1
+        assert "ANY(bf IN coalesce(dm.background_factors, [])" in conditions[0]
+        assert params == {"background_factors_lower": ["axenic"]}
+
+    def test_growth_phases_any_lowered(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(growth_phases=["Darkness"])
+        assert len(conditions) == 1
+        assert "ANY(gp IN coalesce(dm.growth_phases, [])" in conditions[0]
+        assert params == {"growth_phases_lower": ["darkness"]}
+
+    def test_publication_doi_list(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(
+            publication_doi=["10.1128/mSystems.00040-18"])
+        assert conditions == ["dm.publication_doi IN $publication_doi"]
+        assert params == {"publication_doi": ["10.1128/mSystems.00040-18"]}
+
+    def test_experiment_ids_list(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(experiment_ids=["exp_1"])
+        assert conditions == ["dm.experiment_id IN $experiment_ids"]
+        assert params == {"experiment_ids": ["exp_1"]}
+
+    def test_derived_metric_ids_list(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(derived_metric_ids=["dm:1", "dm:2"])
+        assert conditions == ["dm.id IN $derived_metric_ids"]
+        assert params == {"derived_metric_ids": ["dm:1", "dm:2"]}
+
+    def test_rankable_true_coerces_to_string(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(rankable=True)
+        assert conditions == ["dm.rankable = $rankable_str"]
+        assert params == {"rankable_str": "true"}
+
+    def test_rankable_false_coerces_to_string(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(rankable=False)
+        assert conditions == ["dm.rankable = $rankable_str"]
+        assert params == {"rankable_str": "false"}
+
+    def test_has_p_value_coerces_to_string(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        _, params_true = _list_derived_metrics_where(has_p_value=True)
+        _, params_false = _list_derived_metrics_where(has_p_value=False)
+        assert params_true == {"has_p_value_str": "true"}
+        assert params_false == {"has_p_value_str": "false"}
+
+    def test_combined_filters(self):
+        from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
+        conditions, params = _list_derived_metrics_where(
+            organism="NATL2A", value_kind="boolean", rankable=False)
+        assert len(conditions) == 3
+        assert params.keys() == {"organism", "value_kind", "rankable_str"}

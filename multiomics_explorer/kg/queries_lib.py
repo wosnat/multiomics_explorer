@@ -4206,3 +4206,96 @@ def build_ontology_organism_gene_count(
     """
     cypher = "MATCH (g:Gene {organism_name:$org}) RETURN count(g) AS total_genes"
     return cypher, {"org": organism_name}
+
+
+def _list_derived_metrics_where(
+    *,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    omics_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    has_p_value: bool | None = None,
+) -> tuple[list[str], dict]:
+    """Shared WHERE builder for build_list_derived_metrics{,_summary}.
+
+    Returns (conditions, params). All filters are AND-joined at the caller.
+    Organism uses space-split CONTAINS (mirrors _list_experiments_where).
+    rankable / has_p_value bool params are coerced to string "true"/"false"
+    for comparison against KG-stored strings.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if organism:
+        conditions.append(
+            "ALL(word IN split(toLower($organism), ' ')"
+            " WHERE toLower(dm.organism_name) CONTAINS word)"
+        )
+        params["organism"] = organism
+
+    if metric_types:
+        conditions.append("dm.metric_type IN $metric_types")
+        params["metric_types"] = metric_types
+
+    if value_kind:
+        conditions.append("dm.value_kind = $value_kind")
+        params["value_kind"] = value_kind
+
+    if compartment:
+        conditions.append("dm.compartment = $compartment")
+        params["compartment"] = compartment
+
+    if omics_type:
+        conditions.append("toUpper(dm.omics_type) = $omics_type_upper")
+        params["omics_type_upper"] = omics_type.upper()
+
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN coalesce(dm.treatment_type, [])"
+            " WHERE toLower(t) IN $treatment_types_lower)"
+        )
+        params["treatment_types_lower"] = [t.lower() for t in treatment_type]
+
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(dm.background_factors, [])"
+            " WHERE toLower(bf) IN $background_factors_lower)"
+        )
+        params["background_factors_lower"] = [bf.lower() for bf in background_factors]
+
+    if growth_phases:
+        conditions.append(
+            "ANY(gp IN coalesce(dm.growth_phases, [])"
+            " WHERE toLower(gp) IN $growth_phases_lower)"
+        )
+        params["growth_phases_lower"] = [gp.lower() for gp in growth_phases]
+
+    if publication_doi:
+        conditions.append("dm.publication_doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+
+    if experiment_ids:
+        conditions.append("dm.experiment_id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+
+    if derived_metric_ids:
+        conditions.append("dm.id IN $derived_metric_ids")
+        params["derived_metric_ids"] = derived_metric_ids
+
+    if rankable is not None:
+        conditions.append("dm.rankable = $rankable_str")
+        params["rankable_str"] = "true" if rankable else "false"
+
+    if has_p_value is not None:
+        conditions.append("dm.has_p_value = $has_p_value_str")
+        params["has_p_value_str"] = "true" if has_p_value else "false"
+
+    return conditions, params
