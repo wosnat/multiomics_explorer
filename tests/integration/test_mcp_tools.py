@@ -1038,3 +1038,154 @@ class TestClusterEnrichmentIntegration:
         union_max = max((len(v) for v in r_union.inputs.background.values()), default=0)
         org_max = max((len(v) for v in r_org.inputs.background.values()), default=0)
         assert org_max >= union_max
+
+
+@pytest.mark.kg
+class TestListDerivedMetrics:
+    """Live-KG integration tests for list_derived_metrics."""
+
+    def test_no_filters_13_dms(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(conn=conn, limit=None)
+        assert out["total_entries"] == 13
+        assert out["total_matching"] == 13
+        assert len(out["results"]) == 13
+
+    def test_value_kind_numeric_6(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
+        assert out["total_matching"] == 6
+        assert all(r["compartment"] == "whole_cell" for r in out["results"])
+
+    def test_value_kind_boolean_6(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(value_kind="boolean", conn=conn, limit=None)
+        assert out["total_matching"] == 6
+        # 4 NATL2A + 2 MIT1002
+        organisms = {r["organism_name"] for r in out["results"]}
+        assert organisms == {
+            "Prochlorococcus NATL2A", "Alteromonas macleodii MIT1002",
+        }
+
+    def test_value_kind_categorical_1(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(value_kind="categorical", conn=conn, limit=None)
+        assert out["total_matching"] == 1
+        row = out["results"][0]
+        assert row["metric_type"] == "darkness_survival_class"
+        assert row["allowed_categories"] is not None
+        assert len(row["allowed_categories"]) == 3
+
+    def test_rankable_true_4(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(rankable=True, conn=conn, limit=None)
+        assert out["total_matching"] == 4
+        assert all(r["rankable"] == "true" for r in out["results"])
+
+    def test_rankable_false_2(self, conn):
+        """Sanity-checks bool→'false' string coercion path.
+        Baseline updated from plan's 2 to 9: boolean DMs (periodic_*, darkness_survival_class)
+        also carry rankable='false', giving 2 numeric + 6 boolean + 1 categorical = 9.
+        """
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(rankable=False, conn=conn, limit=None)
+        assert out["total_matching"] == 9
+        metric_types = {r["metric_type"] for r in out["results"]}
+        # The two non-rankable numeric DMs are always in this set
+        assert "peak_time_protein_h" in metric_types
+        assert "peak_time_transcript_h" in metric_types
+        assert all(r["rankable"] == "false" for r in out["results"])
+
+    def test_has_p_value_true_empty(self, conn):
+        """Intentional: no DM in current KG has p-values."""
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(has_p_value=True, conn=conn, limit=None)
+        assert out["total_matching"] == 0
+        assert out["results"] == []
+
+    def test_organism_short_code(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(organism="MED4", conn=conn, limit=None)
+        assert out["total_matching"] == 6
+        assert all(r["organism_name"] == "Prochlorococcus MED4" for r in out["results"])
+
+    def test_organism_full_name(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(
+            organism="Prochlorococcus NATL2A", conn=conn, limit=None)
+        assert out["total_matching"] == 5
+
+    def test_organism_alteromonas(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(organism="MIT1002", conn=conn, limit=None)
+        assert out["total_matching"] == 2
+
+    def test_search_text_diel_amplitude(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(search_text="diel amplitude", conn=conn, limit=5)
+        # Top hits must include both diel_amplitude_* DMs
+        top_metric_types = [r["metric_type"] for r in out["results"][:2]]
+        assert "diel_amplitude_protein_log2" in top_metric_types
+        assert "diel_amplitude_transcript_log2" in top_metric_types
+        assert out["score_max"] is not None
+        assert out["score_median"] is not None
+
+    def test_publication_biller_7(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(
+            publication_doi=["10.1128/mSystems.00040-18"], conn=conn, limit=None)
+        assert out["total_matching"] == 7
+
+    def test_derived_metric_ids_direct(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        target = (
+            "derived_metric:journal.pone.0043432:"
+            "table_s2_waldbauer_diel_metrics:damping_ratio"
+        )
+        out = list_derived_metrics(derived_metric_ids=[target], conn=conn)
+        assert out["total_matching"] == 1
+        assert out["results"][0]["derived_metric_id"] == target
+
+    def test_summary_results_empty(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(summary=True, conn=conn)
+        assert out["results"] == []
+        assert out["returned"] == 0
+        assert len(out["by_value_kind"]) == 3  # numeric, boolean, categorical
+        assert len(out["by_organism"]) == 3
+
+    def test_verbose_adds_fields(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(verbose=True, limit=1, conn=conn)
+        row = out["results"][0]
+        assert "treatment" in row
+        assert "light_condition" in row
+        assert "experimental_context" in row
+        # p_value_threshold NOT in Cypher — still keyed in Pydantic default, absent here
+        assert row.get("p_value_threshold") is None
+
+    def test_envelope_keys_always_present(self, conn):
+        """Zero-row filter case: breakdowns are [], not missing."""
+        from multiomics_explorer.api import list_derived_metrics
+        out = list_derived_metrics(
+            derived_metric_ids=["nonexistent:id"], conn=conn, limit=None)
+        assert out["total_matching"] == 0
+        for key in (
+            "by_organism", "by_value_kind", "by_metric_type", "by_compartment",
+            "by_omics_type", "by_treatment_type", "by_background_factors",
+            "by_growth_phase",
+        ):
+            assert key in out
+            assert out[key] == []
+        assert out["results"] == []
+        assert out["score_max"] is None
+
+    def test_pagination_offset(self, conn):
+        from multiomics_explorer.api import list_derived_metrics
+        page1 = list_derived_metrics(conn=conn, limit=5, offset=0)
+        page2 = list_derived_metrics(conn=conn, limit=5, offset=5)
+        page1_ids = {r["derived_metric_id"] for r in page1["results"]}
+        page2_ids = {r["derived_metric_id"] for r in page2["results"]}
+        assert page1_ids.isdisjoint(page2_ids)
+        assert page1["truncated"] is True
+        assert page2["truncated"] is True  # 5 + 5 = 10 < 13
