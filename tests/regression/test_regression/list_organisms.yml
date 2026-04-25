@@ -106,9 +106,8 @@ rows:
   - diel
   - light
   clade: null
-  cluster_types:
-  - classification
-  clustering_analysis_count: 1
+  cluster_types: []
+  clustering_analysis_count: 0
   experiment_count: 8
   gene_count: 4028
   genus: Alteromonas
@@ -287,7 +286,7 @@ rows:
   - diel
   - time_course
   clustering_analysis_count: 4
-  experiment_count: 108
+  experiment_count: 109
   gene_count: 1976
   genus: Prochlorococcus
   growth_phases:
@@ -303,11 +302,12 @@ rows:
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
+  - PAIRED_RNASEQ_PROTEOME
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
-  publication_count: 14
+  publication_count: 15
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -468,9 +468,8 @@ rows:
   - viral
   clade: LLII
   cluster_types:
-  - classification
   - diel
-  clustering_analysis_count: 4
+  clustering_analysis_count: 2
   experiment_count: 17
   gene_count: 2214
   genus: Prochlorococcus

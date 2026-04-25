@@ -4206,3 +4206,285 @@ def build_ontology_organism_gene_count(
     """
     cypher = "MATCH (g:Gene {organism_name:$org}) RETURN count(g) AS total_genes"
     return cypher, {"org": organism_name}
+
+
+def _list_derived_metrics_where(
+    *,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    omics_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    has_p_value: bool | None = None,
+) -> tuple[list[str], dict]:
+    """Shared WHERE builder for build_list_derived_metrics{,_summary}.
+
+    Returns (conditions, params). All filters are AND-joined at the caller.
+    Organism uses space-split CONTAINS (mirrors _list_experiments_where).
+    rankable / has_p_value bool params are coerced to string "true"/"false"
+    for comparison against KG-stored strings.
+    omics_type is scalar on DerivedMetric (unlike list-valued on Experiment);
+    filter is exact-match after toUpper normalization.
+    treatment_type / background_factors / growth_phases are wrapped in
+    coalesce(..., []) defensively — the KG convention guarantees non-null
+    lists, but the coalesce keeps the ANY() filter null-safe against
+    schema drift.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if organism:
+        conditions.append(
+            "ALL(word IN split(toLower($organism), ' ')"
+            " WHERE toLower(dm.organism_name) CONTAINS word)"
+        )
+        params["organism"] = organism
+
+    if metric_types:
+        conditions.append("dm.metric_type IN $metric_types")
+        params["metric_types"] = metric_types
+
+    if value_kind:
+        conditions.append("dm.value_kind = $value_kind")
+        params["value_kind"] = value_kind
+
+    if compartment:
+        conditions.append("dm.compartment = $compartment")
+        params["compartment"] = compartment
+
+    if omics_type:
+        conditions.append("toUpper(dm.omics_type) = $omics_type_upper")
+        params["omics_type_upper"] = omics_type.upper()
+
+    if treatment_type:
+        conditions.append(
+            "ANY(t IN coalesce(dm.treatment_type, [])"
+            " WHERE toLower(t) IN $treatment_types_lower)"
+        )
+        params["treatment_types_lower"] = [t.lower() for t in treatment_type]
+
+    if background_factors:
+        conditions.append(
+            "ANY(bf IN coalesce(dm.background_factors, [])"
+            " WHERE toLower(bf) IN $background_factors_lower)"
+        )
+        params["background_factors_lower"] = [bf.lower() for bf in background_factors]
+
+    if growth_phases:
+        conditions.append(
+            "ANY(gp IN coalesce(dm.growth_phases, [])"
+            " WHERE toLower(gp) IN $growth_phases_lower)"
+        )
+        params["growth_phases_lower"] = [gp.lower() for gp in growth_phases]
+
+    if publication_doi:
+        conditions.append("dm.publication_doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+
+    if experiment_ids:
+        conditions.append("dm.experiment_id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+
+    if derived_metric_ids:
+        conditions.append("dm.id IN $derived_metric_ids")
+        params["derived_metric_ids"] = derived_metric_ids
+
+    if rankable is not None:
+        conditions.append("dm.rankable = $rankable_str")
+        params["rankable_str"] = "true" if rankable else "false"
+
+    if has_p_value is not None:
+        conditions.append("dm.has_p_value = $has_p_value_str")
+        params["has_p_value_str"] = "true" if has_p_value else "false"
+
+    return conditions, params
+
+
+def build_list_derived_metrics_summary(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    omics_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    has_p_value: bool | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for list_derived_metrics.
+
+    RETURN keys: total_entries, total_matching, by_organism, by_value_kind,
+    by_metric_type, by_compartment, by_omics_type, by_treatment_type,
+    by_background_factors, by_growth_phase.
+    When search_text: adds score_max, score_median.
+    """
+    conditions, params = _list_derived_metrics_where(
+        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, omics_type=omics_type,
+        treatment_type=treatment_type, background_factors=background_factors,
+        growth_phases=growth_phases, publication_doi=publication_doi,
+        experiment_ids=experiment_ids, derived_metric_ids=derived_metric_ids,
+        rankable=rankable, has_p_value=has_p_value,
+    )
+
+    if search_text is not None:
+        params["search_text"] = search_text
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('derivedMetricFullText', $search_text)\n"
+            "YIELD node AS dm, score\n"
+        )
+        score_cols = (
+            ",\n     max(score) AS score_max"
+            ",\n     percentileDisc(score, 0.5) AS score_median"
+        )
+        score_return = ", score_max, score_median"
+    else:
+        match_block = "MATCH (dm:DerivedMetric)\n"
+        score_cols = ""
+        score_return = ""
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    cypher = (
+        f"{match_block}"
+        f"{where_block}"
+        "WITH collect(dm.organism_name) AS organisms,\n"
+        "     collect(dm.value_kind) AS value_kinds,\n"
+        "     collect(dm.metric_type) AS metric_types,\n"
+        "     collect(dm.compartment) AS compartments,\n"
+        "     collect(dm.omics_type) AS omics_types,\n"
+        "     apoc.coll.flatten(collect(coalesce(dm.treatment_type, []))) AS treatment_types_flat,\n"
+        "     apoc.coll.flatten(collect(coalesce(dm.background_factors, []))) AS background_factors_flat,\n"
+        "     apoc.coll.flatten(collect(coalesce(dm.growth_phases, []))) AS growth_phases_flat,\n"
+        f"     count(dm) AS total_matching{score_cols}\n"
+        "CALL { MATCH (all_dm:DerivedMetric) RETURN count(all_dm) AS total_entries }\n"
+        "RETURN total_entries, total_matching,\n"
+        "       apoc.coll.frequencies(organisms) AS by_organism,\n"
+        "       apoc.coll.frequencies(value_kinds) AS by_value_kind,\n"
+        "       apoc.coll.frequencies(metric_types) AS by_metric_type,\n"
+        "       apoc.coll.frequencies(compartments) AS by_compartment,\n"
+        "       apoc.coll.frequencies(omics_types) AS by_omics_type,\n"
+        "       apoc.coll.frequencies(treatment_types_flat) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(background_factors_flat) AS by_background_factors,\n"
+        f"       apoc.coll.frequencies(growth_phases_flat) AS by_growth_phase{score_return}"
+    )
+    return cypher, params
+
+
+def build_list_derived_metrics(
+    *,
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    omics_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    has_p_value: bool | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for list_derived_metrics.
+
+    RETURN keys (compact): derived_metric_id, name, metric_type, value_kind,
+    rankable, has_p_value, unit, allowed_categories (CASE-gated on
+    value_kind='categorical'), field_description, organism_name,
+    experiment_id, publication_doi, compartment, omics_type,
+    treatment_type, background_factors, total_gene_count, growth_phases.
+    When search_text: adds score.
+    When verbose: adds treatment, light_condition, experimental_context.
+
+    NOTE: p_value_threshold is intentionally absent from the RETURN — the
+    property does not exist on any DerivedMetric in the current KG. See
+    docs/tool-specs/list_derived_metrics.md §Verbose adds for the
+    reinstatement rule (CASE-gated on dm.has_p_value='true').
+    """
+    conditions, params = _list_derived_metrics_where(
+        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, omics_type=omics_type,
+        treatment_type=treatment_type, background_factors=background_factors,
+        growth_phases=growth_phases, publication_doi=publication_doi,
+        experiment_ids=experiment_ids, derived_metric_ids=derived_metric_ids,
+        rankable=rankable, has_p_value=has_p_value,
+    )
+
+    if search_text is not None:
+        params["search_text"] = search_text
+        match_block = (
+            "CALL db.index.fulltext.queryNodes('derivedMetricFullText', $search_text)\n"
+            "YIELD node AS dm, score\n"
+        )
+        score_col = ",\n       score"
+        order_prefix = "score DESC, "
+    else:
+        match_block = "MATCH (dm:DerivedMetric)\n"
+        score_col = ""
+        order_prefix = ""
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       dm.treatment AS treatment"
+            ",\n       dm.light_condition AS light_condition"
+            ",\n       dm.experimental_context AS experimental_context"
+        )
+
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        f"{match_block}"
+        f"{where_block}"
+        "RETURN dm.id AS derived_metric_id,\n"
+        "       dm.name AS name,\n"
+        "       dm.metric_type AS metric_type,\n"
+        "       dm.value_kind AS value_kind,\n"
+        "       dm.rankable = 'true' AS rankable,\n"
+        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       dm.unit AS unit,\n"
+        "       CASE WHEN dm.value_kind = 'categorical'\n"
+        "            THEN dm.allowed_categories ELSE null END AS allowed_categories,\n"
+        "       dm.field_description AS field_description,\n"
+        "       dm.organism_name AS organism_name,\n"
+        "       dm.experiment_id AS experiment_id,\n"
+        "       dm.publication_doi AS publication_doi,\n"
+        "       dm.compartment AS compartment,\n"
+        "       dm.omics_type AS omics_type,\n"
+        "       coalesce(dm.treatment_type, []) AS treatment_type,\n"
+        "       coalesce(dm.background_factors, []) AS background_factors,\n"
+        "       dm.total_gene_count AS total_gene_count,\n"
+        f"       coalesce(dm.growth_phases, []) AS growth_phases{score_col}{verbose_cols}\n"
+        f"ORDER BY {order_prefix}dm.organism_name ASC, dm.value_kind ASC, dm.id ASC"
+        f"{skip_clause}{limit_clause}"
+    )
+    return cypher, params

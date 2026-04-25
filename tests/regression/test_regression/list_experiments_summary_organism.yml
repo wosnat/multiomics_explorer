@@ -6,7 +6,7 @@ rows:
   - '{''count'': 1, ''item'': ''diel''}'
   - '{''count'': 1, ''item'': ''viral''}'
   - '{''count'': 10, ''item'': ''coculture''}'
-  - '{''count'': 24, ''item'': ''axenic''}'
+  - '{''count'': 25, ''item'': ''axenic''}'
   - '{''count'': 29, ''item'': ''light''}'
   - '{''count'': 7, ''item'': ''darkness''}'
   by_cluster_type:
@@ -24,12 +24,13 @@ rows:
   - '{''count'': 6, ''item'': ''stationary''}'
   - '{''count'': 7, ''item'': ''nutrient_limited''}'
   by_omics_type:
+  - '{''count'': 1, ''item'': ''PAIRED_RNASEQ_PROTEOME''}'
   - '{''count'': 12, ''item'': ''RNASEQ''}'
   - '{''count'': 14, ''item'': ''PROTEOMICS''}'
   - '{''count'': 19, ''item'': ''MICROARRAY''}'
   by_organism:
   - '{''count'': 1, ''item'': ''Alteromonas macleodii HOT1A3''}'
-  - '{''count'': 36, ''item'': ''Prochlorococcus MED4''}'
+  - '{''count'': 37, ''item'': ''Prochlorococcus MED4''}'
   - '{''count'': 4, ''item'': ''Alteromonas (MarRef v6)''}'
   - '{''count'': 4, ''item'': ''Marinobacter (MarRef v6)''}'
   by_publication:
@@ -39,6 +40,7 @@ rows:
   - '{''count'': 1, ''item'': ''10.1073/pnas.0601301103''}'
   - '{''count'': 1, ''item'': ''10.1186/1471-2180-14-11''}'
   - '{''count'': 1, ''item'': ''10.1371/journal.pone.0005135''}'
+  - '{''count'': 1, ''item'': ''10.1371/journal.pone.0043432''}'
   - '{''count'': 1, ''item'': ''10.3389/fmicb.2022.1038136''}'
   - '{''count'': 12, ''item'': ''10.1128/spectrum.03275-22''}'
   - '{''count'': 3, ''item'': ''10.1038/ismej.2011.49''}'
@@ -49,20 +51,20 @@ rows:
   - '{''count'': 6, ''item'': ''10.1128/JB.01097-06''}'
   by_table_scope:
   - '{''count'': 12, ''item'': ''filtered_subset''}'
-  - '{''count'': 2, ''item'': ''''}'
   - '{''count'': 22, ''item'': ''all_detected_genes''}'
+  - '{''count'': 3, ''item'': ''''}'
   - '{''count'': 3, ''item'': ''significant_any_timepoint''}'
   - '{''count'': 6, ''item'': ''significant_only''}'
   by_treatment_type:
-  - '{''count'': 1, ''item'': ''diel''}'
   - '{''count'': 1, ''item'': ''growth_phase''}'
   - '{''count'': 1, ''item'': ''phosphorus''}'
   - '{''count'': 1, ''item'': ''salt''}'
   - '{''count'': 11, ''item'': ''coculture''}'
   - '{''count'': 16, ''item'': ''carbon''}'
+  - '{''count'': 2, ''item'': ''diel''}'
   - '{''count'': 3, ''item'': ''iron''}'
   - '{''count'': 3, ''item'': ''viral''}'
   - '{''count'': 8, ''item'': ''light''}'
   - '{''count'': 8, ''item'': ''nitrogen''}'
   time_course_count: 12
-  total_matching: 45
+  total_matching: 46

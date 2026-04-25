@@ -929,6 +929,71 @@
     columns: [total_matching, by_organism]
 
 # ---------------------------------------------------------------------------
+# list_derived_metrics
+# ---------------------------------------------------------------------------
+
+- id: list_derived_metrics_all
+  tool: list_derived_metrics
+  desc: All DMs returned when no filters
+  params: {}
+  expect:
+    min_rows: 13
+    columns:
+      - derived_metric_id
+      - name
+      - metric_type
+      - value_kind
+      - rankable
+      - has_p_value
+      - unit
+      - allowed_categories
+      - field_description
+      - organism_name
+      - experiment_id
+      - publication_doi
+      - compartment
+      - omics_type
+      - treatment_type
+      - background_factors
+      - total_gene_count
+      - growth_phases
+
+- id: list_derived_metrics_rankable_true
+  tool: list_derived_metrics
+  desc: Rankable-only filter yields 4 DMs
+  params:
+    rankable: true
+  expect:
+    min_rows: 4
+    max_rows: 4
+
+- id: list_derived_metrics_rankable_false
+  tool: list_derived_metrics
+  desc: Non-rankable filter yields 9 DMs in live KG
+  params:
+    rankable: false
+  expect:
+    min_rows: 9
+    max_rows: 9
+
+- id: list_derived_metrics_has_p_value_empty
+  tool: list_derived_metrics
+  desc: No DM carries p-values in current KG (intentional signal)
+  params:
+    has_p_value: true
+  expect:
+    min_rows: 0
+    max_rows: 0
+
+- id: list_derived_metrics_search_diel
+  tool: list_derived_metrics
+  desc: Full-text diel returns amplitude DMs ranked highest
+  params:
+    search_text: "diel amplitude"
+  expect:
+    min_rows: 2
+
+# ---------------------------------------------------------------------------
 # differential_expression_by_gene
 # ---------------------------------------------------------------------------
 

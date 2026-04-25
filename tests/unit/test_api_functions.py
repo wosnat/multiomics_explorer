@@ -4237,3 +4237,134 @@ class TestClusterEnrichment:
         assert len(skips) == 1
         assert skips[0].cluster_id == "gc:99"
         assert skips[0].cluster_name == "Cluster B"
+
+
+class TestListDerivedMetrics:
+    """Tests for api.list_derived_metrics."""
+
+    _SUMMARY_ROW = {
+        "total_entries": 13,
+        "total_matching": 4,
+        "by_organism": [{"item": "Prochlorococcus MED4", "count": 4}],
+        "by_value_kind": [{"item": "numeric", "count": 4}],
+        "by_metric_type": [
+            {"item": "damping_ratio", "count": 1},
+            {"item": "diel_amplitude_protein_log2", "count": 1},
+        ],
+        "by_compartment": [{"item": "whole_cell", "count": 4}],
+        "by_omics_type": [{"item": "PAIRED_RNASEQ_PROTEOME", "count": 4}],
+        "by_treatment_type": [{"item": "diel", "count": 4}],
+        "by_background_factors": [{"item": "axenic", "count": 4}],
+        "by_growth_phase": [],
+    }
+
+    _DETAIL_ROW = {
+        "derived_metric_id": "derived_metric:.../damping_ratio",
+        "name": "Transcript:protein amplitude ratio",
+        "metric_type": "damping_ratio",
+        "value_kind": "numeric",
+        "rankable": "true",
+        "has_p_value": "false",
+        "unit": "",
+        "allowed_categories": None,
+        "field_description": "...",
+        "organism_name": "Prochlorococcus MED4",
+        "experiment_id": "exp_1",
+        "publication_doi": "10.1371/journal.pone.0043432",
+        "compartment": "whole_cell",
+        "omics_type": "PAIRED_RNASEQ_PROTEOME",
+        "treatment_type": ["diel"],
+        "background_factors": ["axenic"],
+        "total_gene_count": 312,
+        "growth_phases": [],
+    }
+
+    def _mock_conn(self, summary_row, detail_rows):
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        # Two calls: summary first, detail second
+        conn.execute_query.side_effect = [[summary_row], detail_rows]
+        return conn
+
+    def test_summary_and_detail_envelope(self):
+        from multiomics_explorer.api.functions import list_derived_metrics
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_derived_metrics(organism="MED4", conn=conn)
+        assert out["total_entries"] == 13
+        assert out["total_matching"] == 4
+        assert out["returned"] == 1
+        assert out["offset"] == 0
+        assert out["truncated"] is True  # 4 > 0 + 1
+        assert len(out["results"]) == 1
+        assert out["results"][0]["derived_metric_id"].endswith("damping_ratio")
+        # Breakdowns renamed from {item, count} to {<key>, count}
+        assert out["by_organism"] == [
+            {"organism_name": "Prochlorococcus MED4", "count": 4}
+        ]
+        assert out["by_value_kind"] == [{"value_kind": "numeric", "count": 4}]
+        assert out["by_background_factors"] == [
+            {"background_factor": "axenic", "count": 4}
+        ]
+        assert out["by_growth_phase"] == []
+        # No search_text → score fields None
+        assert out["score_max"] is None
+        assert out["score_median"] is None
+
+    def test_summary_true_skips_detail_query(self):
+        from multiomics_explorer.api.functions import list_derived_metrics
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        conn.execute_query.side_effect = [[self._SUMMARY_ROW]]  # only summary called
+        out = list_derived_metrics(summary=True, conn=conn)
+        assert out["results"] == []
+        assert out["returned"] == 0
+        assert out["truncated"] is True  # total_matching > 0
+        assert conn.execute_query.call_count == 1
+
+    def test_search_text_empty_raises(self):
+        from multiomics_explorer.api.functions import list_derived_metrics
+        import pytest
+        with pytest.raises(ValueError, match="search_text"):
+            list_derived_metrics(search_text="")
+
+    def test_search_text_whitespace_raises(self):
+        from multiomics_explorer.api.functions import list_derived_metrics
+        import pytest
+        with pytest.raises(ValueError, match="search_text"):
+            list_derived_metrics(search_text="   ")
+
+    def test_score_stats_present_when_search(self):
+        from multiomics_explorer.api.functions import list_derived_metrics
+        summary_with_score = {**self._SUMMARY_ROW, "score_max": 1.9, "score_median": 0.8}
+        conn = self._mock_conn(summary_with_score, [self._DETAIL_ROW])
+        out = list_derived_metrics(search_text="diel", conn=conn)
+        assert out["score_max"] == 1.9
+        assert out["score_median"] == 0.8
+
+    def test_lucene_retry_on_parse_error(self):
+        from multiomics_explorer.api.functions import list_derived_metrics
+        from neo4j.exceptions import ClientError
+        from unittest.mock import MagicMock
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            ClientError("parse error"),  # summary first call fails
+            [self._SUMMARY_ROW],           # summary retry succeeds
+            [self._DETAIL_ROW],             # detail succeeds
+        ]
+        out = list_derived_metrics(search_text="diel*", conn=conn)
+        # Escape check — the retry call used escaped "diel\\*"
+        second_call_params = conn.execute_query.call_args_list[1].kwargs
+        assert second_call_params["search_text"] == r"diel\*"
+        assert out["total_matching"] == 4
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import list_derived_metrics as api_ldm
+        from multiomics_explorer.api import list_derived_metrics as api_direct
+        assert api_ldm is api_direct
+
+    def test_returns_score_max_none_when_no_search(self):
+        from multiomics_explorer.api.functions import list_derived_metrics
+        conn = self._mock_conn(self._SUMMARY_ROW, [])
+        out = list_derived_metrics(conn=conn)
+        assert out["score_max"] is None
+        assert out["score_median"] is None

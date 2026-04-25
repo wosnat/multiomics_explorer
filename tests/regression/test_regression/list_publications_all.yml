@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 35
+row_count: 36
 rows:
 - authors:
   - James I. Mullet
@@ -405,9 +405,8 @@ rows:
   - axenic
   - coculture
   - diel
-  cluster_types:
-  - classification
-  clustering_analysis_count: 3
+  cluster_types: []
+  clustering_analysis_count: 0
   doi: 10.1128/mSystems.00040-18
   experiment_count: 3
   growth_phases:
@@ -810,6 +809,29 @@ rows:
     in environmental phosphate concentrations
   treatment_types:
   - phosphorus
+  year: 2012
+- authors:
+  - Jacob R. Waldbauer
+  - Maureen L. Coleman
+  - Sallie W. Chisholm
+  - Sébastien Rodrigue
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: 10.1371/journal.pone.0043432
+  experiment_count: 1
+  growth_phases: []
+  journal: PLOS ONE
+  omics_types:
+  - PAIRED_RNASEQ_PROTEOME
+  organisms:
+  - Prochlorococcus MED4
+  study_type: Transcriptomics and Proteomics
+  title: Transcriptome and Proteome Dynamics of a Light-Dark Synchronized Bacterial
+    Cell Cycle
+  treatment_types:
+  - diel
   year: 2012
 - authors:
   - Anne W Thompson

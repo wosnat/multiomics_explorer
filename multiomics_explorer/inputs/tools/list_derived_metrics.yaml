@@ -1,0 +1,68 @@
+# Human-authored content for list_derived_metrics about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Orient — what DerivedMetrics exist in the KG?
+    call: list_derived_metrics(summary=True)
+
+  - title: Pre-flight for numeric drill-down — which DMs support rank/bucket?
+    call: list_derived_metrics(value_kind="numeric", rankable=True)
+
+  - title: Find rhythm / diel evidence via full-text
+    call: list_derived_metrics(search_text="diel amplitude", limit=5)
+
+  - title: Per-publication inventory
+    call: list_derived_metrics(publication_doi=["10.1128/mSystems.00040-18"])
+
+  - title: Per-organism inventory
+    call: list_derived_metrics(organism="NATL2A", verbose=True)
+
+  - title: Pick one DM unambiguously, then drill down
+    steps: |
+      Step 1: list_derived_metrics(search_text="damping ratio")
+              → copy the derived_metric_id of the best match
+
+      Step 2: genes_by_numeric_metric(
+                derived_metric_ids=["derived_metric:...:damping_ratio"],
+                bucket=["top_decile"])
+              → top-decile genes by transcript-to-protein damping
+
+verbose_fields:
+  - treatment
+  - light_condition
+  - experimental_context
+  - p_value_threshold
+
+chaining:
+  - "list_derived_metrics → gene_derived_metrics(locus_tags, derived_metric_ids)"
+  - "list_derived_metrics(value_kind='numeric', rankable=True) → genes_by_numeric_metric(derived_metric_ids, bucket=[...])"
+  - "list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(derived_metric_ids, flag=True)"
+  - "list_derived_metrics(value_kind='categorical') → genes_by_categorical_metric(derived_metric_ids, categories=[...])"
+
+mistakes:
+  - >-
+    Call this FIRST before drill-downs. Inspect rankable / has_p_value /
+    value_kind / allowed_categories / compartment here — the downstream drill-down
+    tools (genes_by_numeric_metric, genes_by_boolean_metric,
+    genes_by_categorical_metric) hard-fail (by design) when the selected DM set
+    doesn't support the requested filter. E.g. passing bucket=['top_decile'] with
+    a non-rankable DM raises; passing significant_only=True when no selected DM
+    has has_p_value=True raises.
+  - >-
+    metric_type is a category tag, not a primary key — the same metric_type can
+    appear across organisms or publications (periodic_in_coculture_LD exists
+    once for NATL2A and once for MIT1002). Use derived_metric_ids to pin one
+    specific DM; use metric_types to union across every DM with that tag.
+  - >-
+    has_p_value=True returns zero rows against today's KG — no DM currently
+    carries p-values. The filter exists for forward-compat; drill-down p-value
+    filters (significant_only, max_adjusted_p_value) will raise with a
+    diagnostic error.
+  - >-
+    allowed_categories is non-null only when value_kind='categorical'. For
+    boolean and numeric DMs it is null — not a bug.
+  - wrong: list_derived_metrics(rankable="true")
+    right: list_derived_metrics(rankable=True)
+  - wrong: list_derived_metrics(organism="Prochlorococcus MED4 strain")
+    right: list_derived_metrics(organism="MED4")

@@ -55,6 +55,10 @@ rows:
   - kegg
   - pfam
   - tigr_role
+  classifier_flag_count: 0
+  classifier_flag_types_observed: []
+  classifier_label_count: 0
+  classifier_label_types_observed: []
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
@@ -63,6 +67,8 @@ rows:
   cluster_types:
   - condition_comparison
   - diel
+  compartments_observed:
+  - whole_cell
   end: 1331
   expression_edge_count: 31
   function_description: Confers DNA tethering and processivity to DNA polymerases
@@ -86,6 +92,14 @@ rows:
     of DNA replication'
   id: ncbigene:PMM0001
   locus_tag: PMM0001
+  numeric_metric_count: 6
+  numeric_metric_types_observed:
+  - damping_ratio
+  - diel_amplitude_protein_log2
+  - diel_amplitude_transcript_log2
+  - peak_time_protein_h
+  - peak_time_transcript_h
+  - protein_transcript_lag_h
   organism_name: Prochlorococcus MED4
   preferred_id: ncbigene
   product: DNA polymerase III, beta subunit

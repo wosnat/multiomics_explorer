@@ -64,7 +64,7 @@ Tool-to-clustering-analog map:
 
 The filter surface and return columns are genuinely different per `value_kind`:
 
-- numeric → `min/max_value`, `min/max_percentile`, `bucket`, `significant_only`, `max_adjusted_p_value`, `max_rank`; returns `value, rank_by_metric, metric_percentile, metric_bucket, adjusted_p_value, significant`
+- numeric → `min/max_value` (always); `min/max_percentile`, `bucket`, `max_rank` (rankable-only); `significant_only`, `max_adjusted_p_value` (has_p_value-only); returns `value` always, plus `rank_by_metric/metric_percentile/metric_bucket` when parent `rankable=true` and `adjusted_p_value/significant` when parent `has_p_value=true` — see *KG invariants* below
 - boolean → `flag`; returns `value` (`"true"|"false"`)
 - categorical → `categories`; returns `value` (category string)
 
@@ -80,6 +80,62 @@ A single polymorphic tool would require ~9 usually-null params plus per-call dis
 For drill-downs, these two params are mutually exclusive; exactly one required. For discovery/gene-centric tools, `derived_metric_ids` and `metric_types` are both optional filters and may be combined with each other and other filters.
 
 `name` stays out of the filter surface (not guaranteed unique) — it appears in results for humans.
+
+### KG invariants (verified against live KG 2026-04-23)
+
+These shape every tool in slice 1 and determine which filters are applicable to which DM:
+
+1. **Rankable gating.** `Derived_metric_quantifies_gene` edges carry `rank_by_metric, metric_percentile, metric_bucket` **only when the parent `DerivedMetric.rankable="true"`**. Non-rankable numeric DMs carry only `{id, metric_type, value}`. Today: 4 of 6 numeric DMs are rankable (`damping_ratio`, `diel_amplitude_protein_log2`, `diel_amplitude_transcript_log2`, `protein_transcript_lag_h`); the two `peak_time_*_h` DMs are not.
+2. **P-value gating.** Numeric edges carry `adjusted_p_value, significant, p_value` **only when the parent `DerivedMetric.has_p_value="true"`**. **No DM in the current KG has `has_p_value="true"`** — the entire p-value column family is absent today. The surface exists for forward-compat; filter params that depend on it will hard-fail against the current KG (documented below), which is an intentional signal to the LLM, not a silent empty result.
+3. **Boolean / categorical edges** carry only `{id, metric_type, value_flag}` and `{id, metric_type, value_text}` respectively — no optional extras.
+4. **Boolean storage is tri-state by intent but paper-dependent by realization.** Logical states: (a) `value_flag="true"` — the DM asserts yes for that gene; (b) `value_flag="false"` — asserts no; (c) no edge at all — the gene wasn't evaluated for that DM. Papers differ in what they materialize: only positive assertions, both, or sparse. Current KG (Biller 2018): **only `value_flag="true"` edges exist** (4,160/4,160). A caller passing `flag=False` returns zero rows today — that's a storage artifact of the one boolean-providing paper in the KG, not a KG-wide guarantee. Tool 4's `mistakes` YAML entry (see *Documentation*) must name this explicitly so the LLM doesn't read zero rows as "no genes are flagged false".
+5. **Gene-side rollup naming is per-kind, not unified.** Experiment, Publication, OrganismTaxon carry a unified `derived_metric_count` / `derived_metric_gene_count` / `derived_metric_types` / `derived_metric_value_kinds` namespace (plus `reports_derived_metric_types` on Experiment). Gene splits the rollup across three kind-specific triples — query builders must reference the exact KG field names:
+
+   | Kind | Count | Types observed |
+   |---|---|---|
+   | numeric | `g.numeric_metric_count` | `g.numeric_metric_types_observed` |
+   | boolean | `g.classifier_flag_count` | `g.classifier_flag_types_observed` |
+   | categorical | `g.classifier_label_count` | `g.classifier_label_types_observed` |
+
+   Plus `g.compartments_observed` (list) for the DM-derived compartment set. No `derived_metric_*` fields exist on Gene. This naming split is a KG-side choice and unlikely to change in slice 1; envelope fields on the explorer side stay in the unified `by_value_kind` / `by_metric_type` style, with the implementer mapping KG field → envelope key at the query-builder layer. Rollup fast-path (skip edge traversal when gene has zero DM signal): `g.numeric_metric_count + g.classifier_flag_count + g.classifier_label_count = 0`.
+
+6. **String-typed booleans.** `DerivedMetric.rankable` and `DerivedMetric.has_p_value` are stored as strings `"true"` / `"false"`, not Neo4j booleans. Edge `value_flag` likewise is `"true"` / `"false"`. Query builders must compare with `dm.rankable = 'true'` etc.; API/MCP params stay `bool | None` with coercion at the query-builder boundary. (Internal-only — not surfaced in tool docs.)
+
+Diagnostics derived from these invariants:
+
+- Every drill-down envelope exposes `excluded_derived_metrics` (list of `{derived_metric_id, metric_type, rankable, has_p_value, reason}`) and `warnings` (human-readable list). These fire when a caller selects a mixed rankable/non-rankable or mixed has_p_value DM set and a gated filter drops some of them.
+- When *all* selected DMs fail a gated filter (e.g. every selected DM is non-rankable and the caller passed `bucket`), the tool raises `ValueError` listing each DM's gate state and the offending filter — instead of returning an empty result that the LLM would struggle to diagnose.
+- Every rankable- or p-value-gated param in a tool signature below is explicitly labelled with its gate.
+
+**Defensive CASE-gating (canonical pattern).** Every gate-dependent RETURN column — DM-level *and* edge-level — is wrapped in Cypher `CASE` on the authoritative DM flag, not trusted blindly from storage:
+
+```
+CASE WHEN dm.rankable   = 'true' THEN r.rank_by_metric    ELSE null END AS rank_by_metric
+CASE WHEN dm.rankable   = 'true' THEN r.metric_percentile ELSE null END AS metric_percentile
+CASE WHEN dm.rankable   = 'true' THEN r.metric_bucket     ELSE null END AS metric_bucket
+CASE WHEN dm.has_p_value = 'true' THEN r.adjusted_p_value  ELSE null END AS adjusted_p_value
+CASE WHEN dm.has_p_value = 'true' THEN r.significant       ELSE null END AS significant
+CASE WHEN dm.has_p_value = 'true' THEN r.p_value           ELSE null END AS p_value   -- verbose
+CASE WHEN dm.has_p_value = 'true' THEN dm.p_value_threshold ELSE null END AS p_value_threshold  -- verbose
+CASE WHEN dm.value_kind = 'categorical' THEN dm.allowed_categories ELSE null END AS allowed_categories
+```
+
+The DM-level flag is the single source of truth; RETURN columns honor it regardless of what the KG happens to materialize on the edge or node. This makes every tool robust to KG build bugs (e.g. a future DM gets `rankable="false"` set but edges accidentally carry rank_by_metric), and keeps the row shape consistent across tools — the same column means the same thing everywhere. Applies to all 5 slice-1 tools uniformly.
+
+**Worked example (canonical test fixture + YAML example).** A caller passes:
+
+```
+genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'],
+                        bucket=['top_decile'])
+```
+
+`damping_ratio` is rankable; `peak_time_protein_h` is not. Result:
+
+- rows returned: `damping_ratio` × genes in its top decile.
+- `excluded_derived_metrics`: `[{derived_metric_id: 'derived_metric:...peak_time_protein_h', metric_type: 'peak_time_protein_h', rankable: 'false', has_p_value: 'false', reason: 'non-rankable; `bucket` filter does not apply'}]`
+- `warnings`: `["1 non-rankable DM excluded by `bucket` filter (peak_time_protein_h)"]`
+
+Contrast with all-non-rankable input (`metric_types=['peak_time_protein_h']` + `bucket=['top_decile']`) which raises `ValueError` rather than silently returning zero rows. Both scenarios are pinned in the KG integration tests and in `examples/derived_metrics_gate_awareness.py`.
 
 ## Tool 1 — `list_derived_metrics`
 
@@ -125,7 +181,7 @@ offset: int = 0
 
 **Compact:** `derived_metric_id, name, metric_type, value_kind, rankable, has_p_value, unit, allowed_categories, field_description, organism_name, experiment_id, publication_doi, compartment, omics_type, treatment_type, background_factors, total_gene_count, growth_phases` plus `score` when `search_text` is provided.
 
-**Verbose adds:** `p_value_threshold, treatment, light_condition, experimental_context`.
+**Verbose adds:** `treatment, light_condition, experimental_context`, plus `p_value_threshold` *when parent `has_p_value="true"`* — null otherwise (no DM in current KG). Parallels the edge-side p-value columns: same gate, same forward-compat treatment.
 
 Rationale for compact inclusions: `unit`, `allowed_categories`, and `field_description` are essential for interpreting a DM in the first place — `metric_type` codes are often opaque (e.g. `diel_amplitude_protein_log2`), so the discovery payload has to carry enough context for an LLM to triage without a round-trip to verbose.
 
@@ -169,7 +225,9 @@ offset: int = 0
 
 ### Result columns (one row per gene × DM; sparse across value_kinds)
 
-**Compact (always):** `locus_tag, gene_name, derived_metric_id, metric_type, value_kind, name, field_description, unit, allowed_categories, value, compartment, treatment_type, background_factors, publication_doi`
+**Compact (always):** `locus_tag, gene_name, derived_metric_id, metric_type, value_kind, rankable, has_p_value, name, field_description, unit, allowed_categories, value, compartment, treatment_type, background_factors, publication_doi`
+
+`rankable` and `has_p_value` (`"true"` / `"false"`) are echoed from the parent DM on every row so downstream rows are self-describing — the LLM doesn't need a separate `list_derived_metrics` call to interpret null values in gate-dependent columns.
 
 - `value` is polymorphic:
   - numeric rows → `float`
@@ -177,11 +235,14 @@ offset: int = 0
   - categorical rows → category string
 - Consumers branch on `value_kind`.
 
-**Compact (numeric-only; null otherwise):** `metric_percentile, metric_bucket, adjusted_p_value, significant, rank_by_metric`
+**Compact (numeric rows only; null on boolean/categorical rows), *doubly* sparse per *KG invariants*:**
 
-These carry real signal for ranking/significance with no analog in other kinds — keeping them as sparse columns avoids both a nested dict (awkward for flat tables) and lossy collapse.
+- *Populated when parent `rankable="true"`, null otherwise:* `rank_by_metric, metric_percentile, metric_bucket`
+- *Populated when parent `has_p_value="true"`, null otherwise (no DM in current KG):* `adjusted_p_value, significant`
 
-**Verbose adds:** `treatment, light_condition, experimental_context, p_value` (raw).
+These carry real signal for ranking/significance with no analog in other kinds — keeping them as sparse columns avoids both a nested dict (awkward for flat tables) and lossy collapse. The LLM branches on each row's `value_kind`, then on its own `rankable` / `has_p_value` columns (echoed from the parent DM — see *Compact* above), to interpret gate-dependent columns without re-querying.
+
+**Verbose adds:** `treatment, light_condition, experimental_context`, plus `p_value` (raw) *when parent `has_p_value="true"`*.
 
 ### Not-found / not-matched
 
@@ -209,15 +270,22 @@ treatment_type: list[str] | None
 background_factors: list[str] | None
 growth_phases: list[str] | None
 
-# Kind-specific edge filters
+# Kind-specific edge filters — gated per *KG invariants*
+
+# Always available on any numeric DM
 min_value: float | None
 max_value: float | None
+
+# Rankable-gated: applied only to DMs where rankable="true"; others excluded via envelope
 min_percentile: float | None
 max_percentile: float | None
 bucket: list[str] | None                 # subset of {top_decile, top_quartile, mid, low}
+max_rank: int | None
+
+# P-value-gated: applied only to DMs where has_p_value="true"; others excluded via envelope
+# Today every DM has has_p_value="false", so these filters always hard-fail -- intentional
 significant_only: bool = False
 max_adjusted_p_value: float | None
-max_rank: int | None                     # implicitly requires rankable=true DMs
 
 summary: bool = False
 verbose: bool = False
@@ -228,14 +296,23 @@ offset: int = 0
 ### Validation
 
 - All selected DMs must have `value_kind='numeric'`; otherwise `ValueError` listing offending IDs + their actual `value_kind`.
-- `max_rank` requires all selected DMs have `rankable=true`; otherwise `ValueError` listing offenders.
+- Any rankable-gated filter (`min_percentile`, `max_percentile`, `bucket`, `max_rank`) fires the following logic:
+  - If **no** selected DM has `rankable="true"` → `ValueError` listing each selected DM's `rankable` state + which filter(s) triggered.
+  - If **some** selected DMs are rankable and some are not → proceed; exclude the non-rankable DMs from the filtered-set and surface them in `excluded_derived_metrics` + `warnings`.
+- Any p-value-gated filter (`significant_only`, `max_adjusted_p_value`) uses the same two-branch logic with `has_p_value`. Since **no** DM in the current KG has `has_p_value="true"`, any use of these filters against today's KG raises — this is the intentional diagnostic signal, not a bug to mask.
 
 ### Envelope (shared across all 3 drill-down tools)
 
 ```
 {
-  total_matching,                        # rows (gene × DM)
-  total_derived_metrics,                 # DMs after selection + scoping
+  total_matching,                        # rows (gene × DM), post-filter
+  total_derived_metrics,                 # DMs that survived selection + scoping + gate
+                                         # exclusion, i.e. DMs contributing rows. Matches
+                                         # the single-scalar convention used by
+                                         # list_clustering_analyses / genes_in_cluster
+                                         # (post-filter count + separate drop lists).
+                                         # Pre-gating count = total_derived_metrics +
+                                         # len(excluded_derived_metrics).
   by_organism, by_metric_type,
   by_compartment, by_publication, by_experiment,
   top_categories,                        # gene_category rollup
@@ -243,6 +320,14 @@ offset: int = 0
   not_found_ids, not_matched_ids,        # from derived_metric_ids
   not_found_metric_types, not_matched_metric_types,
   not_matched_organism,
+  excluded_derived_metrics,              # list[{derived_metric_id, metric_type, rankable,
+                                         #       has_p_value, reason}] — DMs that passed
+                                         # selection/scoping but were dropped because a
+                                         # rankable- or p-value-gated filter did not apply
+                                         # to them. Primary LLM diagnostic when a real DM
+                                         # yields zero rows.
+  warnings,                              # list[str] — human-readable summary, e.g.
+                                         # "2 non-rankable DMs excluded by `bucket` filter"
   returned, offset, truncated,
   results: [...]
 }
@@ -250,15 +335,21 @@ offset: int = 0
 
 ### Result columns
 
-**Shared compact (all 3 drill-downs):** `locus_tag, gene_name, product, gene_category, organism_name, derived_metric_id, metric_type, name, compartment, experiment_id, publication_doi, treatment_type, background_factors`
+**Shared compact (all 3 drill-downs):** `locus_tag, gene_name, product, gene_category, organism_name, derived_metric_id, metric_type, value_kind, rankable, has_p_value, name, compartment, experiment_id, publication_doi, treatment_type, background_factors`
 
-**Numeric extras (compact):** `value, rank_by_metric, metric_percentile, metric_bucket, adjusted_p_value, significant`
+`value_kind, rankable, has_p_value` are echoed from the parent DM so numeric rows are self-describing with respect to which gate-dependent extras carry data. For boolean and categorical drill-downs these columns are informative but redundant (homogeneous per call) — kept for cross-tool row-shape consistency.
 
-**Verbose adds:** `gene_function_description, gene_summary, field_description, unit, treatment, light_condition, experimental_context, p_value`.
+**Numeric extras (compact), tiered per *KG invariants*:**
+
+- *Always populated:* `value`
+- *Populated when parent `rankable="true"`, null otherwise:* `rank_by_metric, metric_percentile, metric_bucket`
+- *Populated when parent `has_p_value="true"`, null otherwise (no DM in current KG):* `adjusted_p_value, significant`
+
+**Verbose adds:** `gene_function_description, gene_summary, field_description, unit, treatment, light_condition, experimental_context`, plus `p_value` (raw) *when parent `has_p_value="true"`*.
 
 ### Default sort
 
-`r.rank_by_metric ASC NULLS LAST, r.value DESC` — rank-ordered when available, falling back to raw value for non-rankable DMs.
+`r.rank_by_metric ASC NULLS LAST, r.value DESC, dm.id ASC, g.locus_tag ASC` — rank-ordered when available, falling back to raw value for non-rankable DMs. `dm.id` then `g.locus_tag` act as deterministic tie-breakers so paginated results are stable across calls.
 
 ## Tool 4 — `genes_by_boolean_metric`
 
@@ -269,8 +360,14 @@ Drill-down on `Derived_metric_flags_gene`.
 Same selection + scoping block as Tool 3. Kind-specific:
 
 ```
-flag: bool | None                        # maps to r.value_flag = 'true' | 'false'
-                                         # default None returns both; typical caller passes True
+flag: bool | None                        # maps to r.value_flag = 'true' | 'false'.
+                                         # default None returns all materialized flag edges.
+                                         # flag=False returns zero rows against the current KG
+                                         # because only positive assertions are stored today
+                                         # (see *KG invariants* §4, tri-state storage). Plan
+                                         # to confirm absence via list_derived_metrics'
+                                         # total_gene_count + gene_derived_metrics if it
+                                         # matters for interpretation.
 ```
 
 ### Validation
@@ -286,7 +383,7 @@ Shared compact (see Tool 3). Extras:
 
 ### Default sort
 
-`locus_tag ASC` — no score to rank by.
+`dm.id ASC, g.locus_tag ASC` — no score to rank by; group rows by DM first, then by locus_tag within each DM. Stable for pagination. Once a paper lands that materializes `value_flag="false"` edges (see *KG invariants* §4), slot `r.value_flag DESC` between the two keys so `"true"` rows group before `"false"` within each DM — flagged here as a forward-refinement, not needed for slice 1.
 
 ## Tool 5 — `genes_by_categorical_metric`
 
@@ -315,7 +412,7 @@ Shared compact (see Tool 3). Extras:
 
 ### Default sort
 
-`r.value_text ASC, locus_tag ASC` — stable grouping by category.
+`r.value_text ASC, dm.id ASC, g.locus_tag ASC` — stable grouping by category, then by DM, then locus_tag. `dm.id` ensures deterministic ordering when multiple DMs share a category.
 
 ## Cross-cutting validation
 
@@ -328,7 +425,10 @@ Shared compact (see Tool 3). Extras:
 | Both `derived_metric_ids` AND `metric_types` on drill-downs | `ValueError` "provide one, not both" |
 | Neither selection param on drill-downs | `ValueError` "must provide one of …" |
 | Selected DM has wrong `value_kind` for the tool | `ValueError` listing offending `derived_metric_id`s + their actual `value_kind` |
-| `max_rank` used but some selected DMs have `rankable=false` | `ValueError` listing offenders |
+| Rankable-gated filter (`min/max_percentile`, `bucket`, `max_rank`) used and *no* selected DM has `rankable="true"` | `ValueError` listing each selected DM's `rankable` state + which filter(s) triggered |
+| Rankable-gated filter used and *some* selected DMs are non-rankable | Proceed; drop non-rankable DMs from filter, surface them in envelope `excluded_derived_metrics` + append to `warnings` |
+| P-value-gated filter (`significant_only`, `max_adjusted_p_value`) used and *no* selected DM has `has_p_value="true"` | `ValueError` listing each selected DM's `has_p_value` state + which filter(s) triggered (today's KG: always hits this) |
+| P-value-gated filter used and *some* selected DMs lack p-values | Proceed; same envelope `excluded_derived_metrics` + `warnings` pattern as rankable |
 | `categories` includes value not in any parent `allowed_categories` | `ValueError` listing unknowns + allowed-set context |
 | `value_kind` filter receives value not in `{numeric, boolean, categorical}` | `ValueError` |
 | Single-organism check fails (locus_tags span organisms, or explicit `organism` conflicts with inferred) | `ValueError` via `_validate_organism_inputs` |
@@ -362,6 +462,26 @@ Per the `testing` skill — three layers.
 - Rank / percentile monotonicity sanity check on numeric results
 - `gene_derived_metrics` with a known Biller 2018 gene → returns boolean + categorical rows
 
+### Gate-exclusion coverage (new, required)
+
+Explicit cases across the three drill-downs, asserting the envelope tells the story:
+
+- **Soft-exclude — mixed DM set.** `genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], bucket=['top_decile'])` → rows returned for `damping_ratio`; `peak_time_protein_h` surfaces in `excluded_derived_metrics` with reason citing `bucket` + `rankable=false`; `warnings` populated.
+- **Hard-fail — all selected DMs fail gate.** `genes_by_numeric_metric(metric_types=['peak_time_transcript_h'], bucket=['top_decile'])` → `ValueError` listing the DM's `rankable=false` state.
+- **Hard-fail — p-value filter against today's KG.** Any of `significant_only=True` / `max_adjusted_p_value=0.05` on any numeric DM → `ValueError`, because 0/13 DMs have `has_p_value='true'`. This is the most common LLM footgun and needs explicit coverage.
+- **Envelope key presence.** `excluded_derived_metrics` and `warnings` are asserted to be keys on **every** drill-down response — empty list `[]` when no exclusions, never missing. Prevents `KeyError`-style brittleness in prompt chaining.
+
+### Worked-example script
+
+`examples/derived_metrics_gate_awareness.py` (new, modeled on `examples/pathway_enrichment.py`) — runnable end-to-end demo of:
+
+1. `list_derived_metrics` entry-point inspection (show `rankable`, `has_p_value`, `value_kind`, `compartment` across all 13 DMs),
+2. soft-exclude case returning both results + `excluded_derived_metrics`,
+3. hard-fail case catching `ValueError` and rendering the diagnostic,
+4. `gene_derived_metrics` polymorphic-`value` branching.
+
+Doubles as a test fixture (the KG integration test block above can reuse the same scenarios) and as the concrete reference the YAML `examples:` sections link to.
+
 ### MCP tool tests
 
 `tests/integration/test_mcp_tools.py` — add happy-path + one-error-path per tool through FastMCP `Client`. Assert envelope JSON structure (not just schema).
@@ -386,6 +506,34 @@ Per the `add-or-update-tool` skill — no hand-written tool docs:
 2. Generate markdown via `uv run python scripts/build_about_content.py {name}` → `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`.
 3. Params table + response schema + expected keys come from the Pydantic `{Name}Result` / `{Name}Response` models in `mcp_server/tools.py` — single source of truth.
 
+### Required `mistakes` + `chaining` coverage (gate-aware)
+
+The KG invariants above create two footgun shapes that the LLM must learn to diagnose from envelope signals, not by trial-and-error. Each YAML **must** surface these prominently (top of `mistakes`, not buried):
+
+**`genes_by_numeric_metric.yaml`** — `mistakes` must include:
+- *Non-rankable DM + rankable-gated filter.* Example: "Calling with `metric_types=['peak_time_transcript_h']` + `bucket=['top_decile']` raises — `peak_time_transcript_h` is non-rankable. Inspect `list_derived_metrics(value_kind='numeric', rankable=True)` to see which DMs support `bucket` / `min_percentile` / `max_percentile` / `max_rank`. Mixed rankable/non-rankable DM sets don't raise — instead the envelope's `excluded_derived_metrics` + `warnings` pinpoint the excluded ones."
+- *P-value filter on current KG.* Example: "`significant_only=True` or `max_adjusted_p_value=0.05` raises today because no DM has `has_p_value='true'`. The surface exists for future DMs; check `list_derived_metrics(has_p_value=True)` before using these filters."
+- *Sparse columns in results.* Example: "`rank_by_metric` / `metric_percentile` / `metric_bucket` are null in rows from non-rankable DMs (e.g. `peak_time_*_h`); don't treat null as missing data — it's gate-driven."
+
+**`genes_by_boolean_metric.yaml`** / **`genes_by_categorical_metric.yaml`** — `mistakes` must include:
+- *Wrong-kind DM for the tool.* Example: "Passing a numeric DM to `genes_by_boolean_metric` raises with a `value_kind` mismatch. Use `list_derived_metrics(value_kind='boolean')` to pick IDs."
+- *(Categorical)* *Unknown category.* Example: "`categories=['foo']` against `darkness_survival_class` raises with the full `allowed_categories` set in the error — pull that set from `list_derived_metrics` verbose output or the error itself."
+
+**`gene_derived_metrics.yaml`** — `chaining` must include:
+- *Polymorphic `value` column.* "Branch on each row's `value_kind` to interpret `value` correctly (float vs `'true'/'false'` vs category string). Numeric rows additionally have rank/percentile/bucket when their parent DM is rankable — null otherwise."
+- *When to drill down.* "For numeric filtering (bucket/percentile/rank), pivot to `genes_by_numeric_metric`; this tool doesn't take numeric edge filters."
+
+**`list_derived_metrics.yaml`** — `chaining` must include:
+- *This is the entry point.* "Inspect `rankable`, `has_p_value`, `value_kind`, `allowed_categories`, `unit`, `compartment` here before selecting DMs for the drill-downs. `metric_type` is a category tag — use `derived_metric_ids` for unambiguous selection."
+- *Filter pre-flight.* "To check whether your intended downstream filter is applicable, filter here: `rankable=True` for rank/percentile/bucket, `has_p_value=True` for significance filters."
+
+For the 4 numeric-touching tools (`list_derived_metrics`, `gene_derived_metrics`, `genes_by_numeric_metric`, plus `genes_by_boolean_metric` for the tri-state storage note), gate awareness lands in two places that are reliably LLM-facing:
+
+1. **First bullet of `mistakes:`** in the tool's YAML — the existing generator preserves list order, so top placement is guaranteed.
+2. **First line of the tool's Pydantic docstring** in `mcp_server/tools.py` — this docstring becomes the MCP tool `description` surfaced directly to the LLM when it lists tools, so any note here is read before the params table. Keep it to a single sentence pointing at `list_derived_metrics` + the envelope fields.
+
+No new YAML schema slot needed. Don't bury the note elsewhere — these two surfaces are the ones the generator and the MCP client actually expose early.
+
 ### Analysis-layer reference (new)
 
 `multiomics_explorer/skills/multiomics-kg-guide/references/analysis/derived_metrics.md` — short concept + workflow guide (~1 page). Covers:
@@ -394,6 +542,8 @@ Per the `add-or-update-tool` skill — no hand-written tool docs:
 - The three `value_kind`s and which tool to reach for
 - 3-tool workflow: `list_derived_metrics` → `gene_derived_metrics` or `genes_by_{kind}_metric`
 - Why `metric_type` is a category tag, not a key — and when to use `derived_metric_ids` vs `metric_types`
+- **Gate awareness**: the `rankable` / `has_p_value` invariants from the KG side, which numeric filters they gate, and how to diagnose an empty result via `excluded_derived_metrics` + `warnings` instead of guessing. Include the concrete current-KG state ("4/6 numeric DMs rankable; 0/13 carry p-values today") as a worked example.
+- **KG encoding quirks worth knowing** (a short "things you'll see in results or `run_cypher`" subsection): boolean-typed props (`rankable`, `has_p_value`, `value_flag`) are stored as **string** `"true"` / `"false"`, not Neo4j booleans — compare with `= 'true'` in raw Cypher. Boolean-flag edges are stored positive-only in today's KG (see gate awareness above). The MCP tools themselves accept and return normal Python / JSON booleans; this only matters when using `run_cypher` directly.
 - Link to the canonical KG-side doc for full schema details
 
 ### CLAUDE.md

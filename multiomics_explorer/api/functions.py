@@ -12,6 +12,7 @@ import logging
 import os
 import re
 import statistics
+from typing import Literal
 
 from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
 
@@ -76,6 +77,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_response_profile,
     build_list_clustering_analyses,
     build_list_clustering_analyses_summary,
+    build_list_derived_metrics,
+    build_list_derived_metrics_summary,
     build_gene_clusters_by_gene,
     build_gene_clusters_by_gene_summary,
     build_genes_in_cluster,
@@ -2523,6 +2526,138 @@ def list_clustering_analyses(
             logger.debug("list_clustering_analyses detail: Lucene parse error, retrying")
             effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
             det_cypher, det_params = build_list_clustering_analyses(
+                search_text=effective_text, **filter_kwargs,
+                verbose=verbose, limit=limit, offset=offset)
+            results = conn.execute_query(det_cypher, **det_params)
+        else:
+            raise
+
+    envelope["returned"] = len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
+    envelope["results"] = results
+    return envelope
+
+
+def list_derived_metrics(
+    search_text: str | None = None,
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: Literal["numeric", "boolean", "categorical"] | None = None,
+    compartment: str | None = None,
+    omics_type: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+    rankable: bool | None = None,
+    has_p_value: bool | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Browse, search, and filter DerivedMetric nodes.
+
+    Returns dict with keys: total_entries, total_matching, by_organism,
+    by_value_kind, by_metric_type, by_compartment, by_omics_type,
+    by_treatment_type, by_background_factors, by_growth_phase,
+    score_max, score_median, returned, offset, truncated, results.
+    Per result (compact): derived_metric_id, name, metric_type, value_kind,
+    rankable, has_p_value, unit, allowed_categories, field_description,
+    organism_name, experiment_id, publication_doi, compartment, omics_type,
+    treatment_type, background_factors, total_gene_count, growth_phases,
+    score (when searching).
+    Per result (verbose): adds treatment, light_condition, experimental_context.
+
+    summary=True: results=[], summary fields only.
+    """
+    if search_text is not None and not search_text.strip():
+        raise ValueError("search_text must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    filter_kwargs = dict(
+        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, omics_type=omics_type,
+        treatment_type=treatment_type, background_factors=background_factors,
+        growth_phases=growth_phases, publication_doi=publication_doi,
+        experiment_ids=experiment_ids, derived_metric_ids=derived_metric_ids,
+        rankable=rankable, has_p_value=has_p_value,
+    )
+
+    effective_text = search_text
+
+    # Summary query — always runs
+    try:
+        sum_cypher, sum_params = build_list_derived_metrics_summary(
+            search_text=effective_text, **filter_kwargs)
+        raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+    except Neo4jClientError:
+        if search_text is not None:
+            logger.debug("list_derived_metrics: Lucene parse error, retrying")
+            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            sum_cypher, sum_params = build_list_derived_metrics_summary(
+                search_text=effective_text, **filter_kwargs)
+            raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+        else:
+            raise
+
+    def _rename_freq(freq_list, key_name):
+        return sorted(
+            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+    total_matching = raw_summary["total_matching"]
+    envelope = {
+        "total_entries": raw_summary["total_entries"],
+        "total_matching": total_matching,
+        "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
+        "by_value_kind": _rename_freq(raw_summary["by_value_kind"], "value_kind"),
+        "by_metric_type": _rename_freq(raw_summary["by_metric_type"], "metric_type"),
+        "by_compartment": _rename_freq(raw_summary["by_compartment"], "compartment"),
+        "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
+        "by_treatment_type": _rename_freq(
+            raw_summary["by_treatment_type"], "treatment_type"),
+        "by_background_factors": _rename_freq(
+            raw_summary["by_background_factors"], "background_factor"),
+        "by_growth_phase": _rename_freq(
+            raw_summary.get("by_growth_phase", []), "growth_phase"),
+    }
+
+    if search_text is not None:
+        envelope["score_max"] = raw_summary.get("score_max")
+        envelope["score_median"] = raw_summary.get("score_median")
+    else:
+        envelope["score_max"] = None
+        envelope["score_median"] = None
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["offset"] = offset
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    try:
+        det_cypher, det_params = build_list_derived_metrics(
+            search_text=effective_text, **filter_kwargs,
+            verbose=verbose, limit=limit, offset=offset)
+        results = conn.execute_query(det_cypher, **det_params)
+    except Neo4jClientError:
+        if search_text is not None and effective_text == search_text:
+            logger.debug("list_derived_metrics detail: Lucene parse error, retrying")
+            effective_text = _LUCENE_SPECIAL.sub(r'\\\g<0>', search_text)
+            det_cypher, det_params = build_list_derived_metrics(
                 search_text=effective_text, **filter_kwargs,
                 verbose=verbose, limit=limit, offset=offset)
             results = conn.execute_query(det_cypher, **det_params)

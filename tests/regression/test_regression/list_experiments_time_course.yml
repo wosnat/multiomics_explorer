@@ -308,9 +308,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  cluster_types:
-  - classification
-  clustering_analysis_count: 1
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_mit1002_rnaseq
   experiment_name: MIT1002 Extended darkness vs 13:11 diel light:dark cycle control
@@ -1441,9 +1440,8 @@ rows:
 - background_factors:
   - axenic
   - diel
-  cluster_types:
-  - classification
-  clustering_analysis_count: 2
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
@@ -1493,9 +1491,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  cluster_types:
-  - classification
-  clustering_analysis_count: 2
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
