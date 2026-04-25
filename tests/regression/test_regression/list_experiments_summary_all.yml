@@ -7,11 +7,10 @@ rows:
   - '{''count'': 12, ''item'': ''diel''}'
   - '{''count'': 2, ''item'': ''viral''}'
   - '{''count'': 31, ''item'': ''darkness''}'
-  - '{''count'': 53, ''item'': ''axenic''}'
+  - '{''count'': 54, ''item'': ''axenic''}'
   - '{''count'': 54, ''item'': ''coculture''}'
   by_cluster_type:
   - '{''count'': 2, ''item'': ''diel''}'
-  - '{''count'': 3, ''item'': ''classification''}'
   - '{''count'': 3, ''item'': ''condition_comparison''}'
   - '{''count'': 3, ''item'': ''time_course''}'
   by_growth_phase:
@@ -26,6 +25,7 @@ rows:
   - '{''count'': 4, ''item'': ''infected''}'
   - '{''count'': 4, ''item'': ''recovery''}'
   by_omics_type:
+  - '{''count'': 1, ''item'': ''PAIRED_RNASEQ_PROTEOME''}'
   - '{''count'': 26, ''item'': ''MICROARRAY''}'
   - '{''count'': 62, ''item'': ''RNASEQ''}'
   - '{''count'': 7, ''item'': ''EXOPROTEOMICS''}'
@@ -46,7 +46,7 @@ rows:
   - '{''count'': 3, ''item'': ''Ruegeria pomeroyi DSS-3''}'
   - '{''count'': 3, ''item'': ''Shewanella sp. W3-18-1''}'
   - '{''count'': 3, ''item'': ''Synechococcus PCC 7002''}'
-  - '{''count'': 36, ''item'': ''Prochlorococcus MED4''}'
+  - '{''count'': 37, ''item'': ''Prochlorococcus MED4''}'
   - '{''count'': 4, ''item'': ''Alteromonas macleodii MIT1002''}'
   - '{''count'': 4, ''item'': ''Synechococcus sp. BL107''}'
   - '{''count'': 5, ''item'': ''Prochlorococcus MIT9312''}'
@@ -68,6 +68,7 @@ rows:
   - '{''count'': 1, ''item'': ''10.1128/mbio.03425-22''}'
   - '{''count'': 1, ''item'': ''10.1186/1471-2180-14-11''}'
   - '{''count'': 1, ''item'': ''10.1371/journal.pone.0005135''}'
+  - '{''count'': 1, ''item'': ''10.1371/journal.pone.0043432''}'
   - '{''count'': 10, ''item'': ''10.1038/s43705-022-00197-2''}'
   - '{''count'': 10, ''item'': ''10.1101/2025.11.24.690089''}'
   - '{''count'': 2, ''item'': ''10.1073/pnas.0601301103''}'
@@ -96,12 +97,12 @@ rows:
   - '{''count'': 13, ''item'': ''significant_any_timepoint''}'
   - '{''count'': 17, ''item'': ''filtered_subset''}'
   - '{''count'': 39, ''item'': ''significant_only''}'
-  - '{''count'': 4, ''item'': ''''}'
+  - '{''count'': 5, ''item'': ''''}'
   - '{''count'': 93, ''item'': ''all_detected_genes''}'
   by_treatment_type:
-  - '{''count'': 1, ''item'': ''diel''}'
   - '{''count'': 1, ''item'': ''temperature''}'
   - '{''count'': 16, ''item'': ''nitrogen''}'
+  - '{''count'': 2, ''item'': ''diel''}'
   - '{''count'': 2, ''item'': ''growth_phase''}'
   - '{''count'': 3, ''item'': ''salt''}'
   - '{''count'': 4, ''item'': ''plastic''}'
@@ -113,4 +114,4 @@ rows:
   - '{''count'': 77, ''item'': ''coculture''}'
   - '{''count'': 9, ''item'': ''light''}'
   time_course_count: 32
-  total_matching: 166
+  total_matching: 167

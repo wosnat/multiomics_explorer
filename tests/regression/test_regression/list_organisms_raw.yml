@@ -154,16 +154,17 @@ rows:
   treatment_types:
   - salt
 - clade: HLI
-  experiment_count: 108
+  experiment_count: 109
   gene_count: 1976
   genus: Prochlorococcus
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
+  - PAIRED_RNASEQ_PROTEOME
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus MED4
-  publication_count: 14
+  publication_count: 15
   species: Prochlorococcus marinus
   strain: MED4
   treatment_types:

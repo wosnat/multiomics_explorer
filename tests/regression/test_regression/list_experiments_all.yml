@@ -1,5 +1,5 @@
 case_id: list_experiments_all
-row_count: 166
+row_count: 167
 rows:
 - background_factors:
   - darkness
@@ -1460,9 +1460,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  cluster_types:
-  - classification
-  clustering_analysis_count: 1
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_mit1002_rnaseq
   experiment_name: MIT1002 Extended darkness vs 13:11 diel light:dark cycle control
@@ -3307,6 +3306,33 @@ rows:
   - growth_phase
 - background_factors:
   - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
+  experiment_name: MED4 diel paired transcript-protein analysis (Waldbauer 2012)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: PAIRED_RNASEQ_PROTEOME
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0043432
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: ''
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - diel
+- background_factors:
+  - axenic
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -4942,9 +4968,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  cluster_types:
-  - classification
-  clustering_analysis_count: 2
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
@@ -4994,9 +5019,8 @@ rows:
 - background_factors:
   - axenic
   - diel
-  cluster_types:
-  - classification
-  clustering_analysis_count: 2
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control

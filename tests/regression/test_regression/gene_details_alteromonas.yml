@@ -13,11 +13,16 @@ rows:
   - cog_category
   - go_mf
   - pfam
+  classifier_flag_count: 0
+  classifier_flag_types_observed: []
+  classifier_label_count: 0
+  classifier_label_types_observed: []
   closest_ortholog_genera:
   - Alteromonas
   closest_ortholog_group_size: 9
   cluster_membership_count: 0
   cluster_types: []
+  compartments_observed: []
   end: 40258
   expression_edge_count: 0
   function_description: Winged helix-turn helix
@@ -25,6 +30,8 @@ rows:
   gene_summary: 'IS630 family transposase :: Winged helix-turn helix'
   id: ncbigene:ALT831_RS00180
   locus_tag: ALT831_RS00180
+  numeric_metric_count: 0
+  numeric_metric_types_observed: []
   organism_name: Alteromonas macleodii MIT1002
   preferred_id: ncbigene
   product: IS630 family transposase
