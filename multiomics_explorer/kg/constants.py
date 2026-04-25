@@ -23,7 +23,6 @@ VALID_TAXONOMIC_LEVELS: set[str] = {
 MAX_SPECIFICITY_RANK: int = 3  # 0=curated, 1=family, 2=order, 3=domain
 
 VALID_CLUSTER_TYPES: set[str] = {
-    "classification",
     "condition_comparison",
     "diel",
     "time_course",
@@ -32,6 +31,7 @@ VALID_CLUSTER_TYPES: set[str] = {
 VALID_OMICS_TYPES: set[str] = {
     "EXOPROTEOMICS",
     "MICROARRAY",
+    "PAIRED_RNASEQ_PROTEOME",
     "PROTEOMICS",
     "RNASEQ",
 }

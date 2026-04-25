@@ -1000,7 +1000,7 @@ class TestClusterEnrichmentIntegration:
 
     def test_basic_call(self, conn):
         from multiomics_explorer.api import list_clustering_analyses, cluster_enrichment
-        analyses = list_clustering_analyses(limit=1, conn=conn)
+        analyses = list_clustering_analyses(organism="MED4", limit=1, conn=conn)
         if not analyses["results"]:
             pytest.skip("No clustering analyses in KG")
         analysis = analyses["results"][0]
@@ -1018,7 +1018,7 @@ class TestClusterEnrichmentIntegration:
 
     def test_organism_background_differs(self, conn):
         from multiomics_explorer.api import list_clustering_analyses, cluster_enrichment
-        analyses = list_clustering_analyses(limit=1, conn=conn)
+        analyses = list_clustering_analyses(organism="MED4", limit=1, conn=conn)
         if not analyses["results"]:
             pytest.skip("No clustering analyses in KG")
         analysis = analyses["results"][0]

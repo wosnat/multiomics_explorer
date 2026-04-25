@@ -108,13 +108,13 @@ cluster_summary:
   universe_size_median: 1424.0
   universe_size_min: 327
 clusters_skipped:
-- cluster: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics|stationary|up
-  reason: empty_gene_set
-- cluster: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics|stationary|down
+- cluster: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics|darkness|down
   reason: empty_gene_set
 - cluster: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics|darkness|up
   reason: empty_gene_set
-- cluster: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics|darkness|down
+- cluster: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics|stationary|down
+  reason: empty_gene_set
+- cluster: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics|stationary|up
   reason: empty_gene_set
 enrichment_params:
   background_mode: table_scope

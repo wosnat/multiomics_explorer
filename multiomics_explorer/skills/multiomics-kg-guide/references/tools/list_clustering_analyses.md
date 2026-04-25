@@ -14,11 +14,11 @@ Inline clusters included — use genes_in_cluster to drill into members.
 |---|---|---|---|
 | search_text | string \| None | None | Lucene full-text query over analysis name, cluster names, functional/behavioral descriptions, experimental_context. Results ranked by score. |
 | organism | string \| None | None | Filter by organism (case-insensitive partial match). |
-| cluster_type | string \| None | None | Filter: 'classification', 'condition_comparison', 'diel', 'time_course'. |
+| cluster_type | string \| None | None | Filter: 'condition_comparison', 'diel', 'time_course'. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen_stress']. |
 | background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel_cycle']. |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
-| omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'MICROARRAY', 'PROTEOMICS', 'RNASEQ'. |
+| omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'MICROARRAY', 'PAIRED_RNASEQ_PROTEOME', 'PROTEOMICS', 'RNASEQ'. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
 | experiment_ids | list[string] \| None | None | Filter by experiment IDs. |
 | analysis_ids | list[string] \| None | None | Filter by analysis IDs. |

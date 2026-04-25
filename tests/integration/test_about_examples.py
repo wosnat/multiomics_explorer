@@ -4,6 +4,7 @@ Parses example-call blocks from about markdown files, executes them via
 the API layer, and verifies responses match expected-keys.
 """
 
+import inspect
 import re
 from pathlib import Path
 
@@ -119,8 +120,18 @@ def _execute_call(call_str: str, conn) -> object:
             # Evaluate simple Python literals
             kwargs[key] = eval(value)  # noqa: S307 — controlled input from our own files
 
+    # About-content examples document the MCP-shape, but we call the API layer
+    # directly. Route MCP-wrapper-only kwargs (anything not in the API signature)
+    # through to_envelope() instead, so EnrichmentResult-returning tools render
+    # the user-visible envelope.
+    api_params = set(inspect.signature(func).parameters)
+    envelope_kwargs = {k: kwargs.pop(k) for k in list(kwargs) if k not in api_params}
+
     kwargs["conn"] = conn
-    return func(**kwargs)
+    result = func(**kwargs)
+    if hasattr(result, "to_envelope"):
+        result = result.to_envelope(**envelope_kwargs)
+    return result
 
 
 def _split_kwargs(args_str: str) -> list[str]:

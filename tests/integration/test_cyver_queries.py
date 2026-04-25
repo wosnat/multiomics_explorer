@@ -127,7 +127,7 @@ def _substitute_params(cypher: str, params: dict) -> str:
 # but are not yet populated on all nodes (e.g. p_value on Gene_in_gene_cluster).
 _KNOWN_MAP_KEYS = {
     "org", "cat", "lt", "cnt", "terms", "srcs", "gid",
-    "org_input", "tt", "bfs", "ts", "eid", "status", "log2fc", "m",
+    "org_input", "tt", "bfs", "ts", "gp", "eid", "status", "log2fc", "m",
     "tpo", "tph", "tp", "nf_raw", "ng_raw", "nm_raw",
     "cr_id", "cr_name", "cc_id", "cc_name", "og_ids", "src", "lvl",
     "cid", "cname",

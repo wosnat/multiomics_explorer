@@ -115,6 +115,15 @@ def _chunk_locus_tags(locus_tags: list[str]) -> list[list[str]]:
     return [locus_tags[i: i + size] for i in range(0, len(locus_tags), size)]
 
 
+def _rename_freq(freq_list: list[dict], key_name: str) -> list[dict]:
+    """Rename APOC ``{item, count}`` rows to ``{<key_name>, count}``, sorted desc by count."""
+    return sorted(
+        [{key_name: f["item"], "count": f["count"]} for f in freq_list],
+        key=lambda x: x["count"],
+        reverse=True,
+    )
+
+
 # Regex for blocking write operations in raw Cypher.
 _WRITE_KEYWORDS = re.compile(
     r"\b(CREATE|MERGE|DELETE|DETACH|SET|REMOVE|DROP|FOREACH|CALL\s*\{|CALL\s+\w+\.\w+|LOAD\s+CSV)\b",
@@ -239,14 +248,6 @@ def genes_by_function(
         raw_summary = _run_summary(st=escaped)
         filter_kwargs["search_text"] = escaped
 
-    # Rename APOC {item, count} to domain keys, sort desc
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
-
     total_matching = raw_summary["total_matching"]
     envelope = {
         "total_search_hits": raw_summary["total_search_hits"],
@@ -316,14 +317,6 @@ def gene_overview(
     # Summary query — always runs
     sum_cypher, sum_params = build_gene_overview_summary(locus_tags=locus_tags)
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
-
-    # Rename APOC {item, count} to domain keys, sort desc
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
 
     total_matching = raw_summary["total_matching"]
     envelope = {
@@ -819,14 +812,6 @@ def list_experiments(
     total_raw = conn.execute_query(total_cypher, **total_params)[0]
     total_entries = total_raw["total_matching"]
 
-    # Rename apoc.coll.frequencies {item, count} to domain keys, sort desc
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
-
     envelope = {
         "total_entries": total_entries,
         "total_matching": raw_summary["total_matching"],
@@ -1095,13 +1080,6 @@ def search_homolog_groups(
             search_text=effective_text, **filter_kwargs)
         raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
-
     total_matching = raw_summary["total_matching"]
     envelope = {
         "total_entries": raw_summary["total_entries"],
@@ -1185,13 +1163,6 @@ def genes_by_homolog_group(
         group_ids=group_ids, organisms=organisms,
     )
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
-
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
 
     by_group_all = _rename_freq(raw_summary["by_group_raw"], "group_id")
     group_counts = [g["count"] for g in by_group_all]
@@ -2185,14 +2156,6 @@ def differential_expression_by_ortholog(
         not_found_experiments = []
         not_matched_experiments = []
 
-    # Use same _rename_freq pattern as genes_by_homolog_group
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
-
     by_organism = _rename_freq(global_raw["by_organism"], "organism_name")
 
     envelope = {
@@ -2478,13 +2441,6 @@ def list_clustering_analyses(
         else:
             raise
 
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
-
     total_matching = raw_summary["total_matching"]
     envelope = {
         "total_entries": raw_summary["total_entries"],
@@ -2609,13 +2565,6 @@ def list_derived_metrics(
         else:
             raise
 
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
-
     total_matching = raw_summary["total_matching"]
     envelope = {
         "total_entries": raw_summary["total_entries"],
@@ -2731,13 +2680,6 @@ def gene_clusters_by_gene(
         locus_tags=locus_tags, **filter_kwargs)
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
-
     total_matching = raw_summary["total_matching"]
     envelope = {
         "total_matching": total_matching,
@@ -2818,13 +2760,6 @@ def genes_in_cluster(
     sum_cypher, sum_params = build_genes_in_cluster_summary(
         cluster_ids=cluster_ids, analysis_id=analysis_id, organism=organism)
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
-
-    def _rename_freq(freq_list, key_name):
-        return sorted(
-            [{key_name: f["item"], "count": f["count"]} for f in freq_list],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
 
     by_cluster = raw_summary["by_cluster"]
     cluster_counts = [c["count"] for c in by_cluster]
@@ -3289,6 +3224,7 @@ def pathway_enrichment(
         else:
             reason = "no_pathways_in_size_range"
         skipped.append({"cluster": cluster, "reason": reason})
+    skipped.sort(key=lambda s: (s["cluster"], s["reason"]))
     result.clusters_skipped = skipped
 
     result.params = {
@@ -3486,6 +3422,13 @@ def cluster_enrichment(
             "member_count": md.get("member_count"),
             "reason": reason,
         })
+    skipped.sort(
+        key=lambda s: (
+            s.get("cluster_name") or "",
+            s.get("cluster_id") or "",
+            s.get("reason") or "",
+        )
+    )
     result.clusters_skipped = skipped
 
     result.params = _cluster_enrichment_params_dict(
