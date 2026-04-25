@@ -11,13 +11,13 @@ rows:
     Higher = stronger damping of transcript oscillations at the protein level (post-transcriptional
     buffering).
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: damping_ratio
   name: Transcript:protein amplitude ratio
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'true'
+  rankable: true
   total_gene_count: 312
   treatment_type:
   - diel
@@ -32,13 +32,13 @@ rows:
   field_description: log2 peak-to-trough amplitude of protein abundance across the
     diel cycle. Higher = stronger protein oscillation.
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: diel_amplitude_protein_log2
   name: Protein amplitude (log2)
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'true'
+  rankable: true
   total_gene_count: 312
   treatment_type:
   - diel
@@ -53,13 +53,13 @@ rows:
   field_description: log2 peak-to-trough amplitude of transcript abundance across
     the diel cycle. Higher = stronger mRNA oscillation.
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: diel_amplitude_transcript_log2
   name: Transcript amplitude (log2)
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'true'
+  rankable: true
   total_gene_count: 312
   treatment_type:
   - diel
@@ -75,13 +75,13 @@ rows:
     transcript_peak, mod 24h). Higher = greater post-transcriptional / translational
     delay.
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: protein_transcript_lag_h
   name: Protein-transcript lag (h)
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'true'
+  rankable: true
   total_gene_count: 312
   treatment_type:
   - diel

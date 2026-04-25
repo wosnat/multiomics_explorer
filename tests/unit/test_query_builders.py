@@ -4416,8 +4416,8 @@ class TestBuildListDerivedMetrics:
         assert "dm.name AS name" in cypher
         assert "dm.metric_type AS metric_type" in cypher
         assert "dm.value_kind AS value_kind" in cypher
-        assert "dm.rankable AS rankable" in cypher
-        assert "dm.has_p_value AS has_p_value" in cypher
+        assert "dm.rankable = 'true' AS rankable" in cypher
+        assert "dm.has_p_value = 'true' AS has_p_value" in cypher
         assert "dm.unit AS unit" in cypher
         assert "CASE WHEN dm.value_kind = 'categorical'" in cypher
         assert "THEN dm.allowed_categories ELSE null END AS allowed_categories" in cypher

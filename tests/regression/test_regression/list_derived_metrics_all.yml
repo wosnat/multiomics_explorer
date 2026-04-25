@@ -11,13 +11,13 @@ rows:
   field_description: RAIN periodicity FDR<0.05 in MIT1002 coculture L:D (Table S4B)
   growth_phases:
   - darkness
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: periodic_in_coculture_LD
   name: Periodic in MIT1002 coculture L:D (Table S4B)
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1128/mSystems.00040-18
-  rankable: 'false'
+  rankable: false
   total_gene_count: 515
   treatment_type:
   - darkness
@@ -34,13 +34,13 @@ rows:
     (Table S4B)
   growth_phases:
   - darkness
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: periodic_in_coculture_extended_darkness
   name: Periodic in MIT1002 coculture extended darkness (Table S4B)
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii MIT1002
   publication_doi: 10.1128/mSystems.00040-18
-  rankable: 'false'
+  rankable: false
   total_gene_count: 2
   treatment_type:
   - darkness
@@ -56,13 +56,13 @@ rows:
     Higher = stronger damping of transcript oscillations at the protein level (post-transcriptional
     buffering).
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: damping_ratio
   name: Transcript:protein amplitude ratio
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'true'
+  rankable: true
   total_gene_count: 312
   treatment_type:
   - diel
@@ -77,13 +77,13 @@ rows:
   field_description: log2 peak-to-trough amplitude of protein abundance across the
     diel cycle. Higher = stronger protein oscillation.
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: diel_amplitude_protein_log2
   name: Protein amplitude (log2)
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'true'
+  rankable: true
   total_gene_count: 312
   treatment_type:
   - diel
@@ -98,13 +98,13 @@ rows:
   field_description: log2 peak-to-trough amplitude of transcript abundance across
     the diel cycle. Higher = stronger mRNA oscillation.
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: diel_amplitude_transcript_log2
   name: Transcript amplitude (log2)
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'true'
+  rankable: true
   total_gene_count: 312
   treatment_type:
   - diel
@@ -119,13 +119,13 @@ rows:
   field_description: Clock-hour at which protein abundance peaks across the 14:10
     diel cycle (0-24h). Phase metric (circular), not a magnitude — not rankable.
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: peak_time_protein_h
   name: Time of peak protein abundance (h)
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'false'
+  rankable: false
   total_gene_count: 312
   treatment_type:
   - diel
@@ -140,13 +140,13 @@ rows:
   field_description: Clock-hour at which mRNA abundance peaks across the 14:10 diel
     cycle (0-24h). Phase metric (circular), not a magnitude — not rankable.
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: peak_time_transcript_h
   name: Time of peak transcript abundance (h)
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'false'
+  rankable: false
   total_gene_count: 312
   treatment_type:
   - diel
@@ -162,13 +162,13 @@ rows:
     transcript_peak, mod 24h). Higher = greater post-transcriptional / translational
     delay.
   growth_phases: []
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: protein_transcript_lag_h
   name: Protein-transcript lag (h)
   omics_type: PAIRED_RNASEQ_PROTEOME
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
-  rankable: 'true'
+  rankable: true
   total_gene_count: 312
   treatment_type:
   - diel
@@ -184,13 +184,13 @@ rows:
   field_description: RAIN periodicity FDR<0.05 in NATL2A axenic L:D (Table S4A)
   growth_phases:
   - darkness
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: periodic_in_axenic_LD
   name: Periodic in NATL2A axenic L:D (Table S4A)
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1128/mSystems.00040-18
-  rankable: 'false'
+  rankable: false
   total_gene_count: 1377
   treatment_type:
   - darkness
@@ -207,13 +207,13 @@ rows:
     (Table S4A)
   growth_phases:
   - darkness
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: periodic_in_axenic_extended_darkness
   name: Periodic in NATL2A axenic extended darkness (Table S4A)
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1128/mSystems.00040-18
-  rankable: 'false'
+  rankable: false
   total_gene_count: 112
   treatment_type:
   - darkness
@@ -229,13 +229,13 @@ rows:
   field_description: RAIN periodicity FDR<0.05 in NATL2A coculture L:D (Table S4A)
   growth_phases:
   - darkness
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: periodic_in_coculture_LD
   name: Periodic in NATL2A coculture L:D (Table S4A)
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1128/mSystems.00040-18
-  rankable: 'false'
+  rankable: false
   total_gene_count: 1651
   treatment_type:
   - darkness
@@ -252,13 +252,13 @@ rows:
     (Table S4A)
   growth_phases:
   - darkness
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: periodic_in_coculture_extended_darkness
   name: Periodic in NATL2A coculture extended darkness (Table S4A)
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1128/mSystems.00040-18
-  rankable: 'false'
+  rankable: false
   total_gene_count: 503
   treatment_type:
   - darkness
@@ -278,13 +278,13 @@ rows:
     (Biller 2018 Table S5)
   growth_phases:
   - darkness
-  has_p_value: 'false'
+  has_p_value: false
   metric_type: darkness_survival_class
   name: NATL2A darkness survival class (Table S5)
   omics_type: RNASEQ
   organism_name: Prochlorococcus NATL2A
   publication_doi: 10.1128/mSystems.00040-18
-  rankable: 'false'
+  rankable: false
   total_gene_count: 258
   treatment_type:
   - darkness

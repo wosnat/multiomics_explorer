@@ -1081,7 +1081,7 @@ class TestListDerivedMetrics:
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=True, conn=conn, limit=None)
         assert out["total_matching"] == 4
-        assert all(r["rankable"] == "true" for r in out["results"])
+        assert all(r["rankable"] is True for r in out["results"])
 
     def test_rankable_false_9(self, conn):
         """Sanity-checks bool→'false' string coercion path.
@@ -1095,7 +1095,7 @@ class TestListDerivedMetrics:
         # The two non-rankable numeric DMs are always in this set
         assert "peak_time_protein_h" in metric_types
         assert "peak_time_transcript_h" in metric_types
-        assert all(r["rankable"] == "false" for r in out["results"])
+        assert all(r["rankable"] is False for r in out["results"])
 
     def test_has_p_value_true_empty(self, conn):
         """Intentional: no DM in current KG has p-values."""
