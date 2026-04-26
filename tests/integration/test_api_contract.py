@@ -1087,3 +1087,112 @@ class TestGeneDerivedMetricsContract:
         data = api.gene_derived_metrics(["PMM1714"], limit=1, verbose=True, conn=conn)
         expected = self.EXPECTED_COMPACT_RESULT_KEYS | self.EXPECTED_VERBOSE_ADD_KEYS
         assert set(data["results"][0].keys()) == expected
+
+
+# ---------------------------------------------------------------------------
+# genes_by_numeric_metric
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGenesByNumericMetricContract:
+    """Pin envelope shape + result keys + per-by_metric entry shape +
+    per-excluded_derived_metrics entry shape. Fail fast on accidental drift.
+    """
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "total_matching", "total_derived_metrics", "total_genes",
+        "by_organism", "by_compartment", "by_publication",
+        "by_experiment", "by_metric", "top_categories",
+        "genes_per_metric_max", "genes_per_metric_median",
+        "not_found_ids", "not_matched_ids",
+        "not_found_metric_types", "not_matched_metric_types",
+        "not_matched_organism",
+        "excluded_derived_metrics", "warnings",
+        "returned", "offset", "truncated", "results",
+    }  # 22 keys
+
+    EXPECTED_COMPACT_RESULT_KEYS = {
+        # Identity / routing (5)
+        "locus_tag", "gene_name", "product", "gene_category", "organism_name",
+        # DM identity (2)
+        "derived_metric_id", "name",
+        # Gate echoes (3)
+        "value_kind", "rankable", "has_p_value",
+        # Numeric value + rankable extras (4)
+        "value", "rank_by_metric", "metric_percentile", "metric_bucket",
+        # adjusted_p_value, significant: Pydantic-only forward-compat
+        # (default=None at wrapper layer; not in raw rows today)
+    }  # 14 raw + 2 forward-compat = 16 surfaced via wrapper
+
+    EXPECTED_VERBOSE_ADD_KEYS = {
+        "metric_type", "field_description", "unit", "compartment",
+        "experiment_id", "publication_doi", "treatment_type",
+        "background_factors", "treatment", "light_condition",
+        "experimental_context", "gene_function_description", "gene_summary",
+        # p_value: deferred — not in raw rows today (Pydantic-only)
+    }  # 13 verbose adds
+
+    EXPECTED_BY_METRIC_KEYS = {
+        "derived_metric_id", "name", "metric_type", "value_kind", "count",
+        # Filtered slice
+        "value_min", "value_q1", "value_median", "value_q3", "value_max",
+        # Full DM (precomputed)
+        "dm_value_min", "dm_value_q1", "dm_value_median", "dm_value_q3",
+        "dm_value_max",
+        # Rank distribution
+        "rank_min", "rank_max",
+    }  # 17 keys
+
+    EXPECTED_EXCLUDED_DM_KEYS = {
+        "derived_metric_id", "metric_type", "rankable", "has_p_value",
+        "reason",
+    }  # 5 keys
+
+    def test_envelope_keys(self, conn):
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], limit=1, conn=conn)
+        assert set(data.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_envelope_keys_summary_only(self, conn):
+        """Same envelope keys must surface with summary=True (results=[])."""
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], summary=True, conn=conn)
+        assert set(data.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_excluded_and_warnings_always_present(self, conn):
+        """Even when no exclusions, envelope carries empty list — never absent."""
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], limit=1, conn=conn)
+        assert data["excluded_derived_metrics"] == []
+        assert data["warnings"] == []
+        assert isinstance(data["excluded_derived_metrics"], list)
+        assert isinstance(data["warnings"], list)
+
+    def test_compact_result_keys(self, conn):
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], limit=1, conn=conn)
+        assert len(data["results"]) >= 1
+        assert set(data["results"][0].keys()) == self.EXPECTED_COMPACT_RESULT_KEYS
+
+    def test_verbose_result_keys(self, conn):
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], limit=1, verbose=True, conn=conn)
+        expected = (
+            self.EXPECTED_COMPACT_RESULT_KEYS | self.EXPECTED_VERBOSE_ADD_KEYS
+        )
+        assert set(data["results"][0].keys()) == expected
+
+    def test_by_metric_entry_keys(self, conn):
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], limit=1, conn=conn)
+        assert len(data["by_metric"]) >= 1
+        assert set(data["by_metric"][0].keys()) == self.EXPECTED_BY_METRIC_KEYS
+
+    def test_excluded_dm_entry_keys(self, conn):
+        """Trigger soft-exclude (mixed rankable + bucket) to populate the
+        excluded_derived_metrics list, then pin its per-entry shape."""
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio", "peak_time_protein_h"],
+            bucket=["top_decile"], limit=1, conn=conn)
+        assert len(data["excluded_derived_metrics"]) >= 1
+        entry = data["excluded_derived_metrics"][0]
+        assert set(entry.keys()) == self.EXPECTED_EXCLUDED_DM_KEYS
