@@ -1,5 +1,5 @@
 case_id: list_experiments_all
-row_count: 167
+row_count: 169
 rows:
 - background_factors:
   - darkness
@@ -1034,32 +1034,39 @@ rows:
   coculture_partner: null
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
   experiment_name: EZ55 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
-  gene_count: 345
+  gene_count: 768
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii EZ55
   publication_doi: 10.1038/ismej.2017.189
-  significant_down_count: 162
-  significant_up_count: 183
+  significant_down_count: 194
+  significant_up_count: 224
   table_scope: significant_only
   table_scope_detail: ''
-  time_point_count: 1
+  time_point_count: 2
   time_point_growth_phases:
+  - acclimated_steady_state
   - acclimated_steady_state
   time_point_hours:
   - '-1.0'
+  - '-1.0'
   time_point_labels:
+  - acclimated
   - acclimated
   time_point_orders:
   - '1'
+  - '2'
   time_point_significant_down:
   - '162'
+  - '32'
   time_point_significant_up:
   - '183'
+  - '41'
   time_point_totals:
   - '345'
+  - '423'
   treatment_type:
   - carbon
 - background_factors:
@@ -4138,6 +4145,34 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+  experiment_name: MIT9312 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
   experiment_id: 10.1038/s42003-019-0410-x_plastic_hdpe_plastic_leachate_50_mit9312_rnaseq
   experiment_name: MIT9312 HDPE plastic leachate (50% dilution) vs AMP1 media control
     (no leachate) (RNASEQ)
@@ -4316,6 +4351,34 @@ rows:
   - '72'
   treatment_type:
   - carbon
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+  experiment_name: MIT9313 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - background_factors:
   - light
   cluster_types: []

@@ -1698,6 +1698,7 @@ def register_tools(mcp: FastMCP):
         time_course_count: int = Field(description="Number of time-course experiments in matching set")
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
+        not_found: list[str] = Field(default_factory=list, description="Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided)")
         results: list[ExperimentResult] = Field(description="Individual experiments (empty when summary=true)")
 
     @mcp.tool(
@@ -1756,6 +1757,12 @@ def register_tools(mcp: FastMCP):
             "'filtered_subset'. E.g. ['all_detected_genes'] for fair "
             "cross-experiment comparison.",
         )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Restrict to specific experiments by id (exact match). "
+            "Combines with other filters via AND. `not_found` in the response "
+            "lists any provided ids that did not match. Mirrors the filter "
+            "shape on sibling tools (pathway_enrichment, ontology_landscape).",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary breakdowns (by organism, "
             "treatment type, omics type, table scope) with no individual "
@@ -1795,6 +1802,7 @@ def register_tools(mcp: FastMCP):
                 omics_type=omics_type, publication_doi=publication_doi,
                 coculture_partner=coculture_partner, search_text=search_text,
                 time_course_only=time_course_only, table_scope=table_scope,
+                experiment_ids=experiment_ids,
                 summary=summary,
                 verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
@@ -1842,6 +1850,7 @@ def register_tools(mcp: FastMCP):
                 time_course_count=result["time_course_count"],
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),
+                not_found=result.get("not_found", []),
                 results=experiments,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "

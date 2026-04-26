@@ -2015,6 +2015,65 @@ class TestListExperiments:
         result = api.list_experiments(offset=5, conn=mock_conn)
         assert result["offset"] == 5
 
+    def test_experiment_ids_filter_threaded_to_builders(self, mock_conn):
+        """experiment_ids flows into the summary + detail builder params (B2 #1)."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=1),  # filtered summary
+            self._summary_result(),                  # unfiltered total_entries
+            [{"found": ["exp_a"]}],                  # not_found probe
+            [self._detail_row(experiment_id="exp_a")],
+        ]
+        result = api.list_experiments(
+            experiment_ids=["exp_a"], conn=mock_conn,
+        )
+        # Summary query has the filter
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        assert summary_call.kwargs.get("experiment_ids") == ["exp_a"]
+        # Detail query has the filter
+        detail_call = mock_conn.execute_query.call_args_list[3]
+        assert detail_call.kwargs.get("experiment_ids") == ["exp_a"]
+        assert result["not_found"] == []
+        assert result["results"][0]["experiment_id"] == "exp_a"
+
+    def test_experiment_ids_not_found_populated(self, mock_conn):
+        """Provided IDs that no Experiment matches surface in not_found."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=1),
+            self._summary_result(),
+            [{"found": ["exp_a"]}],  # only one of the two requested ids exists
+            [self._detail_row(experiment_id="exp_a")],
+        ]
+        result = api.list_experiments(
+            experiment_ids=["exp_a", "exp_zzz"], conn=mock_conn,
+        )
+        assert result["not_found"] == ["exp_zzz"]
+        assert result["total_matching"] == 1
+
+    def test_experiment_ids_summary_mode_still_returns_not_found(self, mock_conn):
+        """In summary mode, not_found is still populated (probe runs before
+        the early return)."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=1),
+            self._summary_result(),
+            [{"found": []}],  # neither id exists
+        ]
+        result = api.list_experiments(
+            experiment_ids=["fake_a", "fake_b"], summary=True, conn=mock_conn,
+        )
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["not_found"] == ["fake_a", "fake_b"]
+
+    def test_default_not_found_empty_list(self, mock_conn):
+        """When experiment_ids not provided, not_found is an empty list."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._detail_row()],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        assert result["not_found"] == []
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene

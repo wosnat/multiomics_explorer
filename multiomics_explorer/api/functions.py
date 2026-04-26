@@ -738,6 +738,7 @@ def list_experiments(
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
     growth_phases: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -750,7 +751,7 @@ def list_experiments(
     Always returns: total_entries, total_matching, by_organism,
     by_treatment_type, by_background_factors, by_omics_type,
     by_publication, by_table_scope, by_cluster_type, by_growth_phase,
-    time_course_count, returned, truncated, results.
+    time_course_count, returned, truncated, not_found, results.
 
     summary=True is sugar for limit=0: results is empty list,
     returned=0, truncated=True.
@@ -768,6 +769,11 @@ def list_experiments(
 
     growth_phases: if provided, restricts to experiments whose growth_phases
     array contains any of the specified values (case-insensitive).
+
+    experiment_ids: if provided, restricts to experiments whose `id` matches
+    any of the listed values (exact match). Mirrors the filter shape on
+    sibling tools (pathway_enrichment, ontology_landscape, etc.).
+    `not_found` in the envelope lists any provided IDs that did not match.
     """
     if summary:
         limit = 0
@@ -779,7 +785,7 @@ def list_experiments(
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
-        growth_phases=growth_phases,
+        growth_phases=growth_phases, experiment_ids=experiment_ids,
     )
 
     def _run_summary(st=search_text):
@@ -825,6 +831,20 @@ def list_experiments(
         "by_growth_phase": _rename_freq(raw_summary.get("by_growth_phase", []), "growth_phase"),
         "time_course_count": raw_summary["time_course_count"],
     }
+
+    # Compute not_found: provided experiment_ids that no Experiment node matches.
+    # Only the experiment_ids filter is used (other filters could exclude a real
+    # ID, which is "filtered out" rather than "not found").
+    if experiment_ids:
+        eid_cypher = (
+            "MATCH (e:Experiment) WHERE e.id IN $experiment_ids "
+            "RETURN collect(e.id) AS found"
+        )
+        eid_rows = conn.execute_query(eid_cypher, experiment_ids=experiment_ids)
+        found_ids = set(eid_rows[0]["found"]) if eid_rows else set()
+        envelope["not_found"] = [eid for eid in experiment_ids if eid not in found_ids]
+    else:
+        envelope["not_found"] = []
 
     # Score distribution (only when search_text used)
     if "score_max" in raw_summary:

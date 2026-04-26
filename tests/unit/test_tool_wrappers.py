@@ -2243,6 +2243,41 @@ class TestListExperimentsWrapper:
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
 
+    @pytest.mark.asyncio
+    async def test_experiment_ids_passed_to_api(self, tool_fns, mock_ctx):
+        """experiment_ids flows from MCP wrapper into api.list_experiments. B2 #1."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value={**self._SAMPLE_SUMMARY, "not_found": []},
+        ) as mock_api:
+            await tool_fns["list_experiments"](
+                mock_ctx, experiment_ids=["exp_a", "exp_b"],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("experiment_ids") == ["exp_a", "exp_b"]
+
+    @pytest.mark.asyncio
+    async def test_not_found_surfaced_in_response(self, tool_fns, mock_ctx):
+        """not_found from api dict appears on the Pydantic response."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value={**self._SAMPLE_SUMMARY, "not_found": ["exp_zzz"]},
+        ):
+            result = await tool_fns["list_experiments"](
+                mock_ctx, experiment_ids=["exp_zzz"],
+            )
+        assert result.not_found == ["exp_zzz"]
+
+    @pytest.mark.asyncio
+    async def test_not_found_default_empty(self, tool_fns, mock_ctx):
+        """When api dict omits not_found, response defaults to empty list."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_SUMMARY,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert result.not_found == []
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene

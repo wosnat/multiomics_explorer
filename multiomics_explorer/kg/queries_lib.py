@@ -984,6 +984,7 @@ def _list_experiments_where(
     table_scope: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for experiment queries.
 
@@ -1048,6 +1049,10 @@ def _list_experiments_where(
         conditions.append("e.table_scope IN $table_scopes")
         params["table_scopes"] = table_scope
 
+    if experiment_ids:
+        conditions.append("e.id IN $experiment_ids")
+        params["experiment_ids"] = experiment_ids
+
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
     return where_block, params
 
@@ -1064,6 +1069,7 @@ def build_list_experiments(
     table_scope: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -1089,6 +1095,7 @@ def build_list_experiments(
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         background_factors=background_factors, growth_phases=growth_phases,
+        experiment_ids=experiment_ids,
     )
 
     verbose_cols = (
@@ -1179,6 +1186,7 @@ def build_list_experiments_summary(
     table_scope: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_experiments.
 
@@ -1197,6 +1205,7 @@ def build_list_experiments_summary(
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         background_factors=background_factors, growth_phases=growth_phases,
+        experiment_ids=experiment_ids,
     )
 
     collect_cols = (

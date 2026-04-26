@@ -45,6 +45,9 @@ examples:
       Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
               → get gene-level results
 
+  - title: Fetch metadata for a known experiment_id list
+    call: list_experiments(experiment_ids=["10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq", "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"], verbose=True)
+
 verbose_fields:
   - publication_title
   - treatment
@@ -61,6 +64,7 @@ chaining:
   - "list_organisms → list_experiments"
   - "list_publications → list_experiments"
   - "list_filter_values → list_experiments"
+  - "list_experiments(search_text=..., verbose=True) → classify → list_experiments(experiment_ids=[...]) for the picked subset"
   - "list_experiments → differential_expression_by_gene"
   - "list_experiments → list_clustering_analyses(experiment_ids=[...])"
 

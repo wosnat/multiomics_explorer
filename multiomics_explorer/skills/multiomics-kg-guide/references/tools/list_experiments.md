@@ -27,6 +27,7 @@ report all assayed genes (fair for cross-experiment comparison).
 | search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |
+| experiment_ids | list[string] \| None | None | Restrict to specific experiments by id (exact match). Combines with other filters via AND. `not_found` in the response lists any provided ids that did not match. Mirrors the filter shape on sibling tools (pathway_enrichment, ontology_landscape). |
 | summary | bool | False | When true, return only summary breakdowns (by organism, treatment type, omics type, table scope) with no individual experiments. Use to orient before drilling into detail. |
 | verbose | bool | False | Include publication title, treatment/control descriptions, and experimental conditions (light, medium, temperature, statistical test, context). |
 | limit | int | 5 | Max results. |
@@ -39,7 +40,7 @@ report all assayed genes (fair for cross-experiment comparison).
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, time_course_count, score_max, score_median, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, time_course_count, score_max, score_median, not_found, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered)
@@ -58,6 +59,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **time_course_count** (int): Number of time-course experiments in matching set
 - **score_max** (float | None): Max Lucene relevance score, present only when search_text is used (e.g. 4.52)
 - **score_median** (float | None): Median Lucene relevance score, present only when search_text is used (e.g. 1.23)
+- **not_found** (list[string]): Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided)
 
 ### Per-result fields
 
@@ -160,12 +162,19 @@ Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
         → get gene-level results
 ```
 
+### Example 7: Fetch metadata for a known experiment_id list
+
+```example-call
+list_experiments(experiment_ids=["10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq", "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"], verbose=True)
+```
+
 ## Chaining patterns
 
 ```
 list_organisms → list_experiments
 list_publications → list_experiments
 list_filter_values → list_experiments
+list_experiments(search_text=..., verbose=True) → classify → list_experiments(experiment_ids=[...]) for the picked subset
 list_experiments → differential_expression_by_gene
 list_experiments → list_clustering_analyses(experiment_ids=[...])
 ```
@@ -198,7 +207,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, time_course_count, score_max, score_median, results
+# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, time_course_count, score_max, score_median, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

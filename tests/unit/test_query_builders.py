@@ -2137,6 +2137,42 @@ class TestBuildGeneStub:
         assert params == {"lt": "SYNW0305"}
 
 
+class TestBuildListExperimentsExperimentIdsFilter:
+    """Coverage for the experiment_ids filter shared across detail + summary
+    builders (B2 #1)."""
+
+    def test_filter_in_cypher(self):
+        cypher, params = build_list_experiments(experiment_ids=["exp_a", "exp_b"])
+        assert "e.id IN $experiment_ids" in cypher
+        assert params["experiment_ids"] == ["exp_a", "exp_b"]
+
+    def test_combines_with_organism(self):
+        cypher, params = build_list_experiments(
+            organism="MED4", experiment_ids=["exp_a"],
+        )
+        assert "e.id IN $experiment_ids" in cypher
+        assert "$organism" in cypher
+        assert params["experiment_ids"] == ["exp_a"]
+
+    def test_none_omits_clause(self):
+        cypher, params = build_list_experiments()
+        assert "experiment_ids" not in params
+        assert "$experiment_ids" not in cypher
+
+    def test_empty_list_omits_clause(self):
+        # `if experiment_ids:` is false for empty lists — no clause.
+        cypher, params = build_list_experiments(experiment_ids=[])
+        assert "experiment_ids" not in params
+        assert "$experiment_ids" not in cypher
+
+    def test_summary_filter_in_cypher(self):
+        cypher, params = build_list_experiments_summary(
+            experiment_ids=["exp_a", "exp_b"],
+        )
+        assert "e.id IN $experiment_ids" in cypher
+        assert params["experiment_ids"] == ["exp_a", "exp_b"]
+
+
 class TestBuildListExperimentsSummary:
     def test_no_filters(self):
         """Returns aggregation columns via apoc.coll.frequencies."""
