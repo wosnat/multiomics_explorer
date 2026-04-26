@@ -1045,11 +1045,10 @@
     columns: []
 
 - id: gene_derived_metrics_summary
-  tool: gene_derived_metrics
+  tool: gene_derived_metrics_summary
   desc: Summary mode for mixed-input batch
   params:
     locus_tags: ["PMM1714", "PMM0001"]
-    summary: true
   expect:
     min_rows: 0
     columns: []

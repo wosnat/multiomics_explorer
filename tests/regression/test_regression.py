@@ -176,10 +176,7 @@ def test_regression(conn, case, data_regression):
     else:
         builder = TOOL_BUILDERS[tool]
         # Strip tool-level params that aren't accepted by query builders
-        builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit", "summary")}
-        # If `summary: true` and a `_summary` builder exists, dispatch to it
-        if params.get("summary") and f"{tool}_summary" in TOOL_BUILDERS:
-            builder = TOOL_BUILDERS[f"{tool}_summary"]
+        builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit")}
         cypher, query_params = builder(**builder_params)
         results = conn.execute_query(cypher, **query_params)
         # gene_details returns g{.*} AS gene — unwrap for flat comparison

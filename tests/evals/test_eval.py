@@ -125,10 +125,7 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
     builder = TOOL_BUILDERS[tool]
     limit = params.get("limit")
     # Strip tool-level params that aren't accepted by query builders
-    builder_params = {k: v for k, v in params.items() if k not in ("limit", "summary")}
-    # If `summary: true` and a `_summary` builder exists, dispatch to it
-    if params.get("summary") and f"{tool}_summary" in TOOL_BUILDERS:
-        builder = TOOL_BUILDERS[f"{tool}_summary"]
+    builder_params = {k: v for k, v in params.items() if k not in ("limit",)}
     cypher, query_params = builder(**builder_params)
     results = conn.execute_query(cypher, **query_params)
     # Apply limit at the test level (mirrors MCP layer behavior)
