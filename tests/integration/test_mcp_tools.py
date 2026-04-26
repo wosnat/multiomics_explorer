@@ -1439,3 +1439,221 @@ class TestGeneDerivedMetrics:
         assert response.returned == 2
         assert response.truncated is True
         assert response.total_matching == 9
+
+
+@pytest.mark.kg
+class TestGenesByNumericMetric:
+    """Integration tests against live KG. Baselines pinned 2026-04-26.
+
+    Calls the api function directly with a real GraphConnection. Most cases
+    use the api/ surface (mirrors `gene_derived_metrics` precedent — also
+    plays well with hard-fail tests that need ValueError, not ToolError).
+    """
+
+    @pytest.mark.asyncio
+    async def test_damping_ratio_top_decile(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], bucket=["top_decile"],
+            limit=50)
+        assert response.total_matching == 32
+        assert response.total_genes == 32
+        assert len(response.by_metric) == 1
+        bm = response.by_metric[0]
+        assert bm.metric_type == "damping_ratio"
+        assert bm.count == 32
+        assert bm.value_min == pytest.approx(12.2, abs=0.5)
+        assert bm.value_median == pytest.approx(15.9, abs=0.5)
+        assert bm.value_max == pytest.approx(25.3, abs=0.1)
+        assert bm.rank_min == 1
+        assert bm.rank_max == 32
+        # Sort key validated: row 1 PMM1545 (rpsH, value=25.3, rank=1)
+        first = response.results[0]
+        assert first.locus_tag == "PMM1545"
+        assert first.gene_name == "rpsH"
+        assert first.value == pytest.approx(25.3, abs=0.1)
+        assert first.rank_by_metric == 1
+
+    @pytest.mark.asyncio
+    async def test_top_decile_full_dm_context(self, tool_fns, conn):
+        """Full-DM precomputed stats (dm.value_*) populated alongside slice."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], bucket=["top_decile"],
+            limit=1)
+        bm = response.by_metric[0]
+        assert bm.dm_value_min == pytest.approx(0.2, abs=0.1)
+        assert bm.dm_value_q1 == pytest.approx(2.8, abs=0.5)
+        assert bm.dm_value_median == pytest.approx(4.9, abs=0.5)
+        assert bm.dm_value_q3 == pytest.approx(7.8, abs=0.5)
+        assert bm.dm_value_max == pytest.approx(25.3, abs=0.1)
+
+    @pytest.mark.asyncio
+    async def test_mixed_rankable_soft_exclude(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio", "peak_time_protein_h"],
+            bucket=["top_decile"], limit=50)
+        # damping_ratio survives, peak_time_protein_h soft-excluded
+        assert response.total_matching == 32
+        assert len(response.excluded_derived_metrics) == 1
+        excluded = response.excluded_derived_metrics[0]
+        assert excluded.derived_metric_id.endswith("peak_time_protein_h")
+        assert excluded.rankable is False
+        assert "bucket" in excluded.reason
+        assert len(response.warnings) == 1
+
+    def test_all_non_rankable_hard_fail(self, conn):
+        """All-non-rankable + bucket → api raises ValueError."""
+        with pytest.raises(ValueError) as exc_info:
+            api.genes_by_numeric_metric(
+                metric_types=["peak_time_transcript_h"],
+                bucket=["top_decile"], conn=conn)
+        msg = str(exc_info.value)
+        assert "rankable=False" in msg or "non-rankable" in msg
+        assert "bucket" in msg
+
+    def test_p_value_filter_hard_fail_today(self, conn):
+        """significant_only against has_p_value=False DM → ValueError."""
+        with pytest.raises(ValueError) as exc_info:
+            api.genes_by_numeric_metric(
+                metric_types=["damping_ratio"],
+                significant_only=True, conn=conn)
+        msg = str(exc_info.value)
+        assert "has_p_value" in msg
+
+    @pytest.mark.asyncio
+    async def test_max_rank_top_n(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], max_rank=5, limit=10)
+        assert response.returned == 5
+        assert response.total_matching == 5
+        ranks = [r.rank_by_metric for r in response.results]
+        assert ranks == [1, 2, 3, 4, 5]
+
+    @pytest.mark.asyncio
+    async def test_min_value_threshold_non_rankable(self, tool_fns, conn):
+        """min_value works on non-rankable DMs (raw threshold, not gated)."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["mascot_identification_probability"],
+            organism="MED4", min_value=99, limit=50)
+        assert response.total_matching >= 1
+        for r in response.results:
+            assert r.value >= 99
+        # min_value is not gated → no soft-exclude
+        assert response.excluded_derived_metrics == []
+
+    @pytest.mark.asyncio
+    async def test_cross_organism_no_scope(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["cell_abundance_biovolume_normalized"],
+            bucket=["top_quartile"], limit=10)
+        assert response.total_matching == 308
+        assert len(response.by_organism) == 2
+        # 152 MIT9312 + 156 MIT9313 = 308
+        org_counts = {o.organism_name: o.count for o in response.by_organism}
+        # match by substring (organism_name is full e.g. "Prochlorococcus MIT9312")
+        mit9312_hits = [c for n, c in org_counts.items() if "MIT9312" in n]
+        mit9313_hits = [c for n, c in org_counts.items() if "MIT9313" in n]
+        assert mit9312_hits == [152]
+        assert mit9313_hits == [156]
+        assert len(response.by_metric) == 2
+        assert response.not_matched_organism is None
+
+    @pytest.mark.asyncio
+    async def test_cross_organism_with_scope(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["cell_abundance_biovolume_normalized"],
+            bucket=["top_quartile"], organism="MIT9313", limit=10)
+        assert response.total_matching == 156
+        assert len(response.by_organism) == 1
+        assert "MIT9313" in response.by_organism[0].organism_name
+        assert response.not_matched_organism is None
+
+    @pytest.mark.asyncio
+    async def test_locus_tags_intersection(self, tool_fns, conn):
+        """Top-5 ranked → intersect locus_tags → 5 rows."""
+        ctx = _ctx_with_conn(conn)
+        # Step 1: pull top-5 by max_rank
+        top5 = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], max_rank=5, limit=10)
+        top5_locs = [r.locus_tag for r in top5.results]
+        assert len(top5_locs) == 5
+        # Step 2: re-call with locus_tags filter
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], locus_tags=top5_locs,
+            limit=10)
+        assert response.total_matching == 5
+        assert response.returned == 5
+        assert {r.locus_tag for r in response.results} == set(top5_locs)
+
+    @pytest.mark.asyncio
+    async def test_summary_only(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], bucket=["top_decile"],
+            summary=True)
+        assert response.results == []
+        assert response.total_matching == 32
+        assert response.returned == 0
+        # truncated = total_matching (32) > offset (0) + returned (0)
+        assert response.truncated is True
+        # Envelope still populated
+        assert len(response.by_metric) == 1
+        assert response.total_genes == 32
+
+    @pytest.mark.asyncio
+    async def test_truncation_pagination(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        page1 = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], limit=10)
+        assert page1.returned == 10
+        assert page1.truncated is True
+        assert page1.total_matching == 312
+        page2 = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], limit=10, offset=10)
+        assert page2.returned == 10
+        # No locus_tag overlap between consecutive pages
+        p1_locs = {r.locus_tag for r in page1.results}
+        p2_locs = {r.locus_tag for r in page2.results}
+        assert p1_locs & p2_locs == set()
+
+    @pytest.mark.asyncio
+    async def test_verbose_columns(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], limit=1, verbose=True)
+        row = response.results[0]
+        assert row.metric_type == "damping_ratio"
+        assert row.unit is not None  # may be empty string but not None
+        assert row.compartment == "whole_cell"
+        assert row.experiment_id is not None
+        assert row.treatment is not None
+        assert row.light_condition is not None
+        assert row.experimental_context is not None
+        assert row.gene_function_description is not None
+        assert row.gene_summary is not None
+        # Forward-compat: p_value field accepts None today
+        assert row.p_value is None
+
+    @pytest.mark.asyncio
+    async def test_by_metric_filtered_vs_full_dm(self, tool_fns, conn):
+        """Filtered slice value range tighter than full-DM range; max
+        coincides because top-decile slice contains the global max."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_numeric_metric"](
+            ctx, metric_types=["damping_ratio"], bucket=["top_decile"],
+            limit=1)
+        bm = response.by_metric[0]
+        # Filtered slice min is well above full-DM min
+        assert bm.value_min == pytest.approx(12.2, abs=0.5)
+        assert bm.dm_value_min == pytest.approx(0.2, abs=0.1)
+        assert bm.value_min > bm.dm_value_min
+        # Slice max == full-DM max (top decile includes the global max)
+        assert bm.value_max == pytest.approx(25.3, abs=0.1)
+        assert bm.dm_value_max == pytest.approx(25.3, abs=0.1)
+        assert bm.value_max == pytest.approx(bm.dm_value_max, abs=0.1)
