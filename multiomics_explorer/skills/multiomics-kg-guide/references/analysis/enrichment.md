@@ -618,9 +618,13 @@ module docstrings for field semantics.
 | `locus_tag` | required | Fisher math |
 | `gene_name` | *optional* | `GeneRef.gene_name` (None if absent) |
 | `product` | *optional* | `GeneRef.product` (None if absent) |
+| `level` | *contextual* | Pass-through from `genes_by_ontology` (ontology hierarchy level). Not read by Fisher; available on `result.term2gene` for downstream filtering. |
+| `gene_category` | *contextual* | Pass-through from `genes_by_ontology` (gene's KG category). Same: not read by Fisher; surfaces in the DataFrame for downstream use. |
 
 Custom-built term2gene works — missing optional columns just yield `None`
-GeneRef fields.
+GeneRef fields. Additional columns (beyond required + optional + the
+contextual ones above) flow through unchanged: `fisher_ora` reads only the
+required columns and ignores the rest.
 
 **`fisher_ora` signature change:** takes `EnrichmentInputs` + `term2gene` and
 returns `EnrichmentResult`. Callers without a KG construct `EnrichmentInputs`
