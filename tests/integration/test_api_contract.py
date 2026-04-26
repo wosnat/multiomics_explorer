@@ -1039,3 +1039,51 @@ class TestClusterEnrichmentContract:
                      "gene_ratio", "bg_ratio", "pvalue", "p_adjust",
                      "count", "bg_count", "fold_enrichment"):
             assert key in row, f"Missing row key: {key}"
+
+
+# ---------------------------------------------------------------------------
+# gene_derived_metrics
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestGeneDerivedMetricsContract:
+    """Pin envelope shape + result keys; fail fast on accidental drift."""
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "total_matching", "total_derived_metrics",
+        "genes_with_metrics", "genes_without_metrics",
+        "not_found", "not_matched",
+        "by_value_kind", "by_metric_type", "by_metric",
+        "by_compartment", "by_treatment_type",
+        "by_background_factors", "by_publication",
+        "returned", "offset", "truncated", "results",
+    }
+
+    EXPECTED_COMPACT_RESULT_KEYS = {
+        "locus_tag", "gene_name", "derived_metric_id", "value_kind",
+        "name", "value", "rankable", "has_p_value",
+        "rank_by_metric", "metric_percentile", "metric_bucket",
+        # adjusted_p_value, significant: deferred from Cypher today; not in
+        # raw rows (Pydantic default=None fills them at the wrapper layer)
+    }
+
+    EXPECTED_VERBOSE_ADD_KEYS = {
+        "metric_type", "field_description", "unit", "allowed_categories",
+        "compartment", "treatment_type", "background_factors",
+        "publication_doi", "treatment", "light_condition",
+        "experimental_context",
+        # p_value: deferred — not in raw rows today
+    }
+
+    def test_envelope_keys_compact(self, conn):
+        data = api.gene_derived_metrics(["PMM1714"], limit=1, conn=conn)
+        assert set(data.keys()) == self.EXPECTED_ENVELOPE_KEYS
+
+    def test_compact_result_keys(self, conn):
+        data = api.gene_derived_metrics(["PMM1714"], limit=1, conn=conn)
+        assert len(data["results"]) >= 1
+        assert set(data["results"][0].keys()) == self.EXPECTED_COMPACT_RESULT_KEYS
+
+    def test_verbose_result_keys(self, conn):
+        data = api.gene_derived_metrics(["PMM1714"], limit=1, verbose=True, conn=conn)
+        expected = self.EXPECTED_COMPACT_RESULT_KEYS | self.EXPECTED_VERBOSE_ADD_KEYS
+        assert set(data["results"][0].keys()) == expected
