@@ -17,6 +17,8 @@ import multiomics_explorer.api.functions as api
 from multiomics_explorer.kg.queries_lib import (
     build_differential_expression_by_gene,
     build_differential_expression_by_ortholog_results,
+    build_gene_derived_metrics,
+    build_gene_derived_metrics_summary,
     build_gene_details,
     build_gene_homologs,
     build_gene_ontology_terms,
@@ -60,6 +62,8 @@ TOOL_BUILDERS = {
     "list_publications": build_list_publications,
     "list_derived_metrics": build_list_derived_metrics,
     "list_derived_metrics_summary": build_list_derived_metrics_summary,
+    "gene_derived_metrics": build_gene_derived_metrics,
+    "gene_derived_metrics_summary": build_gene_derived_metrics_summary,
     "list_experiments": build_list_experiments,
     "list_experiments_summary": build_list_experiments_summary,
     "differential_expression_by_gene": build_differential_expression_by_gene,
@@ -172,7 +176,10 @@ def test_regression(conn, case, data_regression):
     else:
         builder = TOOL_BUILDERS[tool]
         # Strip tool-level params that aren't accepted by query builders
-        builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit")}
+        builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit", "summary")}
+        # If `summary: true` and a `_summary` builder exists, dispatch to it
+        if params.get("summary") and f"{tool}_summary" in TOOL_BUILDERS:
+            builder = TOOL_BUILDERS[f"{tool}_summary"]
         cypher, query_params = builder(**builder_params)
         results = conn.execute_query(cypher, **query_params)
         # gene_details returns g{.*} AS gene — unwrap for flat comparison

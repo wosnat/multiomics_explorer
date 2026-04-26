@@ -1,0 +1,60 @@
+case_id: gene_derived_metrics_summary
+row_count: 1
+rows:
+- by_background_factors:
+  - '{''count'': 15, ''item'': ''axenic''}'
+  - '{''count'': 3, ''item'': ''light''}'
+  by_compartment:
+  - '{''count'': 12, ''item'': ''whole_cell''}'
+  - '{''count'': 3, ''item'': ''vesicle''}'
+  by_metric:
+  - '{''count'': 1, ''value_kind'': ''boolean'', ''name'': ''MED4 protein detected
+    in vesicle proteome (Biller 2014 Table S2)'', ''metric_type'': ''vesicle_proteome_member'',
+    ''derived_metric_id'': ''derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member''}'
+  - '{''count'': 1, ''value_kind'': ''categorical'', ''name'': ''MED4 vesicle protein
+    PSORTb predicted localization (Biller 2014 Table S2)'', ''metric_type'': ''predicted_subcellular_localization'',
+    ''derived_metric_id'': ''derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization''}'
+  - '{''count'': 1, ''value_kind'': ''numeric'', ''name'': ''MED4 vesicle protein
+    Mascot identification probability (Biller 2014 Table S2)'', ''metric_type'': ''mascot_identification_probability'',
+    ''derived_metric_id'': ''derived_metric:science.1243457:s2_med4_vesicle_proteome:mascot_identification_probability''}'
+  - '{''count'': 2, ''value_kind'': ''numeric'', ''name'': ''Protein amplitude (log2)'',
+    ''metric_type'': ''diel_amplitude_protein_log2'', ''derived_metric_id'': ''derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:diel_amplitude_protein_log2''}'
+  - '{''count'': 2, ''value_kind'': ''numeric'', ''name'': ''Protein-transcript lag
+    (h)'', ''metric_type'': ''protein_transcript_lag_h'', ''derived_metric_id'': ''derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:protein_transcript_lag_h''}'
+  - '{''count'': 2, ''value_kind'': ''numeric'', ''name'': ''Time of peak protein
+    abundance (h)'', ''metric_type'': ''peak_time_protein_h'', ''derived_metric_id'':
+    ''derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h''}'
+  - '{''count'': 2, ''value_kind'': ''numeric'', ''name'': ''Time of peak transcript
+    abundance (h)'', ''metric_type'': ''peak_time_transcript_h'', ''derived_metric_id'':
+    ''derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_transcript_h''}'
+  - '{''count'': 2, ''value_kind'': ''numeric'', ''name'': ''Transcript amplitude
+    (log2)'', ''metric_type'': ''diel_amplitude_transcript_log2'', ''derived_metric_id'':
+    ''derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:diel_amplitude_transcript_log2''}'
+  - '{''count'': 2, ''value_kind'': ''numeric'', ''name'': ''Transcript:protein amplitude
+    ratio'', ''metric_type'': ''damping_ratio'', ''derived_metric_id'': ''derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio''}'
+  by_metric_type:
+  - '{''count'': 1, ''item'': ''mascot_identification_probability''}'
+  - '{''count'': 1, ''item'': ''predicted_subcellular_localization''}'
+  - '{''count'': 1, ''item'': ''vesicle_proteome_member''}'
+  - '{''count'': 2, ''item'': ''damping_ratio''}'
+  - '{''count'': 2, ''item'': ''diel_amplitude_protein_log2''}'
+  - '{''count'': 2, ''item'': ''diel_amplitude_transcript_log2''}'
+  - '{''count'': 2, ''item'': ''peak_time_protein_h''}'
+  - '{''count'': 2, ''item'': ''peak_time_transcript_h''}'
+  - '{''count'': 2, ''item'': ''protein_transcript_lag_h''}'
+  by_publication:
+  - '{''count'': 12, ''item'': ''10.1371/journal.pone.0043432''}'
+  - '{''count'': 3, ''item'': ''10.1126/science.1243457''}'
+  by_treatment_type:
+  - '{''count'': 12, ''item'': ''diel''}'
+  - '{''count'': 3, ''item'': ''compartment''}'
+  by_value_kind:
+  - '{''count'': 1, ''item'': ''boolean''}'
+  - '{''count'': 1, ''item'': ''categorical''}'
+  - '{''count'': 13, ''item'': ''numeric''}'
+  genes_with_metrics: 2
+  genes_without_metrics: 0
+  not_found: []
+  not_matched: []
+  total_derived_metrics: 9
+  total_matching: 15

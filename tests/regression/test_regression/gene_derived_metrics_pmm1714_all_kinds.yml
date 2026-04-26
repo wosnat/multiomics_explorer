@@ -1,0 +1,103 @@
+case_id: gene_derived_metrics_pmm1714_all_kinds
+row_count: 9
+rows:
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  rank_by_metric: null
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  rank_by_metric: null
+  rankable: false
+  value: Cytoplasmic Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: low
+  metric_percentile: 8.3601
+  name: Transcript:protein amplitude ratio
+  rank_by_metric: 286
+  rankable: true
+  value: 1.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:diel_amplitude_protein_log2
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: top_quartile
+  metric_percentile: 76.2058
+  name: Protein amplitude (log2)
+  rank_by_metric: 75
+  rankable: true
+  value: 0.52
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:diel_amplitude_transcript_log2
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: low
+  metric_percentile: 8.6817
+  name: Transcript amplitude (log2)
+  rank_by_metric: 285
+  rankable: true
+  value: 0.66
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: Time of peak protein abundance (h)
+  rank_by_metric: null
+  rankable: false
+  value: 12.4
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_transcript_h
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: Time of peak transcript abundance (h)
+  rank_by_metric: null
+  rankable: false
+  value: 21.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:protein_transcript_lag_h
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: top_quartile
+  metric_percentile: 80.7074
+  name: Protein-transcript lag (h)
+  rank_by_metric: 61
+  rankable: true
+  value: 15.7
+  value_kind: numeric
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:mascot_identification_probability
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: MED4 vesicle protein Mascot identification probability (Biller 2014 Table
+    S2)
+  rank_by_metric: null
+  rankable: false
+  value: 99.9
+  value_kind: numeric

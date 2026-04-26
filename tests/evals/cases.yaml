@@ -1017,6 +1017,44 @@
     min_rows: 2
 
 # ---------------------------------------------------------------------------
+# gene_derived_metrics
+# ---------------------------------------------------------------------------
+
+- id: gene_derived_metrics_pmm1714_all_kinds
+  tool: gene_derived_metrics
+  desc: PMM1714 has all 3 DM kinds (boolean + categorical + numeric)
+  params:
+    locus_tags: ["PMM1714"]
+  expect:
+    min_rows: 9
+    columns:
+      - locus_tag
+      - derived_metric_id
+      - value_kind
+      - value
+      - rankable
+
+- id: gene_derived_metrics_kind_mismatch
+  tool: gene_derived_metrics
+  desc: NATL2A boolean-only gene under value_kind='numeric' lands in not_matched
+  params:
+    locus_tags: ["PMN2A_2128"]
+    value_kind: numeric
+  expect:
+    min_rows: 0
+    columns: []
+
+- id: gene_derived_metrics_summary
+  tool: gene_derived_metrics
+  desc: Summary mode for mixed-input batch
+  params:
+    locus_tags: ["PMM1714", "PMM0001"]
+    summary: true
+  expect:
+    min_rows: 0
+    columns: []
+
+# ---------------------------------------------------------------------------
 # differential_expression_by_gene
 # ---------------------------------------------------------------------------
 
