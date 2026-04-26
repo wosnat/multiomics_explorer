@@ -97,3 +97,32 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 | `multiomics_explorer/api/functions.py` | Public Python API — wraps query builders + execute |
 | `multiomics_explorer/config/settings.py` | Pydantic settings from .env |
 | `multiomics_explorer/cli/main.py` | Typer CLI |
+| `multiomics_explorer/inputs/tools/{tool}.yaml` | Human-authored about-content (examples, mistakes, chaining, verbose_fields) — generated md is downstream |
+| `scripts/build_about_content.py` | Generator for `skills/multiomics-kg-guide/references/tools/*.md` |
+| `scripts/sync_skills.sh` | Sync generated skill content into MCP resources |
+
+## Skill / about-content workflow
+
+Per `.claude/skills/layer-rules/`, the two skill subtrees behave differently:
+
+**Tool docs are generated** — never edit
+`multiomics_explorer/skills/multiomics-kg-guide/references/tools/*.md` directly. Source of truth:
+
+- Human-authored sections (`examples`, `mistakes`, `chaining`, `verbose_fields`,
+  any new section structures): `multiomics_explorer/inputs/tools/{tool}.yaml`.
+- Auto-generated sections (params, response format, envelope keys, "Package
+  import equivalent"): Pydantic models in `mcp_server/tools.py` plus the
+  generator in `scripts/build_about_content.py`. To change a generated section
+  structure, edit the script (and the YAML schema if a new field is needed).
+
+After edits, regenerate and sync:
+
+```bash
+uv run python scripts/build_about_content.py
+scripts/sync_skills.sh
+```
+
+**Analysis docs are hand-authored** —
+`multiomics_explorer/skills/multiomics-kg-guide/references/analysis/*.md` (e.g.
+`enrichment.md`, `expression.md`) are edited directly. Update the corresponding
+md when an analysis utility's signature, return shape, or behavior changes.
