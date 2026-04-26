@@ -1,6 +1,184 @@
 case_id: list_derived_metrics_all
-row_count: 13
+row_count: 27
 rows:
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_bacterial_chemotaxis
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Bacterial chemotaxis^ KEGG/topic enrichment set used
+    in Hennon 2017 EZ55 coculture analysis
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_bacterial_chemotaxis
+  name: 'EZ55 enrichment set: Bacterial chemotaxis (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 56
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_biosynthesis_of_amino_acids
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Biosynthesis of amino acids^ KEGG/topic enrichment
+    set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_biosynthesis_of_amino_acids
+  name: 'EZ55 enrichment set: Biosynthesis of amino acids (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 114
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_carbon_metabolism
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Carbon Metabolism^ KEGG/topic enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_carbon_metabolism
+  name: 'EZ55 enrichment set: Carbon metabolism (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 94
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_fatty_acid_metabolism
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Fatty Acid Metabolism^ KEGG/topic enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_fatty_acid_metabolism
+  name: 'EZ55 enrichment set: Fatty acid metabolism (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 30
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_flagellar_assembly
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Flagellar assembly^ KEGG/topic enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_flagellar_assembly
+  name: 'EZ55 enrichment set: Flagellar assembly (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 38
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_redox_genes
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Redox genes^ enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_redox_genes
+  name: 'EZ55 enrichment set: Redox genes (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 20
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_ribosome
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Ribosome^ KEGG/topic enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_ribosome
+  name: 'EZ55 enrichment set: Ribosome (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 54
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_tonb_associated_genes
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^TonB-associated genes^ enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_tonb_associated_genes
+  name: 'EZ55 enrichment set: TonB-associated genes (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 70
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
 - allowed_categories: null
   background_factors:
   - coculture
@@ -173,6 +351,140 @@ rows:
   treatment_type:
   - diel
   unit: hours
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+  field_description: Hi3-normalized adjusted spectral counts per cell biovolume (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S3
+  growth_phases: []
+  has_p_value: false
+  metric_type: cell_abundance_biovolume_normalized
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 1014
+  treatment_type:
+  - compartment
+  unit: spectral counts / cell biovolume
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:vesicle_abundance_biovolume_normalized
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+  field_description: Hi3-normalized adjusted spectral counts per vesicle biovolume
+    (Trypsin/Lys-C, COMETa); Biller 2022 Table S3
+  growth_phases: []
+  has_p_value: false
+  metric_type: vesicle_abundance_biovolume_normalized
+  name: MIT9312 vesicle protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 221
+  treatment_type:
+  - compartment
+  unit: spectral counts / vesicle biovolume
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s4_mit9312_enrichment:log2_vesicle_cell_enrichment
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+  field_description: log2(vesicle / cell) of biovolume-normalized spectral counts;
+    restricted to proteins in top 25% of vesicle counts per strain (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S4
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_vesicle_cell_enrichment
+  name: MIT9312 log2 vesicle/cell enrichment (Biller 2022 Table S4)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 204
+  treatment_type:
+  - compartment
+  unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+  field_description: Hi3-normalized adjusted spectral counts per cell biovolume (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S3
+  growth_phases: []
+  has_p_value: false
+  metric_type: cell_abundance_biovolume_normalized
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 1039
+  treatment_type:
+  - compartment
+  unit: spectral counts / cell biovolume
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:vesicle_abundance_biovolume_normalized
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+  field_description: Hi3-normalized adjusted spectral counts per vesicle biovolume
+    (Trypsin/Lys-C, COMETa); Biller 2022 Table S3
+  growth_phases: []
+  has_p_value: false
+  metric_type: vesicle_abundance_biovolume_normalized
+  name: MIT9313 vesicle protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 350
+  treatment_type:
+  - compartment
+  unit: spectral counts / vesicle biovolume
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s4_mit9313_enrichment:log2_vesicle_cell_enrichment
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+  field_description: log2(vesicle / cell) of biovolume-normalized spectral counts;
+    restricted to proteins in top 25% of vesicle counts per strain (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S4
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_vesicle_cell_enrichment
+  name: MIT9313 log2 vesicle/cell enrichment (Biller 2022 Table S4)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 310
+  treatment_type:
+  - compartment
+  unit: log2 ratio
   value_kind: numeric
 - allowed_categories: null
   background_factors:

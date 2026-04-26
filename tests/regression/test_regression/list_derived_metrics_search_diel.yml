@@ -17,7 +17,7 @@ rows:
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
   rankable: true
-  score: 1.9
+  score: 2.9224
   total_gene_count: 312
   treatment_type:
   - diel
@@ -39,7 +39,7 @@ rows:
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
   rankable: true
-  score: 1.9
+  score: 2.9224
   total_gene_count: 312
   treatment_type:
   - diel
@@ -62,7 +62,7 @@ rows:
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
   rankable: true
-  score: 1.5513
+  score: 2.3607
   total_gene_count: 312
   treatment_type:
   - diel
@@ -84,7 +84,7 @@ rows:
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
   rankable: false
-  score: 0.4224
+  score: 0.6616
   total_gene_count: 312
   treatment_type:
   - diel
@@ -106,7 +106,7 @@ rows:
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1371/journal.pone.0043432
   rankable: false
-  score: 0.4224
+  score: 0.6616
   total_gene_count: 312
   treatment_type:
   - diel

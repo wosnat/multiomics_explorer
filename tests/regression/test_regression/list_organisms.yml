@@ -380,7 +380,7 @@ rows:
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
-  experiment_count: 20
+  experiment_count: 22
   gene_count: 1978
   genus: Prochlorococcus
   growth_phases:
@@ -394,7 +394,7 @@ rows:
   - RNASEQ
   organism_name: Prochlorococcus MIT9312
   organism_type: genome_strain
-  publication_count: 4
+  publication_count: 5
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -402,6 +402,7 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - compartment
   - phosphorus
   - plastic
 - background_factors:
@@ -411,7 +412,7 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
-  experiment_count: 21
+  experiment_count: 23
   gene_count: 2948
   genus: Prochlorococcus
   growth_phases:
@@ -422,10 +423,11 @@ rows:
   ncbi_taxon_id: 74547
   omics_types:
   - MICROARRAY
+  - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9313
   organism_type: genome_strain
-  publication_count: 6
+  publication_count: 7
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -433,6 +435,7 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - compartment
   - iron
   - nitrogen
   - phosphorus

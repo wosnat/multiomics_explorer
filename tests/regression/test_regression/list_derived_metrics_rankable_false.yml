@@ -1,6 +1,184 @@
 case_id: list_derived_metrics_rankable_false
-row_count: 9
+row_count: 17
 rows:
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_bacterial_chemotaxis
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Bacterial chemotaxis^ KEGG/topic enrichment set used
+    in Hennon 2017 EZ55 coculture analysis
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_bacterial_chemotaxis
+  name: 'EZ55 enrichment set: Bacterial chemotaxis (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 56
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_biosynthesis_of_amino_acids
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Biosynthesis of amino acids^ KEGG/topic enrichment
+    set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_biosynthesis_of_amino_acids
+  name: 'EZ55 enrichment set: Biosynthesis of amino acids (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 114
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_carbon_metabolism
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Carbon Metabolism^ KEGG/topic enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_carbon_metabolism
+  name: 'EZ55 enrichment set: Carbon metabolism (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 94
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_fatty_acid_metabolism
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Fatty Acid Metabolism^ KEGG/topic enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_fatty_acid_metabolism
+  name: 'EZ55 enrichment set: Fatty acid metabolism (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 30
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_flagellar_assembly
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Flagellar assembly^ KEGG/topic enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_flagellar_assembly
+  name: 'EZ55 enrichment set: Flagellar assembly (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 38
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_redox_genes
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Redox genes^ enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_redox_genes
+  name: 'EZ55 enrichment set: Redox genes (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 20
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_ribosome
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^Ribosome^ KEGG/topic enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_ribosome
+  name: 'EZ55 enrichment set: Ribosome (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 54
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - coculture
+  - diel
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2017.189:supp_table_5_categories:enrichment_tonb_associated_genes
+  experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
+  field_description: Member of ^TonB-associated genes^ enrichment set
+  growth_phases:
+  - acclimated_steady_state
+  has_p_value: false
+  metric_type: enrichment_tonb_associated_genes
+  name: 'EZ55 enrichment set: TonB-associated genes (Table S5)'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/ismej.2017.189
+  rankable: false
+  total_gene_count: 70
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
 - allowed_categories: null
   background_factors:
   - coculture

@@ -1,5 +1,5 @@
 case_id: list_derived_metrics_rankable_true
-row_count: 4
+row_count: 10
 rows:
 - allowed_categories: null
   background_factors:
@@ -86,4 +86,138 @@ rows:
   treatment_type:
   - diel
   unit: hours
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+  field_description: Hi3-normalized adjusted spectral counts per cell biovolume (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S3
+  growth_phases: []
+  has_p_value: false
+  metric_type: cell_abundance_biovolume_normalized
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 1014
+  treatment_type:
+  - compartment
+  unit: spectral counts / cell biovolume
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:vesicle_abundance_biovolume_normalized
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+  field_description: Hi3-normalized adjusted spectral counts per vesicle biovolume
+    (Trypsin/Lys-C, COMETa); Biller 2022 Table S3
+  growth_phases: []
+  has_p_value: false
+  metric_type: vesicle_abundance_biovolume_normalized
+  name: MIT9312 vesicle protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 221
+  treatment_type:
+  - compartment
+  unit: spectral counts / vesicle biovolume
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s4_mit9312_enrichment:log2_vesicle_cell_enrichment
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+  field_description: log2(vesicle / cell) of biovolume-normalized spectral counts;
+    restricted to proteins in top 25% of vesicle counts per strain (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S4
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_vesicle_cell_enrichment
+  name: MIT9312 log2 vesicle/cell enrichment (Biller 2022 Table S4)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 204
+  treatment_type:
+  - compartment
+  unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+  field_description: Hi3-normalized adjusted spectral counts per cell biovolume (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S3
+  growth_phases: []
+  has_p_value: false
+  metric_type: cell_abundance_biovolume_normalized
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 1039
+  treatment_type:
+  - compartment
+  unit: spectral counts / cell biovolume
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:vesicle_abundance_biovolume_normalized
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+  field_description: Hi3-normalized adjusted spectral counts per vesicle biovolume
+    (Trypsin/Lys-C, COMETa); Biller 2022 Table S3
+  growth_phases: []
+  has_p_value: false
+  metric_type: vesicle_abundance_biovolume_normalized
+  name: MIT9313 vesicle protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 350
+  treatment_type:
+  - compartment
+  unit: spectral counts / vesicle biovolume
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s4_mit9313_enrichment:log2_vesicle_cell_enrichment
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+  field_description: log2(vesicle / cell) of biovolume-normalized spectral counts;
+    restricted to proteins in top 25% of vesicle counts per strain (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S4
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_vesicle_cell_enrichment
+  name: MIT9313 log2 vesicle/cell enrichment (Biller 2022 Table S4)
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  rankable: true
+  total_gene_count: 310
+  treatment_type:
+  - compartment
+  unit: log2 ratio
   value_kind: numeric

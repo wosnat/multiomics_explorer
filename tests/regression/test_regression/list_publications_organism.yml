@@ -235,7 +235,7 @@ rows:
   doi: 10.1371/journal.pone.0043432
   experiment_count: 1
   growth_phases: []
-  journal: PLOS ONE
+  journal: PLoS ONE
   omics_types:
   - PAIRED_RNASEQ_PROTEOME
   organisms:

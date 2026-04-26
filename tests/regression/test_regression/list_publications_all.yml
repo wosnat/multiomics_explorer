@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 36
+row_count: 37
 rows:
 - authors:
   - James I. Mullet
@@ -308,6 +308,38 @@ rows:
     omics analysis
   treatment_types:
   - coculture
+  year: 2022
+- authors:
+  - Aldo A. Arellano
+  - Anitra E. Ingalls
+  - Benjamin A. S. Van Mooy
+  - Katherine R. Heal
+  - Keven Dooley
+  - Kevin W. Becker
+  - Laura R. Hmelo
+  - Laura T. Carlson
+  - Rachel A. Lundeen
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: 10.1111/1462-2920.15834
+  experiment_count: 2
+  growth_phases: []
+  journal: Environmental Microbiology
+  omics_types:
+  - PROTEOMICS
+  organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  study_type: Lipidomics|Proteomics|Metabolomics|Enzymology|Microbial ecology
+  title: 'Prochlorococcus extracellular vesicles: molecular composition and adsorption
+    to diverse microbes'
+  treatment_types:
+  - compartment
   year: 2022
 - authors:
   - Ian T. Paulsen
@@ -822,7 +854,7 @@ rows:
   doi: 10.1371/journal.pone.0043432
   experiment_count: 1
   growth_phases: []
-  journal: PLOS ONE
+  journal: PLoS ONE
   omics_types:
   - PAIRED_RNASEQ_PROTEOME
   organisms:
