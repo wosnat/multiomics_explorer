@@ -124,6 +124,7 @@ Step 3: gene_overview(locus_tags=["PMM0845", ...])
 ```
 search_ontology → genes_by_ontology
 search_ontology → genes_by_ontology → gene_overview
+list_filter_values('brite_tree') → search_ontology(ontology='brite', tree=...)
 ```
 
 ## Common mistakes
@@ -135,6 +136,8 @@ search_ontology → genes_by_ontology → gene_overview
 - For brite: term IDs look like 'brite:ko00001' (tree root) or 'brite:K00001' (leaf KO). BRITE trees mix functional and taxonomic hierarchies — confirm the tree context before using term IDs in genes_by_ontology.
 
 - Use `level` to restrict results to a specific hierarchy depth (0 = broadest). Use `tree` to scope BRITE searches to a single tree (e.g. 'transporters'). Both filters are optional.
+
+- For BRITE, pass `tree=...` (e.g. `tree='transporters'`); without it, results are dominated by the largest BRITE tree (~1,776 enzyme entries at level 3) and rarely what's wanted. Discover trees via `list_filter_values('brite_tree')`.
 
 ```mistake
 search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene
