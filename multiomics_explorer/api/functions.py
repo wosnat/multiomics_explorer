@@ -84,6 +84,9 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_clusters_by_gene_summary,
     build_gene_derived_metrics,
     build_gene_derived_metrics_summary,
+    build_genes_by_numeric_metric,
+    build_genes_by_numeric_metric_diagnostics,
+    build_genes_by_numeric_metric_summary,
     build_genes_in_cluster,
     build_genes_in_cluster_summary,
     build_ontology_experiment_check,
@@ -2928,6 +2931,352 @@ def gene_derived_metrics(
     envelope["truncated"] = total_matching > offset + len(results)
     envelope["results"] = results
     return envelope
+
+
+def genes_by_numeric_metric(
+    derived_metric_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    min_value: float | None = None,
+    max_value: float | None = None,
+    min_percentile: float | None = None,
+    max_percentile: float | None = None,
+    bucket: list[str] | None = None,
+    max_rank: int | None = None,
+    significant_only: bool = False,
+    max_adjusted_p_value: float | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Numeric DerivedMetric drill-down. Cross-organism by design.
+
+    3-query orchestration:
+      1. diagnostics — resolve selection, fetch gate states.
+      2. (api/ validates) — value_kind=='numeric' check; rankable /
+         has_p_value gate compat; build excluded_derived_metrics + warnings.
+      3. summary — aggregations over surviving DM ID list (always runs).
+      4. detail — rows; skipped when limit==0.
+
+    Selection is mutually exclusive: pass exactly one of
+    `derived_metric_ids` or `metric_types`.
+
+    Returns dict with keys: total_matching, total_derived_metrics,
+    total_genes, by_organism, by_compartment, by_publication,
+    by_experiment, by_metric, top_categories, genes_per_metric_max,
+    genes_per_metric_median, not_found_ids, not_matched_ids,
+    not_found_metric_types, not_matched_metric_types,
+    not_matched_organism, excluded_derived_metrics, warnings,
+    returned, offset, truncated, results.
+    Per result (compact, 14 cols): locus_tag, gene_name, product,
+    gene_category, organism_name, derived_metric_id, name, value_kind,
+    rankable, has_p_value, value, rank_by_metric, metric_percentile,
+    metric_bucket.
+    Per result (verbose adds, 13 cols): metric_type, field_description,
+    unit, compartment, experiment_id, publication_doi, treatment_type,
+    background_factors, treatment, light_condition, experimental_context,
+    gene_function_description, gene_summary.
+
+    summary=True: results=[], summary fields only.
+
+    Raises:
+        ValueError: derived_metric_ids+metric_types both/neither set;
+                    rankable-gated filter used and ALL selected DMs
+                    rankable=False;
+                    has_p_value-gated filter used and ALL selected DMs
+                    has_p_value=False.
+    """
+    # 1. Mutual exclusion check
+    if derived_metric_ids is not None and metric_types is not None:
+        raise ValueError(
+            "provide one of derived_metric_ids or metric_types, not both")
+    if derived_metric_ids is None and metric_types is None:
+        raise ValueError(
+            "must provide one of derived_metric_ids or metric_types")
+
+    # 2. summary=True shortcut
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # 3. Q1: diagnostics
+    diag_cypher, diag_params = build_genes_by_numeric_metric_diagnostics(
+        derived_metric_ids=derived_metric_ids,
+        metric_types=metric_types,
+        organism=organism,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+    )
+    diagnostics = conn.execute_query(diag_cypher, **diag_params)
+
+    # 4. Compute not_found_ids / not_found_metric_types
+    surviving_ids = {d["derived_metric_id"] for d in diagnostics}
+    surviving_metric_types = {d["metric_type"] for d in diagnostics}
+    not_found_ids = [
+        x for x in (derived_metric_ids or []) if x not in surviving_ids
+    ]
+    not_found_metric_types = [
+        x for x in (metric_types or []) if x not in surviving_metric_types
+    ]
+
+    excluded_derived_metrics: list[dict] = []
+    warnings: list[str] = []
+
+    # 5. Validate rankable gate
+    rankable_filters = {
+        "min_percentile": min_percentile,
+        "max_percentile": max_percentile,
+        "bucket": bucket,
+        "max_rank": max_rank,
+    }
+    triggered_rank = [
+        name for name, val in rankable_filters.items() if val is not None
+    ]
+    if triggered_rank:
+        rankable_dms = [d for d in diagnostics if d["rankable"]]
+        non_rankable_dms = [d for d in diagnostics if not d["rankable"]]
+        if not diagnostics:
+            # Nothing survived diagnostic scoping — fall through; summary
+            # will be empty.
+            pass
+        elif not rankable_dms and non_rankable_dms:
+            non_rankable_repr = [
+                f"{d['derived_metric_id']} (rankable=False)"
+                for d in non_rankable_dms
+            ]
+            raise ValueError(
+                f"All {len(non_rankable_dms)} selected DMs are non-rankable; "
+                f"cannot apply rankable-gated filter(s) {triggered_rank}. "
+                f"Selected DMs: {non_rankable_repr}. "
+                f"Inspect rankable=true DMs via "
+                f"list_derived_metrics(value_kind='numeric', rankable=True)."
+            )
+        elif non_rankable_dms:
+            filter_label = ", ".join(f"`{f}`" for f in triggered_rank)
+            for d in non_rankable_dms:
+                excluded_derived_metrics.append({
+                    "derived_metric_id": d["derived_metric_id"],
+                    "metric_type": d["metric_type"],
+                    "rankable": False,
+                    "has_p_value": d["has_p_value"],
+                    "reason": (
+                        f"non-rankable; {filter_label} filter does not apply"
+                    ),
+                })
+            mt_list = ", ".join(d["metric_type"] for d in non_rankable_dms)
+            warnings.append(
+                f"{len(non_rankable_dms)} non-rankable DM(s) excluded by "
+                f"{filter_label} filter ({mt_list})"
+            )
+
+    # 6. Validate has_p_value gate
+    pval_filters = {
+        "significant_only": significant_only if significant_only else None,
+        "max_adjusted_p_value": max_adjusted_p_value,
+    }
+    triggered_pval = [
+        name for name, val in pval_filters.items() if val is not None
+    ]
+    if triggered_pval:
+        excluded_set_for_pval = {
+            x["derived_metric_id"] for x in excluded_derived_metrics
+        }
+        pval_dms = [
+            d for d in diagnostics
+            if d["has_p_value"]
+            and d["derived_metric_id"] not in excluded_set_for_pval
+        ]
+        non_pval_dms = [
+            d for d in diagnostics
+            if not d["has_p_value"]
+            and d["derived_metric_id"] not in excluded_set_for_pval
+        ]
+        if not diagnostics:
+            pass
+        elif not pval_dms and non_pval_dms:
+            raise ValueError(
+                f"All {len(non_pval_dms)} selected DMs have "
+                f"has_p_value=False; cannot apply has_p_value-gated "
+                f"filter(s) {triggered_pval}. No numeric DM in the current "
+                f"KG has p-values. Inspect has_p_value=true DMs via "
+                f"list_derived_metrics(has_p_value=True)."
+            )
+        elif non_pval_dms:
+            filter_label = ", ".join(f"`{f}`" for f in triggered_pval)
+            for d in non_pval_dms:
+                excluded_derived_metrics.append({
+                    "derived_metric_id": d["derived_metric_id"],
+                    "metric_type": d["metric_type"],
+                    "rankable": d["rankable"],
+                    "has_p_value": False,
+                    "reason": (
+                        f"has_p_value=False; {filter_label} filter does "
+                        f"not apply"
+                    ),
+                })
+            mt_list = ", ".join(d["metric_type"] for d in non_pval_dms)
+            warnings.append(
+                f"{len(non_pval_dms)} has_p_value=False DM(s) excluded by "
+                f"{filter_label} filter ({mt_list})"
+            )
+
+    # 7. Build surviving DM ID list (post-gate)
+    excluded_set = {x["derived_metric_id"] for x in excluded_derived_metrics}
+    surviving = [
+        d["derived_metric_id"]
+        for d in diagnostics
+        if d["derived_metric_id"] not in excluded_set
+    ]
+
+    # Defensive: if everything got soft-excluded, return empty envelope
+    # without calling summary/detail (which require non-empty list).
+    if not surviving:
+        return {
+            "total_matching": 0,
+            "total_derived_metrics": 0,
+            "total_genes": 0,
+            "by_organism": [],
+            "by_compartment": [],
+            "by_publication": [],
+            "by_experiment": [],
+            "by_metric": [],
+            "top_categories": [],
+            "genes_per_metric_max": 0,
+            "genes_per_metric_median": 0.0,
+            "not_found_ids": not_found_ids,
+            "not_matched_ids": [],
+            "not_found_metric_types": not_found_metric_types,
+            "not_matched_metric_types": [],
+            "not_matched_organism": organism,
+            "excluded_derived_metrics": excluded_derived_metrics,
+            "warnings": warnings,
+            "returned": 0,
+            "offset": offset,
+            "truncated": False,
+            "results": [],
+        }
+
+    # 8. Q2: summary (always runs)
+    sum_cypher, sum_params = build_genes_by_numeric_metric_summary(
+        derived_metric_ids=surviving,
+        locus_tags=locus_tags,
+        min_value=min_value, max_value=max_value,
+        min_percentile=min_percentile, max_percentile=max_percentile,
+        bucket=bucket, max_rank=max_rank,
+    )
+    sum_rows = conn.execute_query(sum_cypher, **sum_params)
+    sum_row = sum_rows[0] if sum_rows else {}
+
+    # 9. Frequency-list rename + post-processing
+    by_organism = _rename_freq(
+        sum_row.get("by_organism", []), "organism_name")
+    by_compartment = _rename_freq(
+        sum_row.get("by_compartment", []), "compartment")
+    by_publication = _rename_freq(
+        sum_row.get("by_publication", []), "publication_doi")
+    by_experiment = _rename_freq(
+        sum_row.get("by_experiment", []), "experiment_id")
+    top_categories = _rename_freq(
+        sum_row.get("top_categories_raw", []), "gene_category")[:5]
+
+    # by_metric is already shaped — sort by count desc
+    by_metric = sorted(
+        sum_row.get("by_metric", []),
+        key=lambda x: x["count"],
+        reverse=True,
+    )
+
+    # 10. Compute not_matched_ids / not_matched_metric_types
+    contributed_ids = {entry["derived_metric_id"] for entry in by_metric}
+    not_matched_ids_all = set(surviving) - contributed_ids
+    not_matched_ids = [
+        x for x in (derived_metric_ids or []) if x in not_matched_ids_all
+    ]
+
+    not_matched_metric_types: list[str] = []
+    if metric_types:
+        for mt in metric_types:
+            dm_ids_for_mt = [
+                d["derived_metric_id"]
+                for d in diagnostics
+                if d["metric_type"] == mt
+            ]
+            if not dm_ids_for_mt:
+                continue  # already in not_found_metric_types
+            if all(
+                d_id in excluded_set or d_id in not_matched_ids_all
+                for d_id in dm_ids_for_mt
+            ):
+                not_matched_metric_types.append(mt)
+
+    # not_matched_organism: organism passed but no by_organism row matches
+    not_matched_organism: str | None = None
+    if organism:
+        if not any(
+            organism.lower() in entry["organism_name"].lower()
+            for entry in by_organism
+        ):
+            not_matched_organism = organism
+
+    # 11. Q3: detail (skip when limit=0)
+    results: list[dict] = []
+    if limit != 0:
+        det_cypher, det_params = build_genes_by_numeric_metric(
+            derived_metric_ids=surviving,
+            locus_tags=locus_tags,
+            min_value=min_value, max_value=max_value,
+            min_percentile=min_percentile, max_percentile=max_percentile,
+            bucket=bucket, max_rank=max_rank,
+            verbose=verbose, limit=limit, offset=offset,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+
+    # 12. Build envelope
+    total_matching = sum_row.get("total_matching", 0)
+    returned = len(results)
+    truncated = total_matching > offset + returned
+
+    return {
+        "total_matching": total_matching,
+        "total_derived_metrics": sum_row.get("total_derived_metrics", 0),
+        "total_genes": sum_row.get("total_genes", 0),
+        "by_organism": by_organism,
+        "by_compartment": by_compartment,
+        "by_publication": by_publication,
+        "by_experiment": by_experiment,
+        "by_metric": by_metric,
+        "top_categories": top_categories,
+        "genes_per_metric_max": sum_row.get("genes_per_metric_max", 0) or 0,
+        "genes_per_metric_median": (
+            sum_row.get("genes_per_metric_median", 0.0) or 0.0
+        ),
+        "not_found_ids": not_found_ids,
+        "not_matched_ids": not_matched_ids,
+        "not_found_metric_types": not_found_metric_types,
+        "not_matched_metric_types": not_matched_metric_types,
+        "not_matched_organism": not_matched_organism,
+        "excluded_derived_metrics": excluded_derived_metrics,
+        "warnings": warnings,
+        "returned": returned,
+        "offset": offset,
+        "truncated": truncated,
+        "results": results,
+    }
 
 
 def genes_in_cluster(

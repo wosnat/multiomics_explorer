@@ -3772,6 +3772,346 @@ class TestGeneDerivedMetrics:
 
 
 # ---------------------------------------------------------------------------
+# genes_by_numeric_metric
+# ---------------------------------------------------------------------------
+
+
+class TestGenesByNumericMetric:
+    """Unit tests for api.genes_by_numeric_metric with mocked GraphConnection."""
+
+    @pytest.fixture
+    def diag_rankable(self):
+        """Diagnostics row(s) — single rankable, no p-value DM."""
+        return [{
+            "derived_metric_id": "dm:dr",
+            "metric_type": "damping_ratio",
+            "value_kind": "numeric",
+            "name": "Damping ratio",
+            "rankable": True,
+            "has_p_value": False,
+            "total_gene_count": 320,
+            "organism_name": "Prochlorococcus MED4",
+        }]
+
+    @pytest.fixture
+    def diag_mixed(self):
+        """Diagnostics with one rankable + one non-rankable DM."""
+        return [
+            {"derived_metric_id": "dm:dr", "metric_type": "damping_ratio",
+             "value_kind": "numeric", "name": "Damping ratio",
+             "rankable": True, "has_p_value": False,
+             "total_gene_count": 320,
+             "organism_name": "Prochlorococcus MED4"},
+            {"derived_metric_id": "dm:da", "metric_type": "diel_amplitude",
+             "value_kind": "numeric", "name": "Diel amplitude",
+             "rankable": False, "has_p_value": False,
+             "total_gene_count": 200,
+             "organism_name": "Prochlorococcus MED4"},
+        ]
+
+    @pytest.fixture
+    def diag_non_rankable(self):
+        return [
+            {"derived_metric_id": "dm:da", "metric_type": "diel_amplitude",
+             "value_kind": "numeric", "name": "Diel amplitude",
+             "rankable": False, "has_p_value": False,
+             "total_gene_count": 200,
+             "organism_name": "Prochlorococcus MED4"},
+        ]
+
+    @pytest.fixture
+    def summary_row(self):
+        """Standard summary row, single DM survived."""
+        return [{
+            "total_matching": 32,
+            "total_derived_metrics": 1,
+            "total_genes": 32,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 32}],
+            "by_compartment": [{"item": "whole_cell", "count": 32}],
+            "by_publication": [{"item": "10.1234/foo", "count": 32}],
+            "by_experiment": [{"item": "exp:1", "count": 32}],
+            "by_metric": [{
+                "derived_metric_id": "dm:dr",
+                "name": "Damping ratio",
+                "metric_type": "damping_ratio",
+                "value_kind": "numeric",
+                "count": 32,
+            }],
+            "top_categories_raw": [
+                {"item": "Translation", "count": 5},
+                {"item": "Carbohydrate metabolism", "count": 4},
+            ],
+            "genes_per_metric_max": 32,
+            "genes_per_metric_median": 32.0,
+        }]
+
+    def test_envelope_keys_present(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            bucket=["top_decile"],
+            conn=mock_conn,
+            summary=True,
+        )
+        for key in [
+            "total_matching", "total_derived_metrics", "total_genes",
+            "by_organism", "by_compartment", "by_publication",
+            "by_experiment", "by_metric", "top_categories",
+            "genes_per_metric_max", "genes_per_metric_median",
+            "not_found_ids", "not_matched_ids",
+            "not_found_metric_types", "not_matched_metric_types",
+            "not_matched_organism", "excluded_derived_metrics", "warnings",
+            "returned", "offset", "truncated", "results",
+        ]:
+            assert key in data, f"missing envelope key: {key}"
+
+    def test_mutual_exclusion_both_raises(self):
+        with pytest.raises(ValueError, match="not both"):
+            api.genes_by_numeric_metric(
+                derived_metric_ids=["dm:dr"],
+                metric_types=["damping_ratio"],
+                conn=MagicMock(),
+            )
+
+    def test_mutual_exclusion_neither_raises(self):
+        with pytest.raises(ValueError, match="must provide one of"):
+            api.genes_by_numeric_metric(conn=MagicMock())
+
+    def test_summary_skips_detail_query(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            bucket=["top_decile"],
+            conn=mock_conn,
+            summary=True,
+        )
+        assert mock_conn.execute_query.call_count == 2  # diag + summary
+        assert data["results"] == []
+        assert data["returned"] == 0
+        assert data["truncated"] is True  # total=32 > 0
+
+    def test_three_query_orchestration(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        details = [{"locus_tag": f"PMM{i:04d}"} for i in range(32)]
+        mock_conn.execute_query.side_effect = [
+            diag_rankable, summary_row, details,
+        ]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            bucket=["top_decile"],
+            conn=mock_conn,
+        )
+        # diag → summary → detail
+        assert mock_conn.execute_query.call_count == 3
+        assert data["returned"] == 32
+
+    def test_all_rankable_no_exclusions(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            bucket=["top_decile"],
+            conn=mock_conn,
+        )
+        assert data["excluded_derived_metrics"] == []
+        assert data["warnings"] == []
+
+    def test_mixed_rankable_excludes_non_rankable(
+            self, diag_mixed, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_mixed, summary_row, []]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio", "diel_amplitude"],
+            bucket=["top_decile"],
+            conn=mock_conn,
+        )
+        assert len(data["excluded_derived_metrics"]) == 1
+        excl = data["excluded_derived_metrics"][0]
+        assert excl["derived_metric_id"] == "dm:da"
+        assert excl["rankable"] is False
+        assert "bucket" in excl["reason"]
+        assert len(data["warnings"]) == 1
+        assert "bucket" in data["warnings"][0]
+
+    def test_all_non_rankable_raises(self, diag_non_rankable):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.return_value = diag_non_rankable
+        with pytest.raises(ValueError, match="non-rankable"):
+            api.genes_by_numeric_metric(
+                metric_types=["diel_amplitude"],
+                bucket=["top_decile"],
+                conn=mock_conn,
+            )
+
+    def test_significant_only_all_no_pvalue_raises(self, diag_rankable):
+        # diag_rankable has has_p_value=False
+        mock_conn = MagicMock()
+        mock_conn.execute_query.return_value = diag_rankable
+        with pytest.raises(ValueError, match="has_p_value=False"):
+            api.genes_by_numeric_metric(
+                metric_types=["damping_ratio"],
+                significant_only=True,
+                conn=mock_conn,
+            )
+
+    def test_max_adjusted_p_value_all_no_pvalue_raises(self, diag_rankable):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.return_value = diag_rankable
+        with pytest.raises(ValueError, match="has_p_value=False"):
+            api.genes_by_numeric_metric(
+                metric_types=["damping_ratio"],
+                max_adjusted_p_value=0.05,
+                conn=mock_conn,
+            )
+
+    def test_not_found_ids_plumbed(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
+        data = api.genes_by_numeric_metric(
+            derived_metric_ids=["dm:dr", "dm:fake"],
+            conn=mock_conn,
+        )
+        assert data["not_found_ids"] == ["dm:fake"]
+
+    def test_not_found_metric_types_plumbed(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio", "no_such_type"],
+            conn=mock_conn,
+        )
+        assert data["not_found_metric_types"] == ["no_such_type"]
+
+    def test_not_matched_organism_set_when_no_match(
+            self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            organism="Alteromonas",  # no match in by_organism
+            conn=mock_conn,
+        )
+        assert data["not_matched_organism"] == "Alteromonas"
+
+    def test_not_matched_organism_none_when_match(
+            self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            organism="Prochlorococcus MED4",
+            conn=mock_conn,
+        )
+        assert data["not_matched_organism"] is None
+
+    def test_top_categories_capped_at_5(self, diag_rankable):
+        # 7 categories in raw — only top 5 should survive
+        big_summary = [{
+            "total_matching": 50, "total_derived_metrics": 1, "total_genes": 50,
+            "by_organism": [], "by_compartment": [], "by_publication": [],
+            "by_experiment": [],
+            "by_metric": [{
+                "derived_metric_id": "dm:dr", "name": "Damping ratio",
+                "metric_type": "damping_ratio", "value_kind": "numeric",
+                "count": 50,
+            }],
+            "top_categories_raw": [
+                {"item": f"cat{i}", "count": 10 - i} for i in range(7)
+            ],
+            "genes_per_metric_max": 50, "genes_per_metric_median": 50.0,
+        }]
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, big_summary, []]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], conn=mock_conn,
+        )
+        assert len(data["top_categories"]) == 5
+        # rename + sorted desc by count
+        assert data["top_categories"][0] == {"gene_category": "cat0", "count": 10}
+
+    def test_by_metric_sorted_count_desc(self, diag_rankable):
+        # by_metric out of order → api/ must sort
+        unsorted_summary = [{
+            "total_matching": 9, "total_derived_metrics": 2, "total_genes": 9,
+            "by_organism": [], "by_compartment": [], "by_publication": [],
+            "by_experiment": [],
+            "by_metric": [
+                {"derived_metric_id": "a", "name": "A", "metric_type": "x",
+                 "value_kind": "numeric", "count": 2},
+                {"derived_metric_id": "b", "name": "B", "metric_type": "y",
+                 "value_kind": "numeric", "count": 7},
+            ],
+            "top_categories_raw": [],
+            "genes_per_metric_max": 7, "genes_per_metric_median": 4.5,
+        }]
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_rankable, unsorted_summary, [],
+        ]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], conn=mock_conn,
+        )
+        assert data["by_metric"][0]["count"] == 7
+        assert data["by_metric"][1]["count"] == 2
+
+    def test_freq_lists_renamed(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], conn=mock_conn,
+        )
+        assert data["by_organism"][0] == {
+            "organism_name": "Prochlorococcus MED4", "count": 32,
+        }
+        assert data["by_compartment"][0] == {
+            "compartment": "whole_cell", "count": 32,
+        }
+        assert data["by_publication"][0] == {
+            "publication_doi": "10.1234/foo", "count": 32,
+        }
+        assert data["by_experiment"][0] == {
+            "experiment_id": "exp:1", "count": 32,
+        }
+
+    def test_truncated_full_set(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        details = [{"locus_tag": f"PMM{i}"} for i in range(32)]
+        mock_conn.execute_query.side_effect = [
+            diag_rankable, summary_row, details,
+        ]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"], conn=mock_conn,
+        )
+        assert data["returned"] == 32
+        assert data["truncated"] is False  # 32 not > 0+32
+
+    def test_truncated_partial(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        details = [{"locus_tag": f"PMM{i}"} for i in range(10)]
+        mock_conn.execute_query.side_effect = [
+            diag_rankable, summary_row, details,
+        ]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            limit=10, conn=mock_conn,
+        )
+        assert data["returned"] == 10
+        assert data["truncated"] is True  # 32 > 0+10
+
+    def test_truncated_summary_mode(self, diag_rankable, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_rankable, summary_row]
+        data = api.genes_by_numeric_metric(
+            metric_types=["damping_ratio"],
+            summary=True, conn=mock_conn,
+        )
+        assert data["returned"] == 0
+        assert data["truncated"] is True  # 32 > 0+0
+
+
+# ---------------------------------------------------------------------------
 # gene_ontology_terms batching fix
 # ---------------------------------------------------------------------------
 
