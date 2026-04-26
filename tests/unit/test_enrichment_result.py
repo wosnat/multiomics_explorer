@@ -75,6 +75,36 @@ class TestGeneRef:
             assert field.description, f"GeneRef.{name} missing description"
 
 
+def test_gene_ref_is_hashable():
+    """GeneRef instances must be usable in set() and as dict keys (B2 #11)."""
+    from multiomics_explorer.analysis.enrichment import GeneRef
+
+    g1 = GeneRef(locus_tag="PMM0712", gene_name="pstS")
+    g2 = GeneRef(locus_tag="PMM0712", gene_name="pstS")
+    g3 = GeneRef(locus_tag="PMM0001", gene_name=None)
+
+    # Hashable
+    assert hash(g1) == hash(g2)
+    # Set semantics
+    assert {g1, g2, g3} == {g1, g3}
+    # Dict keys
+    d = {g1: "a"}
+    assert d[g2] == "a"
+
+
+def test_gene_ref_is_immutable():
+    """frozen=True prevents accidental mutation."""
+    from pydantic import ValidationError
+    from multiomics_explorer.analysis.enrichment import GeneRef
+
+    g = GeneRef(locus_tag="PMM0712")
+    try:
+        g.locus_tag = "PMM0001"
+    except (ValidationError, TypeError, AttributeError):
+        return
+    raise AssertionError("GeneRef should be frozen and reject mutation")
+
+
 class TestEnrichmentExplanation:
     def test_importable(self):
         from multiomics_explorer import EnrichmentExplanation

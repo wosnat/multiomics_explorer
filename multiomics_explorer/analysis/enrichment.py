@@ -13,7 +13,7 @@ from __future__ import annotations
 import statistics
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 import pandas as pd
 import scipy.stats as _stats
@@ -113,7 +113,14 @@ class DEStats(BaseModel):
 
 
 class GeneRef(BaseModel):
-    """A gene referenced in an enrichment result — locus_tag plus optional name/product/DE stats."""
+    """A gene referenced in an enrichment result — locus_tag plus optional name/product/DE stats.
+
+    Hashable. Hash includes all fields; for cross-cluster overlap by gene
+    identity, project to `g.locus_tag` first
+    (e.g. `{g.locus_tag for g in result.overlap_genes(c, t)}`).
+    """
+
+    model_config = ConfigDict(frozen=True)
 
     locus_tag: str = Field(
         description="Primary gene identifier, e.g. 'PMM0712'."
