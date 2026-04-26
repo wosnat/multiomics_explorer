@@ -1,6 +1,7 @@
 # Human-authored content for cluster_enrichment about page.
 
 python_returns: EnrichmentResult
+python_returns_example: docs://examples/pathway_enrichment.py
 
 examples:
   - title: Single analysis, CyanoRak level 1

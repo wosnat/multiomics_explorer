@@ -115,6 +115,8 @@ def test_python_returns_override():
     assert "returns dict" not in text
     assert "EnrichmentResult" in text
     assert ".to_envelope(" in text
+    # Without an explicit example URL, no example pointer is emitted.
+    assert "docs://examples/" not in text
 
 
 def test_python_returns_default_unchanged():
@@ -131,6 +133,42 @@ def test_python_returns_default_unchanged():
     )
     text = "\n".join(section)
     assert "returns dict with keys" in text
+
+
+def test_python_returns_example_pointer_emitted():
+    """When both `python_returns` and `python_returns_example` are set,
+    the section appends a `See <example>` line. Decoupled from any
+    specific example URL — works for any class. B2 #5 follow-up."""
+    from scripts.build_about_content import _build_package_import_section
+
+    section = _build_package_import_section(
+        tool_name="pathway_enrichment",
+        params=[],
+        envelope=[{"name": "results"}],
+        has_results=True,
+        python_returns="EnrichmentResult",
+        python_returns_example="docs://examples/pathway_enrichment.py",
+    )
+    text = "\n".join(section)
+    assert "docs://examples/pathway_enrichment.py" in text
+    assert "See " in text
+
+
+def test_python_returns_example_omitted_without_python_returns():
+    """An example pointer alone (without `python_returns`) does NOT
+    appear — the dict-returning path emits envelope keys only."""
+    from scripts.build_about_content import _build_package_import_section
+
+    section = _build_package_import_section(
+        tool_name="list_organisms",
+        params=[],
+        envelope=[{"name": "results"}],
+        has_results=True,
+        python_returns=None,
+        python_returns_example="docs://examples/whatever.py",
+    )
+    text = "\n".join(section)
+    assert "whatever.py" not in text
 
 
 def test_response_notes_renders_subsection():

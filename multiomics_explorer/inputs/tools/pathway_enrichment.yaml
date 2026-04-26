@@ -3,6 +3,7 @@
 # Pydantic models via scripts/build_about_content.py.
 
 python_returns: EnrichmentResult
+python_returns_example: docs://examples/pathway_enrichment.py
 
 examples:
   - title: Single experiment, default direction=both

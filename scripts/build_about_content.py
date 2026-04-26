@@ -4,10 +4,29 @@
 Merges auto-extracted Pydantic schema data with human-authored input
 YAML files to produce per-tool about pages served via MCP resource.
 
+Output: writes directly to
+``multiomics_explorer/skills/multiomics-kg-guide/references/tools/{tool}.md``
+(no separate sync step — that path is served).
+
 Usage:
     uv run python scripts/build_about_content.py                  # all tools with input files
     uv run python scripts/build_about_content.py list_publications # specific tool
     uv run python scripts/build_about_content.py --skeleton search_genes  # generate input YAML skeleton
+
+Supported YAML keys (in ``multiomics_explorer/inputs/tools/{tool}.yaml``):
+
+| Key                       | Type                          | Renders as                                              |
+|---------------------------|-------------------------------|---------------------------------------------------------|
+| ``examples``              | list[{title, call, response, steps}] | "Few-shot examples" section                       |
+| ``verbose_fields``        | list[str]                     | Splits per-result table into compact + verbose          |
+| ``chaining``              | list[str]                     | "Chaining patterns" section                             |
+| ``mistakes``              | list (str or {wrong, right})  | "Good to know" / "Common mistakes" sections             |
+| ``response_notes``        | list[{title, body}]           | Subsections under "Response format"                     |
+| ``python_returns``        | str (class name)              | Replaces "returns dict with keys" with object-shape hint|
+| ``python_returns_example``| str (URI)                     | Appends a `See <uri>` line (only when python_returns set)|
+
+Auto-generated sections (params table, response format, envelope keys) are
+extracted from Pydantic models in ``mcp_server/tools.py``.
 """
 
 import argparse
@@ -313,6 +332,7 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
         envelope=envelope,
         has_results=has_results,
         python_returns=(input_data or {}).get("python_returns"),
+        python_returns_example=(input_data or {}).get("python_returns_example"),
     ))
 
     return "\n".join(lines)
@@ -341,6 +361,7 @@ def _build_package_import_section(
     envelope: list[dict],
     has_results: bool,
     python_returns: str | None = None,
+    python_returns_example: str | None = None,
 ) -> list[str]:
     """Render the 'Package import equivalent' section.
 
@@ -349,6 +370,10 @@ def _build_package_import_section(
     instead of asserting a dict return. Default behavior — `# returns
     dict with keys: ...` — preserved for the 20+ tools that do return
     dicts.
+
+    When `python_returns_example` is set (e.g. "docs://examples/foo.py"),
+    a `See <example>` line is appended pointing at the runnable resource.
+    Independent of `python_returns` — but most useful when paired.
     """
     lines: list[str] = [
         "## Package import equivalent",
@@ -368,7 +393,8 @@ def _build_package_import_section(
         lines.append(f'# returns {python_returns}; access result.results')
         lines.append('# and accessors. Call result.to_envelope() for the')
         lines.append('# MCP-equivalent dict shape.')
-        lines.append('# See docs://examples/pathway_enrichment.py for runnable code.')
+        if python_returns_example:
+            lines.append(f'# See {python_returns_example} for runnable code.')
     else:
         # API returns a subset of the MCP envelope (no returned/truncated wrapper)
         api_keys = [
@@ -436,6 +462,20 @@ def generate_skeleton(tool_name: str, schema: dict) -> str:
         "  # - \"plain note about this tool\"",
         "  # - wrong: \"common mistake\"",
         "  #   right: \"correct approach\"",
+        "",
+        "# Optional: subsections rendered under 'Response format'.",
+        "# response_notes:",
+        "#   - title: \"Cluster naming\"",
+        "#     body: |",
+        "#       Cluster IDs follow `{experiment_id}|{timepoint}|{direction}`.",
+        "",
+        "# Optional: when the Python entry point returns an object (not a",
+        "# dict), declare the class name here. The 'Package import equivalent'",
+        "# block then emits result.results / .to_envelope() hints instead of",
+        "# 'returns dict with keys: ...'. Pair with python_returns_example",
+        "# for a runnable-code pointer.",
+        "# python_returns: SomeResultClass",
+        "# python_returns_example: docs://examples/some_example.py",
         "",
     ]
     return "\n".join(lines)
