@@ -57,6 +57,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_ontology_experiment_check,
     build_ontology_organism_gene_count,
     build_gene_derived_metrics_summary,
+    build_gene_derived_metrics,
 )
 from multiomics_explorer.kg.queries_lib import _hierarchy_walk
 
@@ -4647,6 +4648,159 @@ class TestBuildGeneDerivedMetricsSummary:
         _, params = build_gene_derived_metrics_summary(
             locus_tags=["A", "B"])
         assert params["locus_tags"] == ["A", "B"]
+
+
+class TestBuildGeneDerivedMetrics:
+    """Unit tests for build_gene_derived_metrics (detail)."""
+
+    def test_no_filters(self):
+        cypher, params = build_gene_derived_metrics(locus_tags=["PMM1714"])
+        assert "UNWIND $locus_tags AS lt" in cypher
+        assert "MATCH (g:Gene {locus_tag: lt})" in cypher
+        assert ("MATCH (dm:DerivedMetric)-"
+                "[r:Derived_metric_quantifies_gene\n"
+                "                          |Derived_metric_flags_gene\n"
+                "                          |Derived_metric_classifies_gene]"
+                "->(g)") in cypher
+        assert "WHERE" not in cypher.split("RETURN")[0]  # no filters
+        assert params == {"locus_tags": ["PMM1714"]}
+
+    def test_value_is_direct_r_access(self):
+        # Post-rebuild: r.value, no CASE-on-value_kind, no properties(r)
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"])
+        assert "r.value AS value" in cypher
+        assert "CASE dm.value_kind" not in cypher
+        assert "properties(r)" not in cypher
+
+    def test_returns_compact_columns(self):
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"])
+        # 11 compact RETURN columns (13 Pydantic minus deferred adjusted_p_value, significant)
+        for col in [
+            "g.locus_tag AS locus_tag",
+            "g.gene_name AS gene_name",
+            "dm.id AS derived_metric_id",
+            "dm.value_kind AS value_kind",
+            "dm.name AS name",
+            "r.value AS value",
+            "dm.rankable = 'true' AS rankable",
+            "dm.has_p_value = 'true' AS has_p_value",
+        ]:
+            assert col in cypher, f"missing compact column: {col}"
+
+    def test_rankable_case_gates(self):
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"])
+        for col in ["rank_by_metric", "metric_percentile", "metric_bucket"]:
+            assert (f"CASE WHEN dm.rankable = 'true' THEN r.{col} "
+                    f"ELSE null END AS {col}") in cypher
+
+    def test_has_p_value_columns_deferred(self):
+        # adjusted_p_value, significant: declared in Pydantic; absent from Cypher
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"])
+        assert "AS adjusted_p_value" not in cypher
+        assert "AS significant" not in cypher
+
+    def test_p_value_deferred_in_verbose(self):
+        # Same forward-compat treatment; verbose RETURN omits r.p_value today
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"], verbose=True)
+        assert "r.p_value" not in cypher
+
+    def test_metric_types_filter(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], metric_types=["damping_ratio"])
+        assert "WHERE dm.metric_type IN $metric_types" in cypher
+        assert params["metric_types"] == ["damping_ratio"]
+
+    def test_value_kind_filter(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], value_kind="numeric")
+        assert "dm.value_kind = $value_kind" in cypher
+
+    def test_compartment_filter(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], compartment="vesicle")
+        assert "dm.compartment = $compartment" in cypher
+
+    def test_treatment_type_lowercased(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], treatment_type=["DIEL"])
+        assert "ANY(t IN coalesce(dm.treatment_type, [])" in cypher
+        assert params["treatment_types_lower"] == ["diel"]
+
+    def test_background_factors_lowercased(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], background_factors=["Axenic"])
+        assert params["bfs_lower"] == ["axenic"]
+
+    def test_publication_doi_filter(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], publication_doi=["10.X/Y"])
+        assert "dm.publication_doi IN $publication_doi" in cypher
+
+    def test_derived_metric_ids_filter(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], derived_metric_ids=["a"])
+        assert "dm.id IN $derived_metric_ids" in cypher
+
+    def test_combined_filters_anded(self):
+        cypher, _ = build_gene_derived_metrics(
+            locus_tags=["X"], value_kind="numeric", compartment="vesicle")
+        assert ("WHERE dm.value_kind = $value_kind AND "
+                "dm.compartment = $compartment") in cypher
+
+    def test_verbose_adds_columns(self):
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"], verbose=True)
+        for col in [
+            "dm.metric_type AS metric_type",
+            "dm.field_description AS field_description",
+            "dm.unit AS unit",
+            "dm.compartment AS compartment",
+            "coalesce(dm.treatment_type, []) AS treatment_type",
+            "coalesce(dm.background_factors, []) AS background_factors",
+            "dm.publication_doi AS publication_doi",
+            "dm.treatment AS treatment",
+            "dm.light_condition AS light_condition",
+            "dm.experimental_context AS experimental_context",
+        ]:
+            assert col in cypher, f"missing verbose column: {col}"
+
+    def test_allowed_categories_case_gated_in_verbose(self):
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"], verbose=True)
+        assert ("CASE WHEN dm.value_kind = 'categorical'\n"
+                "            THEN dm.allowed_categories ELSE null END "
+                "AS allowed_categories") in cypher
+
+    def test_compact_omits_verbose_fields(self):
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"], verbose=False)
+        for col in ["AS metric_type", "AS field_description", "AS unit",
+                    "AS allowed_categories", "AS compartment",
+                    "AS treatment_type", "AS background_factors",
+                    "AS publication_doi", "AS treatment",
+                    "AS light_condition", "AS experimental_context"]:
+            assert col not in cypher, f"{col} should be verbose-only"
+
+    def test_order_by(self):
+        cypher, _ = build_gene_derived_metrics(locus_tags=["X"])
+        assert ("ORDER BY g.locus_tag ASC, dm.value_kind ASC, "
+                "dm.id ASC") in cypher
+
+    def test_limit_offset(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+        assert params["offset"] == 5
+
+    def test_no_skip_when_offset_zero(self):
+        cypher, params = build_gene_derived_metrics(
+            locus_tags=["X"], limit=10)
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
+    def test_no_limit_when_none(self):
+        cypher, params = build_gene_derived_metrics(locus_tags=["X"])
+        assert "LIMIT" not in cypher
+        assert "limit" not in params
 
 
 class TestBuildListDerivedMetrics:

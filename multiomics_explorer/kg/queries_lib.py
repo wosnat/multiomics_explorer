@@ -4633,3 +4633,131 @@ def build_gene_derived_metrics_summary(
         "       apoc.coll.frequencies([r IN rows | r.doi]) AS by_publication"
     )
     return cypher, params
+
+
+def build_gene_derived_metrics(
+    *,
+    locus_tags: list[str],
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for gene_derived_metrics.
+
+    One row per gene × DM. `r.value` is polymorphic across edge types
+    (float / 'true'/'false' string / category string) — branch on
+    value_kind in the consumer.
+
+    RETURN keys (compact, 11 columns today): locus_tag, gene_name,
+    derived_metric_id, value_kind, name, value, rankable, has_p_value,
+    rank_by_metric, metric_percentile, metric_bucket.
+
+    NOTE: adjusted_p_value, significant are declared in the Pydantic
+    Result model with default=None but NOT in the current Cypher RETURN
+    — no edge in today's KG carries those props (no DM has
+    has_p_value='true') and including them produces CyVer schema
+    warnings. Mirrors p_value_threshold deferral in
+    build_list_derived_metrics. Re-add CASE-gated RETURN columns
+    (`CASE WHEN dm.has_p_value = 'true' THEN r.<col> ELSE null END`)
+    when a has_p_value='true' DM lands.
+
+    RETURN keys (verbose, 11 added today): metric_type,
+    field_description, unit, allowed_categories, compartment,
+    treatment_type, background_factors, publication_doi, treatment,
+    light_condition, experimental_context. p_value (raw, edge-side)
+    is also deferred until has_p_value DM lands.
+    """
+    params: dict = {"locus_tags": locus_tags}
+
+    conditions: list[str] = []
+    if metric_types is not None:
+        conditions.append("dm.metric_type IN $metric_types")
+        params["metric_types"] = metric_types
+    if value_kind is not None:
+        conditions.append("dm.value_kind = $value_kind")
+        params["value_kind"] = value_kind
+    if compartment is not None:
+        conditions.append("dm.compartment = $compartment")
+        params["compartment"] = compartment
+    if treatment_type is not None:
+        conditions.append(
+            "ANY(t IN coalesce(dm.treatment_type, [])"
+            " WHERE toLower(t) IN $treatment_types_lower)"
+        )
+        params["treatment_types_lower"] = [t.lower() for t in treatment_type]
+    if background_factors is not None:
+        conditions.append(
+            "ANY(bf IN coalesce(dm.background_factors, [])"
+            " WHERE toLower(bf) IN $bfs_lower)"
+        )
+        params["bfs_lower"] = [bf.lower() for bf in background_factors]
+    if publication_doi is not None:
+        conditions.append("dm.publication_doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+    if derived_metric_ids is not None:
+        conditions.append("dm.id IN $derived_metric_ids")
+        params["derived_metric_ids"] = derived_metric_ids
+
+    where_block = ""
+    if conditions:
+        where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       dm.metric_type AS metric_type"
+            ",\n       dm.field_description AS field_description"
+            ",\n       dm.unit AS unit"
+            ",\n       CASE WHEN dm.value_kind = 'categorical'\n"
+            "            THEN dm.allowed_categories ELSE null END "
+            "AS allowed_categories"
+            ",\n       dm.compartment AS compartment"
+            ",\n       coalesce(dm.treatment_type, []) AS treatment_type"
+            ",\n       coalesce(dm.background_factors, []) AS background_factors"
+            ",\n       dm.publication_doi AS publication_doi"
+            ",\n       dm.treatment AS treatment"
+            ",\n       dm.light_condition AS light_condition"
+            ",\n       dm.experimental_context AS experimental_context"
+        )
+
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "MATCH (g:Gene {locus_tag: lt})\n"
+        "MATCH (dm:DerivedMetric)-[r:Derived_metric_quantifies_gene\n"
+        "                          |Derived_metric_flags_gene\n"
+        "                          |Derived_metric_classifies_gene]->(g)\n"
+        f"{where_block}"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.gene_name AS gene_name,\n"
+        "       dm.id AS derived_metric_id,\n"
+        "       dm.value_kind AS value_kind,\n"
+        "       dm.name AS name,\n"
+        "       r.value AS value,\n"
+        "       dm.rankable = 'true' AS rankable,\n"
+        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       CASE WHEN dm.rankable = 'true' THEN r.rank_by_metric ELSE null END AS rank_by_metric,\n"
+        "       CASE WHEN dm.rankable = 'true' THEN r.metric_percentile ELSE null END AS metric_percentile,\n"
+        "       CASE WHEN dm.rankable = 'true' THEN r.metric_bucket ELSE null END AS metric_bucket"
+        f"{verbose_cols}\n"
+        "ORDER BY g.locus_tag ASC, dm.value_kind ASC, dm.id ASC"
+        f"{skip_clause}{limit_clause}"
+    )
+    return cypher, params
