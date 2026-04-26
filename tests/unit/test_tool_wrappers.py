@@ -3300,6 +3300,20 @@ class TestOntologyLandscapeWrapper:
             with pytest.raises(ToolError):
                 await tool_fns["ontology_landscape"](mock_ctx, organism="BOGUS")
 
+    @pytest.mark.asyncio
+    async def test_default_limit_is_none(self, mock_ctx, tool_fns):
+        """MCP default limit should be None (Python API parity); B2 #3."""
+        with patch(
+            "multiomics_explorer.api.functions.ontology_landscape",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["ontology_landscape"](mock_ctx, organism="MED4")
+            # Default limit should be None — assert it was passed through as None.
+            kwargs = mock_api.call_args.kwargs
+            assert kwargs["limit"] is None, (
+                f"Expected default limit=None, got {kwargs['limit']}"
+            )
+
 
 class TestPathwayEnrichmentWrapper:
     def test_response_model_imports(self):

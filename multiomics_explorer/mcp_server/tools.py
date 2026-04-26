@@ -4080,7 +4080,11 @@ def register_tools(mcp: FastMCP):
         verbose: Annotated[bool, Field(
             description="Include example_terms (top 3 terms per level).",
         )] = False,
-        limit: Annotated[int, Field(description="Max rows returned", ge=1)] = 10,
+        limit: Annotated[int | None, Field(
+            description="Max rows returned. None (default) returns all rows; "
+                        "set an integer to truncate.",
+            ge=1,
+        )] = None,
         offset: Annotated[int, Field(description="Skip N rows before limit", ge=0)] = 0,
         min_gene_set_size: Annotated[int, Field(
             description="Exclude terms with fewer genes than this (default 5).",

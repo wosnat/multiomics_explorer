@@ -20,7 +20,7 @@ experiments' quantified genes. See docs://tools/ontology_landscape.
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | If true, omit per-row results (by_ontology only). |
 | verbose | bool | False | Include example_terms (top 3 terms per level). |
-| limit | int | 10 | Max rows returned |
+| limit | int \| None | None | Max rows returned. None (default) returns all rows; set an integer to truncate. |
 | offset | int | 0 | Skip N rows before limit |
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
@@ -154,6 +154,8 @@ result['total_rows']  # KeyError
 ```correction
 result['total_matching']
 ```
+
+- Default `limit=None` returns all rows; if you set an explicit integer, check the response envelope's `truncated` field to know whether more rows exist beyond what was returned.
 
 ## Package import equivalent
 

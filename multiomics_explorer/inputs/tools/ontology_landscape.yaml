@@ -46,3 +46,4 @@ mistakes:
   - "BRITE stats at each level mix all trees together by default. Use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). BRITE rows are broken down per tree when `tree` is specified. Use `list_filter_values('brite_tree')` to discover available trees."
   - wrong: "result['total_rows']  # KeyError"
     right: "result['total_matching']"
+  - "Default `limit=None` returns all rows; if you set an explicit integer, check the response envelope's `truncated` field to know whether more rows exist beyond what was returned."
