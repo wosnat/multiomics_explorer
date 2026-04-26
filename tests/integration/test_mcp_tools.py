@@ -4,10 +4,14 @@ These tests exercise the tool-level logic (query building + result handling)
 without the MCP transport layer. They use the shared `conn` fixture from conftest.
 """
 
+import asyncio
 import json
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from fastmcp import FastMCP
 
+from multiomics_explorer.mcp_server.tools import register_tools
 from multiomics_explorer.kg.queries_lib import (
     build_gene_stub,
     build_gene_details,
@@ -1246,3 +1250,192 @@ class TestListDerivedMetrics:
         assert page1_ids.isdisjoint(page2_ids)
         assert page1["truncated"] is True
         assert page2["truncated"] is True  # 5 + 5 = 10 < 13
+
+
+@pytest.fixture(scope="module")
+def tool_fns():
+    """Register MCP tools on a fresh FastMCP and return {name: fn} dict.
+
+    Used by integration tests that exercise the wrapper layer (Pydantic
+    response models, ToolError raising) against the live KG.
+    """
+    mcp = FastMCP("test")
+    register_tools(mcp)
+    tools = asyncio.run(mcp.list_tools())
+    return {t.name: asyncio.run(mcp.get_tool(t.name)).fn for t in tools}
+
+
+def _ctx_with_conn(conn):
+    """Build an AsyncMock Context with the real GraphConnection injected."""
+    ctx = AsyncMock()
+    ctx.request_context.lifespan_context.conn = conn
+    return ctx
+
+
+@pytest.mark.kg
+class TestGeneDerivedMetrics:
+    """Integration tests against live KG. Baselines pinned 2026-04-26."""
+
+    @pytest.mark.asyncio
+    async def test_pmm1714_all_three_kinds(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714"], limit=20)
+        assert response.total_matching == 9
+        assert response.total_derived_metrics == 9
+        assert response.genes_with_metrics == 1
+        assert response.returned == 9
+        kinds = {r.value_kind for r in response.results}
+        assert kinds == {"numeric", "boolean", "categorical"}
+        # Polymorphic value typing
+        for r in response.results:
+            if r.value_kind == "numeric":
+                assert isinstance(r.value, float)
+            elif r.value_kind == "boolean":
+                assert r.value in ("true", "false")
+            elif r.value_kind == "categorical":
+                assert isinstance(r.value, str)
+
+    @pytest.mark.asyncio
+    async def test_pmm0001_diel_only(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM0001"], limit=20)
+        assert response.total_matching == 6
+        assert all(r.value_kind == "numeric" for r in response.results)
+        # 4 rankable (damping_ratio, diel_amp_*, protein_transcript_lag),
+        # 2 non-rankable (peak_time_*)
+        rankable_count = sum(1 for r in response.results if r.rankable)
+        assert rankable_count == 4
+        # Sparse extras null on non-rankable rows
+        for r in response.results:
+            if not r.rankable:
+                assert r.rank_by_metric is None
+                assert r.metric_percentile is None
+                assert r.metric_bucket is None
+
+    @pytest.mark.asyncio
+    async def test_value_kind_filter_routes(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714"], value_kind="boolean")
+        assert response.total_matching == 1
+        # metric_type is verbose-only; assert against compact fields instead
+        assert response.results[0].derived_metric_id.endswith(
+            "vesicle_proteome_member")
+        assert response.results[0].value == "true"
+        assert response.results[0].value_kind == "boolean"
+
+    @pytest.mark.asyncio
+    async def test_kind_mismatch_not_matched(self, tool_fns, conn):
+        """Gene with only boolean DM signal under value_kind='numeric' filter
+        lands in not_matched, not silently dropped."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMN2A_2128"], value_kind="numeric")
+        assert response.total_matching == 0
+        assert response.not_matched == ["PMN2A_2128"]
+        assert response.genes_without_metrics == 1
+        assert response.not_found == []
+
+    @pytest.mark.asyncio
+    async def test_not_found_path(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        # When ALL locus_tags are unknown, organism cannot be inferred —
+        # _validate_organism_inputs raises by design. Pass organism
+        # explicitly to exercise the all-unknown-locus_tag path.
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM_DOES_NOT_EXIST"], organism="MED4")
+        assert response.total_matching == 0
+        assert response.not_found == ["PMM_DOES_NOT_EXIST"]
+        assert response.not_matched == []
+        assert response.genes_without_metrics == 0
+
+    @pytest.mark.asyncio
+    async def test_mixed_input_with_filter(self, tool_fns, conn):
+        """All 3 diagnostic buckets within single-organism scope."""
+        ctx = _ctx_with_conn(conn)
+        # NOTE: PMN2A_2128 (NATL2A) cannot be combined with MED4 locus_tags —
+        # single-organism enforcement is by design. Use PMM0002 (MED4 gene
+        # with no DM signal) for the not_matched bucket instead.
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714", "PMM_FAKE", "PMM0002"],
+            value_kind="numeric", limit=20)
+        assert response.total_matching == 7  # PMM1714 numeric only
+        assert response.genes_with_metrics == 1
+        assert response.genes_without_metrics == 1  # PMM0002
+        assert response.not_found == ["PMM_FAKE"]
+        assert response.not_matched == ["PMM0002"]
+
+    @pytest.mark.asyncio
+    async def test_compartment_filter(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714"], compartment="vesicle", limit=20)
+        assert response.total_matching == 3  # boolean + categorical + numeric Biller 2014
+
+    @pytest.mark.asyncio
+    async def test_publication_doi_filter(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714"],
+            publication_doi=["10.1371/journal.pone.0043432"], limit=20)
+        assert response.total_matching == 6  # 6 Waldbauer numeric DMs
+
+    @pytest.mark.asyncio
+    async def test_summary_only(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714"], summary=True)
+        assert response.results == []
+        assert response.truncated is True
+        # All by_* keys present (even if empty)
+        for breakdown_attr in [
+            "by_value_kind", "by_metric_type", "by_metric",
+            "by_compartment", "by_treatment_type",
+            "by_background_factors", "by_publication",
+        ]:
+            assert hasattr(response, breakdown_attr)
+
+    @pytest.mark.asyncio
+    async def test_by_metric_disambiguates(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714"], summary=True)
+        assert len(response.by_metric) == 9  # one per DM touching the gene
+        for entry in response.by_metric:
+            assert entry.derived_metric_id  # non-empty
+            assert entry.name
+            assert entry.metric_type
+            assert entry.value_kind in ("numeric", "boolean", "categorical")
+            assert entry.count >= 1
+
+    @pytest.mark.asyncio
+    async def test_verbose_columns(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714"], verbose=True, limit=1)
+        row = response.results[0]
+        # Verbose-only fields populated (treatment, light_condition, etc.)
+        assert row.treatment is not None
+        assert row.light_condition is not None
+        assert row.experimental_context is not None
+        # p_value forward-compat — None today
+        assert row.p_value is None
+
+    @pytest.mark.asyncio
+    async def test_organism_conflict_raises(self, tool_fns, conn):
+        from fastmcp.exceptions import ToolError
+        ctx = _ctx_with_conn(conn)
+        with pytest.raises(ToolError):
+            await tool_fns["gene_derived_metrics"](
+                ctx, locus_tags=["PMM1714", "PMN2A_2128"])  # MED4 + NATL2A
+
+    @pytest.mark.asyncio
+    async def test_truncation(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714"], limit=2)
+        assert response.returned == 2
+        assert response.truncated is True
+        assert response.total_matching == 9
