@@ -4194,7 +4194,9 @@ def register_tools(mcp: FastMCP):
     ) -> PathwayEnrichmentResponse:
         """Pathway over-representation analysis from DE results (Fisher + BH).
 
-        See docs://analysis/enrichment for methodology and examples.
+        See docs://analysis/enrichment for methodology;
+        docs://examples/pathway_enrichment.py for runnable code (covers
+        EnrichmentResult accessors, custom term2gene, compareCluster export).
         """
         await ctx.info(
             f"pathway_enrichment organism={organism} experiments={len(experiment_ids)} "
@@ -4274,7 +4276,9 @@ def register_tools(mcp: FastMCP):
         Runs ORA on every cluster in a clustering analysis. Use
         list_clustering_analyses to find analysis IDs. Background
         defaults to the union of all clustered genes.
-        See docs://analysis/enrichment for methodology.
+        See docs://analysis/enrichment for methodology;
+        docs://examples/pathway_enrichment.py for runnable code (the custom
+        term2gene path covers cluster-membership enrichment).
         """
         await ctx.info(
             f"cluster_enrichment analysis_id={analysis_id} "

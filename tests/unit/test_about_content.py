@@ -96,6 +96,43 @@ def _extract_param_names_from_about(content: str) -> list[str]:
     return names
 
 
+def test_python_returns_override():
+    """When YAML carries `python_returns: <Class>`, the package-import
+    block emits an object-shape example, not `returns dict`. B2 #5."""
+    from scripts.build_about_content import _build_package_import_section
+
+    section = _build_package_import_section(
+        tool_name="pathway_enrichment",
+        params=[
+            {"name": "organism", "default": "—"},
+            {"name": "experiment_ids", "default": "—"},
+        ],
+        envelope=[{"name": "results"}],
+        has_results=True,
+        python_returns="EnrichmentResult",
+    )
+    text = "\n".join(section)
+    assert "returns dict" not in text
+    assert "EnrichmentResult" in text
+    assert ".to_envelope(" in text
+
+
+def test_python_returns_default_unchanged():
+    """When `python_returns` absent, fall back to the existing
+    `returns dict with keys` behavior."""
+    from scripts.build_about_content import _build_package_import_section
+
+    section = _build_package_import_section(
+        tool_name="list_organisms",
+        params=[],
+        envelope=[{"name": "total_matching"}, {"name": "results"}],
+        has_results=True,
+        python_returns=None,
+    )
+    text = "\n".join(section)
+    assert "returns dict with keys" in text
+
+
 class TestAboutContentConsistency:
     """Verify about files are consistent with tool schemas."""
 

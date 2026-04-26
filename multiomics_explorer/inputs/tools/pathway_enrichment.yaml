@@ -2,6 +2,8 @@
 # Auto-generated sections (params, response format, expected-keys) come from
 # Pydantic models via scripts/build_about_content.py.
 
+python_returns: EnrichmentResult
+
 examples:
   - title: Single experiment, default direction=both
     call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1)

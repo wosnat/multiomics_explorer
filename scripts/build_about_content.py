@@ -304,33 +304,69 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
                 lines.append("")
 
     # Package import (auto-generated)
-    lines.append("## Package import equivalent")
-    lines.append("")
-    lines.append("```python")
-    lines.append(f"from multiomics_explorer import {tool_name}")
-    lines.append("")
-    # Build example call with required params
+    lines.extend(_build_package_import_section(
+        tool_name=tool_name,
+        params=params,
+        envelope=envelope,
+        has_results=has_results,
+        python_returns=(input_data or {}).get("python_returns"),
+    ))
+
+    return "\n".join(lines)
+
+
+def _build_package_import_section(
+    *,
+    tool_name: str,
+    params: list[dict],
+    envelope: list[dict],
+    has_results: bool,
+    python_returns: str | None = None,
+) -> list[str]:
+    """Render the 'Package import equivalent' section.
+
+    When `python_returns` is set (e.g. "EnrichmentResult"), the example
+    shows the object's accessors (`.results`, `.to_envelope(...)`)
+    instead of asserting a dict return. Default behavior — `# returns
+    dict with keys: ...` — preserved for the 20+ tools that do return
+    dicts.
+    """
+    lines: list[str] = [
+        "## Package import equivalent",
+        "",
+        "```python",
+        f"from multiomics_explorer import {tool_name}",
+        "",
+    ]
     required_params = [p for p in params if p["default"] == "—"]
-    if required_params:
-        example_args = ", ".join(
-            f'{p["name"]}=...' for p in required_params
-        )
-        lines.append(f'result = {tool_name}({example_args})')
+    args_str = ", ".join(f'{p["name"]}=...' for p in required_params)
+    lines.append(
+        f'result = {tool_name}({args_str})' if required_params
+        else f'result = {tool_name}()'
+    )
+
+    if python_returns:
+        lines.append(f'# returns {python_returns}; access result.results')
+        lines.append('# and accessors. Call result.to_envelope() for the')
+        lines.append('# MCP-equivalent dict shape.')
+        lines.append('# See docs://examples/pathway_enrichment.py for runnable code.')
     else:
-        lines.append(f'result = {tool_name}()')
-    # API returns a subset of the MCP envelope (no returned/truncated wrapper)
-    api_keys = [f["name"] for f in envelope if f["name"] not in ("returned", "truncated")]
-    if has_results:
-        api_keys.append("results")
-    envelope_keys = ", ".join(api_keys)
-    lines.append(f'# returns dict with keys: {envelope_keys}')
+        # API returns a subset of the MCP envelope (no returned/truncated wrapper)
+        api_keys = [
+            f["name"] for f in envelope
+            if f["name"] not in ("returned", "truncated")
+        ]
+        if has_results:
+            api_keys.append("results")
+        envelope_keys = ", ".join(api_keys)
+        lines.append(f'# returns dict with keys: {envelope_keys}')
+
     lines.append("```")
     lines.append("")
     lines.append("Use package import for bulk data extraction in scripts.")
     lines.append("Use MCP for reasoning and interactive exploration.")
     lines.append("")
-
-    return "\n".join(lines)
+    return lines
 
 
 def generate_skeleton(tool_name: str, schema: dict) -> str:

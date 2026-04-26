@@ -4,7 +4,9 @@
 
 Pathway over-representation analysis from DE results (Fisher + BH).
 
-See docs://analysis/enrichment for methodology and examples.
+See docs://analysis/enrichment for methodology;
+docs://examples/pathway_enrichment.py for runnable code (covers
+EnrichmentResult accessors, custom term2gene, compareCluster export).
 
 ## Parameters
 
@@ -192,7 +194,10 @@ pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or
 from multiomics_explorer import pathway_enrichment
 
 result = pathway_enrichment(organism=..., experiment_ids=..., ontology=...)
-# returns dict with keys: organism_name, ontology, level, total_matching, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, no_expression, term_validation, clusters_skipped, enrichment_params, results
+# returns EnrichmentResult; access result.results
+# and accessors. Call result.to_envelope() for the
+# MCP-equivalent dict shape.
+# See docs://examples/pathway_enrichment.py for runnable code.
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -7,7 +7,9 @@ Cluster-membership over-representation analysis (Fisher + BH).
 Runs ORA on every cluster in a clustering analysis. Use
 list_clustering_analyses to find analysis IDs. Background
 defaults to the union of all clustered genes.
-See docs://analysis/enrichment for methodology.
+See docs://analysis/enrichment for methodology;
+docs://examples/pathway_enrichment.py for runnable code (the custom
+term2gene path covers cluster-membership enrichment).
 
 ## Parameters
 
@@ -175,7 +177,10 @@ cluster_enrichment(..., background='cluster_union')  # or 'organism', or a locus
 from multiomics_explorer import cluster_enrichment
 
 result = cluster_enrichment(analysis_id=..., organism=..., ontology=...)
-# returns dict with keys: analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, clusters_skipped, term_validation, enrichment_params, results
+# returns EnrichmentResult; access result.results
+# and accessors. Call result.to_envelope() for the
+# MCP-equivalent dict shape.
+# See docs://examples/pathway_enrichment.py for runnable code.
 ```
 
 Use package import for bulk data extraction in scripts.

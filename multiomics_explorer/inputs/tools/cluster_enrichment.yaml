@@ -1,5 +1,7 @@
 # Human-authored content for cluster_enrichment about page.
 
+python_returns: EnrichmentResult
+
 examples:
   - title: Single analysis, CyanoRak level 1
     call: cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_diel_clusters", organism="MED4", ontology="cyanorak_role", level=1)
