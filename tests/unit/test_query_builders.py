@@ -56,6 +56,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_ontology_expcov,
     build_ontology_experiment_check,
     build_ontology_organism_gene_count,
+    build_gene_derived_metrics_summary,
 )
 from multiomics_explorer.kg.queries_lib import _hierarchy_walk
 
@@ -4529,6 +4530,123 @@ class TestBuildListDerivedMetricsSummary:
         assert "score_max" in cypher
         assert "score_median" in cypher
         assert params == {"search_text": "diel", "organism": "MED4", "value_kind": "numeric"}
+
+
+class TestBuildGeneDerivedMetricsSummary:
+    """Unit tests for build_gene_derived_metrics_summary (no Neo4j)."""
+
+    def test_no_filters(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714", "PMM0001"])
+        assert "UNWIND $locus_tags AS lt" in cypher
+        assert "OPTIONAL MATCH (g:Gene {locus_tag: lt})" in cypher
+        assert ("Derived_metric_quantifies_gene\n"
+                "                    |Derived_metric_flags_gene\n"
+                "                    |Derived_metric_classifies_gene") in cypher
+        assert "WHERE dm IS NULL OR" not in cypher  # no DM filters
+        assert params == {"locus_tags": ["PMM1714", "PMM0001"]}
+
+    def test_metric_types_filter(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"], metric_types=["damping_ratio"])
+        assert "WHERE dm IS NULL OR ( dm.metric_type IN $metric_types" in cypher
+        assert params["metric_types"] == ["damping_ratio"]
+
+    def test_value_kind_filter(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"], value_kind="numeric")
+        assert "dm.value_kind = $value_kind" in cypher
+        assert params["value_kind"] == "numeric"
+
+    def test_compartment_filter(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"], compartment="vesicle")
+        assert "dm.compartment = $compartment" in cypher
+        assert params["compartment"] == "vesicle"
+
+    def test_treatment_type_lowercased(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"], treatment_type=["DIEL", "Darkness"])
+        assert "ANY(t IN coalesce(dm.treatment_type, [])" in cypher
+        assert "toLower(t) IN $treatment_types_lower" in cypher
+        assert params["treatment_types_lower"] == ["diel", "darkness"]
+
+    def test_background_factors_lowercased(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"], background_factors=["AXENIC"])
+        assert "ANY(bf IN coalesce(dm.background_factors, [])" in cypher
+        assert "toLower(bf) IN $bfs_lower" in cypher
+        assert params["bfs_lower"] == ["axenic"]
+
+    def test_publication_doi_filter(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"],
+            publication_doi=["10.1371/journal.pone.0043432"])
+        assert "dm.publication_doi IN $publication_doi" in cypher
+        assert params["publication_doi"] == ["10.1371/journal.pone.0043432"]
+
+    def test_derived_metric_ids_filter(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"],
+            derived_metric_ids=["derived_metric:journal.pone.0043432:..."])
+        assert "dm.id IN $derived_metric_ids" in cypher
+
+    def test_combined_filters_anded(self):
+        cypher, params = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"],
+            value_kind="numeric", compartment="vesicle")
+        # Both conditions inside the same `dm IS NULL OR (... AND ...)` group
+        assert ("dm.value_kind = $value_kind AND dm.compartment = "
+                "$compartment") in cypher
+
+    def test_optional_match_cascade(self):
+        cypher, _ = build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714"], value_kind="numeric")
+        # Cascade emits g IS NULL → not_found, dm IS NULL → not_matched
+        assert ("collect(DISTINCT CASE WHEN g IS NULL THEN lt END)"
+                " AS nf_raw") in cypher
+        assert ("collect(DISTINCT CASE WHEN g IS NOT NULL AND dm IS NULL"
+                " THEN lt END) AS nm_raw") in cypher
+
+    def test_rows_map_includes_name(self):
+        cypher, _ = build_gene_derived_metrics_summary(locus_tags=["X"])
+        # Required for by_metric self-describing entries
+        assert "name: dm.name" in cypher
+
+    def test_returns_all_envelope_keys(self):
+        cypher, _ = build_gene_derived_metrics_summary(locus_tags=["X"])
+        for key in [
+            "total_matching", "total_derived_metrics",
+            "genes_with_metrics", "genes_without_metrics",
+            "not_found", "not_matched",
+            "by_value_kind", "by_metric_type",
+            "by_metric", "by_compartment",
+            "by_treatment_type", "by_background_factors", "by_publication",
+        ]:
+            assert key in cypher, f"missing envelope key: {key}"
+
+    def test_by_metric_self_describing_shape(self):
+        cypher, _ = build_gene_derived_metrics_summary(locus_tags=["X"])
+        # by_metric carries derived_metric_id, name, metric_type, value_kind, count
+        assert "[dm_id IN apoc.coll.toSet([r IN rows | r.dm_id])" in cypher
+        assert "derived_metric_id: dm_id" in cypher
+        assert "name: head([r IN rows WHERE r.dm_id = dm_id | r.name])" in cypher
+        assert "value_kind: head([r IN rows WHERE r.dm_id = dm_id | r.vk])" in cypher
+
+    def test_total_derived_metrics_distinct(self):
+        cypher, _ = build_gene_derived_metrics_summary(locus_tags=["X"])
+        assert ("size(apoc.coll.toSet([r IN rows | r.dm_id]))"
+                " AS total_derived_metrics") in cypher
+
+    def test_genes_without_metrics_arithmetic(self):
+        cypher, _ = build_gene_derived_metrics_summary(locus_tags=["X"])
+        assert ("size(input_tags) - size(apoc.coll.toSet([r IN rows | r.lt]))"
+                "\n         - size(not_found) AS genes_without_metrics") in cypher
+
+    def test_locus_tags_param(self):
+        _, params = build_gene_derived_metrics_summary(
+            locus_tags=["A", "B"])
+        assert params["locus_tags"] == ["A", "B"]
 
 
 class TestBuildListDerivedMetrics:

@@ -4527,3 +4527,109 @@ def build_list_derived_metrics(
         f"{skip_clause}{limit_clause}"
     )
     return cypher, params
+
+
+def build_gene_derived_metrics_summary(
+    *,
+    locus_tags: list[str],
+    metric_types: list[str] | None = None,
+    value_kind: str | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for gene_derived_metrics.
+
+    OPTIONAL MATCH cascade tracks not_found (no Gene) / not_matched
+    (Gene present but no DM rows after filters, including kind-mismatch).
+    DM-level filters wrapped inside `dm IS NULL OR (...)` so the OPTIONAL
+    MATCH still emits a "no edge" row for not_matched bookkeeping.
+
+    RETURN keys: total_matching, total_derived_metrics, genes_with_metrics,
+    genes_without_metrics, not_found, not_matched, by_value_kind,
+    by_metric_type, by_metric, by_compartment, by_treatment_type,
+    by_background_factors, by_publication.
+    """
+    params: dict = {"locus_tags": locus_tags}
+
+    dm_conditions: list[str] = []
+    if metric_types is not None:
+        dm_conditions.append("dm.metric_type IN $metric_types")
+        params["metric_types"] = metric_types
+    if value_kind is not None:
+        dm_conditions.append("dm.value_kind = $value_kind")
+        params["value_kind"] = value_kind
+    if compartment is not None:
+        dm_conditions.append("dm.compartment = $compartment")
+        params["compartment"] = compartment
+    if treatment_type is not None:
+        dm_conditions.append(
+            "ANY(t IN coalesce(dm.treatment_type, [])"
+            " WHERE toLower(t) IN $treatment_types_lower)"
+        )
+        params["treatment_types_lower"] = [t.lower() for t in treatment_type]
+    if background_factors is not None:
+        dm_conditions.append(
+            "ANY(bf IN coalesce(dm.background_factors, [])"
+            " WHERE toLower(bf) IN $bfs_lower)"
+        )
+        params["bfs_lower"] = [bf.lower() for bf in background_factors]
+    if publication_doi is not None:
+        dm_conditions.append("dm.publication_doi IN $publication_doi")
+        params["publication_doi"] = publication_doi
+    if derived_metric_ids is not None:
+        dm_conditions.append("dm.id IN $derived_metric_ids")
+        params["derived_metric_ids"] = derived_metric_ids
+
+    where_block = ""
+    if dm_conditions:
+        where_block = (
+            "WHERE dm IS NULL OR ( "
+            + " AND ".join(dm_conditions)
+            + " )\n"
+        )
+
+    cypher = (
+        "UNWIND $locus_tags AS lt\n"
+        "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
+        "OPTIONAL MATCH (g)<-[r:Derived_metric_quantifies_gene\n"
+        "                    |Derived_metric_flags_gene\n"
+        "                    |Derived_metric_classifies_gene]-(dm:DerivedMetric)\n"
+        f"{where_block}"
+        "WITH lt, g, dm, $locus_tags AS input_tags\n"
+        "WITH input_tags,\n"
+        "     collect(DISTINCT CASE WHEN g IS NULL THEN lt END) AS nf_raw,\n"
+        "     collect(DISTINCT CASE WHEN g IS NOT NULL AND dm IS NULL THEN lt END) AS nm_raw,\n"
+        "     collect(CASE WHEN dm IS NOT NULL THEN\n"
+        "       {lt: lt, dm_id: dm.id, name: dm.name,\n"
+        "        mt: dm.metric_type, vk: dm.value_kind,\n"
+        "        comp: dm.compartment, doi: dm.publication_doi,\n"
+        "        tt: dm.treatment_type, bfs: dm.background_factors} END) AS rows\n"
+        "WITH input_tags,\n"
+        "     [x IN nf_raw WHERE x IS NOT NULL] AS not_found,\n"
+        "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched,\n"
+        "     rows\n"
+        "RETURN size(rows) AS total_matching,\n"
+        "       size(apoc.coll.toSet([r IN rows | r.dm_id])) AS total_derived_metrics,\n"
+        "       size(apoc.coll.toSet([r IN rows | r.lt])) AS genes_with_metrics,\n"
+        "       size(input_tags) - size(apoc.coll.toSet([r IN rows | r.lt]))\n"
+        "         - size(not_found) AS genes_without_metrics,\n"
+        "       not_found, not_matched,\n"
+        "       apoc.coll.frequencies([r IN rows | r.vk]) AS by_value_kind,\n"
+        "       apoc.coll.frequencies([r IN rows | r.mt]) AS by_metric_type,\n"
+        "       [dm_id IN apoc.coll.toSet([r IN rows | r.dm_id]) |\n"
+        "         {derived_metric_id: dm_id,\n"
+        "          name: head([r IN rows WHERE r.dm_id = dm_id | r.name]),\n"
+        "          metric_type: head([r IN rows WHERE r.dm_id = dm_id | r.mt]),\n"
+        "          value_kind: head([r IN rows WHERE r.dm_id = dm_id | r.vk]),\n"
+        "          count: size([r IN rows WHERE r.dm_id = dm_id])}] AS by_metric,\n"
+        "       apoc.coll.frequencies([r IN rows | r.comp]) AS by_compartment,\n"
+        "       apoc.coll.frequencies(\n"
+        "         apoc.coll.flatten([r IN rows | coalesce(r.tt, [])])) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(\n"
+        "         apoc.coll.flatten([r IN rows | coalesce(r.bfs, [])])) AS by_background_factors,\n"
+        "       apoc.coll.frequencies([r IN rows | r.doi]) AS by_publication"
+    )
+    return cypher, params
