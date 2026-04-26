@@ -2173,6 +2173,19 @@ class TestBuildListExperimentsExperimentIdsFilter:
         assert params["experiment_ids"] == ["exp_a", "exp_b"]
 
 
+class TestBuildListExperimentsDistinctGeneCount:
+    """Coverage for the precomputed distinct_gene_count RETURN column (B2 #2)."""
+
+    def test_returns_distinct_gene_count(self):
+        cypher, _ = build_list_experiments()
+        assert "e.distinct_gene_count AS distinct_gene_count" in cypher
+
+    def test_distinct_gene_count_returned_with_filters(self):
+        # Column should still be in RETURN when filters narrow the result.
+        cypher, _ = build_list_experiments(organism="MED4", verbose=True)
+        assert "distinct_gene_count" in cypher
+
+
 class TestBuildListExperimentsSummary:
     def test_no_filters(self):
         """Returns aggregation columns via apoc.coll.frequencies."""

@@ -6,6 +6,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -43,6 +44,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -80,6 +82,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +100 nM glucose vs light
     (control)'
@@ -117,6 +120,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 16
@@ -153,6 +157,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 3950
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
   gene_count: 3950
@@ -189,6 +194,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -227,6 +233,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -265,6 +272,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
     (control)'
@@ -303,6 +311,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 343
@@ -339,6 +348,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   gene_count: 1849
@@ -375,6 +385,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
@@ -440,6 +451,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
@@ -492,6 +504,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (RNASEQ)
@@ -557,6 +570,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (RNASEQ)
@@ -594,6 +608,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
   gene_count: 327
@@ -630,6 +645,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
   gene_count: 327
@@ -666,6 +682,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 327
@@ -702,6 +719,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 327
@@ -738,6 +756,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 28
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
   experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
     (34 psu) (RNASEQ)
@@ -775,6 +794,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 857
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   gene_count: 2534
@@ -825,6 +845,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  distinct_gene_count: 1714
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
     (RNASEQ)
@@ -861,6 +882,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 32
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
   gene_count: 49
@@ -917,6 +939,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 39
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
   gene_count: 52
@@ -980,6 +1003,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Phage
+  distinct_gene_count: 25
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_dark
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in dark
     (RNASEQ)
@@ -1030,6 +1054,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Phage
+  distinct_gene_count: 30
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in light
     (RNASEQ)
@@ -1095,6 +1120,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 166
   experiment_id: 10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray
   experiment_name: MED4 Air (0.036% CO2 / 21% O2) vs Time 0 (pre-shock) (MICROARRAY)
   gene_count: 166
@@ -1132,6 +1158,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 4
   experiment_id: 10.1038/ismej.2015.36_carbon_ambient_co2_no_o2_med4_microarray
   experiment_name: MED4 Ambient CO2, no O2 (0.036% CO2 / 0% O2) vs Air (0.036% CO2
     / 21% O2) (MICROARRAY)
@@ -1170,6 +1197,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 285
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
   experiment_name: MED4 Low CO2 (0.004% CO2 / 21% O2) vs Air (0.036% CO2 / 21% O2)
     (MICROARRAY)
@@ -1208,6 +1236,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 252
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
   experiment_name: MED4 Low CO2 and no O2 (0.004% CO2 / 0% O2) vs Air (0.036% CO2
     / 21% O2) (MICROARRAY)
@@ -1247,6 +1276,7 @@ rows:
   - condition_comparison
   clustering_analysis_count: 1
   coculture_partner: null
+  distinct_gene_count: 0
   experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
   experiment_name: MED4 steady-state expression profiling across growth conditions
   gene_count: 0
@@ -1274,6 +1304,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 0
   experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
   experiment_name: MED4 diel paired transcript-protein analysis (Waldbauer 2012)
   gene_count: 0
@@ -1302,6 +1333,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light_2
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
   gene_count: 112
@@ -1338,6 +1370,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
   gene_count: 224
@@ -1381,6 +1414,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_growth_medium_ironreplete_control_med4_med4_microarray
   experiment_name: MED4 Iron-replete control (MED4) vs Iron starvation (MED4) (MICROARRAY)
   gene_count: 112
@@ -1418,6 +1452,7 @@ rows:
   - diel
   clustering_analysis_count: 1
   coculture_partner: null
+  distinct_gene_count: 0
   experiment_id: 10.1371/journal.pone.0005135_diel_cycling_med4_microarray
   experiment_name: MED4 diel gene expression profiling over 48h light-dark cycle
   gene_count: 0
@@ -1446,6 +1481,7 @@ rows:
   - time_course
   clustering_analysis_count: 1
   coculture_partner: Phage
+  distinct_gene_count: 45
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
   experiment_name: MED4 Phage infected vs Pro99 medium phage infection baseline (MICROARRAY)
   gene_count: 360
@@ -1530,6 +1566,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_blue_light_13_umol_med4_microarray
   experiment_name: MED4 Blue light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
   gene_count: 198
@@ -1567,6 +1604,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_dcmu_white_light_13_med4_microarray
   experiment_name: MED4 DCMU + white light (13 umol photons m-2 s-1) vs White light
     (13 umol photons m-2 s-1) (MICROARRAY)
@@ -1604,6 +1642,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_green_light_13_umol_med4_microarray
   experiment_name: MED4 Green light (13 umol photons m-2 s-1) vs Darkness control
     (MICROARRAY)
@@ -1642,6 +1681,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
@@ -1679,6 +1719,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
@@ -1715,6 +1756,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_high_white_light_55_med4_microarray
   experiment_name: MED4 High white light (55 umol photons m-2 s-1) vs Darkness control
     (MICROARRAY)
@@ -1754,6 +1796,7 @@ rows:
   - time_course
   clustering_analysis_count: 1
   coculture_partner: null
+  distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
@@ -1826,6 +1869,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 34
   experiment_id: 10.1073/pnas.0601301103_phosphorus_phosphate_starvation_med4_microarray
   experiment_name: MED4 Phosphate starvation vs P-replete Pro99 medium (MICROARRAY)
   gene_count: 170
@@ -1891,6 +1935,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_red_light_13_umol_med4_microarray
   experiment_name: MED4 Red light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
   gene_count: 198
@@ -1927,6 +1972,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_white_light_13_umol_med4_microarray
   experiment_name: MED4 White light (13 umol photons m-2 s-1) vs Darkness control
     (MICROARRAY)

@@ -76,7 +76,8 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | is_time_course | bool | Whether experiment has multiple time points |
 | table_scope | string \| None (optional) | What genes the source DE table contains. Values: all_detected_genes, significant_any_timepoint, significant_only, top_n, filtered_subset. Critical for interpreting missing genes. |
 | table_scope_detail | string \| None (optional) | Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8') |
-| gene_count | int | Total genes with expression data (e.g. 1696) |
+| gene_count | int | Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments). For a 6-TP experiment with 1697 genes/TP, gene_count=10182. For non-time-course it equals distinct_gene_count (e.g. 1696). |
+| distinct_gene_count | int | Distinct gene count across the experiment — number of distinct gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count, equal for non-time-course experiments. (e.g. 1697) |
 | genes_by_status | GeneStatusBreakdown | Gene counts by expression status |
 | timepoints | list[TimePoint] \| None (optional) | Per-timepoint gene counts. Omitted for non-time-course experiments. |
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this experiment (e.g. 4) |
@@ -168,6 +169,22 @@ Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
 list_experiments(experiment_ids=["10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq", "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"], verbose=True)
 ```
 
+### Example 8: gene_count vs distinct_gene_count for time-course experiments
+
+```
+Each result row carries both `gene_count` (cumulative row count
+across timepoints — equals `sum(time_point_totals)`) and
+`distinct_gene_count` (unique genes measured, independent of
+timepoint count). For non-time-course experiments they're equal.
+
+For a time-course experiment measuring 1697 genes at 6 timepoints:
+  gene_count             = 10182   (= 6 × 1697)
+  distinct_gene_count    =  1697
+
+Use `distinct_gene_count` for detection-power / pathway-background
+sizing. Per-TP detail lives in `timepoints[].gene_count`.
+```
+
 ## Chaining patterns
 
 ```
@@ -192,6 +209,8 @@ list_experiments → list_clustering_analyses(experiment_ids=[...])
 - Check table_scope before interpreting missing genes — some experiments only include significant genes
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
+- For time-course experiments, top-level `gene_count` is the **cumulative row count across timepoints** (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`.
 
 ```mistake
 list_experiments(publication='Biller 2018')

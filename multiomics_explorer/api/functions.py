@@ -759,9 +759,9 @@ def list_experiments(
     Per result: experiment_id, experiment_name, publication_doi,
     organism_name, treatment_type, background_factors, coculture_partner,
     omics_type, is_time_course (bool), table_scope, table_scope_detail,
-    gene_count, genes_by_status (dict), clustering_analysis_count,
-    cluster_types, growth_phases, time_point_growth_phases,
-    timepoints (list, omitted if not time-course).
+    gene_count, distinct_gene_count, genes_by_status (dict),
+    clustering_analysis_count, cluster_types, growth_phases,
+    time_point_growth_phases, timepoints (list, omitted if not time-course).
     When verbose=True, also includes: publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context.
@@ -774,6 +774,16 @@ def list_experiments(
     any of the listed values (exact match). Mirrors the filter shape on
     sibling tools (pathway_enrichment, ontology_landscape, etc.).
     `not_found` in the envelope lists any provided IDs that did not match.
+
+    gene_count vs distinct_gene_count
+    ---------------------------------
+    For time-course experiments, top-level `gene_count` is the cumulative row
+    count across timepoints (= ``sum(time_point_totals)``). A 6-TP experiment
+    with 1697 genes per TP has ``gene_count == 10182``. Use
+    ``distinct_gene_count`` for detection-power / pathway-background reasoning
+    — that's the number of distinct genes with at least one measurement edge,
+    regardless of timepoint. For non-time-course experiments the two are
+    equal. Per-TP detail lives in ``timepoints[].gene_count``.
     """
     if summary:
         limit = 0

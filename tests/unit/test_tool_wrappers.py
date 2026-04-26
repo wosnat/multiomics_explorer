@@ -1969,6 +1969,7 @@ class TestListExperimentsWrapper:
         "table_scope": "all_detected_genes",
         "table_scope_detail": None,
         "gene_count": 1696,
+        "distinct_gene_count": 1696,
         "genes_by_status": {"significant_up": 245, "significant_down": 178, "not_significant": 1273},
     }
 
@@ -2277,6 +2278,20 @@ class TestListExperimentsWrapper:
         ):
             result = await tool_fns["list_experiments"](mock_ctx, summary=True)
         assert result.not_found == []
+
+    @pytest.mark.asyncio
+    async def test_distinct_gene_count_in_pydantic_result(self, tool_fns, mock_ctx):
+        """Per-experiment distinct_gene_count is a real Pydantic field
+        and flows through. B2 #2."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._make_detail(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        row = result.results[0]
+        assert row.distinct_gene_count == 1696
+        assert row.gene_count == 1696
+        assert row.distinct_gene_count <= row.gene_count
 
 
 # ---------------------------------------------------------------------------

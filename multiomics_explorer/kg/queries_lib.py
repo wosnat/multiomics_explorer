@@ -1079,9 +1079,10 @@ def build_list_experiments(
     RETURN keys (compact): experiment_id, experiment_name, publication_doi,
     organism_name, treatment_type, coculture_partner, omics_type,
     is_time_course, table_scope, table_scope_detail,
-    gene_count, significant_up_count, significant_down_count,
-    time_point_count, time_point_labels, time_point_orders, time_point_hours,
-    time_point_totals, time_point_significant_up, time_point_significant_down,
+    gene_count, distinct_gene_count, significant_up_count,
+    significant_down_count, time_point_count, time_point_labels,
+    time_point_orders, time_point_hours, time_point_totals,
+    time_point_significant_up, time_point_significant_down,
     clustering_analysis_count, cluster_types, growth_phases,
     time_point_growth_phases.
     RETURN keys (verbose): adds publication_title, treatment,
@@ -1136,6 +1137,7 @@ def build_list_experiments(
         "       e.table_scope AS table_scope,\n"
         "       e.table_scope_detail AS table_scope_detail,\n"
         "       e.gene_count AS gene_count,\n"
+        "       e.distinct_gene_count AS distinct_gene_count,\n"
         "       e.significant_up_count AS significant_up_count,\n"
         "       e.significant_down_count AS significant_down_count,\n"
         "       e.time_point_count AS time_point_count,\n"

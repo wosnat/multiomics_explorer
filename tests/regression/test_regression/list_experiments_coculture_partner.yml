@@ -6,6 +6,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   gene_count: 1849
@@ -41,6 +42,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  distinct_gene_count: 1714
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
     (RNASEQ)
@@ -77,6 +79,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  distinct_gene_count: 2267
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
     conditions (RNASEQ)
@@ -113,6 +116,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  distinct_gene_count: 2268
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
     conditions (RNASEQ)
@@ -149,6 +153,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii MIT1002
+  distinct_gene_count: 353
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
     Prochlorococcus NATL2A (RNASEQ)

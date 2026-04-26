@@ -1761,6 +1761,7 @@ class TestListExperiments:
             "table_scope": "gene_level",
             "table_scope_detail": "gene_level_all",
             "gene_count": 1696,
+            "distinct_gene_count": 1696,
             "significant_up_count": 245,
             "significant_down_count": 178,
             "time_point_count": 1,
@@ -2073,6 +2074,35 @@ class TestListExperiments:
         ]
         result = api.list_experiments(conn=mock_conn)
         assert result["not_found"] == []
+
+    def test_distinct_gene_count_passthrough(self, mock_conn):
+        """distinct_gene_count flows through api/ post-process unchanged
+        and the cumulative-vs-distinct invariant holds (B2 #2)."""
+        # Time-course mock: cumulative gene_count = 6 * 1697 = 10182,
+        # distinct_gene_count = 1697.
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [self._detail_row(
+                experiment_id="time_course_med4",
+                is_time_course="true",
+                gene_count=10182,
+                distinct_gene_count=1697,
+                time_point_count=6,
+                time_point_labels=["1h", "3h", "6h", "12h", "24h", "48h"],
+                time_point_orders=[1, 2, 3, 4, 5, 6],
+                time_point_hours=[1.0, 3.0, 6.0, 12.0, 24.0, 48.0],
+                time_point_totals=[1697, 1697, 1697, 1697, 1697, 1697],
+                time_point_significant_up=[10, 20, 30, 40, 50, 60],
+                time_point_significant_down=[5, 10, 15, 20, 25, 30],
+            )],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        row = result["results"][0]
+        assert row["distinct_gene_count"] == 1697
+        assert row["gene_count"] == 10182
+        # Invariant: distinct count never exceeds cumulative.
+        assert row["distinct_gene_count"] <= row["gene_count"]
 
 
 # ---------------------------------------------------------------------------

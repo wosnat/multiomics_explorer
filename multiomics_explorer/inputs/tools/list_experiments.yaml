@@ -48,6 +48,20 @@ examples:
   - title: Fetch metadata for a known experiment_id list
     call: list_experiments(experiment_ids=["10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq", "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"], verbose=True)
 
+  - title: "gene_count vs distinct_gene_count for time-course experiments"
+    steps: |
+      Each result row carries both `gene_count` (cumulative row count
+      across timepoints — equals `sum(time_point_totals)`) and
+      `distinct_gene_count` (unique genes measured, independent of
+      timepoint count). For non-time-course experiments they're equal.
+
+      For a time-course experiment measuring 1697 genes at 6 timepoints:
+        gene_count             = 10182   (= 6 × 1697)
+        distinct_gene_count    =  1697
+
+      Use `distinct_gene_count` for detection-power / pathway-background
+      sizing. Per-TP detail lives in `timepoints[].gene_count`.
+
 verbose_fields:
   - publication_title
   - treatment
@@ -75,5 +89,6 @@ mistakes:
   - "When summary=true, verbose and limit have no effect"
   - "Check table_scope before interpreting missing genes — some experiments only include significant genes"
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
+  - "For time-course experiments, top-level `gene_count` is the **cumulative row count across timepoints** (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`."
   - wrong: "list_experiments(publication='Biller 2018')"
     right: "list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])"

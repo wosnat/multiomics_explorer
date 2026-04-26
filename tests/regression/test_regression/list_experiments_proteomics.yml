@@ -6,6 +6,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -43,6 +44,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -80,6 +82,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: light +100 nM glucose vs light
     (control)'
@@ -117,6 +120,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: light +5 mM glucose vs light (control)'
   gene_count: 11
@@ -153,6 +157,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -190,6 +195,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -227,6 +233,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +100 nM glucose vs light
     (control)'
@@ -264,6 +271,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 16
@@ -300,6 +308,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -337,6 +346,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -374,6 +384,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: light +100 nM glucose vs light
     (control)'
@@ -411,6 +422,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: light +5 mM glucose vs light (control)'
   gene_count: 54
@@ -447,6 +459,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -484,6 +497,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -521,6 +535,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: light +100 nM glucose vs light
     (control)'
@@ -558,6 +573,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: light +5 mM glucose vs light
     (control)'
@@ -595,6 +611,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -632,6 +649,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -669,6 +687,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: light +100 nM glucose vs light
     (control)'
@@ -706,6 +725,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: light +5 mM glucose vs light
     (control)'
@@ -744,6 +764,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 2226
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -809,6 +830,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 2226
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -853,6 +875,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  distinct_gene_count: 85
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -891,6 +914,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  distinct_gene_count: 85
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -929,6 +953,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  distinct_gene_count: 85
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +100 nM glucose vs light
     (control)'
@@ -967,6 +992,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  distinct_gene_count: 85
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +5 mM glucose vs light
     (control)'
@@ -1005,6 +1031,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -1043,6 +1070,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -1081,6 +1109,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
     (control)'
@@ -1119,6 +1148,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 343
@@ -1156,6 +1186,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  distinct_gene_count: 198
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +100 nM glucose vs darkness
     (control)'
@@ -1194,6 +1225,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  distinct_gene_count: 198
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -1232,6 +1264,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  distinct_gene_count: 198
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +100 nM glucose vs light
     (control)'
@@ -1270,6 +1303,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  distinct_gene_count: 198
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +5 mM glucose vs light
     (control)'
@@ -1308,6 +1342,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  distinct_gene_count: 148
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +100 nM glucose vs
     darkness (control)'
@@ -1346,6 +1381,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  distinct_gene_count: 147
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -1384,6 +1420,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  distinct_gene_count: 147
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +100 nM glucose vs light
     (control)'
@@ -1422,6 +1459,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  distinct_gene_count: 148
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +5 mM glucose vs light
     (control)'
@@ -1460,6 +1498,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  distinct_gene_count: 487
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +100 nM glucose vs
     darkness (control)'
@@ -1498,6 +1537,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  distinct_gene_count: 488
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +5 mM glucose vs darkness
     (control)'
@@ -1536,6 +1576,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  distinct_gene_count: 488
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +100 nM glucose vs light
     (control)'
@@ -1574,6 +1615,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  distinct_gene_count: 488
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +5 mM glucose vs light
     (control)'
@@ -1612,6 +1654,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
@@ -1677,6 +1720,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
     (PROTEOMICS)
@@ -1729,6 +1773,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
   gene_count: 327
@@ -1765,6 +1810,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
   gene_count: 327
@@ -1801,6 +1847,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 327
@@ -1837,6 +1884,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 327
@@ -1873,6 +1921,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
   experiment_name: MIT9312 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
@@ -1901,6 +1950,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 38
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_mit9312_itraq
   experiment_name: 'MIT9312 proteomics: Pi replete vs Pi deplete (iTRAQ)'
   gene_count: 38
@@ -1938,6 +1988,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
   experiment_name: MIT9313 vesicle vs whole-cell proteome (label-free LC-MS/MS)
   gene_count: 0
@@ -1966,6 +2017,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 63
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_natl2a_itraq
   experiment_name: 'NATL2A proteomics: Pi replete vs Pi deplete (iTRAQ)'
   gene_count: 63
@@ -2003,6 +2055,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 930
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: darkness +100 nM glucose vs darkness (control)'
   gene_count: 930
@@ -2039,6 +2092,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 929
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: darkness +5 mM glucose vs darkness (control)'
   gene_count: 929
@@ -2075,6 +2129,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 930
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 930
@@ -2111,6 +2166,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 928
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 928
@@ -2147,6 +2203,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 389
   experiment_id: 10.1128/mSystems.00008-17_azaserine_ss120_proteomics
   experiment_name: 'SS120 proteomics: control vs azaserine (N-limitation proxy)'
   gene_count: 389
@@ -2183,6 +2240,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 34
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_ss120_itraq
   experiment_name: 'SS120 proteomics: Pi replete vs Pi deplete (iTRAQ)'
   gene_count: 34
@@ -2219,6 +2277,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus elongatus PCC 7942
+  distinct_gene_count: 228
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_proteomics
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
     putida cscRABY (proteomics)
@@ -2256,6 +2315,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: darkness +100 nM glucose vs darkness (control)'
   gene_count: 359
@@ -2292,6 +2352,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: darkness +5 mM glucose vs darkness (control)'
   gene_count: 359
@@ -2328,6 +2389,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 359
@@ -2364,6 +2426,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 359
@@ -2400,6 +2463,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: darkness +100 nM glucose vs darkness (control)'
   gene_count: 895
@@ -2436,6 +2500,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: darkness +5 mM glucose vs darkness (control)'
   gene_count: 895
@@ -2472,6 +2537,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 894
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 894
@@ -2508,6 +2574,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 895
@@ -2543,6 +2610,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Pseudomonas putida KT2440
+  distinct_gene_count: 527
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (proteomics)
@@ -2579,6 +2647,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Escherichia coli
+  distinct_gene_count: 34
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_proteomics
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
     (proteomics)
@@ -2617,6 +2686,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 167
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +100 nM glucose vs darkness (control)'
   gene_count: 167
@@ -2653,6 +2723,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 167
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +5 mM glucose vs darkness (control)'
   gene_count: 167
@@ -2689,6 +2760,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 167
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 167
@@ -2725,6 +2797,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  distinct_gene_count: 166
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 166
