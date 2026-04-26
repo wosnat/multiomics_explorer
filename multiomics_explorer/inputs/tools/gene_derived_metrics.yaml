@@ -1,0 +1,75 @@
+# Human-authored content for gene_derived_metrics about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Gene with all three DM kinds (boolean + categorical + numeric)
+    call: gene_derived_metrics(locus_tags=["PMM1714"])
+
+  - title: Mixed-input summary — surfaces by_metric, not_found, not_matched
+    call: gene_derived_metrics(locus_tags=["PMM1714", "PMM0001", "PMM_FAKE"], summary=True)
+
+  - title: Kind-filter routing — only boolean DM signal
+    call: gene_derived_metrics(locus_tags=["PMM1714"], value_kind="boolean")
+
+  - title: Compartment routing — only vesicle DMs for this gene
+    call: gene_derived_metrics(locus_tags=["PMM1714"], compartment="vesicle")
+
+  - title: DE → DM annotation chain
+    steps: |
+      Step 1: differential_expression_by_gene(experiment_ids=[...], significant_only=True)
+              → extract top hits' locus_tags
+
+      Step 2: gene_derived_metrics(locus_tags=top_hits)
+              → see which hits have rhythmicity flags / vesicle membership / damping rank
+
+      Step 3 (drill-down): genes_by_numeric_metric(
+                derived_metric_ids=["derived_metric:...:damping_ratio"],
+                bucket=["top_decile"])
+              → top-decile damped genes; intersect with DE top hits
+
+verbose_fields:
+  - metric_type
+  - field_description
+  - unit
+  - allowed_categories
+  - compartment
+  - treatment_type
+  - background_factors
+  - publication_doi
+  - treatment
+  - light_condition
+  - experimental_context
+  - p_value
+
+chaining:
+  - "gene_derived_metrics → genes_by_numeric_metric(derived_metric_ids, bucket=[...])"
+  - "differential_expression_by_gene → gene_derived_metrics(locus_tags)"
+  - "resolve_gene → gene_derived_metrics(locus_tags)"
+
+mistakes:
+  - >-
+    The `value` column is polymorphic — branch on each row's `value_kind`
+    (`'numeric'` → float, `'boolean'` → `'true'`/`'false'` string,
+    `'categorical'` → category string). Numeric rows additionally have
+    `rank_by_metric`, `metric_percentile`, `metric_bucket` populated when
+    their parent DM is rankable; null otherwise (e.g. `peak_time_protein_h`).
+  - >-
+    For numeric edge filtering (bucket / percentile / rank / value
+    thresholds), pivot to `genes_by_numeric_metric`. This tool intentionally
+    has no edge-level numeric filters — it is the gene-anchor surface only.
+  - >-
+    `not_matched` ≠ no DM signal at all. `not_matched` lists genes that
+    exist in the KG but have zero DM rows AFTER the applied filters. A
+    gene with only boolean DM signal called with `value_kind='numeric'`
+    lands in `not_matched`. Inspect rollup props
+    (`g.numeric_metric_count` etc. via `gene_overview`) for unfiltered
+    availability.
+  - >-
+    Single organism enforced. Mixing locus_tags from MED4 and NATL2A
+    raises `ValueError`. Call once per organism.
+  - wrong: gene_derived_metrics(locus_tags=["PMM1714"], min_value=1.0)
+    right: First call gene_derived_metrics(locus_tags=["PMM1714"]); then
+      pivot to genes_by_numeric_metric(derived_metric_ids=[...], min_value=1.0)
+  - wrong: gene_derived_metrics(locus_tags=[])
+    right: locus_tags must be non-empty (raises ValueError).
