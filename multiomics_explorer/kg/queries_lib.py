@@ -4761,3 +4761,293 @@ def build_gene_derived_metrics(
         f"{skip_clause}{limit_clause}"
     )
     return cypher, params
+
+
+def build_genes_by_numeric_metric_diagnostics(
+    *,
+    derived_metric_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    organism: str | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Pre-flight DM selection + gate-state probe for genes_by_numeric_metric.
+
+    api/ runs this BEFORE summary/detail so it can:
+      1. Validate every selected DM has `value_kind='numeric'` (raise on
+         mismatch).
+      2. Compute `excluded_derived_metrics` for rankable-/p-value-gated
+         filters that don't apply to some/all selected DMs.
+      3. Pass the surviving DM ID list to summary/detail.
+
+    Reuses `_list_derived_metrics_where` for DM-scoping conditions with a
+    hardcoded `value_kind='numeric'` predicate (this tool only drills into
+    numeric DMs; mismatches surface here as zero-row results that api/
+    converts to a ValueError listing offending IDs).
+
+    RETURN keys (one row per surviving DM, 8 columns):
+      derived_metric_id, metric_type, value_kind, name,
+      rankable, has_p_value, total_gene_count, organism_name.
+    """
+    conditions, params = _list_derived_metrics_where(
+        organism=organism,
+        metric_types=metric_types,
+        value_kind="numeric",
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        publication_doi=publication_doi,
+        experiment_ids=experiment_ids,
+        derived_metric_ids=derived_metric_ids,
+    )
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)\n"
+        f"{where_block}"
+        "RETURN dm.id AS derived_metric_id,\n"
+        "       dm.metric_type AS metric_type,\n"
+        "       dm.value_kind AS value_kind,\n"
+        "       dm.name AS name,\n"
+        "       dm.rankable = 'true' AS rankable,\n"
+        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       dm.total_gene_count AS total_gene_count,\n"
+        "       dm.organism_name AS organism_name\n"
+        "ORDER BY dm.id ASC"
+    )
+    return cypher, params
+
+
+def build_genes_by_numeric_metric_summary(
+    *,
+    derived_metric_ids: list[str],
+    locus_tags: list[str] | None = None,
+    min_value: float | None = None,
+    max_value: float | None = None,
+    min_percentile: float | None = None,
+    max_percentile: float | None = None,
+    bucket: list[str] | None = None,
+    max_rank: int | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for genes_by_numeric_metric.
+
+    Takes the gate-validated `derived_metric_ids` list (api/ has already
+    resolved metric_types and excluded incompatible DMs), plus all
+    edge-level filters that survived gate validation. Produces the
+    envelope rollups in one query.
+
+    `significant_only` / `max_adjusted_p_value` are NOT parameters —
+    they would never reach this builder against today's KG (api/ raises
+    on the all-fail branch). When a has_p_value DM lands, add the
+    corresponding edge-level WHERE conditions here.
+
+    RETURN keys: total_matching, total_derived_metrics, total_genes,
+    by_organism, by_compartment, by_publication, by_experiment,
+    by_metric, top_categories_raw, genes_per_metric_max,
+    genes_per_metric_median.
+    """
+    params: dict = {"derived_metric_ids": derived_metric_ids}
+
+    conditions: list[str] = ["dm.id IN $derived_metric_ids"]
+    if locus_tags is not None:
+        conditions.append("g.locus_tag IN $locus_tags")
+        params["locus_tags"] = locus_tags
+    if min_value is not None:
+        conditions.append("r.value >= $min_value")
+        params["min_value"] = min_value
+    if max_value is not None:
+        conditions.append("r.value <= $max_value")
+        params["max_value"] = max_value
+    if min_percentile is not None:
+        conditions.append("r.metric_percentile >= $min_percentile")
+        params["min_percentile"] = min_percentile
+    if max_percentile is not None:
+        conditions.append("r.metric_percentile <= $max_percentile")
+        params["max_percentile"] = max_percentile
+    if bucket is not None:
+        conditions.append("r.metric_bucket IN $bucket")
+        params["bucket"] = bucket
+    if max_rank is not None:
+        conditions.append("r.rank_by_metric <= $max_rank")
+        params["max_rank"] = max_rank
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)-[r:Derived_metric_quantifies_gene]->(g:Gene)\n"
+        f"{where_block}"
+        "WITH collect({\n"
+        "  dm_id: dm.id, dm_name: dm.name, mt: dm.metric_type, vk: dm.value_kind,\n"
+        "  org: g.organism_name, cat: coalesce(g.gene_category, 'Unknown'),\n"
+        "  comp: dm.compartment, doi: dm.publication_doi, exp: dm.experiment_id,\n"
+        "  lt: g.locus_tag,\n"
+        "  value: r.value, rank: r.rank_by_metric,\n"
+        "  dm_vmin: dm.value_min, dm_vq1: dm.value_q1, dm_vmed: dm.value_median,\n"
+        "  dm_vq3: dm.value_q3, dm_vmax: dm.value_max\n"
+        "}) AS rows\n"
+        "RETURN\n"
+        "  size(rows) AS total_matching,\n"
+        "  size(apoc.coll.toSet([x IN rows | x.dm_id])) AS total_derived_metrics,\n"
+        "  size(apoc.coll.toSet([x IN rows | x.lt])) AS total_genes,\n"
+        "  apoc.coll.frequencies([x IN rows | x.org]) AS by_organism,\n"
+        "  apoc.coll.frequencies([x IN rows | x.comp]) AS by_compartment,\n"
+        "  apoc.coll.frequencies([x IN rows | x.doi]) AS by_publication,\n"
+        "  apoc.coll.frequencies([x IN rows | x.exp]) AS by_experiment,\n"
+        "  apoc.coll.frequencies([x IN rows | x.cat]) AS top_categories_raw,\n"
+        "  [dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "    {derived_metric_id: dm_id,\n"
+        "     name:        head([x IN rows WHERE x.dm_id = dm_id | x.dm_name]),\n"
+        "     metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt]),\n"
+        "     value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk]),\n"
+        "     count:       size([x IN rows WHERE x.dm_id = dm_id]),\n"
+        "     value_min:    apoc.coll.min([x IN rows WHERE x.dm_id = dm_id | x.value]),\n"
+        "     value_max:    apoc.coll.max([x IN rows WHERE x.dm_id = dm_id | x.value]),\n"
+        "     value_median: apoc.coll.sort([x IN rows WHERE x.dm_id = dm_id | x.value])\n"
+        "                     [toInteger(size([x IN rows WHERE x.dm_id = dm_id]) / 2)],\n"
+        "     value_q1: apoc.coll.sort([x IN rows WHERE x.dm_id = dm_id | x.value])\n"
+        "                 [toInteger(size([x IN rows WHERE x.dm_id = dm_id]) * 0.25)],\n"
+        "     value_q3: apoc.coll.sort([x IN rows WHERE x.dm_id = dm_id | x.value])\n"
+        "                 [toInteger(size([x IN rows WHERE x.dm_id = dm_id]) * 0.75)],\n"
+        "     dm_value_min:    head([x IN rows WHERE x.dm_id = dm_id | x.dm_vmin]),\n"
+        "     dm_value_q1:     head([x IN rows WHERE x.dm_id = dm_id | x.dm_vq1]),\n"
+        "     dm_value_median: head([x IN rows WHERE x.dm_id = dm_id | x.dm_vmed]),\n"
+        "     dm_value_q3:     head([x IN rows WHERE x.dm_id = dm_id | x.dm_vq3]),\n"
+        "     dm_value_max:    head([x IN rows WHERE x.dm_id = dm_id | x.dm_vmax]),\n"
+        "     rank_min: apoc.coll.min(\n"
+        "       [x IN rows WHERE x.dm_id = dm_id AND x.rank IS NOT NULL | x.rank]),\n"
+        "     rank_max: apoc.coll.max(\n"
+        "       [x IN rows WHERE x.dm_id = dm_id AND x.rank IS NOT NULL | x.rank])\n"
+        "    }] AS by_metric,\n"
+        "  apoc.coll.max([dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "                 size([x IN rows WHERE x.dm_id = dm_id])]) AS genes_per_metric_max,\n"
+        "  toFloat(apoc.coll.sort([dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "                          size([x IN rows WHERE x.dm_id = dm_id])])\n"
+        "          [toInteger(size(apoc.coll.toSet([x IN rows | x.dm_id])) / 2)])\n"
+        "    AS genes_per_metric_median"
+    )
+    return cypher, params
+
+
+def build_genes_by_numeric_metric(
+    *,
+    derived_metric_ids: list[str],
+    locus_tags: list[str] | None = None,
+    min_value: float | None = None,
+    max_value: float | None = None,
+    min_percentile: float | None = None,
+    max_percentile: float | None = None,
+    bucket: list[str] | None = None,
+    max_rank: int | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for genes_by_numeric_metric.
+
+    Takes the gate-validated `derived_metric_ids` list. Same edge-level
+    filter set as the summary builder. Returns 14 compact columns
+    (per-row gene + DM identity + gate echoes + value extras), plus 13
+    verbose columns when verbose=True.
+
+    NOTE: adjusted_p_value, significant declared in Pydantic Result with
+    default=None, NOT in current Cypher RETURN — no edge in today's KG
+    carries those props (no DM has has_p_value='true') and including them
+    produces CyVer schema warnings. p_value (raw, edge-side) is also
+    deferred for the same reason. Re-add CASE-gated RETURN columns
+    (`CASE WHEN dm.has_p_value = 'true' THEN r.<col> ELSE null END`)
+    when a has_p_value='true' DM lands.
+
+    RETURN keys (compact, 14 columns): locus_tag, gene_name, product,
+    gene_category, organism_name, derived_metric_id, name, value_kind,
+    rankable, has_p_value, value, rank_by_metric, metric_percentile,
+    metric_bucket.
+
+    RETURN keys (verbose adds, 13 columns): metric_type,
+    field_description, unit, compartment, experiment_id, publication_doi,
+    treatment_type, background_factors, treatment, light_condition,
+    experimental_context, gene_function_description, gene_summary.
+    """
+    params: dict = {"derived_metric_ids": derived_metric_ids}
+
+    conditions: list[str] = ["dm.id IN $derived_metric_ids"]
+    if locus_tags is not None:
+        conditions.append("g.locus_tag IN $locus_tags")
+        params["locus_tags"] = locus_tags
+    if min_value is not None:
+        conditions.append("r.value >= $min_value")
+        params["min_value"] = min_value
+    if max_value is not None:
+        conditions.append("r.value <= $max_value")
+        params["max_value"] = max_value
+    if min_percentile is not None:
+        conditions.append("r.metric_percentile >= $min_percentile")
+        params["min_percentile"] = min_percentile
+    if max_percentile is not None:
+        conditions.append("r.metric_percentile <= $max_percentile")
+        params["max_percentile"] = max_percentile
+    if bucket is not None:
+        conditions.append("r.metric_bucket IN $bucket")
+        params["bucket"] = bucket
+    if max_rank is not None:
+        conditions.append("r.rank_by_metric <= $max_rank")
+        params["max_rank"] = max_rank
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       dm.metric_type AS metric_type"
+            ",\n       dm.field_description AS field_description"
+            ",\n       dm.unit AS unit"
+            ",\n       dm.compartment AS compartment"
+            ",\n       dm.experiment_id AS experiment_id"
+            ",\n       dm.publication_doi AS publication_doi"
+            ",\n       coalesce(dm.treatment_type, []) AS treatment_type"
+            ",\n       coalesce(dm.background_factors, []) AS background_factors"
+            ",\n       dm.treatment AS treatment"
+            ",\n       dm.light_condition AS light_condition"
+            ",\n       dm.experimental_context AS experimental_context"
+            ",\n       g.function_description AS gene_function_description"
+            ",\n       g.gene_summary AS gene_summary"
+        )
+
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)-[r:Derived_metric_quantifies_gene]->(g:Gene)\n"
+        f"{where_block}"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.gene_name AS gene_name,\n"
+        "       g.product AS product,\n"
+        "       g.gene_category AS gene_category,\n"
+        "       g.organism_name AS organism_name,\n"
+        "       dm.id AS derived_metric_id,\n"
+        "       dm.name AS name,\n"
+        "       dm.value_kind AS value_kind,\n"
+        "       dm.rankable = 'true' AS rankable,\n"
+        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       r.value AS value,\n"
+        "       CASE WHEN dm.rankable = 'true' THEN r.rank_by_metric ELSE null END AS rank_by_metric,\n"
+        "       CASE WHEN dm.rankable = 'true' THEN r.metric_percentile ELSE null END AS metric_percentile,\n"
+        "       CASE WHEN dm.rankable = 'true' THEN r.metric_bucket ELSE null END AS metric_bucket"
+        f"{verbose_cols}\n"
+        "ORDER BY r.rank_by_metric ASC, r.value DESC, dm.id ASC, g.locus_tag ASC"
+        f"{skip_clause}{limit_clause}"
+    )
+    return cypher, params

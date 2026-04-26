@@ -58,6 +58,9 @@ from multiomics_explorer.kg.queries_lib import (
     build_ontology_organism_gene_count,
     build_gene_derived_metrics_summary,
     build_gene_derived_metrics,
+    build_genes_by_numeric_metric_diagnostics,
+    build_genes_by_numeric_metric_summary,
+    build_genes_by_numeric_metric,
 )
 from multiomics_explorer.kg.queries_lib import _hierarchy_walk
 
@@ -4910,3 +4913,375 @@ class TestBuildListDerivedMetrics:
             "\n            THEN dm.allowed_categories ELSE null END AS allowed_categories"
             in cypher
         )
+
+
+class TestBuildGenesByNumericMetricDiagnostics:
+    """Unit tests for build_genes_by_numeric_metric_diagnostics (no Neo4j)."""
+
+    def test_metric_types_filter(self):
+        cypher, params = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"])
+        assert "dm.metric_type IN $metric_types" in cypher
+        assert params["metric_types"] == ["damping_ratio"]
+
+    def test_derived_metric_ids_filter(self):
+        cypher, params = build_genes_by_numeric_metric_diagnostics(
+            derived_metric_ids=["dm:abc"])
+        assert "dm.id IN $derived_metric_ids" in cypher
+        assert params["derived_metric_ids"] == ["dm:abc"]
+
+    def test_value_kind_hardcoded(self):
+        # Builder always emits the value_kind='numeric' guard
+        cypher, params = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"])
+        assert "dm.value_kind = $value_kind" in cypher
+        assert params["value_kind"] == "numeric"
+
+    def test_value_kind_hardcoded_with_no_other_filters(self):
+        # Even minimal call (no selection) carries the hardcoded guard
+        cypher, params = build_genes_by_numeric_metric_diagnostics()
+        assert "dm.value_kind = $value_kind" in cypher
+        assert params["value_kind"] == "numeric"
+
+    def test_returns_canonical_columns(self):
+        cypher, _ = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"])
+        for col in [
+            "dm.id AS derived_metric_id",
+            "dm.metric_type AS metric_type",
+            "dm.value_kind AS value_kind",
+            "dm.name AS name",
+            "dm.rankable = 'true' AS rankable",
+            "dm.has_p_value = 'true' AS has_p_value",
+            "dm.total_gene_count AS total_gene_count",
+            "dm.organism_name AS organism_name",
+        ]:
+            assert col in cypher, f"missing canonical column: {col}"
+
+    def test_organism_filter(self):
+        cypher, params = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"], organism="MED4")
+        assert ("ALL(word IN split(toLower($organism), ' ')"
+                " WHERE toLower(dm.organism_name) CONTAINS word)") in cypher
+        assert params["organism"] == "MED4"
+
+    def test_compartment_filter(self):
+        cypher, params = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"], compartment="vesicle")
+        assert "dm.compartment = $compartment" in cypher
+        assert params["compartment"] == "vesicle"
+
+    def test_treatment_type_lower(self):
+        cypher, params = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"], treatment_type=["DIEL"])
+        assert "ANY(t IN coalesce(dm.treatment_type, [])" in cypher
+        assert "toLower(t) IN $treatment_types_lower" in cypher
+        assert params["treatment_types_lower"] == ["diel"]
+
+    def test_background_factors_lower(self):
+        cypher, params = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"], background_factors=["AXENIC"])
+        assert "ANY(bf IN coalesce(dm.background_factors, [])" in cypher
+        assert "toLower(bf) IN $background_factors_lower" in cypher
+        assert params["background_factors_lower"] == ["axenic"]
+
+    def test_combined_filters(self):
+        cypher, _ = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"], organism="MED4",
+            compartment="vesicle")
+        # Conditions AND-joined
+        assert " AND " in cypher.split("RETURN")[0]
+        assert "dm.metric_type IN $metric_types" in cypher
+        assert "dm.value_kind = $value_kind" in cypher
+        assert "dm.compartment = $compartment" in cypher
+
+    def test_order_by(self):
+        cypher, _ = build_genes_by_numeric_metric_diagnostics(
+            metric_types=["damping_ratio"])
+        assert "ORDER BY dm.id ASC" in cypher
+
+
+class TestBuildGenesByNumericMetricSummary:
+    """Unit tests for build_genes_by_numeric_metric_summary (no Neo4j)."""
+
+    def test_minimal_call(self):
+        cypher, params = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        assert ("MATCH (dm:DerivedMetric)-[r:Derived_metric_quantifies_gene]->"
+                "(g:Gene)") in cypher
+        assert "WHERE dm.id IN $derived_metric_ids" in cypher
+        assert params == {"derived_metric_ids": ["dm:abc"]}
+
+    def test_locus_tags_filter(self):
+        cypher, params = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"], locus_tags=["PMM1545"])
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert params["locus_tags"] == ["PMM1545"]
+
+    def test_min_max_value(self):
+        cypher, params = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"], min_value=1.5, max_value=10.0)
+        assert "r.value >= $min_value" in cypher
+        assert "r.value <= $max_value" in cypher
+        assert params["min_value"] == 1.5
+        assert params["max_value"] == 10.0
+
+    def test_min_max_percentile(self):
+        cypher, params = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"],
+            min_percentile=90.0, max_percentile=99.0)
+        assert "r.metric_percentile >= $min_percentile" in cypher
+        assert "r.metric_percentile <= $max_percentile" in cypher
+        assert params["min_percentile"] == 90.0
+        assert params["max_percentile"] == 99.0
+
+    def test_bucket_filter(self):
+        cypher, params = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"], bucket=["top_decile"])
+        assert "r.metric_bucket IN $bucket" in cypher
+        assert params["bucket"] == ["top_decile"]
+
+    def test_max_rank(self):
+        cypher, params = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"], max_rank=5)
+        assert "r.rank_by_metric <= $max_rank" in cypher
+        assert params["max_rank"] == 5
+
+    def test_combined_edge_filters(self):
+        cypher, _ = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"],
+            min_value=1.0, bucket=["top_decile"], max_rank=10)
+        # All clauses AND-joined in a single WHERE
+        where_block = cypher.split("RETURN")[0]
+        assert "dm.id IN $derived_metric_ids" in where_block
+        assert "r.value >= $min_value" in where_block
+        assert "r.metric_bucket IN $bucket" in where_block
+        assert "r.rank_by_metric <= $max_rank" in where_block
+        assert " AND " in where_block
+
+    def test_returns_expected_envelope_columns(self):
+        cypher, _ = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        for col in [
+            "AS total_matching",
+            "AS total_derived_metrics",
+            "AS total_genes",
+            "AS by_organism",
+            "AS by_compartment",
+            "AS by_publication",
+            "AS by_experiment",
+            "AS by_metric",
+            "AS top_categories_raw",
+            "AS genes_per_metric_max",
+            "AS genes_per_metric_median",
+        ]:
+            assert col in cypher, f"missing envelope column: {col}"
+
+    def test_by_metric_shape(self):
+        cypher, _ = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        # Each by_metric entry has these 17 keys
+        for key in [
+            "derived_metric_id: dm_id",
+            "name:        head([x IN rows WHERE x.dm_id = dm_id | x.dm_name])",
+            "metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt])",
+            "value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk])",
+            "count:       size([x IN rows WHERE x.dm_id = dm_id])",
+            "value_min:",
+            "value_max:",
+            "value_median:",
+            "value_q1:",
+            "value_q3:",
+            "dm_value_min:",
+            "dm_value_q1:",
+            "dm_value_median:",
+            "dm_value_q3:",
+            "dm_value_max:",
+            "rank_min:",
+            "rank_max:",
+        ]:
+            assert key in cypher, f"missing by_metric key: {key}"
+
+    def test_dm_value_props_in_return(self):
+        # All 5 precomputed DM-distribution props read in WITH/collect
+        cypher, _ = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        for prop in ["dm.value_min", "dm.value_q1", "dm.value_median",
+                     "dm.value_q3", "dm.value_max"]:
+            assert prop in cypher, f"missing precomputed DM prop: {prop}"
+
+    def test_value_median_via_sorted_index(self):
+        cypher, _ = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        # Median computed via sort + size/2 index, not percentileCont
+        assert "apoc.coll.sort([x IN rows WHERE x.dm_id = dm_id | x.value])" in cypher
+        assert "percentileCont" not in cypher
+
+    def test_rank_min_max_filter_nulls(self):
+        cypher, _ = build_genes_by_numeric_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        # Rank list comprehension filters non-null ranks
+        assert ("[x IN rows WHERE x.dm_id = dm_id AND x.rank IS NOT NULL"
+                " | x.rank]") in cypher
+
+
+class TestBuildGenesByNumericMetric:
+    """Unit tests for build_genes_by_numeric_metric (detail)."""
+
+    def test_minimal_call(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"])
+        assert ("MATCH (dm:DerivedMetric)-[r:Derived_metric_quantifies_gene]->"
+                "(g:Gene)") in cypher
+        assert "WHERE dm.id IN $derived_metric_ids" in cypher
+        assert params == {"derived_metric_ids": ["dm:abc"]}
+
+    def test_returns_expected_compact_columns(self):
+        # Exactly 14 compact RETURN columns
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"])
+        for col in [
+            "g.locus_tag AS locus_tag",
+            "g.gene_name AS gene_name",
+            "g.product AS product",
+            "g.gene_category AS gene_category",
+            "g.organism_name AS organism_name",
+            "dm.id AS derived_metric_id",
+            "dm.name AS name",
+            "dm.value_kind AS value_kind",
+            "dm.rankable = 'true' AS rankable",
+            "dm.has_p_value = 'true' AS has_p_value",
+            "r.value AS value",
+            "AS rank_by_metric",
+            "AS metric_percentile",
+            "AS metric_bucket",
+        ]:
+            assert col in cypher, f"missing compact column: {col}"
+
+    def test_compact_omits_verbose_moved_fields(self):
+        # 6 fields verbose-moved; 2 forward-compat absent
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], verbose=False)
+        for col in [
+            "AS metric_type",
+            "AS compartment",
+            "AS experiment_id",
+            "AS publication_doi",
+            "AS treatment_type",
+            "AS background_factors",
+        ]:
+            assert col not in cypher, f"{col} should be verbose-only"
+        # Forward-compat (Pydantic-only)
+        assert "AS adjusted_p_value" not in cypher
+        assert "AS significant" not in cypher
+
+    def test_value_is_direct_r_access(self):
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"])
+        assert "r.value AS value" in cypher
+        assert "CASE dm.value_kind" not in cypher
+        assert "properties(r)" not in cypher
+
+    def test_rankable_case_gates(self):
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"])
+        for col in ["rank_by_metric", "metric_percentile", "metric_bucket"]:
+            assert (f"CASE WHEN dm.rankable = 'true' THEN r.{col}"
+                    f" ELSE null END AS {col}") in cypher
+
+    def test_has_p_value_columns_deferred(self):
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"])
+        assert "AS adjusted_p_value" not in cypher
+        assert "AS significant" not in cypher
+
+    def test_p_value_deferred_in_verbose(self):
+        # verbose RETURN does NOT contain r.p_value today
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], verbose=True)
+        assert "r.p_value" not in cypher
+
+    def test_rankable_has_p_value_coerced(self):
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"])
+        assert "dm.rankable = 'true' AS rankable" in cypher
+        assert "dm.has_p_value = 'true' AS has_p_value" in cypher
+
+    def test_locus_tags_filter(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], locus_tags=["PMM1545"])
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert params["locus_tags"] == ["PMM1545"]
+
+    def test_min_max_value(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], min_value=1.5, max_value=10.0)
+        assert "r.value >= $min_value" in cypher
+        assert "r.value <= $max_value" in cypher
+        assert params["min_value"] == 1.5
+        assert params["max_value"] == 10.0
+
+    def test_min_max_percentile(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"],
+            min_percentile=90.0, max_percentile=99.0)
+        assert "r.metric_percentile >= $min_percentile" in cypher
+        assert "r.metric_percentile <= $max_percentile" in cypher
+
+    def test_bucket_filter(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], bucket=["top_decile"])
+        assert "r.metric_bucket IN $bucket" in cypher
+        assert params["bucket"] == ["top_decile"]
+
+    def test_max_rank_filter(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], max_rank=5)
+        assert "r.rank_by_metric <= $max_rank" in cypher
+        assert params["max_rank"] == 5
+
+    def test_verbose_adds_columns(self):
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], verbose=True)
+        for col in [
+            "dm.metric_type AS metric_type",
+            "dm.field_description AS field_description",
+            "dm.unit AS unit",
+            "dm.compartment AS compartment",
+            "dm.experiment_id AS experiment_id",
+            "dm.publication_doi AS publication_doi",
+            "coalesce(dm.treatment_type, []) AS treatment_type",
+            "coalesce(dm.background_factors, []) AS background_factors",
+            "dm.treatment AS treatment",
+            "dm.light_condition AS light_condition",
+            "dm.experimental_context AS experimental_context",
+            "g.function_description AS gene_function_description",
+            "g.gene_summary AS gene_summary",
+        ]:
+            assert col in cypher, f"missing verbose column: {col}"
+
+    def test_order_by(self):
+        cypher, _ = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"])
+        assert ("ORDER BY r.rank_by_metric ASC, r.value DESC, "
+                "dm.id ASC, g.locus_tag ASC") in cypher
+
+    def test_limit_offset(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+        assert params["offset"] == 5
+
+    def test_no_skip_when_offset_zero(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"], limit=10)
+        assert "SKIP" not in cypher
+        assert "offset" not in params
+
+    def test_no_limit_when_none(self):
+        cypher, params = build_genes_by_numeric_metric(
+            derived_metric_ids=["dm:abc"])
+        assert "LIMIT" not in cypher
+        assert "limit" not in params
