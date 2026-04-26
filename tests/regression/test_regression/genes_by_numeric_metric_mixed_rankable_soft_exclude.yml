@@ -1,0 +1,515 @@
+by_compartment:
+- compartment: whole_cell
+  count: 32
+by_experiment:
+- count: 32
+  experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
+by_metric:
+- count: 32
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  dm_value_max: 25.3
+  dm_value_median: 4.9
+  dm_value_min: 0.2
+  dm_value_q1: 2.8
+  dm_value_q3: 7.8
+  metric_type: damping_ratio
+  name: Transcript:protein amplitude ratio
+  rank_max: 32
+  rank_min: 1
+  value_kind: numeric
+  value_max: 25.3
+  value_median: 15.9
+  value_min: 12.2
+  value_q1: 13.7
+  value_q3: 20.5
+by_organism:
+- count: 32
+  organism_name: Prochlorococcus MED4
+by_publication:
+- count: 32
+  publication_doi: 10.1371/journal.pone.0043432
+case_id: genes_by_numeric_metric_mixed_rankable_soft_exclude
+excluded_derived_metrics:
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h
+  has_p_value: false
+  metric_type: peak_time_protein_h
+  rankable: false
+  reason: non-rankable; `bucket` filter does not apply
+genes_per_metric_max: 32
+genes_per_metric_median: 32.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types:
+- peak_time_protein_h
+not_matched_organism: null
+offset: 0
+results:
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Replication and repair
+  gene_name: dnaN
+  has_p_value: false
+  locus_tag: PMM0001
+  metric_bucket: top_decile
+  metric_percentile: 92.926
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: DNA polymerase III, beta subunit
+  rank_by_metric: 23
+  rankable: true
+  value: 13.8
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Carbohydrate metabolism
+  gene_name: gltA
+  has_p_value: false
+  locus_tag: PMM0161
+  metric_bucket: top_decile
+  metric_percentile: 99.3569
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: citrate synthase
+  rank_by_metric: 3
+  rankable: true
+  value: 21.4
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Stress response and adaptation
+  gene_name: rplJ
+  has_p_value: false
+  locus_tag: PMM0202
+  metric_bucket: top_decile
+  metric_percentile: 94.2122
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: 50S ribosomal protein L10
+  rank_by_metric: 19
+  rankable: true
+  value: 14.6
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Carbohydrate metabolism
+  gene_name: eno
+  has_p_value: false
+  locus_tag: PMM0208
+  metric_bucket: top_decile
+  metric_percentile: 95.1768
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: enolase
+  rank_by_metric: 16
+  rankable: true
+  value: 15.9
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Nucleotide metabolism
+  gene_name: thyx
+  has_p_value: false
+  locus_tag: PMM0243
+  metric_bucket: top_decile
+  metric_percentile: 91.9614
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: thymidylate synthase
+  rank_by_metric: 26
+  rankable: true
+  value: 13.4
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Central intermediary metabolism
+  gene_name: amt1
+  has_p_value: false
+  locus_tag: PMM0263
+  metric_bucket: top_decile
+  metric_percentile: 92.283
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: ammonium transporter
+  rank_by_metric: 25
+  rankable: true
+  value: 13.6
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Photosynthesis
+  gene_name: psbE
+  has_p_value: false
+  locus_tag: PMM0297
+  metric_bucket: top_decile
+  metric_percentile: 92.6045
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: cytochrome b559, alpha subunit
+  rank_by_metric: 24
+  rankable: true
+  value: 13.7
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Cell cycle and division
+  gene_name: minE
+  has_p_value: false
+  locus_tag: PMM0320
+  metric_bucket: top_decile
+  metric_percentile: 97.1061
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: cell division topological specificity factor MinE
+  rank_by_metric: 10
+  rankable: true
+  value: 19.2
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM0364
+  metric_bucket: top_decile
+  metric_percentile: 96.7846
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein (DUF3303)
+  rank_by_metric: 11
+  rankable: true
+  value: 18.5
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Post-translational modification
+  gene_name: phb
+  has_p_value: false
+  locus_tag: PMM0482
+  metric_bucket: top_decile
+  metric_percentile: 93.8907
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: prohibitin-like protein
+  rank_by_metric: 20
+  rankable: true
+  value: 14.1
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Photosynthesis
+  gene_name: rbcL
+  has_p_value: false
+  locus_tag: PMM0550
+  metric_bucket: top_decile
+  metric_percentile: 95.4984
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: ribulose bisphosphate carboxylase, large subunit
+  rank_by_metric: 15
+  rankable: true
+  value: 16.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Photosynthesis
+  gene_name: csoS2
+  has_p_value: false
+  locus_tag: PMM0552
+  metric_bucket: top_decile
+  metric_percentile: 91.6399
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: carboxysome shell protein CsoS2
+  rank_by_metric: 27
+  rankable: true
+  value: 13.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM0732
+  metric_bucket: top_decile
+  metric_percentile: 96.1415
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: translation initiation factor IF-2, N-terminal domain-containing protein
+  rank_by_metric: 13
+  rankable: true
+  value: 17.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Translation
+  gene_name: rpsB
+  has_p_value: false
+  locus_tag: PMM0753
+  metric_bucket: top_decile
+  metric_percentile: 94.5338
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: 30S ribosomal protein S2
+  rank_by_metric: 18
+  rankable: true
+  value: 14.8
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Photosynthesis
+  gene_name: fbp-sbp
+  has_p_value: false
+  locus_tag: PMM0767
+  metric_bucket: top_decile
+  metric_percentile: 98.3923
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: bifunctional fructose-1,6-biphosphatase/sedoheptulose1,7-biphosphate phosphatase
+  rank_by_metric: 6
+  rankable: true
+  value: 21.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Nucleotide metabolism
+  gene_name: purQ
+  has_p_value: false
+  locus_tag: PMM0780
+  metric_bucket: top_decile
+  metric_percentile: 98.0707
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: phosphoribosylformylglycinamidine (FGAM) synthase, glutamine amidotransferase
+    domain
+  rank_by_metric: 7
+  rankable: true
+  value: 20.8
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Carbohydrate metabolism
+  gene_name: prkB
+  has_p_value: false
+  locus_tag: PMM0785
+  metric_bucket: top_decile
+  metric_percentile: 94.8553
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: phosphoribulokinase
+  rank_by_metric: 17
+  rankable: true
+  value: 15.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Translation
+  gene_name: metG
+  has_p_value: false
+  locus_tag: PMM0867
+  metric_bucket: top_decile
+  metric_percentile: 97.4277
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: methionine--tRNA ligase
+  rank_by_metric: 9
+  rankable: true
+  value: 19.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Translation
+  gene_name: pheT
+  has_p_value: false
+  locus_tag: PMM0871
+  metric_bucket: top_decile
+  metric_percentile: 99.0354
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: phenylalanine--tRNA ligase, beta subunit
+  rank_by_metric: 4
+  rankable: true
+  value: 21.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Coenzyme metabolism
+  gene_name: dxs
+  has_p_value: false
+  locus_tag: PMM0907
+  metric_bucket: top_decile
+  metric_percentile: 93.5691
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: 1-deoxy-D-xylulose-5-phosphate synthase
+  rank_by_metric: 21
+  rankable: true
+  value: 13.9
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Carbohydrate metabolism
+  gene_name: phdB
+  has_p_value: false
+  locus_tag: PMM0930
+  metric_bucket: top_decile
+  metric_percentile: 99.6785
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: pyruvate dehydrogenase E1 component beta subunit
+  rank_by_metric: 2
+  rankable: true
+  value: 23.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Transcription
+  gene_name: pnp
+  has_p_value: false
+  locus_tag: PMM1191
+  metric_bucket: top_decile
+  metric_percentile: 97.7492
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: polyribonucleotide nucleotidyltransferase
+  rank_by_metric: 8
+  rankable: true
+  value: 20.5
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1232
+  metric_bucket: top_decile
+  metric_percentile: 91.3183
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: S-adenosyl-L-methionine-dependent methyltransferase
+  rank_by_metric: 28
+  rankable: true
+  value: 13.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Regulatory functions
+  gene_name: hupB
+  has_p_value: false
+  locus_tag: PMM1321
+  metric_bucket: top_decile
+  metric_percentile: 93.2476
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: DNA-binding protein HU-beta
+  rank_by_metric: 22
+  rankable: true
+  value: 13.9
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Cell wall and membrane
+  gene_name: bamA
+  has_p_value: false
+  locus_tag: PMM1338
+  metric_bucket: top_decile
+  metric_percentile: 90.6752
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: outer membrane protein insertion porin family
+  rank_by_metric: 30
+  rankable: true
+  value: 13.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Translation
+  gene_name: fusA
+  has_p_value: false
+  locus_tag: PMM1509
+  metric_bucket: top_decile
+  metric_percentile: 90.3537
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: elongation factor G
+  rank_by_metric: 31
+  rankable: true
+  value: 12.7
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Transcription
+  gene_name: rpoA
+  has_p_value: false
+  locus_tag: PMM1535
+  metric_bucket: top_decile
+  metric_percentile: 95.8199
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: DNA-directed RNA polymerase, alpha subunit
+  rank_by_metric: 14
+  rankable: true
+  value: 16.5
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Translation
+  gene_name: rpsH
+  has_p_value: false
+  locus_tag: PMM1545
+  metric_bucket: top_decile
+  metric_percentile: 100.0
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: 30S ribosomal protein S8
+  rank_by_metric: 1
+  rankable: true
+  value: 25.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Translation
+  gene_name: rpsQ
+  has_p_value: false
+  locus_tag: PMM1549
+  metric_bucket: top_decile
+  metric_percentile: 96.463
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: 30S ribosomal protein S17
+  rank_by_metric: 12
+  rankable: true
+  value: 17.4
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Photosynthesis
+  gene_name: psaC
+  has_p_value: false
+  locus_tag: PMM1607
+  metric_bucket: top_decile
+  metric_percentile: 90.0322
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: photosystem I iron-sulfur center subunit VII PsaC
+  rank_by_metric: 32
+  rankable: true
+  value: 12.2
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Carbohydrate metabolism
+  gene_name: tktA
+  has_p_value: false
+  locus_tag: PMM1610
+  metric_bucket: top_decile
+  metric_percentile: 98.7138
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: transketolase
+  rank_by_metric: 5
+  rankable: true
+  value: 21.3
+  value_kind: numeric
+- derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  gene_category: Stress response and adaptation
+  gene_name: sqdB
+  has_p_value: false
+  locus_tag: PMM1665
+  metric_bucket: top_decile
+  metric_percentile: 90.9968
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  product: UDP-sulfoquinovose synthase
+  rank_by_metric: 29
+  rankable: true
+  value: 13.3
+  value_kind: numeric
+returned: 32
+row_count: 32
+top_categories:
+- count: 6
+  gene_category: Translation
+- count: 5
+  gene_category: Carbohydrate metabolism
+- count: 5
+  gene_category: Photosynthesis
+- count: 3
+  gene_category: Unknown
+- count: 2
+  gene_category: Stress response and adaptation
+total_derived_metrics: 1
+total_genes: 32
+total_matching: 32
+truncated: false
+warnings:
+- 1 non-rankable DM(s) excluded by `bucket` filter (peak_time_protein_h)

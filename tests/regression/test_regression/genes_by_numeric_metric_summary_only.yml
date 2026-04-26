@@ -1,0 +1,59 @@
+by_compartment:
+- compartment: whole_cell
+  count: 312
+by_experiment:
+- count: 312
+  experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
+by_metric:
+- count: 312
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  dm_value_max: 25.3
+  dm_value_median: 4.9
+  dm_value_min: 0.2
+  dm_value_q1: 2.8
+  dm_value_q3: 7.8
+  metric_type: damping_ratio
+  name: Transcript:protein amplitude ratio
+  rank_max: 312
+  rank_min: 1
+  value_kind: numeric
+  value_max: 25.3
+  value_median: 4.9
+  value_min: 0.2
+  value_q1: 2.8
+  value_q3: 7.8
+by_organism:
+- count: 312
+  organism_name: Prochlorococcus MED4
+by_publication:
+- count: 312
+  publication_doi: 10.1371/journal.pone.0043432
+case_id: genes_by_numeric_metric_summary_only
+excluded_derived_metrics: []
+genes_per_metric_max: 312
+genes_per_metric_median: 312.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types: []
+not_matched_organism: null
+offset: 0
+results: []
+returned: 0
+row_count: 0
+top_categories:
+- count: 47
+  gene_category: Translation
+- count: 30
+  gene_category: Amino acid metabolism
+- count: 30
+  gene_category: Unknown
+- count: 29
+  gene_category: Photosynthesis
+- count: 28
+  gene_category: Carbohydrate metabolism
+total_derived_metrics: 1
+total_genes: 312
+total_matching: 312
+truncated: true
+warnings: []

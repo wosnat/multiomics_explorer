@@ -1,0 +1,4394 @@
+by_compartment:
+- compartment: vesicle
+  count: 308
+by_experiment:
+- count: 156
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+- count: 152
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+by_metric:
+- count: 156
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  dm_value_max: 2.98e-06
+  dm_value_median: 1.87e-08
+  dm_value_min: 2.24e-09
+  dm_value_q1: 7.48e-09
+  dm_value_q3: 5.125e-08
+  metric_type: cell_abundance_biovolume_normalized
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  rank_max: 260
+  rank_min: 105
+  value_kind: numeric
+  value_max: 1.17e-07
+  value_median: 7.11e-08
+  value_min: 5.16e-08
+  value_q1: 5.99e-08
+  value_q3: 8.98e-08
+- count: 152
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  dm_value_max: 8.02e-07
+  dm_value_median: 7.67e-09
+  dm_value_min: 8.85e-10
+  dm_value_q1: 3.25e-09
+  dm_value_q3: 2.01e-08
+  metric_type: cell_abundance_biovolume_normalized
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  rank_max: 254
+  rank_min: 103
+  value_kind: numeric
+  value_max: 4.6e-08
+  value_median: 2.92e-08
+  value_min: 2.01e-08
+  value_q1: 2.42e-08
+  value_q3: 3.45e-08
+by_organism:
+- count: 156
+  organism_name: Prochlorococcus MIT9313
+- count: 152
+  organism_name: Prochlorococcus MIT9312
+by_publication:
+- count: 308
+  publication_doi: 10.1111/1462-2920.15834
+case_id: genes_by_numeric_metric_cross_organism
+excluded_derived_metrics: []
+genes_per_metric_max: 156
+genes_per_metric_median: 156.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types: []
+not_matched_organism: null
+offset: 0
+results:
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0008
+  metric_bucket: top_quartile
+  metric_percentile: 76.4933
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved membrane protein
+  rank_by_metric: 245
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: grpE
+  has_p_value: false
+  locus_tag: PMT0021
+  metric_bucket: top_quartile
+  metric_percentile: 82.1773
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: chaperone protein GrpE
+  rank_by_metric: 186
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: dnaJ1
+  has_p_value: false
+  locus_tag: PMT0022
+  metric_bucket: top_quartile
+  metric_percentile: 84.7784
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: DnaJ type I chaperone protein
+  rank_by_metric: 159
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0030
+  metric_bucket: top_quartile
+  metric_percentile: 84.5857
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: cyclophilin type peptidyl-prolyl cis-trans isomerase/CLD family protein
+  rank_by_metric: 161
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: PSTA
+  has_p_value: false
+  locus_tag: PMT0043
+  metric_bucket: top_quartile
+  metric_percentile: 88.921
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 3-phosphoserine transaminase
+  rank_by_metric: 116
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: sqdB
+  has_p_value: false
+  locus_tag: PMT0050
+  metric_bucket: top_quartile
+  metric_percentile: 85.5491
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: UDP-sulfoquinovose synthase
+  rank_by_metric: 151
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cellular processes
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0077
+  metric_bucket: top_quartile
+  metric_percentile: 79.4798
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: type I secretion system ABC transporter, HlyB family
+  rank_by_metric: 214
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: secA
+  has_p_value: false
+  locus_tag: PMT0083
+  metric_bucket: top_quartile
+  metric_percentile: 88.2466
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: preprotein translocase SecA subunit
+  rank_by_metric: 123
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: legI
+  has_p_value: false
+  locus_tag: PMT0106
+  metric_bucket: top_quartile
+  metric_percentile: 82.948
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: N,N^-diacetyllegionaminate synthase
+  rank_by_metric: 178
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: infC
+  has_p_value: false
+  locus_tag: PMT0119
+  metric_bucket: top_quartile
+  metric_percentile: 81.1175
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: translation initiation factor IF-3
+  rank_by_metric: 197
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Replication and repair
+  gene_name: gyrB
+  has_p_value: false
+  locus_tag: PMT0121
+  metric_bucket: top_quartile
+  metric_percentile: 79.6724
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: DNA gyrase, B subunit
+  rank_by_metric: 212
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: gpx
+  has_p_value: false
+  locus_tag: PMT0125
+  metric_bucket: top_quartile
+  metric_percentile: 86.6089
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: glutathione peroxidase
+  rank_by_metric: 140
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: mreB
+  has_p_value: false
+  locus_tag: PMT0142
+  metric_bucket: top_quartile
+  metric_percentile: 76.2042
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: rod shape-determining protein MreB
+  rank_by_metric: 248
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0148
+  metric_bucket: top_quartile
+  metric_percentile: 85.2601
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rank_by_metric: 154
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: thiC
+  has_p_value: false
+  locus_tag: PMT0160
+  metric_bucket: top_quartile
+  metric_percentile: 78.6127
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: thiamine biosynthesis protein
+  rank_by_metric: 223
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: ccr1
+  has_p_value: false
+  locus_tag: PMT0173
+  metric_bucket: top_quartile
+  metric_percentile: 80.1541
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: cyanobacterial cold resistance protein
+  rank_by_metric: 207
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: SynDsbAB
+  has_p_value: false
+  locus_tag: PMT0176
+  metric_bucket: top_quartile
+  metric_percentile: 80.7322
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: disulfide bond forming protein
+  rank_by_metric: 201
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0190
+  metric_bucket: top_quartile
+  metric_percentile: 82.8516
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: LysM domain-containing protein
+  rank_by_metric: 179
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: pdhC
+  has_p_value: false
+  locus_tag: PMT0220
+  metric_bucket: top_quartile
+  metric_percentile: 86.2235
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
+  rank_by_metric: 144
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cellular processes
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0238
+  metric_bucket: top_quartile
+  metric_percentile: 78.131
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: bacteriocin-type signal sequence
+  rank_by_metric: 228
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0285
+  metric_bucket: top_quartile
+  metric_percentile: 82.3699
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: possible peptidase
+  rank_by_metric: 184
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: clpP4
+  has_p_value: false
+  locus_tag: PMT0315
+  metric_bucket: top_quartile
+  metric_percentile: 80.0578
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ATP-dependent Clp protease, protease subunit
+  rank_by_metric: 208
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: lpdA
+  has_p_value: false
+  locus_tag: PMT0335
+  metric_bucket: top_quartile
+  metric_percentile: 88.7283
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: dihydrolipoamide dehydrogenase
+  rank_by_metric: 118
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: sodN
+  has_p_value: false
+  locus_tag: PMT0340
+  metric_bucket: top_quartile
+  metric_percentile: 81.0212
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: superoxide dismutase [Ni]
+  rank_by_metric: 198
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: pdhA
+  has_p_value: false
+  locus_tag: PMT0347
+  metric_bucket: top_quartile
+  metric_percentile: 76.3969
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: pyruvate dehydrogenase E1 component complex alpha subunit
+  rank_by_metric: 246
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: ffh
+  has_p_value: false
+  locus_tag: PMT0349
+  metric_bucket: top_quartile
+  metric_percentile: 81.4066
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: signal recognition particle protein
+  rank_by_metric: 194
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsP
+  has_p_value: false
+  locus_tag: PMT0350
+  metric_bucket: top_quartile
+  metric_percentile: 88.1503
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S16
+  rank_by_metric: 124
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: prxQ
+  has_p_value: false
+  locus_tag: PMT0387
+  metric_bucket: top_quartile
+  metric_percentile: 76.0116
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 2-Cys peroxiredoxin
+  rank_by_metric: 250
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: acs
+  has_p_value: false
+  locus_tag: PMT0389
+  metric_bucket: top_quartile
+  metric_percentile: 89.4027
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: acetate--CoA ligase
+  rank_by_metric: 111
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: comB
+  has_p_value: false
+  locus_tag: PMT0396
+  metric_bucket: top_quartile
+  metric_percentile: 78.5164
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 2-phosphosulpholactate phosphatase
+  rank_by_metric: 224
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: thrS
+  has_p_value: false
+  locus_tag: PMT0424
+  metric_bucket: top_quartile
+  metric_percentile: 82.0809
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: threonyl-tRNA synthetase
+  rank_by_metric: 187
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: glgB
+  has_p_value: false
+  locus_tag: PMT0444
+  metric_bucket: top_quartile
+  metric_percentile: 79.9615
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 1,4-alpha-glucan branching enzyme
+  rank_by_metric: 209
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: hemE
+  has_p_value: false
+  locus_tag: PMT0445
+  metric_bucket: top_quartile
+  metric_percentile: 83.7187
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: uroporphyrinogen decarboxylase
+  rank_by_metric: 170
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: ftn
+  has_p_value: false
+  locus_tag: PMT0495
+  metric_bucket: top_quartile
+  metric_percentile: 80.6358
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ferritin
+  rank_by_metric: 202
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: ftn
+  has_p_value: false
+  locus_tag: PMT0499
+  metric_bucket: top_quartile
+  metric_percentile: 89.5954
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ferritin
+  rank_by_metric: 109
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: ycf39
+  has_p_value: false
+  locus_tag: PMT0506
+  metric_bucket: top_quartile
+  metric_percentile: 75.2408
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: NAD(P)-binding domain-containing protein
+  rank_by_metric: 258
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Energy production
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0512
+  metric_bucket: top_quartile
+  metric_percentile: 75.8189
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: glutaredoxin family protein
+  rank_by_metric: 252
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cellular processes
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0519
+  metric_bucket: top_quartile
+  metric_percentile: 83.6224
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rank_by_metric: 171
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0527
+  metric_bucket: top_quartile
+  metric_percentile: 81.9846
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein (DUF3727)
+  rank_by_metric: 188
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0557
+  metric_bucket: top_quartile
+  metric_percentile: 83.9114
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: pentapeptide repeats family protein
+  rank_by_metric: 168
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: rpe
+  has_p_value: false
+  locus_tag: PMT0569
+  metric_bucket: top_quartile
+  metric_percentile: 77.7457
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ribulose-phosphate 3-epimerase
+  rank_by_metric: 232
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsB
+  has_p_value: false
+  locus_tag: PMT0584
+  metric_bucket: top_quartile
+  metric_percentile: 80.4432
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S2
+  rank_by_metric: 204
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: spt
+  has_p_value: false
+  locus_tag: PMT0600
+  metric_bucket: top_quartile
+  metric_percentile: 77.3603
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: alanine--glyoxylate aminotransferase
+  rank_by_metric: 236
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: secF
+  has_p_value: false
+  locus_tag: PMT0616
+  metric_bucket: top_quartile
+  metric_percentile: 76.7823
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: Preprotein translocase SecF subunit
+  rank_by_metric: 242
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: secD
+  has_p_value: false
+  locus_tag: PMT0617
+  metric_bucket: top_quartile
+  metric_percentile: 87.1869
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: preprotein translocase SecD subunit
+  rank_by_metric: 134
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0626
+  metric_bucket: top_quartile
+  metric_percentile: 85.1638
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: pentapeptide repeats family protein
+  rank_by_metric: 155
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: clpP1
+  has_p_value: false
+  locus_tag: PMT0676
+  metric_bucket: top_quartile
+  metric_percentile: 87.4759
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ATP-dependent Clp protease, protease subunit
+  rank_by_metric: 131
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: pyk
+  has_p_value: false
+  locus_tag: PMT0679
+  metric_bucket: top_quartile
+  metric_percentile: 88.343
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: pyruvate kinase
+  rank_by_metric: 122
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: dxs
+  has_p_value: false
+  locus_tag: PMT0685
+  metric_bucket: top_quartile
+  metric_percentile: 86.5125
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 1-deoxy-D-xylulose-5-phosphate synthase
+  rank_by_metric: 141
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: psaK
+  has_p_value: false
+  locus_tag: PMT0687
+  metric_bucket: top_quartile
+  metric_percentile: 85.4528
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: photosystem I reaction center subunit X
+  rank_by_metric: 152
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: rpmB
+  has_p_value: false
+  locus_tag: PMT0695
+  metric_bucket: top_quartile
+  metric_percentile: 78.42
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L28
+  rank_by_metric: 225
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0723
+  metric_bucket: top_quartile
+  metric_percentile: 75.1445
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: flavin reductase-like domain containing protein
+  rank_by_metric: 259
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: metH
+  has_p_value: false
+  locus_tag: PMT0729
+  metric_bucket: top_quartile
+  metric_percentile: 79.8651
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: methionine synthase
+  rank_by_metric: 210
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: psb32
+  has_p_value: false
+  locus_tag: PMT0747
+  metric_bucket: top_quartile
+  metric_percentile: 77.6493
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: integral membrane protein involved in the photoprotection of photosystem
+    II
+  rank_by_metric: 233
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: vacB
+  has_p_value: false
+  locus_tag: PMT0766
+  metric_bucket: top_quartile
+  metric_percentile: 87.5723
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: exoribonuclease R
+  rank_by_metric: 130
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: pmbA
+  has_p_value: false
+  locus_tag: PMT0771
+  metric_bucket: top_quartile
+  metric_percentile: 85.3565
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: possible modulator of DNA gyrase
+  rank_by_metric: 153
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: gcpE
+  has_p_value: false
+  locus_tag: PMT0777
+  metric_bucket: top_quartile
+  metric_percentile: 83.0443
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: (E)-4-hydroxy-3-methylbut-2-enyl diphosphate synthase
+  rank_by_metric: 177
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: chlH
+  has_p_value: false
+  locus_tag: PMT0815
+  metric_bucket: top_quartile
+  metric_percentile: 84.9711
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: protoporphyrin IX Mg-chelatase, subunit ChlH
+  rank_by_metric: 157
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: tpiA
+  has_p_value: false
+  locus_tag: PMT0817
+  metric_bucket: top_quartile
+  metric_percentile: 84.6821
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: triosephosphate isomerase
+  rank_by_metric: 160
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0821
+  metric_bucket: top_quartile
+  metric_percentile: 78.9017
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein (DUF3386)
+  rank_by_metric: 220
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: carB
+  has_p_value: false
+  locus_tag: PMT0822
+  metric_bucket: top_quartile
+  metric_percentile: 80.5395
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: carbamoyl-phosphate synthase, large subunit
+  rank_by_metric: 203
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: hflC
+  has_p_value: false
+  locus_tag: PMT0908
+  metric_bucket: top_quartile
+  metric_percentile: 89.499
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: prohibitin-like protein
+  rank_by_metric: 110
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0956
+  metric_bucket: top_quartile
+  metric_percentile: 88.5356
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: possible kinesin motor domain
+  rank_by_metric: 120
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1045
+  metric_bucket: top_quartile
+  metric_percentile: 87.9576
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: possible Glyceraldehyde 3-phosphate dehydrogenase
+  rank_by_metric: 126
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1093
+  metric_bucket: top_quartile
+  metric_percentile: 87.2832
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein
+  rank_by_metric: 133
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cellular processes
+  gene_name: opcA
+  has_p_value: false
+  locus_tag: PMT1103
+  metric_bucket: top_quartile
+  metric_percentile: 75.7225
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: glucose 6-phosphate dehydrogenase assembly protein
+  rank_by_metric: 253
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell cycle and division
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1125
+  metric_bucket: top_quartile
+  metric_percentile: 80.9249
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rank_by_metric: 199
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: guaB
+  has_p_value: false
+  locus_tag: PMT1126
+  metric_bucket: top_quartile
+  metric_percentile: 89.9807
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: inositol-5-monophosphate dehydrogenase
+  rank_by_metric: 105
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: thrA
+  has_p_value: false
+  locus_tag: PMT1143
+  metric_bucket: top_quartile
+  metric_percentile: 78.0347
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: homoserine dehydrogenase
+  rank_by_metric: 229
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: acrA
+  has_p_value: false
+  locus_tag: PMT1156
+  metric_bucket: top_quartile
+  metric_percentile: 88.632
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: RND efflux pump, MFP subunit, HlyD family
+  rank_by_metric: 119
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1186
+  metric_bucket: top_quartile
+  metric_percentile: 84.4894
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: type-II peroxiredoxin
+  rank_by_metric: 162
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: htrA
+  has_p_value: false
+  locus_tag: PMT1188
+  metric_bucket: top_quartile
+  metric_percentile: 84.3931
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: serine protease
+  rank_by_metric: 163
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: rbcS
+  has_p_value: false
+  locus_tag: PMT1204
+  metric_bucket: top_quartile
+  metric_percentile: 81.5992
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ribulose bisphosphate carboxylase, small subunit
+  rank_by_metric: 192
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsA2
+  has_p_value: false
+  locus_tag: PMT1233
+  metric_bucket: top_quartile
+  metric_percentile: 82.5626
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S1
+  rank_by_metric: 182
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: frr
+  has_p_value: false
+  locus_tag: PMT1245
+  metric_bucket: top_quartile
+  metric_percentile: 79.3834
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ribosome recycling factor
+  rank_by_metric: 215
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: talA
+  has_p_value: false
+  locus_tag: PMT1248
+  metric_bucket: top_quartile
+  metric_percentile: 85.6455
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: transaldolase
+  rank_by_metric: 150
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: hemC
+  has_p_value: false
+  locus_tag: PMT1273
+  metric_bucket: top_quartile
+  metric_percentile: 75.0482
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: porphobilinogen deaminase
+  rank_by_metric: 260
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplS
+  has_p_value: false
+  locus_tag: PMT1306
+  metric_bucket: top_quartile
+  metric_percentile: 81.8882
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L19
+  rank_by_metric: 189
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Lipid metabolism
+  gene_name: fabG
+  has_p_value: false
+  locus_tag: PMT1333
+  metric_bucket: top_quartile
+  metric_percentile: 80.3468
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: beta-ketoacyl-(acyl-carrier-protein) reductase (KR)
+  rank_by_metric: 205
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: ALB3
+  has_p_value: false
+  locus_tag: PMT1371
+  metric_bucket: top_quartile
+  metric_percentile: 84.0077
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: photosystem II assembly factor
+  rank_by_metric: 167
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: lpxA
+  has_p_value: false
+  locus_tag: PMT1410
+  metric_bucket: top_quartile
+  metric_percentile: 76.6859
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: acyl-[acyl-carrier-protein]-UDP-N- acetylglucosamine O-acyltransferase
+  rank_by_metric: 243
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplU
+  has_p_value: false
+  locus_tag: PMT1420
+  metric_bucket: top_quartile
+  metric_percentile: 86.8015
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L21
+  rank_by_metric: 138
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: rpoZ
+  has_p_value: false
+  locus_tag: PMT1442
+  metric_bucket: top_quartile
+  metric_percentile: 77.264
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: DNA-directed RNA polymerase omega subunit
+  rank_by_metric: 237
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: ycf65
+  has_p_value: false
+  locus_tag: PMT1454
+  metric_bucket: top_quartile
+  metric_percentile: 78.3237
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ribosomal protein Ycf65
+  rank_by_metric: 226
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: atpF
+  has_p_value: false
+  locus_tag: PMT1469
+  metric_bucket: top_quartile
+  metric_percentile: 86.3198
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ATP synthase subunit B
+  rank_by_metric: 143
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: atpG
+  has_p_value: false
+  locus_tag: PMT1470
+  metric_bucket: top_quartile
+  metric_percentile: 86.1272
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ATP synthase B^
+  rank_by_metric: 145
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: ycf35
+  has_p_value: false
+  locus_tag: PMT1499
+  metric_bucket: top_quartile
+  metric_percentile: 83.526
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: regulator of CO2 utilization Ycf35
+  rank_by_metric: 172
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: grrP
+  has_p_value: false
+  locus_tag: PMT1517
+  metric_bucket: top_quartile
+  metric_percentile: 89.7881
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: extracellular substrate-binding orphan, GRRM family protein
+  rank_by_metric: 107
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1523
+  metric_bucket: top_quartile
+  metric_percentile: 89.3064
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rank_by_metric: 112
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1536
+  metric_bucket: top_quartile
+  metric_percentile: 86.7052
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein
+  rank_by_metric: 139
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: hemB
+  has_p_value: false
+  locus_tag: PMT1547
+  metric_bucket: top_quartile
+  metric_percentile: 78.2274
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: delta-aminolevulinic acid dehydratase
+  rank_by_metric: 227
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: trxB
+  has_p_value: false
+  locus_tag: PMT1551
+  metric_bucket: top_quartile
+  metric_percentile: 83.237
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: thioredoxin-disulfide reductase (NTR system)
+  rank_by_metric: 175
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1585
+  metric_bucket: top_quartile
+  metric_percentile: 79.7688
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: PRC-barrel domain-containing protein
+  rank_by_metric: 211
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: ycf66
+  has_p_value: false
+  locus_tag: PMT1591
+  metric_bucket: top_quartile
+  metric_percentile: 86.4162
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved hypothetical protein Ycf66
+  rank_by_metric: 142
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Energy production
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1600
+  metric_bucket: top_quartile
+  metric_percentile: 75.9152
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein (DUF3747)
+  rank_by_metric: 251
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: sufD
+  has_p_value: false
+  locus_tag: PMT1604
+  metric_bucket: top_quartile
+  metric_percentile: 78.8054
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ABC transporter involved in Fe-S cluster assembly, permease component
+  rank_by_metric: 221
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1608
+  metric_bucket: top_quartile
+  metric_percentile: 79.2871
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rank_by_metric: 216
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  has_p_value: false
+  locus_tag: PMT1614
+  metric_bucket: top_quartile
+  metric_percentile: 87.0906
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: phosphoglucomutase
+  rank_by_metric: 135
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: degQ
+  has_p_value: false
+  locus_tag: PMT1636
+  metric_bucket: top_quartile
+  metric_percentile: 84.2967
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: serine endoprotease, periplasmic
+  rank_by_metric: 164
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: invA
+  has_p_value: false
+  locus_tag: PMT1647
+  metric_bucket: top_quartile
+  metric_percentile: 77.1676
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: alkaline and neutral invertase
+  rank_by_metric: 238
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: petD
+  has_p_value: false
+  locus_tag: PMT1648
+  metric_bucket: top_quartile
+  metric_percentile: 76.5896
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: cytochrome b6/f complex subunit 4
+  rank_by_metric: 244
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: ctp
+  has_p_value: false
+  locus_tag: PMT1650
+  metric_bucket: top_quartile
+  metric_percentile: 79.1908
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: carboxy-terminal processing peptidase
+  rank_by_metric: 217
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: panC-cmk
+  has_p_value: false
+  locus_tag: PMT1689
+  metric_bucket: top_quartile
+  metric_percentile: 75.6262
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: bifunctional pantoate ligase/cytidylate kinase
+  rank_by_metric: 254
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Replication and repair
+  gene_name: recA
+  has_p_value: false
+  locus_tag: PMT1727
+  metric_bucket: top_quartile
+  metric_percentile: 87.7649
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: recombinase A
+  rank_by_metric: 128
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplW
+  has_p_value: false
+  locus_tag: PMT1734
+  metric_bucket: top_quartile
+  metric_percentile: 83.815
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L23
+  rank_by_metric: 169
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsC
+  has_p_value: false
+  locus_tag: PMT1738
+  metric_bucket: top_quartile
+  metric_percentile: 78.7091
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S3
+  rank_by_metric: 222
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpmC
+  has_p_value: false
+  locus_tag: PMT1740
+  metric_bucket: top_quartile
+  metric_percentile: 79.0944
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L29
+  rank_by_metric: 218
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsQ
+  has_p_value: false
+  locus_tag: PMT1741
+  metric_bucket: top_quartile
+  metric_percentile: 87.6686
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S17
+  rank_by_metric: 129
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplN
+  has_p_value: false
+  locus_tag: PMT1742
+  metric_bucket: top_quartile
+  metric_percentile: 83.1407
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L14
+  rank_by_metric: 176
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsH
+  has_p_value: false
+  locus_tag: PMT1745
+  metric_bucket: top_quartile
+  metric_percentile: 85.0674
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S8
+  rank_by_metric: 156
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplO
+  has_p_value: false
+  locus_tag: PMT1749
+  metric_bucket: top_quartile
+  metric_percentile: 89.0173
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L15
+  rank_by_metric: 115
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplQ
+  has_p_value: false
+  locus_tag: PMT1756
+  metric_bucket: top_quartile
+  metric_percentile: 82.4663
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L17
+  rank_by_metric: 183
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpmE
+  has_p_value: false
+  locus_tag: PMT1760
+  metric_bucket: top_quartile
+  metric_percentile: 76.1079
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L31
+  rank_by_metric: 249
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: glsF
+  has_p_value: false
+  locus_tag: PMT1777
+  metric_bucket: top_quartile
+  metric_percentile: 81.3102
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ferredoxin-dependent glutamate synthase
+  rank_by_metric: 195
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsL
+  has_p_value: false
+  locus_tag: PMT1779
+  metric_bucket: top_quartile
+  metric_percentile: 75.5299
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S12
+  rank_by_metric: 255
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsJ
+  has_p_value: false
+  locus_tag: PMT1783
+  metric_bucket: top_quartile
+  metric_percentile: 87.8613
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S10
+  rank_by_metric: 127
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: rne
+  has_p_value: false
+  locus_tag: PMT1789
+  metric_bucket: top_quartile
+  metric_percentile: 84.8748
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: ribonuclease E
+  rank_by_metric: 158
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: ileS
+  has_p_value: false
+  locus_tag: PMT1817
+  metric_bucket: top_quartile
+  metric_percentile: 77.0713
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: isoleucyl-tRNA synthetase
+  rank_by_metric: 239
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: glyA
+  has_p_value: false
+  locus_tag: PMT1847
+  metric_bucket: top_quartile
+  metric_percentile: 80.8285
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: serine hydroxymethyltransferase
+  rank_by_metric: 200
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: purH
+  has_p_value: false
+  locus_tag: PMT1857
+  metric_bucket: top_quartile
+  metric_percentile: 77.9383
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: bifunctional purine biosynthesis protein (AICAR transformylase/IMP cyclohydrolase)
+  rank_by_metric: 230
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1874
+  metric_bucket: top_quartile
+  metric_percentile: 82.7553
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein (DUF541)
+  rank_by_metric: 180
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Lipid metabolism
+  gene_name: fabI
+  has_p_value: false
+  locus_tag: PMT1881
+  metric_bucket: top_quartile
+  metric_percentile: 89.21
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: enoyl-(acyl-carrier-protein) reductase (ENR)
+  rank_by_metric: 113
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: chlD
+  has_p_value: false
+  locus_tag: PMT1887
+  metric_bucket: top_quartile
+  metric_percentile: 77.842
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: protoporphyrin IX Mg-chelatase, subunit ChlD
+  rank_by_metric: 231
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: ycf48
+  has_p_value: false
+  locus_tag: PMT1895
+  metric_bucket: top_quartile
+  metric_percentile: 89.1137
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: photosystem II stability/assembly factor
+  rank_by_metric: 114
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1915
+  metric_bucket: top_quartile
+  metric_percentile: 86.9942
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: glycosyl transferase 8 family protein
+  rank_by_metric: 136
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: icd
+  has_p_value: false
+  locus_tag: PMT1935
+  metric_bucket: top_quartile
+  metric_percentile: 82.659
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: isocitrate dehydrogenase
+  rank_by_metric: 181
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Lipid metabolism
+  gene_name: fabF
+  has_p_value: false
+  locus_tag: PMT1956
+  metric_bucket: top_quartile
+  metric_percentile: 81.7919
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: beta-ketoacyl-(acyl-carrier-protein) synthase II (KASII)
+  rank_by_metric: 190
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Signal transduction
+  gene_name: rpaA
+  has_p_value: false
+  locus_tag: PMT1988
+  metric_bucket: top_quartile
+  metric_percentile: 75.4335
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: two-component system response regulator RR class II (RRII)-CheY-OmpR
+  rank_by_metric: 256
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Lipid metabolism
+  gene_name: fabD
+  has_p_value: false
+  locus_tag: PMT1997
+  metric_bucket: top_quartile
+  metric_percentile: 76.3006
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: malonyl CoA-acyl carrier protein transacylase (MCAT)
+  rank_by_metric: 247
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT2002
+  metric_bucket: top_quartile
+  metric_percentile: 84.2004
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: RNA-binding protein
+  rank_by_metric: 165
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: crtP
+  has_p_value: false
+  locus_tag: PMT2004
+  metric_bucket: top_quartile
+  metric_percentile: 77.553
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: phytoene dehydrogenase
+  rank_by_metric: 234
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Central intermediary metabolism
+  gene_name: cysC
+  has_p_value: false
+  locus_tag: PMT2029
+  metric_bucket: top_quartile
+  metric_percentile: 76.975
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: adenylylsulfate kinase
+  rank_by_metric: 240
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: ycf29
+  has_p_value: false
+  locus_tag: PMT2043
+  metric_bucket: top_quartile
+  metric_percentile: 84.104
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: two-component response regulator, NarL subfamily
+  rank_by_metric: 166
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT2068
+  metric_bucket: top_quartile
+  metric_percentile: 89.8844
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: beta-lactamase superfamily domain protein
+  rank_by_metric: 106
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: eno
+  has_p_value: false
+  locus_tag: PMT2083
+  metric_bucket: top_quartile
+  metric_percentile: 89.6917
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: enolase
+  rank_by_metric: 108
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: nusG
+  has_p_value: false
+  locus_tag: PMT2087
+  metric_bucket: top_quartile
+  metric_percentile: 87.3796
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: transcription termination/antitermination factor NusG
+  rank_by_metric: 132
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplK
+  has_p_value: false
+  locus_tag: PMT2088
+  metric_bucket: top_quartile
+  metric_percentile: 79.5761
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L11
+  rank_by_metric: 213
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: rplL
+  has_p_value: false
+  locus_tag: PMT2091
+  metric_bucket: top_quartile
+  metric_percentile: 88.8247
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L7/L12
+  rank_by_metric: 117
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: gatB
+  has_p_value: false
+  locus_tag: PMT2139
+  metric_bucket: top_quartile
+  metric_percentile: 83.4297
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: aspartyl-tRNA(Asn)/glutamyl-tRNA(Gln) amidotransferase subunit B
+  rank_by_metric: 173
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: ndk
+  has_p_value: false
+  locus_tag: PMT2148
+  metric_bucket: top_quartile
+  metric_percentile: 78.9981
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: nucleoside diphosphate kinase
+  rank_by_metric: 219
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Inorganic ion transport
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT2153
+  metric_bucket: top_quartile
+  metric_percentile: 80.2505
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rank_by_metric: 206
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT2167
+  metric_bucket: top_quartile
+  metric_percentile: 86.0308
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: NADPH-dependent FMN reductase family protein
+  rank_by_metric: 146
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplI
+  has_p_value: false
+  locus_tag: PMT2175
+  metric_bucket: top_quartile
+  metric_percentile: 88.4393
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 50S ribosomal protein L9
+  rank_by_metric: 121
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT2193
+  metric_bucket: top_quartile
+  metric_percentile: 85.9345
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rank_by_metric: 147
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: aspS
+  has_p_value: false
+  locus_tag: PMT2216
+  metric_bucket: top_quartile
+  metric_percentile: 75.3372
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: aspartyl-tRNA synthetase
+  rank_by_metric: 257
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: acnB
+  has_p_value: false
+  locus_tag: PMT2249
+  metric_bucket: top_quartile
+  metric_percentile: 88.0539
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
+  rank_by_metric: 125
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsF
+  has_p_value: false
+  locus_tag: PMT2259
+  metric_bucket: top_quartile
+  metric_percentile: 81.5029
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S6
+  rank_by_metric: 193
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Replication and repair
+  gene_name: uvrA
+  has_p_value: false
+  locus_tag: PMT2270
+  metric_bucket: top_quartile
+  metric_percentile: 81.6956
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: excinuclease UvrABC complex, ATPase subunit
+  rank_by_metric: 191
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: purL
+  has_p_value: false
+  locus_tag: PMT9312_0003
+  metric_bucket: top_quartile
+  metric_percentile: 82.4284
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: phosphoribosylformylglycinamidine synthase, synthetase domain
+  rank_by_metric: 179
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: ftsY
+  has_p_value: false
+  locus_tag: PMT9312_0010
+  metric_bucket: top_quartile
+  metric_percentile: 75.2221
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: signal recognition particle-docking protein FtsY
+  rank_by_metric: 252
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: msrB
+  has_p_value: false
+  locus_tag: PMT9312_0015
+  metric_bucket: top_quartile
+  metric_percentile: 77.5913
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: peptide methionine-R-sulfoxide reductase
+  rank_by_metric: 228
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: dnaJ1
+  has_p_value: false
+  locus_tag: PMT9312_0017
+  metric_bucket: top_quartile
+  metric_percentile: 80.6515
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: DnaJ type I chaperone protein
+  rank_by_metric: 197
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0020
+  metric_bucket: top_quartile
+  metric_percentile: 79.7631
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: DNA-binding protein, YbaB/EbfC family
+  rank_by_metric: 206
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0025
+  metric_bucket: top_quartile
+  metric_percentile: 82.231
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: cyclophilin type peptidyl-prolyl cis-trans isomerase/CLD family protein
+  rank_by_metric: 181
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: efp
+  has_p_value: false
+  locus_tag: PMT9312_0026
+  metric_bucket: top_quartile
+  metric_percentile: 87.5617
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: translation elongation factor P
+  rank_by_metric: 127
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: flv3
+  has_p_value: false
+  locus_tag: PMT9312_0044
+  metric_bucket: top_quartile
+  metric_percentile: 75.5183
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: flavoprotein involved in Mehler reaction
+  rank_by_metric: 249
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: gatB
+  has_p_value: false
+  locus_tag: PMT9312_0049
+  metric_bucket: top_quartile
+  metric_percentile: 83.7117
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: aspartyl-tRNA(Asn)/glutamyl-tRNA(Gln) amidotransferase subunit B
+  rank_by_metric: 166
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: ycf66
+  has_p_value: false
+  locus_tag: PMT9312_0065
+  metric_bucket: top_quartile
+  metric_percentile: 75.1234
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: uncharacterized conserved hypothetical protein Ycf66
+  rank_by_metric: 253
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: pgmA2
+  has_p_value: false
+  locus_tag: PMT9312_0079
+  metric_bucket: top_quartile
+  metric_percentile: 81.8361
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: phosphoglucomutase
+  rank_by_metric: 185
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: ktrA
+  has_p_value: false
+  locus_tag: PMT9312_0088
+  metric_bucket: top_quartile
+  metric_percentile: 78.1836
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: Ktr-type potassium uptake system, NAD-binding component
+  rank_by_metric: 222
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0100
+  metric_bucket: top_quartile
+  metric_percentile: 76.6041
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: Inositol monophosphatase family protein
+  rank_by_metric: 238
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: tolC
+  has_p_value: false
+  locus_tag: PMT9312_0101
+  metric_bucket: top_quartile
+  metric_percentile: 78.0849
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: TolC-like outer membrane efflux protein, RND family
+  rank_by_metric: 223
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: iscA
+  has_p_value: false
+  locus_tag: PMT9312_0119
+  metric_bucket: top_quartile
+  metric_percentile: 78.6772
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: iron-sulfur cluster complex assembly protein IscA
+  rank_by_metric: 217
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: ndhO
+  has_p_value: false
+  locus_tag: PMT9312_0124
+  metric_bucket: top_quartile
+  metric_percentile: 75.4195
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: NADH dehydrogenase I subunit NdhO
+  rank_by_metric: 250
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Signal transduction
+  gene_name: rpaB
+  has_p_value: false
+  locus_tag: PMT9312_0136
+  metric_bucket: top_quartile
+  metric_percentile: 80.5528
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: two-component system response regulator RR class II (RRII)-CheY-OmpR
+  rank_by_metric: 198
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0144
+  metric_bucket: top_quartile
+  metric_percentile: 84.304
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: RNA-binding protein
+  rank_by_metric: 160
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Regulatory functions
+  gene_name: pedR
+  has_p_value: false
+  locus_tag: PMT9312_0156
+  metric_bucket: top_quartile
+  metric_percentile: 80.4541
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: redox-responsive LuxR-type transcriptional regulator PedR
+  rank_by_metric: 199
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: ycf29
+  has_p_value: false
+  locus_tag: PMT9312_0171
+  metric_bucket: top_quartile
+  metric_percentile: 86.2784
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: two-component response regulator, NarL subfamily
+  rank_by_metric: 140
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: ndhH
+  has_p_value: false
+  locus_tag: PMT9312_0174
+  metric_bucket: top_quartile
+  metric_percentile: 75.7157
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: NADH dehydrogenase I subunit NdhH (chain 7 or delta)
+  rank_by_metric: 247
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplK
+  has_p_value: false
+  locus_tag: PMT9312_0206
+  metric_bucket: top_quartile
+  metric_percentile: 81.54
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 50S ribosomal protein L11
+  rank_by_metric: 188
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: nusG
+  has_p_value: false
+  locus_tag: PMT9312_0207
+  metric_bucket: top_quartile
+  metric_percentile: 83.0207
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: transcription termination/antitermination factor NusG
+  rank_by_metric: 173
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: trxB
+  has_p_value: false
+  locus_tag: PMT9312_0213
+  metric_bucket: top_quartile
+  metric_percentile: 88.4501
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: thioredoxin-disulfide reductase (NTR system)
+  rank_by_metric: 118
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: hemB
+  has_p_value: false
+  locus_tag: PMT9312_0217
+  metric_bucket: top_quartile
+  metric_percentile: 85.9822
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: delta-aminolevulinic acid dehydratase
+  rank_by_metric: 143
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: cp12
+  has_p_value: false
+  locus_tag: PMT9312_0222
+  metric_bucket: top_quartile
+  metric_percentile: 79.2695
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: CP12 polypeptide
+  rank_by_metric: 211
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: ileS
+  has_p_value: false
+  locus_tag: PMT9312_0240
+  metric_bucket: top_quartile
+  metric_percentile: 86.8707
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: isoleucyl-tRNA synthetase
+  rank_by_metric: 134
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0256
+  metric_bucket: top_quartile
+  metric_percentile: 82.922
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: protein of unknown function DUF3769
+  rank_by_metric: 174
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: chlD
+  has_p_value: false
+  locus_tag: PMT9312_0290
+  metric_bucket: top_quartile
+  metric_percentile: 84.7976
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: protoporphyrin IX Mg-chelatase, subunit ChlD
+  rank_by_metric: 155
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Secondary metabolites
+  gene_name: ycf22
+  has_p_value: false
+  locus_tag: PMT9312_0291
+  metric_bucket: top_quartile
+  metric_percentile: 76.5054
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ABC-type transport system, periplasmic component
+  rank_by_metric: 239
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: ctp
+  has_p_value: false
+  locus_tag: PMT9312_0330
+  metric_bucket: top_quartile
+  metric_percentile: 82.1323
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: carboxy-terminal processing peptidase
+  rank_by_metric: 182
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Replication and repair
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0373
+  metric_bucket: top_quartile
+  metric_percentile: 87.0681
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: Putative Type II restriction endonuclease
+  rank_by_metric: 132
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell cycle and division
+  gene_name: sepF
+  has_p_value: false
+  locus_tag: PMT9312_0391
+  metric_bucket: top_quartile
+  metric_percentile: 78.5785
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: cell division protein SepF (Cdv2)
+  rank_by_metric: 218
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Lipid metabolism
+  gene_name: fadD
+  has_p_value: false
+  locus_tag: PMT9312_0398
+  metric_bucket: top_quartile
+  metric_percentile: 85.8835
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: long-chain acyl-CoA synthetase
+  rank_by_metric: 144
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0399
+  metric_bucket: top_quartile
+  metric_percentile: 82.0336
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  rank_by_metric: 183
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: pdhC
+  has_p_value: false
+  locus_tag: PMT9312_0400
+  metric_bucket: top_quartile
+  metric_percentile: 88.2527
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: pyruvate dehydrogenase complex, dihydrolipoamide acyltransferase (E2) component
+  rank_by_metric: 120
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: nifU
+  has_p_value: false
+  locus_tag: PMT9312_0414
+  metric_bucket: top_quartile
+  metric_percentile: 81.7374
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: NifU-like protein
+  rank_by_metric: 186
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Replication and repair
+  gene_name: topA
+  has_p_value: false
+  locus_tag: PMT9312_0435
+  metric_bucket: top_quartile
+  metric_percentile: 87.463
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: DNA topoisomerase I, omega subunit
+  rank_by_metric: 128
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: petC
+  has_p_value: false
+  locus_tag: PMT9312_0462
+  metric_bucket: top_quartile
+  metric_percentile: 85.0938
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: cytochrome b6-f complex iron-sulfur subunit
+  rank_by_metric: 152
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0474
+  metric_bucket: top_quartile
+  metric_percentile: 79.6644
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: Prochlorococcus/marine Synechococcus Hyper-Conserved Protein (PSHCP)
+  rank_by_metric: 207
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Signal transduction
+  gene_name: yajQ
+  has_p_value: false
+  locus_tag: PMT9312_0481
+  metric_bucket: top_quartile
+  metric_percentile: 82.5271
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: cyclic-di-GMP-binding protein
+  rank_by_metric: 178
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: hemC
+  has_p_value: false
+  locus_tag: PMT9312_0496
+  metric_bucket: top_quartile
+  metric_percentile: 87.8578
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: porphobilinogen deaminase
+  rank_by_metric: 124
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: rpoD1
+  has_p_value: false
+  locus_tag: PMT9312_0497
+  metric_bucket: top_quartile
+  metric_percentile: 80.3554
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: major RNA polymerase sigma factor, type I
+  rank_by_metric: 200
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: ycf41
+  has_p_value: false
+  locus_tag: PMT9312_0503
+  metric_bucket: top_quartile
+  metric_percentile: 84.6989
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: possible single-stranded DNA-binding protein
+  rank_by_metric: 156
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: proS
+  has_p_value: false
+  locus_tag: PMT9312_0509
+  metric_bucket: top_quartile
+  metric_percentile: 81.4413
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: proline--tRNA ligase
+  rank_by_metric: 189
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: frr
+  has_p_value: false
+  locus_tag: PMT9312_0521
+  metric_bucket: top_quartile
+  metric_percentile: 87.3643
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ribosome recycling factor
+  rank_by_metric: 129
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsA2
+  has_p_value: false
+  locus_tag: PMT9312_0530
+  metric_bucket: top_quartile
+  metric_percentile: 88.9437
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 30S ribosomal protein S1
+  rank_by_metric: 113
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: csoS4A
+  has_p_value: false
+  locus_tag: PMT9312_0554
+  metric_bucket: top_quartile
+  metric_percentile: 83.4156
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: pentameric carboxysome shell protein Csos4A (peptide A)
+  rank_by_metric: 169
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: hemE
+  has_p_value: false
+  locus_tag: PMT9312_0583
+  metric_bucket: top_quartile
+  metric_percentile: 81.3425
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: uroporphyrinogen decarboxylase
+  rank_by_metric: 190
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: glgB
+  has_p_value: false
+  locus_tag: PMT9312_0584
+  metric_bucket: top_quartile
+  metric_percentile: 89.0424
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 1,4-alpha-glucan branching enzyme
+  rank_by_metric: 112
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0599
+  metric_bucket: top_quartile
+  metric_percentile: 79.5656
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: Conserved hypothetical protein
+  rank_by_metric: 208
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: aroA
+  has_p_value: false
+  locus_tag: PMT9312_0613
+  metric_bucket: top_quartile
+  metric_percentile: 89.3386
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 3-phosphoshikimate 1-carboxyvinyltransferase
+  rank_by_metric: 109
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: comB
+  has_p_value: false
+  locus_tag: PMT9312_0614
+  metric_bucket: top_quartile
+  metric_percentile: 76.4067
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 2-phosphosulpholactate phosphatase
+  rank_by_metric: 240
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: ybeM
+  has_p_value: false
+  locus_tag: PMT9312_0615
+  metric_bucket: top_quartile
+  metric_percentile: 75.0247
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: deaminated glutathione amidase
+  rank_by_metric: 254
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: acs
+  has_p_value: false
+  locus_tag: PMT9312_0619
+  metric_bucket: top_quartile
+  metric_percentile: 82.8233
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: acetate--CoA ligase
+  rank_by_metric: 175
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0649
+  metric_bucket: top_quartile
+  metric_percentile: 77.9862
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: pentapeptide repeats family protein
+  rank_by_metric: 224
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: nrdJ
+  has_p_value: false
+  locus_tag: PMT9312_0661
+  metric_bucket: top_quartile
+  metric_percentile: 89.7335
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ribonucleoside-diphosphate reductase
+  rank_by_metric: 105
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: pstS
+  has_p_value: false
+  locus_tag: PMT9312_0722
+  metric_bucket: top_quartile
+  metric_percentile: 88.154
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: phosphate ABC transporter, phosphate-binding protein PstS
+  rank_by_metric: 121
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: clpP1
+  has_p_value: false
+  locus_tag: PMT9312_0750
+  metric_bucket: top_quartile
+  metric_percentile: 82.3297
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ATP-dependent Clp protease, protease subunit
+  rank_by_metric: 180
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsB
+  has_p_value: false
+  locus_tag: PMT9312_0761
+  metric_bucket: top_quartile
+  metric_percentile: 85.6861
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 30S ribosomal protein S2
+  rank_by_metric: 146
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: tsf
+  has_p_value: false
+  locus_tag: PMT9312_0762
+  metric_bucket: top_quartile
+  metric_percentile: 76.9003
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: Translation elongation factor Ts
+  rank_by_metric: 235
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: typA
+  has_p_value: false
+  locus_tag: PMT9312_0770
+  metric_bucket: top_quartile
+  metric_percentile: 80.9477
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: GTP-binding protein TypA/BipA
+  rank_by_metric: 194
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: gnd
+  has_p_value: false
+  locus_tag: PMT9312_0778
+  metric_bucket: top_quartile
+  metric_percentile: 75.617
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 6-phosphogluconate dehydrogenase
+  rank_by_metric: 248
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: ilvD
+  has_p_value: false
+  locus_tag: PMT9312_0782
+  metric_bucket: top_quartile
+  metric_percentile: 87.7591
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: dihydroxy-acid dehydratase
+  rank_by_metric: 125
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0783
+  metric_bucket: top_quartile
+  metric_percentile: 77.7887
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  rank_by_metric: 226
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0785
+  metric_bucket: top_quartile
+  metric_percentile: 83.3169
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: pentapeptide repeats family protein
+  rank_by_metric: 170
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: leuB
+  has_p_value: false
+  locus_tag: PMT9312_0794
+  metric_bucket: top_quartile
+  metric_percentile: 76.8016
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 3-isopropylmalate dehydrogenase
+  rank_by_metric: 236
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0798
+  metric_bucket: top_quartile
+  metric_percentile: 76.0118
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein (DUF3727)
+  rank_by_metric: 244
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0858
+  metric_bucket: top_quartile
+  metric_percentile: 89.2399
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: glycine zipper 2TM domain-containing protein
+  rank_by_metric: 110
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: phdB
+  has_p_value: false
+  locus_tag: PMT9312_0869
+  metric_bucket: top_quartile
+  metric_percentile: 79.4669
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: pyruvate dehydrogenase E1 component beta subunit
+  rank_by_metric: 209
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: pyk
+  has_p_value: false
+  locus_tag: PMT9312_0888
+  metric_bucket: top_quartile
+  metric_percentile: 81.0464
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: pyruvate kinase
+  rank_by_metric: 193
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: ppiB
+  has_p_value: false
+  locus_tag: PMT9312_0906
+  metric_bucket: top_quartile
+  metric_percentile: 84.5015
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: peptidyl-prolyl cis-trans isomerase
+  rank_by_metric: 158
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: leuS
+  has_p_value: false
+  locus_tag: PMT9312_0911
+  metric_bucket: top_quartile
+  metric_percentile: 78.8746
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: leucine--tRNA ligase
+  rank_by_metric: 215
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0917
+  metric_bucket: top_quartile
+  metric_percentile: 85.3899
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: flavin reductase-like domain containing protein
+  rank_by_metric: 149
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: metH
+  has_p_value: false
+  locus_tag: PMT9312_0923
+  metric_bucket: top_quartile
+  metric_percentile: 86.6732
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: methionine synthase
+  rank_by_metric: 136
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_0924
+  metric_bucket: top_quartile
+  metric_percentile: 84.0079
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  rank_by_metric: 163
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: pheT
+  has_p_value: false
+  locus_tag: PMT9312_0930
+  metric_bucket: top_quartile
+  metric_percentile: 88.0553
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: phenylalanine--tRNA ligase, beta subunit
+  rank_by_metric: 122
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: vacB
+  has_p_value: false
+  locus_tag: PMT9312_0953
+  metric_bucket: top_quartile
+  metric_percentile: 79.8618
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: exoribonuclease R
+  rank_by_metric: 205
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: ndhV
+  has_p_value: false
+  locus_tag: PMT9312_0955
+  metric_bucket: top_quartile
+  metric_percentile: 81.2438
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: NADH dehydrogenase subunit NdhV
+  rank_by_metric: 191
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: dapB
+  has_p_value: false
+  locus_tag: PMT9312_0968
+  metric_bucket: top_quartile
+  metric_percentile: 76.308
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 4-hydroxy-tetrahydrodipicolinate reductase
+  rank_by_metric: 241
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: chlH
+  has_p_value: false
+  locus_tag: PMT9312_0969
+  metric_bucket: top_quartile
+  metric_percentile: 82.7246
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: protoporphyrin IX Mg-chelatase, subunit ChlH
+  rank_by_metric: 176
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: tpiA
+  has_p_value: false
+  locus_tag: PMT9312_0971
+  metric_bucket: top_quartile
+  metric_percentile: 87.1668
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: triosephosphate isomerase
+  rank_by_metric: 131
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: carB
+  has_p_value: false
+  locus_tag: PMT9312_0975
+  metric_bucket: top_quartile
+  metric_percentile: 77.4926
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: carbamoyl-phosphate synthase, large subunit
+  rank_by_metric: 229
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1003
+  metric_bucket: top_quartile
+  metric_percentile: 87.9566
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein (DUF3303)
+  rank_by_metric: 123
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: gpx
+  has_p_value: false
+  locus_tag: PMT9312_1016
+  metric_bucket: top_quartile
+  metric_percentile: 84.9951
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: glutathione peroxidase
+  rank_by_metric: 153
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1017
+  metric_bucket: top_quartile
+  metric_percentile: 84.2053
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  rank_by_metric: 161
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1021
+  metric_bucket: top_quartile
+  metric_percentile: 85.2912
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: uncharacterized conserved secreted protein
+  rank_by_metric: 150
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1033
+  metric_bucket: top_quartile
+  metric_percentile: 76.2093
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: uncharacterized conserved membrane protein
+  rank_by_metric: 242
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1044
+  metric_bucket: top_quartile
+  metric_percentile: 78.4798
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: CobW-like pseudocobalamin biosynthesis protein
+  rank_by_metric: 219
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Replication and repair
+  gene_name: gyrA
+  has_p_value: false
+  locus_tag: PMT9312_1074
+  metric_bucket: top_quartile
+  metric_percentile: 84.8963
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: DNA gyrase, A subunit
+  rank_by_metric: 154
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: clpC
+  has_p_value: false
+  locus_tag: PMT9312_1099
+  metric_bucket: top_quartile
+  metric_percentile: 86.9694
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ATP-dependent Clp protease ATP-binding subunit ClpC
+  rank_by_metric: 133
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: lysA
+  has_p_value: false
+  locus_tag: PMT9312_1101
+  metric_bucket: top_quartile
+  metric_percentile: 84.1066
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: diaminopimelate decarboxylase
+  rank_by_metric: 162
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: crhR
+  has_p_value: false
+  locus_tag: PMT9312_1112
+  metric_bucket: top_quartile
+  metric_percentile: 76.7029
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: cyanobacterial RNA helicase
+  rank_by_metric: 237
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Signal transduction
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1124
+  metric_bucket: top_quartile
+  metric_percentile: 87.2655
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: two-component system response regulator RR class II (RRII)-OmpR
+  rank_by_metric: 130
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: natF
+  has_p_value: false
+  locus_tag: PMT9312_1168
+  metric_bucket: top_quartile
+  metric_percentile: 80.1579
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ABC-type uptake transporter for acidic and neutral polar amino acids (N-II),
+    substrate binding protein
+  rank_by_metric: 202
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: tolC
+  has_p_value: false
+  locus_tag: PMT9312_1181
+  metric_bucket: top_quartile
+  metric_percentile: 85.7848
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: TolC-like outer membrane efflux protein, RND family
+  rank_by_metric: 145
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: pntB
+  has_p_value: false
+  locus_tag: PMT9312_1242
+  metric_bucket: top_quartile
+  metric_percentile: 82.6259
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: pyridine nucleotide transhydrogenase beta subunit
+  rank_by_metric: 177
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: ycf4
+  has_p_value: false
+  locus_tag: PMT9312_1255
+  metric_bucket: top_quartile
+  metric_percentile: 75.9131
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: photosytem I complex assembly protein Ycf4
+  rank_by_metric: 245
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1264
+  metric_bucket: top_quartile
+  metric_percentile: 79.1708
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: outer membrane porin
+  rank_by_metric: 212
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: sppA
+  has_p_value: false
+  locus_tag: PMT9312_1281
+  metric_bucket: top_quartile
+  metric_percentile: 89.1412
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: signal peptide peptidase SppA (protease IV)
+  rank_by_metric: 111
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1283
+  metric_bucket: top_quartile
+  metric_percentile: 85.5874
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: uncharacterized conserved lipoprotein (DUF2808)
+  rank_by_metric: 147
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: serS
+  has_p_value: false
+  locus_tag: PMT9312_1289
+  metric_bucket: top_quartile
+  metric_percentile: 81.6387
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: serine--tRNA ligase
+  rank_by_metric: 187
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: gmd
+  has_p_value: false
+  locus_tag: PMT9312_1316
+  metric_bucket: top_quartile
+  metric_percentile: 85.1925
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: GDP-mannose 4,6-dehydratase
+  rank_by_metric: 151
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Central intermediary metabolism
+  gene_name: ybeY
+  has_p_value: false
+  locus_tag: PMT9312_1340
+  metric_bucket: top_quartile
+  metric_percentile: 80.0592
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: N-acetylneuraminate synthase
+  rank_by_metric: 203
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Nucleotide metabolism
+  gene_name: legI
+  has_p_value: false
+  locus_tag: PMT9312_1346
+  metric_bucket: top_quartile
+  metric_percentile: 78.381
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: N,N^-diacetyllegionaminate synthase
+  rank_by_metric: 220
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: kpsD
+  has_p_value: false
+  locus_tag: PMT9312_1375
+  metric_bucket: top_quartile
+  metric_percentile: 86.1797
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: polysaccharide biosynthesis/export family protein
+  rank_by_metric: 141
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsP
+  has_p_value: false
+  locus_tag: PMT9312_1381
+  metric_bucket: top_quartile
+  metric_percentile: 88.845
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 30S ribosomal protein S16
+  rank_by_metric: 114
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: ffh
+  has_p_value: false
+  locus_tag: PMT9312_1382
+  metric_bucket: top_quartile
+  metric_percentile: 79.0721
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: signal recognition particle protein
+  rank_by_metric: 213
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: pdhA
+  has_p_value: false
+  locus_tag: PMT9312_1384
+  metric_bucket: top_quartile
+  metric_percentile: 79.9605
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: pyruvate dehydrogenase E1 component complex alpha subunit
+  rank_by_metric: 204
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: sodN
+  has_p_value: false
+  locus_tag: PMT9312_1390
+  metric_bucket: top_quartile
+  metric_percentile: 77.0977
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: superoxide dismutase [Ni]
+  rank_by_metric: 233
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1423
+  metric_bucket: top_quartile
+  metric_percentile: 77.69
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  rank_by_metric: 227
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: pepA
+  has_p_value: false
+  locus_tag: PMT9312_1430
+  metric_bucket: top_quartile
+  metric_percentile: 77.8875
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: leucine aminopeptidase
+  rank_by_metric: 225
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: serA
+  has_p_value: false
+  locus_tag: PMT9312_1452
+  metric_bucket: top_quartile
+  metric_percentile: 88.5489
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: D-3-phosphoglycerate dehydrogenase (PGDH)
+  rank_by_metric: 117
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1502
+  metric_bucket: top_quartile
+  metric_percentile: 76.1106
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  rank_by_metric: 243
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: rpoZ
+  has_p_value: false
+  locus_tag: PMT9312_1524
+  metric_bucket: top_quartile
+  metric_percentile: 84.4028
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: DNA-directed RNA polymerase omega subunit
+  rank_by_metric: 159
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: atpE
+  has_p_value: false
+  locus_tag: PMT9312_1532
+  metric_bucket: top_quartile
+  metric_percentile: 79.3682
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ATP synthase epsilon chain
+  rank_by_metric: 210
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: atpD
+  has_p_value: false
+  locus_tag: PMT9312_1545
+  metric_bucket: top_quartile
+  metric_percentile: 83.9092
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ATP synthase delta chain
+  rank_by_metric: 164
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: atpF
+  has_p_value: false
+  locus_tag: PMT9312_1546
+  metric_bucket: top_quartile
+  metric_percentile: 88.7463
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ATP synthase subunit B
+  rank_by_metric: 115
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: atpH
+  has_p_value: false
+  locus_tag: PMT9312_1548
+  metric_bucket: top_quartile
+  metric_percentile: 83.2182
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ATP synthase C chain
+  rank_by_metric: 171
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: iaiH
+  has_p_value: false
+  locus_tag: PMT9312_1573
+  metric_bucket: top_quartile
+  metric_percentile: 80.849
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: PBS lyase HEAT-like repeat domain-containing protein
+  rank_by_metric: 195
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: dapL
+  has_p_value: false
+  locus_tag: PMT9312_1592
+  metric_bucket: top_quartile
+  metric_percentile: 88.6476
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: LL-diaminopimelate aminotransferase
+  rank_by_metric: 116
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transcription
+  gene_name: rne
+  has_p_value: false
+  locus_tag: PMT9312_1593
+  metric_bucket: top_quartile
+  metric_percentile: 80.7502
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ribonuclease E
+  rank_by_metric: 196
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: prfA
+  has_p_value: false
+  locus_tag: PMT9312_1622
+  metric_bucket: top_quartile
+  metric_percentile: 77.3939
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: peptide chain release factor 1
+  rank_by_metric: 230
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplM
+  has_p_value: false
+  locus_tag: PMT9312_1625
+  metric_bucket: top_quartile
+  metric_percentile: 86.4758
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 50S ribosomal protein L13
+  rank_by_metric: 138
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsM
+  has_p_value: false
+  locus_tag: PMT9312_1630
+  metric_bucket: top_quartile
+  metric_percentile: 83.1194
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 30S ribosomal protein S13
+  rank_by_metric: 172
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsE
+  has_p_value: false
+  locus_tag: PMT9312_1634
+  metric_bucket: top_quartile
+  metric_percentile: 83.613
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 30S ribosomal protein S5
+  rank_by_metric: 167
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: rplR
+  has_p_value: false
+  locus_tag: PMT9312_1635
+  metric_bucket: top_quartile
+  metric_percentile: 78.9733
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 50S ribosomal protein L18
+  rank_by_metric: 214
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsH
+  has_p_value: false
+  locus_tag: PMT9312_1637
+  metric_bucket: top_quartile
+  metric_percentile: 83.5143
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 30S ribosomal protein S8
+  rank_by_metric: 168
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplE
+  has_p_value: false
+  locus_tag: PMT9312_1638
+  metric_bucket: top_quartile
+  metric_percentile: 89.536
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 50S ribosomal protein L5
+  rank_by_metric: 107
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplN
+  has_p_value: false
+  locus_tag: PMT9312_1640
+  metric_bucket: top_quartile
+  metric_percentile: 81.1451
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 50S ribosomal protein L14
+  rank_by_metric: 192
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsC
+  has_p_value: false
+  locus_tag: PMT9312_1644
+  metric_bucket: top_quartile
+  metric_percentile: 86.5745
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 30S ribosomal protein S3
+  rank_by_metric: 137
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rplC
+  has_p_value: false
+  locus_tag: PMT9312_1650
+  metric_bucket: top_quartile
+  metric_percentile: 88.3514
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 50S ribosomal protein L3
+  rank_by_metric: 119
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: hemF
+  has_p_value: false
+  locus_tag: PMT9312_1674
+  metric_bucket: top_quartile
+  metric_percentile: 89.9309
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: coproporphyrinogen-III oxidase
+  rank_by_metric: 103
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1680
+  metric_bucket: top_quartile
+  metric_percentile: 86.3771
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  rank_by_metric: 139
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Lipid metabolism
+  gene_name: fabF
+  has_p_value: false
+  locus_tag: PMT9312_1702
+  metric_bucket: top_quartile
+  metric_percentile: 89.4373
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: beta-ketoacyl-(acyl-carrier-protein) synthase II (KASII)
+  rank_by_metric: 108
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: thiC
+  has_p_value: false
+  locus_tag: PMT9312_1704
+  metric_bucket: top_quartile
+  metric_percentile: 80.2567
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: thiamine biosynthesis protein
+  rank_by_metric: 201
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1710
+  metric_bucket: top_quartile
+  metric_percentile: 78.2823
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: conserved hypothetical protein
+  rank_by_metric: 221
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Cell wall and membrane
+  gene_name: mreB
+  has_p_value: false
+  locus_tag: PMT9312_1715
+  metric_bucket: top_quartile
+  metric_percentile: 81.9348
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: rod shape-determining protein MreB
+  rank_by_metric: 184
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Replication and repair
+  gene_name: ssb
+  has_p_value: false
+  locus_tag: PMT9312_1716
+  metric_bucket: top_quartile
+  metric_percentile: 75.8144
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: single-stranded DNA-binding protein
+  rank_by_metric: 246
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: ahcY
+  has_p_value: false
+  locus_tag: PMT9312_1718
+  metric_bucket: top_quartile
+  metric_percentile: 76.999
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: adenosylhomocysteinase
+  rank_by_metric: 234
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Transport
+  gene_name: mgtE
+  has_p_value: false
+  locus_tag: PMT9312_1723
+  metric_bucket: top_quartile
+  metric_percentile: 78.7759
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: magnesium transporter
+  rank_by_metric: 216
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Replication and repair
+  gene_name: gyrB
+  has_p_value: false
+  locus_tag: PMT9312_1727
+  metric_bucket: top_quartile
+  metric_percentile: 86.772
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: DNA gyrase, B subunit
+  rank_by_metric: 135
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Post-translational modification
+  gene_name: secA
+  has_p_value: false
+  locus_tag: PMT9312_1732
+  metric_bucket: top_quartile
+  metric_percentile: 86.0809
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: preprotein translocase SecA subunit
+  rank_by_metric: 142
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: asd
+  has_p_value: false
+  locus_tag: PMT9312_1746
+  metric_bucket: top_quartile
+  metric_percentile: 77.2952
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: aspartate-semialdehyde dehydrogenase
+  rank_by_metric: 231
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: clpX
+  has_p_value: false
+  locus_tag: PMT9312_1749
+  metric_bucket: top_quartile
+  metric_percentile: 77.1964
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: ATP-dependent Clp protease ATP-binding subunit, ClpX
+  rank_by_metric: 232
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: sqdB
+  has_p_value: false
+  locus_tag: PMT9312_1757
+  metric_bucket: top_quartile
+  metric_percentile: 85.4886
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: UDP-sulfoquinovose synthase
+  rank_by_metric: 148
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Stress response and adaptation
+  gene_name: metC
+  has_p_value: false
+  locus_tag: PMT9312_1762
+  metric_bucket: top_quartile
+  metric_percentile: 75.3208
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: cystathionine beta-lyase family aluminum resistance protein
+  rank_by_metric: 251
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: acnB
+  has_p_value: false
+  locus_tag: PMT9312_1793
+  metric_bucket: top_quartile
+  metric_percentile: 87.6604
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: aconitate hydratase 2 / 2-methylisocitrate dehydratase
+  rank_by_metric: 126
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsF
+  has_p_value: false
+  locus_tag: PMT9312_1799
+  metric_bucket: top_quartile
+  metric_percentile: 83.8105
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: 30S ribosomal protein S6
+  rank_by_metric: 165
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Amino acid metabolism
+  gene_name: thrC
+  has_p_value: false
+  locus_tag: PMT9312_1808
+  metric_bucket: top_quartile
+  metric_percentile: 89.6347
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: threonine synthase
+  rank_by_metric: 106
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1840
+  metric_bucket: top_quartile
+  metric_percentile: 84.6002
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: uncharacterized conserved membrane protein
+  rank_by_metric: 157
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT9312_1878
+  metric_bucket: top_quartile
+  metric_percentile: 89.8322
+  name: MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9312
+  product: Conserved hypothetical protein
+  rank_by_metric: 104
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: csoS1E
+  has_p_value: false
+  locus_tag: PMT_1199
+  metric_bucket: top_quartile
+  metric_percentile: 82.2736
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: carboxysome shell peptide
+  rank_by_metric: 185
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Translation
+  gene_name: rpsS
+  has_p_value: false
+  locus_tag: PMT_1736
+  metric_bucket: top_quartile
+  metric_percentile: 85.8382
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: 30S ribosomal protein S19
+  rank_by_metric: 148
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Photosynthesis
+  gene_name: psbJ
+  has_p_value: false
+  locus_tag: PMT_1899
+  metric_bucket: top_quartile
+  metric_percentile: 85.7418
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: photosystem II reaction center protein PsbJ
+  rank_by_metric: 149
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Coenzyme metabolism
+  gene_name: grxC
+  has_p_value: false
+  locus_tag: PMT_2062
+  metric_bucket: top_quartile
+  metric_percentile: 77.4566
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: glutaredoxin 3
+  rank_by_metric: 235
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT_2376
+  metric_bucket: top_quartile
+  metric_percentile: 86.8979
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: Conserved hypothetical protein
+  rank_by_metric: 137
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT_2613
+  metric_bucket: top_quartile
+  metric_percentile: 81.2139
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: hypothetical protein
+  rank_by_metric: 196
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT_2743
+  metric_bucket: top_quartile
+  metric_percentile: 83.3333
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rank_by_metric: 174
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+- derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  gene_category: Carbohydrate metabolism
+  gene_name: rub
+  has_p_value: false
+  locus_tag: PMT_2883
+  metric_bucket: top_quartile
+  metric_percentile: 76.8786
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  product: rubredoxin
+  rank_by_metric: 241
+  rankable: true
+  value: 0.0
+  value_kind: numeric
+returned: 308
+row_count: 308
+top_categories:
+- count: 51
+  gene_category: Translation
+- count: 39
+  gene_category: Unknown
+- count: 35
+  gene_category: Stress response and adaptation
+- count: 34
+  gene_category: Carbohydrate metabolism
+- count: 25
+  gene_category: Coenzyme metabolism
+total_derived_metrics: 2
+total_genes: 308
+total_matching: 308
+truncated: false
+warnings: []

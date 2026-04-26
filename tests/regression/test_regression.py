@@ -20,6 +20,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_derived_metrics,
     build_gene_derived_metrics_summary,
     build_gene_details,
+    build_genes_by_numeric_metric,
     build_gene_homologs,
     build_gene_ontology_terms,
     build_gene_overview,
@@ -64,6 +65,7 @@ TOOL_BUILDERS = {
     "list_derived_metrics_summary": build_list_derived_metrics_summary,
     "gene_derived_metrics": build_gene_derived_metrics,
     "gene_derived_metrics_summary": build_gene_derived_metrics_summary,
+    "genes_by_numeric_metric": build_genes_by_numeric_metric,
     "list_experiments": build_list_experiments,
     "list_experiments_summary": build_list_experiments_summary,
     "differential_expression_by_gene": build_differential_expression_by_gene,
@@ -164,6 +166,20 @@ def test_regression(conn, case, data_regression):
         # Capture full envelope — shape changes (new summary fields, etc.)
         # should surface cleanly in the golden file diff.
         data = api.pathway_enrichment(**params, conn=conn).to_envelope()
+        normalized_rows = _normalize(data.get("results", []))
+        envelope = {k: v for k, v in data.items() if k != "results"}
+        envelope["results"] = normalized_rows
+        envelope["row_count"] = len(normalized_rows)
+        data_regression.check(
+            {"case_id": case["id"], **envelope},
+            basename=case["id"],
+        )
+        return
+    elif tool == "genes_by_numeric_metric":
+        # Dispatch via api (L2) — builder takes resolved derived_metric_ids
+        # only; the api handles metric_types → ID resolution + gate
+        # validation. Capture full envelope so shape changes surface cleanly.
+        data = api.genes_by_numeric_metric(**params, conn=conn)
         normalized_rows = _normalize(data.get("results", []))
         envelope = {k: v for k, v in data.items() if k != "results"}
         envelope["results"] = normalized_rows

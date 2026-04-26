@@ -28,6 +28,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function,
     build_genes_by_homolog_group,
     build_genes_by_homolog_group_summary,
+    build_genes_by_numeric_metric,
     build_gene_details,
     build_gene_homologs,
     build_list_derived_metrics,
@@ -75,6 +76,7 @@ TOOL_BUILDERS = {
     "list_derived_metrics": build_list_derived_metrics,
     "gene_derived_metrics": build_gene_derived_metrics,
     "gene_derived_metrics_summary": build_gene_derived_metrics_summary,
+    "genes_by_numeric_metric": build_genes_by_numeric_metric,
     "differential_expression_by_gene": build_differential_expression_by_gene,
     "search_homolog_groups": build_search_homolog_groups,
     "search_homolog_groups_summary": build_search_homolog_groups_summary,
@@ -121,6 +123,12 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         if limit is not None:
             api_params["limit"] = limit
         return api.pathway_enrichment(**api_params, conn=conn).to_envelope().get("results", [])
+
+    if tool == "genes_by_numeric_metric":
+        # Dispatch via api (L2) — detail builder requires resolved
+        # derived_metric_ids; api handles metric_types → ID resolution +
+        # gate validation. Eval cases assert on rows.
+        return api.genes_by_numeric_metric(**params, conn=conn).get("results", [])
 
     builder = TOOL_BUILDERS[tool]
     limit = params.get("limit")

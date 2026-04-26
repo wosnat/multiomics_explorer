@@ -1054,6 +1054,67 @@
     columns: []
 
 # ---------------------------------------------------------------------------
+# genes_by_numeric_metric
+# ---------------------------------------------------------------------------
+
+- id: genes_by_numeric_metric_damping_ratio_top_decile
+  tool: genes_by_numeric_metric
+  desc: damping_ratio top-decile drill-down (single rankable DM, MED4)
+  params:
+    metric_types: ["damping_ratio"]
+    bucket: ["top_decile"]
+  expect:
+    min_rows: 5
+    columns:
+      - locus_tag
+      - derived_metric_id
+      - value_kind
+      - value
+      - rankable
+      - rank_by_metric
+      - metric_bucket
+
+- id: genes_by_numeric_metric_mixed_rankable_soft_exclude
+  tool: genes_by_numeric_metric
+  desc: Mixed rankable + non-rankable selection; bucket filter soft-excludes
+  params:
+    metric_types: ["damping_ratio", "peak_time_protein_h"]
+    bucket: ["top_decile"]
+  expect:
+    min_rows: 5
+    columns:
+      - locus_tag
+      - derived_metric_id
+      - value
+      - rankable
+      - metric_bucket
+
+- id: genes_by_numeric_metric_cross_organism
+  tool: genes_by_numeric_metric
+  desc: Cross-organism cell_abundance_biovolume_normalized (no organism scope)
+  params:
+    metric_types: ["cell_abundance_biovolume_normalized"]
+    bucket: ["top_quartile"]
+  expect:
+    min_rows: 5
+    columns:
+      - locus_tag
+      - organism_name
+      - derived_metric_id
+      - value
+      - metric_bucket
+
+- id: genes_by_numeric_metric_summary_only
+  tool: genes_by_numeric_metric
+  desc: Summary-only mode — envelope populated, results empty
+  params:
+    metric_types: ["damping_ratio"]
+    summary: true
+  expect:
+    min_rows: 0
+    columns: []
+
+# ---------------------------------------------------------------------------
 # differential_expression_by_gene
 # ---------------------------------------------------------------------------
 
