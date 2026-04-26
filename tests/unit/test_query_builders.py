@@ -1918,6 +1918,13 @@ class TestBuildListPublicationsSummary:
         assert "ANY(a IN p.authors WHERE toLower(a) CONTAINS toLower($author))" in cypher
         assert params["author"] == "Chisholm"
 
+    def test_uses_optional_match_for_filtered_count(self):
+        """The filtered count uses OPTIONAL MATCH so an empty intersection
+        still emits one row with total_matching=0 (otherwise the caller
+        IndexErrors on summary[0])."""
+        cypher, _ = build_list_publications_summary(organism="MED4")
+        assert "OPTIONAL MATCH (p:Publication)" in cypher
+
 
 class TestBuildListPublicationsPublicationDoisFilter:
     """Coverage for the publication_dois filter shared across detail + summary
