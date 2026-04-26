@@ -82,6 +82,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_derived_metrics_summary,
     build_gene_clusters_by_gene,
     build_gene_clusters_by_gene_summary,
+    build_gene_derived_metrics,
+    build_gene_derived_metrics_summary,
     build_genes_in_cluster,
     build_genes_in_cluster_summary,
     build_ontology_experiment_check,
@@ -2804,6 +2806,119 @@ def gene_clusters_by_gene(
         return envelope
 
     det_cypher, det_params = build_gene_clusters_by_gene(
+        locus_tags=locus_tags, **filter_kwargs,
+        verbose=verbose, limit=limit, offset=offset)
+    results = conn.execute_query(det_cypher, **det_params)
+
+    envelope["returned"] = len(results)
+    envelope["offset"] = offset
+    envelope["truncated"] = total_matching > offset + len(results)
+    envelope["results"] = results
+    return envelope
+
+
+def gene_derived_metrics(
+    locus_tags: list[str],
+    organism: str | None = None,
+    metric_types: list[str] | None = None,
+    value_kind: Literal["numeric", "boolean", "categorical"] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    derived_metric_ids: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Gene-centric DerivedMetric lookup. Single organism enforced.
+
+    Returns dict with keys: total_matching, total_derived_metrics,
+    genes_with_metrics, genes_without_metrics, not_found, not_matched,
+    by_value_kind, by_metric_type, by_metric, by_compartment,
+    by_treatment_type, by_background_factors, by_publication,
+    returned, offset, truncated, results.
+    Per result (compact, 13 Pydantic fields; 11 emitted by Cypher today):
+    locus_tag, gene_name, derived_metric_id, value_kind, name, value,
+    rankable, has_p_value, rank_by_metric, metric_percentile,
+    metric_bucket, adjusted_p_value (None today), significant (None today).
+    Per result (verbose adds, 12 Pydantic; 11 emitted today): metric_type,
+    field_description, unit, allowed_categories, compartment,
+    treatment_type, background_factors, publication_doi, treatment,
+    light_condition, experimental_context, p_value (None today).
+
+    summary=True: results=[], summary fields only.
+
+    Raises:
+        ValueError: locus_tags empty, or spans multiple organisms,
+                    or organism arg conflicts with inferred organism.
+    """
+    if not locus_tags:
+        raise ValueError("locus_tags must not be empty.")
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # Single-organism enforcement
+    _validate_organism_inputs(
+        organism=organism, locus_tags=locus_tags,
+        experiment_ids=None, conn=conn,
+    )
+
+    filter_kwargs = dict(
+        metric_types=metric_types, value_kind=value_kind,
+        compartment=compartment, treatment_type=treatment_type,
+        background_factors=background_factors,
+        publication_doi=publication_doi,
+        derived_metric_ids=derived_metric_ids,
+    )
+
+    # Summary query — always runs
+    sum_cypher, sum_params = build_gene_derived_metrics_summary(
+        locus_tags=locus_tags, **filter_kwargs)
+    raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
+
+    total_matching = raw_summary["total_matching"]
+
+    # by_metric is already shaped — sort by count desc; no rename
+    by_metric = sorted(
+        raw_summary["by_metric"], key=lambda x: x["count"], reverse=True)
+
+    envelope = {
+        "total_matching": total_matching,
+        "total_derived_metrics": raw_summary["total_derived_metrics"],
+        "genes_with_metrics": raw_summary["genes_with_metrics"],
+        "genes_without_metrics": raw_summary["genes_without_metrics"],
+        "not_found": raw_summary["not_found"],
+        "not_matched": raw_summary["not_matched"],
+        "by_value_kind": _rename_freq(
+            raw_summary["by_value_kind"], "value_kind"),
+        "by_metric_type": _rename_freq(
+            raw_summary["by_metric_type"], "metric_type"),
+        "by_metric": by_metric,
+        "by_compartment": _rename_freq(
+            raw_summary["by_compartment"], "compartment"),
+        "by_treatment_type": _rename_freq(
+            raw_summary["by_treatment_type"], "treatment_type"),
+        "by_background_factors": _rename_freq(
+            raw_summary["by_background_factors"], "background_factor"),
+        "by_publication": _rename_freq(
+            raw_summary["by_publication"], "publication_doi"),
+    }
+
+    # Detail query — skip when limit=0
+    if limit == 0:
+        envelope["returned"] = 0
+        envelope["offset"] = offset
+        envelope["truncated"] = total_matching > 0
+        envelope["results"] = []
+        return envelope
+
+    det_cypher, det_params = build_gene_derived_metrics(
         locus_tags=locus_tags, **filter_kwargs,
         verbose=verbose, limit=limit, offset=offset)
     results = conn.execute_query(det_cypher, **det_params)

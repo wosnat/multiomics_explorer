@@ -3620,6 +3620,157 @@ class TestGenesInCluster:
         assert "cluster:fake:id" in result["not_found_clusters"]
 
 
+class TestGeneDerivedMetrics:
+    """Unit tests for api.gene_derived_metrics with mocked GraphConnection."""
+
+    @pytest.fixture
+    def mock_summary_result(self):
+        return [{
+            "total_matching": 9,
+            "total_derived_metrics": 9,
+            "genes_with_metrics": 1,
+            "genes_without_metrics": 0,
+            "not_found": [],
+            "not_matched": [],
+            "by_value_kind": [{"item": "numeric", "count": 7},
+                              {"item": "boolean", "count": 1},
+                              {"item": "categorical", "count": 1}],
+            "by_metric_type": [{"item": "damping_ratio", "count": 1}],
+            "by_metric": [{"derived_metric_id": "dm:foo",
+                           "name": "Foo metric",
+                           "metric_type": "damping_ratio",
+                           "value_kind": "numeric",
+                           "count": 1}],
+            "by_compartment": [{"item": "whole_cell", "count": 7},
+                               {"item": "vesicle", "count": 2}],
+            "by_treatment_type": [{"item": "diel", "count": 6}],
+            "by_background_factors": [{"item": "axenic", "count": 9}],
+            "by_publication": [{"item": "10.1371/...", "count": 9}],
+        }]
+
+    def test_envelope_keys_present(self, mock_summary_result):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [mock_summary_result, []]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM1714"], conn=mock_conn, summary=True)
+        for key in [
+            "total_matching", "total_derived_metrics",
+            "genes_with_metrics", "genes_without_metrics",
+            "not_found", "not_matched",
+            "by_value_kind", "by_metric_type", "by_metric",
+            "by_compartment", "by_treatment_type",
+            "by_background_factors", "by_publication",
+            "returned", "offset", "truncated", "results",
+        ]:
+            assert key in data, f"missing envelope key: {key}"
+
+    def test_summary_skips_detail_query(self, mock_summary_result):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        mock_conn.execute_query.return_value = mock_summary_result
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM1714"], conn=mock_conn, summary=True)
+        assert mock_conn.execute_query.call_count == 1  # summary only
+        assert data["results"] == []
+        assert data["returned"] == 0
+        assert data["truncated"] is True  # total_matching=9 > returned=0
+
+    def test_empty_locus_tags_raises(self):
+        from unittest.mock import MagicMock
+        with pytest.raises(ValueError, match="locus_tags must not be empty"):
+            api.gene_derived_metrics([], conn=MagicMock())
+
+    def test_truncated_full_set(self, mock_summary_result):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        details = [{"locus_tag": "PMM1714"}] * 9
+        mock_conn.execute_query.side_effect = [mock_summary_result, details]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(["PMM1714"], conn=mock_conn)
+        assert data["returned"] == 9
+        assert data["truncated"] is False  # 9 not > 0+9
+
+    def test_truncated_partial(self, mock_summary_result):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        details = [{"locus_tag": "PMM1714"}] * 5
+        mock_conn.execute_query.side_effect = [mock_summary_result, details]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM1714"], conn=mock_conn, limit=5)
+        assert data["returned"] == 5
+        assert data["truncated"] is True  # 9 > 0+5
+
+    def test_rename_freq_applied(self, mock_summary_result):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [mock_summary_result, []]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM1714"], conn=mock_conn, summary=True)
+        # Frequency-style breakdowns get renamed item -> domain key
+        assert data["by_value_kind"][0] == {"value_kind": "numeric", "count": 7}
+        assert data["by_compartment"][0] == {"compartment": "whole_cell", "count": 7}
+
+    def test_by_metric_passthrough_no_rename(self, mock_summary_result):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [mock_summary_result, []]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM1714"], conn=mock_conn, summary=True)
+        # by_metric is already shaped; should NOT be renamed
+        assert data["by_metric"][0]["derived_metric_id"] == "dm:foo"
+        assert data["by_metric"][0]["name"] == "Foo metric"
+
+    def test_by_metric_sorted_count_desc(self):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        # Cypher returns set-iteration order, api/ must sort
+        mock_summary = [{
+            "total_matching": 5, "total_derived_metrics": 2,
+            "genes_with_metrics": 1, "genes_without_metrics": 0,
+            "not_found": [], "not_matched": [],
+            "by_value_kind": [], "by_metric_type": [],
+            "by_metric": [
+                {"derived_metric_id": "a", "name": "A", "metric_type": "x",
+                 "value_kind": "numeric", "count": 1},
+                {"derived_metric_id": "b", "name": "B", "metric_type": "y",
+                 "value_kind": "numeric", "count": 4},
+            ],
+            "by_compartment": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_publication": [],
+        }]
+        mock_conn.execute_query.side_effect = [mock_summary, []]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["X"], conn=mock_conn, summary=True)
+        assert data["by_metric"][0]["count"] == 4
+        assert data["by_metric"][1]["count"] == 1
+
+    def test_not_found_plumbed_through(self):
+        from unittest.mock import MagicMock, patch
+        mock_conn = MagicMock()
+        mock_summary = [{
+            "total_matching": 0, "total_derived_metrics": 0,
+            "genes_with_metrics": 0, "genes_without_metrics": 0,
+            "not_found": ["PMM_FAKE"], "not_matched": [],
+            "by_value_kind": [], "by_metric_type": [],
+            "by_metric": [], "by_compartment": [],
+            "by_treatment_type": [], "by_background_factors": [],
+            "by_publication": [],
+        }]
+        mock_conn.execute_query.side_effect = [mock_summary, []]
+        with patch("multiomics_explorer.api.functions._validate_organism_inputs"):
+            data = api.gene_derived_metrics(
+                ["PMM_FAKE"], conn=mock_conn, summary=True)
+        assert data["not_found"] == ["PMM_FAKE"]
+        assert data["not_matched"] == []
+
+
 # ---------------------------------------------------------------------------
 # gene_ontology_terms batching fix
 # ---------------------------------------------------------------------------
