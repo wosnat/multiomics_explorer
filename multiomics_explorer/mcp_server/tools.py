@@ -1513,6 +1513,7 @@ def register_tools(mcp: FastMCP):
         returned: int = Field(description="Publications in this response")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
+        not_found: list[str] = Field(default_factory=list, description="Input publication_dois that did not match any Publication node (empty unless publication_dois was provided)")
         results: list[PublicationResult]
 
     @mcp.tool(
@@ -1545,6 +1546,12 @@ def register_tools(mcp: FastMCP):
             description="Filter by author name (case-insensitive). "
             "E.g. 'Sher', 'Chisholm'.",
         )] = None,
+        publication_dois: Annotated[list[str] | None, Field(
+            description="Restrict to specific publications by DOI (case-insensitive). "
+            "Combines with other filters via AND. `not_found` in the response "
+            "lists any provided DOIs that did not match. Mirrors the filter "
+            "shape on sibling list_* tools (list_experiments.experiment_ids).",
+        )] = None,
         verbose: Annotated[bool, Field(
             description="Include abstract and description. "
             "Default compact for routing.",
@@ -1571,6 +1578,7 @@ def register_tools(mcp: FastMCP):
                 background_factors=background_factors,
                 growth_phases=growth_phases,
                 search_text=search_text, author=author,
+                publication_dois=publication_dois,
                 verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             results = [PublicationResult(**r) for r in result["results"]]
@@ -1590,6 +1598,7 @@ def register_tools(mcp: FastMCP):
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
+                not_found=result.get("not_found", []),
                 results=results,
             )
             await ctx.info(f"Returning {response.returned} of {response.total_matching} "

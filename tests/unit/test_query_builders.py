@@ -1919,6 +1919,53 @@ class TestBuildListPublicationsSummary:
         assert params["author"] == "Chisholm"
 
 
+class TestBuildListPublicationsPublicationDoisFilter:
+    """Coverage for the publication_dois filter shared across detail + summary
+    builders. Mirrors the experiment_ids pattern on list_experiments."""
+
+    def test_filter_in_cypher(self):
+        cypher, params = build_list_publications(
+            publication_dois=["10.1038/ismej.2016.70", "10.1101/foo"],
+        )
+        assert "toLower(p.doi) IN $publication_dois" in cypher
+        assert params["publication_dois"] == [
+            "10.1038/ismej.2016.70", "10.1101/foo",
+        ]
+
+    def test_case_insensitive(self):
+        """Input DOIs are lowercased to match the toLower() comparison."""
+        _, params = build_list_publications(
+            publication_dois=["10.1038/ISMEJ.2016.70"],
+        )
+        assert params["publication_dois"] == ["10.1038/ismej.2016.70"]
+
+    def test_combines_with_organism(self):
+        cypher, params = build_list_publications(
+            organism="MED4", publication_dois=["10.1038/ismej.2016.70"],
+        )
+        assert "toLower(p.doi) IN $publication_dois" in cypher
+        assert "$organism" in cypher
+        assert params["publication_dois"] == ["10.1038/ismej.2016.70"]
+
+    def test_none_omits_clause(self):
+        cypher, params = build_list_publications()
+        assert "publication_dois" not in params
+        assert "$publication_dois" not in cypher
+
+    def test_empty_list_omits_clause(self):
+        # `if publication_dois:` is false for empty lists — no clause.
+        cypher, params = build_list_publications(publication_dois=[])
+        assert "publication_dois" not in params
+        assert "$publication_dois" not in cypher
+
+    def test_summary_filter_in_cypher(self):
+        cypher, params = build_list_publications_summary(
+            publication_dois=["10.1038/ismej.2016.70"],
+        )
+        assert "toLower(p.doi) IN $publication_dois" in cypher
+        assert params["publication_dois"] == ["10.1038/ismej.2016.70"]
+
+
 class TestBuildListExperiments:
     def test_no_filters(self):
         """No filters produces MATCH with no WHERE, no fulltext CALL."""

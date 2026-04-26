@@ -33,6 +33,9 @@ examples:
       Step 3: genes_by_function(search_text="photosystem", organism="MED4")
               → find genes of interest
 
+  - title: Fetch metadata for a known DOI list
+    call: list_publications(publication_dois=["10.1038/ismej.2016.70", "10.1101/2025.11.24.690089"], verbose=True)
+
 verbose_fields:
   - abstract
   - description
@@ -42,6 +45,7 @@ chaining:
   - "list_publications → list_experiments → differential_expression_by_gene"
   - "list_publications → genes_by_function"
   - "list_publications → list_clustering_analyses(publication_doi=[...])"
+  - "list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset"
 
 mistakes:
   - "treatment_type is a string filter, not a list — use treatment_type='coculture' not treatment_type=['coculture']"

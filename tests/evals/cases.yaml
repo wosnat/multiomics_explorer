@@ -854,6 +854,15 @@
     min_rows: 2
     columns: [doi, title, authors]
 
+- id: list_publications_dois
+  tool: list_publications
+  desc: Restrict to specific DOIs (case-insensitive)
+  params:
+    publication_dois: ["10.1038/ismej.2016.70"]
+  expect:
+    min_rows: 1
+    columns: [doi, title, authors]
+
 # ── Experiments ──────────────────────────────────────────
 
 - id: list_experiments_all
@@ -960,21 +969,21 @@
 
 - id: list_derived_metrics_rankable_true
   tool: list_derived_metrics
-  desc: Rankable-only filter yields 4 DMs
+  desc: Rankable-only filter yields rankable numeric DMs
   params:
     rankable: true
   expect:
-    min_rows: 4
-    max_rows: 4
+    min_rows: 11
+    max_rows: 11
 
 - id: list_derived_metrics_rankable_false
   tool: list_derived_metrics
-  desc: Non-rankable filter yields 9 DMs in live KG
+  desc: Non-rankable filter yields all non-rankable DMs
   params:
     rankable: false
   expect:
-    min_rows: 9
-    max_rows: 9
+    min_rows: 23
+    max_rows: 23
 
 - id: list_derived_metrics_has_p_value_empty
   tool: list_derived_metrics

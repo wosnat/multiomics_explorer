@@ -1,5 +1,5 @@
 case_id: list_experiments_all
-row_count: 169
+row_count: 172
 rows:
 - background_factors:
   - darkness
@@ -3395,6 +3395,67 @@ rows:
   - growth_phase
 - background_factors:
   - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  distinct_gene_count: 0
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
+  experiment_name: MED4 vesicle proteome (LC-MS/MS, presence + Mascot probability
+    + PSORTb localization)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: significant_only
+  table_scope_detail: Proteins meeting Mascot >=97% identification probability with
+    >=1 exclusive unique peptide; no whole-cell comparison reported.
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  distinct_gene_count: 0
+  experiment_id: 10.1126/science.1243457_vesicle_dnaseq_med4
+  experiment_name: MED4 vesicle-encapsulated DNA-seq (top-50 ORFs by avg read coverage)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_DNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top 50 ORFs by average read coverage; full set of 1079 covered
+    ORFs not in supplementary.
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- background_factors:
+  - axenic
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
@@ -4253,7 +4314,7 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
-  omics_type: PROTEOMICS
+  omics_type: VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
   significant_down_count: 0
@@ -4471,7 +4532,7 @@ rows:
   gene_count: 0
   growth_phases: []
   is_time_course: 'false'
-  omics_type: PROTEOMICS
+  omics_type: VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834
   significant_down_count: 0
@@ -4655,6 +4716,37 @@ rows:
   - '2268'
   treatment_type:
   - coculture
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  distinct_gene_count: 0
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
+  experiment_name: MIT9313 vesicle proteome (LC-MS/MS, presence + Mascot probability
+    + PSORTb localization)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1126/science.1243457
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: significant_only
+  table_scope_detail: Proteins meeting Mascot identification threshold with >=1 exclusive
+    unique peptide; no whole-cell comparison reported.
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - background_factors:
   - axenic
   - light
@@ -5833,19 +5925,19 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
-  distinct_gene_count: 219
+  distinct_gene_count: 222
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_asw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in ASW coculture with
     Synechococcus WH7803
-  gene_count: 1533
+  gene_count: 1554
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'true'
   omics_type: EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1111/1462-2920.14012
-  significant_down_count: 197
-  significant_up_count: 449
+  significant_down_count: 198
+  significant_up_count: 457
   table_scope: all_detected_genes
   table_scope_detail: All R. pomeroyi DSS-3 proteins detected in ASW exoproteome across
     all timepoints
@@ -5888,24 +5980,24 @@ rows:
   - '19'
   - '44'
   - '46'
-  - '61'
+  - '62'
   - '9'
   time_point_significant_up:
   - '1'
-  - '103'
+  - '101'
+  - '105'
   - '11'
-  - '115'
-  - '48'
-  - '72'
-  - '99'
+  - '117'
+  - '49'
+  - '73'
   time_point_totals:
-  - '219'
-  - '219'
-  - '219'
-  - '219'
-  - '219'
-  - '219'
-  - '219'
+  - '222'
+  - '222'
+  - '222'
+  - '222'
+  - '222'
+  - '222'
+  - '222'
   treatment_type:
   - coculture
 - background_factors:
@@ -5913,19 +6005,19 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
-  distinct_gene_count: 181
+  distinct_gene_count: 184
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_sw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in SW coculture with
     Synechococcus WH7803
-  gene_count: 1267
+  gene_count: 1288
   growth_phases:
   - acclimated_steady_state
   is_time_course: 'true'
   omics_type: EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1111/1462-2920.14012
-  significant_down_count: 140
-  significant_up_count: 176
+  significant_down_count: 142
+  significant_up_count: 180
   table_scope: all_detected_genes
   table_scope_detail: All R. pomeroyi DSS-3 proteins detected in SW exoproteome across
     all timepoints
@@ -5968,24 +6060,24 @@ rows:
   - '1'
   - '14'
   - '26'
-  - '47'
-  - '50'
+  - '48'
+  - '51'
   time_point_significant_up:
   - '0'
   - '0'
-  - '17'
+  - '18'
   - '30'
   - '5'
-  - '55'
-  - '69'
+  - '56'
+  - '71'
   time_point_totals:
-  - '181'
-  - '181'
-  - '181'
-  - '181'
-  - '181'
-  - '181'
-  - '181'
+  - '184'
+  - '184'
+  - '184'
+  - '184'
+  - '184'
+  - '184'
+  - '184'
   treatment_type:
   - coculture
 - background_factors:

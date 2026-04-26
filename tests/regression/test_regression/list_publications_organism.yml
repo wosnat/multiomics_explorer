@@ -1,5 +1,5 @@
 case_id: list_publications_organism
-row_count: 15
+row_count: 16
 rows:
 - authors:
   - Daniel Sher
@@ -195,6 +195,33 @@ rows:
   treatment_types:
   - carbon
   year: 2015
+- authors:
+  - Anne W. Thompson
+  - Florence Schubotz
+  - Roger E. Summons
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: 10.1126/science.1243457
+  experiment_count: 3
+  growth_phases: []
+  journal: Science
+  omics_types:
+  - VESICLE_DNASEQ
+  - VESICLE_PROTEOMICS
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Imaging, Proteomics, Genomics, Lipidomics, Nanoparticle tracking analysis
+  title: Bacterial Vesicles in Marine Ecosystems
+  treatment_types:
+  - compartment
+  year: 2014
 - authors:
   - Bang Wang
   - Chaoguang Tian

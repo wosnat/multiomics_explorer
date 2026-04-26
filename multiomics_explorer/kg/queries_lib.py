@@ -708,6 +708,7 @@ def _list_publications_where(
     growth_phases: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
+    publication_dois: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for publication queries.
 
@@ -751,6 +752,10 @@ def _list_publications_where(
         )
         params["author"] = author
 
+    if publication_dois:
+        conditions.append("toLower(p.doi) IN $publication_dois")
+        params["publication_dois"] = [d.lower() for d in publication_dois]
+
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
     return where_block, params
 
@@ -763,6 +768,7 @@ def build_list_publications(
     growth_phases: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
+    publication_dois: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
 ) -> tuple[str, dict]:
@@ -778,6 +784,7 @@ def build_list_publications(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
         search_text=search_text, author=author,
+        publication_dois=publication_dois,
     )
 
     verbose_cols = (
@@ -847,6 +854,7 @@ def build_list_publications_summary(
     growth_phases: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
+    publication_dois: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for matching publications.
 
@@ -858,6 +866,7 @@ def build_list_publications_summary(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
         search_text=search_text, author=author,
+        publication_dois=publication_dois,
     )
 
     if search_text:
@@ -870,10 +879,13 @@ def build_list_publications_summary(
             "RETURN count(p2) AS total_entries, total_matching"
         )
     else:
+        # OPTIONAL MATCH preserves the total_entries row when the filtered
+        # MATCH returns zero rows — without it, an empty filter intersection
+        # collapses to 0 result rows and callers IndexError on summary[0].
         cypher = (
             "MATCH (p:Publication)\n"
             "WITH count(p) AS total_entries\n"
-            "MATCH (p:Publication)\n"
+            "OPTIONAL MATCH (p:Publication)\n"
             f"{where_block}"
             "RETURN total_entries, count(p) AS total_matching"
         )

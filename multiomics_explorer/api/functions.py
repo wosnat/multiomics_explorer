@@ -631,6 +631,7 @@ def list_publications(
     growth_phases: str | None = None,
     search_text: str | None = None,
     author: str | None = None,
+    publication_dois: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -641,7 +642,7 @@ def list_publications(
 
     Returns dict with keys: total_entries, total_matching, returned, truncated,
     by_organism, by_treatment_type, by_background_factors, by_omics_type,
-    by_cluster_type, results.
+    by_cluster_type, not_found, results.
     Per result: doi, title, authors, year, journal, study_type, organisms,
     experiment_count, treatment_types, background_factors, omics_types,
     clustering_analysis_count, cluster_types, growth_phases.
@@ -650,6 +651,11 @@ def list_publications(
 
     growth_phases: if provided, restricts to publications whose growth_phases
     array contains the specified value (case-insensitive).
+
+    publication_dois: if provided, restricts to publications whose `doi`
+    matches any of the listed values (case-insensitive). Mirrors the filter
+    shape on sibling list_* tools (list_experiments.experiment_ids).
+    `not_found` in the envelope lists any provided DOIs that did not match.
     """
     conn = _default_conn(conn)
     filter_kwargs = dict(
@@ -657,6 +663,7 @@ def list_publications(
         background_factors=background_factors,
         growth_phases=growth_phases,
         search_text=search_text, author=author,
+        publication_dois=publication_dois,
     )
 
     def _execute(st=search_text):
@@ -712,6 +719,22 @@ def list_publications(
     if not verbose:
         results = [{k: v for k, v in r.items() if k != "cluster_count"} for r in results]
 
+    # Compute not_found: provided publication_dois that no Publication node
+    # matches. Only the publication_dois filter is used (other filters could
+    # exclude a real DOI, which is "filtered out" rather than "not found").
+    if publication_dois:
+        doi_cypher = (
+            "MATCH (p:Publication) WHERE toLower(p.doi) IN $dois "
+            "RETURN collect(toLower(p.doi)) AS found"
+        )
+        doi_rows = conn.execute_query(
+            doi_cypher, dois=[d.lower() for d in publication_dois],
+        )
+        found_dois = set(doi_rows[0]["found"]) if doi_rows else set()
+        not_found = [d for d in publication_dois if d.lower() not in found_dois]
+    else:
+        not_found = []
+
     return {
         "total_entries": summary["total_entries"],
         "total_matching": summary["total_matching"],
@@ -723,6 +746,7 @@ def list_publications(
         "returned": len(results),
         "offset": offset,
         "truncated": summary["total_matching"] > offset + len(results),
+        "not_found": not_found,
         "results": results,
     }
 

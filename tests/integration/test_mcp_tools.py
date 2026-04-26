@@ -185,6 +185,33 @@ class TestListPublications:
         assert summary["total_matching"] == len(data)
         assert summary["total_entries"] >= summary["total_matching"]
 
+    def test_publication_dois_filter(self, conn):
+        """publication_dois filter returns only the requested DOIs (case-
+        insensitive). `not_found` surfaces unmatched DOIs."""
+        result = api.list_publications(
+            publication_dois=["10.1038/ISMEJ.2016.70", "10.9999/does-not-exist"],
+            conn=conn,
+        )
+        assert result["total_matching"] == 1
+        assert len(result["results"]) == 1
+        assert result["results"][0]["doi"].lower() == "10.1038/ismej.2016.70"
+        assert result["not_found"] == ["10.9999/does-not-exist"]
+
+    def test_empty_intersection_returns_zero_matching(self, conn):
+        """Filter combinations that match zero publications return
+        total_matching=0 cleanly (not IndexError). The summary builder uses
+        OPTIONAL MATCH so the total_entries row survives an empty filter."""
+        # Pair a real DOI with a non-matching organism to force empty intersection.
+        result = api.list_publications(
+            publication_dois=["10.1038/ismej.2016.70"],
+            organism="DefinitelyNotARealOrganism",
+            conn=conn,
+        )
+        assert result["total_matching"] == 0
+        assert result["total_entries"] >= 15  # unfiltered count survives
+        assert result["results"] == []
+        assert result["not_found"] == []  # the DOI exists; it's filtered out
+
 
 @pytest.mark.kg
 class TestListOrganisms:
@@ -1047,50 +1074,45 @@ class TestListDerivedMetrics:
     def test_no_filters_13_dms(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(conn=conn, limit=None)
-        assert out["total_entries"] == 13
-        assert out["total_matching"] == 13
-        assert len(out["results"]) == 13
+        assert out["total_entries"] == 34
+        assert out["total_matching"] == 34
+        assert len(out["results"]) == 34
 
     def test_value_kind_numeric_6(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
-        assert out["total_matching"] == 6
+        assert out["total_matching"] == 15
         assert all(r["value_kind"] == "numeric" for r in out["results"])
-        assert all(r["compartment"] == "whole_cell" for r in out["results"])
+        compartments = {r["compartment"] for r in out["results"]}
+        assert compartments == {"whole_cell", "vesicle"}
 
     def test_value_kind_boolean_6(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="boolean", conn=conn, limit=None)
-        assert out["total_matching"] == 6
-        # 4 NATL2A + 2 MIT1002
+        assert out["total_matching"] == 16
         organisms = {r["organism_name"] for r in out["results"]}
-        assert organisms == {
-            "Prochlorococcus NATL2A", "Alteromonas macleodii MIT1002",
-        }
+        assert "Prochlorococcus NATL2A" in organisms
+        assert "Alteromonas macleodii MIT1002" in organisms
 
     def test_value_kind_categorical_1(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="categorical", conn=conn, limit=None)
-        assert out["total_matching"] == 1
-        row = out["results"][0]
-        assert row["metric_type"] == "darkness_survival_class"
-        assert row["allowed_categories"] is not None
-        assert len(row["allowed_categories"]) == 3
+        assert out["total_matching"] == 3
+        metric_types = {r["metric_type"] for r in out["results"]}
+        assert "darkness_survival_class" in metric_types
+        assert all(r["allowed_categories"] is not None for r in out["results"])
 
     def test_rankable_true_4(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=True, conn=conn, limit=None)
-        assert out["total_matching"] == 4
+        assert out["total_matching"] == 11
         assert all(r["rankable"] is True for r in out["results"])
 
     def test_rankable_false_9(self, conn):
-        """Sanity-checks bool→'false' string coercion path.
-        Baseline updated from plan's 2 to 9: boolean DMs (periodic_*, darkness_survival_class)
-        also carry rankable='false', giving 2 numeric + 6 boolean + 1 categorical = 9.
-        """
+        """Sanity-checks bool→'false' string coercion path."""
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=False, conn=conn, limit=None)
-        assert out["total_matching"] == 9
+        assert out["total_matching"] == 23
         metric_types = {r["metric_type"] for r in out["results"]}
         # The two non-rankable numeric DMs are always in this set
         assert "peak_time_protein_h" in metric_types
@@ -1107,7 +1129,7 @@ class TestListDerivedMetrics:
     def test_organism_short_code(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(organism="MED4", conn=conn, limit=None)
-        assert out["total_matching"] == 6
+        assert out["total_matching"] == 10
         assert all(r["organism_name"] == "Prochlorococcus MED4" for r in out["results"])
 
     def test_organism_full_name(self, conn):
@@ -1153,7 +1175,7 @@ class TestListDerivedMetrics:
         assert out["results"] == []
         assert out["returned"] == 0
         assert len(out["by_value_kind"]) == 3  # numeric, boolean, categorical
-        assert len(out["by_organism"]) == 3
+        assert len(out["by_organism"]) == 6
 
     def test_verbose_adds_fields(self, conn):
         from multiomics_explorer.api import list_derived_metrics

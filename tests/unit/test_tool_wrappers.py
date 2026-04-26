@@ -1937,6 +1937,58 @@ class TestListPublicationsWrapper:
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
 
+    @pytest.mark.asyncio
+    async def test_publication_dois_passed_to_api(self, tool_fns, mock_ctx):
+        """publication_dois flows from MCP wrapper into api.list_publications."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 21, "total_matching": 0,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "returned": 0, "truncated": False, "results": [],
+                "not_found": [],
+            },
+        ) as mock_api:
+            await tool_fns["list_publications"](
+                mock_ctx, publication_dois=["10.1234/a", "10.1234/b"],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("publication_dois") == ["10.1234/a", "10.1234/b"]
+
+    @pytest.mark.asyncio
+    async def test_not_found_surfaced_in_response(self, tool_fns, mock_ctx):
+        """not_found from api dict appears on the Pydantic response."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 21, "total_matching": 0,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "returned": 0, "truncated": False, "results": [],
+                "not_found": ["10.1234/zzz"],
+            },
+        ):
+            result = await tool_fns["list_publications"](
+                mock_ctx, publication_dois=["10.1234/zzz"],
+            )
+        assert result.not_found == ["10.1234/zzz"]
+
+    @pytest.mark.asyncio
+    async def test_not_found_default_empty(self, tool_fns, mock_ctx):
+        """When api dict omits not_found, response defaults to empty list."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 21, "total_matching": 21,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "returned": 0, "truncated": True, "results": [],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        assert result.not_found == []
+
 
 class TestListExperimentsWrapper:
     _SAMPLE_SUMMARY = {

@@ -1,0 +1,27 @@
+case_id: list_publications_dois
+row_count: 1
+rows:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: 10.1038/ismej.2016.70
+  experiment_count: 5
+  growth_phases:
+  - exponential
+  journal: The ISME Journal
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii HOT1A3
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: RNA-seq
+  title: 'Transcriptional response of Prochlorococcus to co-culture with a marine
+    Alteromonas: differences between strains and the involvement of putative infochemicals'
+  treatment_types:
+  - coculture
+  year: 2016

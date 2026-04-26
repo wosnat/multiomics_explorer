@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 37
+row_count: 38
 rows:
 - authors:
   - James I. Mullet
@@ -331,11 +331,11 @@ rows:
   growth_phases: []
   journal: Environmental Microbiology
   omics_types:
-  - PROTEOMICS
+  - VESICLE_PROTEOMICS
   organisms:
   - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
-  study_type: Lipidomics|Proteomics|Metabolomics|Enzymology|Microbial ecology
+  study_type: Multi-omics (lipidomics, proteomics, metabolomics)
   title: 'Prochlorococcus extracellular vesicles: molecular composition and adsorption
     to diverse microbes'
   treatment_types:
@@ -750,6 +750,33 @@ rows:
   treatment_types:
   - phosphorus
   year: 2015
+- authors:
+  - Anne W. Thompson
+  - Florence Schubotz
+  - Roger E. Summons
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  doi: 10.1126/science.1243457
+  experiment_count: 3
+  growth_phases: []
+  journal: Science
+  omics_types:
+  - VESICLE_DNASEQ
+  - VESICLE_PROTEOMICS
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Imaging, Proteomics, Genomics, Lipidomics, Nanoparticle tracking analysis
+  title: Bacterial Vesicles in Marine Ecosystems
+  treatment_types:
+  - compartment
+  year: 2014
 - authors:
   - Alexander S Beliaev
   - Allan Konopka

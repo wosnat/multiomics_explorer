@@ -18,6 +18,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 | growth_phases | string \| None | None | Filter by growth phase (case-insensitive). E.g. 'exponential', 'nutrient_limited'. |
 | search_text | string \| None | None | Free-text search on title, abstract, and description (Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'. |
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
+| publication_dois | list[string] \| None | None | Restrict to specific publications by DOI (case-insensitive). Combines with other filters via AND. `not_found` in the response lists any provided DOIs that did not match. Mirrors the filter shape on sibling list_* tools (list_experiments.experiment_ids). |
 | verbose | bool | False | Include abstract and description. Default compact for routing. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
@@ -29,7 +30,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, returned, offset, truncated, results
+total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, returned, offset, truncated, not_found, results
 ```
 
 - **total_entries** (int): Total publications in KG (unfiltered)
@@ -42,6 +43,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **returned** (int): Publications in this response
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
+- **not_found** (list[string]): Input publication_dois that did not match any Publication node (empty unless publication_dois was provided)
 
 ### Per-result fields
 
@@ -113,12 +115,19 @@ Step 3: genes_by_function(search_text="photosystem", organism="MED4")
         → find genes of interest
 ```
 
+### Example 4: Fetch metadata for a known DOI list
+
+```example-call
+list_publications(publication_dois=["10.1038/ismej.2016.70", "10.1101/2025.11.24.690089"], verbose=True)
+```
+
 ## Chaining patterns
 
 ```
 list_publications → list_experiments → differential_expression_by_gene
 list_publications → genes_by_function
 list_publications → list_clustering_analyses(publication_doi=[...])
+list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset
 ```
 
 ## Common mistakes
@@ -145,7 +154,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, offset, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

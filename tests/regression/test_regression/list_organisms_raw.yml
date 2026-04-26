@@ -154,7 +154,7 @@ rows:
   treatment_types:
   - salt
 - clade: HLI
-  experiment_count: 109
+  experiment_count: 112
   gene_count: 1976
   genus: Prochlorococcus
   ncbi_taxon_id: 59919
@@ -163,13 +163,16 @@ rows:
   - PAIRED_RNASEQ_PROTEOME
   - PROTEOMICS
   - RNASEQ
+  - VESICLE_DNASEQ
+  - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
-  publication_count: 15
+  publication_count: 16
   species: Prochlorococcus marinus
   strain: MED4
   treatment_types:
   - carbon
   - coculture
+  - compartment
   - diel
   - growth_phase
   - iron
@@ -213,6 +216,7 @@ rows:
   omics_types:
   - PROTEOMICS
   - RNASEQ
+  - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9312
   publication_count: 5
   species: Prochlorococcus marinus
@@ -224,16 +228,17 @@ rows:
   - phosphorus
   - plastic
 - clade: LLIV
-  experiment_count: 23
+  experiment_count: 26
   gene_count: 2948
   genus: Prochlorococcus
   ncbi_taxon_id: 74547
   omics_types:
   - MICROARRAY
-  - PROTEOMICS
   - RNASEQ
+  - VESICLE_DNASEQ
+  - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
-  publication_count: 7
+  publication_count: 8
   species: Prochlorococcus marinus
   strain: MIT9313
   treatment_types:

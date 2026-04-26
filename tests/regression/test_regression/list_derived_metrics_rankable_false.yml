@@ -1,5 +1,5 @@
 case_id: list_derived_metrics_rankable_false
-row_count: 17
+row_count: 23
 rows:
 - allowed_categories: null
   background_factors:
@@ -227,6 +227,56 @@ rows:
 - allowed_categories: null
   background_factors:
   - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
+  field_description: 'Boolean flag: protein identified in MED4 vesicle proteome by
+    LC-MS/MS (Mascot >=97% identification probability with >=1 exclusive unique peptide).'
+  growth_phases: []
+  has_p_value: false
+  metric_type: vesicle_proteome_member
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  rankable: false
+  total_gene_count: 32
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: boolean
+- allowed_categories:
+  - Cytoplasmic
+  - Cytoplasmic Membrane
+  - Extracellular
+  - Outer Membrane
+  - Periplasmic
+  - Unknown
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
+  field_description: PSORTb-predicted subcellular localization for proteins in the
+    MED4 vesicle proteome.
+  growth_phases: []
+  has_p_value: false
+  metric_type: predicted_subcellular_localization
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  rankable: false
+  total_gene_count: 32
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: categorical
+- allowed_categories: null
+  background_factors:
+  - axenic
   compartment: whole_cell
   derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h
   experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
@@ -265,6 +315,102 @@ rows:
   treatment_type:
   - diel
   unit: hours
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:mascot_identification_probability
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
+  field_description: Mascot peptide-identification probability (%) for the protein
+    in the MED4 vesicle proteome; quality score, not abundance. Cutoff was 97%.
+  growth_phases: []
+  has_p_value: false
+  metric_type: mascot_identification_probability
+  name: MED4 vesicle protein Mascot identification probability (Biller 2014 Table
+    S2)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  rankable: false
+  total_gene_count: 32
+  treatment_type:
+  - compartment
+  unit: percent
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
+  field_description: 'Boolean flag: protein identified in MIT9313 vesicle proteome
+    by LC-MS/MS (Mascot identification with >=1 exclusive unique peptide).'
+  growth_phases: []
+  has_p_value: false
+  metric_type: vesicle_proteome_member
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1126/science.1243457
+  rankable: false
+  total_gene_count: 26
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: boolean
+- allowed_categories:
+  - Cytoplasmic
+  - Cytoplasmic Membrane
+  - Extracellular
+  - Outer Membrane
+  - Periplasmic
+  - Unknown
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
+  field_description: PSORTb-predicted subcellular localization for proteins in the
+    MIT9313 vesicle proteome.
+  growth_phases: []
+  has_p_value: false
+  metric_type: predicted_subcellular_localization
+  name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1126/science.1243457
+  rankable: false
+  total_gene_count: 26
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: categorical
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:mascot_identification_probability
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
+  field_description: Mascot peptide-identification probability (%) for the protein
+    in the MIT9313 vesicle proteome; quality score, not abundance.
+  growth_phases: []
+  has_p_value: false
+  metric_type: mascot_identification_probability
+  name: MIT9313 vesicle protein Mascot identification probability (Biller 2014 Table
+    S3)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1126/science.1243457
+  rankable: false
+  total_gene_count: 26
+  treatment_type:
+  - compartment
+  unit: percent
   value_kind: numeric
 - allowed_categories: null
   background_factors:

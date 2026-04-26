@@ -6,8 +6,8 @@ rows:
   - '{''count'': 1, ''item'': ''diel''}'
   - '{''count'': 1, ''item'': ''viral''}'
   - '{''count'': 10, ''item'': ''coculture''}'
-  - '{''count'': 25, ''item'': ''axenic''}'
-  - '{''count'': 29, ''item'': ''light''}'
+  - '{''count'': 27, ''item'': ''axenic''}'
+  - '{''count'': 31, ''item'': ''light''}'
   - '{''count'': 7, ''item'': ''darkness''}'
   by_cluster_type:
   - '{''count'': 1, ''item'': ''condition_comparison''}'
@@ -25,12 +25,14 @@ rows:
   - '{''count'': 7, ''item'': ''nutrient_limited''}'
   by_omics_type:
   - '{''count'': 1, ''item'': ''PAIRED_RNASEQ_PROTEOME''}'
+  - '{''count'': 1, ''item'': ''VESICLE_DNASEQ''}'
+  - '{''count'': 1, ''item'': ''VESICLE_PROTEOMICS''}'
   - '{''count'': 12, ''item'': ''RNASEQ''}'
   - '{''count'': 14, ''item'': ''PROTEOMICS''}'
   - '{''count'': 19, ''item'': ''MICROARRAY''}'
   by_organism:
   - '{''count'': 1, ''item'': ''Alteromonas macleodii HOT1A3''}'
-  - '{''count'': 37, ''item'': ''Prochlorococcus MED4''}'
+  - '{''count'': 39, ''item'': ''Prochlorococcus MED4''}'
   - '{''count'': 4, ''item'': ''Alteromonas (MarRef v6)''}'
   - '{''count'': 4, ''item'': ''Marinobacter (MarRef v6)''}'
   by_publication:
@@ -43,6 +45,7 @@ rows:
   - '{''count'': 1, ''item'': ''10.1371/journal.pone.0043432''}'
   - '{''count'': 1, ''item'': ''10.3389/fmicb.2022.1038136''}'
   - '{''count'': 12, ''item'': ''10.1128/spectrum.03275-22''}'
+  - '{''count'': 2, ''item'': ''10.1126/science.1243457''}'
   - '{''count'': 3, ''item'': ''10.1038/ismej.2011.49''}'
   - '{''count'': 3, ''item'': ''10.1038/msb4100087''}'
   - '{''count'': 4, ''item'': ''10.1038/ismej.2015.36''}'
@@ -50,21 +53,23 @@ rows:
   - '{''count'': 6, ''item'': ''10.1101/2025.11.24.690089''}'
   - '{''count'': 6, ''item'': ''10.1128/JB.01097-06''}'
   by_table_scope:
+  - '{''count'': 1, ''item'': ''top_n''}'
   - '{''count'': 12, ''item'': ''filtered_subset''}'
   - '{''count'': 22, ''item'': ''all_detected_genes''}'
   - '{''count'': 3, ''item'': ''''}'
   - '{''count'': 3, ''item'': ''significant_any_timepoint''}'
-  - '{''count'': 6, ''item'': ''significant_only''}'
+  - '{''count'': 7, ''item'': ''significant_only''}'
   by_treatment_type:
   - '{''count'': 1, ''item'': ''growth_phase''}'
   - '{''count'': 1, ''item'': ''phosphorus''}'
   - '{''count'': 1, ''item'': ''salt''}'
   - '{''count'': 11, ''item'': ''coculture''}'
   - '{''count'': 16, ''item'': ''carbon''}'
+  - '{''count'': 2, ''item'': ''compartment''}'
   - '{''count'': 2, ''item'': ''diel''}'
   - '{''count'': 3, ''item'': ''iron''}'
   - '{''count'': 3, ''item'': ''viral''}'
   - '{''count'': 8, ''item'': ''light''}'
   - '{''count'': 8, ''item'': ''nitrogen''}'
   time_course_count: 12
-  total_matching: 46
+  total_matching: 48

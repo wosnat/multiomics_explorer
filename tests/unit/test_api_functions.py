@@ -1728,6 +1728,63 @@ class TestListPublications:
         assert result["results"][0]["doi"] == "10.1234/2"
         assert result["offset"] == 2
 
+    def test_publication_dois_filter_threaded_to_builders(self, mock_conn):
+        """publication_dois flows into the summary + detail builder params."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21, "total_matching": 1}],   # summary
+            [{**self._PUB_ROW, "doi": "10.1234/a"}],         # detail
+            [{"found": ["10.1234/a"]}],                      # not_found probe
+        ]
+        result = api.list_publications(
+            publication_dois=["10.1234/a"], conn=mock_conn,
+        )
+        # Summary query has the filter
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        assert summary_call.kwargs.get("publication_dois") == ["10.1234/a"]
+        # Detail query has the filter
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert detail_call.kwargs.get("publication_dois") == ["10.1234/a"]
+        assert result["not_found"] == []
+        assert result["results"][0]["doi"] == "10.1234/a"
+
+    def test_publication_dois_not_found_populated(self, mock_conn):
+        """Provided DOIs that no Publication matches surface in not_found.
+        Comparison is case-insensitive (input preserved in not_found list)."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21, "total_matching": 1}],
+            [{**self._PUB_ROW, "doi": "10.1234/a"}],
+            [{"found": ["10.1234/a"]}],  # only one of two requested DOIs exists
+        ]
+        result = api.list_publications(
+            publication_dois=["10.1234/A", "10.1234/zzz"],
+            conn=mock_conn,
+        )
+        # 10.1234/A normalises to lowercase and matches
+        assert result["not_found"] == ["10.1234/zzz"]
+        assert result["total_matching"] == 1
+
+    def test_publication_dois_not_found_probe_lowercases(self, mock_conn):
+        """The not_found probe sends lowercased DOIs to Cypher."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21, "total_matching": 0}],
+            [],
+            [{"found": []}],
+        ]
+        api.list_publications(
+            publication_dois=["10.1234/MIXEDCase"], conn=mock_conn,
+        )
+        probe_call = mock_conn.execute_query.call_args_list[2]
+        assert probe_call.kwargs.get("dois") == ["10.1234/mixedcase"]
+
+    def test_default_not_found_empty_list(self, mock_conn):
+        """When publication_dois not provided, not_found is an empty list."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 21, "total_matching": 21}],
+            [self._PUB_ROW],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        assert result["not_found"] == []
+
 
 class TestListExperiments:
     """Tests for list_experiments API function."""

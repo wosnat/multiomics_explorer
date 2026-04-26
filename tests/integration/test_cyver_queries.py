@@ -215,6 +215,7 @@ _BUILDERS: list[tuple[str, ...]] = [
     # --- publications ---
     ("list_publications", build_list_publications, {}),
     ("list_publications_search", build_list_publications, {"search_text": "light"}),
+    ("list_publications_dois", build_list_publications, {"publication_dois": ["10.1038/ismej.2016.70"]}),
     ("list_publications_summary", build_list_publications_summary, {}),
     ("list_publications_summary_search", build_list_publications_summary, {"search_text": "light"}),
     # --- organisms ---

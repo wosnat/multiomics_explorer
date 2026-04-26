@@ -10,11 +10,11 @@ rows:
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 153, ''name'': ''Energy production and
     conversion''}'
-  - '{''id'': ''cog.category:G'', ''count'': 26, ''name'': ''Carbohydrate transport
-    and metabolism''}'
+  - '{''id'': ''cog.category:F'', ''count'': 7, ''name'': ''Nucleotide transport and
+    metabolism''}'
+  - '{''id'': ''cog.category:H'', ''count'': 20, ''name'': ''Coenzyme transport and
+    metabolism''}'
   - '{''id'': ''cog.category:K'', ''count'': 6, ''name'': ''Transcription''}'
-  - '{''id'': ''cog.category:O'', ''count'': 10, ''name'': ''Post-translational modification,
-    protein turnover, chaperones''}'
   - '{''id'': ''cog.category:S'', ''count'': 134, ''name'': ''Function unknown''}'
   top_cyanorak_roles:
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 41, ''name'': ''Cellular processes
