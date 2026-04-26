@@ -102,6 +102,28 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 | foreground_gene_ids | list[string] \| None (optional) | Verbose only: the k DE genes in this pathway (clusterProfiler: geneID split) |
 | background_gene_ids | list[string] \| None (optional) | Verbose only: pathway members in background NOT in DE set (non-overlapping complement) |
 
+### Cluster naming
+
+Cluster IDs returned in `results[].cluster` follow the canonical format:
+
+```
+{experiment_id}|{timepoint}|{direction}
+```
+
+Examples: `Tolonen_Ndeplete_R1|6h|up`, `Weissberg_axenic_RNA|day14|down`.
+
+Timepoint handling: experiments without numeric timepoints (single-condition
+studies) render the timepoint slot as the literal string `"NA"` —
+e.g. `cluster_membership_exp1|NA|up`.
+
+Drill-down accessors take the cluster string verbatim:
+
+```python
+result.explain("Tolonen_Ndeplete_R1|6h|up", "kegg.pathway:ko00910")
+result.overlap_genes("Tolonen_Ndeplete_R1|6h|up", "kegg.pathway:ko00910")
+```
+
+
 ## Few-shot examples
 
 ### Example 1: Single experiment, default direction=both

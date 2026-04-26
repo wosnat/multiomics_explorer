@@ -133,6 +133,28 @@ def test_python_returns_default_unchanged():
     assert "returns dict with keys" in text
 
 
+def test_response_notes_renders_subsection():
+    """When YAML provides response_notes:, build_about_content.py
+    renders them as a subsection under Response format. B2 #6."""
+    from scripts.build_about_content import _build_response_notes_section
+
+    section = _build_response_notes_section([
+        {"title": "Cluster naming",
+         "body": "Cluster IDs are `{experiment_id}|{timepoint}|{direction}`. NaN timepoints render as `\"NA\"`."},
+    ])
+    text = "\n".join(section)
+    assert "### Cluster naming" in text
+    assert "experiment_id" in text
+    assert "NA" in text
+
+
+def test_response_notes_empty_list():
+    """No response_notes → empty section list."""
+    from scripts.build_about_content import _build_response_notes_section
+    assert _build_response_notes_section([]) == []
+    assert _build_response_notes_section(None) == []
+
+
 class TestAboutContentConsistency:
     """Verify about files are consistent with tool schemas."""
 

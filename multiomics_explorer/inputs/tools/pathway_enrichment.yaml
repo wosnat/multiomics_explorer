@@ -35,6 +35,28 @@ verbose_fields:
   - foreground_gene_ids
   - background_gene_ids
 
+response_notes:
+  - title: "Cluster naming"
+    body: |
+      Cluster IDs returned in `results[].cluster` follow the canonical format:
+
+      ```
+      {experiment_id}|{timepoint}|{direction}
+      ```
+
+      Examples: `Tolonen_Ndeplete_R1|6h|up`, `Weissberg_axenic_RNA|day14|down`.
+
+      Timepoint handling: experiments without numeric timepoints (single-condition
+      studies) render the timepoint slot as the literal string `"NA"` —
+      e.g. `cluster_membership_exp1|NA|up`.
+
+      Drill-down accessors take the cluster string verbatim:
+
+      ```python
+      result.explain("Tolonen_Ndeplete_R1|6h|up", "kegg.pathway:ko00910")
+      result.overlap_genes("Tolonen_Ndeplete_R1|6h|up", "kegg.pathway:ko00910")
+      ```
+
 chaining:
   - "ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment"
   - "pathway_enrichment → gene_overview"

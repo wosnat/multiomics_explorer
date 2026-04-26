@@ -235,6 +235,9 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
                 lines.append(f"| {f['name']} | {type_escaped}{req} | {desc} |")
             lines.append("")
 
+    # Response notes (subsections under Response format, from input YAML)
+    lines.extend(_build_response_notes_section((input_data or {}).get("response_notes")))
+
     # Few-shot examples (from input YAML)
     if input_data and input_data.get("examples"):
         lines.append("## Few-shot examples")
@@ -313,6 +316,22 @@ def render_about(tool_name: str, schema: dict, input_data: dict | None) -> str:
     ))
 
     return "\n".join(lines)
+
+
+def _build_response_notes_section(notes: list[dict] | None) -> list[str]:
+    """Render YAML `response_notes` as subsections under Response format.
+
+    Each note is `{"title": str, "body": str}`. Empty / None → no output.
+    """
+    if not notes:
+        return []
+    lines: list[str] = []
+    for note in notes:
+        lines.append(f"### {note['title']}")
+        lines.append("")
+        lines.append(note["body"])
+        lines.append("")
+    return lines
 
 
 def _build_package_import_section(
