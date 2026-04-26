@@ -142,6 +142,12 @@ Step 2: pathway_enrichment(organism="MED4", experiment_ids=[...], ontology=<pick
         → Fisher ORA results
 ```
 
+### Example 7: Hand-curated DAG-ontology panel via search_ontology + term_ids
+
+```example-call
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="go_bp", term_ids=["go:0071941", "go:0071705"])
+```
+
 ## Chaining patterns
 
 ```
@@ -177,6 +183,8 @@ pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or
 ```
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
+- For DAG ontologies (`go_*`), `level=N`-only enrichment silently drops biologically-meaningful terms at heterogeneous depths. For narrow research questions, hand-curate a `term_ids` panel via `search_ontology(ontology='go_bp', search_text=...)` and pass it directly. Use `level` only when surveying a whole branch.
 
 ## Package import equivalent
 
