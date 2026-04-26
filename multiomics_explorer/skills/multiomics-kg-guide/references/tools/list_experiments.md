@@ -76,8 +76,8 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | is_time_course | bool | Whether experiment has multiple time points |
 | table_scope | string \| None (optional) | What genes the source DE table contains. Values: all_detected_genes, significant_any_timepoint, significant_only, top_n, filtered_subset. Critical for interpreting missing genes. |
 | table_scope_detail | string \| None (optional) | Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8') |
-| gene_count | int | Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments). For a 6-TP experiment with 1697 genes/TP, gene_count=10182. For non-time-course it equals distinct_gene_count (e.g. 1696). |
-| distinct_gene_count | int | Distinct gene count across the experiment — number of distinct gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count, equal for non-time-course experiments. (e.g. 1697) |
+| gene_count | int | Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments). For a 6-TP experiment with 1697 genes/TP, gene_count=10182. For non-time-course experiments equals distinct_gene_count. |
+| distinct_gene_count | int | Distinct gene count across the experiment — number of distinct gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count; for the same 6-TP example, distinct_gene_count=1697 vs gene_count=10182. |
 | genes_by_status | GeneStatusBreakdown | Gene counts by expression status |
 | timepoints | list[TimePoint] \| None (optional) | Per-timepoint gene counts. Omitted for non-time-course experiments. |
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this experiment (e.g. 4) |
