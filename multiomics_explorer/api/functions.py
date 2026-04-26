@@ -47,6 +47,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_gene_categories,
     build_list_growth_phases,
     build_list_organisms,
+    build_list_organisms_summary,
     build_list_publications,
     build_list_publications_summary,
     build_list_experiments,
@@ -556,16 +557,24 @@ def list_filter_values(
 
 
 def list_organisms(
+    organism_names: list[str] | None = None,
+    summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """List all organisms in the knowledge graph.
+    """List organisms in the knowledge graph, optionally filtered by name.
 
-    Returns dict with keys: total_entries, returned, truncated,
-    by_cluster_type, by_organism_type, results.
+    organism_names: when provided, restricts results to organisms whose
+        preferred_name matches (case-insensitive). Unknown names are
+        returned in `not_found`.
+    summary: when True, sets limit=0 internally — results=[], summary
+        fields only.
+
+    Returns dict with keys: total_entries, total_matching, returned, offset,
+    truncated, by_cluster_type, by_organism_type, not_found, results.
     Per result: organism_name, genus, species, strain, clade,
     ncbi_taxon_id, organism_type, gene_count, publication_count,
     experiment_count, treatment_types, omics_types,
@@ -576,24 +585,42 @@ def list_organisms(
     kingdom, superkingdom, lineage, cluster_count.
     """
     conn = _default_conn(conn)
-    cypher, params = build_list_organisms(verbose=verbose)
-    all_results = conn.execute_query(cypher, **params)
-    total = len(all_results)
+    if summary:
+        limit = 0
 
-    # Compute by_cluster_type breakdown from all results
+    names_lc = [n.lower() for n in organism_names] if organism_names else None
+
+    cypher, params = build_list_organisms(
+        organism_names_lc=names_lc, verbose=verbose,
+    )
+    matched = conn.execute_query(cypher, **params)
+    total_matching = len(matched)
+
+    # total_entries: KG-wide. Skip the extra query when no filter is set —
+    # total_matching == total_entries in that case.
+    if organism_names is None:
+        total_entries = total_matching
+    else:
+        summary_cypher, summary_params = build_list_organisms_summary()
+        summary_rows = conn.execute_query(summary_cypher, **summary_params)
+        total_entries = summary_rows[0]["total_entries"] if summary_rows else 0
+
+    # Breakdowns reflect the matched set.
     ct_counts: dict[str, int] = {}
-    for org in all_results:
+    ot_counts: dict[str, int] = {}
+    for org in matched:
         for ct in org.get("cluster_types", []):
             ct_counts[ct] = ct_counts.get(ct, 0) + 1
-
-    # Compute by_organism_type breakdown from all results
-    ot_counts: dict[str, int] = {}
-    for org in all_results:
         ot = org.get("organism_type")
         if ot:
             ot_counts[ot] = ot_counts.get(ot, 0) + 1
 
-    results = all_results[offset:offset + limit] if limit else all_results[offset:]
+    if limit == 0:
+        results = []
+    elif limit is None:
+        results = matched[offset:]
+    else:
+        results = matched[offset:offset + limit]
 
     # Sparse-strip reference fields when null
     for r in results:
@@ -605,8 +632,23 @@ def list_organisms(
     if not verbose:
         results = [{k: v for k, v in r.items() if k != "cluster_count"} for r in results]
 
+    # not_found: input names that didn't match any OrganismTaxon
+    # (case-insensitive). Original casing preserved in the returned list.
+    if organism_names:
+        not_found_cypher = (
+            "MATCH (o:OrganismTaxon) "
+            "WHERE toLower(o.preferred_name) IN $names_lc "
+            "RETURN collect(toLower(o.preferred_name)) AS found"
+        )
+        nf_rows = conn.execute_query(not_found_cypher, names_lc=names_lc)
+        found = set(nf_rows[0]["found"]) if nf_rows else set()
+        not_found = [n for n in organism_names if n.lower() not in found]
+    else:
+        not_found = []
+
     return {
-        "total_entries": total,
+        "total_entries": total_entries,
+        "total_matching": total_matching,
         "by_cluster_type": sorted(
             [{"cluster_type": k, "count": v} for k, v in ct_counts.items()],
             key=lambda x: x["count"],
@@ -619,7 +661,8 @@ def list_organisms(
         ),
         "returned": len(results),
         "offset": offset,
-        "truncated": total > offset + len(results),
+        "truncated": total_matching > offset + len(results),
+        "not_found": not_found,
         "results": results,
     }
 

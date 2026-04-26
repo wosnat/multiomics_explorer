@@ -247,15 +247,21 @@ class TestListOrganismsWrapper:
 
     @pytest.mark.asyncio
     async def test_returns_response_envelope(self, tool_fns, mock_ctx):
-        """Response has total_entries, returned, truncated, results."""
+        """Response has total_entries, total_matching, returned, truncated, not_found, results."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 15, "returned": 1, "truncated": True, "results": [self._SAMPLE_ORG]},
+            return_value={
+                "total_entries": 15, "total_matching": 15,
+                "returned": 1, "truncated": True,
+                "not_found": [], "results": [self._SAMPLE_ORG],
+            },
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
         assert result.total_entries == 15
+        assert result.total_matching == 15
         assert result.returned == 1
-        assert result.truncated is True  # 15 > 1
+        assert result.truncated is True
+        assert result.not_found == []
         assert len(result.results) == 1
 
     @pytest.mark.asyncio
@@ -263,7 +269,11 @@ class TestListOrganismsWrapper:
         """Compact result has 11 fields, no taxonomy hierarchy."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 1, "returned": 1, "truncated": False, "results": [self._SAMPLE_ORG]},
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "returned": 1, "truncated": False,
+                "not_found": [], "results": [self._SAMPLE_ORG],
+            },
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
         org = result.results[0]
@@ -282,7 +292,11 @@ class TestListOrganismsWrapper:
                        "lineage": "cellular organisms; Bacteria; ..."}
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 1, "returned": 1, "truncated": False, "results": [verbose_org]},
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "returned": 1, "truncated": False,
+                "not_found": [], "results": [verbose_org],
+            },
         ):
             result = await tool_fns["list_organisms"](mock_ctx, verbose=True)
         org = result.results[0]
@@ -294,10 +308,15 @@ class TestListOrganismsWrapper:
         """Empty results return envelope with total_entries=0."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 0, "returned": 0, "truncated": False, "results": []},
+            return_value={
+                "total_entries": 0, "total_matching": 0,
+                "returned": 0, "truncated": False,
+                "not_found": [], "results": [],
+            },
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
         assert result.total_entries == 0
+        assert result.total_matching == 0
         assert result.returned == 0
         assert result.truncated is False
         assert result.results == []
@@ -307,7 +326,12 @@ class TestListOrganismsWrapper:
         """returned == len(results), truncated == (total > returned)."""
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
-            return_value={"total_entries": 2, "returned": 2, "truncated": False, "results": [self._SAMPLE_ORG, self._SAMPLE_ORG]},
+            return_value={
+                "total_entries": 2, "total_matching": 2,
+                "returned": 2, "truncated": False,
+                "not_found": [],
+                "results": [self._SAMPLE_ORG, self._SAMPLE_ORG],
+            },
         ):
             result = await tool_fns["list_organisms"](mock_ctx)
         assert result.returned == 2
@@ -318,14 +342,63 @@ class TestListOrganismsWrapper:
         with patch(
             "multiomics_explorer.api.functions.list_organisms",
             return_value={
-                "total_entries": 10, "returned": 2,
-                "truncated": True, "offset": 5, "results": [],
+                "total_entries": 10, "total_matching": 10, "returned": 2,
+                "truncated": True, "offset": 5, "not_found": [], "results": [],
             },
         ) as mock_api:
-            result = await tool_fns["list_organisms"](mock_ctx, offset=5)
+            await tool_fns["list_organisms"](mock_ctx, offset=5)
         mock_api.assert_called_once()
         call_kwargs = mock_api.call_args.kwargs if mock_api.call_args.kwargs else {}
         assert call_kwargs.get("offset") == 5
+
+    @pytest.mark.asyncio
+    async def test_organism_names_forwarded(self, tool_fns, mock_ctx):
+        """organism_names is forwarded to the api call verbatim."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 32, "total_matching": 1, "returned": 1,
+                "truncated": False, "not_found": [],
+                "results": [self._SAMPLE_ORG],
+            },
+        ) as mock_api:
+            await tool_fns["list_organisms"](
+                mock_ctx, organism_names=["Prochlorococcus MED4"],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("organism_names") == ["Prochlorococcus MED4"]
+
+    @pytest.mark.asyncio
+    async def test_summary_forwarded(self, tool_fns, mock_ctx):
+        """summary flag is forwarded to the api call."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 32, "total_matching": 32, "returned": 0,
+                "truncated": True, "not_found": [], "results": [],
+            },
+        ) as mock_api:
+            await tool_fns["list_organisms"](mock_ctx, summary=True)
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("summary") is True
+
+    @pytest.mark.asyncio
+    async def test_unknown_input_populates_not_found(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 32, "total_matching": 1, "returned": 1,
+                "truncated": False, "not_found": ["Bogus Org"],
+                "results": [self._SAMPLE_ORG],
+            },
+        ):
+            result = await tool_fns["list_organisms"](
+                mock_ctx,
+                organism_names=["Prochlorococcus MED4", "Bogus Org"],
+            )
+        assert result.not_found == ["Bogus Org"]
+        assert result.total_matching == 1
+        assert result.total_entries == 32
 
 
 # ---------------------------------------------------------------------------

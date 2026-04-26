@@ -934,9 +934,14 @@ def build_list_growth_phases() -> tuple[str, dict]:
 
 def build_list_organisms(
     *,
+    organism_names_lc: list[str] | None = None,
     verbose: bool = False,
 ) -> tuple[str, dict]:
-    """Build Cypher for listing all organisms with data-availability signals.
+    """Build Cypher for listing organisms with data-availability signals.
+
+    organism_names_lc: optional list of lowercased preferred_names. When
+        None, returns all organisms. When non-None, restricts to organisms
+        whose preferred_name (lowercased) is in the list.
 
     RETURN keys (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
@@ -960,6 +965,8 @@ def build_list_organisms(
 
     cypher = (
         "MATCH (o:OrganismTaxon)\n"
+        "WHERE $organism_names_lc IS NULL\n"
+        "   OR toLower(o.preferred_name) IN $organism_names_lc\n"
         "RETURN o.preferred_name AS organism_name,\n"
         "       o.organism_type AS organism_type,\n"
         "       o.genus AS genus,\n"
@@ -981,6 +988,15 @@ def build_list_organisms(
         f"{verbose_cols}\n"
         "ORDER BY o.genus, o.preferred_name"
     )
+    return cypher, {"organism_names_lc": organism_names_lc}
+
+
+def build_list_organisms_summary() -> tuple[str, dict]:
+    """Build Cypher for the KG-wide OrganismTaxon count.
+
+    RETURN keys: total_entries.
+    """
+    cypher = "MATCH (o:OrganismTaxon) RETURN count(o) AS total_entries"
     return cypher, {}
 
 

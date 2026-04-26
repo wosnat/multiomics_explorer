@@ -496,11 +496,13 @@ def register_tools(mcp: FastMCP):
 
     class ListOrganismsResponse(BaseModel):
         total_entries: int = Field(description="Total organisms in the KG")
-        by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type, sorted by count descending")
-        by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type, sorted by count descending")
+        total_matching: int = Field(description="Organisms matching the filter (= total_entries when no filter)")
+        by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type over the matched set, sorted by count descending")
+        by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted by count descending")
         returned: int = Field(description="Number of results returned")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
-        truncated: bool = Field(description="True if results were truncated by limit")
+        truncated: bool = Field(description="True if total_matching > offset + returned")
+        not_found: list[str] = Field(default_factory=list, description="organism_names inputs that didn't match any organism (case-insensitive); [] when no filter")
         results: list[OrganismResult]
 
     @mcp.tool(
@@ -509,6 +511,17 @@ def register_tools(mcp: FastMCP):
     )
     async def list_organisms(
         ctx: Context,
+        organism_names: Annotated[list[str] | None, Field(
+            description=(
+                "Filter by exact organism preferred_name (case-insensitive). "
+                "Pass values from a prior list_organisms call or another "
+                "tool's organism_name field. Unknown names are reported in "
+                "not_found rather than raising."
+            ),
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (results=[]).",
+        )] = False,
         verbose: Annotated[bool, Field(
             description="Include full taxonomy hierarchy "
             "(family, order, class, phylum, kingdom, superkingdom, lineage).",
@@ -520,7 +533,7 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListOrganismsResponse:
-        """List all organisms in the knowledge graph.
+        """List organisms in the knowledge graph, optionally filtered by name.
 
         Returns taxonomy, gene counts, publication counts, and organism_type
         for each organism. organism_type classifies each organism as
@@ -530,26 +543,44 @@ def register_tools(mcp: FastMCP):
 
         Use the returned organism names as filter values in genes_by_function,
         resolve_gene, genes_by_ontology, list_publications, etc. The organism
-        filter uses partial matching — "MED4", "Prochlorococcus MED4", and
-        "Prochlorococcus" all work.
+        filter on those tools uses partial matching — "MED4",
+        "Prochlorococcus MED4", and "Prochlorococcus" all work. The
+        organism_names filter on this tool uses exact match (case-
+        insensitive) on preferred_name; unknown names are reported in
+        not_found.
         """
-        await ctx.info(f"list_organisms verbose={verbose} limit={limit} offset={offset}")
+        await ctx.info(
+            f"list_organisms organism_names={organism_names} summary={summary} "
+            f"verbose={verbose} limit={limit} offset={offset}"
+        )
         try:
             conn = _conn(ctx)
-            result = api.list_organisms(verbose=verbose, limit=limit, offset=offset, conn=conn)
+            result = api.list_organisms(
+                organism_names=organism_names,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
             organisms = [OrganismResult(**r) for r in result["results"]]
             by_cluster_type = [OrgClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
             by_organism_type = [OrgTypeBreakdown(**b) for b in result.get("by_organism_type", [])]
             response = ListOrganismsResponse(
                 total_entries=result["total_entries"],
+                total_matching=result["total_matching"],
                 by_cluster_type=by_cluster_type,
                 by_organism_type=by_organism_type,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],
+                not_found=result.get("not_found", []),
                 results=organisms,
             )
-            await ctx.info(f"Returning {response.returned} of {response.total_entries} organisms")
+            await ctx.info(
+                f"Returning {response.returned} of {response.total_matching} matched "
+                f"({response.total_entries} in KG) organisms"
+            )
             return response
         except Exception as e:
             await ctx.error(f"list_organisms unexpected error: {e}")

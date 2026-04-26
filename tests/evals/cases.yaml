@@ -193,6 +193,20 @@
     contains:
       organism_name: Prochlorococcus MED4
 
+- id: list_organisms_filter_by_name
+  tool: list_organisms
+  desc: organism_names filter narrows to matched rows
+  params:
+    organism_names_lc: ["prochlorococcus med4", "prochlorococcus mit9301"]
+  expect:
+    min_rows: 2
+    max_rows: 2
+    columns: [organism_name, genus, species, strain, clade, ncbi_taxon_id,
+              gene_count, publication_count, experiment_count,
+              treatment_types, omics_types]
+    contains:
+      organism_name: Prochlorococcus MED4
+
 - id: list_organisms_raw
   tool: raw_cypher
   desc: Snapshot of all organisms with precomputed stats

@@ -266,6 +266,40 @@ class TestListOrganisms:
         genera = [r["genus"] for r in results if r["genus"] is not None]
         assert genera == sorted(genera)
 
+    def test_organism_names_filter_known_and_unknown(self, conn):
+        """organism_names filter returns matched rows + reports unknowns in not_found."""
+        result = api.list_organisms(
+            organism_names=[
+                "Prochlorococcus MED4",
+                "Prochlorococcus MIT9301",
+                "Bogus organism",
+            ],
+            conn=conn,
+        )
+        assert result["total_matching"] == 2
+        assert result["total_entries"] >= 13
+        assert result["not_found"] == ["Bogus organism"]
+        names = {r["organism_name"] for r in result["results"]}
+        assert "Prochlorococcus MED4" in names
+        assert "Prochlorococcus MIT9301" in names
+
+    def test_organism_names_case_insensitive(self, conn):
+        """Lowercase / mixed-case input still matches preferred_name."""
+        result = api.list_organisms(
+            organism_names=["prochlorococcus med4"], conn=conn,
+        )
+        assert result["total_matching"] == 1
+        assert result["not_found"] == []
+        assert result["results"][0]["organism_name"] == "Prochlorococcus MED4"
+
+    def test_summary_flag_returns_only_envelope(self, conn):
+        """summary=True yields results=[] + envelope counts."""
+        result = api.list_organisms(summary=True, conn=conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] == result["total_entries"]
+        assert result["truncated"] is True
+
 
 @pytest.mark.kg
 class TestListExperiments:

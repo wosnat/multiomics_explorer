@@ -1,0 +1,83 @@
+case_id: list_organisms_filter_by_name
+row_count: 2
+rows:
+- background_factors:
+  - axenic
+  - chemical
+  - coculture
+  - darkness
+  - diel
+  - light
+  - viral
+  clade: HLI
+  cluster_types:
+  - condition_comparison
+  - diel
+  - time_course
+  clustering_analysis_count: 4
+  experiment_count: 112
+  gene_count: 1976
+  genus: Prochlorococcus
+  growth_phases:
+  - acclimated_steady_state
+  - acute_stress
+  - darkness
+  - death
+  - exponential
+  - infected
+  - nutrient_limited
+  - recovery
+  - stationary
+  ncbi_taxon_id: 59919
+  omics_types:
+  - MICROARRAY
+  - PAIRED_RNASEQ_PROTEOME
+  - PROTEOMICS
+  - RNASEQ
+  - VESICLE_DNASEQ
+  - VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  organism_type: genome_strain
+  publication_count: 16
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MED4
+  treatment_types:
+  - carbon
+  - coculture
+  - compartment
+  - diel
+  - growth_phase
+  - iron
+  - light
+  - nitrogen
+  - phosphorus
+  - salt
+  - viral
+- background_factors:
+  - axenic
+  - diel
+  - light
+  clade: HLII
+  cluster_types:
+  - condition_comparison
+  clustering_analysis_count: 1
+  experiment_count: 2
+  gene_count: 1935
+  genus: Prochlorococcus
+  growth_phases:
+  - exponential
+  ncbi_taxon_id: 167546
+  omics_types:
+  - RNASEQ
+  organism_name: Prochlorococcus MIT9301
+  organism_type: genome_strain
+  publication_count: 2
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9301
+  treatment_types:
+  - growth_phase
+  - temperature

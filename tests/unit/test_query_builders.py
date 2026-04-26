@@ -23,6 +23,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_gene_categories,
     build_list_growth_phases,
     build_list_organisms,
+    build_list_organisms_summary,
     build_list_publications,
     build_list_publications_summary,
     build_list_experiments,
@@ -846,9 +847,9 @@ class TestBuildListOrganisms:
                      "superkingdom", "lineage"]:
             assert col in cypher
 
-    def test_no_params(self):
+    def test_default_params(self):
         _, params = build_list_organisms()
-        assert params == {}
+        assert params == {"organism_names_lc": None}
 
     def test_ordered_by_genus_and_name(self):
         cypher, _ = build_list_organisms()
@@ -862,6 +863,28 @@ class TestBuildListOrganisms:
         cypher, _ = build_list_organisms()
         assert "o.reference_database AS reference_database" in cypher
         assert "o.reference_proteome AS reference_proteome" in cypher
+
+    def test_filter_clause_present(self):
+        """WHERE gates the filter via $organism_names_lc IS NULL OR ..."""
+        cypher, _ = build_list_organisms()
+        assert "$organism_names_lc IS NULL" in cypher
+        assert "toLower(o.preferred_name) IN $organism_names_lc" in cypher
+
+    def test_filter_param_passthrough(self):
+        """Lowercased input list is forwarded verbatim as a Cypher param."""
+        names = ["prochlorococcus med4", "prochlorococcus mit9301"]
+        _, params = build_list_organisms(organism_names_lc=names)
+        assert params == {"organism_names_lc": names}
+
+
+class TestBuildListOrganismsSummary:
+    def test_returns_count_only(self):
+        cypher, params = build_list_organisms_summary()
+        assert "MATCH (o:OrganismTaxon)" in cypher
+        assert "count(o) AS total_entries" in cypher
+        # No filter — KG-wide count.
+        assert "WHERE" not in cypher
+        assert params == {}
 
 
 class TestOntologyConfig:

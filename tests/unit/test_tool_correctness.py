@@ -1806,10 +1806,12 @@ class TestListOrganismsCorrectness:
             "multiomics_explorer.api.functions.list_organisms",
             return_value={
                 "total_entries": 15,
+                "total_matching": 15,
                 "returned": 2,
                 "truncated": True,
                 "by_cluster_type": [],
                 "by_organism_type": [],
+                "not_found": [],
                 "results": [
                     {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
                      "genus": "Prochlorococcus",
@@ -1847,6 +1849,7 @@ class TestListOrganismsCorrectness:
             "multiomics_explorer.api.functions.list_organisms",
             return_value={
                 "total_entries": 2,
+                "total_matching": 2,
                 "returned": 2,
                 "truncated": False,
                 "by_cluster_type": [],
@@ -1854,6 +1857,7 @@ class TestListOrganismsCorrectness:
                     {"organism_type": "genome_strain", "count": 1},
                     {"organism_type": "reference_proteome_match", "count": 1},
                 ],
+                "not_found": [],
                 "results": [
                     {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
                      "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",
@@ -1889,6 +1893,7 @@ class TestListOrganismsCorrectness:
             "multiomics_explorer.api.functions.list_organisms",
             return_value={
                 "total_entries": 2,
+                "total_matching": 2,
                 "returned": 2,
                 "truncated": False,
                 "by_cluster_type": [],
@@ -1897,6 +1902,7 @@ class TestListOrganismsCorrectness:
                     {"organism_type": "treatment", "count": 5},
                     {"organism_type": "reference_proteome_match", "count": 2},
                 ],
+                "not_found": [],
                 "results": [
                     {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
                      "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",

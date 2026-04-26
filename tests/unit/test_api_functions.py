@@ -837,6 +837,87 @@ class TestListOrganisms:
         assert result["offset"] == 2
         assert result["truncated"] is True
 
+    def test_total_matching_no_filter(self, mock_conn):
+        """Without filter, total_matching == total_entries; no extra query runs."""
+        mock_conn.execute_query.return_value = self._ROWS
+        result = api.list_organisms(conn=mock_conn)
+        assert result["total_matching"] == 2
+        assert result["total_entries"] == 2
+        assert result["not_found"] == []
+        assert mock_conn.execute_query.call_count == 1  # detail query only
+
+    def test_filter_lowercases_input(self, mock_conn):
+        """api lowercases input list before forwarding to the builder."""
+        mock_conn.execute_query.side_effect = [
+            self._ROWS[:1],                              # detail
+            [{"total_entries": 32}],                     # summary count
+            [{"found": ["prochlorococcus med4"]}],       # not_found lookup
+        ]
+        api.list_organisms(
+            organism_names=["Prochlorococcus MED4"], conn=mock_conn,
+        )
+        # First call is the builder query — params include lowercased list.
+        first_call_kwargs = mock_conn.execute_query.call_args_list[0][1]
+        assert first_call_kwargs["organism_names_lc"] == ["prochlorococcus med4"]
+
+    def test_filter_with_unknown_populates_not_found(self, mock_conn):
+        """Unknown names appear in not_found, original casing preserved."""
+        mock_conn.execute_query.side_effect = [
+            self._ROWS[:1],                              # detail
+            [{"total_entries": 32}],                     # summary count
+            [{"found": ["prochlorococcus med4"]}],       # not_found lookup
+        ]
+        result = api.list_organisms(
+            organism_names=["Prochlorococcus MED4", "Bogus Org"],
+            conn=mock_conn,
+        )
+        assert result["total_entries"] == 32
+        assert result["total_matching"] == 1
+        assert result["not_found"] == ["Bogus Org"]
+
+    def test_filter_all_match_empty_not_found(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._ROWS,                                  # detail
+            [{"total_entries": 32}],                     # summary count
+            [{"found": [
+                "prochlorococcus med4",
+                "alteromonas macleodii ez55",
+            ]}],                                          # not_found lookup
+        ]
+        result = api.list_organisms(
+            organism_names=["Prochlorococcus MED4", "Alteromonas macleodii EZ55"],
+            conn=mock_conn,
+        )
+        assert result["not_found"] == []
+        assert result["total_matching"] == 2
+
+    def test_summary_flag_zeros_results(self, mock_conn):
+        """summary=True → results=[], summary fields populated."""
+        mock_conn.execute_query.return_value = self._ROWS
+        result = api.list_organisms(summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] == 2
+        # Breakdowns still computed from the matched rows
+        ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
+        assert ct_map.get("condition_comparison") == 1
+        assert result["truncated"] is True
+
+    def test_breakdowns_over_filtered_set(self, mock_conn):
+        """When filter applied, breakdowns reflect only matched rows."""
+        mock_conn.execute_query.side_effect = [
+            self._ROWS[:1],                              # detail (MED4 only)
+            [{"total_entries": 32}],
+            [{"found": ["prochlorococcus med4"]}],
+        ]
+        result = api.list_organisms(
+            organism_names=["Prochlorococcus MED4"], conn=mock_conn,
+        )
+        ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
+        # Only MED4 contributes — EZ55 was filtered out.
+        assert ct_map["condition_comparison"] == 1
+        assert "diel" in ct_map
+
 
 # ---------------------------------------------------------------------------
 # search_ontology

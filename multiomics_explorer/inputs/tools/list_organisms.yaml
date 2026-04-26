@@ -8,6 +8,7 @@ examples:
     response: |
       {
         "total_entries": 32,
+        "total_matching": 32,
         "by_organism_type": [
           {"organism_type": "genome_strain", "count": 25},
           {"organism_type": "treatment", "count": 5},
@@ -16,14 +17,23 @@ examples:
         "returned": 5,
         "truncated": true,
         "offset": 0,
+        "not_found": [],
         "results": [
           {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel", "time_course"]},
           {"organism_name": "Alteromonas (MarRef v6)", "organism_type": "reference_proteome_match", "genus": "Alteromonas", "gene_count": 500, "reference_database": "MarRef v6", "reference_proteome": "UP000262181", ...}
         ]
       }
 
+  - title: Summary only (no rows)
+    call: list_organisms(summary=True)
+
   - title: Full taxonomy
     call: list_organisms(verbose=True)
+
+  - title: Look up specific organisms by name
+    call: list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301", "Bogus organism"])
+    response: |
+      {"total_entries": 32, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, ...}]}
 
   - title: Chaining to genes and publications
     steps: |
@@ -57,6 +67,8 @@ mistakes:
   - "gene_count and publication_count are counts of data in the KG, not biological totals"
   - "Organisms with gene_count=0 are parent/umbrella taxonomy nodes (e.g. genus-level 'Alteromonas')"
   - "The organism filter in other tools uses partial matching — 'MED4', 'Prochlorococcus MED4', and 'Prochlorococcus' all work"
+  - "organism_names on this tool uses exact match (case-insensitive) on preferred_name — short forms like 'MED4' will not match. Pass canonical names from a prior list_organisms call."
+  - "not_found contains organism_names inputs whose preferred_name didn't match any OrganismTaxon (case-insensitive)."
   - "reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others"
   - "organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching)"
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
