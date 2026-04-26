@@ -3342,6 +3342,181 @@ def register_tools(mcp: FastMCP):
             await ctx.error(f"list_clustering_analyses unexpected error: {e}")
             raise ToolError(f"Error in list_clustering_analyses: {e}")
 
+    # ── gene_derived_metrics breakdowns ────────────────────────────────
+
+    class GeneDmValueKindBreakdown(BaseModel):
+        value_kind: Literal["numeric", "boolean", "categorical"] = Field(
+            description="DM value kind.")
+        count: int = Field(description="Rows of this value_kind.")
+
+    class GeneDmMetricTypeBreakdown(BaseModel):
+        metric_type: str = Field(description="DM metric_type tag.")
+        count: int = Field(description="Rows of this metric_type.")
+
+    class GeneDmMetricBreakdown(BaseModel):
+        derived_metric_id: str = Field(description="Unique DM id.")
+        name: str = Field(description="Human-readable DM name.")
+        metric_type: str = Field(description="Category tag.")
+        value_kind: Literal["numeric", "boolean", "categorical"] = Field(
+            description="Routes to the matching genes_by_*_metric drill-down.")
+        count: int = Field(description="Rows contributed by this DM.")
+
+    class GeneDmCompartmentBreakdown(BaseModel):
+        compartment: str = Field(
+            description="Sample compartment ('whole_cell', 'vesicle', etc.).")
+        count: int = Field(description="Rows in this compartment.")
+
+    class GeneDmTreatmentBreakdown(BaseModel):
+        treatment_type: str = Field(description="Treatment type.")
+        count: int = Field(description="Rows touching this treatment.")
+
+    class GeneDmBackgroundFactorBreakdown(BaseModel):
+        background_factor: str = Field(description="Background experimental factor.")
+        count: int = Field(description="Rows under this factor.")
+
+    class GeneDmPublicationBreakdown(BaseModel):
+        publication_doi: str = Field(description="Parent publication DOI.")
+        count: int = Field(description="Rows from this publication.")
+
+    class GeneDerivedMetricsResult(BaseModel):
+        # ── compact (always populated by api/) ──────────────────────────
+        locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM1714').")
+        gene_name: str | None = Field(
+            default=None,
+            description="Gene name (e.g. 'dnaN') — null when KG has no name.")
+        derived_metric_id: str = Field(
+            description="Unique parent-DM id. Pass to `derived_metric_ids` "
+                        "on genes_by_*_metric drill-downs to pin this exact "
+                        "DM. metric_type, compartment, publication_doi etc. "
+                        "are available in verbose mode or via "
+                        "list_derived_metrics(derived_metric_ids=[...]).")
+        value_kind: Literal["numeric", "boolean", "categorical"] = Field(
+            description="Determines how to interpret `value`. Routes to the "
+                        "matching genes_by_*_metric drill-down.")
+        name: str = Field(
+            description="Human-readable DM name (e.g. 'Transcript:protein "
+                        "amplitude ratio'). Saves a round-trip to "
+                        "list_derived_metrics for opaque metric_type codes.")
+        value: float | str = Field(
+            description="Polymorphic measurement: float on numeric rows, "
+                        "'true'/'false' string on boolean rows, category "
+                        "string on categorical rows. Branch on `value_kind`.")
+        rankable: bool = Field(
+            description="Echoed from parent DM. True iff this row's `value` "
+                        "carries rank/percentile/bucket extras.")
+        has_p_value: bool = Field(
+            description="Echoed from parent DM. True iff adjusted_p_value/"
+                        "significant carry data. No DM in current KG has p-values.")
+        rank_by_metric: int | None = Field(
+            default=None,
+            description="Rank by metric value (1 = highest). Populated only "
+                        "when parent DM rankable=True.")
+        metric_percentile: float | None = Field(
+            default=None,
+            description="Percentile within metric distribution (0-100). "
+                        "Same gate as rank_by_metric.")
+        metric_bucket: str | None = Field(
+            default=None,
+            description="Bucket label ('top_decile', 'top_quartile', 'mid', "
+                        "'low'). Same gate as rank_by_metric.")
+        adjusted_p_value: float | None = Field(
+            default=None,
+            description="BH-adjusted p-value. Populated only when parent DM "
+                        "has_p_value=True. No DM in current KG has p-values; "
+                        "Cypher RETURN omits this column today.")
+        significant: bool | None = Field(
+            default=None,
+            description="Significance flag at the DM's p_value_threshold. "
+                        "Same gate as adjusted_p_value.")
+        # ── verbose adds (default None / [] when verbose=False) ─────────
+        metric_type: str | None = Field(
+            default=None,
+            description="Category tag for this DM (e.g. 'damping_ratio'). "
+                        "Verbose only.")
+        field_description: str | None = Field(
+            default=None,
+            description="Detailed explanation of what this DM measures. "
+                        "Verbose only.")
+        unit: str | None = Field(
+            default=None,
+            description="Measurement unit (e.g. 'hours', 'log2'). "
+                        "Verbose only.")
+        allowed_categories: list[str] | None = Field(
+            default=None,
+            description="Valid category strings — non-null only on "
+                        "categorical rows. Verbose only.")
+        compartment: str | None = Field(
+            default=None,
+            description="Sample compartment. Verbose only.")
+        treatment_type: list[str] = Field(
+            default_factory=list,
+            description="Treatment type(s) for the parent experiment. "
+                        "Verbose only.")
+        background_factors: list[str] = Field(
+            default_factory=list,
+            description="Background experimental factors (may be empty). "
+                        "Verbose only.")
+        publication_doi: str | None = Field(
+            default=None,
+            description="Parent publication DOI. Verbose only.")
+        treatment: str | None = Field(
+            default=None,
+            description="Treatment description in plain language. Verbose only.")
+        light_condition: str | None = Field(
+            default=None,
+            description="Light regime. Verbose only.")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Longer experimental setup description. Verbose only.")
+        p_value: float | None = Field(
+            default=None,
+            description="Raw p-value. Populated only when parent DM "
+                        "has_p_value=True (none in current KG). Verbose only.")
+
+    class GeneDerivedMetricsResponse(BaseModel):
+        total_matching: int = Field(
+            description="Gene × DM rows matching all filters.")
+        total_derived_metrics: int = Field(
+            description="Distinct DMs touching the input genes after filters.")
+        genes_with_metrics: int = Field(
+            description="Input genes with >=1 matching DM row.")
+        genes_without_metrics: int = Field(
+            description="Input genes present in KG but with zero matching "
+                        "DM rows after filters.")
+        not_found: list[str] = Field(
+            default_factory=list,
+            description="Input locus_tags absent from the KG (echo).")
+        not_matched: list[str] = Field(
+            default_factory=list,
+            description="Input locus_tags in KG but with zero DM rows after "
+                        "filters (includes kind-mismatch when value_kind set).")
+        by_value_kind: list[GeneDmValueKindBreakdown] = Field(
+            description="Rows per value_kind.")
+        by_metric_type: list[GeneDmMetricTypeBreakdown] = Field(
+            description="Rows per metric_type — coarse rollup; same "
+                        "metric_type may aggregate across publications.")
+        by_metric: list[GeneDmMetricBreakdown] = Field(
+            description="Rows per unique DerivedMetric — fine breakdown that "
+                        "disambiguates within a metric_type. Each entry "
+                        "embeds name, metric_type, and value_kind so "
+                        "derived_metric_ids can be picked for downstream "
+                        "drill-down. Sorted by count desc.")
+        by_compartment: list[GeneDmCompartmentBreakdown] = Field(
+            description="Rows per compartment.")
+        by_treatment_type: list[GeneDmTreatmentBreakdown] = Field(
+            description="Rows per treatment_type (flattened).")
+        by_background_factors: list[GeneDmBackgroundFactorBreakdown] = Field(
+            description="Rows per background factor (flattened).")
+        by_publication: list[GeneDmPublicationBreakdown] = Field(
+            description="Rows per parent publication.")
+        returned: int = Field(description="Length of results list.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        results: list[GeneDerivedMetricsResult] = Field(
+            default_factory=list,
+            description="One row per gene × DM. Empty when summary=True.")
+
     # -----------------------------------------------------------------
     # list_derived_metrics
     # -----------------------------------------------------------------
@@ -3889,6 +4064,156 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"gene_clusters_by_gene unexpected error: {e}")
             raise ToolError(f"Error in gene_clusters_by_gene: {e}")
+
+    # ── gene_derived_metrics ───────────────────────────────────────────
+
+    @mcp.tool(
+        tags={"derived-metrics", "genes", "batch"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def gene_derived_metrics(
+        ctx: Context,
+        locus_tags: Annotated[list[str], Field(
+            description="Gene locus tags to look up (e.g. ['PMM1714', "
+                        "'PMM0001']). Required, non-empty. Single organism "
+                        "enforced — locus_tags must all resolve to the same "
+                        "organism (or pair with `organism` to disambiguate).",
+        )],
+        organism: Annotated[str | None, Field(
+            description="Organism to scope to. Accepts short strain code "
+                        "('MED4', 'NATL2A', 'MIT1002') or full name. "
+                        "Case-insensitive substring match. Inferred from "
+                        "locus_tags when omitted.",
+        )] = None,
+        metric_types: Annotated[list[str] | None, Field(
+            description="Filter by metric_type tags (e.g. "
+                        "'diel_amplitude_protein_log2'). Same metric_type may "
+                        "appear across publications — pair with publication_doi "
+                        "or use derived_metric_ids to pin one specific DM.",
+        )] = None,
+        value_kind: Annotated[
+            Literal["numeric", "boolean", "categorical"] | None, Field(
+                description="Restrict to one DM kind. Each kind has a "
+                            "different `value` column type — 'numeric' → "
+                            "float, 'boolean' → 'true'/'false', "
+                            "'categorical' → category string.",
+            )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Filter to DMs from one sample compartment "
+                        "('whole_cell', 'vesicle', 'exoproteome', "
+                        "'spent_medium', 'lysate'). Exact match.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Treatment type(s) to match. Returns DMs whose "
+                        "treatment_type list overlaps ANY of the given "
+                        "values. Case-insensitive.",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Background experimental factor(s) to match. "
+                        "ANY-overlap. Case-insensitive.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Filter by one or more publication DOIs. Exact match.",
+        )] = None,
+        derived_metric_ids: Annotated[list[str] | None, Field(
+            description="Look up specific DMs by their unique id. Use to "
+                        "pin one DM when the same metric_type appears across "
+                        "publications. Pair with `list_derived_metrics`.",
+        )] = None,
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (counts, breakdowns, "
+                        "not_found / not_matched). Sugar for limit=0; results=[].",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include detailed text fields per row: treatment, "
+                        "light_condition, experimental_context, plus raw "
+                        "p_value when parent DM has_p_value=True.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows to return. Paginate with offset. Use "
+                        "`summary=True` for summary-only (sets limit=0 "
+                        "internally).",
+            ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset (starting row, 0-indexed).", ge=0,
+        )] = 0,
+    ) -> GeneDerivedMetricsResponse:
+        """Polymorphic `value` column — branch on `value_kind` per row; consult `list_derived_metrics(value_kind=...)` first to know which DMs exist and whether numeric rows carry rank/percentile/bucket extras (rankable gate) or `adjusted_p_value`/`significant` (has_p_value gate).
+
+        Gene-centric batch lookup for DerivedMetric annotations — one row
+        per gene × DM. `value` is `float` on numeric rows, `'true'`/'false'`
+        on boolean rows, category string on categorical rows. Numeric extras
+        (rank_by_metric, metric_percentile, metric_bucket) are populated
+        only when the parent DM is rankable; null otherwise. Same gate for
+        adjusted_p_value / significant on has_p_value DMs (none in the
+        current KG).
+
+        Single organism enforced. not_found (locus_tag absent from KG) and
+        not_matched (in KG but no DM rows after filters — includes
+        kind-mismatch when value_kind is set) make empty rows diagnosable.
+        For edge-level numeric filters (bucket / percentile / rank / value
+        thresholds), pivot to genes_by_numeric_metric.
+        """
+        await ctx.info(f"gene_derived_metrics locus_tags={locus_tags} "
+                       f"organism={organism}")
+        try:
+            conn = _conn(ctx)
+            data = api.gene_derived_metrics(
+                locus_tags, organism=organism,
+                metric_types=metric_types, value_kind=value_kind,
+                compartment=compartment, treatment_type=treatment_type,
+                background_factors=background_factors,
+                publication_doi=publication_doi,
+                derived_metric_ids=derived_metric_ids,
+                summary=summary, verbose=verbose,
+                limit=limit, offset=offset, conn=conn,
+            )
+            # Build breakdowns + results into NEW locals (don't mutate data)
+            by_value_kind = [GeneDmValueKindBreakdown(**b)
+                             for b in data["by_value_kind"]]
+            by_metric_type = [GeneDmMetricTypeBreakdown(**b)
+                              for b in data["by_metric_type"]]
+            by_metric = [GeneDmMetricBreakdown(**b)
+                         for b in data["by_metric"]]
+            by_compartment = [GeneDmCompartmentBreakdown(**b)
+                              for b in data["by_compartment"]]
+            by_treatment_type = [GeneDmTreatmentBreakdown(**b)
+                                 for b in data["by_treatment_type"]]
+            by_background_factors = [GeneDmBackgroundFactorBreakdown(**b)
+                                     for b in data["by_background_factors"]]
+            by_publication = [GeneDmPublicationBreakdown(**b)
+                              for b in data["by_publication"]]
+            results = [GeneDerivedMetricsResult(**r) for r in data["results"]]
+            response = GeneDerivedMetricsResponse(
+                total_matching=data["total_matching"],
+                total_derived_metrics=data["total_derived_metrics"],
+                genes_with_metrics=data["genes_with_metrics"],
+                genes_without_metrics=data["genes_without_metrics"],
+                not_found=data["not_found"],
+                not_matched=data["not_matched"],
+                by_value_kind=by_value_kind,
+                by_metric_type=by_metric_type,
+                by_metric=by_metric,
+                by_compartment=by_compartment,
+                by_treatment_type=by_treatment_type,
+                by_background_factors=by_background_factors,
+                by_publication=by_publication,
+                returned=data["returned"],
+                offset=data.get("offset", 0),
+                truncated=data["truncated"],
+                results=results,
+            )
+            await ctx.info(f"Returning {response.returned} of "
+                           f"{response.total_matching} gene×DM rows")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"gene_derived_metrics error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"gene_derived_metrics unexpected error: {e}")
+            raise ToolError(f"Error in gene_derived_metrics: {e}")
 
     # ── genes_in_cluster ───────────────────────────────────────────────
 

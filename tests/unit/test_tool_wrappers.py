@@ -60,6 +60,7 @@ EXPECTED_TOOLS = [
     "list_clustering_analyses",
     "list_derived_metrics",
     "gene_clusters_by_gene",
+    "gene_derived_metrics",
     "genes_in_cluster",
     "ontology_landscape",
     "pathway_enrichment",
@@ -3701,3 +3702,117 @@ class TestListDerivedMetricsWrapper:
             with pytest.raises(ToolError, match="Error in list_derived_metrics"):
                 await tool_fns["list_derived_metrics"](mock_ctx)
         mock_ctx.error.assert_awaited()
+
+
+class TestGeneDerivedMetricsWrapper:
+    """Unit tests for gene_derived_metrics MCP wrapper."""
+
+    @pytest.fixture
+    def envelope_data(self):
+        return {
+            "total_matching": 9, "total_derived_metrics": 9,
+            "genes_with_metrics": 1, "genes_without_metrics": 0,
+            "not_found": [], "not_matched": [],
+            "by_value_kind": [{"value_kind": "numeric", "count": 7}],
+            "by_metric_type": [{"metric_type": "damping_ratio", "count": 1}],
+            "by_metric": [{"derived_metric_id": "dm:foo", "name": "Foo",
+                           "metric_type": "damping_ratio",
+                           "value_kind": "numeric", "count": 1}],
+            "by_compartment": [{"compartment": "whole_cell", "count": 7}],
+            "by_treatment_type": [{"treatment_type": "diel", "count": 6}],
+            "by_background_factors": [{"background_factor": "axenic", "count": 9}],
+            "by_publication": [{"publication_doi": "10.X/Y", "count": 9}],
+            "returned": 1, "offset": 0, "truncated": True,
+            "results": [{
+                "locus_tag": "PMM1714",
+                "gene_name": "dnaN",
+                "derived_metric_id": "dm:foo",
+                "value_kind": "numeric",
+                "name": "Foo",
+                "value": 1.3,
+                "rankable": True,
+                "has_p_value": False,
+                "rank_by_metric": 286,
+                "metric_percentile": 8.36,
+                "metric_bucket": "low",
+                # adjusted_p_value, significant: missing in dict; Pydantic fills None
+            }],
+        }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, envelope_data):
+        from unittest.mock import patch, AsyncMock
+        with patch("multiomics_explorer.mcp_server.tools.api.gene_derived_metrics",
+                   return_value=envelope_data):
+            ctx = AsyncMock()
+            response = await tool_fns["gene_derived_metrics"](
+                ctx, locus_tags=["PMM1714"])
+        assert response.total_matching == 9
+        assert response.returned == 1
+        assert len(response.by_metric) == 1
+
+    @pytest.mark.asyncio
+    async def test_polymorphic_value_field(self, tool_fns):
+        """Pydantic value: float | str accepts both."""
+        from unittest.mock import patch, AsyncMock
+        for val in [1.3, "true", "Cytoplasmic Membrane"]:
+            envelope = {
+                "total_matching": 1, "total_derived_metrics": 1,
+                "genes_with_metrics": 1, "genes_without_metrics": 0,
+                "not_found": [], "not_matched": [],
+                "by_value_kind": [], "by_metric_type": [], "by_metric": [],
+                "by_compartment": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_publication": [],
+                "returned": 1, "offset": 0, "truncated": False,
+                "results": [{
+                    "locus_tag": "X", "gene_name": None,
+                    "derived_metric_id": "dm:1",
+                    "value_kind": "numeric" if isinstance(val, float) else "boolean",
+                    "name": "n", "value": val,
+                    "rankable": False, "has_p_value": False,
+                }],
+            }
+            with patch("multiomics_explorer.mcp_server.tools.api.gene_derived_metrics",
+                       return_value=envelope):
+                ctx = AsyncMock()
+                response = await tool_fns["gene_derived_metrics"](
+                    ctx, locus_tags=["X"])
+            assert response.results[0].value == val
+
+    @pytest.mark.asyncio
+    async def test_sparse_extras_default_none(self, tool_fns, envelope_data):
+        """Result accepts row dicts with adjusted_p_value/significant absent."""
+        from unittest.mock import patch, AsyncMock
+        with patch("multiomics_explorer.mcp_server.tools.api.gene_derived_metrics",
+                   return_value=envelope_data):
+            ctx = AsyncMock()
+            response = await tool_fns["gene_derived_metrics"](
+                ctx, locus_tags=["X"])
+        row = response.results[0]
+        assert row.adjusted_p_value is None
+        assert row.significant is None
+        assert row.p_value is None  # verbose-only, also default None
+
+    @pytest.mark.asyncio
+    async def test_summary_empty_results(self, tool_fns, envelope_data):
+        from unittest.mock import patch, AsyncMock
+        envelope_data["results"] = []
+        envelope_data["returned"] = 0
+        envelope_data["truncated"] = True
+        with patch("multiomics_explorer.mcp_server.tools.api.gene_derived_metrics",
+                   return_value=envelope_data):
+            ctx = AsyncMock()
+            response = await tool_fns["gene_derived_metrics"](
+                ctx, locus_tags=["X"], summary=True)
+        assert response.results == []
+        assert response.truncated is True
+
+    @pytest.mark.asyncio
+    async def test_value_error_to_tool_error(self, tool_fns):
+        from unittest.mock import patch, AsyncMock
+        from fastmcp.exceptions import ToolError
+        with patch("multiomics_explorer.mcp_server.tools.api.gene_derived_metrics",
+                   side_effect=ValueError("locus_tags must not be empty.")):
+            ctx = AsyncMock()
+            with pytest.raises(ToolError, match="locus_tags must not be empty"):
+                await tool_fns["gene_derived_metrics"](ctx, locus_tags=[])
