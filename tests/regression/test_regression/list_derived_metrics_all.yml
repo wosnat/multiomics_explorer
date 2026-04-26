@@ -444,7 +444,7 @@ rows:
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1126/science.1243457
   rankable: true
-  total_gene_count: 0
+  total_gene_count: 46
   treatment_type:
   - compartment
   unit: reads
