@@ -61,6 +61,7 @@ EXPECTED_TOOLS = [
     "list_derived_metrics",
     "gene_clusters_by_gene",
     "gene_derived_metrics",
+    "genes_by_numeric_metric",
     "genes_in_cluster",
     "ontology_landscape",
     "pathway_enrichment",
@@ -3816,3 +3817,176 @@ class TestGeneDerivedMetricsWrapper:
             ctx = AsyncMock()
             with pytest.raises(ToolError, match="locus_tags must not be empty"):
                 await tool_fns["gene_derived_metrics"](ctx, locus_tags=[])
+
+
+class TestGenesByNumericMetricWrapper:
+    """Unit tests for genes_by_numeric_metric MCP wrapper."""
+
+    @pytest.fixture
+    def envelope_data(self):
+        return {
+            "total_matching": 32,
+            "total_derived_metrics": 1,
+            "total_genes": 32,
+            "by_organism": [
+                {"organism_name": "Prochlorococcus MED4", "count": 32},
+            ],
+            "by_compartment": [{"compartment": "whole_cell", "count": 32}],
+            "by_publication": [{"publication_doi": "10.X/Y", "count": 32}],
+            "by_experiment": [{"experiment_id": "exp:foo", "count": 32}],
+            "by_metric": [{
+                "derived_metric_id": "dm:damping_ratio",
+                "name": "Damping ratio",
+                "metric_type": "damping_ratio",
+                "value_kind": "numeric",
+                "count": 32,
+                "value_min": 12.2, "value_q1": 13.5,
+                "value_median": 15.9, "value_q3": 18.0, "value_max": 25.3,
+                "dm_value_min": 0.0, "dm_value_q1": 3.0,
+                "dm_value_median": 6.0, "dm_value_q3": 10.0,
+                "dm_value_max": 28.0,
+                "rank_min": 1, "rank_max": 32,
+            }],
+            "top_categories": [
+                {"gene_category": "Translation", "count": 6},
+                {"gene_category": "Photosynthesis", "count": 5},
+            ],
+            "genes_per_metric_max": 32,
+            "genes_per_metric_median": 32.0,
+            "not_found_ids": [],
+            "not_matched_ids": [],
+            "not_found_metric_types": [],
+            "not_matched_metric_types": [],
+            "not_matched_organism": None,
+            "excluded_derived_metrics": [],
+            "warnings": [],
+            "returned": 1,
+            "offset": 0,
+            "truncated": True,
+            "results": [{
+                "locus_tag": "PMM1545",
+                "gene_name": "rpsH",
+                "product": "30S ribosomal protein S8",
+                "gene_category": "Translation",
+                "organism_name": "Prochlorococcus MED4",
+                "derived_metric_id": "dm:damping_ratio",
+                "name": "Damping ratio",
+                "value_kind": "numeric",
+                "rankable": True,
+                "has_p_value": False,
+                "value": 25.3,
+                "rank_by_metric": 1,
+                "metric_percentile": 100.0,
+                "metric_bucket": "top_decile",
+            }],
+        }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_envelope(self, tool_fns, envelope_data):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_numeric_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_numeric_metric"](
+                ctx, metric_types=["damping_ratio"], bucket=["top_decile"])
+        assert response.total_matching == 32
+        assert response.total_derived_metrics == 1
+        assert response.total_genes == 32
+        assert response.returned == 1
+        assert response.truncated is True
+        assert len(response.by_metric) == 1
+        assert response.by_metric[0].value_kind == "numeric"
+        assert response.by_metric[0].dm_value_max == 28.0
+        assert response.by_metric[0].rank_min == 1
+        assert response.results[0].locus_tag == "PMM1545"
+        assert response.results[0].value == 25.3
+        assert response.results[0].metric_bucket == "top_decile"
+
+    @pytest.mark.asyncio
+    async def test_excluded_dm_envelope_field(self, tool_fns, envelope_data):
+        """Pydantic accepts list[ExcludedDerivedMetric] including empty list."""
+        # Empty list (default)
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_numeric_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_numeric_metric"](
+                ctx, metric_types=["damping_ratio"])
+        assert response.excluded_derived_metrics == []
+
+        # Single-entry list
+        envelope_data["excluded_derived_metrics"] = [{
+            "derived_metric_id": "dm:peak_time_protein_h",
+            "metric_type": "peak_time_protein_h",
+            "rankable": False,
+            "has_p_value": False,
+            "reason": "non-rankable; bucket filter does not apply",
+        }]
+        envelope_data["warnings"] = [
+            "1 non-rankable DM excluded by `bucket` filter "
+            "(peak_time_protein_h)",
+        ]
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_numeric_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_numeric_metric"](
+                ctx, metric_types=["damping_ratio", "peak_time_protein_h"],
+                bucket=["top_decile"])
+        assert len(response.excluded_derived_metrics) == 1
+        excl = response.excluded_derived_metrics[0]
+        assert excl.derived_metric_id == "dm:peak_time_protein_h"
+        assert excl.rankable is False
+        assert excl.has_p_value is False
+        assert "non-rankable" in excl.reason
+        assert len(response.warnings) == 1
+
+    @pytest.mark.asyncio
+    async def test_warnings_default_empty(self, tool_fns, envelope_data):
+        """Empty warnings list parses cleanly."""
+        envelope_data["warnings"] = []
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_numeric_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_numeric_metric"](
+                ctx, metric_types=["damping_ratio"])
+        assert response.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_summary_empty_results(self, tool_fns, envelope_data):
+        """summary=True → results=[] + populated envelope."""
+        envelope_data["results"] = []
+        envelope_data["returned"] = 0
+        envelope_data["truncated"] = True
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_numeric_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_numeric_metric"](
+                ctx, metric_types=["damping_ratio"], summary=True)
+        assert response.results == []
+        assert response.returned == 0
+        assert response.truncated is True
+        assert response.total_matching == 32
+        assert len(response.by_metric) == 1
+
+    @pytest.mark.asyncio
+    async def test_value_error_to_tool_error(self, tool_fns):
+        """When api/ raises ValueError, wrapper raises ToolError."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_numeric_metric",
+            side_effect=ValueError(
+                "must provide one of derived_metric_ids or metric_types"),
+        ):
+            ctx = AsyncMock()
+            with pytest.raises(
+                ToolError,
+                match="must provide one of derived_metric_ids or metric_types",
+            ):
+                await tool_fns["genes_by_numeric_metric"](ctx)

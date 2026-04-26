@@ -4697,3 +4697,492 @@ def register_tools(mcp: FastMCP):
             await ctx.warning("; ".join(warnings))
 
         return ClusterEnrichmentResponse(**envelope)
+
+    # ── genes_by_numeric_metric breakdowns ─────────────────────────────
+
+    class GenesByNumericMetricOrganismBreakdown(BaseModel):
+        organism_name: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Rows from this organism in current result.")
+
+    class GenesByNumericMetricCompartmentBreakdown(BaseModel):
+        compartment: str = Field(description="Sample compartment.")
+        count: int = Field(description="Rows in this compartment.")
+
+    class GenesByNumericMetricPublicationBreakdown(BaseModel):
+        publication_doi: str = Field(description="Parent publication DOI.")
+        count: int = Field(description="Rows from this publication.")
+
+    class GenesByNumericMetricExperimentBreakdown(BaseModel):
+        experiment_id: str = Field(description="Parent experiment id.")
+        count: int = Field(description="Rows from this experiment.")
+
+    class GenesByNumericMetricCategoryBreakdown(BaseModel):
+        gene_category: str = Field(description="Gene functional category.")
+        count: int = Field(description="Rows in this category.")
+
+    class GenesByNumericMetricBreakdown(BaseModel):
+        """Per-DM rollup: filtered-slice value distribution + full-DM context."""
+        derived_metric_id: str = Field(description="Unique DM id.")
+        name: str = Field(description="DM human label.")
+        metric_type: str = Field(description="Category tag.")
+        value_kind: Literal["numeric"] = Field(
+            description="Always 'numeric' in this tool; kept for cross-tool "
+                        "row-shape consistency.")
+        count: int = Field(
+            description="Rows contributed by this DM after filters.")
+        # Filtered slice (query-time)
+        value_min: float | None = Field(
+            default=None, description="Min `r.value` in filtered slice.")
+        value_q1: float | None = Field(
+            default=None, description="Q1 of `r.value` in filtered slice.")
+        value_median: float | None = Field(
+            default=None, description="Median of `r.value` in filtered slice.")
+        value_q3: float | None = Field(
+            default=None, description="Q3 of `r.value` in filtered slice.")
+        value_max: float | None = Field(
+            default=None, description="Max `r.value` in filtered slice.")
+        # Full DM (precomputed dm.value_*)
+        dm_value_min: float | None = Field(
+            default=None,
+            description="Full-DM min (precomputed `dm.value_min`). Always "
+                        "populated for numeric DMs after the 2026-04-26 KG "
+                        "rebuild.")
+        dm_value_q1: float | None = Field(
+            default=None,
+            description="Full-DM Q1 (precomputed `dm.value_q1`).")
+        dm_value_median: float | None = Field(
+            default=None,
+            description="Full-DM median (precomputed `dm.value_median`).")
+        dm_value_q3: float | None = Field(
+            default=None,
+            description="Full-DM Q3 (precomputed `dm.value_q3`).")
+        dm_value_max: float | None = Field(
+            default=None,
+            description="Full-DM max (precomputed `dm.value_max`).")
+        # Rank distribution (filtered, rankable-only)
+        rank_min: int | None = Field(
+            default=None,
+            description="Min rank in filtered slice. Null on non-rankable DMs.")
+        rank_max: int | None = Field(
+            default=None,
+            description="Max rank in filtered slice. Null on non-rankable DMs.")
+
+    class ExcludedDerivedMetric(BaseModel):
+        derived_metric_id: str = Field(description="DM id that was excluded.")
+        metric_type: str = Field(description="DM metric_type tag.")
+        rankable: bool = Field(description="DM `rankable` flag.")
+        has_p_value: bool = Field(description="DM `has_p_value` flag.")
+        reason: str = Field(
+            description="Human-readable explanation, e.g. "
+                        "'non-rankable; bucket filter does not apply'.")
+
+    # ── genes_by_numeric_metric per-row result ─────────────────────────
+
+    class GenesByNumericMetricResult(BaseModel):
+        # Identity / routing (5)
+        locus_tag: str = Field(
+            description="Gene locus tag (e.g. 'PMM1545').")
+        gene_name: str | None = Field(
+            default=None,
+            description="Gene name (e.g. 'rpsH'); null when KG has none.")
+        product: str | None = Field(
+            default=None,
+            description="Gene product (e.g. '30S ribosomal protein S8').")
+        gene_category: str | None = Field(
+            default=None,
+            description="Functional category (e.g. 'Translation').")
+        organism_name: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MED4').")
+        # DM identity (2)
+        derived_metric_id: str = Field(
+            description="Unique parent-DM id.")
+        name: str = Field(description="DM human label.")
+        # Gate echoes (3) — sourced from parent DM, coerced to Python bool
+        value_kind: Literal["numeric"] = Field(
+            description="Always 'numeric' for this tool; kept for cross-tool "
+                        "row-shape consistency with `gene_derived_metrics`.")
+        rankable: bool = Field(
+            description="Echoed from parent DM; True iff "
+                        "`rank_by_metric`/`metric_percentile`/`metric_bucket` "
+                        "carry data.")
+        has_p_value: bool = Field(
+            description="Echoed from parent DM; True iff "
+                        "`adjusted_p_value`/`significant` carry data (none "
+                        "in current KG).")
+        # Numeric value (4)
+        value: float = Field(description="Measurement value.")
+        rank_by_metric: int | None = Field(
+            default=None,
+            description="Rank by value (1=highest). Populated only when "
+                        "rankable=True.")
+        metric_percentile: float | None = Field(
+            default=None,
+            description="Percentile (0-100). Same gate as rank_by_metric.")
+        metric_bucket: str | None = Field(
+            default=None,
+            description="Bucket label (top_decile / top_quartile / mid / "
+                        "low). Same gate.")
+        # Pydantic-only forward-compat (2; not in current Cypher RETURN)
+        adjusted_p_value: float | None = Field(
+            default=None,
+            description="BH-adjusted p-value. Populated only when "
+                        "has_p_value=True. None in current KG.")
+        significant: bool | None = Field(
+            default=None,
+            description="Significance flag. Same gate as adjusted_p_value.")
+        # ── Verbose adds (default None / [] when verbose=False) ─────────
+        metric_type: str | None = Field(
+            default=None,
+            description="Category tag. Verbose only.")
+        field_description: str | None = Field(
+            default=None,
+            description="Detailed explanation of what this DM measures. "
+                        "Verbose only.")
+        unit: str | None = Field(
+            default=None,
+            description="Measurement unit. Verbose only.")
+        compartment: str | None = Field(
+            default=None,
+            description="Sample compartment. Verbose only.")
+        experiment_id: str | None = Field(
+            default=None,
+            description="Parent experiment id. Verbose only.")
+        publication_doi: str | None = Field(
+            default=None,
+            description="Parent publication DOI. Verbose only.")
+        treatment_type: list[str] = Field(
+            default_factory=list,
+            description="Treatment type(s). Verbose only.")
+        background_factors: list[str] = Field(
+            default_factory=list,
+            description="Background factor(s). Verbose only.")
+        treatment: str | None = Field(
+            default=None,
+            description="Treatment description in plain language. Verbose only.")
+        light_condition: str | None = Field(
+            default=None,
+            description="Light regime. Verbose only.")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Longer experimental setup description. Verbose only.")
+        gene_function_description: str | None = Field(
+            default=None,
+            description="Gene functional description (gene-level). Verbose only.")
+        gene_summary: str | None = Field(
+            default=None,
+            description="Gene summary text (gene-level). Verbose only.")
+        p_value: float | None = Field(
+            default=None,
+            description="Raw p-value; gated on has_p_value=True. Verbose "
+                        "only. None in current KG.")
+
+    # ── genes_by_numeric_metric envelope ───────────────────────────────
+
+    class GenesByNumericMetricResponse(BaseModel):
+        total_matching: int = Field(
+            description="Rows after all filters + gate exclusion.")
+        total_derived_metrics: int = Field(
+            description="Distinct DMs contributing rows.")
+        total_genes: int = Field(description="Distinct genes in results.")
+        by_organism: list[GenesByNumericMetricOrganismBreakdown] = Field(
+            default_factory=list, description="Rows per organism.")
+        by_compartment: list[GenesByNumericMetricCompartmentBreakdown] = Field(
+            default_factory=list, description="Rows per compartment.")
+        by_publication: list[GenesByNumericMetricPublicationBreakdown] = Field(
+            default_factory=list, description="Rows per publication.")
+        by_experiment: list[GenesByNumericMetricExperimentBreakdown] = Field(
+            default_factory=list, description="Rows per experiment.")
+        by_metric: list[GenesByNumericMetricBreakdown] = Field(
+            default_factory=list,
+            description="Per-DM rollup: filtered-slice value distribution + "
+                        "full-DM context. Sorted by count desc.")
+        top_categories: list[GenesByNumericMetricCategoryBreakdown] = Field(
+            default_factory=list,
+            description="Top 5 gene categories by count.")
+        genes_per_metric_max: int = Field(
+            default=0, description="Largest per-DM gene count.")
+        genes_per_metric_median: float = Field(
+            default=0.0, description="Median per-DM gene count.")
+        not_found_ids: list[str] = Field(
+            default_factory=list,
+            description="`derived_metric_ids` inputs not present in KG.")
+        not_matched_ids: list[str] = Field(
+            default_factory=list,
+            description="`derived_metric_ids` in KG but produced 0 rows after "
+                        "edge-level filters (excludes gate-excluded DMs).")
+        not_found_metric_types: list[str] = Field(
+            default_factory=list,
+            description="`metric_types` inputs that match no DM after scoping.")
+        not_matched_metric_types: list[str] = Field(
+            default_factory=list,
+            description="`metric_types` whose DMs produced 0 rows.")
+        not_matched_organism: str | None = Field(
+            default=None,
+            description="`organism` arg that matched no surviving DM.")
+        excluded_derived_metrics: list[ExcludedDerivedMetric] = Field(
+            default_factory=list,
+            description="DMs dropped by rankable / has_p_value gate. Always "
+                        "present (empty list when no exclusions).")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Human-readable summary of excluded_derived_metrics.")
+        returned: int = Field(description="Length of results list.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        results: list[GenesByNumericMetricResult] = Field(
+            default_factory=list,
+            description="One row per gene × DM. Empty when summary=True.")
+
+    @mcp.tool(
+        tags={"derived-metrics", "genes", "drill-down", "numeric"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def genes_by_numeric_metric(
+        ctx: Context,
+        # ── Selection (exactly one required, mutually exclusive) ────────
+        derived_metric_ids: Annotated[list[str] | None, Field(
+            description="DerivedMetric node IDs to drill into. Use when the "
+                        "same `metric_type` appears across publications / "
+                        "organisms and you need to pin one. Discover IDs via "
+                        "`list_derived_metrics`. Mutually exclusive with "
+                        "`metric_types`.",
+        )] = None,
+        metric_types: Annotated[list[str] | None, Field(
+            description="Metric-type tags (e.g. ['damping_ratio', "
+                        "'diel_amplitude_protein_log2']). Unions every DM "
+                        "carrying that tag, then narrows by scoping filters. "
+                        "Same tag can appear across organisms (e.g. "
+                        "'cell_abundance_biovolume_normalized' is on both "
+                        "MIT9312 and MIT9313 today). Mutually exclusive with "
+                        "`derived_metric_ids`.",
+        )] = None,
+        # ── DM-scoping filters (intersected with selection) ─────────────
+        organism: Annotated[str | None, Field(
+            description="Organism to scope the DM set to. Accepts short strain "
+                        "code ('MED4', 'NATL2A', 'MIT9312') or full name. "
+                        "Case-insensitive substring match. Single-organism is "
+                        "**not** enforced — omit to drill across all "
+                        "organisms a metric_type spans.",
+        )] = None,
+        locus_tags: Annotated[list[str] | None, Field(
+            description="Restrict drill-down to a specific gene set (e.g. DE "
+                        "hits from `differential_expression_by_gene`). Filter "
+                        "on `g.locus_tag IN $locus_tags` post-MATCH. Genes "
+                        "with no edge for the selected DM produce no row "
+                        "(silent — surfaced via `total_genes` shortfall).",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Scope to DMs from one or more experiments.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Scope to DMs from one or more publications.",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell', 'vesicle', "
+                        "'exoproteome', 'spent_medium', 'lysate'). Exact match.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Treatment type(s) (e.g. ['diel', 'compartment']). "
+                        "ANY-overlap. Case-insensitive.",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Background factor(s) (e.g. ['axenic', 'light']). "
+                        "ANY-overlap. Case-insensitive.",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Growth phase(s). ANY-overlap. Case-insensitive.",
+        )] = None,
+        # ── Edge-level filters: always-available (any numeric DM) ───────
+        min_value: Annotated[float | None, Field(
+            description="Lower bound on `r.value`. Always applicable — no gate. "
+                        "Use for raw-threshold queries on non-rankable DMs "
+                        "(e.g. mascot probability >= 99).",
+        )] = None,
+        max_value: Annotated[float | None, Field(
+            description="Upper bound on `r.value`. Always applicable.",
+        )] = None,
+        # ── Edge-level filters: RANKABLE-GATED ──────────────────────────
+        min_percentile: Annotated[float | None, Field(
+            description="Lower bound on `r.metric_percentile` (0-100). "
+                        "**Rankable-gated** — raises if every selected DM has "
+                        "`rankable=False`. Soft-excludes non-rankable DMs from "
+                        "mixed input, surfaced in `excluded_derived_metrics`.",
+            ge=0, le=100,
+        )] = None,
+        max_percentile: Annotated[float | None, Field(
+            description="Upper bound on `r.metric_percentile`. "
+                        "**Rankable-gated.**",
+            ge=0, le=100,
+        )] = None,
+        bucket: Annotated[list[str] | None, Field(
+            description="Bucket label(s) — subset of "
+                        "{'top_decile','top_quartile','mid','low'}. "
+                        "**Rankable-gated.** Today's KG buckets correspond to "
+                        "decile / quartile splits computed at import time per "
+                        "DM.",
+        )] = None,
+        max_rank: Annotated[int | None, Field(
+            description="Cap on `r.rank_by_metric` (1 = highest). Use for "
+                        "top-N drill-down. **Rankable-gated.**",
+            ge=1,
+        )] = None,
+        # ── Edge-level filters: HAS_P_VALUE-GATED ───────────────────────
+        significant_only: Annotated[bool, Field(
+            description="Filter to `r.significant=true`. **has_p_value-gated** "
+                        "— raises against today's KG (no DM has p-values yet). "
+                        "Forward-compat surface; check "
+                        "`list_derived_metrics(has_p_value=True)` before using.",
+        )] = False,
+        max_adjusted_p_value: Annotated[float | None, Field(
+            description="Upper bound on `r.adjusted_p_value`. "
+                        "**has_p_value-gated**.",
+            ge=0, le=1,
+        )] = None,
+        # ── Result-size controls ────────────────────────────────────────
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (counts, breakdowns, "
+                        "by_metric, diagnostics). Sugar for limit=0; "
+                        "results=[].",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy text fields per row: "
+                        "gene_function_description, gene_summary, plus DM "
+                        "context (metric_type, field_description, unit, "
+                        "compartment, experiment_id, publication_doi, "
+                        "treatment_type, background_factors, treatment, "
+                        "light_condition, experimental_context). p_value (raw) "
+                        "is reserved for future has_p_value DMs.",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows to return. Paginate with `offset`. Use "
+                        "`summary=True` for summary-only (sets limit=0).",
+            ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset (starting row, 0-indexed).",
+            ge=0,
+        )] = 0,
+    ) -> GenesByNumericMetricResponse:
+        """Pass `derived_metric_ids` XOR `metric_types` (one required); rankable-gated filters (`bucket`, `min/max_percentile`, `max_rank`) raise if every selected DM has `rankable=False` and soft-exclude on mixed input — inspect `list_derived_metrics(value_kind='numeric', rankable=True)` first to see which DMs support which filters.
+
+        Numeric DM drill-down — one row per gene × DM. `r.value` (float) is
+        always returned; `rank_by_metric` / `metric_percentile` /
+        `metric_bucket` are populated only on rows from rankable DMs (null
+        otherwise — same shape as `gene_derived_metrics`). Cross-organism by
+        design; envelope `by_organism` and per-row `organism_name` make
+        cross-strain rows self-describing. The `by_metric` envelope rollup
+        pairs filtered-slice value distribution with full-DM distribution
+        (precomputed) so callers can read "your top-decile slice 12.2-25.3
+        out of full DM range 0-28" directly.
+
+        `excluded_derived_metrics` + `warnings` envelope keys are the
+        primary diagnostic when a real DM produces zero rows; check these
+        before assuming the result is empty for biological reasons.
+        """
+        selection_size = (
+            len(derived_metric_ids) if derived_metric_ids is not None
+            else (len(metric_types) if metric_types is not None else 0)
+        )
+        gate_filters_present = [
+            name for name, val in (
+                ("min_percentile", min_percentile),
+                ("max_percentile", max_percentile),
+                ("bucket", bucket),
+                ("max_rank", max_rank),
+                ("significant_only", significant_only or None),
+                ("max_adjusted_p_value", max_adjusted_p_value),
+            ) if val is not None
+        ]
+        await ctx.info(
+            f"genes_by_numeric_metric selection_size={selection_size} "
+            f"gate_filters={gate_filters_present}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.genes_by_numeric_metric(
+                derived_metric_ids=derived_metric_ids,
+                metric_types=metric_types,
+                organism=organism,
+                locus_tags=locus_tags,
+                experiment_ids=experiment_ids,
+                publication_doi=publication_doi,
+                compartment=compartment,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases,
+                min_value=min_value,
+                max_value=max_value,
+                min_percentile=min_percentile,
+                max_percentile=max_percentile,
+                bucket=bucket,
+                max_rank=max_rank,
+                significant_only=significant_only,
+                max_adjusted_p_value=max_adjusted_p_value,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"genes_by_numeric_metric error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(f"genes_by_numeric_metric unexpected error: {e}")
+            raise ToolError(f"Error in genes_by_numeric_metric: {e}")
+
+        if data["excluded_derived_metrics"]:
+            await ctx.warning(
+                f"{len(data['excluded_derived_metrics'])} DM(s) excluded; "
+                "see `excluded_derived_metrics` in envelope"
+            )
+
+        # Build response in NEW LOCAL VARIABLES — don't mutate `data`.
+        by_organism = [GenesByNumericMetricOrganismBreakdown(**x)
+                       for x in data["by_organism"]]
+        by_compartment = [GenesByNumericMetricCompartmentBreakdown(**x)
+                          for x in data["by_compartment"]]
+        by_publication = [GenesByNumericMetricPublicationBreakdown(**x)
+                          for x in data["by_publication"]]
+        by_experiment = [GenesByNumericMetricExperimentBreakdown(**x)
+                         for x in data["by_experiment"]]
+        by_metric = [GenesByNumericMetricBreakdown(**x)
+                     for x in data["by_metric"]]
+        top_categories = [GenesByNumericMetricCategoryBreakdown(**x)
+                          for x in data["top_categories"]]
+        excluded_derived_metrics = [ExcludedDerivedMetric(**x)
+                                    for x in data["excluded_derived_metrics"]]
+        results = [GenesByNumericMetricResult(**r) for r in data["results"]]
+
+        response = GenesByNumericMetricResponse(
+            total_matching=data["total_matching"],
+            total_derived_metrics=data["total_derived_metrics"],
+            total_genes=data["total_genes"],
+            by_organism=by_organism,
+            by_compartment=by_compartment,
+            by_publication=by_publication,
+            by_experiment=by_experiment,
+            by_metric=by_metric,
+            top_categories=top_categories,
+            genes_per_metric_max=data["genes_per_metric_max"],
+            genes_per_metric_median=data["genes_per_metric_median"],
+            not_found_ids=data["not_found_ids"],
+            not_matched_ids=data["not_matched_ids"],
+            not_found_metric_types=data["not_found_metric_types"],
+            not_matched_metric_types=data["not_matched_metric_types"],
+            not_matched_organism=data.get("not_matched_organism"),
+            excluded_derived_metrics=excluded_derived_metrics,
+            warnings=data["warnings"],
+            returned=data["returned"],
+            offset=data.get("offset", 0),
+            truncated=data["truncated"],
+            results=results,
+        )
+        await ctx.info(
+            f"Returning {response.returned} of {response.total_matching} "
+            f"gene×DM rows"
+        )
+        return response
