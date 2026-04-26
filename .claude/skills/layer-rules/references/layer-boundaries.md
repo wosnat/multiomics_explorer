@@ -346,11 +346,11 @@ format, and expected keys come from the Pydantic models.
 **Human authors the YAML** (examples, chaining, mistakes).
 **Script extracts from Pydantic** (params, response format, keys).
 
-### Sync
+### Build
 
-Research skills source: `multiomics_explorer/skills/`
-Dev copy: `.claude/skills/research/` (gitignored)
-Sync: `scripts/sync_skills.sh`
+`scripts/build_about_content.py` writes generated md directly to
+`multiomics_explorer/skills/multiomics-kg-guide/references/tools/`.
+That tree is the served path — no separate sync step.
 
 Update YAML + rebuild when tool behavior changes.
 

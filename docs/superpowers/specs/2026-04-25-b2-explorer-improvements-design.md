@@ -15,10 +15,10 @@
 are generated. The source of truth is `multiomics_explorer/inputs/tools/{tool}.yaml`
 (human-authored: examples, mistakes, chaining, verbose_fields) plus the Pydantic models
 in `mcp_server/tools.py` (params, response format, envelope keys). After YAML edits,
-regenerate with `uv run python scripts/build_about_content.py` and sync via
-`scripts/sync_skills.sh`. If a section structure that the build script doesn't yet
-support is needed (e.g. a brand-new subsection), extend `scripts/build_about_content.py`
-in the same change.
+regenerate with `uv run python scripts/build_about_content.py` — the build script
+writes directly to the skills tree, no separate sync step. If a section structure
+that the build script doesn't yet support is needed (e.g. a brand-new subsection),
+extend `scripts/build_about_content.py` in the same change.
 
 ---
 
@@ -87,7 +87,7 @@ apply to every relevant card without restating per-card.
 - `tests/integration/test_about_examples.py` — every `examples:` entry in a
   YAML is exercised against the live KG. Cards #5 and #7 add new examples;
   the integration test must pass with KG running.
-- Regen + sync (`scripts/build_about_content.py` + `scripts/sync_skills.sh`)
+- Regen + sync (`scripts/build_about_content.py`)
   is implied for every YAML or build-script change.
 
 **Skill / about-content workflow** (per
@@ -216,7 +216,7 @@ inconsistency that researchers notice immediately.
      `distinct_gene_count` in use (e.g. for filtering / sizing) and a
      `mistakes:` entry contrasting `gene_count` (cumulative) vs
      `distinct_gene_count` (unique). Regenerate via
-     `scripts/build_about_content.py` + `scripts/sync_skills.sh`.
+     `scripts/build_about_content.py`.
 
 2. **Discoverability fix on top-level `gene_count`** (still needed; the
    cumulative-vs-distinct distinction is now explicit thanks to the new field
@@ -351,7 +351,8 @@ generated block implied a flat dict.
 - `inputs/tools/pathway_enrichment.yaml` declares `python_returns: EnrichmentResult`
   and the regenerated `pathway_enrichment.md` shows an object-shape example with
   `.results` and `.to_envelope()`, not a dict.
-- `scripts/sync_skills.sh` run; sibling skill docs auto-updated.
+- Build script run; sibling skill docs auto-updated (no separate sync needed —
+  build_about_content.py writes directly to the skills tree).
 - `cluster_enrichment` (which similarly returns an `EnrichmentResult`) gets the
   same override in the same commit — grep for tools where
   `from multiomics_explorer.analysis.enrichment import EnrichmentResult` appears.
@@ -412,7 +413,7 @@ hunt for it. B2 explore phase had this as friction.
 - `inputs/tools/pathway_enrichment.yaml` populates the field with the canonical
   format, a worked example (`pmm0001|6h|up`), and the NaN→`"NA"` rule.
 - Old `mistakes` entry that mentioned the convention removed (now a redirect at most).
-- Regenerate via `scripts/build_about_content.py` + `scripts/sync_skills.sh`.
+- Regenerate via `scripts/build_about_content.py`.
 - Tests:
   - `tests/unit/test_about_content.py` — covers the new section structure
     (asserts the subsection renders when YAML field present).
@@ -451,7 +452,7 @@ following it.
 - New `mistakes:` entry on DAG-vs-flat selection.
 - Runnable resource at `docs://examples/pathway_enrichment.py` updated to mirror
   the new example, if it exists.
-- Regenerate via `scripts/build_about_content.py` + `scripts/sync_skills.sh`.
+- Regenerate via `scripts/build_about_content.py`.
 - Tests:
   - `tests/integration/test_about_examples.py` — the new example must execute
     against the live KG and return a non-empty enrichment result. Pick `term_ids`
@@ -485,7 +486,7 @@ is already in `inputs/tools/pathway_enrichment.yaml` and
 - New `mistakes:` entry in `inputs/tools/search_ontology.yaml` covering the BRITE
   case.
 - New (or updated) `chaining:` entry showing the discovery → search chain.
-- Regenerate via `scripts/build_about_content.py` + `scripts/sync_skills.sh`.
+- Regenerate via `scripts/build_about_content.py`.
 - Tests:
   - `tests/unit/test_about_content.py` — passes after YAML edit + regen.
 

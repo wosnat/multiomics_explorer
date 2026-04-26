@@ -10,8 +10,8 @@
 about-content generator, and the analysis utility module. Each task is
 self-contained (no cross-task dependencies), follows TDD, and ends in a commit.
 Tasks 1-2 are pure-Python ergonomics; Tasks 3-7 touch the about-content
-pipeline (`scripts/build_about_content.py` + `inputs/tools/*.yaml` + regen +
-`scripts/sync_skills.sh`); Tasks 8-9 are full 4-layer passes per
+pipeline (`scripts/build_about_content.py` + `inputs/tools/*.yaml` + regen);
+Tasks 8-9 are full 4-layer passes per
 [.claude/skills/add-or-update-tool](../../../.claude/skills/add-or-update-tool/SKILL.md).
 
 **Tech Stack:** Python 3, pytest, Pydantic v2, FastMCP, Neo4j (APOC), `uv`.
@@ -60,7 +60,7 @@ pipeline (`scripts/build_about_content.py` + `inputs/tools/*.yaml` + regen +
 | `.../tools/cluster_enrichment.md` | (Task 6) |
 | `.../tools/list_experiments.md` | (Tasks 8, 9) |
 
-After each YAML edit: `uv run python scripts/build_about_content.py` then `scripts/sync_skills.sh`.
+After each YAML edit: `uv run python scripts/build_about_content.py` (writes directly to the skills tree — no separate sync step).
 
 ---
 
@@ -422,15 +422,7 @@ Expected: writes to
 `multiomics_explorer/skills/multiomics-kg-guide/references/tools/search_ontology.md`
 without errors.
 
-- [ ] **Step 4: Sync skills**
-
-```bash
-scripts/sync_skills.sh
-```
-
-Expected: prints sync output, no errors.
-
-- [ ] **Step 5: Verify the new content rendered**
+- [ ] **Step 4: Verify the new content rendered**
 
 ```bash
 grep -n "BRITE\|brite_tree\|enzyme entries" multiomics_explorer/skills/multiomics-kg-guide/references/tools/search_ontology.md
@@ -571,7 +563,6 @@ mistakes:
 
 ```bash
 uv run python scripts/build_about_content.py ontology_landscape
-scripts/sync_skills.sh
 ```
 
 Expected: writes ontology_landscape.md without errors.
@@ -678,7 +669,6 @@ mistakes:
 
 ```bash
 uv run python scripts/build_about_content.py pathway_enrichment
-scripts/sync_skills.sh
 ```
 
 Expected: writes pathway_enrichment.md.
@@ -933,7 +923,6 @@ term2gene path covers cluster-membership enrichment).
 ```bash
 uv run python scripts/build_about_content.py pathway_enrichment
 uv run python scripts/build_about_content.py cluster_enrichment
-scripts/sync_skills.sh
 ```
 
 - [ ] **Step 9: Verify the regenerated md**
@@ -1120,7 +1109,6 @@ in Response format § Cluster naming."`).
 
 ```bash
 uv run python scripts/build_about_content.py pathway_enrichment
-scripts/sync_skills.sh
 ```
 
 - [ ] **Step 9: Verify the new section rendered**
@@ -1485,7 +1473,6 @@ chaining:
 
 ```bash
 uv run python scripts/build_about_content.py list_experiments
-scripts/sync_skills.sh
 ```
 
 - [ ] **Step 17: Update regression baselines**
@@ -1772,7 +1759,6 @@ examples:
 
 ```bash
 uv run python scripts/build_about_content.py list_experiments
-scripts/sync_skills.sh
 ```
 
 - [ ] **Step 16: Update regression baselines**

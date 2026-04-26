@@ -98,8 +98,7 @@ Already in `.claude/settings.json`. Update the `--directory` path if needed:
 | `multiomics_explorer/config/settings.py` | Pydantic settings from .env |
 | `multiomics_explorer/cli/main.py` | Typer CLI |
 | `multiomics_explorer/inputs/tools/{tool}.yaml` | Human-authored about-content (examples, mistakes, chaining, verbose_fields) — generated md is downstream |
-| `scripts/build_about_content.py` | Generator for `skills/multiomics-kg-guide/references/tools/*.md` |
-| `scripts/sync_skills.sh` | Sync generated skill content into MCP resources |
+| `scripts/build_about_content.py` | Generator — writes `skills/multiomics-kg-guide/references/tools/*.md` directly (no separate sync step) |
 
 ## Skill / about-content workflow
 
@@ -115,11 +114,10 @@ Per `.claude/skills/layer-rules/`, the two skill subtrees behave differently:
   generator in `scripts/build_about_content.py`. To change a generated section
   structure, edit the script (and the YAML schema if a new field is needed).
 
-After edits, regenerate and sync:
+After edits, regenerate (writes directly to the skills tree):
 
 ```bash
 uv run python scripts/build_about_content.py
-scripts/sync_skills.sh
 ```
 
 **Analysis docs are hand-authored** —

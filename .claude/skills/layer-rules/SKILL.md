@@ -47,7 +47,8 @@ Pydantic response models → FastMCP auto-generates `outputSchema`.
 Per-tool about content auto-generated from Pydantic models + input
 YAML (`inputs/tools/{name}.yaml`) via `scripts/build_about_content.py`.
 Served at `docs://tools/{tool-name}`. Update YAML when tool behavior
-changes, then rebuild. Sync via `scripts/sync_skills.sh`.
+changes, then rebuild — the generator writes directly to the skills
+tree.
 
 ## Analysis utilities (`analysis/expression.py`)
 
