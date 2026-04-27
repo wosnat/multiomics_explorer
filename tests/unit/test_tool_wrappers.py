@@ -62,6 +62,8 @@ EXPECTED_TOOLS = [
     "gene_clusters_by_gene",
     "gene_derived_metrics",
     "genes_by_numeric_metric",
+    "genes_by_boolean_metric",
+    "genes_by_categorical_metric",
     "genes_in_cluster",
     "ontology_landscape",
     "pathway_enrichment",
@@ -3990,3 +3992,453 @@ class TestGenesByNumericMetricWrapper:
                 match="must provide one of derived_metric_ids or metric_types",
             ):
                 await tool_fns["genes_by_numeric_metric"](ctx)
+
+
+# ---------------------------------------------------------------------------
+# genes_by_boolean_metric
+# ---------------------------------------------------------------------------
+class TestGenesByBooleanMetricWrapper:
+    """Unit tests for genes_by_boolean_metric MCP wrapper."""
+
+    @pytest.fixture
+    def envelope_data(self):
+        return {
+            "total_matching": 58,
+            "total_derived_metrics": 2,
+            "total_genes": 58,
+            "by_organism": [
+                {"organism_name": "Prochlorococcus MED4", "count": 32},
+                {"organism_name": "Prochlorococcus MIT9313", "count": 26},
+            ],
+            "by_compartment": [{"compartment": "vesicle", "count": 58}],
+            "by_publication": [
+                {"publication_doi": "10.1111/1462-2920.12187", "count": 58},
+            ],
+            "by_experiment": [
+                {"experiment_id": "exp:biller2014:med4_vesicle", "count": 32},
+                {"experiment_id": "exp:biller2014:mit9313_vesicle", "count": 26},
+            ],
+            "by_value": [{"value": "true", "count": 58}],
+            "by_metric": [
+                {
+                    "derived_metric_id": "dm:vesicle_proteome_member:med4",
+                    "name": "MED4 vesicle proteome",
+                    "metric_type": "vesicle_proteome_member",
+                    "value_kind": "boolean",
+                    "count": 32,
+                    "true_count": 32,
+                    "false_count": 0,
+                    "dm_total_gene_count": 32,
+                    "dm_true_count": 32,
+                    "dm_false_count": 0,
+                },
+                {
+                    "derived_metric_id": "dm:vesicle_proteome_member:mit9313",
+                    "name": "MIT9313 vesicle proteome",
+                    "metric_type": "vesicle_proteome_member",
+                    "value_kind": "boolean",
+                    "count": 26,
+                    "true_count": 26,
+                    "false_count": 0,
+                    "dm_total_gene_count": 26,
+                    "dm_true_count": 26,
+                    "dm_false_count": 0,
+                },
+            ],
+            "top_categories": [
+                {"gene_category": "Membrane/wall", "count": 12},
+                {"gene_category": "Unknown", "count": 6},
+            ],
+            "genes_per_metric_max": 32,
+            "genes_per_metric_median": 29.0,
+            "not_found_ids": [],
+            "not_matched_ids": [],
+            "not_found_metric_types": [],
+            "not_matched_metric_types": [],
+            "not_matched_organism": None,
+            "excluded_derived_metrics": [],
+            "warnings": [],
+            "returned": 1,
+            "offset": 0,
+            "truncated": True,
+            "results": [{
+                "locus_tag": "PMM0090",
+                "gene_name": None,
+                "product": "Hypothetical protein",
+                "gene_category": "Unknown",
+                "organism_name": "Prochlorococcus MED4",
+                "derived_metric_id": "dm:vesicle_proteome_member:med4",
+                "name": "MED4 vesicle proteome",
+                "value_kind": "boolean",
+                "rankable": False,
+                "has_p_value": False,
+                "value": "true",
+            }],
+        }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, envelope_data):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_boolean_metric",
+            return_value=envelope_data,
+        ) as mock_api:
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_boolean_metric"](
+                ctx, metric_types=["vesicle_proteome_member"])
+        assert mock_api.called
+        assert response.total_matching == 58
+        assert response.total_derived_metrics == 2
+        assert response.total_genes == 58
+        assert response.returned == 1
+        assert response.truncated is True
+        assert len(response.by_organism) == 2
+        assert len(response.by_value) == 1
+        assert response.by_value[0].value == "true"
+        assert response.by_value[0].count == 58
+        assert len(response.by_metric) == 2
+        assert response.by_metric[0].value_kind == "boolean"
+        assert response.by_metric[0].true_count == 32
+        assert response.by_metric[0].false_count == 0
+        assert response.by_metric[0].dm_true_count == 32
+        assert response.by_metric[0].dm_false_count == 0
+        assert response.results[0].locus_tag == "PMM0090"
+        assert response.results[0].value == "true"
+        assert response.results[0].value_kind == "boolean"
+        assert response.results[0].rankable is False
+        assert response.results[0].has_p_value is False
+        # Always-empty cross-tool envelope keys
+        assert response.excluded_derived_metrics == []
+        assert response.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, envelope_data):
+        """summary=True → results=[] + populated summary envelope."""
+        envelope_data["results"] = []
+        envelope_data["returned"] = 0
+        envelope_data["truncated"] = True
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_boolean_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_boolean_metric"](
+                ctx, metric_types=["vesicle_proteome_member"], summary=True)
+        assert response.results == []
+        assert response.returned == 0
+        assert response.truncated is True
+        assert response.total_matching == 58
+        assert len(response.by_metric) == 2
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, envelope_data):
+        """All params are forwarded through to api.genes_by_boolean_metric."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_boolean_metric",
+            return_value=envelope_data,
+        ) as mock_api:
+            ctx = AsyncMock()
+            await tool_fns["genes_by_boolean_metric"](
+                ctx,
+                metric_types=["vesicle_proteome_member"],
+                organism="MED4",
+                locus_tags=["PMM0090", "PMM0097"],
+                experiment_ids=["exp:biller2014:med4_vesicle"],
+                publication_doi=["10.1111/1462-2920.12187"],
+                compartment="vesicle",
+                treatment_type=["compartment"],
+                background_factors=["axenic"],
+                growth_phases=["exponential"],
+                flag=True,
+                summary=False,
+                verbose=True,
+                limit=10,
+                offset=5,
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["metric_types"] == ["vesicle_proteome_member"]
+        assert kwargs["derived_metric_ids"] is None
+        assert kwargs["organism"] == "MED4"
+        assert kwargs["locus_tags"] == ["PMM0090", "PMM0097"]
+        assert kwargs["experiment_ids"] == ["exp:biller2014:med4_vesicle"]
+        assert kwargs["publication_doi"] == ["10.1111/1462-2920.12187"]
+        assert kwargs["compartment"] == "vesicle"
+        assert kwargs["treatment_type"] == ["compartment"]
+        assert kwargs["background_factors"] == ["axenic"]
+        assert kwargs["growth_phases"] == ["exponential"]
+        assert kwargs["flag"] is True
+        assert kwargs["summary"] is False
+        assert kwargs["verbose"] is True
+        assert kwargs["limit"] == 10
+        assert kwargs["offset"] == 5
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, envelope_data):
+        """Wrapper preserves api/'s truncated + offset bookkeeping."""
+        envelope_data["returned"] = 5
+        envelope_data["offset"] = 5
+        envelope_data["truncated"] = True
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_boolean_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_boolean_metric"](
+                ctx, metric_types=["vesicle_proteome_member"],
+                offset=5, limit=5)
+        assert response.offset == 5
+        assert response.truncated is True
+        assert response.total_matching == 58
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns):
+        """When api/ raises ValueError, wrapper raises ToolError."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api.genes_by_boolean_metric",
+            side_effect=ValueError(
+                "must provide one of derived_metric_ids or metric_types"),
+        ):
+            ctx = AsyncMock()
+            with pytest.raises(
+                ToolError,
+                match="must provide one of derived_metric_ids or metric_types",
+            ):
+                await tool_fns["genes_by_boolean_metric"](ctx)
+
+
+# ---------------------------------------------------------------------------
+# genes_by_categorical_metric
+# ---------------------------------------------------------------------------
+class TestGenesByCategoricalMetricWrapper:
+    """Unit tests for genes_by_categorical_metric MCP wrapper."""
+
+    @pytest.fixture
+    def envelope_data(self):
+        return {
+            "total_matching": 14,
+            "total_derived_metrics": 2,
+            "total_genes": 14,
+            "by_organism": [
+                {"organism_name": "Prochlorococcus MED4", "count": 8},
+                {"organism_name": "Prochlorococcus MIT9313", "count": 6},
+            ],
+            "by_compartment": [{"compartment": "vesicle", "count": 14}],
+            "by_publication": [
+                {"publication_doi": "10.1111/1462-2920.12187", "count": 14},
+            ],
+            "by_experiment": [
+                {"experiment_id": "exp:biller2014:med4_vesicle", "count": 8},
+                {"experiment_id": "exp:biller2014:mit9313_vesicle", "count": 6},
+            ],
+            "by_category": [
+                {"category": "Outer Membrane", "count": 8},
+                {"category": "Periplasmic", "count": 6},
+            ],
+            "by_metric": [
+                {
+                    "derived_metric_id": (
+                        "dm:predicted_subcellular_localization:med4"),
+                    "name": "MED4 PSORTb localization",
+                    "metric_type": "predicted_subcellular_localization",
+                    "value_kind": "categorical",
+                    "count": 8,
+                    "by_category": [
+                        {"category": "Outer Membrane", "count": 5},
+                        {"category": "Periplasmic", "count": 3},
+                    ],
+                    "allowed_categories": [
+                        "Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic",
+                        "Outer Membrane", "Extracellular", "Unknown",
+                    ],
+                    "dm_total_gene_count": 32,
+                    "dm_by_category": [
+                        {"category": "Cytoplasmic", "count": 11},
+                        {"category": "Cytoplasmic Membrane", "count": 6},
+                        {"category": "Outer Membrane", "count": 5},
+                        {"category": "Periplasmic", "count": 3},
+                        {"category": "Unknown", "count": 7},
+                    ],
+                },
+            ],
+            "top_categories": [
+                {"gene_category": "Membrane/wall", "count": 8},
+                {"gene_category": "Unknown", "count": 4},
+            ],
+            "genes_per_metric_max": 8,
+            "genes_per_metric_median": 7.0,
+            "not_found_ids": [],
+            "not_matched_ids": [],
+            "not_found_metric_types": [],
+            "not_matched_metric_types": [],
+            "not_matched_organism": None,
+            "excluded_derived_metrics": [],
+            "warnings": [],
+            "returned": 1,
+            "offset": 0,
+            "truncated": True,
+            "results": [{
+                "locus_tag": "PMM0097",
+                "gene_name": None,
+                "product": "Hypothetical protein",
+                "gene_category": "Membrane/wall",
+                "organism_name": "Prochlorococcus MED4",
+                "derived_metric_id": (
+                    "dm:predicted_subcellular_localization:med4"),
+                "name": "MED4 PSORTb localization",
+                "value_kind": "categorical",
+                "rankable": False,
+                "has_p_value": False,
+                "value": "Outer Membrane",
+            }],
+        }
+
+    @pytest.mark.asyncio
+    async def test_returns_response_model(self, tool_fns, envelope_data):
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api"
+            ".genes_by_categorical_metric",
+            return_value=envelope_data,
+        ) as mock_api:
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_categorical_metric"](
+                ctx,
+                metric_types=["predicted_subcellular_localization"],
+                categories=["Outer Membrane", "Periplasmic"])
+        assert mock_api.called
+        assert response.total_matching == 14
+        assert response.total_derived_metrics == 2
+        assert response.total_genes == 14
+        assert response.returned == 1
+        assert response.truncated is True
+        assert len(response.by_organism) == 2
+        # Envelope-level by_category uses the kind-specific freq class
+        assert len(response.by_category) == 2
+        assert response.by_category[0].category == "Outer Membrane"
+        assert response.by_category[0].count == 8
+        # by_metric carries nested by_category + dm_by_category + allowed
+        assert len(response.by_metric) == 1
+        bm = response.by_metric[0]
+        assert bm.value_kind == "categorical"
+        assert bm.count == 8
+        assert len(bm.by_category) == 2
+        assert bm.by_category[0].category == "Outer Membrane"
+        assert "Extracellular" in bm.allowed_categories
+        assert bm.dm_total_gene_count == 32
+        assert len(bm.dm_by_category) == 5
+        assert bm.dm_by_category[0].category == "Cytoplasmic"
+        # Result row
+        assert response.results[0].locus_tag == "PMM0097"
+        assert response.results[0].value == "Outer Membrane"
+        assert response.results[0].value_kind == "categorical"
+        assert response.results[0].rankable is False
+        assert response.results[0].has_p_value is False
+        # Always-empty cross-tool envelope keys
+        assert response.excluded_derived_metrics == []
+        assert response.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_empty_results(self, tool_fns, envelope_data):
+        """summary=True → results=[] + populated summary envelope."""
+        envelope_data["results"] = []
+        envelope_data["returned"] = 0
+        envelope_data["truncated"] = True
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api"
+            ".genes_by_categorical_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_categorical_metric"](
+                ctx,
+                metric_types=["predicted_subcellular_localization"],
+                summary=True)
+        assert response.results == []
+        assert response.returned == 0
+        assert response.truncated is True
+        assert response.total_matching == 14
+        assert len(response.by_metric) == 1
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, envelope_data):
+        """All params are forwarded through to api.genes_by_categorical_metric."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api"
+            ".genes_by_categorical_metric",
+            return_value=envelope_data,
+        ) as mock_api:
+            ctx = AsyncMock()
+            await tool_fns["genes_by_categorical_metric"](
+                ctx,
+                metric_types=["predicted_subcellular_localization"],
+                organism="MED4",
+                locus_tags=["PMM0097"],
+                experiment_ids=["exp:biller2014:med4_vesicle"],
+                publication_doi=["10.1111/1462-2920.12187"],
+                compartment="vesicle",
+                treatment_type=["compartment"],
+                background_factors=["axenic"],
+                growth_phases=["exponential"],
+                categories=["Outer Membrane", "Periplasmic"],
+                summary=False,
+                verbose=True,
+                limit=10,
+                offset=5,
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["metric_types"] == [
+            "predicted_subcellular_localization"]
+        assert kwargs["derived_metric_ids"] is None
+        assert kwargs["organism"] == "MED4"
+        assert kwargs["locus_tags"] == ["PMM0097"]
+        assert kwargs["experiment_ids"] == ["exp:biller2014:med4_vesicle"]
+        assert kwargs["publication_doi"] == ["10.1111/1462-2920.12187"]
+        assert kwargs["compartment"] == "vesicle"
+        assert kwargs["treatment_type"] == ["compartment"]
+        assert kwargs["background_factors"] == ["axenic"]
+        assert kwargs["growth_phases"] == ["exponential"]
+        assert kwargs["categories"] == ["Outer Membrane", "Periplasmic"]
+        assert kwargs["summary"] is False
+        assert kwargs["verbose"] is True
+        assert kwargs["limit"] == 10
+        assert kwargs["offset"] == 5
+
+    @pytest.mark.asyncio
+    async def test_truncation_metadata(self, tool_fns, envelope_data):
+        """Wrapper preserves api/'s truncated + offset bookkeeping."""
+        envelope_data["returned"] = 5
+        envelope_data["offset"] = 5
+        envelope_data["truncated"] = True
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api"
+            ".genes_by_categorical_metric",
+            return_value=envelope_data,
+        ):
+            ctx = AsyncMock()
+            response = await tool_fns["genes_by_categorical_metric"](
+                ctx,
+                metric_types=["predicted_subcellular_localization"],
+                offset=5, limit=5)
+        assert response.offset == 5
+        assert response.truncated is True
+        assert response.total_matching == 14
+
+    @pytest.mark.asyncio
+    async def test_value_error_raises_tool_error(self, tool_fns):
+        """When api/ raises ValueError (e.g. unknown category), wrapper
+        raises ToolError."""
+        with patch(
+            "multiomics_explorer.mcp_server.tools.api"
+            ".genes_by_categorical_metric",
+            side_effect=ValueError(
+                "categories includes unknown values: ['Foo']; allowed "
+                "values across selected DMs: ['Cytoplasmic', "
+                "'Outer Membrane', 'Periplasmic']"),
+        ):
+            ctx = AsyncMock()
+            with pytest.raises(
+                ToolError,
+                match="categories includes unknown values",
+            ):
+                await tool_fns["genes_by_categorical_metric"](
+                    ctx,
+                    metric_types=["predicted_subcellular_localization"],
+                    categories=["Foo"])
