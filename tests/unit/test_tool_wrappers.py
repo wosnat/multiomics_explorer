@@ -234,6 +234,27 @@ class TestListFilterValuesWrapper:
             await tool_fns["list_filter_values"](mock_ctx)
         assert mock_fn.call_count == 1
 
+    def test_filter_type_literal_includes_dm_types(self, tool_fns):
+        """Verify the filter_type Literal includes the 3 DM-awareness values added in Task 1.
+
+        Calling tool_fns[...] invokes the raw function and bypasses FastMCP's
+        Pydantic validation layer, so we cannot trigger a ToolError here.
+        Instead we introspect the type hint — FastMCP uses it to build the JSON
+        schema that enforces the constraint at the MCP protocol boundary.
+        """
+        import inspect
+        import typing
+        fn = tool_fns["list_filter_values"]
+        hints = typing.get_type_hints(fn, include_extras=True)
+        ft_hint = hints.get("filter_type")
+        assert ft_hint is not None, "filter_type parameter not found in type hints"
+        hint_str = str(ft_hint)
+        assert "Literal" in hint_str, f"Expected Literal in filter_type hint, got: {hint_str}"
+        for valid in ("gene_category", "brite_tree", "growth_phase", "metric_type", "value_kind", "compartment"):
+            assert valid in hint_str, (
+                f"Expected '{valid}' in filter_type Literal, got: {hint_str}"
+            )
+
 
 # ---------------------------------------------------------------------------
 # list_organisms
