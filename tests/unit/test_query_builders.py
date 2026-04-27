@@ -61,6 +61,12 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_numeric_metric_diagnostics,
     build_genes_by_numeric_metric_summary,
     build_genes_by_numeric_metric,
+    build_genes_by_boolean_metric_diagnostics,
+    build_genes_by_boolean_metric_summary,
+    build_genes_by_boolean_metric,
+    build_genes_by_categorical_metric_diagnostics,
+    build_genes_by_categorical_metric_summary,
+    build_genes_by_categorical_metric,
 )
 from multiomics_explorer.kg.queries_lib import _hierarchy_walk
 
@@ -5285,3 +5291,500 @@ class TestBuildGenesByNumericMetric:
             derived_metric_ids=["dm:abc"])
         assert "LIMIT" not in cypher
         assert "limit" not in params
+
+
+class TestBuildGenesByBooleanMetricDiagnostics:
+    """Unit tests for build_genes_by_boolean_metric_diagnostics (no Neo4j)."""
+
+    def test_no_filters(self):
+        # Even minimal call (no selection) carries the hardcoded value_kind guard
+        cypher, params = build_genes_by_boolean_metric_diagnostics()
+        assert "MATCH (dm:DerivedMetric)" in cypher
+        assert "dm.value_kind = $value_kind" in cypher
+        assert params == {"value_kind": "boolean"}
+
+    def test_metric_types_filter(self):
+        cypher, params = build_genes_by_boolean_metric_diagnostics(
+            metric_types=["vesicle_proteome_member"])
+        assert "dm.metric_type IN $metric_types" in cypher
+        assert params["metric_types"] == ["vesicle_proteome_member"]
+
+    def test_derived_metric_ids_filter(self):
+        cypher, params = build_genes_by_boolean_metric_diagnostics(
+            derived_metric_ids=["dm:abc"])
+        assert "dm.id IN $derived_metric_ids" in cypher
+        assert params["derived_metric_ids"] == ["dm:abc"]
+
+    def test_organism_filter(self):
+        cypher, params = build_genes_by_boolean_metric_diagnostics(
+            metric_types=["vesicle_proteome_member"], organism="MED4")
+        assert ("ALL(word IN split(toLower($organism), ' ')"
+                " WHERE toLower(dm.organism_name) CONTAINS word)") in cypher
+        assert params["organism"] == "MED4"
+
+    def test_scoping_filters_combine(self):
+        cypher, params = build_genes_by_boolean_metric_diagnostics(
+            metric_types=["vesicle_proteome_member"],
+            compartment="vesicle",
+            treatment_type=["DIEL"],
+            background_factors=["AXENIC"],
+            growth_phases=["EXPONENTIAL"],
+            publication_doi=["10.1/foo"],
+            experiment_ids=["exp:1"],
+        )
+        where_block = cypher.split("RETURN")[0]
+        assert "dm.metric_type IN $metric_types" in where_block
+        assert "dm.compartment = $compartment" in where_block
+        assert "ANY(t IN coalesce(dm.treatment_type, [])" in where_block
+        assert "ANY(bf IN coalesce(dm.background_factors, [])" in where_block
+        assert "ANY(gp IN coalesce(dm.growth_phases, [])" in where_block
+        assert "dm.publication_doi IN $publication_doi" in where_block
+        assert "dm.experiment_id IN $experiment_ids" in where_block
+        assert " AND " in where_block
+        assert params["compartment"] == "vesicle"
+        assert params["treatment_types_lower"] == ["diel"]
+        assert params["background_factors_lower"] == ["axenic"]
+        assert params["growth_phases_lower"] == ["exponential"]
+        assert params["publication_doi"] == ["10.1/foo"]
+        assert params["experiment_ids"] == ["exp:1"]
+
+    def test_value_kind_hardcoded_boolean(self):
+        cypher, params = build_genes_by_boolean_metric_diagnostics(
+            metric_types=["vesicle_proteome_member"])
+        assert "dm.value_kind = $value_kind" in cypher
+        assert params["value_kind"] == "boolean"
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_genes_by_boolean_metric_diagnostics(
+            metric_types=["vesicle_proteome_member"])
+        for col in [
+            "dm.id AS derived_metric_id",
+            "dm.metric_type AS metric_type",
+            "dm.value_kind AS value_kind",
+            "dm.name AS name",
+            "dm.total_gene_count AS total_gene_count",
+            "dm.organism_name AS organism_name",
+        ]:
+            assert col in cypher, f"missing canonical column: {col}"
+        # Boolean diagnostics has NO rankable / has_p_value / allowed_categories
+        assert "AS rankable" not in cypher
+        assert "AS has_p_value" not in cypher
+        assert "AS allowed_categories" not in cypher
+        assert "ORDER BY dm.id ASC" in cypher
+
+
+class TestBuildGenesByBooleanMetricSummary:
+    """Unit tests for build_genes_by_boolean_metric_summary (no Neo4j)."""
+
+    def test_no_filters(self):
+        cypher, params = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        assert ("MATCH (dm:DerivedMetric)-[r:Derived_metric_flags_gene]->"
+                "(g:Gene)") in cypher
+        assert "WHERE dm.id IN $derived_metric_ids" in cypher
+        assert params == {"derived_metric_ids": ["dm:abc"]}
+
+    def test_locus_tags_filter(self):
+        cypher, params = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"], locus_tags=["PMM0090"])
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert params["locus_tags"] == ["PMM0090"]
+
+    def test_flag_true_filter(self):
+        cypher, params = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"], flag=True)
+        assert "r.value = $flag_str" in cypher
+        assert params["flag_str"] == "true"
+
+    def test_flag_false_filter(self):
+        cypher, params = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"], flag=False)
+        assert "r.value = $flag_str" in cypher
+        assert params["flag_str"] == "false"
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        for col in [
+            "AS total_matching",
+            "AS total_derived_metrics",
+            "AS total_genes",
+            "AS by_organism",
+            "AS by_compartment",
+            "AS by_publication",
+            "AS by_experiment",
+            "AS by_value",
+            "AS top_categories_raw",
+            "AS by_metric",
+            "AS genes_per_metric_max",
+            "AS genes_per_metric_median",
+        ]:
+            assert col in cypher, f"missing envelope column: {col}"
+
+    def test_by_metric_carries_dm_precomputed_stats(self):
+        cypher, _ = build_genes_by_boolean_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        # Per-DM filtered counts
+        for key in [
+            "derived_metric_id: dm_id",
+            "name:        head([x IN rows WHERE x.dm_id = dm_id | x.dm_name])",
+            "metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt])",
+            "value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk])",
+            "count:       size([x IN rows WHERE x.dm_id = dm_id])",
+            "true_count:  size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'true'])",
+            "false_count: size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'false'])",
+            "dm_total_gene_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_total])",
+            "dm_true_count:  head([x IN rows WHERE x.dm_id = dm_id | x.dm_true])",
+            "dm_false_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_false])",
+        ]:
+            assert key in cypher, f"missing by_metric key: {key}"
+        # Precomputed DM-distribution props read in WITH/collect
+        for prop in ["dm.total_gene_count", "dm.flag_true_count",
+                     "dm.flag_false_count"]:
+            assert prop in cypher, f"missing precomputed DM prop: {prop}"
+
+
+class TestBuildGenesByBooleanMetric:
+    """Unit tests for build_genes_by_boolean_metric (detail)."""
+
+    def test_no_filters(self):
+        cypher, params = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"])
+        assert ("MATCH (dm:DerivedMetric)-[r:Derived_metric_flags_gene]->"
+                "(g:Gene)") in cypher
+        assert "WHERE dm.id IN $derived_metric_ids" in cypher
+        assert params == {"derived_metric_ids": ["dm:abc"]}
+
+    def test_locus_tags_filter(self):
+        cypher, params = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"], locus_tags=["PMM0090"])
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert params["locus_tags"] == ["PMM0090"]
+
+    def test_flag_filter(self):
+        cypher, params = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"], flag=True)
+        assert "r.value = $flag_str" in cypher
+        assert params["flag_str"] == "true"
+        cypher, params = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"], flag=False)
+        assert params["flag_str"] == "false"
+
+    def test_returns_expected_columns_compact(self):
+        cypher, _ = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"])
+        for col in [
+            "g.locus_tag AS locus_tag",
+            "g.gene_name AS gene_name",
+            "g.product AS product",
+            "g.gene_category AS gene_category",
+            "g.organism_name AS organism_name",
+            "dm.id AS derived_metric_id",
+            "dm.name AS name",
+            "dm.value_kind AS value_kind",
+            "dm.rankable = 'true' AS rankable",
+            "dm.has_p_value = 'true' AS has_p_value",
+            "r.value AS value",
+        ]:
+            assert col in cypher, f"missing compact column: {col}"
+        # Verbose columns are absent in compact mode
+        for col in [
+            "AS metric_type",
+            "AS compartment",
+            "AS experiment_id",
+            "AS publication_doi",
+            "AS treatment_type",
+            "AS background_factors",
+            "AS gene_function_description",
+            "AS gene_summary",
+        ]:
+            assert col not in cypher, f"{col} should be verbose-only"
+
+    def test_returns_expected_columns_verbose(self):
+        cypher, _ = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"], verbose=True)
+        for col in [
+            "dm.metric_type AS metric_type",
+            "dm.field_description AS field_description",
+            "dm.unit AS unit",
+            "dm.compartment AS compartment",
+            "dm.experiment_id AS experiment_id",
+            "dm.publication_doi AS publication_doi",
+            "coalesce(dm.treatment_type, []) AS treatment_type",
+            "coalesce(dm.background_factors, []) AS background_factors",
+            "dm.treatment AS treatment",
+            "dm.light_condition AS light_condition",
+            "dm.experimental_context AS experimental_context",
+            "g.function_description AS gene_function_description",
+            "g.gene_summary AS gene_summary",
+        ]:
+            assert col in cypher, f"missing verbose column: {col}"
+        # Categorical-only verbose addition is absent here
+        assert "AS allowed_categories" not in cypher
+
+    def test_order_by(self):
+        cypher, _ = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"])
+        assert "ORDER BY dm.id ASC, g.locus_tag ASC" in cypher
+
+    def test_limit_clause(self):
+        cypher, params = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"], limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+        assert params["offset"] == 5
+
+    def test_limit_none(self):
+        cypher, params = build_genes_by_boolean_metric(
+            derived_metric_ids=["dm:abc"])
+        assert "LIMIT" not in cypher
+        assert "SKIP" not in cypher
+        assert "limit" not in params
+        assert "offset" not in params
+
+
+class TestBuildGenesByCategoricalMetricDiagnostics:
+    """Unit tests for build_genes_by_categorical_metric_diagnostics (no Neo4j)."""
+
+    def test_no_filters(self):
+        cypher, params = build_genes_by_categorical_metric_diagnostics()
+        assert "MATCH (dm:DerivedMetric)" in cypher
+        assert "dm.value_kind = $value_kind" in cypher
+        assert params == {"value_kind": "categorical"}
+
+    def test_metric_types_filter(self):
+        cypher, params = build_genes_by_categorical_metric_diagnostics(
+            metric_types=["predicted_subcellular_localization"])
+        assert "dm.metric_type IN $metric_types" in cypher
+        assert params["metric_types"] == ["predicted_subcellular_localization"]
+
+    def test_derived_metric_ids_filter(self):
+        cypher, params = build_genes_by_categorical_metric_diagnostics(
+            derived_metric_ids=["dm:abc"])
+        assert "dm.id IN $derived_metric_ids" in cypher
+        assert params["derived_metric_ids"] == ["dm:abc"]
+
+    def test_organism_filter(self):
+        cypher, params = build_genes_by_categorical_metric_diagnostics(
+            metric_types=["predicted_subcellular_localization"],
+            organism="MED4")
+        assert ("ALL(word IN split(toLower($organism), ' ')"
+                " WHERE toLower(dm.organism_name) CONTAINS word)") in cypher
+        assert params["organism"] == "MED4"
+
+    def test_scoping_filters_combine(self):
+        cypher, params = build_genes_by_categorical_metric_diagnostics(
+            metric_types=["predicted_subcellular_localization"],
+            compartment="cell",
+            treatment_type=["DIEL"],
+            background_factors=["AXENIC"],
+            growth_phases=["EXPONENTIAL"],
+            publication_doi=["10.1/foo"],
+            experiment_ids=["exp:1"],
+        )
+        where_block = cypher.split("RETURN")[0]
+        assert "dm.metric_type IN $metric_types" in where_block
+        assert "dm.compartment = $compartment" in where_block
+        assert "ANY(t IN coalesce(dm.treatment_type, [])" in where_block
+        assert "ANY(bf IN coalesce(dm.background_factors, [])" in where_block
+        assert "ANY(gp IN coalesce(dm.growth_phases, [])" in where_block
+        assert "dm.publication_doi IN $publication_doi" in where_block
+        assert "dm.experiment_id IN $experiment_ids" in where_block
+        assert " AND " in where_block
+        assert params["compartment"] == "cell"
+
+    def test_value_kind_hardcoded_categorical(self):
+        cypher, params = build_genes_by_categorical_metric_diagnostics(
+            metric_types=["predicted_subcellular_localization"])
+        assert "dm.value_kind = $value_kind" in cypher
+        assert params["value_kind"] == "categorical"
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_genes_by_categorical_metric_diagnostics(
+            metric_types=["predicted_subcellular_localization"])
+        for col in [
+            "dm.id AS derived_metric_id",
+            "dm.metric_type AS metric_type",
+            "dm.value_kind AS value_kind",
+            "dm.name AS name",
+            "dm.total_gene_count AS total_gene_count",
+            "dm.organism_name AS organism_name",
+            "dm.allowed_categories AS allowed_categories",
+        ]:
+            assert col in cypher, f"missing canonical column: {col}"
+        # Categorical diagnostics has NO rankable / has_p_value
+        assert "AS rankable" not in cypher
+        assert "AS has_p_value" not in cypher
+        assert "ORDER BY dm.id ASC" in cypher
+
+
+class TestBuildGenesByCategoricalMetricSummary:
+    """Unit tests for build_genes_by_categorical_metric_summary (no Neo4j)."""
+
+    def test_no_filters(self):
+        cypher, params = build_genes_by_categorical_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        assert ("MATCH (dm:DerivedMetric)-[r:Derived_metric_classifies_gene]->"
+                "(g:Gene)") in cypher
+        assert "WHERE dm.id IN $derived_metric_ids" in cypher
+        assert params == {"derived_metric_ids": ["dm:abc"]}
+
+    def test_locus_tags_filter(self):
+        cypher, params = build_genes_by_categorical_metric_summary(
+            derived_metric_ids=["dm:abc"], locus_tags=["PMM0097"])
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert params["locus_tags"] == ["PMM0097"]
+
+    def test_categories_filter(self):
+        cypher, params = build_genes_by_categorical_metric_summary(
+            derived_metric_ids=["dm:abc"],
+            categories=["Outer Membrane", "Periplasmic"])
+        assert "r.value IN $categories" in cypher
+        assert params["categories"] == ["Outer Membrane", "Periplasmic"]
+
+    def test_returns_expected_columns(self):
+        cypher, _ = build_genes_by_categorical_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        for col in [
+            "AS total_matching",
+            "AS total_derived_metrics",
+            "AS total_genes",
+            "AS by_organism",
+            "AS by_compartment",
+            "AS by_publication",
+            "AS by_experiment",
+            "AS by_category",
+            "AS top_categories_raw",
+            "AS by_metric",
+            "AS genes_per_metric_max",
+            "AS genes_per_metric_median",
+        ]:
+            assert col in cypher, f"missing envelope column: {col}"
+
+    def test_by_metric_carries_dm_precomputed_histogram(self):
+        cypher, _ = build_genes_by_categorical_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        # Filtered slice histogram for the matching rows
+        assert ("by_category: apoc.coll.frequencies("
+                "[x IN rows WHERE x.dm_id = dm_id | x.value])") in cypher
+        # Full-DM precomputed histogram via zipped category_labels / category_counts
+        assert "dm_by_category:" in cypher
+        assert ("[i IN range(0,\n"
+                "            size(head([x IN rows WHERE x.dm_id = dm_id "
+                "| x.dm_labels])) - 1)") in cypher
+        assert ("{item:  head([x IN rows WHERE x.dm_id = dm_id | x.dm_labels])[i],"
+                "\n           count: head([x IN rows WHERE x.dm_id = dm_id "
+                "| x.dm_counts])[i]}") in cypher
+        # WITH/collect reads the precomputed DM props
+        for prop in ["dm.total_gene_count", "dm.category_labels",
+                     "dm.category_counts", "dm.allowed_categories"]:
+            assert prop in cypher, f"missing precomputed DM prop: {prop}"
+
+    def test_by_metric_includes_allowed_categories(self):
+        cypher, _ = build_genes_by_categorical_metric_summary(
+            derived_metric_ids=["dm:abc"])
+        # Per-DM dict carries allowed_categories (passed through from collect)
+        assert ("allowed_categories:  head([x IN rows WHERE x.dm_id = dm_id "
+                "| x.dm_allowed])") in cypher
+        # And dm_total_gene_count
+        assert ("dm_total_gene_count: head([x IN rows WHERE x.dm_id = dm_id "
+                "| x.dm_total])") in cypher
+
+
+class TestBuildGenesByCategoricalMetric:
+    """Unit tests for build_genes_by_categorical_metric (detail)."""
+
+    def test_no_filters(self):
+        cypher, params = build_genes_by_categorical_metric(
+            derived_metric_ids=["dm:abc"])
+        assert ("MATCH (dm:DerivedMetric)-[r:Derived_metric_classifies_gene]->"
+                "(g:Gene)") in cypher
+        assert "WHERE dm.id IN $derived_metric_ids" in cypher
+        assert params == {"derived_metric_ids": ["dm:abc"]}
+
+    def test_locus_tags_filter(self):
+        cypher, params = build_genes_by_categorical_metric(
+            derived_metric_ids=["dm:abc"], locus_tags=["PMM0097"])
+        assert "g.locus_tag IN $locus_tags" in cypher
+        assert params["locus_tags"] == ["PMM0097"]
+
+    def test_categories_filter(self):
+        cypher, params = build_genes_by_categorical_metric(
+            derived_metric_ids=["dm:abc"],
+            categories=["Outer Membrane", "Periplasmic"])
+        assert "r.value IN $categories" in cypher
+        assert params["categories"] == ["Outer Membrane", "Periplasmic"]
+
+    def test_returns_expected_columns_compact(self):
+        cypher, _ = build_genes_by_categorical_metric(
+            derived_metric_ids=["dm:abc"])
+        for col in [
+            "g.locus_tag AS locus_tag",
+            "g.gene_name AS gene_name",
+            "g.product AS product",
+            "g.gene_category AS gene_category",
+            "g.organism_name AS organism_name",
+            "dm.id AS derived_metric_id",
+            "dm.name AS name",
+            "dm.value_kind AS value_kind",
+            "dm.rankable = 'true' AS rankable",
+            "dm.has_p_value = 'true' AS has_p_value",
+            "r.value AS value",
+        ]:
+            assert col in cypher, f"missing compact column: {col}"
+        # Verbose columns are absent in compact mode
+        for col in [
+            "AS metric_type",
+            "AS compartment",
+            "AS experiment_id",
+            "AS publication_doi",
+            "AS treatment_type",
+            "AS background_factors",
+            "AS gene_function_description",
+            "AS gene_summary",
+            "AS allowed_categories",
+        ]:
+            assert col not in cypher, f"{col} should be verbose-only"
+
+    def test_returns_expected_columns_verbose(self):
+        cypher, _ = build_genes_by_categorical_metric(
+            derived_metric_ids=["dm:abc"], verbose=True)
+        for col in [
+            "dm.metric_type AS metric_type",
+            "dm.field_description AS field_description",
+            "dm.unit AS unit",
+            "dm.compartment AS compartment",
+            "dm.experiment_id AS experiment_id",
+            "dm.publication_doi AS publication_doi",
+            "coalesce(dm.treatment_type, []) AS treatment_type",
+            "coalesce(dm.background_factors, []) AS background_factors",
+            "dm.treatment AS treatment",
+            "dm.light_condition AS light_condition",
+            "dm.experimental_context AS experimental_context",
+            "g.function_description AS gene_function_description",
+            "g.gene_summary AS gene_summary",
+            "dm.allowed_categories AS allowed_categories",
+        ]:
+            assert col in cypher, f"missing verbose column: {col}"
+
+    def test_order_by(self):
+        cypher, _ = build_genes_by_categorical_metric(
+            derived_metric_ids=["dm:abc"])
+        assert "ORDER BY r.value ASC, dm.id ASC, g.locus_tag ASC" in cypher
+
+    def test_limit_clause(self):
+        cypher, params = build_genes_by_categorical_metric(
+            derived_metric_ids=["dm:abc"], limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+        assert params["offset"] == 5
+
+    def test_limit_none(self):
+        cypher, params = build_genes_by_categorical_metric(
+            derived_metric_ids=["dm:abc"])
+        assert "LIMIT" not in cypher
+        assert "SKIP" not in cypher
+        assert "limit" not in params
+        assert "offset" not in params

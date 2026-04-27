@@ -5051,3 +5051,436 @@ def build_genes_by_numeric_metric(
         f"{skip_clause}{limit_clause}"
     )
     return cypher, params
+
+
+def build_genes_by_boolean_metric_diagnostics(
+    *,
+    derived_metric_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    organism: str | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Pre-flight DM selection + value_kind validation probe for boolean drill-down.
+
+    Reuses `_list_derived_metrics_where` for DM-scoping conditions with a
+    hardcoded `value_kind='boolean'` predicate. Mismatched IDs (numeric or
+    categorical DMs passed in `derived_metric_ids`) surface as zero-row
+    results that api/ converts into `not_found_ids`.
+
+    RETURN keys (one row per surviving DM, 6 columns):
+      derived_metric_id, metric_type, value_kind, name,
+      total_gene_count, organism_name.
+    """
+    conditions, params = _list_derived_metrics_where(
+        organism=organism,
+        metric_types=metric_types,
+        value_kind="boolean",
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        publication_doi=publication_doi,
+        experiment_ids=experiment_ids,
+        derived_metric_ids=derived_metric_ids,
+    )
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)\n"
+        f"{where_block}"
+        "RETURN dm.id AS derived_metric_id,\n"
+        "       dm.metric_type AS metric_type,\n"
+        "       dm.value_kind AS value_kind,\n"
+        "       dm.name AS name,\n"
+        "       dm.total_gene_count AS total_gene_count,\n"
+        "       dm.organism_name AS organism_name\n"
+        "ORDER BY dm.id ASC"
+    )
+    return cypher, params
+
+
+def build_genes_by_boolean_metric_summary(
+    *,
+    derived_metric_ids: list[str],
+    locus_tags: list[str] | None = None,
+    flag: bool | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for genes_by_boolean_metric.
+
+    Takes the diagnostics-validated `derived_metric_ids` list plus the
+    edge-level `flag` filter. Boolean DMs have no rankable / has_p_value
+    gates so no gate-resolution step is needed.
+
+    RETURN keys: total_matching, total_derived_metrics, total_genes,
+    by_organism, by_compartment, by_publication, by_experiment,
+    by_value, top_categories_raw, by_metric (per-DM filtered + full-DM
+    precomputed counts), genes_per_metric_max, genes_per_metric_median.
+    """
+    params: dict = {"derived_metric_ids": derived_metric_ids}
+
+    conditions: list[str] = ["dm.id IN $derived_metric_ids"]
+    if locus_tags is not None:
+        conditions.append("g.locus_tag IN $locus_tags")
+        params["locus_tags"] = locus_tags
+    if flag is not None:
+        # Edge property `value` is BioCypher string-typed bool ("true"/"false").
+        conditions.append("r.value = $flag_str")
+        params["flag_str"] = "true" if flag else "false"
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)-[r:Derived_metric_flags_gene]->(g:Gene)\n"
+        f"{where_block}"
+        "WITH collect({\n"
+        "  dm_id: dm.id, dm_name: dm.name, mt: dm.metric_type, vk: dm.value_kind,\n"
+        "  org: g.organism_name, cat: coalesce(g.gene_category, 'Unknown'),\n"
+        "  comp: dm.compartment, doi: dm.publication_doi, exp: dm.experiment_id,\n"
+        "  lt: g.locus_tag,\n"
+        "  value: r.value,\n"
+        "  dm_total: dm.total_gene_count,\n"
+        "  dm_true: dm.flag_true_count,\n"
+        "  dm_false: dm.flag_false_count\n"
+        "}) AS rows\n"
+        "RETURN\n"
+        "  size(rows) AS total_matching,\n"
+        "  size(apoc.coll.toSet([x IN rows | x.dm_id])) AS total_derived_metrics,\n"
+        "  size(apoc.coll.toSet([x IN rows | x.lt])) AS total_genes,\n"
+        "  apoc.coll.frequencies([x IN rows | x.org]) AS by_organism,\n"
+        "  apoc.coll.frequencies([x IN rows | x.comp]) AS by_compartment,\n"
+        "  apoc.coll.frequencies([x IN rows | x.doi]) AS by_publication,\n"
+        "  apoc.coll.frequencies([x IN rows | x.exp]) AS by_experiment,\n"
+        "  apoc.coll.frequencies([x IN rows | x.value]) AS by_value,\n"
+        "  apoc.coll.frequencies([x IN rows | x.cat]) AS top_categories_raw,\n"
+        "  [dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "    {derived_metric_id: dm_id,\n"
+        "     name:        head([x IN rows WHERE x.dm_id = dm_id | x.dm_name]),\n"
+        "     metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt]),\n"
+        "     value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk]),\n"
+        "     count:       size([x IN rows WHERE x.dm_id = dm_id]),\n"
+        "     true_count:  size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'true']),\n"
+        "     false_count: size([x IN rows WHERE x.dm_id = dm_id AND x.value = 'false']),\n"
+        "     dm_total_gene_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_total]),\n"
+        "     dm_true_count:  head([x IN rows WHERE x.dm_id = dm_id | x.dm_true]),\n"
+        "     dm_false_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_false])\n"
+        "    }] AS by_metric,\n"
+        "  apoc.coll.max([dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "                 size([x IN rows WHERE x.dm_id = dm_id])]) AS genes_per_metric_max,\n"
+        "  toFloat(apoc.coll.sort([dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "                          size([x IN rows WHERE x.dm_id = dm_id])])\n"
+        "          [toInteger(size(apoc.coll.toSet([x IN rows | x.dm_id])) / 2)])\n"
+        "    AS genes_per_metric_median"
+    )
+    return cypher, params
+
+
+def build_genes_by_boolean_metric(
+    *,
+    derived_metric_ids: list[str],
+    locus_tags: list[str] | None = None,
+    flag: bool | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for genes_by_boolean_metric.
+
+    11 compact RETURN columns (per-row gene + DM identity + value),
+    plus 13 verbose columns. No CASE-gate wrappers: boolean edges have
+    no rankable / has_p_value extras.
+
+    RETURN keys (compact, 11): locus_tag, gene_name, product, gene_category,
+    organism_name, derived_metric_id, name, value_kind, rankable,
+    has_p_value, value.
+
+    RETURN keys (verbose adds, 13): metric_type, field_description, unit,
+    compartment, experiment_id, publication_doi, treatment_type,
+    background_factors, treatment, light_condition, experimental_context,
+    gene_function_description, gene_summary.
+    """
+    params: dict = {"derived_metric_ids": derived_metric_ids}
+
+    conditions: list[str] = ["dm.id IN $derived_metric_ids"]
+    if locus_tags is not None:
+        conditions.append("g.locus_tag IN $locus_tags")
+        params["locus_tags"] = locus_tags
+    if flag is not None:
+        # Edge property `value` is BioCypher string-typed bool ("true"/"false").
+        conditions.append("r.value = $flag_str")
+        params["flag_str"] = "true" if flag else "false"
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       dm.metric_type AS metric_type"
+            ",\n       dm.field_description AS field_description"
+            ",\n       dm.unit AS unit"
+            ",\n       dm.compartment AS compartment"
+            ",\n       dm.experiment_id AS experiment_id"
+            ",\n       dm.publication_doi AS publication_doi"
+            ",\n       coalesce(dm.treatment_type, []) AS treatment_type"
+            ",\n       coalesce(dm.background_factors, []) AS background_factors"
+            ",\n       dm.treatment AS treatment"
+            ",\n       dm.light_condition AS light_condition"
+            ",\n       dm.experimental_context AS experimental_context"
+            ",\n       g.function_description AS gene_function_description"
+            ",\n       g.gene_summary AS gene_summary"
+        )
+
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)-[r:Derived_metric_flags_gene]->(g:Gene)\n"
+        f"{where_block}"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.gene_name AS gene_name,\n"
+        "       g.product AS product,\n"
+        "       g.gene_category AS gene_category,\n"
+        "       g.organism_name AS organism_name,\n"
+        "       dm.id AS derived_metric_id,\n"
+        "       dm.name AS name,\n"
+        "       dm.value_kind AS value_kind,\n"
+        "       dm.rankable = 'true' AS rankable,\n"
+        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       r.value AS value"
+        f"{verbose_cols}\n"
+        "ORDER BY dm.id ASC, g.locus_tag ASC"
+        f"{skip_clause}{limit_clause}"
+    )
+    return cypher, params
+
+
+def build_genes_by_categorical_metric_diagnostics(
+    *,
+    derived_metric_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    organism: str | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Pre-flight DM selection + value_kind validation probe for categorical drill-down.
+
+    Reuses `_list_derived_metrics_where` for DM-scoping conditions with a
+    hardcoded `value_kind='categorical'` predicate. Mismatched IDs surface
+    as zero-row results that api/ converts into `not_found_ids`.
+
+    RETURN keys (one row per surviving DM, 7 columns):
+      derived_metric_id, metric_type, value_kind, name,
+      total_gene_count, organism_name, allowed_categories.
+    """
+    conditions, params = _list_derived_metrics_where(
+        organism=organism,
+        metric_types=metric_types,
+        value_kind="categorical",
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+        publication_doi=publication_doi,
+        experiment_ids=experiment_ids,
+        derived_metric_ids=derived_metric_ids,
+    )
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)\n"
+        f"{where_block}"
+        "RETURN dm.id AS derived_metric_id,\n"
+        "       dm.metric_type AS metric_type,\n"
+        "       dm.value_kind AS value_kind,\n"
+        "       dm.name AS name,\n"
+        "       dm.total_gene_count AS total_gene_count,\n"
+        "       dm.organism_name AS organism_name,\n"
+        "       dm.allowed_categories AS allowed_categories\n"
+        "ORDER BY dm.id ASC"
+    )
+    return cypher, params
+
+
+def build_genes_by_categorical_metric_summary(
+    *,
+    derived_metric_ids: list[str],
+    locus_tags: list[str] | None = None,
+    categories: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Build summary Cypher for genes_by_categorical_metric.
+
+    Takes the diagnostics-validated `derived_metric_ids` list plus the
+    edge-level `categories` filter (api/ has already validated each
+    category against the union of allowed_categories per DM).
+
+    RETURN keys: total_matching, total_derived_metrics, total_genes,
+    by_organism, by_compartment, by_publication, by_experiment,
+    by_category, top_categories_raw, by_metric (per-DM filtered slice +
+    full-DM precomputed histogram via dm.category_labels /
+    dm.category_counts), genes_per_metric_max, genes_per_metric_median.
+    """
+    params: dict = {"derived_metric_ids": derived_metric_ids}
+
+    conditions: list[str] = ["dm.id IN $derived_metric_ids"]
+    if locus_tags is not None:
+        conditions.append("g.locus_tag IN $locus_tags")
+        params["locus_tags"] = locus_tags
+    if categories is not None:
+        conditions.append("r.value IN $categories")
+        params["categories"] = categories
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)-[r:Derived_metric_classifies_gene]->(g:Gene)\n"
+        f"{where_block}"
+        "WITH collect({\n"
+        "  dm_id: dm.id, dm_name: dm.name, mt: dm.metric_type, vk: dm.value_kind,\n"
+        "  org: g.organism_name, cat: coalesce(g.gene_category, 'Unknown'),\n"
+        "  comp: dm.compartment, doi: dm.publication_doi, exp: dm.experiment_id,\n"
+        "  lt: g.locus_tag,\n"
+        "  value: r.value,\n"
+        "  dm_total: dm.total_gene_count,\n"
+        "  dm_labels: dm.category_labels,\n"
+        "  dm_counts: dm.category_counts,\n"
+        "  dm_allowed: dm.allowed_categories\n"
+        "}) AS rows\n"
+        "RETURN\n"
+        "  size(rows) AS total_matching,\n"
+        "  size(apoc.coll.toSet([x IN rows | x.dm_id])) AS total_derived_metrics,\n"
+        "  size(apoc.coll.toSet([x IN rows | x.lt])) AS total_genes,\n"
+        "  apoc.coll.frequencies([x IN rows | x.org]) AS by_organism,\n"
+        "  apoc.coll.frequencies([x IN rows | x.comp]) AS by_compartment,\n"
+        "  apoc.coll.frequencies([x IN rows | x.doi]) AS by_publication,\n"
+        "  apoc.coll.frequencies([x IN rows | x.exp]) AS by_experiment,\n"
+        "  apoc.coll.frequencies([x IN rows | x.value]) AS by_category,\n"
+        "  apoc.coll.frequencies([x IN rows | x.cat]) AS top_categories_raw,\n"
+        "  [dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "    {derived_metric_id: dm_id,\n"
+        "     name:        head([x IN rows WHERE x.dm_id = dm_id | x.dm_name]),\n"
+        "     metric_type: head([x IN rows WHERE x.dm_id = dm_id | x.mt]),\n"
+        "     value_kind:  head([x IN rows WHERE x.dm_id = dm_id | x.vk]),\n"
+        "     count:       size([x IN rows WHERE x.dm_id = dm_id]),\n"
+        "     by_category: apoc.coll.frequencies([x IN rows WHERE x.dm_id = dm_id | x.value]),\n"
+        "     allowed_categories:  head([x IN rows WHERE x.dm_id = dm_id | x.dm_allowed]),\n"
+        "     dm_total_gene_count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_total]),\n"
+        "     dm_by_category:\n"
+        "       [i IN range(0,\n"
+        "            size(head([x IN rows WHERE x.dm_id = dm_id | x.dm_labels])) - 1)\n"
+        "        | {item:  head([x IN rows WHERE x.dm_id = dm_id | x.dm_labels])[i],\n"
+        "           count: head([x IN rows WHERE x.dm_id = dm_id | x.dm_counts])[i]}]\n"
+        "    }] AS by_metric,\n"
+        "  apoc.coll.max([dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "                 size([x IN rows WHERE x.dm_id = dm_id])]) AS genes_per_metric_max,\n"
+        "  toFloat(apoc.coll.sort([dm_id IN apoc.coll.toSet([x IN rows | x.dm_id]) |\n"
+        "                          size([x IN rows WHERE x.dm_id = dm_id])])\n"
+        "          [toInteger(size(apoc.coll.toSet([x IN rows | x.dm_id])) / 2)])\n"
+        "    AS genes_per_metric_median"
+    )
+    return cypher, params
+
+
+def build_genes_by_categorical_metric(
+    *,
+    derived_metric_ids: list[str],
+    locus_tags: list[str] | None = None,
+    categories: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build detail Cypher for genes_by_categorical_metric.
+
+    11 compact RETURN columns (per-row gene + DM identity + value),
+    plus 14 verbose columns (= boolean's 13 verbose + allowed_categories).
+    No CASE-gate wrappers: categorical edges have no rankable / has_p_value
+    extras.
+
+    RETURN keys (compact, 11): locus_tag, gene_name, product, gene_category,
+    organism_name, derived_metric_id, name, value_kind, rankable,
+    has_p_value, value.
+
+    RETURN keys (verbose adds, 14): metric_type, field_description, unit,
+    compartment, experiment_id, publication_doi, treatment_type,
+    background_factors, treatment, light_condition, experimental_context,
+    gene_function_description, gene_summary, allowed_categories.
+    """
+    params: dict = {"derived_metric_ids": derived_metric_ids}
+
+    conditions: list[str] = ["dm.id IN $derived_metric_ids"]
+    if locus_tags is not None:
+        conditions.append("g.locus_tag IN $locus_tags")
+        params["locus_tags"] = locus_tags
+    if categories is not None:
+        conditions.append("r.value IN $categories")
+        params["categories"] = categories
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n"
+
+    verbose_cols = ""
+    if verbose:
+        verbose_cols = (
+            ",\n       dm.metric_type AS metric_type"
+            ",\n       dm.field_description AS field_description"
+            ",\n       dm.unit AS unit"
+            ",\n       dm.compartment AS compartment"
+            ",\n       dm.experiment_id AS experiment_id"
+            ",\n       dm.publication_doi AS publication_doi"
+            ",\n       coalesce(dm.treatment_type, []) AS treatment_type"
+            ",\n       coalesce(dm.background_factors, []) AS background_factors"
+            ",\n       dm.treatment AS treatment"
+            ",\n       dm.light_condition AS light_condition"
+            ",\n       dm.experimental_context AS experimental_context"
+            ",\n       g.function_description AS gene_function_description"
+            ",\n       g.gene_summary AS gene_summary"
+            ",\n       dm.allowed_categories AS allowed_categories"
+        )
+
+    if offset:
+        skip_clause = "\nSKIP $offset"
+        params["offset"] = offset
+    else:
+        skip_clause = ""
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        "MATCH (dm:DerivedMetric)-[r:Derived_metric_classifies_gene]->(g:Gene)\n"
+        f"{where_block}"
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.gene_name AS gene_name,\n"
+        "       g.product AS product,\n"
+        "       g.gene_category AS gene_category,\n"
+        "       g.organism_name AS organism_name,\n"
+        "       dm.id AS derived_metric_id,\n"
+        "       dm.name AS name,\n"
+        "       dm.value_kind AS value_kind,\n"
+        "       dm.rankable = 'true' AS rankable,\n"
+        "       dm.has_p_value = 'true' AS has_p_value,\n"
+        "       r.value AS value"
+        f"{verbose_cols}\n"
+        "ORDER BY r.value ASC, dm.id ASC, g.locus_tag ASC"
+        f"{skip_clause}{limit_clause}"
+    )
+    return cypher, params
