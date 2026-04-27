@@ -33,16 +33,17 @@
 
 ## Task ordering
 
-1. **list_filter_values** — 3 new filter types. Smallest, fully unblocked.
-2. **list_organisms** — smallest list tool.
-3. **list_publications** — adds `compartment` filter; `compartments` rollup is a list.
-4. **list_experiments** — most complex envelope; `compartment` is a singleton on the row.
-5. **gene_overview (compact + envelope)** — KG-rebuild-independent: uses computed sum from existing per-kind props.
-6. **gene_overview (verbose per-kind fields)** — KG-rebuild-dependent: uses post-D8-rename Gene props.
-7. **Regression baselines + about content + CLAUDE.md.**
-8. **Fulltext-search assertions** — KG-rebuild-dependent: validates D5 (search_text DM-token routing).
+KG side (D5 + D8) was verified live before implementation began (2026-04-27 evening), so all tasks are unblocked. Task 5 absorbs the previous Task 6 (verbose per-kind + post-D8 rename adoption) since the KG already exposes the renamed names.
 
-Tasks 1–5 + 7's regression+about portion can land during the KG rebuild window. Tasks 6 + 8 wait for the rebuild.
+1. **list_filter_values** — 3 new filter types.
+2. **list_organisms** — DM rollups + compartment filter.
+3. **list_publications** — same shape as 2.
+4. **list_experiments** — scalar compartment.
+5. **gene_overview (full)** — compact + envelope + verbose per-kind fields, using post-D8 names directly. (Plan's old Task 6 is folded in.)
+6. **Regression baselines + about content + CLAUDE.md** (plan's old Task 7).
+7. **Fulltext-search assertions** (plan's old Task 8) — validates D5 token routing.
+
+All tasks must be **strictly serial** because they all touch the same source/test files (the user's no-shared-files-concurrent constraint). Worktree-style parallelism is not applicable here.
 
 ---
 
@@ -1175,9 +1176,9 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 
 ---
 
-## Task 5: `gene_overview` — compact DM rollup + envelope `has_derived_metrics`
+## Task 5: `gene_overview` — full DM rollup (compact + verbose + envelope)
 
-**KG-rebuild status:** unblocked. Compact `derived_metric_count` is computed at the API/builder layer as `numeric_metric_count + classifier_flag_count + classifier_label_count` (or post-rebuild equivalents); compact `derived_metric_value_kinds` is computed from per-kind counts > 0. Both are layer-agnostic to the D8 rename.
+**KG-rebuild status:** unblocked. KG D8 rename verified live 2026-04-27: Gene now exposes `boolean_metric_count` / `categorical_metric_count` / `boolean_metric_types_observed` / `categorical_metric_types_observed`. This task absorbs the original plan's Task 6 (verbose per-kind fields + post-D8 names) since gating is gone.
 
 **Files:**
 - Modify: `multiomics_explorer/kg/queries_lib.py:404-470` (`build_gene_overview`)
@@ -1212,16 +1213,22 @@ pytest tests/unit/test_query_builders.py::TestBuildGeneOverview -v
 
 - [ ] **Step 3: Extend `build_gene_overview`**
 
-In `multiomics_explorer/kg/queries_lib.py`, find `build_gene_overview` (line ~417). The existing builder returns `cluster_membership_count` / `cluster_types` per row. Add compact-side per-kind sources so the API can synthesize the unified count:
+In `multiomics_explorer/kg/queries_lib.py`, find `build_gene_overview` (line ~417). The existing builder returns `cluster_membership_count` / `cluster_types` per row. Add compact-side per-kind sources so the API can synthesize the unified count, plus verbose-only per-kind types lists + compartments:
 
 ```python
-# In the RETURN clause, after the existing cluster_types line, add:
+# In the RETURN clause, after the existing cluster_types line, add (compact):
 "       coalesce(g.numeric_metric_count, 0) AS numeric_metric_count,\n"
-"       coalesce(g.classifier_flag_count, 0) AS classifier_flag_count,\n"
-"       coalesce(g.classifier_label_count, 0) AS classifier_label_count,\n"
+"       coalesce(g.boolean_metric_count, 0) AS boolean_metric_count,\n"
+"       coalesce(g.categorical_metric_count, 0) AS categorical_metric_count,\n"
+
+# In the verbose_cols string (verbose-only):
+"\n       coalesce(g.numeric_metric_types_observed, []) AS numeric_metric_types_observed,"
+"\n       coalesce(g.boolean_metric_types_observed, []) AS boolean_metric_types_observed,"
+"\n       coalesce(g.categorical_metric_types_observed, []) AS categorical_metric_types_observed,"
+"\n       coalesce(g.compartments_observed, []) AS compartments_observed"
 ```
 
-(After the D8 KG rebuild ships, Task 6 will rename these RETURN aliases to `boolean_metric_count` / `categorical_metric_count`.)
+Use post-D8 KG names directly (verified live 2026-04-27).
 
 - [ ] **Step 4: Update `build_gene_overview_summary`**
 
@@ -1232,8 +1239,8 @@ The existing summary returns `has_clusters: int` (count of locus_tags with clust
 "       size([g IN found WHERE g.cluster_membership_count > 0]) AS has_clusters,\n"
 "       size([g IN found WHERE\n"
 "           coalesce(g.numeric_metric_count, 0)\n"
-"         + coalesce(g.classifier_flag_count, 0)\n"
-"         + coalesce(g.classifier_label_count, 0) > 0]) AS has_derived_metrics,\n"
+"         + coalesce(g.boolean_metric_count, 0)\n"
+"         + coalesce(g.categorical_metric_count, 0) > 0]) AS has_derived_metrics,\n"
 ```
 
 - [ ] **Step 5: Run builder tests**
@@ -1253,8 +1260,8 @@ def test_synthesizes_dm_count_and_value_kinds(self, mock_conn):
         "locus_tag": "PMM0001", "gene_name": "rbcL",
         "cluster_membership_count": 0, "cluster_types": [],
         "numeric_metric_count": 5,
-        "classifier_flag_count": 3,
-        "classifier_label_count": 0,
+        "boolean_metric_count": 3,
+        "categorical_metric_count": 0,
     }]
     summary_row = {
         "total_matching": 1, "found_count": 1,
@@ -1272,8 +1279,8 @@ def test_zero_dm_gene_has_empty_value_kinds(self, mock_conn):
         "locus_tag": "PMM9999", "gene_name": "x",
         "cluster_membership_count": 0, "cluster_types": [],
         "numeric_metric_count": 0,
-        "classifier_flag_count": 0,
-        "classifier_label_count": 0,
+        "boolean_metric_count": 0,
+        "categorical_metric_count": 0,
     }]
     summary_row = {"total_matching": 1, "found_count": 1,
                    "has_clusters": 0, "has_derived_metrics": 0}
@@ -1291,19 +1298,30 @@ pytest tests/unit/test_api_functions.py::TestGeneOverview -v -k "synthesizes or 
 
 - [ ] **Step 8: Update `gene_overview` API function**
 
-In `multiomics_explorer/api/functions.py`, find `gene_overview`. After the row materialization step, synthesize the compact DM fields and drop the per-kind raw fields from compact (they'll come back in Task 6 verbose):
+In `multiomics_explorer/api/functions.py`, find `gene_overview`. Synthesize the compact DM fields from the per-kind raw fields, then gate the per-kind fields + types-observed lists + compartments_observed on `verbose`:
 
 ```python
 # After existing cluster-field handling, before returning:
 KIND_FIELD_MAP = [
     ("numeric_metric_count", "numeric"),
-    ("classifier_flag_count", "boolean"),
-    ("classifier_label_count", "categorical"),
+    ("boolean_metric_count", "boolean"),
+    ("categorical_metric_count", "categorical"),
 ]
+VERBOSE_DM_FIELDS = (
+    "numeric_metric_count", "boolean_metric_count", "categorical_metric_count",
+    "numeric_metric_types_observed", "boolean_metric_types_observed",
+    "categorical_metric_types_observed", "compartments_observed",
+)
+
 for r in results:
-    counts = {kind: r.pop(field, 0) for field, kind in KIND_FIELD_MAP}
+    # Synthesize unified rollup from per-kind counts (always needed)
+    counts = {kind: r.get(field, 0) for field, kind in KIND_FIELD_MAP}
     r["derived_metric_count"] = sum(counts.values())
     r["derived_metric_value_kinds"] = [k for k, v in counts.items() if v > 0]
+    if not verbose:
+        # Strip per-kind raw fields from compact responses
+        for f in VERBOSE_DM_FIELDS:
+            r.pop(f, None)
 
 # Surface has_derived_metrics in the envelope:
 return {
@@ -1322,9 +1340,10 @@ Expected: pass.
 
 - [ ] **Step 10: Update Pydantic models**
 
-In `multiomics_explorer/mcp_server/tools.py`, find `GeneOverviewResult`. Add:
+In `multiomics_explorer/mcp_server/tools.py`, find `GeneOverviewResult`. Add compact + verbose fields:
 
 ```python
+# Compact (always present)
 derived_metric_count: int = Field(
     default=0,
     description="Total DerivedMetric annotations on this gene (sum across numeric/boolean/categorical kinds).",
@@ -1333,6 +1352,15 @@ derived_metric_value_kinds: list[str] = Field(
     default_factory=list,
     description="Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs.",
 )
+
+# Verbose-only (None on compact responses)
+numeric_metric_count: int | None = Field(default=None, description="Numeric DM count (verbose).")
+boolean_metric_count: int | None = Field(default=None, description="Boolean DM count (verbose).")
+categorical_metric_count: int | None = Field(default=None, description="Categorical DM count (verbose).")
+numeric_metric_types_observed: list[str] | None = Field(default=None, description="Numeric metric_types observed (verbose).")
+boolean_metric_types_observed: list[str] | None = Field(default=None, description="Boolean metric_types observed (verbose).")
+categorical_metric_types_observed: list[str] | None = Field(default=None, description="Categorical metric_types observed (verbose).")
+compartments_observed: list[str] | None = Field(default=None, description="DM compartments observed for this gene (verbose).")
 ```
 
 On `GeneOverviewResponse`:
@@ -1391,7 +1419,15 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 
 ---
 
-## Task 6: `gene_overview` — verbose per-kind fields (post-D8 KG rebuild)
+## Task 6: ABSORBED INTO TASK 5
+
+KG D8 rename was verified live before implementation began (2026-04-27 evening), so the original Task 5 / Task 6 split (compact-then-verbose) collapsed into a single Task 5. **Skip this section** — proceed to Task 7 after Task 5 lands.
+
+The original Task 6 content is preserved below for historical reference but should NOT be executed independently.
+
+---
+
+### (Original Task 6 content — historical, do not execute)
 
 **Status:** GATED on KG rebuild adopting D8. Run only after the companion KG spec has landed and verification queries pass.
 
@@ -1751,9 +1787,9 @@ Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>"
 
 ---
 
-## Task 8: Fulltext-search assertions (post-D5 KG rebuild)
+## Task 8: Fulltext-search assertions
 
-**Status:** GATED on the KG fulltext enrichment landing (`derived_metric_search_text` property + index recreation).
+**Status:** Unblocked. KG D5 enrichment verified live 2026-04-27: `experimentFullText` includes `derived_metric_search_text` + `compartment` (bonus); `publicationFullText` includes `derived_metric_search_text` + `compartments` (bonus); `geneFullText` unchanged.
 
 **Files:**
 - Modify: `tests/integration/test_mcp_tools.py` (extend existing classes)
