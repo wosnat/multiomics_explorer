@@ -1,0 +1,151 @@
+# Human-authored content for genes_by_boolean_metric about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Vesicle proteome cross-organism — same metric_type spans two strains
+    call: genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
+    response: |
+      {
+        "total_matching": 58,
+        "total_derived_metrics": 2,
+        "total_genes": 58,
+        "by_organism": [
+          {"organism_name": "Prochlorococcus MED4", "count": 32},
+          {"organism_name": "Prochlorococcus MIT9313", "count": 26}
+        ],
+        "by_compartment": [{"compartment": "vesicle", "count": 58}],
+        "by_publication": [{"publication_doi": "10.1126/science.1243457", "count": 58}],
+        "by_value": [{"value": "true", "count": 58}],
+        "by_metric": [
+          {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "count": 32, "true_count": 32, "false_count": 0, "dm_total_gene_count": 32, "dm_true_count": 32, "dm_false_count": 0},
+          {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "name": "MIT9313 vesicle proteome member", "value_kind": "boolean", "count": 26, "true_count": 26, "false_count": 0, "dm_total_gene_count": 26, "dm_true_count": 26, "dm_false_count": 0}
+        ],
+        "top_categories": [
+          {"gene_category": "Translation", "count": 12},
+          {"gene_category": "Unknown", "count": 9}
+        ],
+        "genes_per_metric_max": 32,
+        "genes_per_metric_median": 29.0,
+        "not_found_ids": [],
+        "not_matched_ids": [],
+        "not_found_metric_types": [],
+        "not_matched_metric_types": [],
+        "not_matched_organism": null,
+        "excluded_derived_metrics": [],
+        "warnings": [],
+        "returned": 5,
+        "offset": 0,
+        "truncated": true,
+        "results": [
+          {"locus_tag": "PMM0090", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"},
+          {"locus_tag": "PMM0097", "gene_name": null, "product": null, "gene_category": null, "organism_name": "Prochlorococcus MED4", "derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "name": "MED4 vesicle proteome member", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"}
+        ]
+      }
+
+  - title: Scoped to one strain — NATL2A periodic-LD flag set
+    call: genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NATL2A')
+    response: |
+      {
+        "total_matching": 5,
+        "total_derived_metrics": 1,
+        "total_genes": 5,
+        "by_organism": [{"organism_name": "Prochlorococcus NATL2A", "count": 5}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 5}],
+        "by_value": [{"value": "true", "count": 5}],
+        "by_metric": [
+          {"derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "metric_type": "periodic_in_coculture_LD", "name": "NATL2A periodic in coculture L:D", "value_kind": "boolean", "count": 5, "true_count": 5, "false_count": 0, "dm_total_gene_count": 1377, "dm_true_count": 5, "dm_false_count": 0}
+        ],
+        "not_found_metric_types": [],
+        "not_matched_metric_types": [],
+        "not_matched_organism": null,
+        "excluded_derived_metrics": [],
+        "warnings": [],
+        "returned": 5,
+        "offset": 0,
+        "truncated": false,
+        "results": [
+          {"locus_tag": "PMN2A_0123", "organism_name": "Prochlorococcus NATL2A", "derived_metric_id": "derived_metric:1462-2920.14179:s2_natl2a_periodic_LD:periodic_in_coculture_LD", "value_kind": "boolean", "rankable": false, "has_p_value": false, "value": "true"}
+        ]
+      }
+
+  - title: Summary-only — full-DM context without per-row drill-down
+    call: genes_by_boolean_metric(metric_types=['vesicle_proteome_member'], summary=True)
+    response: |
+      {
+        "total_matching": 58,
+        "total_derived_metrics": 2,
+        "total_genes": 58,
+        "by_organism": [
+          {"organism_name": "Prochlorococcus MED4", "count": 32},
+          {"organism_name": "Prochlorococcus MIT9313", "count": 26}
+        ],
+        "by_compartment": [{"compartment": "vesicle", "count": 58}],
+        "by_value": [{"value": "true", "count": 58}],
+        "by_metric": [
+          {"derived_metric_id": "derived_metric:pnas.1402782111:s2_med4_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "value_kind": "boolean", "count": 32, "true_count": 32, "false_count": 0, "dm_total_gene_count": 32, "dm_true_count": 32, "dm_false_count": 0},
+          {"derived_metric_id": "derived_metric:pnas.1402782111:s2_mit9313_vesicle_proteome:vesicle_proteome_member", "metric_type": "vesicle_proteome_member", "value_kind": "boolean", "count": 26, "true_count": 26, "false_count": 0, "dm_total_gene_count": 26, "dm_true_count": 26, "dm_false_count": 0}
+        ],
+        "genes_per_metric_max": 32,
+        "genes_per_metric_median": 29.0,
+        "excluded_derived_metrics": [],
+        "warnings": [],
+        "returned": 0,
+        "offset": 0,
+        "truncated": true,
+        "results": []
+      }
+
+  - title: DE → top hits → boolean flag intersection
+    steps: |
+      Step 1: differential_expression_by_gene(organism="MED4", significant_only=True, limit=20)
+              → extract `locus_tag` from each result row (top-20 |log2FC|).
+
+      Step 2: genes_by_boolean_metric(
+                metric_types=["vesicle_proteome_member"],
+                locus_tags=[<those 20 locus_tags>])
+              → which DE hits are also vesicle-proteome members?
+                Per-row `value="true"` confirms the flag; envelope
+                `total_matching` shows the intersection size.
+
+      Step 3 (drill-down): gene_overview(locus_tags=[<intersected genes>])
+              → routing context for the genes that are both DE-significant
+                AND vesicle-detected.
+
+verbose_fields:
+  - metric_type
+  - field_description
+  - unit
+  - compartment
+  - experiment_id
+  - publication_doi
+  - treatment_type
+  - background_factors
+  - treatment
+  - light_condition
+  - experimental_context
+  - gene_function_description
+  - gene_summary
+
+chaining:
+  - "list_derived_metrics(value_kind='boolean') → genes_by_boolean_metric(metric_types=[...]) → gene_overview / genes_by_function"
+  - "differential_expression_by_gene → top hits → genes_by_boolean_metric(metric_types=[...], locus_tags=hits)"
+  - "genes_by_boolean_metric (no organism filter) → split via envelope by_organism for cross-strain comparison"
+
+mistakes:
+  - >-
+    Positive-only storage in current KG. `flag=False` returns zero rows
+    today because every materialized boolean edge is `r.value="true"`
+    (slice-1 spec §"KG invariants" §4 — `dm.flag_false_count=0` on every
+    current DM). Inspect `by_metric[*].dm_false_count` (always 0 today)
+    before assuming a gene is "not flagged false". Mirrors the numeric
+    tool's "p-value filter on current KG" gotcha — surface exists for
+    future DMs.
+  - >-
+    Sparse `rankable` / `has_p_value` echoes. Both are always `False` on
+    every row from current boolean DMs — kept for cross-tool row-shape
+    consistency with `genes_by_numeric_metric`, not because this tool
+    reads them as a meaningful signal. Don't gate downstream logic on
+    them.
+  - wrong: genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])  # numeric DM
+    right: genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])  # discover IDs via list_derived_metrics(value_kind='boolean') first
