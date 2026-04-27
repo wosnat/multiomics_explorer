@@ -1,0 +1,263 @@
+by_category:
+- category: Outer Membrane
+  count: 8
+- category: Periplasmic
+  count: 6
+by_compartment:
+- compartment: vesicle
+  count: 14
+by_experiment:
+- count: 8
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
+- count: 6
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
+by_metric:
+- allowed_categories:
+  - Cytoplasmic
+  - Cytoplasmic Membrane
+  - Periplasmic
+  - Outer Membrane
+  - Extracellular
+  - Unknown
+  by_category:
+  - category: Outer Membrane
+    count: 5
+  - category: Periplasmic
+    count: 3
+  count: 8
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  dm_by_category:
+  - category: Cytoplasmic
+    count: 11
+  - category: Unknown
+    count: 7
+  - category: Cytoplasmic Membrane
+    count: 6
+  - category: Outer Membrane
+    count: 5
+  - category: Periplasmic
+    count: 3
+  dm_total_gene_count: 32
+  metric_type: predicted_subcellular_localization
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  value_kind: categorical
+- allowed_categories:
+  - Cytoplasmic
+  - Cytoplasmic Membrane
+  - Periplasmic
+  - Outer Membrane
+  - Extracellular
+  - Unknown
+  by_category:
+  - category: Periplasmic
+    count: 3
+  - category: Outer Membrane
+    count: 3
+  count: 6
+  derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
+  dm_by_category:
+  - category: Unknown
+    count: 15
+  - category: Extracellular
+    count: 3
+  - category: Outer Membrane
+    count: 3
+  - category: Periplasmic
+    count: 3
+  - category: Cytoplasmic
+    count: 2
+  dm_total_gene_count: 26
+  metric_type: predicted_subcellular_localization
+  name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
+  value_kind: categorical
+by_organism:
+- count: 8
+  organism_name: Prochlorococcus MED4
+- count: 6
+  organism_name: Prochlorococcus MIT9313
+by_publication:
+- count: 14
+  publication_doi: 10.1126/science.1243457
+case_id: genes_by_categorical_metric_psortb_membrane_categories
+excluded_derived_metrics: []
+genes_per_metric_max: 8
+genes_per_metric_median: 8.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types: []
+not_matched_organism: null
+offset: 0
+results:
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Post-translational modification
+  gene_name: degQ
+  has_p_value: false
+  locus_tag: PMM0090
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: serine endoprotease, periplasmic
+  rankable: false
+  value: Periplasmic
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Stress response and adaptation
+  gene_name: tolC
+  has_p_value: false
+  locus_tag: PMM0097
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: TolC-like outer membrane efflux protein, RND family
+  rankable: false
+  value: Outer Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM0254
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: protein of unknown function DUF3769
+  rankable: false
+  value: Outer Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Stress response and adaptation
+  gene_name: pstS
+  has_p_value: false
+  locus_tag: PMM0710
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: phosphate ABC transporter, phosphate-binding protein PstS
+  rankable: false
+  value: Periplasmic
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Signal transduction
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1124
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: autotransporter beta-domain containing protein
+  rankable: false
+  value: Outer Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Cell motility
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1162
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  rankable: false
+  value: Outer Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Cell wall and membrane
+  gene_name: bamA
+  has_p_value: false
+  locus_tag: PMM1338
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: outer membrane protein insertion porin family
+  rankable: false
+  value: Outer Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Post-translational modification
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1425
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: peptidase S1C
+  rankable: false
+  value: Periplasmic
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0642
+  name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: curli production assembly/transport component CsgG family protein
+  rankable: false
+  value: Outer Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Stress response and adaptation
+  gene_name: pstS
+  has_p_value: false
+  locus_tag: PMT0993
+  name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: phosphate ABC transporter, phosphate-binding protein PstS
+  rankable: false
+  value: Periplasmic
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Cell wall and membrane
+  gene_name: bamA
+  has_p_value: false
+  locus_tag: PMT1413
+  name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: outer membrane protein insertion porin family
+  rankable: false
+  value: Outer Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1513
+  name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: outer membrane protein
+  rankable: false
+  value: Outer Membrane
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Transport
+  gene_name: grrP
+  has_p_value: false
+  locus_tag: PMT1517
+  name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: extracellular substrate-binding orphan, GRRM family protein
+  rankable: false
+  value: Periplasmic
+  value_kind: categorical
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization
+  gene_category: Post-translational modification
+  gene_name: degQ
+  has_p_value: false
+  locus_tag: PMT1636
+  name: MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: serine endoprotease, periplasmic
+  rankable: false
+  value: Periplasmic
+  value_kind: categorical
+returned: 14
+row_count: 14
+top_categories:
+- count: 5
+  gene_category: Cell wall and membrane
+- count: 3
+  gene_category: Post-translational modification
+- count: 3
+  gene_category: Stress response and adaptation
+- count: 1
+  gene_category: Cell motility
+- count: 1
+  gene_category: Signal transduction
+total_derived_metrics: 2
+total_genes: 14
+total_matching: 14
+truncated: false
+warnings: []

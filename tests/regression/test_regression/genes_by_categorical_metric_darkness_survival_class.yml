@@ -1,0 +1,348 @@
+by_category:
+- category: darkness_axenic+darkness_coculture
+  count: 95
+- category: darkness_coculture+unique_coculture
+  count: 87
+- category: darkness_axenic+unique_axenic
+  count: 76
+by_compartment:
+- compartment: whole_cell
+  count: 258
+by_experiment:
+- count: 258
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
+by_metric:
+- allowed_categories:
+  - darkness_axenic+darkness_coculture
+  - darkness_coculture+unique_coculture
+  - darkness_axenic+unique_axenic
+  by_category:
+  - category: darkness_axenic+darkness_coculture
+    count: 95
+  - category: darkness_coculture+unique_coculture
+    count: 87
+  - category: darkness_axenic+unique_axenic
+    count: 76
+  count: 258
+  derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  dm_by_category:
+  - category: darkness_axenic+darkness_coculture
+    count: 95
+  - category: darkness_coculture+unique_coculture
+    count: 87
+  - category: darkness_axenic+unique_axenic
+    count: 76
+  dm_total_gene_count: 258
+  metric_type: darkness_survival_class
+  name: NATL2A darkness survival class (Table S5)
+  value_kind: categorical
+by_organism:
+- count: 258
+  organism_name: Prochlorococcus NATL2A
+by_publication:
+- count: 258
+  publication_doi: 10.1128/mSystems.00040-18
+case_id: genes_by_categorical_metric_darkness_survival_class
+excluded_derived_metrics: []
+genes_per_metric_max: 258
+genes_per_metric_median: 258.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types: []
+not_matched_organism: null
+offset: 0
+results:
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Stress response and adaptation
+  gene_name: clpB1
+  has_p_value: false
+  locus_tag: PMN2A_0016
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Stress response and adaptation
+  gene_name: petE
+  has_p_value: false
+  locus_tag: PMN2A_0017
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: plastocyanin
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Carbohydrate metabolism
+  gene_name: glgB
+  has_p_value: false
+  locus_tag: PMN2A_0020
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: 1,4-alpha-glucan branching enzyme
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Unknown
+  gene_name: PMN2A_RS03120
+  has_p_value: false
+  locus_tag: PMN2A_0036
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: uncharacterized conserved membrane protein (DUF697)
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Stress response and adaptation
+  gene_name: pcb
+  has_p_value: false
+  locus_tag: PMN2A_0066
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: divinyl-chlorophyll a/b binding light harvesting protein, photosystem II-associated
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Unknown
+  gene_name: PMN2A_RS03520
+  has_p_value: false
+  locus_tag: PMN2A_0114
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: repair family protein
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Amino acid metabolism
+  gene_name: spt
+  has_p_value: false
+  locus_tag: PMN2A_0142
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: alanine--glyoxylate aminotransferase
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Translation
+  gene_name: rpsB
+  has_p_value: false
+  locus_tag: PMN2A_0157
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: 30S ribosomal protein S2
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Coenzyme metabolism
+  gene_name: chlP
+  has_p_value: false
+  locus_tag: PMN2A_0164
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: geranylgeranyl reductase
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Stress response and adaptation
+  gene_name: gnd
+  has_p_value: false
+  locus_tag: PMN2A_0176
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: 6-phosphogluconate dehydrogenase
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Amino acid metabolism
+  gene_name: ilvD
+  has_p_value: false
+  locus_tag: PMN2A_0180
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: dihydroxy-acid dehydratase
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Stress response and adaptation
+  gene_name: fda
+  has_p_value: false
+  locus_tag: PMN2A_0188
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: fructose-1,6-bisphosphate aldolase class I
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Carbohydrate metabolism
+  gene_name: prkB
+  has_p_value: false
+  locus_tag: PMN2A_0193
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: phosphoribulokinase
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Transport
+  gene_name: ftn
+  has_p_value: false
+  locus_tag: PMN2A_0212
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: ferritin
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Stress response and adaptation
+  gene_name: pcb
+  has_p_value: false
+  locus_tag: PMN2A_0215
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: divinyl-chlorophyll a/b binding light harvesting protein, photosystem I-associated
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Post-translational modification
+  gene_name: ftsH2
+  has_p_value: false
+  locus_tag: PMN2A_0293
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: photosystem II D1 repair protein FtsH2
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Carbohydrate metabolism
+  gene_name: pyk
+  has_p_value: false
+  locus_tag: PMN2A_0295
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: pyruvate kinase
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Coenzyme metabolism
+  gene_name: dxs
+  has_p_value: false
+  locus_tag: PMN2A_0300
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: 1-deoxy-D-xylulose-5-phosphate synthase
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Stress response and adaptation
+  gene_name: rpmB
+  has_p_value: false
+  locus_tag: PMN2A_0305
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: 50S ribosomal protein L28
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Photosynthesis
+  gene_name: cyabrB2
+  has_p_value: false
+  locus_tag: PMN2A_0411
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: AbrB-like transcriptional regulator involved in photosynthesis regulation
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Unknown
+  gene_name: PMN2A_RS05355
+  has_p_value: false
+  locus_tag: PMN2A_0467
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: conserved hypothetical protein family PM-17
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Unknown
+  gene_name: PMN2A_RS05375
+  has_p_value: false
+  locus_tag: PMN2A_0470
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: conserved hypothetical protein
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Unknown
+  gene_name: ydiU
+  has_p_value: false
+  locus_tag: PMN2A_0538
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: ACR YdiU/UPF0061 family protein
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Unknown
+  gene_name: PMN2A_RS05790
+  has_p_value: false
+  locus_tag: PMN2A_0542
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: conserved hypothetical protein
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+- derived_metric_id: derived_metric:mSystems.00040-18:s5_natl2a_survival:darkness_survival_class
+  gene_category: Photosynthesis
+  gene_name: psbA
+  has_p_value: false
+  locus_tag: PMN2A_0558
+  name: NATL2A darkness survival class (Table S5)
+  organism_name: Prochlorococcus NATL2A
+  product: photosystem II protein D1.1
+  rankable: false
+  value: darkness_axenic+darkness_coculture
+  value_kind: categorical
+returned: 25
+row_count: 25
+top_categories:
+- count: 48
+  gene_category: Stress response and adaptation
+- count: 31
+  gene_category: Unknown
+- count: 31
+  gene_category: Photosynthesis
+- count: 30
+  gene_category: Translation
+- count: 28
+  gene_category: Coenzyme metabolism
+total_derived_metrics: 1
+total_genes: 258
+total_matching: 258
+truncated: true
+warnings: []

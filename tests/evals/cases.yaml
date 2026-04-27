@@ -1115,6 +1115,94 @@
     columns: []
 
 # ---------------------------------------------------------------------------
+# genes_by_boolean_metric
+# ---------------------------------------------------------------------------
+
+- id: genes_by_boolean_metric_vesicle_proteome_cross_organism
+  tool: genes_by_boolean_metric
+  desc: Vesicle proteome members across MED4 and MIT9313 (cross-organism)
+  params:
+    metric_types: ["vesicle_proteome_member"]
+    limit: 200
+  expect:
+    min_rows: 50
+    columns:
+      - locus_tag
+      - gene_name
+      - organism_name
+      - derived_metric_id
+      - value_kind
+      - value
+
+- id: genes_by_boolean_metric_natl2a_periodic_scope
+  tool: genes_by_boolean_metric
+  desc: NATL2A periodic_in_coculture_LD organism-scoped drill-down
+  params:
+    metric_types: ["periodic_in_coculture_LD"]
+    organism: "NATL2A"
+    limit: 25
+  expect:
+    min_rows: 1
+    columns:
+      - locus_tag
+      - organism_name
+      - derived_metric_id
+      - value
+
+- id: genes_by_boolean_metric_summary_only
+  tool: genes_by_boolean_metric
+  desc: Summary-only mode — envelope populated, results empty
+  params:
+    metric_types: ["vesicle_proteome_member"]
+    summary: true
+  expect:
+    min_rows: 0
+    columns: []
+
+# ---------------------------------------------------------------------------
+# genes_by_categorical_metric
+# ---------------------------------------------------------------------------
+
+- id: genes_by_categorical_metric_psortb_membrane_categories
+  tool: genes_by_categorical_metric
+  desc: PSORTb outer-membrane / periplasmic vesicle proteins
+  params:
+    metric_types: ["predicted_subcellular_localization"]
+    categories: ["Outer Membrane", "Periplasmic"]
+    limit: 50
+  expect:
+    min_rows: 10
+    columns:
+      - locus_tag
+      - organism_name
+      - derived_metric_id
+      - value
+
+- id: genes_by_categorical_metric_darkness_survival_class
+  tool: genes_by_categorical_metric
+  desc: NATL2A darkness_survival_class drill-down (single categorical DM)
+  params:
+    metric_types: ["darkness_survival_class"]
+    limit: 25
+  expect:
+    min_rows: 5
+    columns:
+      - locus_tag
+      - organism_name
+      - derived_metric_id
+      - value
+
+- id: genes_by_categorical_metric_summary_only
+  tool: genes_by_categorical_metric
+  desc: Summary-only mode — envelope populated, results empty
+  params:
+    metric_types: ["predicted_subcellular_localization"]
+    summary: true
+  expect:
+    min_rows: 0
+    columns: []
+
+# ---------------------------------------------------------------------------
 # differential_expression_by_gene
 # ---------------------------------------------------------------------------
 

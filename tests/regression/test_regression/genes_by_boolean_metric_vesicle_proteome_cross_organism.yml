@@ -1,0 +1,707 @@
+by_compartment:
+- compartment: vesicle
+  count: 58
+by_experiment:
+- count: 32
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
+- count: 26
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
+by_metric:
+- count: 32
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  dm_false_count: 0
+  dm_total_gene_count: 32
+  dm_true_count: 32
+  false_count: 0
+  metric_type: vesicle_proteome_member
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  true_count: 32
+  value_kind: boolean
+- count: 26
+  derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  dm_false_count: 0
+  dm_total_gene_count: 26
+  dm_true_count: 26
+  false_count: 0
+  metric_type: vesicle_proteome_member
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  true_count: 26
+  value_kind: boolean
+by_organism:
+- count: 32
+  organism_name: Prochlorococcus MED4
+- count: 26
+  organism_name: Prochlorococcus MIT9313
+by_publication:
+- count: 58
+  publication_doi: 10.1126/science.1243457
+by_value:
+- count: 58
+  value: 'true'
+case_id: genes_by_boolean_metric_vesicle_proteome_cross_organism
+excluded_derived_metrics: []
+genes_per_metric_max: 32
+genes_per_metric_median: 32.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types: []
+not_matched_organism: null
+offset: 0
+results:
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Post-translational modification
+  gene_name: degQ
+  has_p_value: false
+  locus_tag: PMM0090
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: serine endoprotease, periplasmic
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: tolC
+  has_p_value: false
+  locus_tag: PMM0097
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: TolC-like outer membrane efflux protein, RND family
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Amino acid metabolism
+  gene_name: aroK
+  has_p_value: false
+  locus_tag: PMM0107
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: shikimate kinase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM0185
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: beta-lactamase superfamily domain protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell cycle and division
+  gene_name: ftsH1
+  has_p_value: false
+  locus_tag: PMM0226
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: cell division protein FtsH1
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM0254
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: protein of unknown function DUF3769
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM0330
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: LysM domain-containing protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Photosynthesis
+  gene_name: rbcL
+  has_p_value: false
+  locus_tag: PMM0550
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: ribulose bisphosphate carboxylase, large subunit
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: pstS
+  has_p_value: false
+  locus_tag: PMM0710
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: phosphate ABC transporter, phosphate-binding protein PstS
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM0793
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: uncharacterized conserved secreted protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Transport
+  gene_name: salY
+  has_p_value: false
+  locus_tag: PMM0913
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: putative ABC efflux system
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM0979
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: uncharacterized conserved membrane protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: lraI
+  has_p_value: false
+  locus_tag: PMM1032
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: ABC-type Mn2+/Zn2+ transport system, periplasmic component
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Signal transduction
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1124
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: autotransporter beta-domain containing protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Transport
+  gene_name: acrA
+  has_p_value: false
+  locus_tag: PMM1139
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: RND efflux pump, MFP subunit, HlyD family
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell motility
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1162
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: idiA2
+  has_p_value: false
+  locus_tag: PMM1164
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: iron deficiency-induced protein A
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Translation
+  gene_name: rsmI
+  has_p_value: false
+  locus_tag: PMM1193
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: 2-O-methyltransferase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell cycle and division
+  gene_name: wzc
+  has_p_value: false
+  locus_tag: PMM1225
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: P-loop containing nucleoside triphosphate hydrolase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Transport
+  gene_name: hetA
+  has_p_value: false
+  locus_tag: PMM1239
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: ABC transporter type 1, ATPase component
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Transcription
+  gene_name: era
+  has_p_value: false
+  locus_tag: PMM1281
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: GTP-binding protein Era
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: bamA
+  has_p_value: false
+  locus_tag: PMM1338
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: outer membrane protein insertion porin family
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: spoIID
+  has_p_value: false
+  locus_tag: PMM1348
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: stage II sporulation protein D
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Post-translational modification
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1425
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: peptidase S1C
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: groL1
+  has_p_value: false
+  locus_tag: PMM1436
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: chaperonin GroEL
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Photosynthesis
+  gene_name: atpA
+  has_p_value: false
+  locus_tag: PMM1451
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: ATP synthase alpha chain
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Translation
+  gene_name: rplM
+  has_p_value: false
+  locus_tag: PMM1532
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: 50S ribosomal protein L13
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Translation
+  gene_name: rpsS
+  has_p_value: false
+  locus_tag: PMM1554
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: 30S ribosomal protein S19
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Translation
+  gene_name: rplC
+  has_p_value: false
+  locus_tag: PMM1558
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: 50S ribosomal protein L3
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Translation
+  gene_name: rplT
+  has_p_value: false
+  locus_tag: PMM1662
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: 50S ribosomal protein L20
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Coenzyme metabolism
+  gene_name: pabC
+  has_p_value: false
+  locus_tag: PMM1693
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: 4-amino-4-deoxychorismate lyase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  product: ABC1 family protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0190
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: LysM domain-containing protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: som
+  has_p_value: false
+  locus_tag: PMT0284
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: outer membrane porin
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: amiC
+  has_p_value: false
+  locus_tag: PMT0394
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: N-acetylmuramoyl-L-alanine amidase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT0642
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: curli production assembly/transport component CsgG family protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Post-translational modification
+  gene_name: ctpA
+  has_p_value: false
+  locus_tag: PMT0776
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: photosystem II D1 protein carboxyl-terminal processing peptidase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: pstS
+  has_p_value: false
+  locus_tag: PMT0993
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: phosphate ABC transporter, phosphate-binding protein PstS
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1093
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1098
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: putative cAMP phosphodiesterase class-II
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Translation
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1297
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: amidase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1393
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: bamA
+  has_p_value: false
+  locus_tag: PMT1413
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: outer membrane protein insertion porin family
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1513
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: outer membrane protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Central intermediary metabolism
+  gene_name: aslA
+  has_p_value: false
+  locus_tag: PMT1515
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: arylsulfatase subfamily S1_4
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Transport
+  gene_name: grrP
+  has_p_value: false
+  locus_tag: PMT1517
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: extracellular substrate-binding orphan, GRRM family protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1521
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved lipoprotein (DUF1254/DUF1214)
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1523
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Energy production
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1600
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein (DUF3747)
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1619
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Post-translational modification
+  gene_name: degQ
+  has_p_value: false
+  locus_tag: PMT1636
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: serine endoprotease, periplasmic
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell wall and membrane
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1841
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: protein of unknown function DUF3769
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT1874
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: uncharacterized conserved secreted protein (DUF541)
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Unknown
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT2102
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Inorganic ion transport
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT2153
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Stress response and adaptation
+  gene_name: urtA
+  has_p_value: false
+  locus_tag: PMT2229
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: ABC-type urea transporter, substrate binding component
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Cell motility
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT_0263
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: pilin
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member
+  gene_category: Inorganic ion transport
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMT_2147
+  name: MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)
+  organism_name: Prochlorococcus MIT9313
+  product: conserved hypothetical protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+returned: 58
+row_count: 58
+top_categories:
+- count: 12
+  gene_category: Unknown
+- count: 9
+  gene_category: Stress response and adaptation
+- count: 9
+  gene_category: Cell wall and membrane
+- count: 6
+  gene_category: Translation
+- count: 4
+  gene_category: Post-translational modification
+total_derived_metrics: 2
+total_genes: 58
+total_matching: 58
+truncated: false
+warnings: []

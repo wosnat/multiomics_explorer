@@ -130,6 +130,12 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         # gate validation. Eval cases assert on rows.
         return api.genes_by_numeric_metric(**params, conn=conn).get("results", [])
 
+    if tool == "genes_by_boolean_metric":
+        return api.genes_by_boolean_metric(**params, conn=conn).get("results", [])
+
+    if tool == "genes_by_categorical_metric":
+        return api.genes_by_categorical_metric(**params, conn=conn).get("results", [])
+
     builder = TOOL_BUILDERS[tool]
     limit = params.get("limit")
     # Strip tool-level params that aren't accepted by query builders

@@ -1,0 +1,331 @@
+by_compartment:
+- compartment: whole_cell
+  count: 1651
+by_experiment:
+- count: 1651
+  experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
+by_metric:
+- count: 1651
+  derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  dm_false_count: 0
+  dm_total_gene_count: 1651
+  dm_true_count: 1651
+  false_count: 0
+  metric_type: periodic_in_coculture_LD
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  true_count: 1651
+  value_kind: boolean
+by_organism:
+- count: 1651
+  organism_name: Prochlorococcus NATL2A
+by_publication:
+- count: 1651
+  publication_doi: 10.1128/mSystems.00040-18
+by_value:
+- count: 1651
+  value: 'true'
+case_id: genes_by_boolean_metric_natl2a_periodic_scope
+excluded_derived_metrics: []
+genes_per_metric_max: 1651
+genes_per_metric_median: 1651.0
+not_found_ids: []
+not_found_metric_types: []
+not_matched_ids: []
+not_matched_metric_types: []
+not_matched_organism: null
+offset: 0
+results:
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Replication and repair
+  gene_name: dnaA
+  has_p_value: false
+  locus_tag: PMN2A_0001
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: chromosomal replication initiator protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Coenzyme metabolism
+  gene_name: gst
+  has_p_value: false
+  locus_tag: PMN2A_0002
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: glutathione S-transferase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Coenzyme metabolism
+  gene_name: gor
+  has_p_value: false
+  locus_tag: PMN2A_0003
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: glutathione reductase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Transport
+  gene_name: yrbG
+  has_p_value: false
+  locus_tag: PMN2A_0004
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: cation:H+ antiporter
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Nucleotide metabolism
+  gene_name: pyrC
+  has_p_value: false
+  locus_tag: PMN2A_0005
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: dihydroorotase, homodimeric type
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Carbohydrate metabolism
+  gene_name: ndhL
+  has_p_value: false
+  locus_tag: PMN2A_0006
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: NADH dehydrogenase I subunit NdhL
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Unknown
+  gene_name: PMN2A_RS02975
+  has_p_value: false
+  locus_tag: PMN2A_0007
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: conserved hypothetical protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Amino acid metabolism
+  gene_name: trpA
+  has_p_value: false
+  locus_tag: PMN2A_0008
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: tryptophan synthase, alpha subunit
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Unknown
+  gene_name: PMN2A_RS02985
+  has_p_value: false
+  locus_tag: PMN2A_0009
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: YCII-like domain-containing protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Carbohydrate metabolism
+  gene_name: petJ3
+  has_p_value: false
+  locus_tag: PMN2A_0010
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: cytochrome c553 (cytochrome c6)
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Unknown
+  gene_name: PMN2A_RS02995
+  has_p_value: false
+  locus_tag: PMN2A_0011
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: conserved hypothetical protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Unknown
+  gene_name: PMN2A_RS03000
+  has_p_value: false
+  locus_tag: PMN2A_0012
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: conserved hypothetical protein (DUF1232)
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Transcription
+  gene_name: rpoD7
+  has_p_value: false
+  locus_tag: PMN2A_0013
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: RNA polymerase sigma factor, type II
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Amino acid metabolism
+  gene_name: hisIE
+  has_p_value: false
+  locus_tag: PMN2A_0014
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: bifunctional phosphoribosyl-ATP pyrophosphohydrolase / phosphoribosyl-AMP
+    cyclohydrolase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Cellular processes
+  gene_name: PMN2A_RS03015
+  has_p_value: false
+  locus_tag: PMN2A_0015
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: putative 6-pyruvoyl tetrahydropterin synthase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Stress response and adaptation
+  gene_name: clpB1
+  has_p_value: false
+  locus_tag: PMN2A_0016
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: ATP-dependent Clp protease ATP-binding subunit ClpB
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Stress response and adaptation
+  gene_name: petE
+  has_p_value: false
+  locus_tag: PMN2A_0017
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: plastocyanin
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Carbohydrate metabolism
+  gene_name: PMN2A_RS03030
+  has_p_value: false
+  locus_tag: PMN2A_0018
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: short chain dehydrogenase family protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Coenzyme metabolism
+  gene_name: hemE
+  has_p_value: false
+  locus_tag: PMN2A_0019
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: uroporphyrinogen decarboxylase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Carbohydrate metabolism
+  gene_name: glgB
+  has_p_value: false
+  locus_tag: PMN2A_0020
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: 1,4-alpha-glucan branching enzyme
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Post-translational modification
+  gene_name: PMN2A_RS03045
+  has_p_value: false
+  locus_tag: PMN2A_0021
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: X-Pro dipeptidyl-peptidase, S15 family
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Unknown
+  gene_name: PMN2A_RS03050
+  has_p_value: false
+  locus_tag: PMN2A_0022
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: uncharacterized conserved secreted protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Unknown
+  gene_name: PMN2A_RS03060
+  has_p_value: false
+  locus_tag: PMN2A_0024
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: conserved hypothetical protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Transport
+  gene_name: PMN2A_RS03065
+  has_p_value: false
+  locus_tag: PMN2A_0025
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: translocation and assembly module TamB-like protein
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+- derived_metric_id: derived_metric:mSystems.00040-18:s4a_natl2a_coculture:periodic_in_coculture_LD
+  gene_category: Amino acid metabolism
+  gene_name: proA
+  has_p_value: false
+  locus_tag: PMN2A_0026
+  name: Periodic in NATL2A coculture L:D (Table S4A)
+  organism_name: Prochlorococcus NATL2A
+  product: glutamate-5-semialdehyde dehydrogenase
+  rankable: false
+  value: 'true'
+  value_kind: boolean
+returned: 25
+row_count: 25
+top_categories:
+- count: 479
+  gene_category: Unknown
+- count: 196
+  gene_category: Stress response and adaptation
+- count: 152
+  gene_category: Coenzyme metabolism
+- count: 119
+  gene_category: Translation
+- count: 93
+  gene_category: Amino acid metabolism
+total_derived_metrics: 1
+total_genes: 1651
+total_matching: 1651
+truncated: true
+warnings: []
