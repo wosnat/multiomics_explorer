@@ -1657,3 +1657,196 @@ class TestGenesByNumericMetric:
         assert bm.value_max == pytest.approx(25.3, abs=0.1)
         assert bm.dm_value_max == pytest.approx(25.3, abs=0.1)
         assert bm.value_max == pytest.approx(bm.dm_value_max, abs=0.1)
+
+
+@pytest.mark.kg
+class TestGenesByBooleanMetric:
+    """Integration tests against live KG. Baselines pinned 2026-04-26.
+
+    Boolean DM drill-down — filtered slice + full-DM precomputed counts.
+    Mirrors `TestGenesByNumericMetric` structure.
+    """
+
+    @pytest.mark.asyncio
+    async def test_vesicle_proteome_cross_organism(self, tool_fns, conn):
+        """Happy path: 32 MED4 + 26 MIT9313 = 58 vesicle-proteome members."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_boolean_metric"](
+            ctx, metric_types=["vesicle_proteome_member"], limit=200)
+        assert response.total_matching == 58
+        assert response.total_genes == 58
+        # Cross-organism: by_organism shows both strains
+        org_counts = {o.organism_name: o.count for o in response.by_organism}
+        med4_hits = [c for n, c in org_counts.items() if "MED4" in n]
+        mit9313_hits = [c for n, c in org_counts.items() if "MIT9313" in n]
+        assert med4_hits == [32]
+        assert mit9313_hits == [26]
+        # by_metric: filtered counts == full-DM precomputed counts (positive-only)
+        assert len(response.by_metric) == 2
+        for bm in response.by_metric:
+            assert bm.value_kind == "boolean"
+            assert bm.true_count == bm.count
+            assert bm.false_count == 0
+            assert bm.dm_true_count == bm.count
+            assert bm.dm_false_count == 0
+        # by_value: every surviving row is 'true'
+        assert response.by_value == [
+            type(response.by_value[0])(value="true", count=58)
+        ] or all(bv.value == "true" for bv in response.by_value)
+
+    @pytest.mark.asyncio
+    async def test_flag_false_zero_rows(self, tool_fns, conn):
+        """flag=False → 0 rows (positive-only KG storage today).
+
+        With the edge-level filter active, by_metric is necessarily empty
+        (no surviving 'false' edges). The "dm_false_count echoes 0" signal
+        is verified separately in the no-flag-filter test above (same DMs).
+        """
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_boolean_metric"](
+            ctx, metric_types=["vesicle_proteome_member"], flag=False, limit=10)
+        assert response.total_matching == 0
+        assert response.returned == 0
+        # All `r.value='false'` filtered out → no DMs contribute rows
+        assert response.by_metric == []
+        # excluded_derived_metrics / warnings always [] for boolean
+        assert response.excluded_derived_metrics == []
+        assert response.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_locus_tags_scoping(self, tool_fns, conn):
+        """3 known vesicle MED4 genes + 1 non-vesicle → 3 rows matching."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_boolean_metric"](
+            ctx, metric_types=["vesicle_proteome_member"],
+            locus_tags=["PMM0090", "PMM0097", "PMM0107", "PMM0001"],
+            limit=10)
+        # PMM0001 exists in KG but isn't flagged → silent absence (no not_found)
+        assert response.total_matching == 3
+        assert response.returned == 3
+        result_locs = {r.locus_tag for r in response.results}
+        assert result_locs == {"PMM0090", "PMM0097", "PMM0107"}
+        # locus_tags do NOT participate in not_found_ids/not_matched_ids;
+        # those are reserved for DM-level inputs.
+        assert response.not_found_ids == []
+        assert response.not_matched_ids == []
+
+    @pytest.mark.asyncio
+    async def test_kind_mismatch_surfaces_as_not_found_ids(self, tool_fns, conn):
+        """Numeric DM ID passed to boolean tool → not_found_ids, no raise."""
+        numeric_dm_id = (
+            "derived_metric:journal.pone.0043432:"
+            "table_s2_waldbauer_diel_metrics:damping_ratio"
+        )
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_boolean_metric"](
+            ctx, derived_metric_ids=[numeric_dm_id], limit=5)
+        assert response.total_matching == 0
+        assert response.results == []
+        assert response.not_found_ids == [numeric_dm_id]
+
+
+@pytest.mark.kg
+class TestGenesByCategoricalMetric:
+    """Integration tests against live KG. Baselines pinned 2026-04-26.
+
+    Categorical DM drill-down — filtered slice + full-DM histogram per DM.
+    Mirrors `TestGenesByNumericMetric` structure.
+    """
+
+    @pytest.mark.asyncio
+    async def test_psortb_membrane_categories(self, tool_fns, conn):
+        """Happy path: PSORTb Outer Membrane / Periplasmic across MED4 + MIT9313."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_categorical_metric"](
+            ctx, metric_types=["predicted_subcellular_localization"],
+            categories=["Outer Membrane", "Periplasmic"], limit=50)
+        assert response.total_matching == 14
+        # by_organism: MED4 (8) + MIT9313 (6)
+        org_counts = {o.organism_name: o.count for o in response.by_organism}
+        med4_hits = [c for n, c in org_counts.items() if "MED4" in n]
+        mit9313_hits = [c for n, c in org_counts.items() if "MIT9313" in n]
+        assert med4_hits == [8]
+        assert mit9313_hits == [6]
+        # by_metric: 2 DMs (one per organism); each carries filtered + full DM
+        assert len(response.by_metric) == 2
+        # Sort by_metric by count desc — MED4 (8) first, MIT9313 (6) second
+        med4_bm = next(b for b in response.by_metric if "med4" in b.derived_metric_id)
+        mit9313_bm = next(b for b in response.by_metric if "mit9313" in b.derived_metric_id)
+        # MED4: 5 OM + 3 PP filtered slice; full DM histogram strict superset
+        med4_filtered = {c.category: c.count for c in med4_bm.by_category}
+        assert med4_filtered == {"Outer Membrane": 5, "Periplasmic": 3}
+        med4_full = {c.category: c.count for c in med4_bm.dm_by_category}
+        assert med4_full["Outer Membrane"] == 5
+        assert med4_full["Periplasmic"] == 3
+        # Full DM also includes Cytoplasmic / Unknown / etc.
+        assert "Cytoplasmic" in med4_full or "Unknown" in med4_full
+        # MIT9313: 3 OM + 3 PP filtered slice
+        mit_filtered = {c.category: c.count for c in mit9313_bm.by_category}
+        assert mit_filtered == {"Outer Membrane": 3, "Periplasmic": 3}
+
+    @pytest.mark.asyncio
+    async def test_unknown_category_raises(self, tool_fns, conn):
+        """Unknown category → ToolError (FastMCP wraps the api ValueError).
+
+        Error message must list every observed `allowed_category` so the
+        caller can self-correct without an extra `list_derived_metrics` call.
+        """
+        from fastmcp.exceptions import ToolError
+        ctx = _ctx_with_conn(conn)
+        with pytest.raises(ToolError) as exc_info:
+            await tool_fns["genes_by_categorical_metric"](
+                ctx, metric_types=["predicted_subcellular_localization"],
+                categories=["nonsense"], limit=10)
+        msg = str(exc_info.value)
+        # Spec: error message lists every observed allowed_category
+        for cat in (
+            "Cytoplasmic", "Cytoplasmic Membrane", "Extracellular",
+            "Outer Membrane", "Periplasmic", "Unknown",
+        ):
+            assert cat in msg, f"missing '{cat}' from error message: {msg}"
+
+    @pytest.mark.asyncio
+    async def test_kind_mismatch_surfaces_as_not_found_ids(self, tool_fns, conn):
+        """Numeric DM ID passed to categorical tool → not_found_ids, no raise."""
+        numeric_dm_id = (
+            "derived_metric:journal.pone.0043432:"
+            "table_s2_waldbauer_diel_metrics:damping_ratio"
+        )
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_categorical_metric"](
+            ctx, derived_metric_ids=[numeric_dm_id], limit=5)
+        assert response.total_matching == 0
+        assert response.results == []
+        assert response.not_found_ids == [numeric_dm_id]
+
+    @pytest.mark.asyncio
+    async def test_by_category_rename_envelope_and_nested(self, tool_fns, conn):
+        """`item` → `category` rename verified at envelope AND nested layers.
+
+        The api/ orchestration step 9 walks `by_metric[*].by_category` and
+        `by_metric[*].dm_by_category` to apply the rename — confirms that
+        post-Cypher walk fired.
+        """
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["genes_by_categorical_metric"](
+            ctx, metric_types=["predicted_subcellular_localization"],
+            categories=["Outer Membrane", "Periplasmic"], limit=50)
+        # Envelope-level by_category: keys {category, count}
+        assert response.by_category, "envelope by_category should not be empty"
+        env_freq = response.by_category[0]
+        assert hasattr(env_freq, "category")
+        assert hasattr(env_freq, "count")
+        # Pydantic model dump confirms the renamed keys
+        assert set(env_freq.model_dump().keys()) == {"category", "count"}
+        # Nested by_metric[0].by_category — should also be renamed
+        assert response.by_metric, "by_metric should not be empty"
+        nested_freq = response.by_metric[0].by_category[0]
+        assert hasattr(nested_freq, "category")
+        assert hasattr(nested_freq, "count")
+        assert set(nested_freq.model_dump().keys()) == {"category", "count"}
+        # Nested by_metric[0].dm_by_category — same rename
+        nested_full = response.by_metric[0].dm_by_category[0]
+        assert hasattr(nested_full, "category")
+        assert hasattr(nested_full, "count")
+        assert set(nested_full.model_dump().keys()) == {"category", "count"}
