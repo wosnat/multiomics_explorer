@@ -98,6 +98,21 @@ Skipped (and why): `bucket` (fixed enum in tool docstring, never KG-dependent), 
 
 `compartment` filter on list tools and the `list_filter_values` `compartment` type both source from `Experiment.compartment` (and rollup `compartments` lists on Publication / OrganismTaxon), not from `DerivedMetric.compartment`. Reasoning: `Experiment.compartment` is the wet-lab fraction (the experiment's biological reality); `DerivedMetric.compartment` is derived from it. They align 1:1 in current data (verified). Using the experiment-side property keeps the filter semantics clean ("show me vesicle experiments") and avoids a DerivedMetric join in the list-tool query path.
 
+### D8 — KG-side rename: classifier_* → boolean_metric_* / categorical_metric_*
+
+KG today stores `g.classifier_flag_count` / `g.classifier_flag_types_observed` (boolean DM rollups) and `g.classifier_label_count` / `g.classifier_label_types_observed` (categorical DM rollups) — slice-1 KG-side legacy from when those were envisioned as classifier-output framings rather than boolean / categorical DM-kind framings. Slice-1 explorer-side tools (`genes_by_boolean_metric`, `genes_by_categorical_metric`) ship under the cleaner kind-named API.
+
+Bundle the KG rename into this slice's KG companion spec rather than carrying an alias layer in `gene_overview`'s query builder:
+
+| Old (Gene prop) | New |
+|---|---|
+| `classifier_flag_count` | `boolean_metric_count` |
+| `classifier_flag_types_observed` | `boolean_metric_types_observed` |
+| `classifier_label_count` | `categorical_metric_count` |
+| `classifier_label_types_observed` | `categorical_metric_types_observed` |
+
+Blast radius on the explorer side: 3 regression baseline files (`tests/regression/test_regression/gene_details_*.yml`) — auto-regenerated via `--force-regen`. No hardcoded references in source (`gene_details` uses `g{.*}` pass-through). No users (internal-only). Bundling beats followup because slice 2's `gene_overview` adopts clean names from day one with no throwaway alias.
+
 ## Architecture
 
 Three explorer-side layers + one KG-side companion. No new files; all changes are additive edits.
@@ -123,25 +138,20 @@ Concise table — full Cypher snippets land during the per-tool Phase-1 verifica
 derived_metric_count: int       # = numeric_metric_count + classifier_flag_count + classifier_label_count
 derived_metric_value_kinds: list[str]  # subset of {numeric, boolean, categorical}; computed from per-kind counts > 0
 
-# Per-row, verbose (additions)
+# Per-row, verbose (additions) — KG-side rename folded into companion spec (D8)
 numeric_metric_count: int
-boolean_metric_count: int       # alias for classifier_flag_count
-categorical_metric_count: int   # alias for classifier_label_count
+boolean_metric_count: int
+categorical_metric_count: int
 numeric_metric_types_observed: list[str]
-classifier_flag_types_observed: list[str]
-classifier_label_types_observed: list[str]
+boolean_metric_types_observed: list[str]
+categorical_metric_types_observed: list[str]
 compartments_observed: list[str]
 
 # Envelope (additions)
 has_derived_metrics: int        # count of requested locus_tags with derived_metric_count > 0
 ```
 
-**Naming subdecision (open):** KG stores `classifier_flag_count` / `classifier_label_count` (slice-1 KG-side legacy). Two options at the explorer boundary:
-
-- **Pass-through (no alias):** API/MCP returns the KG names verbatim. Zero translation layer; consistent with `gene_derived_metrics` already shipping these names. LLM has to learn the asymmetry between this surface and `genes_by_boolean_metric` / `genes_by_categorical_metric`.
-- **Alias to `boolean_metric_count` / `categorical_metric_count`:** matches the slice-1 drill-down tool naming. Translation lives in the query builder's RETURN clause. Adds a one-line mapping; gives the LLM a uniform vocabulary across the DM tool family.
-
-Recommend the alias. Document the asymmetry as a footnote in `references/analysis/derived_metrics.md` either way.
+Naming reflects post-rename KG state (see D8 / KG companion spec). Slice 2 adopts the cleaned-up names directly — no alias layer.
 
 No new params (gene_overview is locus_tag-driven; no filter param fits).
 
@@ -277,7 +287,10 @@ Wrapper dispatch in `list_filter_values` adds three `elif` branches matching the
 
 **File:** `docs/kg-specs/2026-04-27-derived-metric-fulltext-enrichment.md`
 
-**Summary:** Add `derived_metric_search_text: str` property on Experiment + Publication, and extend `experimentFullText` + `publicationFullText` indexes to include it. Tokens come from each node's reachable DerivedMetrics: `name`, `metric_type` (snake_case → space-tokenized for human-search compatibility, e.g. `damping ratio`), `field_description`, `compartment`.
+**Summary:** Two coordinated KG-side changes for slice 2 (one rebuild covers both):
+
+1. Add `derived_metric_search_text: str` property on Experiment + Publication; extend `experimentFullText` + `publicationFullText` indexes to include it. Tokens come from each node's reachable DerivedMetrics: `name`, `metric_type` (snake_case → space-tokenized for human-search compatibility, e.g. `damping ratio`), `field_description`, `compartment`.
+2. Rename `Gene.classifier_flag_count` → `boolean_metric_count`, `Gene.classifier_flag_types_observed` → `boolean_metric_types_observed`, `Gene.classifier_label_count` → `categorical_metric_count`, `Gene.classifier_label_types_observed` → `categorical_metric_types_observed` (D8). Internal-only, no users.
 
 **Current state (verified 2026-04-27):**
 - `experimentFullText` indexes Experiment.{name, treatment, control, experimental_context, light_condition}
@@ -291,6 +304,10 @@ Wrapper dispatch in `list_filter_values` adds three `elif` branches matching the
 |---|---|---|
 | Experiment | `derived_metric_search_text` | new (computed during post-import: aggregate DM tokens for DMs reported by experiment) |
 | Publication | `derived_metric_search_text` | new (computed during post-import: aggregate across publication's experiments) |
+| Gene | `classifier_flag_count` | rename → `boolean_metric_count` (D8) |
+| Gene | `classifier_flag_types_observed` | rename → `boolean_metric_types_observed` (D8) |
+| Gene | `classifier_label_count` | rename → `categorical_metric_count` (D8) |
+| Gene | `classifier_label_types_observed` | rename → `categorical_metric_types_observed` (D8) |
 
 **Index changes:**
 
@@ -320,6 +337,15 @@ SHOW FULLTEXT INDEXES YIELD name, properties
 WHERE name = 'geneFullText'
 RETURN properties
 // Expect: gene_summary, all_identifiers, gene_name_synonyms, alternate_functional_descriptions
+
+// Confirm D8 rename — old names removed, new names populated
+MATCH (g:Gene) WHERE g.boolean_metric_count > 0
+RETURN count(*) AS genes_with_boolean_dms
+// Expect: matches pre-rename baseline of g.classifier_flag_count > 0
+
+MATCH (g:Gene) WHERE g.classifier_flag_count IS NOT NULL
+RETURN count(*) AS leftover_legacy_props
+// Expect: 0
 ```
 
 **Coordination:** This KG spec must land *before* the explorer-side fulltext-relying tests can be written. Other slice-2 work (rollup fields, envelope keys, compartment filter, `list_filter_values` types) is unblocked by the KG state already live as of 2026-04-27 and can proceed in parallel with the KG enrichment.
@@ -373,6 +399,7 @@ Per the `testing` skill — three layers, mirrors slice-1 patterns.
 
 - Add cases to `tests/evals/cases.yaml` covering: `compartment` filter on each list tool; new `filter_type` values; gene_overview with DM-rich gene set.
 - Existing TOOL_BUILDERS rows need refreshed baselines because RETURN columns expanded — run `pytest tests/regression/ --force-regen -m kg` after the builders land.
+- D8 rename forces regen of `tests/regression/test_regression/gene_details_*.yml` (3 files reference the legacy `classifier_flag_*` / `classifier_label_*` keys via `gene_details`'s `g{.*}` pass-through). Same `--force-regen` run picks them up.
 
 ### About-content tests
 
