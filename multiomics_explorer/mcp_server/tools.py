@@ -5186,3 +5186,734 @@ def register_tools(mcp: FastMCP):
             f"gene×DM rows"
         )
         return response
+
+    # ── genes_by_boolean_metric Pydantic models ────────────────────────
+
+    class GenesByBooleanMetricValueBreakdown(BaseModel):
+        value: str = Field(
+            description="Edge value: 'true' or 'false' (string-typed bool).")
+        count: int = Field(description="Rows with this value.")
+
+    class GenesByBooleanMetricBreakdown(BaseModel):
+        """Per-DM rollup: filtered-slice + full-DM positive/negative tallies."""
+        derived_metric_id: str = Field(description="Unique DM id.")
+        name: str = Field(description="DM human label.")
+        metric_type: str = Field(description="Category tag.")
+        value_kind: Literal["boolean"] = Field(
+            description="Always 'boolean' in this tool.")
+        count: int = Field(
+            description="Rows contributed by this DM after filters.")
+        # Filtered slice (query-time)
+        true_count: int = Field(
+            description="Rows in filtered slice with r.value='true'.")
+        false_count: int = Field(
+            description="Rows in filtered slice with r.value='false' "
+                        "(always 0 today — positive-only KG storage).")
+        # Full DM (precomputed)
+        dm_total_gene_count: int = Field(
+            description="Full-DM total gene count (precomputed "
+                        "`dm.total_gene_count`).")
+        dm_true_count: int = Field(
+            description="Full-DM positive tally (precomputed "
+                        "`dm.flag_true_count`).")
+        dm_false_count: int = Field(
+            description="Full-DM negative tally (precomputed "
+                        "`dm.flag_false_count` — always 0 today).")
+
+    class GenesByBooleanMetricResult(BaseModel):
+        # Identity / routing (5)
+        locus_tag: str = Field(
+            description="Gene locus tag (e.g. 'PMM0090').")
+        gene_name: str | None = Field(
+            default=None, description="Gene symbol; null when KG has none.")
+        product: str | None = Field(
+            default=None, description="Gene product.")
+        gene_category: str | None = Field(
+            default=None, description="Coarse functional category.")
+        organism_name: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MED4').")
+        # DM identity (2)
+        derived_metric_id: str = Field(description="Unique parent-DM id.")
+        name: str = Field(description="DM human label.")
+        # Gate echoes (3) — kept for cross-tool row-shape consistency
+        value_kind: Literal["boolean"] = Field(
+            description="Always 'boolean' for this tool; kept for cross-tool "
+                        "row-shape consistency with `genes_by_numeric_metric`.")
+        rankable: bool = Field(
+            description="DM-level rankable flag (always False today for "
+                        "boolean DMs).")
+        has_p_value: bool = Field(
+            description="DM-level p-value flag (always False today for "
+                        "boolean DMs).")
+        # Edge value (1)
+        value: str = Field(
+            description="'true' or 'false' (string-typed bool — see KG-spec "
+                        "BioCypher constraint).")
+        # ── Verbose adds (default None) ─────────────────────────────────
+        metric_type: str | None = Field(
+            default=None, description="Category tag. Verbose only.")
+        field_description: str | None = Field(
+            default=None,
+            description="Detailed explanation of what this DM measures. "
+                        "Verbose only.")
+        unit: str | None = Field(
+            default=None,
+            description="Measurement unit (typically null for boolean DMs). "
+                        "Verbose only.")
+        compartment: str | None = Field(
+            default=None,
+            description="Sample compartment. Verbose only.")
+        experiment_id: str | None = Field(
+            default=None, description="Parent experiment id. Verbose only.")
+        publication_doi: str | None = Field(
+            default=None, description="Parent publication DOI. Verbose only.")
+        treatment_type: list[str] | None = Field(
+            default=None,
+            description="Treatment type(s). Verbose only.")
+        background_factors: list[str] | None = Field(
+            default=None,
+            description="Background factor(s). Verbose only.")
+        treatment: str | None = Field(
+            default=None,
+            description="Treatment description in plain language. Verbose only.")
+        light_condition: str | None = Field(
+            default=None, description="Light regime. Verbose only.")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Longer experimental setup description. Verbose only.")
+        gene_function_description: str | None = Field(
+            default=None,
+            description="Gene functional description (gene-level). Verbose only.")
+        gene_summary: str | None = Field(
+            default=None,
+            description="Gene summary text (gene-level). Verbose only.")
+
+    class GenesByBooleanMetricResponse(BaseModel):
+        total_matching: int = Field(
+            description="Rows post-filter (gene × DM pairs).")
+        total_derived_metrics: int = Field(
+            description="Distinct DMs contributing rows.")
+        total_genes: int = Field(description="Distinct genes in results.")
+        by_organism: list[GenesByNumericMetricOrganismBreakdown] = Field(
+            default_factory=list, description="Rows per organism.")
+        by_compartment: list[GenesByNumericMetricCompartmentBreakdown] = Field(
+            default_factory=list, description="Rows per compartment.")
+        by_publication: list[GenesByNumericMetricPublicationBreakdown] = Field(
+            default_factory=list, description="Rows per publication.")
+        by_experiment: list[GenesByNumericMetricExperimentBreakdown] = Field(
+            default_factory=list, description="Rows per experiment.")
+        by_value: list[GenesByBooleanMetricValueBreakdown] = Field(
+            default_factory=list,
+            description="Frequency rollup of `r.value` across surviving rows. "
+                        "Today every row is 'true' (positive-only KG storage).")
+        top_categories: list[GenesByNumericMetricCategoryBreakdown] = Field(
+            default_factory=list, description="Top 5 gene categories by count.")
+        by_metric: list[GenesByBooleanMetricBreakdown] = Field(
+            default_factory=list,
+            description="Per-DM rollup: filtered-slice true/false counts + "
+                        "full-DM precomputed tallies. Sorted by count desc.")
+        genes_per_metric_max: int = Field(
+            default=0, description="Largest per-DM gene count.")
+        genes_per_metric_median: float = Field(
+            default=0.0, description="Median per-DM gene count.")
+        not_found_ids: list[str] = Field(
+            default_factory=list,
+            description="`derived_metric_ids` inputs not present in KG (or "
+                        "scoped out / wrong value_kind).")
+        not_matched_ids: list[str] = Field(
+            default_factory=list,
+            description="`derived_metric_ids` in KG but produced 0 rows after "
+                        "edge-level filters.")
+        not_found_metric_types: list[str] = Field(
+            default_factory=list,
+            description="`metric_types` inputs that match no DM after scoping.")
+        not_matched_metric_types: list[str] = Field(
+            default_factory=list,
+            description="`metric_types` whose DMs produced 0 rows.")
+        not_matched_organism: str | None = Field(
+            default=None,
+            description="`organism` arg that matched no surviving DM.")
+        excluded_derived_metrics: list[ExcludedDerivedMetric] = Field(
+            default_factory=list,
+            description="Always [] for boolean DMs (no rankable / has_p_value "
+                        "gates). Kept for cross-tool envelope-shape "
+                        "consistency.")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Always [] for boolean DMs. Kept for cross-tool "
+                        "envelope-shape consistency.")
+        returned: int = Field(description="Length of results list.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        results: list[GenesByBooleanMetricResult] = Field(
+            default_factory=list,
+            description="One row per gene × DM. Empty when summary=True.")
+
+    @mcp.tool(
+        tags={"derived_metric", "boolean", "drill_down"},
+        annotations={"readOnlyHint": True},
+    )
+    async def genes_by_boolean_metric(
+        ctx: Context,
+        # ── Selection (exactly one required, mutually exclusive) ────────
+        derived_metric_ids: Annotated[list[str] | None, Field(
+            description="Boolean DerivedMetric node IDs. Use when the same "
+                        "`metric_type` appears across organisms / publications "
+                        "and you need to pin one. Discover IDs via "
+                        "`list_derived_metrics(value_kind='boolean')`. "
+                        "Mutually exclusive with `metric_types`. Wrong-kind "
+                        "IDs (numeric / categorical) surface silently in "
+                        "`not_found_ids`.",
+        )] = None,
+        metric_types: Annotated[list[str] | None, Field(
+            description="Boolean metric-type tags (e.g. "
+                        "['vesicle_proteome_member', "
+                        "'periodic_in_coculture_LD']). Unions every DM "
+                        "carrying that tag, then narrows by scoping filters. "
+                        "Same tag can appear across organisms (e.g. "
+                        "'vesicle_proteome_member' is on both MED4 + MIT9313). "
+                        "Mutually exclusive with `derived_metric_ids`.",
+        )] = None,
+        # ── DM-scoping filters (intersected with selection) ─────────────
+        organism: Annotated[str | None, Field(
+            description="Organism to scope the DM set to. Accepts short "
+                        "strain code ('MED4', 'NATL2A', 'MIT9313') or full "
+                        "name. Case-insensitive substring match. "
+                        "Single-organism is **not** enforced — omit to drill "
+                        "across all organisms a metric_type spans.",
+        )] = None,
+        locus_tags: Annotated[list[str] | None, Field(
+            description="Restrict drill-down to a specific gene set (e.g. DE "
+                        "hits from `differential_expression_by_gene`). Filter "
+                        "on `g.locus_tag IN $locus_tags` post-MATCH. Genes "
+                        "with no edge for the selected DM produce no row.",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Scope to DMs from one or more experiments.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Scope to DMs from one or more publications.",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell', 'vesicle', "
+                        "'exoproteome', 'spent_medium', 'lysate'). Exact "
+                        "match.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Treatment type(s) (e.g. ['diel']). ANY-overlap. "
+                        "Case-insensitive.",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Background factor(s) (e.g. ['axenic', 'light']). "
+                        "ANY-overlap. Case-insensitive.",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Growth phase(s). ANY-overlap. Case-insensitive.",
+        )] = None,
+        # ── Edge-level filter (kind-specific) ───────────────────────────
+        flag: Annotated[bool | None, Field(
+            description="Filter on `r.value`: True keeps `'true'` edges, "
+                        "False keeps `'false'` edges. Coerced to the "
+                        "string-typed bool stored in the KG (BioCypher "
+                        "constraint). **flag=False returns zero rows today** "
+                        "— current KG stores only positive (true) edges; "
+                        "inspect `by_metric[*].dm_false_count` (always 0 "
+                        "today) before assuming a gene is 'not flagged'.",
+        )] = None,
+        # ── Result-size controls ────────────────────────────────────────
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (counts, breakdowns, "
+                        "by_metric, diagnostics). Sugar for limit=0; "
+                        "results=[].",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy text fields per row: "
+                        "gene_function_description, gene_summary, plus DM "
+                        "context (metric_type, field_description, unit, "
+                        "compartment, experiment_id, publication_doi, "
+                        "treatment_type, background_factors, treatment, "
+                        "light_condition, experimental_context).",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows to return. Paginate with `offset`. Use "
+                        "`summary=True` for summary-only (sets limit=0).",
+            ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset (starting row, 0-indexed).",
+            ge=0,
+        )] = 0,
+    ) -> GenesByBooleanMetricResponse:
+        """Pass `derived_metric_ids` XOR `metric_types` (one required); wrong-kind IDs (numeric / categorical) surface silently in `not_found_ids` — inspect `list_derived_metrics(value_kind='boolean')` first to pick valid boolean DMs.
+
+        Boolean DM drill-down — one row per gene × DM × edge value. `r.value`
+        is the string-typed bool ('true' / 'false'). Cross-organism by
+        design; envelope `by_organism` and per-row `organism_name` make
+        cross-strain rows self-describing. The `by_metric` envelope rollup
+        pairs filtered-slice true/false tallies with full-DM precomputed
+        counts (`dm_true_count`, `dm_false_count`) so callers can read "32
+        of 32 MED4 vesicle-proteome members" directly.
+
+        **Positive-only storage gotcha:** every current boolean DM has
+        `dm.flag_false_count=0`; `flag=False` returns zero rows today. The
+        `by_metric[*].dm_false_count` echo makes this self-evident without
+        a follow-up call.
+
+        `excluded_derived_metrics` and `warnings` are always `[]` (no
+        rankable / has_p_value gates apply to boolean DMs); kept as
+        envelope keys for cross-tool shape consistency with
+        `genes_by_numeric_metric`.
+        """
+        selection_size = (
+            len(derived_metric_ids) if derived_metric_ids is not None
+            else (len(metric_types) if metric_types is not None else 0)
+        )
+        await ctx.info(
+            f"genes_by_boolean_metric selection_size={selection_size} "
+            f"flag={flag}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.genes_by_boolean_metric(
+                derived_metric_ids=derived_metric_ids,
+                metric_types=metric_types,
+                organism=organism,
+                locus_tags=locus_tags,
+                experiment_ids=experiment_ids,
+                publication_doi=publication_doi,
+                compartment=compartment,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases,
+                flag=flag,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"genes_by_boolean_metric error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(f"genes_by_boolean_metric unexpected error: {e}")
+            raise ToolError(f"Error in genes_by_boolean_metric: {e}")
+
+        # Build response in NEW LOCAL VARIABLES — don't mutate `data`.
+        by_organism = [GenesByNumericMetricOrganismBreakdown(**x)
+                       for x in data["by_organism"]]
+        by_compartment = [GenesByNumericMetricCompartmentBreakdown(**x)
+                          for x in data["by_compartment"]]
+        by_publication = [GenesByNumericMetricPublicationBreakdown(**x)
+                          for x in data["by_publication"]]
+        by_experiment = [GenesByNumericMetricExperimentBreakdown(**x)
+                         for x in data["by_experiment"]]
+        by_value = [GenesByBooleanMetricValueBreakdown(**x)
+                    for x in data["by_value"]]
+        top_categories = [GenesByNumericMetricCategoryBreakdown(**x)
+                          for x in data["top_categories"]]
+        by_metric = [GenesByBooleanMetricBreakdown(**x)
+                     for x in data["by_metric"]]
+        excluded_derived_metrics = [ExcludedDerivedMetric(**x)
+                                    for x in data["excluded_derived_metrics"]]
+        results = [GenesByBooleanMetricResult(**r) for r in data["results"]]
+
+        response = GenesByBooleanMetricResponse(
+            total_matching=data["total_matching"],
+            total_derived_metrics=data["total_derived_metrics"],
+            total_genes=data["total_genes"],
+            by_organism=by_organism,
+            by_compartment=by_compartment,
+            by_publication=by_publication,
+            by_experiment=by_experiment,
+            by_value=by_value,
+            top_categories=top_categories,
+            by_metric=by_metric,
+            genes_per_metric_max=data["genes_per_metric_max"],
+            genes_per_metric_median=data["genes_per_metric_median"],
+            not_found_ids=data["not_found_ids"],
+            not_matched_ids=data["not_matched_ids"],
+            not_found_metric_types=data["not_found_metric_types"],
+            not_matched_metric_types=data["not_matched_metric_types"],
+            not_matched_organism=data.get("not_matched_organism"),
+            excluded_derived_metrics=excluded_derived_metrics,
+            warnings=data["warnings"],
+            returned=data["returned"],
+            offset=data.get("offset", 0),
+            truncated=data["truncated"],
+            results=results,
+        )
+        await ctx.info(
+            f"Returning {response.returned} of {response.total_matching} "
+            f"gene×DM rows"
+        )
+        return response
+
+    # ── genes_by_categorical_metric Pydantic models ────────────────────
+
+    class GenesByCategoricalMetricCategoryFreq(BaseModel):
+        category: str = Field(description="Category label.")
+        count: int = Field(description="Rows with this category.")
+
+    class GenesByCategoricalMetricBreakdown(BaseModel):
+        """Per-DM rollup: filtered-slice category histogram + full-DM context."""
+        derived_metric_id: str = Field(description="Unique DM id.")
+        name: str = Field(description="DM human label.")
+        metric_type: str = Field(description="Category tag.")
+        value_kind: Literal["categorical"] = Field(
+            description="Always 'categorical' in this tool.")
+        count: int = Field(
+            description="Rows contributed by this DM after filters.")
+        # Filtered slice (query-time)
+        by_category: list[GenesByCategoricalMetricCategoryFreq] = Field(
+            default_factory=list,
+            description="Filtered-slice per-DM frequency, computed via "
+                        "`apoc.coll.frequencies` on filtered rows.")
+        allowed_categories: list[str] = Field(
+            default_factory=list,
+            description="Schema-declared full set (`dm.allowed_categories`); "
+                        "may be a superset of observed categories.")
+        # Full DM (precomputed)
+        dm_total_gene_count: int = Field(
+            description="Full-DM total gene count (precomputed "
+                        "`dm.total_gene_count`).")
+        dm_by_category: list[GenesByCategoricalMetricCategoryFreq] = Field(
+            default_factory=list,
+            description="Full-DM histogram, zip of `dm.category_labels` + "
+                        "`dm.category_counts`. Includes only observed "
+                        "categories (may be a strict subset of "
+                        "`allowed_categories`).")
+
+    class GenesByCategoricalMetricResult(BaseModel):
+        # Identity / routing (5)
+        locus_tag: str = Field(
+            description="Gene locus tag (e.g. 'PMM0097').")
+        gene_name: str | None = Field(
+            default=None, description="Gene symbol; null when KG has none.")
+        product: str | None = Field(
+            default=None, description="Gene product.")
+        gene_category: str | None = Field(
+            default=None, description="Coarse functional category.")
+        organism_name: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MED4').")
+        # DM identity (2)
+        derived_metric_id: str = Field(description="Unique parent-DM id.")
+        name: str = Field(description="DM human label.")
+        # Gate echoes (3) — kept for cross-tool row-shape consistency
+        value_kind: Literal["categorical"] = Field(
+            description="Always 'categorical' for this tool; kept for "
+                        "cross-tool row-shape consistency with "
+                        "`genes_by_numeric_metric`.")
+        rankable: bool = Field(
+            description="DM-level rankable flag (always False today for "
+                        "categorical DMs).")
+        has_p_value: bool = Field(
+            description="DM-level p-value flag (always False today for "
+                        "categorical DMs).")
+        # Edge value (1)
+        value: str = Field(
+            description="Category label (one of the parent DM's "
+                        "`allowed_categories`).")
+        # ── Verbose adds (default None) ─────────────────────────────────
+        metric_type: str | None = Field(
+            default=None, description="Category tag. Verbose only.")
+        field_description: str | None = Field(
+            default=None,
+            description="Detailed explanation of what this DM measures. "
+                        "Verbose only.")
+        unit: str | None = Field(
+            default=None,
+            description="Measurement unit (typically null for categorical "
+                        "DMs). Verbose only.")
+        compartment: str | None = Field(
+            default=None, description="Sample compartment. Verbose only.")
+        experiment_id: str | None = Field(
+            default=None, description="Parent experiment id. Verbose only.")
+        publication_doi: str | None = Field(
+            default=None, description="Parent publication DOI. Verbose only.")
+        treatment_type: list[str] | None = Field(
+            default=None,
+            description="Treatment type(s). Verbose only.")
+        background_factors: list[str] | None = Field(
+            default=None,
+            description="Background factor(s). Verbose only.")
+        treatment: str | None = Field(
+            default=None,
+            description="Treatment description in plain language. Verbose only.")
+        light_condition: str | None = Field(
+            default=None, description="Light regime. Verbose only.")
+        experimental_context: str | None = Field(
+            default=None,
+            description="Longer experimental setup description. Verbose only.")
+        gene_function_description: str | None = Field(
+            default=None,
+            description="Gene functional description (gene-level). Verbose only.")
+        gene_summary: str | None = Field(
+            default=None,
+            description="Gene summary text (gene-level). Verbose only.")
+        allowed_categories: list[str] | None = Field(
+            default=None,
+            description="Schema-declared full set for this row's parent DM. "
+                        "Verbose only.")
+
+    class GenesByCategoricalMetricResponse(BaseModel):
+        total_matching: int = Field(
+            description="Rows post-filter (gene × DM pairs).")
+        total_derived_metrics: int = Field(
+            description="Distinct DMs contributing rows.")
+        total_genes: int = Field(description="Distinct genes in results.")
+        by_organism: list[GenesByNumericMetricOrganismBreakdown] = Field(
+            default_factory=list, description="Rows per organism.")
+        by_compartment: list[GenesByNumericMetricCompartmentBreakdown] = Field(
+            default_factory=list, description="Rows per compartment.")
+        by_publication: list[GenesByNumericMetricPublicationBreakdown] = Field(
+            default_factory=list, description="Rows per publication.")
+        by_experiment: list[GenesByNumericMetricExperimentBreakdown] = Field(
+            default_factory=list, description="Rows per experiment.")
+        by_category: list[GenesByCategoricalMetricCategoryFreq] = Field(
+            default_factory=list,
+            description="Frequency rollup of `r.value` across surviving rows. "
+                        "Cross-DM unioned — a category present in two DMs sums.")
+        top_categories: list[GenesByNumericMetricCategoryBreakdown] = Field(
+            default_factory=list, description="Top 5 gene categories by count.")
+        by_metric: list[GenesByCategoricalMetricBreakdown] = Field(
+            default_factory=list,
+            description="Per-DM rollup: filtered-slice category histogram + "
+                        "full-DM precomputed histogram. Sorted by count desc.")
+        genes_per_metric_max: int = Field(
+            default=0, description="Largest per-DM gene count.")
+        genes_per_metric_median: float = Field(
+            default=0.0, description="Median per-DM gene count.")
+        not_found_ids: list[str] = Field(
+            default_factory=list,
+            description="`derived_metric_ids` inputs not present in KG (or "
+                        "scoped out / wrong value_kind).")
+        not_matched_ids: list[str] = Field(
+            default_factory=list,
+            description="`derived_metric_ids` in KG but produced 0 rows after "
+                        "edge-level filters.")
+        not_found_metric_types: list[str] = Field(
+            default_factory=list,
+            description="`metric_types` inputs that match no DM after scoping.")
+        not_matched_metric_types: list[str] = Field(
+            default_factory=list,
+            description="`metric_types` whose DMs produced 0 rows.")
+        not_matched_organism: str | None = Field(
+            default=None,
+            description="`organism` arg that matched no surviving DM.")
+        excluded_derived_metrics: list[ExcludedDerivedMetric] = Field(
+            default_factory=list,
+            description="Always [] for categorical DMs (no rankable / "
+                        "has_p_value gates). Kept for cross-tool envelope-shape "
+                        "consistency.")
+        warnings: list[str] = Field(
+            default_factory=list,
+            description="Always [] for categorical DMs. Kept for cross-tool "
+                        "envelope-shape consistency.")
+        returned: int = Field(description="Length of results list.")
+        offset: int = Field(default=0, description="Pagination offset used.")
+        truncated: bool = Field(
+            description="True when total_matching > offset + returned.")
+        results: list[GenesByCategoricalMetricResult] = Field(
+            default_factory=list,
+            description="One row per gene × DM. Empty when summary=True.")
+
+    @mcp.tool(
+        tags={"derived_metric", "categorical", "drill_down"},
+        annotations={"readOnlyHint": True},
+    )
+    async def genes_by_categorical_metric(
+        ctx: Context,
+        # ── Selection (exactly one required, mutually exclusive) ────────
+        derived_metric_ids: Annotated[list[str] | None, Field(
+            description="Categorical DerivedMetric node IDs. Use when the "
+                        "same `metric_type` appears across organisms / "
+                        "publications and you need to pin one. Discover IDs "
+                        "via `list_derived_metrics(value_kind='categorical')`."
+                        " Mutually exclusive with `metric_types`. Wrong-kind "
+                        "IDs (numeric / boolean) surface silently in "
+                        "`not_found_ids`.",
+        )] = None,
+        metric_types: Annotated[list[str] | None, Field(
+            description="Categorical metric-type tags (e.g. "
+                        "['predicted_subcellular_localization', "
+                        "'darkness_survival_class']). Unions every DM "
+                        "carrying that tag, then narrows by scoping filters. "
+                        "Same tag can appear across organisms (e.g. "
+                        "'predicted_subcellular_localization' is on both "
+                        "MED4 + MIT9313). Mutually exclusive with "
+                        "`derived_metric_ids`.",
+        )] = None,
+        # ── DM-scoping filters (intersected with selection) ─────────────
+        organism: Annotated[str | None, Field(
+            description="Organism to scope the DM set to. Accepts short "
+                        "strain code ('MED4', 'NATL2A', 'MIT9313') or full "
+                        "name. Case-insensitive substring match. "
+                        "Single-organism is **not** enforced — omit to drill "
+                        "across all organisms a metric_type spans.",
+        )] = None,
+        locus_tags: Annotated[list[str] | None, Field(
+            description="Restrict drill-down to a specific gene set (e.g. DE "
+                        "hits from `differential_expression_by_gene`). Filter "
+                        "on `g.locus_tag IN $locus_tags` post-MATCH. Genes "
+                        "with no edge for the selected DM produce no row.",
+        )] = None,
+        experiment_ids: Annotated[list[str] | None, Field(
+            description="Scope to DMs from one or more experiments.",
+        )] = None,
+        publication_doi: Annotated[list[str] | None, Field(
+            description="Scope to DMs from one or more publications.",
+        )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Sample compartment ('whole_cell', 'vesicle', "
+                        "'exoproteome', 'spent_medium', 'lysate'). Exact "
+                        "match.",
+        )] = None,
+        treatment_type: Annotated[list[str] | None, Field(
+            description="Treatment type(s). ANY-overlap. Case-insensitive.",
+        )] = None,
+        background_factors: Annotated[list[str] | None, Field(
+            description="Background factor(s). ANY-overlap. Case-insensitive.",
+        )] = None,
+        growth_phases: Annotated[list[str] | None, Field(
+            description="Growth phase(s). ANY-overlap. Case-insensitive.",
+        )] = None,
+        # ── Edge-level filter (kind-specific) ───────────────────────────
+        categories: Annotated[list[str] | None, Field(
+            description="Filter on `r.value`: keep rows whose value is in "
+                        "this set. Validated against the union of the "
+                        "selected DMs' `allowed_categories` — unknown "
+                        "values raise `ValueError` listing the allowed set. "
+                        "E.g. ['Outer Membrane', 'Periplasmic'] for "
+                        "`predicted_subcellular_localization`.",
+        )] = None,
+        # ── Result-size controls ────────────────────────────────────────
+        summary: Annotated[bool, Field(
+            description="Return summary fields only (counts, breakdowns, "
+                        "by_metric, diagnostics). Sugar for limit=0; "
+                        "results=[].",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy text fields per row: "
+                        "gene_function_description, gene_summary, "
+                        "allowed_categories, plus DM context (metric_type, "
+                        "field_description, unit, compartment, experiment_id, "
+                        "publication_doi, treatment_type, background_factors, "
+                        "treatment, light_condition, experimental_context).",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max rows to return. Paginate with `offset`. Use "
+                        "`summary=True` for summary-only (sets limit=0).",
+            ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Pagination offset (starting row, 0-indexed).",
+            ge=0,
+        )] = 0,
+    ) -> GenesByCategoricalMetricResponse:
+        """Pass `derived_metric_ids` XOR `metric_types` (one required); `categories` must be a subset of the union of selected DMs' `allowed_categories` (raises with the allowed set listed otherwise) — inspect `list_derived_metrics(value_kind='categorical')` first to see each DM's allowed set.
+
+        Categorical DM drill-down — one row per gene × DM × edge value.
+        `r.value` is a category label. Cross-organism by design; envelope
+        `by_organism` and per-row `organism_name` make cross-strain rows
+        self-describing. The `by_metric` envelope rollup pairs filtered-slice
+        category histogram (`by_category`) with full-DM precomputed
+        histogram (`dm_by_category`) plus the schema-declared
+        `allowed_categories` so callers can detect declared-but-unobserved
+        categories without an extra call.
+
+        Wrong-kind IDs (numeric / boolean) surface silently in
+        `not_found_ids` — inspect `list_derived_metrics(value_kind='categorical')`
+        first to pick valid categorical DMs.
+
+        `excluded_derived_metrics` and `warnings` are always `[]` (no
+        rankable / has_p_value gates apply to categorical DMs); kept as
+        envelope keys for cross-tool shape consistency with
+        `genes_by_numeric_metric`.
+        """
+        selection_size = (
+            len(derived_metric_ids) if derived_metric_ids is not None
+            else (len(metric_types) if metric_types is not None else 0)
+        )
+        await ctx.info(
+            f"genes_by_categorical_metric selection_size={selection_size} "
+            f"categories={categories}"
+        )
+        try:
+            conn = _conn(ctx)
+            data = api.genes_by_categorical_metric(
+                derived_metric_ids=derived_metric_ids,
+                metric_types=metric_types,
+                organism=organism,
+                locus_tags=locus_tags,
+                experiment_ids=experiment_ids,
+                publication_doi=publication_doi,
+                compartment=compartment,
+                treatment_type=treatment_type,
+                background_factors=background_factors,
+                growth_phases=growth_phases,
+                categories=categories,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+        except ValueError as e:
+            await ctx.warning(f"genes_by_categorical_metric error: {e}")
+            raise ToolError(str(e)) from e
+        except Exception as e:
+            await ctx.error(
+                f"genes_by_categorical_metric unexpected error: {e}")
+            raise ToolError(f"Error in genes_by_categorical_metric: {e}")
+
+        # Build response in NEW LOCAL VARIABLES — don't mutate `data`.
+        by_organism = [GenesByNumericMetricOrganismBreakdown(**x)
+                       for x in data["by_organism"]]
+        by_compartment = [GenesByNumericMetricCompartmentBreakdown(**x)
+                          for x in data["by_compartment"]]
+        by_publication = [GenesByNumericMetricPublicationBreakdown(**x)
+                          for x in data["by_publication"]]
+        by_experiment = [GenesByNumericMetricExperimentBreakdown(**x)
+                         for x in data["by_experiment"]]
+        by_category = [GenesByCategoricalMetricCategoryFreq(**x)
+                       for x in data["by_category"]]
+        top_categories = [GenesByNumericMetricCategoryBreakdown(**x)
+                          for x in data["top_categories"]]
+        by_metric = [GenesByCategoricalMetricBreakdown(**x)
+                     for x in data["by_metric"]]
+        excluded_derived_metrics = [ExcludedDerivedMetric(**x)
+                                    for x in data["excluded_derived_metrics"]]
+        results = [GenesByCategoricalMetricResult(**r) for r in data["results"]]
+
+        response = GenesByCategoricalMetricResponse(
+            total_matching=data["total_matching"],
+            total_derived_metrics=data["total_derived_metrics"],
+            total_genes=data["total_genes"],
+            by_organism=by_organism,
+            by_compartment=by_compartment,
+            by_publication=by_publication,
+            by_experiment=by_experiment,
+            by_category=by_category,
+            top_categories=top_categories,
+            by_metric=by_metric,
+            genes_per_metric_max=data["genes_per_metric_max"],
+            genes_per_metric_median=data["genes_per_metric_median"],
+            not_found_ids=data["not_found_ids"],
+            not_matched_ids=data["not_matched_ids"],
+            not_found_metric_types=data["not_found_metric_types"],
+            not_matched_metric_types=data["not_matched_metric_types"],
+            not_matched_organism=data.get("not_matched_organism"),
+            excluded_derived_metrics=excluded_derived_metrics,
+            warnings=data["warnings"],
+            returned=data["returned"],
+            offset=data.get("offset", 0),
+            truncated=data["truncated"],
+            results=results,
+        )
+        await ctx.info(
+            f"Returning {response.returned} of {response.total_matching} "
+            f"gene×DM rows"
+        )
+        return response
