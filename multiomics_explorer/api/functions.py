@@ -587,6 +587,7 @@ def list_filter_values(
 
 def list_organisms(
     organism_names: list[str] | None = None,
+    compartment: str | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -594,24 +595,26 @@ def list_organisms(
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """List organisms in the knowledge graph, optionally filtered by name.
+    """List organisms in the knowledge graph, optionally filtered by name or compartment.
 
-    organism_names: when provided, restricts results to organisms whose
-        preferred_name matches (case-insensitive). Unknown names are
-        returned in `not_found`.
-    summary: when True, sets limit=0 internally — results=[], summary
-        fields only.
+    organism_names: when provided, restricts to organisms whose preferred_name
+        matches (case-insensitive). Unknown names returned in `not_found`.
+    compartment: when provided, restricts to organisms with at least one
+        experiment in that wet-lab compartment ('whole_cell', 'vesicle',
+        'exoproteome', 'spent_medium', 'lysate').
+    summary: when True, sets limit=0 internally — results=[], summary fields only.
 
     Returns dict with keys: total_entries, total_matching, returned, offset,
-    truncated, by_cluster_type, by_organism_type, not_found, results.
-    Per result: organism_name, genus, species, strain, clade,
-    ncbi_taxon_id, organism_type, gene_count, publication_count,
-    experiment_count, treatment_types, omics_types,
-    clustering_analysis_count, cluster_types.
-    Sparse fields (omitted when null): reference_database,
-    reference_proteome.
-    When verbose=True, also includes: family, order, tax_class, phylum,
-    kingdom, superkingdom, lineage, cluster_count.
+    truncated, by_cluster_type, by_organism_type, by_value_kind, by_metric_type,
+    by_compartment, not_found, results.
+    Per result (compact): organism_name, organism_type, genus, species,
+    strain, clade, ncbi_taxon_id, gene_count, publication_count,
+    experiment_count, treatment_types, omics_types, clustering_analysis_count,
+    cluster_types, derived_metric_count, derived_metric_value_kinds, compartments.
+    Sparse fields (omitted when null): reference_database, reference_proteome.
+    When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
+    superkingdom, lineage, cluster_count, derived_metric_gene_count,
+    derived_metric_types.
     """
     conn = _default_conn(conn)
     if summary:
@@ -619,47 +622,56 @@ def list_organisms(
 
     names_lc = [n.lower() for n in organism_names] if organism_names else None
 
-    cypher, params = build_list_organisms(
-        organism_names_lc=names_lc, verbose=verbose,
+    # Always run summary first — provides total_entries, total_matching,
+    # and the 3 new rollup envelope keys.
+    summary_cypher, summary_params = build_list_organisms_summary(
+        organism_names_lc=names_lc, compartment=compartment,
     )
-    matched = conn.execute_query(cypher, **params)
-    total_matching = len(matched)
+    summary_rows = conn.execute_query(summary_cypher, **summary_params)
+    summary_row = summary_rows[0] if summary_rows else {
+        "total_entries": 0, "total_matching": 0,
+        "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+    }
+    total_entries = summary_row["total_entries"]
+    total_matching = summary_row["total_matching"]
 
-    # total_entries: KG-wide. Skip the extra query when no filter is set —
-    # total_matching == total_entries in that case.
-    if organism_names is None:
-        total_entries = total_matching
-    else:
-        summary_cypher, summary_params = build_list_organisms_summary()
-        summary_rows = conn.execute_query(summary_cypher, **summary_params)
-        total_entries = summary_rows[0]["total_entries"] if summary_rows else 0
-
-    # Breakdowns reflect the matched set.
+    # Breakdowns reflect the matched set (computed from detail rows).
     ct_counts: dict[str, int] = {}
     ot_counts: dict[str, int] = {}
-    for org in matched:
-        for ct in org.get("cluster_types", []):
-            ct_counts[ct] = ct_counts.get(ct, 0) + 1
-        ot = org.get("organism_type")
-        if ot:
-            ot_counts[ot] = ot_counts.get(ot, 0) + 1
 
     if limit == 0:
         results = []
-    elif limit is None:
-        results = matched[offset:]
     else:
-        results = matched[offset:offset + limit]
+        detail_cypher, detail_params = build_list_organisms(
+            organism_names_lc=names_lc, compartment=compartment, verbose=verbose,
+        )
+        matched = conn.execute_query(detail_cypher, **detail_params)
 
-    # Sparse-strip reference fields when null
-    for r in results:
-        if r.get("reference_database") is None:
-            r.pop("reference_database", None)
-            r.pop("reference_proteome", None)
+        for org in matched:
+            for ct in org.get("cluster_types", []):
+                ct_counts[ct] = ct_counts.get(ct, 0) + 1
+            ot = org.get("organism_type")
+            if ot:
+                ot_counts[ot] = ot_counts.get(ot, 0) + 1
 
-    # Gate verbose-only fields
-    if not verbose:
-        results = [{k: v for k, v in r.items() if k != "cluster_count"} for r in results]
+        if offset:
+            matched = matched[offset:]
+        if limit is not None:
+            matched = matched[:limit]
+        results = list(matched)
+
+        # Sparse-strip reference fields when null
+        for r in results:
+            if r.get("reference_database") is None:
+                r.pop("reference_database", None)
+                r.pop("reference_proteome", None)
+
+        # Gate verbose-only fields
+        if not verbose:
+            results = [{k: v for k, v in r.items()
+                        if k not in ("cluster_count", "derived_metric_gene_count",
+                                     "derived_metric_types")}
+                       for r in results]
 
     # not_found: input names that didn't match any OrganismTaxon
     # (case-insensitive). Original casing preserved in the returned list.
@@ -688,6 +700,12 @@ def list_organisms(
             key=lambda x: x["count"],
             reverse=True,
         ),
+        "by_value_kind": _rename_freq(summary_row.get("by_value_kind", []),
+                                      "value_kind"),
+        "by_metric_type": _rename_freq(summary_row.get("by_metric_type", []),
+                                       "metric_type"),
+        "by_compartment": _rename_freq(summary_row.get("by_compartment", []),
+                                       "compartment"),
         "returned": len(results),
         "offset": offset,
         "truncated": total_matching > offset + len(results),

@@ -2,7 +2,7 @@
 
 ## What it does
 
-List organisms in the knowledge graph, optionally filtered by name.
+List organisms in the knowledge graph, optionally filtered by name or compartment.
 
 Returns taxonomy, gene counts, publication counts, and organism_type
 for each organism. organism_type classifies each organism as
@@ -23,6 +23,7 @@ not_found.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism_names | list[string] \| None | None | Filter by exact organism preferred_name (case-insensitive). Pass values from a prior list_organisms call or another tool's organism_name field. Unknown names are reported in not_found rather than raising. |
+| compartment | string \| None | None | Filter to organisms with at least one experiment in this wet-lab compartment (e.g. 'vesicle', 'whole_cell'). Use list_filter_values(filter_type='compartment') to enumerate valid values. |
 | summary | bool | False | Return summary fields only (results=[]). |
 | verbose | bool | False | Include full taxonomy hierarchy (family, order, class, phylum, kingdom, superkingdom, lineage). |
 | limit | int | 5 | Max results. |
@@ -33,13 +34,16 @@ not_found.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_cluster_type, by_organism_type, returned, offset, truncated, not_found, results
+total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, returned, offset, truncated, not_found, results
 ```
 
 - **total_entries** (int): Total organisms in the KG
 - **total_matching** (int): Organisms matching the filter (= total_entries when no filter)
 - **by_cluster_type** (list[OrgClusterTypeBreakdown]): Organism counts per cluster type over the matched set, sorted by count descending
 - **by_organism_type** (list[OrgTypeBreakdown]): Organism counts per type over the matched set, sorted by count descending
+- **by_value_kind** (list[object]): DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.
+- **by_metric_type** (list[object]): DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.
+- **by_compartment** (list[object]): Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.
 - **returned** (int): Number of results returned
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > offset + returned
@@ -65,6 +69,11 @@ total_entries, total_matching, by_cluster_type, by_organism_type, returned, offs
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this organism (e.g. 4) |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']) |
 | growth_phases | list[string] (optional) | Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
+| derived_metric_count | int (optional) | Total DerivedMetric annotations on this organism's experiments (0 when none). |
+| derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} present across this organism's DMs. Use to route to genes_by_{numeric,boolean,categorical}_metric. |
+| compartments | list[string] (optional) | Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']). |
+| derived_metric_gene_count | int \| None (optional) | Total gene-level DM annotation count (verbose-only). |
+| derived_metric_types | list[string] \| None (optional) | Distinct metric_type tags observed (verbose-only). |
 | reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
 | reference_proteome | string \| None (optional) | Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms. |
 
@@ -178,7 +187,7 @@ list_organisms → list_clustering_analyses(organism=...)
 from multiomics_explorer import list_organisms
 
 result = list_organisms()
-# returns dict with keys: total_entries, total_matching, by_cluster_type, by_organism_type, offset, not_found, results
+# returns dict with keys: total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

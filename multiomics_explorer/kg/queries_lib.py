@@ -976,6 +976,7 @@ def build_list_compartments() -> tuple[str, dict]:
 def build_list_organisms(
     *,
     organism_names_lc: list[str] | None = None,
+    compartment: str | None = None,
     verbose: bool = False,
 ) -> tuple[str, dict]:
     """Build Cypher for listing organisms with data-availability signals.
@@ -983,14 +984,18 @@ def build_list_organisms(
     organism_names_lc: optional list of lowercased preferred_names. When
         None, returns all organisms. When non-None, restricts to organisms
         whose preferred_name (lowercased) is in the list.
+    compartment: optional Experiment.compartment value (e.g. 'vesicle')
+        to restrict to organisms whose compartments list includes it.
 
     RETURN keys (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, background_factors, omics_types,
-    clustering_analysis_count, cluster_types, reference_database,
+    clustering_analysis_count, cluster_types, derived_metric_count,
+    derived_metric_value_kinds, compartments, reference_database,
     reference_proteome, growth_phases.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
-    superkingdom, lineage, cluster_count.
+    superkingdom, lineage, cluster_count, derived_metric_gene_count,
+    derived_metric_types.
     """
     verbose_cols = (
         ",\n       o.family AS family,"
@@ -1000,14 +1005,26 @@ def build_list_organisms(
         "\n       o.kingdom AS kingdom,"
         "\n       o.superkingdom AS superkingdom,"
         "\n       o.lineage AS lineage,"
-        "\n       coalesce(o.cluster_count, 0) AS cluster_count"
+        "\n       coalesce(o.cluster_count, 0) AS cluster_count,"
+        "\n       coalesce(o.derived_metric_gene_count, 0) AS derived_metric_gene_count,"
+        "\n       coalesce(o.derived_metric_types, []) AS derived_metric_types"
         if verbose else ""
     )
 
+    conditions = [
+        "($organism_names_lc IS NULL"
+        " OR toLower(o.preferred_name) IN $organism_names_lc)"
+    ]
+    params: dict = {"organism_names_lc": organism_names_lc}
+    if compartment is not None:
+        conditions.append("$compartment IN coalesce(o.compartments, [])")
+        params["compartment"] = compartment
+
+    where_block = "WHERE " + "\n  AND ".join(conditions) + "\n"
+
     cypher = (
         "MATCH (o:OrganismTaxon)\n"
-        "WHERE $organism_names_lc IS NULL\n"
-        "   OR toLower(o.preferred_name) IN $organism_names_lc\n"
+        f"{where_block}"
         "RETURN o.preferred_name AS organism_name,\n"
         "       o.organism_type AS organism_type,\n"
         "       o.genus AS genus,\n"
@@ -1023,22 +1040,57 @@ def build_list_organisms(
         "       o.omics_types AS omics_types,\n"
         "       coalesce(o.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
         "       coalesce(o.cluster_types, []) AS cluster_types,\n"
+        "       coalesce(o.derived_metric_count, 0) AS derived_metric_count,\n"
+        "       coalesce(o.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
+        "       coalesce(o.compartments, []) AS compartments,\n"
         "       o.reference_database AS reference_database,\n"
         "       o.reference_proteome AS reference_proteome,\n"
         "       coalesce(o.growth_phases, []) AS growth_phases"
         f"{verbose_cols}\n"
         "ORDER BY o.genus, o.preferred_name"
     )
-    return cypher, {"organism_names_lc": organism_names_lc}
+    return cypher, params
 
 
-def build_list_organisms_summary() -> tuple[str, dict]:
-    """Build Cypher for the KG-wide OrganismTaxon count.
+def build_list_organisms_summary(
+    *,
+    organism_names_lc: list[str] | None = None,
+    compartment: str | None = None,
+) -> tuple[str, dict]:
+    """Summary count + DM/compartment rollups across matched organisms.
 
-    RETURN keys: total_entries.
+    RETURN keys: total_entries, total_matching, by_value_kind,
+    by_metric_type, by_compartment.
     """
-    cypher = "MATCH (o:OrganismTaxon) RETURN count(o) AS total_entries"
-    return cypher, {}
+    conditions = [
+        "($organism_names_lc IS NULL"
+        " OR toLower(o.preferred_name) IN $organism_names_lc)"
+    ]
+    params: dict = {"organism_names_lc": organism_names_lc}
+    if compartment is not None:
+        conditions.append("$compartment IN coalesce(o.compartments, [])")
+        params["compartment"] = compartment
+    where_block = "WHERE " + "\n  AND ".join(conditions) + "\n"
+
+    cypher = (
+        "MATCH (o:OrganismTaxon)\n"
+        "WITH count(o) AS total_entries\n"
+        "OPTIONAL MATCH (o:OrganismTaxon)\n"
+        f"{where_block}"
+        "WITH total_entries,\n"
+        "     count(o) AS total_matching,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(o.derived_metric_value_kinds, []))) AS vks,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(o.derived_metric_types, []))) AS mtypes,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(o.compartments, []))) AS comps\n"
+        "RETURN total_entries, total_matching,\n"
+        "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
+        "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
+        "       apoc.coll.frequencies(comps) AS by_compartment"
+    )
+    return cypher, params
 
 
 def _list_experiments_where(

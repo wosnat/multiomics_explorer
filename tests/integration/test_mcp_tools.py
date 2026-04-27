@@ -304,6 +304,27 @@ class TestListOrganisms:
         assert result["total_matching"] == result["total_entries"]
         assert result["truncated"] is True
 
+    def test_envelope_dm_rollups_present(self, conn):
+        """Summary mode returns by_value_kind, by_metric_type, by_compartment."""
+        result = api.list_organisms(summary=True, conn=conn)
+        for key in ("by_value_kind", "by_metric_type", "by_compartment"):
+            assert key in result, f"Missing envelope key: {key}"
+            assert isinstance(result[key], list), f"{key} should be a list"
+
+    def test_compartment_filter_narrows(self, conn):
+        """Filtering by 'vesicle' returns fewer or equal organisms than unfiltered."""
+        result_all = api.list_organisms(summary=True, conn=conn)
+        result_vesicle = api.list_organisms(compartment="vesicle", summary=True, conn=conn)
+        assert result_vesicle["total_matching"] <= result_all["total_matching"]
+
+    def test_per_row_dm_count_present(self, conn):
+        """Each result row has the 3 new compact DM fields."""
+        result = api.list_organisms(limit=5, conn=conn)
+        for row in result["results"]:
+            assert "derived_metric_count" in row, "Missing derived_metric_count"
+            assert "derived_metric_value_kinds" in row, "Missing derived_metric_value_kinds"
+            assert "compartments" in row, "Missing compartments"
+
 
 @pytest.mark.kg
 class TestListExperiments:

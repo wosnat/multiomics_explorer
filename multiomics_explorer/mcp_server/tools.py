@@ -485,6 +485,13 @@ def register_tools(mcp: FastMCP):
         superkingdom: str | None = Field(default=None, description="Taxonomic superkingdom (e.g. 'Bacteria')")
         lineage: str | None = Field(default=None, description="Full NCBI taxonomy lineage string (e.g. 'cellular organisms; Bacteria; ...; Prochlorococcus marinus')")
         cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 35)")
+        # DM compact fields
+        derived_metric_count: int = Field(default=0, description="Total DerivedMetric annotations on this organism's experiments (0 when none).")
+        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Subset of {numeric, boolean, categorical} present across this organism's DMs. Use to route to genes_by_{numeric,boolean,categorical}_metric.")
+        compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']).")
+        # DM verbose-only fields
+        derived_metric_gene_count: int | None = Field(default=None, description="Total gene-level DM annotation count (verbose-only).")
+        derived_metric_types: list[str] | None = Field(default=None, description="Distinct metric_type tags observed (verbose-only).")
         # sparse reference fields (reference_proteome_match only)
         reference_database: str | None = Field(default=None, description="Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms.")
         reference_proteome: str | None = Field(default=None, description="Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms.")
@@ -502,6 +509,9 @@ def register_tools(mcp: FastMCP):
         total_matching: int = Field(description="Organisms matching the filter (= total_entries when no filter)")
         by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type over the matched set, sorted by count descending")
         by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted by count descending")
+        by_value_kind: list[dict] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.")
+        by_metric_type: list[dict] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.")
+        by_compartment: list[dict] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.")
         returned: int = Field(description="Number of results returned")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > offset + returned")
@@ -522,6 +532,9 @@ def register_tools(mcp: FastMCP):
                 "not_found rather than raising."
             ),
         )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Filter to organisms with at least one experiment in this wet-lab compartment (e.g. 'vesicle', 'whole_cell'). Use list_filter_values(filter_type='compartment') to enumerate valid values.",
+        )] = None,
         summary: Annotated[bool, Field(
             description="Return summary fields only (results=[]).",
         )] = False,
@@ -536,7 +549,7 @@ def register_tools(mcp: FastMCP):
             description="Number of results to skip for pagination.", ge=0,
         )] = 0,
     ) -> ListOrganismsResponse:
-        """List organisms in the knowledge graph, optionally filtered by name.
+        """List organisms in the knowledge graph, optionally filtered by name or compartment.
 
         Returns taxonomy, gene counts, publication counts, and organism_type
         for each organism. organism_type classifies each organism as
@@ -553,13 +566,14 @@ def register_tools(mcp: FastMCP):
         not_found.
         """
         await ctx.info(
-            f"list_organisms organism_names={organism_names} summary={summary} "
-            f"verbose={verbose} limit={limit} offset={offset}"
+            f"list_organisms organism_names={organism_names} compartment={compartment} "
+            f"summary={summary} verbose={verbose} limit={limit} offset={offset}"
         )
         try:
             conn = _conn(ctx)
             result = api.list_organisms(
                 organism_names=organism_names,
+                compartment=compartment,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -574,6 +588,9 @@ def register_tools(mcp: FastMCP):
                 total_matching=result["total_matching"],
                 by_cluster_type=by_cluster_type,
                 by_organism_type=by_organism_type,
+                by_value_kind=result.get("by_value_kind", []),
+                by_metric_type=result.get("by_metric_type", []),
+                by_compartment=result.get("by_compartment", []),
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],

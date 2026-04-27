@@ -425,6 +425,62 @@ class TestListOrganismsWrapper:
         assert result.total_matching == 1
         assert result.total_entries == 32
 
+    @pytest.mark.asyncio
+    async def test_compartment_forwarded(self, tool_fns, mock_ctx):
+        """compartment param is forwarded to the api call."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 5, "total_matching": 3, "returned": 3,
+                "truncated": False, "not_found": [], "results": [],
+                "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+            },
+        ) as mock_api:
+            await tool_fns["list_organisms"](mock_ctx, compartment="vesicle")
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("compartment") == "vesicle"
+
+    @pytest.mark.asyncio
+    async def test_dm_rollup_envelope_keys_present(self, tool_fns, mock_ctx):
+        """Response model includes by_value_kind, by_metric_type, by_compartment."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 2, "total_matching": 2, "returned": 0,
+                "truncated": True, "not_found": [], "results": [],
+                "by_value_kind": [{"value_kind": "numeric", "count": 5}],
+                "by_metric_type": [{"metric_type": "damping_ratio", "count": 3}],
+                "by_compartment": [{"compartment": "whole_cell", "count": 2}],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx, summary=True)
+        assert result.by_value_kind == [{"value_kind": "numeric", "count": 5}]
+        assert result.by_metric_type == [{"metric_type": "damping_ratio", "count": 3}]
+        assert result.by_compartment == [{"compartment": "whole_cell", "count": 2}]
+
+    @pytest.mark.asyncio
+    async def test_per_row_dm_fields_present(self, tool_fns, mock_ctx):
+        """Each result row includes derived_metric_count, derived_metric_value_kinds, compartments."""
+        sample_org_with_dm = {
+            **self._SAMPLE_ORG,
+            "derived_metric_count": 7,
+            "derived_metric_value_kinds": ["numeric", "boolean"],
+            "compartments": ["whole_cell"],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 1, "total_matching": 1, "returned": 1,
+                "truncated": False, "not_found": [], "results": [sample_org_with_dm],
+                "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        org = result.results[0]
+        assert org.derived_metric_count == 7
+        assert org.derived_metric_value_kinds == ["numeric", "boolean"]
+        assert org.compartments == ["whole_cell"]
+
 
 # ---------------------------------------------------------------------------
 # resolve_gene

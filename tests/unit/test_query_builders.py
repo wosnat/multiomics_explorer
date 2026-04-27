@@ -918,15 +918,51 @@ class TestBuildListOrganisms:
         _, params = build_list_organisms(organism_names_lc=names)
         assert params == {"organism_names_lc": names}
 
+    def test_compact_returns_dm_rollup_fields(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms
+        cypher, _ = build_list_organisms()
+        assert "coalesce(o.derived_metric_count, 0) AS derived_metric_count" in cypher
+        assert "coalesce(o.derived_metric_value_kinds, []) AS derived_metric_value_kinds" in cypher
+        assert "coalesce(o.compartments, []) AS compartments" in cypher
+
+    def test_verbose_adds_dm_extras(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms
+        cypher, _ = build_list_organisms(verbose=True)
+        assert "coalesce(o.derived_metric_gene_count, 0) AS derived_metric_gene_count" in cypher
+        assert "coalesce(o.derived_metric_types, []) AS derived_metric_types" in cypher
+
+    def test_compartment_filter_param(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms
+        cypher, params = build_list_organisms(compartment="vesicle")
+        assert "$compartment IN coalesce(o.compartments, [])" in cypher
+        assert params["compartment"] == "vesicle"
+
 
 class TestBuildListOrganismsSummary:
-    def test_returns_count_only(self):
+    def test_returns_count(self):
         cypher, params = build_list_organisms_summary()
         assert "MATCH (o:OrganismTaxon)" in cypher
-        assert "count(o) AS total_entries" in cypher
-        # No filter — KG-wide count.
-        assert "WHERE" not in cypher
-        assert params == {}
+        assert "total_entries" in cypher
+        # No-filter call — organism_names_lc=None is still a param.
+        assert params == {"organism_names_lc": None}
+
+    def test_summary_returns_rollup_keys(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_summary
+        cypher, _ = build_list_organisms_summary()
+        assert "by_value_kind" in cypher
+        assert "by_metric_type" in cypher
+        assert "by_compartment" in cypher
+
+    def test_summary_compartment_filter(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_summary
+        cypher, params = build_list_organisms_summary(compartment="vesicle")
+        assert "$compartment IN coalesce(o.compartments, [])" in cypher
+        assert params["compartment"] == "vesicle"
+
+    def test_summary_total_matching(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_summary
+        cypher, _ = build_list_organisms_summary()
+        assert "total_matching" in cypher
 
 
 class TestOntologyConfig:

@@ -791,6 +791,8 @@ class TestListOrganisms:
          "experiment_count": 46, "treatment_types": ["coculture", "light_stress"],
          "omics_types": ["RNASEQ", "PROTEOMICS"],
          "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel"],
+         "derived_metric_count": 7, "derived_metric_value_kinds": ["numeric", "boolean"],
+         "compartments": ["whole_cell"],
          "background_factors": []},
         {"organism_name": "Alteromonas macleodii EZ55", "genus": "Alteromonas",
          "species": "Alteromonas macleodii", "strain": "EZ55", "clade": None,
@@ -798,11 +800,20 @@ class TestListOrganisms:
          "experiment_count": 13, "treatment_types": ["carbon_stress"],
          "omics_types": ["RNASEQ"],
          "clustering_analysis_count": 0, "cluster_types": [],
+         "derived_metric_count": 0, "derived_metric_value_kinds": [],
+         "compartments": [],
          "background_factors": []},
     ]
+    # Summary row returned by build_list_organisms_summary (APOC frequencies format)
+    _SUMMARY_ROW = {
+        "total_entries": 2, "total_matching": 2,
+        "by_value_kind": [{"item": "numeric", "count": 1}, {"item": "boolean", "count": 1}],
+        "by_metric_type": [{"item": "damping_ratio", "count": 1}],
+        "by_compartment": [{"item": "whole_cell", "count": 1}],
+    }
 
     def test_returns_dict(self, mock_conn):
-        mock_conn.execute_query.return_value = self._ROWS
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], self._ROWS]
         result = api.list_organisms(conn=mock_conn)
         assert isinstance(result, dict)
         assert result["total_entries"] == 2
@@ -810,24 +821,27 @@ class TestListOrganisms:
         assert result["results"][0]["organism_name"] == "Prochlorococcus MED4"
 
     def test_passes_verbose(self, mock_conn):
-        mock_conn.execute_query.return_value = []
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], [],
+        ]
         api.list_organisms(verbose=True, conn=mock_conn)
-        cypher = mock_conn.execute_query.call_args[0][0]
-        assert "family" in cypher
+        # Second call is the detail query — check its cypher for "family"
+        detail_cypher = mock_conn.execute_query.call_args_list[1][0][0]
+        assert "family" in detail_cypher
 
     def test_limit_slices_results(self, mock_conn):
-        mock_conn.execute_query.return_value = self._ROWS
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], self._ROWS]
         result = api.list_organisms(limit=1, conn=mock_conn)
         assert result["total_entries"] == 2
         assert len(result["results"]) == 1
 
     def test_limit_none_returns_all(self, mock_conn):
-        mock_conn.execute_query.return_value = self._ROWS
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], self._ROWS]
         result = api.list_organisms(conn=mock_conn)
         assert len(result["results"]) == 2
 
     def test_by_cluster_type_in_envelope(self, mock_conn):
-        mock_conn.execute_query.return_value = self._ROWS
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], self._ROWS]
         result = api.list_organisms(conn=mock_conn)
         assert "by_cluster_type" in result
         # MED4 has condition_comparison and diel; EZ55 has none
@@ -837,26 +851,30 @@ class TestListOrganisms:
 
     def test_verbose_includes_cluster_count(self, mock_conn):
         rows = [{**r, "cluster_count": 10} for r in self._ROWS]
-        mock_conn.execute_query.return_value = rows
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], rows]
         result = api.list_organisms(verbose=True, conn=mock_conn)
         assert "cluster_count" in result["results"][0]
 
     def test_compact_excludes_cluster_count(self, mock_conn):
         rows = [{**r, "cluster_count": 10} for r in self._ROWS]
-        mock_conn.execute_query.return_value = rows
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], rows]
         result = api.list_organisms(verbose=False, conn=mock_conn)
         assert "cluster_count" not in result["results"][0]
 
     def test_offset_skips_results(self, mock_conn):
-        mock_conn.execute_query.return_value = [
+        org_rows = [
             {"organism_name": f"Org{i}", "genus": "G", "species": "S",
              "strain": "s", "clade": None, "ncbi_taxon_id": i,
              "gene_count": 100, "publication_count": 1,
              "experiment_count": 1, "treatment_types": [], "omics_types": [],
              "clustering_analysis_count": 0, "cluster_types": [],
+             "derived_metric_count": 0, "derived_metric_value_kinds": [],
+             "compartments": [],
              "background_factors": []}
             for i in range(5)
         ]
+        summary = {**self._SUMMARY_ROW, "total_entries": 5, "total_matching": 5}
+        mock_conn.execute_query.side_effect = [[summary], org_rows]
         result = api.list_organisms(limit=2, offset=2, conn=mock_conn)
         assert result["total_entries"] == 5
         assert result["returned"] == 2
@@ -865,33 +883,36 @@ class TestListOrganisms:
         assert result["truncated"] is True
 
     def test_total_matching_no_filter(self, mock_conn):
-        """Without filter, total_matching == total_entries; no extra query runs."""
-        mock_conn.execute_query.return_value = self._ROWS
+        """Without filter, total_matching and total_entries come from summary query."""
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], self._ROWS]
         result = api.list_organisms(conn=mock_conn)
         assert result["total_matching"] == 2
         assert result["total_entries"] == 2
         assert result["not_found"] == []
-        assert mock_conn.execute_query.call_count == 1  # detail query only
+        # summary + detail = 2 calls (no not_found query when no filter)
+        assert mock_conn.execute_query.call_count == 2
 
     def test_filter_lowercases_input(self, mock_conn):
-        """api lowercases input list before forwarding to the builder."""
+        """api lowercases input list before forwarding to both builders."""
+        filtered_summary = {**self._SUMMARY_ROW, "total_entries": 32, "total_matching": 1}
         mock_conn.execute_query.side_effect = [
+            [filtered_summary],                          # summary
             self._ROWS[:1],                              # detail
-            [{"total_entries": 32}],                     # summary count
             [{"found": ["prochlorococcus med4"]}],       # not_found lookup
         ]
         api.list_organisms(
             organism_names=["Prochlorococcus MED4"], conn=mock_conn,
         )
-        # First call is the builder query — params include lowercased list.
-        first_call_kwargs = mock_conn.execute_query.call_args_list[0][1]
-        assert first_call_kwargs["organism_names_lc"] == ["prochlorococcus med4"]
+        # Second call is the detail query — params include lowercased list.
+        detail_call_kwargs = mock_conn.execute_query.call_args_list[1][1]
+        assert detail_call_kwargs["organism_names_lc"] == ["prochlorococcus med4"]
 
     def test_filter_with_unknown_populates_not_found(self, mock_conn):
         """Unknown names appear in not_found, original casing preserved."""
+        filtered_summary = {**self._SUMMARY_ROW, "total_entries": 32, "total_matching": 1}
         mock_conn.execute_query.side_effect = [
+            [filtered_summary],                          # summary
             self._ROWS[:1],                              # detail
-            [{"total_entries": 32}],                     # summary count
             [{"found": ["prochlorococcus med4"]}],       # not_found lookup
         ]
         result = api.list_organisms(
@@ -903,9 +924,10 @@ class TestListOrganisms:
         assert result["not_found"] == ["Bogus Org"]
 
     def test_filter_all_match_empty_not_found(self, mock_conn):
+        filtered_summary = {**self._SUMMARY_ROW, "total_entries": 32, "total_matching": 2}
         mock_conn.execute_query.side_effect = [
+            [filtered_summary],                          # summary
             self._ROWS,                                  # detail
-            [{"total_entries": 32}],                     # summary count
             [{"found": [
                 "prochlorococcus med4",
                 "alteromonas macleodii ez55",
@@ -919,22 +941,22 @@ class TestListOrganisms:
         assert result["total_matching"] == 2
 
     def test_summary_flag_zeros_results(self, mock_conn):
-        """summary=True → results=[], summary fields populated."""
-        mock_conn.execute_query.return_value = self._ROWS
+        """summary=True → results=[], summary fields populated. by_cluster_type is []."""
+        mock_conn.execute_query.return_value = [self._SUMMARY_ROW]
         result = api.list_organisms(summary=True, conn=mock_conn)
         assert result["results"] == []
         assert result["returned"] == 0
         assert result["total_matching"] == 2
-        # Breakdowns still computed from the matched rows
-        ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
-        assert ct_map.get("condition_comparison") == 1
+        # In summary mode (limit=0), no detail rows → by_cluster_type is empty
+        assert result["by_cluster_type"] == []
         assert result["truncated"] is True
 
     def test_breakdowns_over_filtered_set(self, mock_conn):
         """When filter applied, breakdowns reflect only matched rows."""
+        filtered_summary = {**self._SUMMARY_ROW, "total_entries": 32, "total_matching": 1}
         mock_conn.execute_query.side_effect = [
+            [filtered_summary],                          # summary
             self._ROWS[:1],                              # detail (MED4 only)
-            [{"total_entries": 32}],
             [{"found": ["prochlorococcus med4"]}],
         ]
         result = api.list_organisms(
@@ -944,6 +966,52 @@ class TestListOrganisms:
         # Only MED4 contributes — EZ55 was filtered out.
         assert ct_map["condition_comparison"] == 1
         assert "diel" in ct_map
+
+    def test_envelope_carries_dm_rollups(self, mock_conn):
+        detail_rows = [{
+            "organism_name": "Prochlorococcus marinus MED4",
+            "organism_type": "marine_cyanobacterium",
+            "genus": "Prochlorococcus", "species": "marinus", "strain": "MED4",
+            "clade": "HLII", "ncbi_taxon_id": "59919",
+            "gene_count": 1900, "publication_count": 4, "experiment_count": 12,
+            "treatment_types": ["light_dark_cycle"], "background_factors": [],
+            "omics_types": ["RNASEQ", "PROTEOMICS"],
+            "clustering_analysis_count": 2, "cluster_types": ["coexpression"],
+            "derived_metric_count": 7,
+            "derived_metric_value_kinds": ["numeric", "boolean"],
+            "compartments": ["whole_cell"],
+            "reference_database": None, "reference_proteome": None,
+            "growth_phases": [],
+        }]
+        summary_row = {
+            "total_entries": 30, "total_matching": 1,
+            "by_value_kind": [{"item": "numeric", "count": 6}, {"item": "boolean", "count": 1}],
+            "by_metric_type": [{"item": "damping_ratio", "count": 1}],
+            "by_compartment": [{"item": "whole_cell", "count": 1}],
+        }
+        mock_conn.execute_query.side_effect = [[summary_row], detail_rows]
+        result = api.list_organisms(conn=mock_conn)
+        # Envelope keys present
+        assert "by_value_kind" in result
+        assert "by_metric_type" in result
+        assert "by_compartment" in result
+        # _rename_freq shapes: [{value_kind: ..., count: ...}]
+        vk_values = {r["value_kind"] for r in result["by_value_kind"]}
+        assert vk_values & {"numeric", "boolean"}
+        # Per-row fields
+        assert result["results"][0]["derived_metric_count"] == 7
+        assert result["results"][0]["compartments"] == ["whole_cell"]
+
+    def test_compartment_filter_param_passes_through(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 30, "total_matching": 0,
+              "by_value_kind": [], "by_metric_type": [], "by_compartment": []}],
+            [],
+        ]
+        api.list_organisms(compartment="vesicle", conn=mock_conn)
+        # Both summary + detail builders called with compartment param
+        calls = mock_conn.execute_query.call_args_list
+        assert any(c.kwargs.get("compartment") == "vesicle" for c in calls)
 
 
 # ---------------------------------------------------------------------------

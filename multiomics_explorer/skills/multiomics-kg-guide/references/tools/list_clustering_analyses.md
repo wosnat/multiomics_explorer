@@ -18,7 +18,7 @@ Inline clusters included — use genes_in_cluster to drill into members.
 | treatment_type | list[string] \| None | None | Filter by treatment type(s). E.g. ['nitrogen_stress']. |
 | background_factors | list[string] \| None | None | Filter by background factors. E.g. ['axenic', 'diel_cycle']. |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
-| omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'MICROARRAY', 'PAIRED_RNASEQ_PROTEOME', 'PROTEOMICS', 'RNASEQ'. |
+| omics_type | string \| None | None | Filter: 'EXOPROTEOMICS', 'MICROARRAY', 'PAIRED_RNASEQ_PROTEOME', 'PROTEOMICS', 'RNASEQ', 'VESICLE_DNASEQ', 'VESICLE_PROTEOMICS'. |
 | publication_doi | list[string] \| None | None | Filter by publication DOI(s). |
 | experiment_ids | list[string] \| None | None | Filter by experiment IDs. |
 | analysis_ids | list[string] \| None | None | Filter by analysis IDs. |
