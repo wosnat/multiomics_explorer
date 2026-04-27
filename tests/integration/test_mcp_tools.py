@@ -470,6 +470,29 @@ class TestListFilterValues:
         assert "count" in result["results"][0]
 
 
+    @pytest.mark.kg
+    def test_metric_type_returns_baseline(self, conn):
+        result = api.list_filter_values(filter_type="metric_type", conn=conn)
+        # Slice-2 baseline 2026-04-27: 13 distinct metric_types
+        assert result["total_entries"] >= 13
+        values = {row["value"] for row in result["results"]}
+        assert "damping_ratio" in values
+        assert "diel_amplitude_protein_log2" in values
+
+    @pytest.mark.kg
+    def test_value_kind_returns_three_kinds(self, conn):
+        result = api.list_filter_values(filter_type="value_kind", conn=conn)
+        values = {row["value"] for row in result["results"]}
+        assert values == {"numeric", "boolean", "categorical"}
+
+    @pytest.mark.kg
+    def test_compartment_returns_baseline(self, conn):
+        result = api.list_filter_values(filter_type="compartment", conn=conn)
+        values = {row["value"] for row in result["results"]}
+        assert "whole_cell" in values
+        assert "vesicle" in values
+
+
 @pytest.mark.kg
 class TestDifferentialExpressionByGene:
     def test_organism_summary(self, conn):

@@ -932,6 +932,47 @@ def build_list_growth_phases() -> tuple[str, dict]:
     return cypher, {}
 
 
+def build_list_metric_types() -> tuple[str, dict]:
+    """List distinct DerivedMetric.metric_type values with DM counts.
+
+    RETURN keys: value, count.
+    """
+    cypher = (
+        "MATCH (dm:DerivedMetric) WHERE dm.metric_type IS NOT NULL\n"
+        "RETURN dm.metric_type AS value, count(*) AS count\n"
+        "ORDER BY count DESC, value"
+    )
+    return cypher, {}
+
+
+def build_list_value_kinds() -> tuple[str, dict]:
+    """List DerivedMetric.value_kind enum values with DM counts per kind.
+
+    RETURN keys: value, count. Today's KG: {numeric, boolean, categorical}.
+    """
+    cypher = (
+        "MATCH (dm:DerivedMetric) WHERE dm.value_kind IS NOT NULL\n"
+        "RETURN dm.value_kind AS value, count(*) AS count\n"
+        "ORDER BY count DESC, value"
+    )
+    return cypher, {}
+
+
+def build_list_compartments() -> tuple[str, dict]:
+    """List distinct Experiment.compartment values with experiment counts.
+
+    Sourced from Experiment.compartment (wet-lab fraction), per slice-2 D7.
+
+    RETURN keys: value, count.
+    """
+    cypher = (
+        "MATCH (e:Experiment) WHERE e.compartment IS NOT NULL\n"
+        "RETURN e.compartment AS value, count(*) AS count\n"
+        "ORDER BY count DESC, value"
+    )
+    return cypher, {}
+
+
 def build_list_organisms(
     *,
     organism_names_lc: list[str] | None = None,

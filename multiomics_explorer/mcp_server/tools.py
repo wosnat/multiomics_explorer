@@ -427,13 +427,16 @@ def register_tools(mcp: FastMCP):
     )
     async def list_filter_values(
         ctx: Context,
-        filter_type: Annotated[Literal["gene_category", "brite_tree", "growth_phase"], Field(
-            description="Which filter's valid values to return. "
-            "'gene_category': values for the category filter in genes_by_function. "
-            "'brite_tree': BRITE tree names for the tree filter in ontology tools. "
-            "'growth_phase': physiological states of the culture at sampling time "
-            "(timepoint-level condition, not gene-specific).",
-        )] = "gene_category",
+        filter_type: Annotated[
+            Literal["gene_category", "brite_tree", "growth_phase",
+                    "metric_type", "value_kind", "compartment"],
+            Field(description=(
+                "Which categorical filter to enumerate. "
+                "'gene_category' / 'brite_tree' / 'growth_phase' (existing); "
+                "'metric_type' / 'value_kind' / 'compartment' (slice 2 — DerivedMetric "
+                "discovery)."
+            )),
+        ] = "gene_category",
     ) -> ListFilterValuesResponse:
         """List valid values for categorical filters used across tools.
 

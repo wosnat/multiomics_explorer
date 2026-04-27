@@ -820,6 +820,37 @@ class TestBuildListBriteTrees:
         assert params == {}
 
 
+class TestBuildListMetricTypes:
+    def test_returns_value_and_count(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metric_types
+        cypher, params = build_list_metric_types()
+        assert "MATCH (dm:DerivedMetric)" in cypher
+        assert "dm.metric_type AS value" in cypher
+        assert "count(*) AS count" in cypher
+        assert "ORDER BY count DESC" in cypher
+        assert params == {}
+
+
+class TestBuildListValueKinds:
+    def test_returns_value_and_count(self):
+        from multiomics_explorer.kg.queries_lib import build_list_value_kinds
+        cypher, params = build_list_value_kinds()
+        assert "dm.value_kind AS value" in cypher
+        assert "count(*) AS count" in cypher
+        assert params == {}
+
+
+class TestBuildListCompartments:
+    def test_sources_from_experiment_not_derived_metric(self):
+        """D7: Experiment.compartment is the source-of-truth (wet-lab fraction)."""
+        from multiomics_explorer.kg.queries_lib import build_list_compartments
+        cypher, params = build_list_compartments()
+        assert "MATCH (e:Experiment)" in cypher
+        assert "e.compartment AS value" in cypher
+        assert "DerivedMetric" not in cypher
+        assert params == {}
+
+
 class TestBuildListOrganisms:
     def test_cypher_structure(self):
         cypher, params = build_list_organisms()

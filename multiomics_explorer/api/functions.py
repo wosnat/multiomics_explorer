@@ -44,8 +44,11 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_homologs,
     build_gene_homologs_summary,
     build_list_brite_trees,
+    build_list_compartments,
     build_list_gene_categories,
     build_list_growth_phases,
+    build_list_metric_types,
+    build_list_value_kinds,
     build_list_organisms,
     build_list_organisms_summary,
     build_list_publications,
@@ -538,6 +541,9 @@ def list_filter_values(
       - ``gene_category``: gene functional categories.
       - ``brite_tree``: KEGG BRITE hierarchy trees.
       - ``growth_phase``: growth phase values on Experiment nodes.
+      - ``metric_type``: DerivedMetric.metric_type tag values (slice 2).
+      - ``value_kind``: DerivedMetric.value_kind enum (slice 2).
+      - ``compartment``: Experiment.compartment values (slice 2 / D7).
     """
     conn = _default_conn(conn)
     if filter_type == "gene_category":
@@ -555,6 +561,18 @@ def list_filter_values(
         cypher, params = build_list_growth_phases()
         rows = conn.execute_query(cypher, **params)
         results = [{"value": r["phase"], "count": r["experiment_count"]} for r in rows]
+    elif filter_type == "metric_type":
+        cypher, params = build_list_metric_types()
+        rows = conn.execute_query(cypher, **params)
+        results = [{"value": r["value"], "count": r["count"]} for r in rows]
+    elif filter_type == "value_kind":
+        cypher, params = build_list_value_kinds()
+        rows = conn.execute_query(cypher, **params)
+        results = [{"value": r["value"], "count": r["count"]} for r in rows]
+    elif filter_type == "compartment":
+        cypher, params = build_list_compartments()
+        rows = conn.execute_query(cypher, **params)
+        results = [{"value": r["value"], "count": r["count"]} for r in rows]
     else:
         raise ValueError(f"Unknown filter_type: {filter_type!r}")
     total = len(results)

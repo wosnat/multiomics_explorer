@@ -752,6 +752,33 @@ class TestListFilterValues:
             api.list_filter_values()
             assert mock_conn.execute_query.called
 
+    def test_dispatches_metric_type(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"value": "damping_ratio", "count": 4},
+            {"value": "diel_amplitude_protein_log2", "count": 2},
+        ]
+        result = api.list_filter_values(filter_type="metric_type", conn=mock_conn)
+        assert result["filter_type"] == "metric_type"
+        assert result["total_entries"] == 2
+        assert result["results"][0] == {"value": "damping_ratio", "count": 4}
+
+    def test_dispatches_value_kind(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"value": "boolean", "count": 14},
+            {"value": "numeric", "count": 15},
+        ]
+        result = api.list_filter_values(filter_type="value_kind", conn=mock_conn)
+        assert {r["value"] for r in result["results"]} == {"boolean", "numeric"}
+
+    def test_dispatches_compartment(self, mock_conn):
+        mock_conn.execute_query.return_value = [
+            {"value": "whole_cell", "count": 160},
+            {"value": "vesicle", "count": 5},
+        ]
+        result = api.list_filter_values(filter_type="compartment", conn=mock_conn)
+        assert result["total_entries"] == 2
+        assert result["results"][0]["value"] == "whole_cell"
+
 
 # ---------------------------------------------------------------------------
 # list_organisms
