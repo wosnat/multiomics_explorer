@@ -4112,6 +4112,531 @@ class TestGenesByNumericMetric:
 
 
 # ---------------------------------------------------------------------------
+# genes_by_boolean_metric
+# ---------------------------------------------------------------------------
+class TestGenesByBooleanMetric:
+    """Unit tests for api.genes_by_boolean_metric with mocked GraphConnection."""
+
+    @pytest.fixture
+    def diag_boolean(self):
+        """Single boolean DM survives diagnostics."""
+        return [{
+            "derived_metric_id": "dm:vp_med4",
+            "metric_type": "vesicle_proteome_member",
+            "value_kind": "boolean",
+            "name": "Vesicle proteome member (MED4)",
+            "total_gene_count": 32,
+            "organism_name": "Prochlorococcus MED4",
+        }]
+
+    @pytest.fixture
+    def diag_two_dms(self):
+        """Two boolean DMs (cross-organism vesicle proteome)."""
+        return [
+            {"derived_metric_id": "dm:vp_med4",
+             "metric_type": "vesicle_proteome_member",
+             "value_kind": "boolean",
+             "name": "Vesicle proteome member (MED4)",
+             "total_gene_count": 32,
+             "organism_name": "Prochlorococcus MED4"},
+            {"derived_metric_id": "dm:vp_mit9313",
+             "metric_type": "vesicle_proteome_member",
+             "value_kind": "boolean",
+             "name": "Vesicle proteome member (MIT9313)",
+             "total_gene_count": 26,
+             "organism_name": "Prochlorococcus MIT9313"},
+        ]
+
+    @pytest.fixture
+    def summary_row(self):
+        """Standard summary row, single DM survived."""
+        return [{
+            "total_matching": 32,
+            "total_derived_metrics": 1,
+            "total_genes": 32,
+            "by_organism": [
+                {"item": "Prochlorococcus MED4", "count": 32},
+            ],
+            "by_compartment": [{"item": "vesicle", "count": 32}],
+            "by_publication": [{"item": "10.1038/foo", "count": 32}],
+            "by_experiment": [{"item": "exp:vesicle_med4", "count": 32}],
+            "by_value": [{"item": "true", "count": 32}],
+            "by_metric": [{
+                "derived_metric_id": "dm:vp_med4",
+                "name": "Vesicle proteome member (MED4)",
+                "metric_type": "vesicle_proteome_member",
+                "value_kind": "boolean",
+                "count": 32,
+                "true_count": 32,
+                "false_count": 0,
+                "dm_total_gene_count": 32,
+                "dm_true_count": 32,
+                "dm_false_count": 0,
+            }],
+            "top_categories_raw": [
+                {"item": "Cellular processes", "count": 5},
+            ],
+            "genes_per_metric_max": 32,
+            "genes_per_metric_median": 32.0,
+        }]
+
+    def test_returns_dict(self, diag_boolean, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_boolean, summary_row, []]
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"], conn=mock_conn,
+        )
+        assert isinstance(data, dict)
+        for key in [
+            "total_matching", "total_derived_metrics", "total_genes",
+            "by_organism", "by_compartment", "by_publication",
+            "by_experiment", "by_value", "by_metric", "top_categories",
+            "genes_per_metric_max", "genes_per_metric_median",
+            "not_found_ids", "not_matched_ids",
+            "not_found_metric_types", "not_matched_metric_types",
+            "not_matched_organism", "excluded_derived_metrics", "warnings",
+            "returned", "offset", "truncated", "results",
+        ]:
+            assert key in data, f"missing envelope key: {key}"
+
+    def test_mutex_selection_raises(self):
+        with pytest.raises(ValueError, match="not both"):
+            api.genes_by_boolean_metric(
+                derived_metric_ids=["dm:vp_med4"],
+                metric_types=["vesicle_proteome_member"],
+                conn=MagicMock(),
+            )
+
+    def test_neither_selection_raises(self):
+        with pytest.raises(ValueError, match="must provide one of"):
+            api.genes_by_boolean_metric(conn=MagicMock())
+
+    def test_kind_mismatch_in_not_found_ids(self, summary_row):
+        # Pass a numeric DM id; diagnostics' value_kind='boolean' filter
+        # gives zero rows → id surfaces in not_found_ids and we
+        # short-circuit before summary/detail.
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
+        data = api.genes_by_boolean_metric(
+            derived_metric_ids=["dm:numeric_dr"], conn=mock_conn,
+        )
+        assert mock_conn.execute_query.call_count == 1  # short-circuit
+        assert data["not_found_ids"] == ["dm:numeric_dr"]
+        assert data["total_matching"] == 0
+        assert data["results"] == []
+
+    def test_summary_true_skips_detail_query(self, diag_boolean, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_boolean, summary_row]
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"],
+            summary=True, conn=mock_conn,
+        )
+        # diag + summary only — no detail
+        assert mock_conn.execute_query.call_count == 2
+        assert data["results"] == []
+        assert data["returned"] == 0
+        assert data["truncated"] is True  # total=32 > 0+0
+
+    def test_excluded_derived_metrics_always_empty_list(
+            self, diag_two_dms, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_two_dms, summary_row, []]
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"], conn=mock_conn,
+        )
+        assert data["excluded_derived_metrics"] == []
+
+    def test_warnings_always_empty_list(
+            self, diag_two_dms, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_two_dms, summary_row, []]
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"], conn=mock_conn,
+        )
+        assert data["warnings"] == []
+
+    def test_not_found_plumbing(self, diag_boolean, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_boolean, summary_row, []]
+        data = api.genes_by_boolean_metric(
+            derived_metric_ids=["dm:vp_med4", "dm:fake"], conn=mock_conn,
+        )
+        assert data["not_found_ids"] == ["dm:fake"]
+
+    def test_not_matched_plumbing(self, diag_two_dms):
+        # Two DMs survive diagnostics, but only one contributes rows
+        # post edge filter → the other is in not_matched_ids.
+        summary_one_dm = [{
+            "total_matching": 32, "total_derived_metrics": 1,
+            "total_genes": 32,
+            "by_organism": [], "by_compartment": [], "by_publication": [],
+            "by_experiment": [], "by_value": [],
+            "by_metric": [{
+                "derived_metric_id": "dm:vp_med4",
+                "name": "Vesicle proteome member (MED4)",
+                "metric_type": "vesicle_proteome_member",
+                "value_kind": "boolean",
+                "count": 32, "true_count": 32, "false_count": 0,
+                "dm_total_gene_count": 32, "dm_true_count": 32,
+                "dm_false_count": 0,
+            }],
+            "top_categories_raw": [],
+            "genes_per_metric_max": 32, "genes_per_metric_median": 32.0,
+        }]
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_two_dms, summary_one_dm, []]
+        data = api.genes_by_boolean_metric(
+            derived_metric_ids=["dm:vp_med4", "dm:vp_mit9313"],
+            conn=mock_conn,
+        )
+        assert data["not_matched_ids"] == ["dm:vp_mit9313"]
+
+    def test_passes_flag_to_summary_and_detail(
+            self, diag_boolean, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_boolean, summary_row, []]
+        api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"],
+            flag=True, conn=mock_conn,
+        )
+        # 3 calls: diag, summary, detail. flag → flag_str='true' on
+        # summary + detail.
+        assert mock_conn.execute_query.call_count == 3
+        sum_kwargs = mock_conn.execute_query.call_args_list[1].kwargs
+        det_kwargs = mock_conn.execute_query.call_args_list[2].kwargs
+        assert sum_kwargs.get("flag_str") == "true"
+        assert det_kwargs.get("flag_str") == "true"
+
+    def test_creates_conn_when_none(self, monkeypatch):
+        # Patch GraphConnection so no real Neo4j call happens.
+        instances = []
+
+        class FakeConn:
+            def __init__(self, *args, **kwargs):
+                instances.append(self)
+                self.execute_query = MagicMock(return_value=[])
+
+        monkeypatch.setattr(
+            "multiomics_explorer.api.functions.GraphConnection", FakeConn)
+        # diagnostics empty → short-circuit before summary/detail.
+        data = api.genes_by_boolean_metric(
+            metric_types=["vesicle_proteome_member"],
+        )
+        assert instances, "GraphConnection should have been instantiated"
+        assert data["total_matching"] == 0
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import (
+            genes_by_boolean_metric as pkg_fn,
+        )
+        from multiomics_explorer.api import (
+            genes_by_boolean_metric as api_fn,
+        )
+        assert pkg_fn is api_fn is api.genes_by_boolean_metric
+
+
+# ---------------------------------------------------------------------------
+# genes_by_categorical_metric
+# ---------------------------------------------------------------------------
+class TestGenesByCategoricalMetric:
+    """Unit tests for api.genes_by_categorical_metric with mocked GraphConnection."""
+
+    @pytest.fixture
+    def diag_categorical(self):
+        """Single categorical DM survives diagnostics, with allowed_categories."""
+        return [{
+            "derived_metric_id": "dm:psortb_med4",
+            "metric_type": "predicted_subcellular_localization",
+            "value_kind": "categorical",
+            "name": "PSORTb subcellular localization (MED4)",
+            "total_gene_count": 32,
+            "organism_name": "Prochlorococcus MED4",
+            "allowed_categories": [
+                "Cytoplasmic", "Cytoplasmic Membrane",
+                "Periplasmic", "Outer Membrane", "Extracellular", "Unknown",
+            ],
+        }]
+
+    @pytest.fixture
+    def diag_two_dms(self):
+        """Two categorical DMs (PSORTb cross-organism)."""
+        return [
+            {"derived_metric_id": "dm:psortb_med4",
+             "metric_type": "predicted_subcellular_localization",
+             "value_kind": "categorical",
+             "name": "PSORTb subcellular localization (MED4)",
+             "total_gene_count": 32,
+             "organism_name": "Prochlorococcus MED4",
+             "allowed_categories": [
+                 "Cytoplasmic", "Cytoplasmic Membrane",
+                 "Periplasmic", "Outer Membrane",
+                 "Extracellular", "Unknown",
+             ]},
+            {"derived_metric_id": "dm:psortb_mit9313",
+             "metric_type": "predicted_subcellular_localization",
+             "value_kind": "categorical",
+             "name": "PSORTb subcellular localization (MIT9313)",
+             "total_gene_count": 26,
+             "organism_name": "Prochlorococcus MIT9313",
+             "allowed_categories": [
+                 "Cytoplasmic", "Cytoplasmic Membrane",
+                 "Periplasmic", "Outer Membrane",
+                 "Extracellular", "Unknown",
+             ]},
+        ]
+
+    @pytest.fixture
+    def summary_row(self):
+        """Standard summary row, single DM survived. by_metric carries
+        nested by_category / dm_by_category in raw {item, count} shape
+        (mirrors apoc.coll.frequencies output)."""
+        return [{
+            "total_matching": 8,
+            "total_derived_metrics": 1,
+            "total_genes": 8,
+            "by_organism": [
+                {"item": "Prochlorococcus MED4", "count": 8},
+            ],
+            "by_compartment": [{"item": "vesicle", "count": 8}],
+            "by_publication": [{"item": "10.1038/foo", "count": 8}],
+            "by_experiment": [{"item": "exp:psortb_med4", "count": 8}],
+            "by_category": [
+                {"item": "Outer Membrane", "count": 5},
+                {"item": "Periplasmic", "count": 3},
+            ],
+            "by_metric": [{
+                "derived_metric_id": "dm:psortb_med4",
+                "name": "PSORTb subcellular localization (MED4)",
+                "metric_type": "predicted_subcellular_localization",
+                "value_kind": "categorical",
+                "count": 8,
+                "by_category": [
+                    {"item": "Outer Membrane", "count": 5},
+                    {"item": "Periplasmic", "count": 3},
+                ],
+                "allowed_categories": [
+                    "Cytoplasmic", "Cytoplasmic Membrane",
+                    "Periplasmic", "Outer Membrane",
+                    "Extracellular", "Unknown",
+                ],
+                "dm_total_gene_count": 32,
+                "dm_by_category": [
+                    {"item": "Cytoplasmic", "count": 11},
+                    {"item": "Cytoplasmic Membrane", "count": 6},
+                    {"item": "Outer Membrane", "count": 5},
+                    {"item": "Periplasmic", "count": 3},
+                    {"item": "Unknown", "count": 7},
+                ],
+            }],
+            "top_categories_raw": [
+                {"item": "Cellular processes", "count": 5},
+            ],
+            "genes_per_metric_max": 8,
+            "genes_per_metric_median": 8.0,
+        }]
+
+    def test_returns_dict(self, diag_categorical, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_categorical, summary_row, [],
+        ]
+        data = api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+            categories=["Outer Membrane", "Periplasmic"],
+            conn=mock_conn,
+        )
+        assert isinstance(data, dict)
+        for key in [
+            "total_matching", "total_derived_metrics", "total_genes",
+            "by_organism", "by_compartment", "by_publication",
+            "by_experiment", "by_category", "by_metric", "top_categories",
+            "genes_per_metric_max", "genes_per_metric_median",
+            "not_found_ids", "not_matched_ids",
+            "not_found_metric_types", "not_matched_metric_types",
+            "not_matched_organism", "excluded_derived_metrics", "warnings",
+            "returned", "offset", "truncated", "results",
+        ]:
+            assert key in data, f"missing envelope key: {key}"
+
+    def test_mutex_selection_raises(self):
+        with pytest.raises(ValueError, match="not both"):
+            api.genes_by_categorical_metric(
+                derived_metric_ids=["dm:psortb_med4"],
+                metric_types=["predicted_subcellular_localization"],
+                conn=MagicMock(),
+            )
+
+    def test_neither_selection_raises(self):
+        with pytest.raises(ValueError, match="must provide one of"):
+            api.genes_by_categorical_metric(conn=MagicMock())
+
+    def test_kind_mismatch_in_not_found_ids(self):
+        # Pass a numeric / boolean DM id; diagnostics' value_kind='categorical'
+        # filter gives zero rows → id surfaces in not_found_ids and we
+        # short-circuit before summary/detail.
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
+        data = api.genes_by_categorical_metric(
+            derived_metric_ids=["dm:vp_med4"], conn=mock_conn,
+        )
+        assert mock_conn.execute_query.call_count == 1  # short-circuit
+        assert data["not_found_ids"] == ["dm:vp_med4"]
+        assert data["total_matching"] == 0
+        assert data["results"] == []
+
+    def test_summary_true_skips_detail_query(
+            self, diag_categorical, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_categorical, summary_row,
+        ]
+        data = api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+            summary=True, conn=mock_conn,
+        )
+        # diag + summary only — no detail
+        assert mock_conn.execute_query.call_count == 2
+        assert data["results"] == []
+        assert data["returned"] == 0
+        assert data["truncated"] is True  # total=8 > 0+0
+
+    def test_excluded_derived_metrics_always_empty_list(
+            self, diag_two_dms, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_two_dms, summary_row, []]
+        data = api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+            conn=mock_conn,
+        )
+        assert data["excluded_derived_metrics"] == []
+
+    def test_warnings_always_empty_list(self, diag_two_dms, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_two_dms, summary_row, []]
+        data = api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+            conn=mock_conn,
+        )
+        assert data["warnings"] == []
+
+    def test_not_found_plumbing(self, diag_categorical, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_categorical, summary_row, [],
+        ]
+        data = api.genes_by_categorical_metric(
+            derived_metric_ids=["dm:psortb_med4", "dm:fake"],
+            conn=mock_conn,
+        )
+        assert data["not_found_ids"] == ["dm:fake"]
+
+    def test_not_matched_plumbing(self, diag_two_dms, summary_row):
+        # Two DMs survive diagnostics; summary_row contributes only one
+        # → the other is not_matched.
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_two_dms, summary_row, []]
+        data = api.genes_by_categorical_metric(
+            derived_metric_ids=["dm:psortb_med4", "dm:psortb_mit9313"],
+            conn=mock_conn,
+        )
+        assert data["not_matched_ids"] == ["dm:psortb_mit9313"]
+
+    def test_categories_subset_validation_raises(self, diag_categorical):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_categorical]
+        with pytest.raises(ValueError, match="allowed_categories"):
+            api.genes_by_categorical_metric(
+                metric_types=["predicted_subcellular_localization"],
+                categories=["nonsense"],
+                conn=mock_conn,
+            )
+
+    def test_categories_subset_validation_message_lists_allowed_union(
+            self, diag_categorical):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [diag_categorical]
+        with pytest.raises(ValueError) as excinfo:
+            api.genes_by_categorical_metric(
+                metric_types=["predicted_subcellular_localization"],
+                categories=["Outer Membrane", "Foo"],
+                conn=mock_conn,
+            )
+        msg = str(excinfo.value)
+        # Mentions the unknown plus the allowed union
+        assert "Foo" in msg
+        for allowed in [
+            "Cytoplasmic", "Cytoplasmic Membrane",
+            "Periplasmic", "Outer Membrane",
+            "Extracellular", "Unknown",
+        ]:
+            assert allowed in msg
+
+    def test_passes_categories_to_summary_and_detail(
+            self, diag_categorical, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_categorical, summary_row, [],
+        ]
+        api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+            categories=["Outer Membrane", "Periplasmic"],
+            conn=mock_conn,
+        )
+        # 3 calls: diag, summary, detail
+        assert mock_conn.execute_query.call_count == 3
+        sum_kwargs = mock_conn.execute_query.call_args_list[1].kwargs
+        det_kwargs = mock_conn.execute_query.call_args_list[2].kwargs
+        assert sum_kwargs.get("categories") == ["Outer Membrane", "Periplasmic"]
+        assert det_kwargs.get("categories") == ["Outer Membrane", "Periplasmic"]
+
+    def test_by_category_renamed_item_to_category(
+            self, diag_categorical, summary_row):
+        mock_conn = MagicMock()
+        mock_conn.execute_query.side_effect = [
+            diag_categorical, summary_row, [],
+        ]
+        data = api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+            conn=mock_conn,
+        )
+        # Envelope-level by_category renamed
+        assert data["by_category"][0].keys() == {"category", "count"}
+        # Nested by_metric[*].by_category renamed
+        nested = data["by_metric"][0]["by_category"]
+        assert nested[0].keys() == {"category", "count"}
+        # Nested by_metric[*].dm_by_category renamed
+        nested_full = data["by_metric"][0]["dm_by_category"]
+        assert nested_full[0].keys() == {"category", "count"}
+
+    def test_creates_conn_when_none(self, monkeypatch):
+        instances = []
+
+        class FakeConn:
+            def __init__(self, *args, **kwargs):
+                instances.append(self)
+                self.execute_query = MagicMock(return_value=[])
+
+        monkeypatch.setattr(
+            "multiomics_explorer.api.functions.GraphConnection", FakeConn)
+        # diagnostics empty → short-circuit before summary/detail.
+        data = api.genes_by_categorical_metric(
+            metric_types=["predicted_subcellular_localization"],
+        )
+        assert instances, "GraphConnection should have been instantiated"
+        assert data["total_matching"] == 0
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import (
+            genes_by_categorical_metric as pkg_fn,
+        )
+        from multiomics_explorer.api import (
+            genes_by_categorical_metric as api_fn,
+        )
+        assert pkg_fn is api_fn is api.genes_by_categorical_metric
+
+
+# ---------------------------------------------------------------------------
 # gene_ontology_terms batching fix
 # ---------------------------------------------------------------------------
 

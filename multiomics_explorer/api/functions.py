@@ -84,6 +84,12 @@ from multiomics_explorer.kg.queries_lib import (
     build_gene_clusters_by_gene_summary,
     build_gene_derived_metrics,
     build_gene_derived_metrics_summary,
+    build_genes_by_boolean_metric,
+    build_genes_by_boolean_metric_diagnostics,
+    build_genes_by_boolean_metric_summary,
+    build_genes_by_categorical_metric,
+    build_genes_by_categorical_metric_diagnostics,
+    build_genes_by_categorical_metric_summary,
     build_genes_by_numeric_metric,
     build_genes_by_numeric_metric_diagnostics,
     build_genes_by_numeric_metric_summary,
@@ -3272,6 +3278,493 @@ def genes_by_numeric_metric(
         "not_matched_organism": not_matched_organism,
         "excluded_derived_metrics": excluded_derived_metrics,
         "warnings": warnings,
+        "returned": returned,
+        "offset": offset,
+        "truncated": truncated,
+        "results": results,
+    }
+
+
+def genes_by_boolean_metric(
+    derived_metric_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    flag: bool | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Boolean DerivedMetric drill-down. Cross-organism by design.
+
+    3-query orchestration:
+      1. diagnostics — resolve selection by intersecting with
+         dm.value_kind='boolean' + scoping filters; surviving IDs drive
+         Q2/Q3. Wrong-kind IDs and IDs filtered out by scoping both
+         surface as not_found_ids (matches genes_by_numeric_metric).
+      2. summary — aggregations over surviving DM ID list (always runs).
+      3. detail — rows; skipped when limit==0.
+
+    Selection is mutually exclusive: pass exactly one of
+    `derived_metric_ids` or `metric_types`. No rankable / has_p_value
+    gates exist for boolean DMs, so `excluded_derived_metrics` and
+    `warnings` are always returned as `[]` (kept for envelope-shape
+    consistency with genes_by_numeric_metric).
+
+    Returns dict with keys: total_matching, total_derived_metrics,
+    total_genes, by_organism, by_compartment, by_publication,
+    by_experiment, by_value, by_metric, top_categories,
+    genes_per_metric_max, genes_per_metric_median, not_found_ids,
+    not_matched_ids, not_found_metric_types, not_matched_metric_types,
+    not_matched_organism, excluded_derived_metrics (always []),
+    warnings (always []), returned, offset, truncated, results.
+    Per result (compact, 11 cols): locus_tag, gene_name, product,
+    gene_category, organism_name, derived_metric_id, name, value_kind,
+    rankable, has_p_value, value.
+    Per result (verbose adds, 13 cols): metric_type, field_description,
+    unit, compartment, experiment_id, publication_doi, treatment_type,
+    background_factors, treatment, light_condition, experimental_context,
+    gene_function_description, gene_summary.
+
+    summary=True: results=[], summary fields only.
+
+    Raises:
+        ValueError: derived_metric_ids+metric_types both/neither set.
+    """
+    # 1. Mutual exclusion check
+    if derived_metric_ids is not None and metric_types is not None:
+        raise ValueError(
+            "provide one of derived_metric_ids or metric_types, not both")
+    if derived_metric_ids is None and metric_types is None:
+        raise ValueError(
+            "must provide one of derived_metric_ids or metric_types")
+
+    # 2. summary=True shortcut
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # 3. Q1: diagnostics
+    diag_cypher, diag_params = build_genes_by_boolean_metric_diagnostics(
+        derived_metric_ids=derived_metric_ids,
+        metric_types=metric_types,
+        organism=organism,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+    )
+    diagnostics = conn.execute_query(diag_cypher, **diag_params)
+
+    # 4. Compute not_found_ids / not_found_metric_types
+    surviving_ids = {d["derived_metric_id"] for d in diagnostics}
+    surviving_metric_types = {d["metric_type"] for d in diagnostics}
+    not_found_ids = [
+        x for x in (derived_metric_ids or []) if x not in surviving_ids
+    ]
+    not_found_metric_types = [
+        x for x in (metric_types or []) if x not in surviving_metric_types
+    ]
+
+    # 5. No gate validation for boolean — excluded_derived_metrics /
+    #    warnings always empty. Surviving = all diagnostics survivors.
+    surviving = [d["derived_metric_id"] for d in diagnostics]
+
+    # 6. Defensive: if everything got filtered out at diagnostics, skip
+    #    summary/detail (Cypher's `IN $derived_metric_ids` would receive
+    #    an empty list).
+    if not surviving:
+        return {
+            "total_matching": 0,
+            "total_derived_metrics": 0,
+            "total_genes": 0,
+            "by_organism": [],
+            "by_compartment": [],
+            "by_publication": [],
+            "by_experiment": [],
+            "by_value": [],
+            "by_metric": [],
+            "top_categories": [],
+            "genes_per_metric_max": 0,
+            "genes_per_metric_median": 0.0,
+            "not_found_ids": not_found_ids,
+            "not_matched_ids": [],
+            "not_found_metric_types": not_found_metric_types,
+            "not_matched_metric_types": [],
+            "not_matched_organism": organism,
+            "excluded_derived_metrics": [],
+            "warnings": [],
+            "returned": 0,
+            "offset": offset,
+            "truncated": False,
+            "results": [],
+        }
+
+    # 7. Q2: summary (always runs)
+    sum_cypher, sum_params = build_genes_by_boolean_metric_summary(
+        derived_metric_ids=surviving,
+        locus_tags=locus_tags,
+        flag=flag,
+    )
+    sum_rows = conn.execute_query(sum_cypher, **sum_params)
+    sum_row = sum_rows[0] if sum_rows else {}
+
+    # 8. Frequency-list rename + post-processing
+    by_organism = _rename_freq(
+        sum_row.get("by_organism", []), "organism_name")
+    by_compartment = _rename_freq(
+        sum_row.get("by_compartment", []), "compartment")
+    by_publication = _rename_freq(
+        sum_row.get("by_publication", []), "publication_doi")
+    by_experiment = _rename_freq(
+        sum_row.get("by_experiment", []), "experiment_id")
+    by_value = _rename_freq(sum_row.get("by_value", []), "value")
+    top_categories = _rename_freq(
+        sum_row.get("top_categories_raw", []), "gene_category")[:5]
+
+    # by_metric: per-DM scalar rollups (true_count / false_count /
+    # dm_*_count are scalars, not freq lists — no nested rename).
+    by_metric = sorted(
+        sum_row.get("by_metric", []),
+        key=lambda x: x["count"],
+        reverse=True,
+    )
+
+    # 9. Compute not_matched_ids / not_matched_metric_types
+    contributed_ids = {entry["derived_metric_id"] for entry in by_metric}
+    not_matched_ids_all = set(surviving) - contributed_ids
+    not_matched_ids = [
+        x for x in (derived_metric_ids or []) if x in not_matched_ids_all
+    ]
+
+    not_matched_metric_types: list[str] = []
+    if metric_types:
+        for mt in metric_types:
+            dm_ids_for_mt = [
+                d["derived_metric_id"]
+                for d in diagnostics
+                if d["metric_type"] == mt
+            ]
+            if not dm_ids_for_mt:
+                continue  # already in not_found_metric_types
+            if all(d_id in not_matched_ids_all for d_id in dm_ids_for_mt):
+                not_matched_metric_types.append(mt)
+
+    # not_matched_organism: organism passed but no by_organism row matches
+    not_matched_organism: str | None = None
+    if organism:
+        if not any(
+            organism.lower() in entry["organism_name"].lower()
+            for entry in by_organism
+        ):
+            not_matched_organism = organism
+
+    # 10. Q3: detail (skip when limit=0)
+    results: list[dict] = []
+    if limit != 0:
+        det_cypher, det_params = build_genes_by_boolean_metric(
+            derived_metric_ids=surviving,
+            locus_tags=locus_tags,
+            flag=flag,
+            verbose=verbose, limit=limit, offset=offset,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+
+    # 11. Build envelope
+    total_matching = sum_row.get("total_matching", 0)
+    returned = len(results)
+    truncated = total_matching > offset + returned
+
+    return {
+        "total_matching": total_matching,
+        "total_derived_metrics": sum_row.get("total_derived_metrics", 0),
+        "total_genes": sum_row.get("total_genes", 0),
+        "by_organism": by_organism,
+        "by_compartment": by_compartment,
+        "by_publication": by_publication,
+        "by_experiment": by_experiment,
+        "by_value": by_value,
+        "by_metric": by_metric,
+        "top_categories": top_categories,
+        "genes_per_metric_max": sum_row.get("genes_per_metric_max", 0) or 0,
+        "genes_per_metric_median": (
+            sum_row.get("genes_per_metric_median", 0.0) or 0.0
+        ),
+        "not_found_ids": not_found_ids,
+        "not_matched_ids": not_matched_ids,
+        "not_found_metric_types": not_found_metric_types,
+        "not_matched_metric_types": not_matched_metric_types,
+        "not_matched_organism": not_matched_organism,
+        "excluded_derived_metrics": [],
+        "warnings": [],
+        "returned": returned,
+        "offset": offset,
+        "truncated": truncated,
+        "results": results,
+    }
+
+
+def genes_by_categorical_metric(
+    derived_metric_ids: list[str] | None = None,
+    metric_types: list[str] | None = None,
+    organism: str | None = None,
+    locus_tags: list[str] | None = None,
+    experiment_ids: list[str] | None = None,
+    publication_doi: list[str] | None = None,
+    compartment: str | None = None,
+    treatment_type: list[str] | None = None,
+    background_factors: list[str] | None = None,
+    growth_phases: list[str] | None = None,
+    categories: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Categorical DerivedMetric drill-down. Cross-organism by design.
+
+    3-query orchestration (same as genes_by_boolean_metric, plus a
+    categories-subset validation step):
+      1. diagnostics — resolve selection by intersecting with
+         dm.value_kind='categorical' + scoping; collect each surviving
+         DM's allowed_categories. Wrong-kind IDs surface as not_found_ids.
+      2. (api/ validates) — `categories` ⊆ union of surviving DMs'
+         `allowed_categories` (raise on unknowns).
+      3. summary — aggregations over surviving DM ID list (always runs).
+      4. detail — rows; skipped when limit==0.
+
+    Selection is mutually exclusive: pass exactly one of
+    `derived_metric_ids` or `metric_types`. No rankable / has_p_value
+    gates exist for categorical DMs, so `excluded_derived_metrics` and
+    `warnings` are always returned as `[]` (kept for envelope-shape
+    consistency with genes_by_numeric_metric).
+
+    Returns dict with keys: total_matching, total_derived_metrics,
+    total_genes, by_organism, by_compartment, by_publication,
+    by_experiment, by_category, by_metric, top_categories,
+    genes_per_metric_max, genes_per_metric_median, not_found_ids,
+    not_matched_ids, not_found_metric_types, not_matched_metric_types,
+    not_matched_organism, excluded_derived_metrics (always []),
+    warnings (always []), returned, offset, truncated, results.
+    Per result (compact, 11 cols): locus_tag, gene_name, product,
+    gene_category, organism_name, derived_metric_id, name, value_kind,
+    rankable, has_p_value, value.
+    Per result (verbose adds, 14 cols): metric_type, field_description,
+    unit, compartment, experiment_id, publication_doi, treatment_type,
+    background_factors, treatment, light_condition, experimental_context,
+    gene_function_description, gene_summary, allowed_categories.
+
+    summary=True: results=[], summary fields only.
+
+    Raises:
+        ValueError: derived_metric_ids+metric_types both/neither set;
+                    categories includes value not in union of selected
+                    DMs' allowed_categories.
+    """
+    # 1. Mutual exclusion check
+    if derived_metric_ids is not None and metric_types is not None:
+        raise ValueError(
+            "provide one of derived_metric_ids or metric_types, not both")
+    if derived_metric_ids is None and metric_types is None:
+        raise ValueError(
+            "must provide one of derived_metric_ids or metric_types")
+
+    # 2. summary=True shortcut
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # 3. Q1: diagnostics
+    diag_cypher, diag_params = build_genes_by_categorical_metric_diagnostics(
+        derived_metric_ids=derived_metric_ids,
+        metric_types=metric_types,
+        organism=organism,
+        experiment_ids=experiment_ids,
+        publication_doi=publication_doi,
+        compartment=compartment,
+        treatment_type=treatment_type,
+        background_factors=background_factors,
+        growth_phases=growth_phases,
+    )
+    diagnostics = conn.execute_query(diag_cypher, **diag_params)
+
+    # 4. Compute not_found_ids / not_found_metric_types
+    surviving_ids = {d["derived_metric_id"] for d in diagnostics}
+    surviving_metric_types = {d["metric_type"] for d in diagnostics}
+    not_found_ids = [
+        x for x in (derived_metric_ids or []) if x not in surviving_ids
+    ]
+    not_found_metric_types = [
+        x for x in (metric_types or []) if x not in surviving_metric_types
+    ]
+
+    # 5. Validate categories ⊆ union of surviving DMs' allowed_categories
+    if categories:
+        allowed_union: set[str] = set()
+        for d in diagnostics:
+            allowed_union.update(d.get("allowed_categories") or [])
+        unknown = [c for c in categories if c not in allowed_union]
+        if unknown:
+            raise ValueError(
+                f"categories include value(s) not in any selected DM's "
+                f"allowed_categories: {sorted(set(unknown))}. Allowed "
+                f"union across surviving DMs: {sorted(allowed_union)}. "
+                f"Inspect via "
+                f"list_derived_metrics(value_kind='categorical')."
+            )
+
+    # 6. No gate validation for categorical — excluded_derived_metrics /
+    #    warnings always empty. Surviving = all diagnostics survivors.
+    surviving = [d["derived_metric_id"] for d in diagnostics]
+
+    # 7. Defensive: if everything got filtered out at diagnostics, skip
+    #    summary/detail.
+    if not surviving:
+        return {
+            "total_matching": 0,
+            "total_derived_metrics": 0,
+            "total_genes": 0,
+            "by_organism": [],
+            "by_compartment": [],
+            "by_publication": [],
+            "by_experiment": [],
+            "by_category": [],
+            "by_metric": [],
+            "top_categories": [],
+            "genes_per_metric_max": 0,
+            "genes_per_metric_median": 0.0,
+            "not_found_ids": not_found_ids,
+            "not_matched_ids": [],
+            "not_found_metric_types": not_found_metric_types,
+            "not_matched_metric_types": [],
+            "not_matched_organism": organism,
+            "excluded_derived_metrics": [],
+            "warnings": [],
+            "returned": 0,
+            "offset": offset,
+            "truncated": False,
+            "results": [],
+        }
+
+    # 8. Q2: summary (always runs)
+    sum_cypher, sum_params = build_genes_by_categorical_metric_summary(
+        derived_metric_ids=surviving,
+        locus_tags=locus_tags,
+        categories=categories,
+    )
+    sum_rows = conn.execute_query(sum_cypher, **sum_params)
+    sum_row = sum_rows[0] if sum_rows else {}
+
+    # 9. Frequency-list rename + post-processing
+    by_organism = _rename_freq(
+        sum_row.get("by_organism", []), "organism_name")
+    by_compartment = _rename_freq(
+        sum_row.get("by_compartment", []), "compartment")
+    by_publication = _rename_freq(
+        sum_row.get("by_publication", []), "publication_doi")
+    by_experiment = _rename_freq(
+        sum_row.get("by_experiment", []), "experiment_id")
+    by_category = _rename_freq(sum_row.get("by_category", []), "category")
+    top_categories = _rename_freq(
+        sum_row.get("top_categories_raw", []), "gene_category")[:5]
+
+    # by_metric: rename nested by_category / dm_by_category freq lists
+    # (item → category) on top of the envelope-level rename. Top-level
+    # keys (count, allowed_categories, dm_total_gene_count) are scalars
+    # / pass-through and don't need renaming.
+    by_metric_raw = sum_row.get("by_metric", [])
+    by_metric: list[dict] = []
+    for entry in by_metric_raw:
+        new_entry = dict(entry)
+        new_entry["by_category"] = _rename_freq(
+            entry.get("by_category", []), "category")
+        new_entry["dm_by_category"] = _rename_freq(
+            entry.get("dm_by_category", []), "category")
+        by_metric.append(new_entry)
+    by_metric.sort(key=lambda x: x["count"], reverse=True)
+
+    # 10. Compute not_matched_ids / not_matched_metric_types
+    contributed_ids = {entry["derived_metric_id"] for entry in by_metric}
+    not_matched_ids_all = set(surviving) - contributed_ids
+    not_matched_ids = [
+        x for x in (derived_metric_ids or []) if x in not_matched_ids_all
+    ]
+
+    not_matched_metric_types: list[str] = []
+    if metric_types:
+        for mt in metric_types:
+            dm_ids_for_mt = [
+                d["derived_metric_id"]
+                for d in diagnostics
+                if d["metric_type"] == mt
+            ]
+            if not dm_ids_for_mt:
+                continue  # already in not_found_metric_types
+            if all(d_id in not_matched_ids_all for d_id in dm_ids_for_mt):
+                not_matched_metric_types.append(mt)
+
+    # not_matched_organism: organism passed but no by_organism row matches
+    not_matched_organism: str | None = None
+    if organism:
+        if not any(
+            organism.lower() in entry["organism_name"].lower()
+            for entry in by_organism
+        ):
+            not_matched_organism = organism
+
+    # 11. Q3: detail (skip when limit=0)
+    results: list[dict] = []
+    if limit != 0:
+        det_cypher, det_params = build_genes_by_categorical_metric(
+            derived_metric_ids=surviving,
+            locus_tags=locus_tags,
+            categories=categories,
+            verbose=verbose, limit=limit, offset=offset,
+        )
+        results = conn.execute_query(det_cypher, **det_params)
+
+    # 12. Build envelope
+    total_matching = sum_row.get("total_matching", 0)
+    returned = len(results)
+    truncated = total_matching > offset + returned
+
+    return {
+        "total_matching": total_matching,
+        "total_derived_metrics": sum_row.get("total_derived_metrics", 0),
+        "total_genes": sum_row.get("total_genes", 0),
+        "by_organism": by_organism,
+        "by_compartment": by_compartment,
+        "by_publication": by_publication,
+        "by_experiment": by_experiment,
+        "by_category": by_category,
+        "by_metric": by_metric,
+        "top_categories": top_categories,
+        "genes_per_metric_max": sum_row.get("genes_per_metric_max", 0) or 0,
+        "genes_per_metric_median": (
+            sum_row.get("genes_per_metric_median", 0.0) or 0.0
+        ),
+        "not_found_ids": not_found_ids,
+        "not_matched_ids": not_matched_ids,
+        "not_found_metric_types": not_found_metric_types,
+        "not_matched_metric_types": not_matched_metric_types,
+        "not_matched_organism": not_matched_organism,
+        "excluded_derived_metrics": [],
+        "warnings": [],
         "returned": returned,
         "offset": offset,
         "truncated": truncated,
