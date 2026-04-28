@@ -432,8 +432,8 @@ def register_tools(mcp: FastMCP):
                     "metric_type", "value_kind", "compartment"],
             Field(description=(
                 "Which categorical filter to enumerate. "
-                "'gene_category' / 'brite_tree' / 'growth_phase' (existing); "
-                "'metric_type' / 'value_kind' / 'compartment' (slice 2 - DerivedMetric "
+                "'gene_category' / 'brite_tree' / 'growth_phase'; "
+                "'metric_type' / 'value_kind' / 'compartment' (DerivedMetric "
                 "discovery)."
             )),
         ] = "gene_category",

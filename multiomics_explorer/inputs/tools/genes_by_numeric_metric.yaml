@@ -192,8 +192,8 @@ mistakes:
     non-numeric DMs simply don't appear in the result. Inspect via
     `list_derived_metrics(derived_metric_ids=[...])` to see the DM's
     actual `value_kind` and pivot to `genes_by_boolean_metric` or
-    `genes_by_categorical_metric`. Slice-1 simplification — a richer
-    'wrong value_kind' diagnostic ships in a follow-up.
+    `genes_by_categorical_metric`. Current limitation — a richer
+    'wrong value_kind' diagnostic is on the roadmap.
   - >-
     Filtered slice vs full DM. `by_metric[i].value_*` describes rows that
     survived your filters. `by_metric[i].dm_value_*` describes the full

@@ -39,7 +39,7 @@ Key properties on a `DerivedMetric` node:
 
 ## Discovery patterns
 
-The slice-2 discovery tools (`gene_overview`, `list_experiments`, `list_publications`,
+The DM-aware discovery tools (`gene_overview`, `list_experiments`, `list_publications`,
 `list_organisms`, `list_filter_values`) surface DerivedMetric rollups so you can browse
 DM evidence without a separate `list_derived_metrics` call:
 

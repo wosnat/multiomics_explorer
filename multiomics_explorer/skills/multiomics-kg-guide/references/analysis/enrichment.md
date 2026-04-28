@@ -338,8 +338,7 @@ foreground? Getting it right matters more than the choice of ontology.
 Each experiment quantifies a subset of the genome. Genes not in the quantified set cannot be
 differentially expressed — they are structurally absent from the numerator. Using them in the
 denominator inflates `N`, artificially depresses `bg_ratio`, and understates enrichment. The
-`de_enrichment_inputs` function builds per-cluster backgrounds from `table_scope` automatically
-(B1 decision D2).
+`de_enrichment_inputs` function builds per-cluster backgrounds from `table_scope` automatically.
 
 Use `table_scope` (the default) whenever your gene sets came from a DE table.
 

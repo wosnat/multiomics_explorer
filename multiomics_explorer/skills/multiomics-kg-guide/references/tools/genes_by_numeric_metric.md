@@ -289,7 +289,7 @@ genes_by_numeric_metric → gene_overview(locus_tags=results)
 
 - `by_metric` is per-DM, not per-tag. Each `by_metric` entry is one DerivedMetric (uniquely identified by `derived_metric_id`). The same `metric_type` tag can appear across organisms (4 such tags in current KG). Use the per-DM rollup to disambiguate.
 
-- Wrong-`value_kind` IDs land in `not_found_ids`, not a typed error. Passing a `derived_metric_ids` of a boolean or categorical DM today produces `not_found_ids=[that_id]` rather than a `value_kind` mismatch error — the diagnostics query hardcodes `value_kind='numeric'`, so non-numeric DMs simply don't appear in the result. Inspect via `list_derived_metrics(derived_metric_ids=[...])` to see the DM's actual `value_kind` and pivot to `genes_by_boolean_metric` or `genes_by_categorical_metric`. Slice-1 simplification — a richer 'wrong value_kind' diagnostic ships in a follow-up.
+- Wrong-`value_kind` IDs land in `not_found_ids`, not a typed error. Passing a `derived_metric_ids` of a boolean or categorical DM today produces `not_found_ids=[that_id]` rather than a `value_kind` mismatch error — the diagnostics query hardcodes `value_kind='numeric'`, so non-numeric DMs simply don't appear in the result. Inspect via `list_derived_metrics(derived_metric_ids=[...])` to see the DM's actual `value_kind` and pivot to `genes_by_boolean_metric` or `genes_by_categorical_metric`. Current limitation — a richer 'wrong value_kind' diagnostic is on the roadmap.
 
 - Filtered slice vs full DM. `by_metric[i].value_*` describes rows that survived your filters. `by_metric[i].dm_value_*` describes the full DM (precomputed). They're different — your top-decile slice is intentionally narrower than the full DM range.
 

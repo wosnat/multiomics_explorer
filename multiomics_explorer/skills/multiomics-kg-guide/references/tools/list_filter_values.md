@@ -12,7 +12,7 @@ Use the returned values as filter parameters in `genes_by_function`
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment') | gene_category | Which categorical filter to enumerate. 'gene_category' / 'brite_tree' / 'growth_phase' (existing); 'metric_type' / 'value_kind' / 'compartment' (slice 2 - DerivedMetric discovery). |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment') | gene_category | Which categorical filter to enumerate. 'gene_category' / 'brite_tree' / 'growth_phase'; 'metric_type' / 'value_kind' / 'compartment' (DerivedMetric discovery). |
 
 ## Response format
 

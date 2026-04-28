@@ -247,7 +247,7 @@ genes_by_boolean_metric (no organism filter) → split via envelope by_organism 
 
 ## Common mistakes
 
-- Positive-only storage in current KG. `flag=False` returns zero rows today because every materialized boolean edge is `r.value="true"` (slice-1 spec §"KG invariants" §4 — `dm.flag_false_count=0` on every current DM). Inspect `by_metric[*].dm_false_count` (always 0 today) before assuming a gene is "not flagged false". Mirrors the numeric tool's "p-value filter on current KG" gotcha — surface exists for future DMs.
+- Positive-only storage in current KG. `flag=False` returns zero rows today because every materialized boolean edge is `r.value="true"` (`dm.flag_false_count=0` on every current DM). Inspect `by_metric[*].dm_false_count` (always 0 today) before assuming a gene is "not flagged false". Mirrors the numeric tool's "p-value filter on current KG" gotcha — surface exists for future DMs.
 
 - Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from current boolean DMs — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
 

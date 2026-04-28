@@ -562,9 +562,9 @@ def list_filter_values(
       - ``gene_category``: gene functional categories.
       - ``brite_tree``: KEGG BRITE hierarchy trees.
       - ``growth_phase``: growth phase values on Experiment nodes.
-      - ``metric_type``: DerivedMetric.metric_type tag values (slice 2).
-      - ``value_kind``: DerivedMetric.value_kind enum (slice 2).
-      - ``compartment``: Experiment.compartment values (slice 2 / D7).
+      - ``metric_type``: DerivedMetric.metric_type tag values.
+      - ``value_kind``: DerivedMetric.value_kind enum.
+      - ``compartment``: Experiment.compartment values.
     """
     conn = _default_conn(conn)
     if filter_type == "gene_category":

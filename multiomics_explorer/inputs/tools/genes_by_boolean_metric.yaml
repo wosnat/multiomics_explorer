@@ -136,8 +136,8 @@ mistakes:
   - >-
     Positive-only storage in current KG. `flag=False` returns zero rows
     today because every materialized boolean edge is `r.value="true"`
-    (slice-1 spec §"KG invariants" §4 — `dm.flag_false_count=0` on every
-    current DM). Inspect `by_metric[*].dm_false_count` (always 0 today)
+    (`dm.flag_false_count=0` on every current DM). Inspect
+    `by_metric[*].dm_false_count` (always 0 today)
     before assuming a gene is "not flagged false". Mirrors the numeric
     tool's "p-value filter on current KG" gotcha — surface exists for
     future DMs.
