@@ -1913,3 +1913,19 @@ kill $SERVER_PID
 ```
 
 Slice 2 complete.
+
+## Deferred follow-ups (tracked for slice 3+)
+
+Items flagged during slice-2 implementation/review that don't block this merge:
+
+1. **MCP-wrapper integration tests** for the 4 slice-2 tools (`gene_overview`, `list_experiments`, `list_publications`, `list_organisms`). Current integration tests in `tests/integration/test_mcp_tools.py` call `api.<func>(conn=conn)` directly, bypassing the FastMCP wrapper layer (typed Pydantic submodels, ToolError raising). The slice-1 DM tools use a `tool_fns[...]` fixture pattern that exercises the wrapper — extend it to cover the slice-2 list/overview tools. Coverage gap, not correctness.
+
+2. **`list_publications` in-memory envelope rollups → summary Cypher.** Slice 2 migrated `by_cluster_type` to summary Cypher, but `by_organism` / `by_treatment_type` / `by_background_factors` / `by_omics_type` still aggregate from detail rows in Python (`api/functions.py:798-810`). Same pattern as Tasks 2/4 already adopted. Currently fine because `list_publications` always fetches all matching detail rows, but it's wasted work and inconsistent with the slice-2 norm.
+
+3. **DE-tool `compartment` filter** (slice-3-tail). `differential_expression_by_gene` / `_by_ortholog` don't filter on compartment yet. Deferred until non-`whole_cell` DE lands; currently only `whole_cell` DE exists.
+
+4. **Generic `Breakdown[T]` Pydantic generic.** Each tool has 3-4 nearly identical `XBreakdown` submodels (e.g. `OrgValueKindBreakdown` / `PubValueKindBreakdown` / `ExpValueKindBreakdown` are structurally identical). A `Breakdown[Annotated[str, Field(description=...)]]` generic could deduplicate, but Pydantic v2 generics interact awkwardly with FastMCP schema generation. Revisit if the breakdown class count doubles.
+
+5. **`list_publications.md` and other about-content files**: review whether `(slice 2)` and `(D5)` / `(D7)` design tags accidentally leak into user-facing docstrings. Strip during a routine docs cleanup pass.
+
+These items are tracked here rather than in commit messages so they don't get lost. Promote to a slice-3 plan when picked up.

@@ -41,9 +41,9 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 - **total_matching** (int): Organisms matching the filter (= total_entries when no filter)
 - **by_cluster_type** (list[OrgClusterTypeBreakdown]): Organism counts per cluster type over the matched set, sorted by count descending
 - **by_organism_type** (list[OrgTypeBreakdown]): Organism counts per type over the matched set, sorted by count descending
-- **by_value_kind** (list[object]): DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.
-- **by_metric_type** (list[object]): DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.
-- **by_compartment** (list[object]): Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.
+- **by_value_kind** (list[OrgValueKindBreakdown]): DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.
+- **by_metric_type** (list[OrgMetricTypeBreakdown]): DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.
+- **by_compartment** (list[OrgCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.
 - **returned** (int): Number of results returned
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > offset + returned

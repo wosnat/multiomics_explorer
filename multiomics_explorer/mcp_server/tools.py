@@ -504,14 +504,26 @@ def register_tools(mcp: FastMCP):
         organism_type: str = Field(description="Organism type (e.g. 'genome_strain')")
         count: int = Field(description="Number of organisms of this type (e.g. 25)")
 
+    class OrgValueKindBreakdown(BaseModel):
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
+        count: int = Field(description="Number of DerivedMetrics with this value_kind across matched organisms.")
+
+    class OrgMetricTypeBreakdown(BaseModel):
+        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class')")
+        count: int = Field(description="Number of DerivedMetrics with this metric_type across matched organisms.")
+
+    class OrgCompartmentBreakdown(BaseModel):
+        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle')")
+        count: int = Field(description="Number of DerivedMetrics in this compartment across matched organisms.")
+
     class ListOrganismsResponse(BaseModel):
         total_entries: int = Field(description="Total organisms in the KG")
         total_matching: int = Field(description="Organisms matching the filter (= total_entries when no filter)")
         by_cluster_type: list[OrgClusterTypeBreakdown] = Field(default_factory=list, description="Organism counts per cluster type over the matched set, sorted by count descending")
         by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted by count descending")
-        by_value_kind: list[dict] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.")
-        by_metric_type: list[dict] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.")
-        by_compartment: list[dict] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.")
+        by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.")
+        by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.")
+        by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.")
         returned: int = Field(description="Number of results returned")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > offset + returned")
@@ -583,14 +595,17 @@ def register_tools(mcp: FastMCP):
             organisms = [OrganismResult(**r) for r in result["results"]]
             by_cluster_type = [OrgClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
             by_organism_type = [OrgTypeBreakdown(**b) for b in result.get("by_organism_type", [])]
+            by_value_kind = [OrgValueKindBreakdown(**b) for b in result.get("by_value_kind", [])]
+            by_metric_type = [OrgMetricTypeBreakdown(**b) for b in result.get("by_metric_type", [])]
+            by_compartment = [OrgCompartmentBreakdown(**b) for b in result.get("by_compartment", [])]
             response = ListOrganismsResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
                 by_cluster_type=by_cluster_type,
                 by_organism_type=by_organism_type,
-                by_value_kind=result.get("by_value_kind", []),
-                by_metric_type=result.get("by_metric_type", []),
-                by_compartment=result.get("by_compartment", []),
+                by_value_kind=by_value_kind,
+                by_metric_type=by_metric_type,
+                by_compartment=by_compartment,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],

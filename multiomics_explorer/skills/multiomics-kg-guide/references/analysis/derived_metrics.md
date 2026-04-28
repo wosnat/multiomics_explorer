@@ -51,6 +51,13 @@ DM evidence without a separate `list_derived_metrics` call:
 - Envelope rollups: `by_value_kind`, `by_metric_type`, `by_compartment`.
 - `compartment` filter on the 3 list tools — values: `whole_cell`, `vesicle`,
   `exoproteome`, `spent_medium`, `lysate`. Scopes to a wet-lab fraction.
+- **`compartment` field shape varies by tool:** `list_experiments` per-row carries
+  `compartment` (scalar string — an experiment lives in one fraction).
+  `list_publications` and `list_organisms` carry `compartments` (list[str] — they
+  aggregate over multiple experiments / strains). `gene_overview` (verbose) carries
+  `compartments_observed` (list[str]). The `compartment` *filter param* is scalar on
+  all 3 list tools — it filters to rows where the compartment is present (scalar
+  equality on Experiment, list-membership on Publication/Organism).
 - `gene_overview` carries per-gene `derived_metric_count` and
   `derived_metric_value_kinds`; verbose adds per-kind counts and
   `compartments_observed`. Envelope: `has_derived_metrics` (count of requested

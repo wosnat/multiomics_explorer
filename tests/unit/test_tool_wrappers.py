@@ -454,9 +454,15 @@ class TestListOrganismsWrapper:
             },
         ):
             result = await tool_fns["list_organisms"](mock_ctx, summary=True)
-        assert result.by_value_kind == [{"value_kind": "numeric", "count": 5}]
-        assert result.by_metric_type == [{"metric_type": "damping_ratio", "count": 3}]
-        assert result.by_compartment == [{"compartment": "whole_cell", "count": 2}]
+        assert len(result.by_value_kind) == 1
+        assert result.by_value_kind[0].value_kind == "numeric"
+        assert result.by_value_kind[0].count == 5
+        assert len(result.by_metric_type) == 1
+        assert result.by_metric_type[0].metric_type == "damping_ratio"
+        assert result.by_metric_type[0].count == 3
+        assert len(result.by_compartment) == 1
+        assert result.by_compartment[0].compartment == "whole_cell"
+        assert result.by_compartment[0].count == 2
 
     @pytest.mark.asyncio
     async def test_per_row_dm_fields_present(self, tool_fns, mock_ctx):
