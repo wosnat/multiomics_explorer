@@ -907,6 +907,11 @@ def list_experiments(
     statistical_test, experimental_context,
     derived_metric_gene_count, derived_metric_types,
     reports_derived_metric_types.
+    Both derived_metric_types and reports_derived_metric_types source
+    from the same KG property today (e.reports_derived_metric_types) and
+    are identical in current data. Both are emitted for forward-compat
+    with a future KG distinction between "DMs reported by this experiment"
+    and "DMs associated with this experiment" (slice-2 D5).
     When search_text is provided, detail results include score.
 
     compartment: if provided, restricts to experiments in that wet-lab

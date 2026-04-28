@@ -1288,6 +1288,14 @@ def build_list_experiments(
     RETURN keys (search_text): adds score.
     compartment: when provided, restricts to experiments in that wet-lab
     compartment (scalar equality: e.compartment = $compartment).
+
+    Note on derived_metric_types vs reports_derived_metric_types:
+    Both fields are sourced from ``e.reports_derived_metric_types`` today —
+    the KG only stores a single report-side rollup on the Experiment node.
+    They are identical in current data and are both surfaced for
+    forward-compat with a future KG distinction between "DMs reported by
+    this experiment" and "DMs associated with this experiment" (per
+    slice-2 design D5).
     """
     where_block, params = _list_experiments_where(
         organism=organism, treatment_type=treatment_type,
