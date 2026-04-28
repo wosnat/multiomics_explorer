@@ -2027,6 +2027,7 @@ class TestGenesByCategoricalMetric:
         nested_full = response.by_metric[0].dm_by_category[0]
         assert hasattr(nested_full, "category")
         assert hasattr(nested_full, "count")
+        assert set(nested_full.model_dump().keys()) == {"category", "count"}
 
 
 @pytest.mark.kg
