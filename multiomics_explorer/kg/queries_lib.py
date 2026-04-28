@@ -1200,10 +1200,8 @@ def _list_experiments_where(
 
     if organism:
         conditions.append(
-            "(ALL(word IN split(toLower($organism), ' ')"
+            "ALL(word IN split(toLower($organism), ' ')"
             " WHERE toLower(e.organism_name) CONTAINS word)"
-            " OR ALL(word IN split(toLower($organism), ' ')"
-            " WHERE toLower(e.coculture_partner) CONTAINS word))"
         )
         params["organism"] = organism
 

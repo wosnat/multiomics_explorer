@@ -2177,12 +2177,28 @@ class TestBuildListExperiments:
         assert params == {}
 
     def test_organism_filter(self):
-        """Organism filter uses ALL(word IN split) on organism_name OR coculture_partner."""
+        """Organism filter matches profiled organism only (no OR against coculture_partner)."""
         cypher, params = build_list_experiments(organism="MED4")
         assert "ALL(word IN split(toLower($organism)" in cypher
         assert "toLower(e.organism_name) CONTAINS word" in cypher
-        assert "toLower(e.coculture_partner) CONTAINS word" in cypher
+        # No OR against coculture_partner — that footgun is gone.
+        assert "toLower(e.coculture_partner) CONTAINS word" not in cypher
         assert params["organism"] == "MED4"
+
+    def test_organism_and_coculture_partner_compose_with_and(self):
+        """organism= and coculture_partner= compose with AND, not OR."""
+        cypher, params = build_list_experiments(
+            organism="MED4", coculture_partner="Alteromonas",
+        )
+        assert "toLower(e.organism_name) CONTAINS word" in cypher
+        assert "toLower(e.coculture_partner) CONTAINS toLower($partner)" in cypher
+        # Two clauses joined by AND, not OR.
+        assert " AND " in cypher
+        # No OR anywhere — the organism predicate must not be re-OR'd, and the
+        # partner predicate composes via outer AND. See spec F2.
+        assert " OR " not in cypher
+        assert params["organism"] == "MED4"
+        assert params["partner"] == "Alteromonas"
 
     def test_treatment_type_filter(self):
         """Treatment type filter uses ANY() for array property."""
