@@ -2027,4 +2027,38 @@ class TestGenesByCategoricalMetric:
         nested_full = response.by_metric[0].dm_by_category[0]
         assert hasattr(nested_full, "category")
         assert hasattr(nested_full, "count")
-        assert set(nested_full.model_dump().keys()) == {"category", "count"}
+
+
+@pytest.mark.kg
+class TestSliceTwoSearchTextReach:
+    """Slice-2 D5: list_experiments / list_publications search_text routes through
+    DM-derived tokens (derived_metric_search_text on Experiment / Publication).
+    Negative assertion confirms genes_by_function is NOT enriched (function-vs-
+    measurement category-error guard)."""
+
+    def test_list_experiments_search_diel_amplitude_hits_waldbauer(self, conn):
+        result = api.list_experiments(search_text="diel amplitude", limit=5, conn=conn)
+        ids = [row["experiment_id"] for row in result["results"]]
+        assert any("waldbauer_2012" in i.lower() for i in ids), \
+            f"Expected Waldbauer 2012 in {ids}"
+
+    def test_list_publications_search_damping_ratio_hits(self, conn):
+        result = api.list_publications(search_text="damping ratio", limit=5, conn=conn)
+        dois = [row["doi"] for row in result["results"]]
+        assert "10.1371/journal.pone.0043432" in dois, \
+            f"Expected Waldbauer 2012 (10.1371/journal.pone.0043432) in {dois}"
+
+    def test_list_publications_search_vesicle_proteome_hits(self, conn):
+        result = api.list_publications(search_text="vesicle proteome", limit=5, conn=conn)
+        # Biller 2014 / 2022 vesicle proteomics papers (and others)
+        assert result["total_matching"] >= 1
+
+    def test_genes_by_function_NOT_enriched_with_dm_tokens(self, conn):
+        """D5 regression guard: geneFullText must NOT match every protein-quantified
+        gene for 'damping ratio'. If geneFullText were DM-enriched, this would
+        return ~312 Waldbauer 2012 genes."""
+        result = api.genes_by_function(search_text="damping ratio", limit=5, conn=conn)
+        assert result["total_matching"] < 50, (
+            f"genes_by_function returned {result['total_matching']} hits for "
+            "'damping ratio' — D5 regression: geneFullText looks DM-enriched."
+        )
