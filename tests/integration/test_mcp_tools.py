@@ -216,6 +216,56 @@ class TestListPublications:
         assert result["results"] == []
         assert result["not_found"] == []  # the DOI exists; it's filtered out
 
+    def test_dm_rollups_present(self, conn):
+        """Envelope keys by_value_kind, by_metric_type, by_compartment are returned."""
+        result = api.list_publications(conn=conn)
+        assert "by_value_kind" in result, "Missing by_value_kind envelope key"
+        assert "by_metric_type" in result, "Missing by_metric_type envelope key"
+        assert "by_compartment" in result, "Missing by_compartment envelope key"
+        # At least some DMs exist in the KG (verified live 2026-04-27)
+        assert isinstance(result["by_value_kind"], list)
+        assert isinstance(result["by_metric_type"], list)
+        assert isinstance(result["by_compartment"], list)
+        assert len(result["by_value_kind"]) > 0, "by_value_kind is empty (expected DMs in KG)"
+
+    def test_compartment_filter_narrows(self, conn):
+        """vesicle filter returns fewer publications than unfiltered."""
+        result_all = api.list_publications(conn=conn)
+        result_vesicle = api.list_publications(compartment="vesicle", conn=conn)
+        assert result_vesicle["total_matching"] <= result_all["total_matching"]
+        # vesicle compartment has at least 1 publication (verified live 2026-04-27)
+        assert result_vesicle["total_matching"] >= 1
+
+    def test_per_row_dm_fields_present(self, conn):
+        """Each result row includes derived_metric_count, derived_metric_value_kinds,
+        compartments."""
+        cypher, params = build_list_publications()
+        results = conn.execute_query(cypher, **params)
+        for r in results:
+            assert "derived_metric_count" in r, f"Missing derived_metric_count in row: {r['doi']}"
+            assert "derived_metric_value_kinds" in r, f"Missing derived_metric_value_kinds in row: {r['doi']}"
+            assert "compartments" in r, f"Missing compartments in row: {r['doi']}"
+
+    def test_summary_mode_preserves_cluster_type_rollup(self, conn):
+        """Regression guard: summary Cypher populates by_cluster_type (migrated from
+        in-memory). Previously this was computed from detail rows; now it must come
+        from the summary Cypher via apoc.coll.frequencies."""
+        cypher, params = build_list_publications_summary()
+        rows = conn.execute_query(cypher, **params)
+        assert rows, "Summary query returned no rows"
+        row = rows[0]
+        assert "by_cluster_type" in row, "by_cluster_type missing from summary row"
+        ct = row["by_cluster_type"]
+        # The KG has publications with cluster analyses — by_cluster_type must be non-empty
+        assert len(ct) > 0, (
+            "by_cluster_type is empty in summary mode — regression from in-memory removal"
+        )
+        # Each entry is a {item, count} dict (apoc.coll.frequencies shape)
+        entry = ct[0]
+        assert "item" in entry or "cluster_type" in entry, (
+            f"Unexpected by_cluster_type entry shape: {entry}"
+        )
+
 
 @pytest.mark.kg
 class TestListOrganisms:

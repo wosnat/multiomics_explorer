@@ -706,6 +706,7 @@ def list_publications(
     search_text: str | None = None,
     author: str | None = None,
     publication_dois: list[str] | None = None,
+    compartment: str | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -714,17 +715,24 @@ def list_publications(
 ) -> dict:
     """List publications with expression data.
 
-    Returns dict with keys: total_entries, total_matching, returned, truncated,
-    by_organism, by_treatment_type, by_background_factors, by_omics_type,
-    by_cluster_type, not_found, results.
-    Per result: doi, title, authors, year, journal, study_type, organisms,
-    experiment_count, treatment_types, background_factors, omics_types,
-    clustering_analysis_count, cluster_types, growth_phases.
-    When verbose=True, also includes abstract, description, cluster_count.
+    Returns dict with keys: total_entries, total_matching, returned, offset,
+    truncated, by_organism, by_treatment_type, by_background_factors,
+    by_omics_type, by_cluster_type, by_value_kind, by_metric_type,
+    by_compartment, not_found, results.
+    Per result (compact): doi, title, authors, year, journal, study_type,
+    organisms, experiment_count, treatment_types, background_factors,
+    omics_types, clustering_analysis_count, cluster_types, growth_phases,
+    derived_metric_count, derived_metric_value_kinds, compartments.
+    When verbose=True, also includes abstract, description, cluster_count,
+    derived_metric_gene_count, derived_metric_types.
     When search_text is provided, also includes score.
 
     growth_phases: if provided, restricts to publications whose growth_phases
     array contains the specified value (case-insensitive).
+
+    compartment: if provided, restricts to publications with at least one
+    experiment in that wet-lab compartment (e.g. 'vesicle', 'whole_cell').
+    Use list_filter_values(filter_type='compartment') to enumerate values.
 
     publication_dois: if provided, restricts to publications whose `doi`
     matches any of the listed values (case-insensitive). Mirrors the filter
@@ -738,19 +746,20 @@ def list_publications(
         growth_phases=growth_phases,
         search_text=search_text, author=author,
         publication_dois=publication_dois,
+        compartment=compartment,
     )
 
     def _execute(st=search_text):
         kw = {**filter_kwargs, "search_text": st}
         summary_cypher, summary_params = build_list_publications_summary(**kw)
-        summary = conn.execute_query(summary_cypher, **summary_params)[0]
+        summary_row = conn.execute_query(summary_cypher, **summary_params)[0]
 
-        # Fetch all matching for breakdowns, then slice for results
+        # Fetch all matching for per-row breakdowns, then slice for results
         data_cypher, data_params = build_list_publications(
             **kw, verbose=verbose,
         )
         all_results = conn.execute_query(data_cypher, **data_params)
-        return summary, all_results
+        return summary_row, all_results
 
     try:
         summary, all_results = _execute()
@@ -762,12 +771,13 @@ def list_publications(
         else:
             raise
 
-    # Compute breakdowns from all matching publications
+    # Compute per-row breakdowns from all matching publications
+    # (by_organism, by_treatment_type, by_background_factors, by_omics_type
+    # remain in-memory from detail rows; by_cluster_type sourced from summary).
     org_counts: dict[str, int] = {}
     tt_counts: dict[str, int] = {}
     bf_counts: dict[str, int] = {}
     omics_counts: dict[str, int] = {}
-    ct_counts: dict[str, int] = {}
     for pub in all_results:
         for org in pub.get("organisms", []):
             org_counts[org] = org_counts.get(org, 0) + 1
@@ -777,8 +787,6 @@ def list_publications(
             bf_counts[bf] = bf_counts.get(bf, 0) + 1
         for ot in pub.get("omics_types", []):
             omics_counts[ot] = omics_counts.get(ot, 0) + 1
-        for ct in pub.get("cluster_types", []):
-            ct_counts[ct] = ct_counts.get(ct, 0) + 1
 
     def _sorted_breakdown(counts, key_name):
         return sorted(
@@ -791,7 +799,10 @@ def list_publications(
 
     # Gate verbose-only fields
     if not verbose:
-        results = [{k: v for k, v in r.items() if k != "cluster_count"} for r in results]
+        results = [{k: v for k, v in r.items()
+                    if k not in ("cluster_count", "derived_metric_gene_count",
+                                 "derived_metric_types")}
+                   for r in results]
 
     # Compute not_found: provided publication_dois that no Publication node
     # matches. Only the publication_dois filter is used (other filters could
@@ -816,7 +827,14 @@ def list_publications(
         "by_treatment_type": _sorted_breakdown(tt_counts, "treatment_type"),
         "by_background_factors": _sorted_breakdown(bf_counts, "background_factor"),
         "by_omics_type": _sorted_breakdown(omics_counts, "omics_type"),
-        "by_cluster_type": _sorted_breakdown(ct_counts, "cluster_type"),
+        "by_cluster_type": _rename_freq(
+            summary.get("by_cluster_type", []), "cluster_type"),
+        "by_value_kind": _rename_freq(
+            summary.get("by_value_kind", []), "value_kind"),
+        "by_metric_type": _rename_freq(
+            summary.get("by_metric_type", []), "metric_type"),
+        "by_compartment": _rename_freq(
+            summary.get("by_compartment", []), "compartment"),
         "returned": len(results),
         "offset": offset,
         "truncated": summary["total_matching"] > offset + len(results),

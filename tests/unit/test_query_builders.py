@@ -1992,6 +1992,32 @@ class TestBuildListPublications:
         cypher, _ = build_list_publications(limit=None)
         assert "LIMIT" not in cypher
 
+    def test_compact_returns_dm_rollup_fields(self):
+        """Compact mode includes derived_metric_count, derived_metric_value_kinds,
+        and compartments columns."""
+        cypher, _ = build_list_publications()
+        assert "coalesce(p.derived_metric_count, 0) AS derived_metric_count" in cypher
+        assert "coalesce(p.derived_metric_value_kinds, []) AS derived_metric_value_kinds" in cypher
+        assert "coalesce(p.compartments, []) AS compartments" in cypher
+
+    def test_verbose_adds_dm_extras(self):
+        """Verbose mode adds derived_metric_gene_count and derived_metric_types."""
+        cypher, _ = build_list_publications(verbose=True)
+        assert "coalesce(p.derived_metric_gene_count, 0) AS derived_metric_gene_count" in cypher
+        assert "coalesce(p.derived_metric_types, []) AS derived_metric_types" in cypher
+
+    def test_compartment_filter_in_where(self):
+        """compartment param adds '$compartment IN coalesce(p.compartments, [])' to WHERE."""
+        cypher, params = build_list_publications(compartment="vesicle")
+        assert "$compartment IN coalesce(p.compartments, [])" in cypher
+        assert params["compartment"] == "vesicle"
+
+    def test_compact_dm_fields_in_search_branch(self):
+        """DM rollup fields also present in the search_text (fulltext) branch."""
+        cypher, _ = build_list_publications(search_text="nitrogen")
+        assert "coalesce(p.derived_metric_count, 0) AS derived_metric_count" in cypher
+        assert "coalesce(p.compartments, []) AS compartments" in cypher
+
 
 class TestBuildListPublicationsSummary:
     def test_no_filters(self):
@@ -2025,6 +2051,30 @@ class TestBuildListPublicationsSummary:
         IndexErrors on summary[0])."""
         cypher, _ = build_list_publications_summary(organism="MED4")
         assert "OPTIONAL MATCH (p:Publication)" in cypher
+
+    def test_summary_returns_dm_rollup_envelope_keys(self):
+        """Summary RETURN includes by_value_kind, by_metric_type, by_compartment."""
+        cypher, _ = build_list_publications_summary()
+        assert "by_value_kind" in cypher
+        assert "by_metric_type" in cypher
+        assert "by_compartment" in cypher
+
+    def test_summary_returns_by_cluster_type(self):
+        """Summary RETURN includes by_cluster_type (migrated from in-memory)."""
+        cypher, _ = build_list_publications_summary()
+        assert "by_cluster_type" in cypher
+
+    def test_summary_compartment_filter(self):
+        """compartment param wired through to summary WHERE clause."""
+        cypher, params = build_list_publications_summary(compartment="vesicle")
+        assert "$compartment IN coalesce(p.compartments, [])" in cypher
+        assert params["compartment"] == "vesicle"
+
+    def test_summary_uses_apoc_frequencies(self):
+        """apoc.coll.frequencies used for DM envelope keys."""
+        cypher, _ = build_list_publications_summary()
+        assert "apoc.coll.frequencies" in cypher
+        assert "apoc.coll.flatten" in cypher
 
 
 class TestBuildListPublicationsPublicationDoisFilter:

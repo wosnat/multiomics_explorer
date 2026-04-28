@@ -1527,11 +1527,16 @@ def register_tools(mcp: FastMCP):
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses from this publication (e.g. 4)")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
         growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases across experiments. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
+        derived_metric_count: int = Field(default=0, description="Number of DerivedMetric nodes from this publication (e.g. 3)")
+        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Value kinds of DerivedMetrics in this publication (e.g. ['numeric', 'boolean'])")
+        compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle'])")
         score: float | None = Field(default=None, description="Lucene relevance score (only with search_text)")
 
         abstract: str | None = Field(default=None, description="Publication abstract (only with verbose=True)")
         description: str | None = Field(default=None, description="Curated study description (only with verbose=True)")
         cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 20)")
+        derived_metric_gene_count: int | None = Field(default=None, description="Total genes annotated by DerivedMetrics in this publication (only with verbose=True)")
+        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric types in this publication (only with verbose=True, e.g. ['diel_rhythmicity'])")
 
     class PubOrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
@@ -1553,6 +1558,18 @@ def register_tools(mcp: FastMCP):
         cluster_type: str = Field(description="Cluster type (e.g. 'condition_comparison')")
         count: int = Field(description="Number of publications (e.g. 4)")
 
+    class PubValueKindBreakdown(BaseModel):
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
+        count: int = Field(description="Number of publications with this value kind (e.g. 3)")
+
+    class PubMetricTypeBreakdown(BaseModel):
+        metric_type: str = Field(description="DerivedMetric type (e.g. 'diel_rhythmicity', 'darkness_survival_class')")
+        count: int = Field(description="Number of publications with this metric type (e.g. 2)")
+
+    class PubCompartmentBreakdown(BaseModel):
+        compartment: str = Field(description="Wet-lab compartment (e.g. 'whole_cell', 'vesicle')")
+        count: int = Field(description="Number of publications with this compartment (e.g. 5)")
+
     class ListPublicationsResponse(BaseModel):
         total_entries: int = Field(description="Total publications in KG (unfiltered)")
         total_matching: int = Field(description="Publications matching filters")
@@ -1561,6 +1578,9 @@ def register_tools(mcp: FastMCP):
         by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted by count descending")
         by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted by count descending")
         by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted by count descending")
+        by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications. Each entry: {value_kind, count}.")
+        by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications. Each entry: {metric_type, count}.")
+        by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications. Each entry: {compartment, count}.")
         returned: int = Field(description="Publications in this response")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
@@ -1603,6 +1623,11 @@ def register_tools(mcp: FastMCP):
             "lists any provided DOIs that did not match. Mirrors the filter "
             "shape on sibling list_* tools (list_experiments.experiment_ids).",
         )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Filter to publications with at least one experiment in this "
+            "wet-lab compartment (e.g. 'vesicle', 'whole_cell'). "
+            "Use list_filter_values(filter_type='compartment') to enumerate valid values.",
+        )] = None,
         verbose: Annotated[bool, Field(
             description="Include abstract and description. "
             "Default compact for routing.",
@@ -1621,7 +1646,8 @@ def register_tools(mcp: FastMCP):
         specific experiments with list_experiments or genes with genes_by_function.
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
-                       f"growth_phases={growth_phases} search_text={search_text} author={author} offset={offset}")
+                       f"growth_phases={growth_phases} search_text={search_text} author={author} "
+                       f"compartment={compartment} offset={offset}")
         try:
             conn = _conn(ctx)
             result = api.list_publications(
@@ -1630,6 +1656,7 @@ def register_tools(mcp: FastMCP):
                 growth_phases=growth_phases,
                 search_text=search_text, author=author,
                 publication_dois=publication_dois,
+                compartment=compartment,
                 verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
             results = [PublicationResult(**r) for r in result["results"]]
@@ -1638,6 +1665,9 @@ def register_tools(mcp: FastMCP):
             by_background_factors = [PubBackgroundFactorBreakdown(**b) for b in result["by_background_factors"]]
             by_omics_type = [PubOmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
             by_cluster_type = [PubClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
+            by_value_kind = [PubValueKindBreakdown(**b) for b in result.get("by_value_kind", [])]
+            by_metric_type = [PubMetricTypeBreakdown(**b) for b in result.get("by_metric_type", [])]
+            by_compartment = [PubCompartmentBreakdown(**b) for b in result.get("by_compartment", [])]
             response = ListPublicationsResponse(
                 total_entries=result["total_entries"],
                 total_matching=result["total_matching"],
@@ -1646,6 +1676,9 @@ def register_tools(mcp: FastMCP):
                 by_background_factors=by_background_factors,
                 by_omics_type=by_omics_type,
                 by_cluster_type=by_cluster_type,
+                by_value_kind=by_value_kind,
+                by_metric_type=by_metric_type,
+                by_compartment=by_compartment,
                 returned=result["returned"],
                 offset=result.get("offset", 0),
                 truncated=result["truncated"],

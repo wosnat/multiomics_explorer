@@ -1868,8 +1868,11 @@ class TestListPublications:
         assert list_publications is api.list_publications
 
     def test_by_cluster_type_computed(self, mock_conn):
+        """by_cluster_type is now sourced from the summary row (migrated from in-memory)."""
         mock_conn.execute_query.side_effect = [
-            [{"total_entries": 1, "total_matching": 1}],
+            [{"total_entries": 1, "total_matching": 1,
+              "by_cluster_type": [{"item": "condition_comparison", "count": 1}],
+              "by_value_kind": [], "by_metric_type": [], "by_compartment": []}],
             [self._PUB_ROW],
         ]
         result = api.list_publications(conn=mock_conn)
@@ -1967,6 +1970,113 @@ class TestListPublications:
         ]
         result = api.list_publications(conn=mock_conn)
         assert result["not_found"] == []
+
+    # --- DM rollup + compartment filter tests (slice 2 Task 3) ---
+
+    def test_dm_envelope_keys_sourced_from_summary(self, mock_conn):
+        """by_value_kind, by_metric_type, by_compartment sourced from summary row."""
+        mock_conn.execute_query.side_effect = [
+            [{
+                "total_entries": 5, "total_matching": 5,
+                "by_value_kind": [{"item": "numeric", "count": 3}],
+                "by_metric_type": [{"item": "rhythmicity", "count": 2}],
+                "by_compartment": [{"item": "whole_cell", "count": 4}],
+                "by_cluster_type": [{"item": "condition_comparison", "count": 2}],
+            }],
+            [self._PUB_ROW],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        assert result["by_value_kind"] == [{"value_kind": "numeric", "count": 3}]
+        assert result["by_metric_type"] == [{"metric_type": "rhythmicity", "count": 2}]
+        assert result["by_compartment"] == [{"compartment": "whole_cell", "count": 4}]
+
+    def test_by_cluster_type_sourced_from_summary(self, mock_conn):
+        """by_cluster_type now sourced from summary row (migrated from in-memory)."""
+        mock_conn.execute_query.side_effect = [
+            [{
+                "total_entries": 1, "total_matching": 1,
+                "by_value_kind": [],
+                "by_metric_type": [],
+                "by_compartment": [],
+                "by_cluster_type": [{"item": "condition_comparison", "count": 1}],
+            }],
+            [self._PUB_ROW],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
+        assert ct_map["condition_comparison"] == 1
+
+    def test_compartment_filter_passed_to_builders(self, mock_conn):
+        """compartment param is forwarded to summary and detail builders."""
+        mock_conn.execute_query.side_effect = [
+            [{
+                "total_entries": 5, "total_matching": 2,
+                "by_value_kind": [], "by_metric_type": [],
+                "by_compartment": [{"item": "vesicle", "count": 2}],
+                "by_cluster_type": [],
+            }],
+            [self._PUB_ROW],
+        ]
+        result = api.list_publications(compartment="vesicle", conn=mock_conn)
+        # Both summary and detail query should receive $compartment
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        detail_call = mock_conn.execute_query.call_args_list[1]
+        assert summary_call.kwargs.get("compartment") == "vesicle"
+        assert detail_call.kwargs.get("compartment") == "vesicle"
+        assert result["total_matching"] == 2
+
+    def test_per_row_dm_fields_present(self, mock_conn):
+        """Per-row derived_metric_count, derived_metric_value_kinds, compartments present."""
+        row = {
+            **self._PUB_ROW,
+            "derived_metric_count": 3,
+            "derived_metric_value_kinds": ["numeric"],
+            "compartments": ["whole_cell"],
+        }
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1,
+              "by_value_kind": [], "by_metric_type": [],
+              "by_compartment": [], "by_cluster_type": []}],
+            [row],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        r = result["results"][0]
+        assert r["derived_metric_count"] == 3
+        assert r["derived_metric_value_kinds"] == ["numeric"]
+        assert r["compartments"] == ["whole_cell"]
+
+    def test_verbose_per_row_dm_extras(self, mock_conn):
+        """Verbose mode includes derived_metric_gene_count and derived_metric_types."""
+        row = {
+            **self._PUB_ROW,
+            "abstract": "...", "description": "...", "cluster_count": 10,
+            "derived_metric_count": 2,
+            "derived_metric_value_kinds": ["boolean"],
+            "compartments": [],
+            "derived_metric_gene_count": 150,
+            "derived_metric_types": ["diel_rhythmicity"],
+        }
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1,
+              "by_value_kind": [], "by_metric_type": [],
+              "by_compartment": [], "by_cluster_type": []}],
+            [row],
+        ]
+        result = api.list_publications(verbose=True, conn=mock_conn)
+        r = result["results"][0]
+        assert r["derived_metric_gene_count"] == 150
+        assert r["derived_metric_types"] == ["diel_rhythmicity"]
+
+    def test_missing_dm_envelope_keys_default_empty(self, mock_conn):
+        """Missing DM envelope keys in summary row default to empty lists."""
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 1, "total_matching": 1}],  # no DM keys
+            [self._PUB_ROW],
+        ]
+        result = api.list_publications(conn=mock_conn)
+        assert result["by_value_kind"] == []
+        assert result["by_metric_type"] == []
+        assert result["by_compartment"] == []
 
 
 class TestListExperiments:

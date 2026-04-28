@@ -709,6 +709,7 @@ def _list_publications_where(
     search_text: str | None = None,
     author: str | None = None,
     publication_dois: list[str] | None = None,
+    compartment: str | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for publication queries.
 
@@ -756,6 +757,10 @@ def _list_publications_where(
         conditions.append("toLower(p.doi) IN $publication_dois")
         params["publication_dois"] = [d.lower() for d in publication_dois]
 
+    if compartment is not None:
+        conditions.append("$compartment IN coalesce(p.compartments, [])")
+        params["compartment"] = compartment
+
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
     return where_block, params
 
@@ -769,6 +774,7 @@ def build_list_publications(
     search_text: str | None = None,
     author: str | None = None,
     publication_dois: list[str] | None = None,
+    compartment: str | None = None,
     verbose: bool = False,
     limit: int | None = None,
 ) -> tuple[str, dict]:
@@ -776,20 +782,26 @@ def build_list_publications(
 
     RETURN keys (compact): doi, title, authors, year, journal, study_type,
     organisms, experiment_count, treatment_types, background_factors, omics_types,
-    clustering_analysis_count, cluster_types, growth_phases.
+    clustering_analysis_count, cluster_types, growth_phases,
+    derived_metric_count, derived_metric_value_kinds, compartments.
     When search_text is provided, also: score.
-    RETURN keys (verbose): adds abstract, description, cluster_count.
+    RETURN keys (verbose): adds abstract, description, cluster_count,
+    derived_metric_gene_count, derived_metric_types.
+    compartment: when provided, restricts to publications with at least one
+    experiment in that wet-lab compartment.
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
         search_text=search_text, author=author,
-        publication_dois=publication_dois,
+        publication_dois=publication_dois, compartment=compartment,
     )
 
     verbose_cols = (
         ",\n       p.abstract AS abstract, p.description AS description,"
-        "\n       p.cluster_count AS cluster_count"
+        "\n       p.cluster_count AS cluster_count,"
+        "\n       coalesce(p.derived_metric_gene_count, 0) AS derived_metric_gene_count,"
+        "\n       coalesce(p.derived_metric_types, []) AS derived_metric_types"
         if verbose else ""
     )
     if limit is not None:
@@ -817,6 +829,9 @@ def build_list_publications(
             "       coalesce(p.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
             "       coalesce(p.cluster_types, []) AS cluster_types,\n"
             "       coalesce(p.growth_phases, []) AS growth_phases,\n"
+            "       coalesce(p.derived_metric_count, 0) AS derived_metric_count,\n"
+            "       coalesce(p.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
+            "       coalesce(p.compartments, []) AS compartments,\n"
             f"       score{verbose_cols}\n"
             f"ORDER BY score DESC, p.publication_year DESC, p.title\n"
             f"{limit_clause}"
@@ -838,7 +853,10 @@ def build_list_publications(
             "       p.omics_types AS omics_types,\n"
             "       coalesce(p.clustering_analysis_count, 0) AS clustering_analysis_count,\n"
             "       coalesce(p.cluster_types, []) AS cluster_types,\n"
-            f"       coalesce(p.growth_phases, []) AS growth_phases{verbose_cols}\n"
+            "       coalesce(p.growth_phases, []) AS growth_phases,\n"
+            "       coalesce(p.derived_metric_count, 0) AS derived_metric_count,\n"
+            "       coalesce(p.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
+            f"       coalesce(p.compartments, []) AS compartments{verbose_cols}\n"
             f"ORDER BY p.publication_year DESC, p.title\n"
             f"{limit_clause}"
         )
@@ -855,18 +873,22 @@ def build_list_publications_summary(
     search_text: str | None = None,
     author: str | None = None,
     publication_dois: list[str] | None = None,
+    compartment: str | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for matching publications.
 
-    RETURN keys: total_entries, total_matching.
+    RETURN keys: total_entries, total_matching, by_value_kind, by_metric_type,
+    by_compartment, by_cluster_type.
     total_entries is the unfiltered count of all publications.
     total_matching is the count after applying filters.
+    The rollup envelope keys use apoc.coll.flatten + apoc.coll.frequencies over
+    the precomputed list properties on each Publication node.
     """
     where_block, params = _list_publications_where(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
         search_text=search_text, author=author,
-        publication_dois=publication_dois,
+        publication_dois=publication_dois, compartment=compartment,
     )
 
     if search_text:
@@ -874,9 +896,21 @@ def build_list_publications_summary(
             "CALL db.index.fulltext.queryNodes('publicationFullText', $search_text)\n"
             "YIELD node AS p, score\n"
             f"{where_block}"
-            "WITH count(p) AS total_matching\n"
+            "WITH count(p) AS total_matching,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(p.derived_metric_value_kinds, []))) AS vks,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(p.derived_metric_types, []))) AS mtypes,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(p.compartments, []))) AS comps,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(p.cluster_types, []))) AS ctypes\n"
             "MATCH (p2:Publication)\n"
-            "RETURN count(p2) AS total_entries, total_matching"
+            "RETURN count(p2) AS total_entries, total_matching,\n"
+            "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
+            "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
+            "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+            "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
         )
     else:
         # OPTIONAL MATCH preserves the total_entries row when the filtered
@@ -887,7 +921,21 @@ def build_list_publications_summary(
             "WITH count(p) AS total_entries\n"
             "OPTIONAL MATCH (p:Publication)\n"
             f"{where_block}"
-            "RETURN total_entries, count(p) AS total_matching"
+            "WITH total_entries,\n"
+            "     count(p) AS total_matching,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(p.derived_metric_value_kinds, []))) AS vks,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(p.derived_metric_types, []))) AS mtypes,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(p.compartments, []))) AS comps,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(p.cluster_types, []))) AS ctypes\n"
+            "RETURN total_entries, total_matching,\n"
+            "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
+            "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
+            "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+            "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
         )
 
     return cypher, params

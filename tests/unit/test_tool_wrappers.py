@@ -2143,6 +2143,72 @@ class TestListPublicationsWrapper:
             result = await tool_fns["list_publications"](mock_ctx)
         assert result.not_found == []
 
+    @pytest.mark.asyncio
+    async def test_dm_envelope_keys_in_response(self, tool_fns, mock_ctx):
+        """by_value_kind, by_metric_type, by_compartment are in the response."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 5, "total_matching": 5,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "by_value_kind": [{"value_kind": "numeric", "count": 3}],
+                "by_metric_type": [{"metric_type": "diel_rhythmicity", "count": 2}],
+                "by_compartment": [{"compartment": "whole_cell", "count": 4}],
+                "returned": 0, "truncated": False, "results": [],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        assert len(result.by_value_kind) == 1
+        assert result.by_value_kind[0].value_kind == "numeric"
+        assert result.by_value_kind[0].count == 3
+        assert len(result.by_metric_type) == 1
+        assert result.by_metric_type[0].metric_type == "diel_rhythmicity"
+        assert len(result.by_compartment) == 1
+        assert result.by_compartment[0].compartment == "whole_cell"
+
+    @pytest.mark.asyncio
+    async def test_compartment_param_forwarded(self, tool_fns, mock_ctx):
+        """compartment param is forwarded to api.list_publications."""
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 5, "total_matching": 2,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+                "returned": 0, "truncated": False, "results": [],
+            },
+        ) as mock_api:
+            await tool_fns["list_publications"](mock_ctx, compartment="vesicle")
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs.get("compartment") == "vesicle"
+
+    @pytest.mark.asyncio
+    async def test_per_row_dm_fields_in_result(self, tool_fns, mock_ctx):
+        """Per-row derived_metric_count, derived_metric_value_kinds, compartments present."""
+        pub_with_dm = {
+            **self._SAMPLE_PUB,
+            "derived_metric_count": 2,
+            "derived_metric_value_kinds": ["boolean"],
+            "compartments": ["whole_cell"],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_publications",
+            return_value={
+                "total_entries": 1, "total_matching": 1,
+                "by_organism": [], "by_treatment_type": [],
+                "by_background_factors": [], "by_omics_type": [],
+                "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+                "returned": 1, "truncated": False, "results": [pub_with_dm],
+            },
+        ):
+            result = await tool_fns["list_publications"](mock_ctx)
+        r = result.results[0]
+        assert r.derived_metric_count == 2
+        assert r.derived_metric_value_kinds == ["boolean"]
+        assert r.compartments == ["whole_cell"]
+
 
 class TestListExperimentsWrapper:
     _SAMPLE_SUMMARY = {

@@ -19,6 +19,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 | search_text | string \| None | None | Free-text search on title, abstract, and description (Lucene syntax). E.g. 'nitrogen', 'co-culture AND phage'. |
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
 | publication_dois | list[string] \| None | None | Restrict to specific publications by DOI (case-insensitive). Combines with other filters via AND. `not_found` in the response lists any provided DOIs that did not match. Mirrors the filter shape on sibling list_* tools (list_experiments.experiment_ids). |
+| compartment | string \| None | None | Filter to publications with at least one experiment in this wet-lab compartment (e.g. 'vesicle', 'whole_cell'). Use list_filter_values(filter_type='compartment') to enumerate valid values. |
 | verbose | bool | False | Include abstract and description. Default compact for routing. |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
@@ -30,7 +31,7 @@ specific experiments with list_experiments or genes with genes_by_function.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, returned, offset, truncated, not_found, results
+total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, returned, offset, truncated, not_found, results
 ```
 
 - **total_entries** (int): Total publications in KG (unfiltered)
@@ -40,6 +41,9 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **by_background_factors** (list[PubBackgroundFactorBreakdown]): Publication counts per background factor, sorted by count descending
 - **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted by count descending
 - **by_cluster_type** (list[PubClusterTypeBreakdown]): Publication counts per cluster type, sorted by count descending
+- **by_value_kind** (list[PubValueKindBreakdown]): DerivedMetric value kind frequency rollup across matched publications. Each entry: {value_kind, count}.
+- **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications. Each entry: {metric_type, count}.
+- **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications. Each entry: {compartment, count}.
 - **returned** (int): Publications in this response
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
@@ -63,7 +67,12 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | clustering_analysis_count | int (optional) | Number of clustering analyses from this publication (e.g. 4) |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
 | growth_phases | list[string] (optional) | Distinct growth phases across experiments. Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
+| derived_metric_count | int (optional) | Number of DerivedMetric nodes from this publication (e.g. 3) |
+| derived_metric_value_kinds | list[string] (optional) | Value kinds of DerivedMetrics in this publication (e.g. ['numeric', 'boolean']) |
+| compartments | list[string] (optional) | Wet-lab compartments measured in this publication (e.g. ['whole_cell', 'vesicle']) |
 | score | float \| None (optional) | Lucene relevance score (only with search_text) |
+| derived_metric_gene_count | int \| None (optional) | Total genes annotated by DerivedMetrics in this publication (only with verbose=True) |
+| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric types in this publication (only with verbose=True, e.g. ['diel_rhythmicity']) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -154,7 +163,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_publications
 
 result = list_publications()
-# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, offset, not_found, results
+# returns dict with keys: total_entries, total_matching, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_cluster_type, by_value_kind, by_metric_type, by_compartment, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.
