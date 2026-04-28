@@ -810,10 +810,27 @@ def register_tools(mcp: FastMCP):
         closest_ortholog_genera: list[str] | None = Field(default=None, description="Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus'])")
         cluster_membership_count: int = Field(default=0, description="Number of cluster memberships (e.g. 3)")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison', 'diel'])")
+        # Compact DM fields (always present)
+        derived_metric_count: int = Field(
+            default=0,
+            description="Total DerivedMetric annotations on this gene (sum across numeric/boolean/categorical kinds).",
+        )
+        derived_metric_value_kinds: list[str] = Field(
+            default_factory=list,
+            description="Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs.",
+        )
         # verbose-only
         gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'dnaN :: DNA polymerase III subunit beta :: Alternative locus ID')")
         function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Alternative locus ID')")
         all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (e.g. ['CK_Pro_MED4_00845', 'Q7V1M0', 'WP_011132479.1'])")
+        # Verbose-only DM fields (None on compact responses)
+        numeric_metric_count: int | None = Field(default=None, description="Numeric DM count (verbose).")
+        boolean_metric_count: int | None = Field(default=None, description="Boolean DM count (verbose).")
+        categorical_metric_count: int | None = Field(default=None, description="Categorical DM count (verbose).")
+        numeric_metric_types_observed: list[str] | None = Field(default=None, description="Numeric metric_types observed (verbose).")
+        boolean_metric_types_observed: list[str] | None = Field(default=None, description="Boolean metric_types observed (verbose).")
+        categorical_metric_types_observed: list[str] | None = Field(default=None, description="Categorical metric_types observed (verbose).")
+        compartments_observed: list[str] | None = Field(default=None, description="DM compartments observed for this gene (verbose).")
 
     class OverviewOrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
@@ -836,6 +853,10 @@ def register_tools(mcp: FastMCP):
         has_significant_expression: int = Field(description="Genes with significant DE observations")
         has_orthologs: int = Field(description="Genes with ortholog group membership")
         has_clusters: int = Field(description="Genes with cluster membership")
+        has_derived_metrics: int = Field(
+            default=0,
+            description="Count of requested locus_tags carrying any DM annotation.",
+        )
         returned: int = Field(description="Results in this response (0 when summary=true)")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
@@ -891,6 +912,7 @@ def register_tools(mcp: FastMCP):
                 has_significant_expression=data["has_significant_expression"],
                 has_orthologs=data["has_orthologs"],
                 has_clusters=data["has_clusters"],
+                has_derived_metrics=data["has_derived_metrics"],
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],

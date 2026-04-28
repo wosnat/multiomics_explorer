@@ -329,7 +329,7 @@ class TestGenesByFunction:
 # gene_overview
 # ---------------------------------------------------------------------------
 class TestGeneOverview:
-    def _summary_result(self, total=1, not_found=None):
+    def _summary_result(self, total=1, not_found=None, has_derived_metrics=0):
         """Helper: mock summary query result."""
         return [{
             "total_matching": total,
@@ -340,6 +340,7 @@ class TestGeneOverview:
             "has_significant_expression": 1,
             "has_orthologs": 1,
             "has_clusters": 0,
+            "has_derived_metrics": has_derived_metrics,
             "not_found": not_found or [],
         }]
 
@@ -355,7 +356,11 @@ class TestGeneOverview:
              "expression_edge_count": 10,
              "significant_up_count": 3, "significant_down_count": 2,
              "closest_ortholog_group_size": 20,
-             "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"]},
+             "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+             "cluster_membership_count": 0, "cluster_types": [],
+             "numeric_metric_count": 0,
+             "boolean_metric_count": 0,
+             "categorical_metric_count": 0},
         ]
 
     def test_returns_dict(self, mock_conn):
@@ -427,6 +432,7 @@ class TestGeneOverview:
                     "has_significant_expression": 0,
                     "has_orthologs": 0,
                     "has_clusters": 0,
+                    "has_derived_metrics": 0,
                     "not_found": ["FAKE"],
                 }],
             ]
@@ -465,6 +471,131 @@ class TestGeneOverview:
         ]
         result = api.gene_overview(["PMM0001"], offset=5, conn=mock_conn)
         assert result["offset"] == 5
+
+    def test_synthesizes_dm_count_and_value_kinds(self, mock_conn):
+        """Compact derived_metric_count = sum of per-kind; value_kinds = which kinds > 0."""
+        detail_rows = [{
+            "locus_tag": "PMM0001", "gene_name": "rbcL",
+            "product": "RuBisCO large subunit",
+            "gene_category": "Carbon fixation",
+            "annotation_quality": 3,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": ["go_bp"],
+            "expression_edge_count": 5,
+            "significant_up_count": 2, "significant_down_count": 1,
+            "closest_ortholog_group_size": 10,
+            "closest_ortholog_genera": ["Prochlorococcus"],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 5,
+            "boolean_metric_count": 3,
+            "categorical_metric_count": 0,
+        }]
+        summary_row = self._summary_result(total=1, has_derived_metrics=1)
+        mock_conn.execute_query.side_effect = [summary_row, detail_rows]
+        result = api.gene_overview(locus_tags=["PMM0001"], conn=mock_conn)
+        assert result["has_derived_metrics"] == 1
+        row = result["results"][0]
+        assert row["derived_metric_count"] == 8
+        assert set(row["derived_metric_value_kinds"]) == {"numeric", "boolean"}
+
+    def test_zero_dm_gene_has_empty_value_kinds(self, mock_conn):
+        """Gene with no DM annotations gets count=0 and empty value_kinds list."""
+        detail_rows = [{
+            "locus_tag": "PMM9999", "gene_name": "x",
+            "product": "hypothetical protein",
+            "gene_category": "Unknown",
+            "annotation_quality": 1,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": [],
+            "expression_edge_count": 0,
+            "significant_up_count": 0, "significant_down_count": 0,
+            "closest_ortholog_group_size": 0,
+            "closest_ortholog_genera": [],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 0,
+            "boolean_metric_count": 0,
+            "categorical_metric_count": 0,
+        }]
+        summary_row = self._summary_result(total=1, has_derived_metrics=0)
+        mock_conn.execute_query.side_effect = [summary_row, detail_rows]
+        result = api.gene_overview(locus_tags=["PMM9999"], conn=mock_conn)
+        assert result["results"][0]["derived_metric_count"] == 0
+        assert result["results"][0]["derived_metric_value_kinds"] == []
+
+    def test_compact_strips_per_kind_and_types_observed(self, mock_conn):
+        """Per-kind raw fields + types lists + compartments_observed are verbose-only."""
+        detail_rows = [{
+            "locus_tag": "PMM0001", "gene_name": "dnaN",
+            "product": "DNA polymerase III subunit beta",
+            "gene_category": "DNA replication",
+            "annotation_quality": 3,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": ["go_bp"],
+            "expression_edge_count": 5,
+            "significant_up_count": 1, "significant_down_count": 0,
+            "closest_ortholog_group_size": 10,
+            "closest_ortholog_genera": ["Prochlorococcus"],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 2,
+            "boolean_metric_count": 1,
+            "categorical_metric_count": 0,
+            "numeric_metric_types_observed": ["diel_amplitude"],
+            "boolean_metric_types_observed": ["rhythmic"],
+            "categorical_metric_types_observed": [],
+            "compartments_observed": ["intracellular"],
+        }]
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(has_derived_metrics=1), detail_rows,
+        ]
+        result = api.gene_overview(locus_tags=["PMM0001"], verbose=False, conn=mock_conn)
+        row = result["results"][0]
+        assert "numeric_metric_count" not in row
+        assert "boolean_metric_count" not in row
+        assert "categorical_metric_count" not in row
+        assert "numeric_metric_types_observed" not in row
+        assert "boolean_metric_types_observed" not in row
+        assert "categorical_metric_types_observed" not in row
+        assert "compartments_observed" not in row
+        # But synthesized compact fields should be present
+        assert "derived_metric_count" in row
+        assert "derived_metric_value_kinds" in row
+
+    def test_verbose_keeps_per_kind_and_types_observed(self, mock_conn):
+        """Verbose mode preserves per-kind counts + types lists + compartments_observed."""
+        detail_rows = [{
+            "locus_tag": "PMM0001", "gene_name": "dnaN",
+            "product": "DNA polymerase III subunit beta",
+            "gene_category": "DNA replication",
+            "annotation_quality": 3,
+            "organism_name": "Prochlorococcus MED4",
+            "annotation_types": ["go_bp"],
+            "expression_edge_count": 5,
+            "significant_up_count": 1, "significant_down_count": 0,
+            "closest_ortholog_group_size": 10,
+            "closest_ortholog_genera": ["Prochlorococcus"],
+            "cluster_membership_count": 0, "cluster_types": [],
+            "numeric_metric_count": 2,
+            "boolean_metric_count": 1,
+            "categorical_metric_count": 0,
+            "numeric_metric_types_observed": ["diel_amplitude"],
+            "boolean_metric_types_observed": ["rhythmic"],
+            "categorical_metric_types_observed": [],
+            "compartments_observed": ["intracellular"],
+        }]
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(has_derived_metrics=1), detail_rows,
+        ]
+        result = api.gene_overview(locus_tags=["PMM0001"], verbose=True, conn=mock_conn)
+        row = result["results"][0]
+        assert row["numeric_metric_count"] == 2
+        assert row["boolean_metric_count"] == 1
+        assert row["categorical_metric_count"] == 0
+        assert row["numeric_metric_types_observed"] == ["diel_amplitude"]
+        assert row["boolean_metric_types_observed"] == ["rhythmic"]
+        assert row["categorical_metric_types_observed"] == []
+        assert row["compartments_observed"] == ["intracellular"]
+        assert row["derived_metric_count"] == 3
+        assert set(row["derived_metric_value_kinds"]) == {"numeric", "boolean"}
 
 
 # ---------------------------------------------------------------------------

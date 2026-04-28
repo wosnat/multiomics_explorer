@@ -1083,6 +1083,23 @@ class TestGeneOverview:
         assert summary["total_matching"] == detail["total_matching"]
         assert detail["total_matching"] == len(detail["results"])
 
+    def test_gene_overview_dm_rollup_for_dm_bearing_gene(self, conn):
+        """DM-bearing gene surfaces has_derived_metrics=1 and a non-empty value_kinds list."""
+        # locus_tag captured from live KG: g.boolean_metric_count > 0
+        KNOWN_DM_GENE = "MIT1002_01809"
+        result = api.gene_overview(locus_tags=[KNOWN_DM_GENE], conn=conn)
+        assert result["has_derived_metrics"] == 1
+        row = result["results"][0]
+        assert row["derived_metric_count"] > 0
+        assert "boolean" in row["derived_metric_value_kinds"]
+
+    def test_gene_overview_verbose_surfaces_per_kind(self, conn):
+        """Verbose mode preserves per-kind counts and compartments_observed."""
+        KNOWN_DM_GENE = "MIT1002_01809"
+        result = api.gene_overview(locus_tags=[KNOWN_DM_GENE], verbose=True, conn=conn)
+        row = result["results"][0]
+        assert row["boolean_metric_count"] > 0
+        assert isinstance(row["compartments_observed"], list)
 
 
 @pytest.mark.kg

@@ -419,6 +419,35 @@ class TestBuildGeneOverview:
         assert "SKIP" not in cypher
         assert "offset" not in params
 
+    def test_compact_includes_per_kind_dm_counts(self):
+        """Compact mode always includes per-kind DM count columns."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=False)
+        assert "boolean_metric_count" in cypher
+        assert "numeric_metric_count" in cypher
+        assert "categorical_metric_count" in cypher
+
+    def test_compact_omits_types_observed_and_compartments(self):
+        """Compact mode omits per-kind types lists and compartments_observed."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=False)
+        assert "numeric_metric_types_observed" not in cypher
+        assert "boolean_metric_types_observed" not in cypher
+        assert "categorical_metric_types_observed" not in cypher
+        assert "compartments_observed" not in cypher
+
+    def test_verbose_includes_types_observed_and_compartments(self):
+        """Verbose mode adds per-kind types lists and compartments_observed."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"], verbose=True)
+        assert "numeric_metric_types_observed" in cypher
+        assert "boolean_metric_types_observed" in cypher
+        assert "categorical_metric_types_observed" in cypher
+        assert "compartments_observed" in cypher
+
+    def test_uses_post_d8_prop_names(self):
+        """Uses post-D8 KG names (boolean_metric_count, not classifier_flag_count)."""
+        cypher, _ = build_gene_overview(locus_tags=["PMM1428"])
+        assert "classifier_flag" not in cypher
+        assert "classifier_label" not in cypher
+
 
 class TestBuildGeneOverviewSummary:
     def test_returns_summary_keys(self):
@@ -443,6 +472,20 @@ class TestBuildGeneOverviewSummary:
         cypher, _ = build_gene_overview_summary(locus_tags=["PMM1428", "FAKE"])
         assert "OPTIONAL MATCH" in cypher
         assert "CASE WHEN g IS NULL" in cypher
+
+    def test_has_derived_metrics_in_summary(self):
+        """Summary emits has_derived_metrics using post-D8 arithmetic."""
+        cypher, _ = build_gene_overview_summary(locus_tags=["PMM1428"])
+        assert "has_derived_metrics" in cypher
+        assert "boolean_metric_count" in cypher
+        assert "numeric_metric_count" in cypher
+        assert "categorical_metric_count" in cypher
+
+    def test_summary_uses_post_d8_prop_names(self):
+        """Summary uses post-D8 prop names (no classifier_* references)."""
+        cypher, _ = build_gene_overview_summary(locus_tags=["PMM1428"])
+        assert "classifier_flag" not in cypher
+        assert "classifier_label" not in cypher
 
 
 class TestBuildGeneDetails:

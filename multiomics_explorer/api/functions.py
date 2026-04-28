@@ -334,6 +334,17 @@ def gene_overview(
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
     total_matching = raw_summary["total_matching"]
+    _KIND_FIELD_MAP = [
+        ("numeric_metric_count", "numeric"),
+        ("boolean_metric_count", "boolean"),
+        ("categorical_metric_count", "categorical"),
+    ]
+    _VERBOSE_DM_FIELDS = (
+        "numeric_metric_count", "boolean_metric_count", "categorical_metric_count",
+        "numeric_metric_types_observed", "boolean_metric_types_observed",
+        "categorical_metric_types_observed", "compartments_observed",
+    )
+
     envelope = {
         "total_matching": total_matching,
         "by_organism": _rename_freq(raw_summary["by_organism"], "organism_name"),
@@ -345,6 +356,7 @@ def gene_overview(
         "has_significant_expression": raw_summary["has_significant_expression"],
         "has_orthologs": raw_summary["has_orthologs"],
         "has_clusters": raw_summary["has_clusters"],
+        "has_derived_metrics": raw_summary["has_derived_metrics"],
         "not_found": raw_summary["not_found"],
     }
 
@@ -360,6 +372,15 @@ def gene_overview(
         locus_tags=locus_tags, verbose=verbose, limit=limit, offset=offset,
     )
     results = conn.execute_query(det_cypher, **det_params)
+
+    # Synthesize compact DM fields; strip verbose-only fields in compact mode
+    for r in results:
+        counts = {kind: r.get(field, 0) for field, kind in _KIND_FIELD_MAP}
+        r["derived_metric_count"] = sum(counts.values())
+        r["derived_metric_value_kinds"] = [k for k, v in counts.items() if v > 0]
+        if not verbose:
+            for f in _VERBOSE_DM_FIELDS:
+                r.pop(f, None)
 
     envelope["returned"] = len(results)
     envelope["offset"] = offset

@@ -43,10 +43,10 @@ rows:
   - kegg
   - pfam
   - tigr_role
-  classifier_flag_count: 0
-  classifier_flag_types_observed: []
-  classifier_label_count: 0
-  classifier_label_types_observed: []
+  boolean_metric_count: 0
+  boolean_metric_types_observed: []
+  categorical_metric_count: 0
+  categorical_metric_types_observed: []
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus

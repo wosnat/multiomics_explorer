@@ -402,6 +402,10 @@ def build_gene_overview_summary(
         "       size([g IN found WHERE (g.significant_up_count + g.significant_down_count) > 0]) AS has_significant_expression,\n"
         "       size([g IN found WHERE g.closest_ortholog_group_size > 0]) AS has_orthologs,\n"
         "       size([g IN found WHERE g.cluster_membership_count > 0]) AS has_clusters,\n"
+        "       size([g IN found WHERE\n"
+        "           coalesce(g.numeric_metric_count, 0)\n"
+        "         + coalesce(g.boolean_metric_count, 0)\n"
+        "         + coalesce(g.categorical_metric_count, 0) > 0]) AS has_derived_metrics,\n"
         "       not_found"
     )
     return cypher, {"locus_tags": locus_tags}
@@ -420,9 +424,12 @@ def build_gene_overview(
     annotation_quality, organism_name, annotation_types,
     expression_edge_count, significant_up_count, significant_down_count,
     closest_ortholog_group_size, closest_ortholog_genera,
-    cluster_membership_count, cluster_types.
+    cluster_membership_count, cluster_types,
+    numeric_metric_count, boolean_metric_count, categorical_metric_count.
     RETURN keys (verbose): adds gene_summary, function_description,
-    all_identifiers.
+    all_identifiers, numeric_metric_types_observed,
+    boolean_metric_types_observed, categorical_metric_types_observed,
+    compartments_observed.
     """
     params: dict = {"locus_tags": locus_tags}
 
@@ -430,6 +437,10 @@ def build_gene_overview(
         ",\n       g.gene_summary AS gene_summary"
         ",\n       g.function_description AS function_description"
         ",\n       g.all_identifiers AS all_identifiers"
+        ",\n       coalesce(g.numeric_metric_types_observed, []) AS numeric_metric_types_observed"
+        ",\n       coalesce(g.boolean_metric_types_observed, []) AS boolean_metric_types_observed"
+        ",\n       coalesce(g.categorical_metric_types_observed, []) AS categorical_metric_types_observed"
+        ",\n       coalesce(g.compartments_observed, []) AS compartments_observed"
         if verbose else ""
     )
 
@@ -458,7 +469,10 @@ def build_gene_overview(
         "       g.closest_ortholog_group_size AS closest_ortholog_group_size,\n"
         "       g.closest_ortholog_genera AS closest_ortholog_genera,\n"
         "       coalesce(g.cluster_membership_count, 0) AS cluster_membership_count,\n"
-        f"       coalesce(g.cluster_types, []) AS cluster_types{verbose_cols}\n"
+        "       coalesce(g.cluster_types, []) AS cluster_types,\n"
+        "       coalesce(g.numeric_metric_count, 0) AS numeric_metric_count,\n"
+        "       coalesce(g.boolean_metric_count, 0) AS boolean_metric_count,\n"
+        f"       coalesce(g.categorical_metric_count, 0) AS categorical_metric_count{verbose_cols}\n"
         f"ORDER BY g.locus_tag{skip_clause}{limit_clause}"
     )
     return cypher, params

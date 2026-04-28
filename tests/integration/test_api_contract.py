@@ -97,6 +97,7 @@ class TestGeneOverviewContract:
         assert "has_expression" in result
         assert "has_significant_expression" in result
         assert "has_orthologs" in result
+        assert "has_derived_metrics" in result
         assert "returned" in result
         assert "truncated" in result
         assert "offset" in result
@@ -113,6 +114,7 @@ class TestGeneOverviewContract:
             "annotation_types", "expression_edge_count",
             "significant_up_count", "significant_down_count", "closest_ortholog_group_size",
             "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
+            "derived_metric_count", "derived_metric_value_kinds",
         }
         assert set(result["results"][0].keys()) == expected_keys
 

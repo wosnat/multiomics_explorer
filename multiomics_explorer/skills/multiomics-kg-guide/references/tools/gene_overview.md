@@ -23,7 +23,7 @@ data exists.
 ### Envelope
 
 ```expected-keys
-total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, returned, offset, truncated, not_found, results
+total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, returned, offset, truncated, not_found, results
 ```
 
 - **total_matching** (int): Genes found in KG from input locus_tags
@@ -34,6 +34,7 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 - **has_significant_expression** (int): Genes with significant DE observations
 - **has_orthologs** (int): Genes with ortholog group membership
 - **has_clusters** (int): Genes with cluster membership
+- **has_derived_metrics** (int): Count of requested locus_tags carrying any DM annotation.
 - **returned** (int): Results in this response (0 when summary=true)
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > returned
@@ -57,6 +58,15 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 | closest_ortholog_genera | list[string] \| None (optional) | Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus']) |
 | cluster_membership_count | int (optional) | Number of cluster memberships (e.g. 3) |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']) |
+| derived_metric_count | int (optional) | Total DerivedMetric annotations on this gene (sum across numeric/boolean/categorical kinds). |
+| derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs. |
+| numeric_metric_count | int \| None (optional) | Numeric DM count (verbose). |
+| boolean_metric_count | int \| None (optional) | Boolean DM count (verbose). |
+| categorical_metric_count | int \| None (optional) | Categorical DM count (verbose). |
+| numeric_metric_types_observed | list[string] \| None (optional) | Numeric metric_types observed (verbose). |
+| boolean_metric_types_observed | list[string] \| None (optional) | Boolean metric_types observed (verbose). |
+| categorical_metric_types_observed | list[string] \| None (optional) | Categorical metric_types observed (verbose). |
+| compartments_observed | list[string] \| None (optional) | DM compartments observed for this gene (verbose). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -148,7 +158,7 @@ gene_overview(locus_tags=['PMM0845'])  # verbose only needed for gene_summary te
 from multiomics_explorer import gene_overview
 
 result = gene_overview(locus_tags=...)
-# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, offset, not_found, results
+# returns dict with keys: total_matching, by_organism, by_category, by_annotation_type, has_expression, has_significant_expression, has_orthologs, has_clusters, has_derived_metrics, offset, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.
