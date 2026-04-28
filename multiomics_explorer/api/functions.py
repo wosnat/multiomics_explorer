@@ -631,13 +631,10 @@ def list_organisms(
     summary_row = summary_rows[0] if summary_rows else {
         "total_entries": 0, "total_matching": 0,
         "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+        "by_cluster_type": [], "by_organism_type": [],
     }
     total_entries = summary_row["total_entries"]
     total_matching = summary_row["total_matching"]
-
-    # Breakdowns reflect the matched set (computed from detail rows).
-    ct_counts: dict[str, int] = {}
-    ot_counts: dict[str, int] = {}
 
     if limit == 0:
         results = []
@@ -646,13 +643,6 @@ def list_organisms(
             organism_names_lc=names_lc, compartment=compartment, verbose=verbose,
         )
         matched = conn.execute_query(detail_cypher, **detail_params)
-
-        for org in matched:
-            for ct in org.get("cluster_types", []):
-                ct_counts[ct] = ct_counts.get(ct, 0) + 1
-            ot = org.get("organism_type")
-            if ot:
-                ot_counts[ot] = ot_counts.get(ot, 0) + 1
 
         if offset:
             matched = matched[offset:]
@@ -690,16 +680,10 @@ def list_organisms(
     return {
         "total_entries": total_entries,
         "total_matching": total_matching,
-        "by_cluster_type": sorted(
-            [{"cluster_type": k, "count": v} for k, v in ct_counts.items()],
-            key=lambda x: x["count"],
-            reverse=True,
-        ),
-        "by_organism_type": sorted(
-            [{"organism_type": k, "count": v} for k, v in ot_counts.items()],
-            key=lambda x: x["count"],
-            reverse=True,
-        ),
+        "by_cluster_type": _rename_freq(
+            summary_row.get("by_cluster_type", []), "cluster_type"),
+        "by_organism_type": _rename_freq(
+            summary_row.get("by_organism_type", []), "organism_type"),
         "by_value_kind": _rename_freq(summary_row.get("by_value_kind", []),
                                       "value_kind"),
         "by_metric_type": _rename_freq(summary_row.get("by_metric_type", []),

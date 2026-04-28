@@ -1057,10 +1057,10 @@ def build_list_organisms_summary(
     organism_names_lc: list[str] | None = None,
     compartment: str | None = None,
 ) -> tuple[str, dict]:
-    """Summary count + DM/compartment rollups across matched organisms.
+    """Summary count + DM/compartment/cluster/organism-type rollups across matched organisms.
 
     RETURN keys: total_entries, total_matching, by_value_kind,
-    by_metric_type, by_compartment.
+    by_metric_type, by_compartment, by_cluster_type, by_organism_type.
     """
     conditions = [
         "($organism_names_lc IS NULL"
@@ -1084,11 +1084,16 @@ def build_list_organisms_summary(
         "     apoc.coll.flatten(\n"
         "       collect(coalesce(o.derived_metric_types, []))) AS mtypes,\n"
         "     apoc.coll.flatten(\n"
-        "       collect(coalesce(o.compartments, []))) AS comps\n"
+        "       collect(coalesce(o.compartments, []))) AS comps,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(o.cluster_types, []))) AS ctypes,\n"
+        "     collect(o.organism_type) AS otypes\n"
         "RETURN total_entries, total_matching,\n"
         "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
         "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
-        "       apoc.coll.frequencies(comps) AS by_compartment"
+        "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+        "       apoc.coll.frequencies(ctypes) AS by_cluster_type,\n"
+        "       apoc.coll.frequencies(otypes) AS by_organism_type"
     )
     return cypher, params
 

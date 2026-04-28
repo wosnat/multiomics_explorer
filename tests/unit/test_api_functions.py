@@ -810,6 +810,9 @@ class TestListOrganisms:
         "by_value_kind": [{"item": "numeric", "count": 1}, {"item": "boolean", "count": 1}],
         "by_metric_type": [{"item": "damping_ratio", "count": 1}],
         "by_compartment": [{"item": "whole_cell", "count": 1}],
+        "by_cluster_type": [{"item": "condition_comparison", "count": 1},
+                             {"item": "diel", "count": 1}],
+        "by_organism_type": [{"item": "genome_strain", "count": 2}],
     }
 
     def test_returns_dict(self, mock_conn):
@@ -941,14 +944,18 @@ class TestListOrganisms:
         assert result["total_matching"] == 2
 
     def test_summary_flag_zeros_results(self, mock_conn):
-        """summary=True → results=[], summary fields populated. by_cluster_type is []."""
+        """summary=True → results=[], summary fields populated from summary builder."""
         mock_conn.execute_query.return_value = [self._SUMMARY_ROW]
         result = api.list_organisms(summary=True, conn=mock_conn)
         assert result["results"] == []
         assert result["returned"] == 0
         assert result["total_matching"] == 2
-        # In summary mode (limit=0), no detail rows → by_cluster_type is empty
-        assert result["by_cluster_type"] == []
+        # Rollups are sourced from the summary builder, so populated even when results=[].
+        ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
+        assert ct_map["condition_comparison"] == 1
+        assert ct_map["diel"] == 1
+        ot_map = {b["organism_type"]: b["count"] for b in result["by_organism_type"]}
+        assert ot_map["genome_strain"] == 2
         assert result["truncated"] is True
 
     def test_breakdowns_over_filtered_set(self, mock_conn):

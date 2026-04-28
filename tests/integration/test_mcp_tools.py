@@ -325,6 +325,22 @@ class TestListOrganisms:
             assert "derived_metric_value_kinds" in row, "Missing derived_metric_value_kinds"
             assert "compartments" in row, "Missing compartments"
 
+    def test_summary_mode_preserves_cluster_and_organism_type_rollups(self, conn):
+        """Regression guard: by_cluster_type and by_organism_type must be populated
+        in summary mode (where detail query is skipped). Pre-Task-2 behavior."""
+        s = api.list_organisms(summary=True, conn=conn)
+        assert len(s["by_cluster_type"]) > 0, (
+            "by_cluster_type empty in summary mode (regression)"
+        )
+        assert len(s["by_organism_type"]) > 0, (
+            "by_organism_type empty in summary mode (regression)"
+        )
+        # Compare with limit=2 to ensure summary-mode rollup matches detail-derived rollup
+        d = api.list_organisms(limit=2, conn=conn)
+        assert {row["cluster_type"] for row in s["by_cluster_type"]} == {
+            row["cluster_type"] for row in d["by_cluster_type"]
+        }, "summary by_cluster_type drifts from detail-derived rollup"
+
 
 @pytest.mark.kg
 class TestListExperiments:
