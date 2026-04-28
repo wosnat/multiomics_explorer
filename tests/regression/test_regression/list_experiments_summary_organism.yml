@@ -13,6 +13,9 @@ rows:
   - '{''count'': 1, ''item'': ''condition_comparison''}'
   - '{''count'': 1, ''item'': ''diel''}'
   - '{''count'': 2, ''item'': ''time_course''}'
+  by_compartment:
+  - '{''count'': 2, ''item'': ''vesicle''}'
+  - '{''count'': 46, ''item'': ''whole_cell''}'
   by_growth_phase:
   - '{''count'': 1, ''item'': ''acclimated_steady_state''}'
   - '{''count'': 1, ''item'': ''death''}'
@@ -23,6 +26,17 @@ rows:
   - '{''count'': 6, ''item'': ''exponential''}'
   - '{''count'': 6, ''item'': ''stationary''}'
   - '{''count'': 7, ''item'': ''nutrient_limited''}'
+  by_metric_type:
+  - '{''count'': 1, ''item'': ''damping_ratio''}'
+  - '{''count'': 1, ''item'': ''diel_amplitude_protein_log2''}'
+  - '{''count'': 1, ''item'': ''diel_amplitude_transcript_log2''}'
+  - '{''count'': 1, ''item'': ''mascot_identification_probability''}'
+  - '{''count'': 1, ''item'': ''peak_time_protein_h''}'
+  - '{''count'': 1, ''item'': ''peak_time_transcript_h''}'
+  - '{''count'': 1, ''item'': ''predicted_subcellular_localization''}'
+  - '{''count'': 1, ''item'': ''protein_transcript_lag_h''}'
+  - '{''count'': 1, ''item'': ''vesicle_dna_avg_read_coverage''}'
+  - '{''count'': 1, ''item'': ''vesicle_proteome_member''}'
   by_omics_type:
   - '{''count'': 1, ''item'': ''PAIRED_RNASEQ_PROTEOME''}'
   - '{''count'': 1, ''item'': ''VESICLE_DNASEQ''}'
@@ -71,5 +85,9 @@ rows:
   - '{''count'': 3, ''item'': ''viral''}'
   - '{''count'': 8, ''item'': ''light''}'
   - '{''count'': 8, ''item'': ''nitrogen''}'
+  by_value_kind:
+  - '{''count'': 1, ''item'': ''boolean''}'
+  - '{''count'': 1, ''item'': ''categorical''}'
+  - '{''count'': 3, ''item'': ''numeric''}'
   time_course_count: 12
   total_matching: 48

@@ -3,6 +3,8 @@ row_count: 2
 rows:
 - annotation_quality: 0
   annotation_types: []
+  boolean_metric_count: 0
+  categorical_metric_count: 0
   closest_ortholog_genera:
   - Alteromonas
   closest_ortholog_group_size: 1
@@ -12,6 +14,7 @@ rows:
   gene_category: Unknown
   gene_name: null
   locus_tag: EZ55_00275
+  numeric_metric_count: 0
   organism_name: Alteromonas macleodii EZ55
   product: hypothetical protein
   significant_down_count: 0
@@ -22,6 +25,8 @@ rows:
   - go_mf
   - pfam
   - tigr_role
+  boolean_metric_count: 0
+  categorical_metric_count: 0
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
@@ -35,6 +40,7 @@ rows:
   gene_category: Unknown
   gene_name: null
   locus_tag: PMM1428
+  numeric_metric_count: 0
   organism_name: Prochlorococcus MED4
   product: EVE domain protein
   significant_down_count: 1

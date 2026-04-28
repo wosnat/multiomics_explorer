@@ -1475,3 +1475,74 @@
       - "10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray"
       - "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"
       - "10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray"
+
+# ── Slice-2 DM-discovery regression cases ───────────────────────────────────
+
+- id: list_organisms_compartment_vesicle
+  tool: list_organisms
+  desc: list_organisms filtered to vesicle compartment — DM rollup slice-2
+  params:
+    compartment: vesicle
+  expect:
+    min_rows: 1
+    columns: [organism_name, derived_metric_count, derived_metric_value_kinds]
+
+- id: list_publications_compartment_vesicle
+  tool: list_publications
+  desc: list_publications filtered to vesicle compartment — DM rollup slice-2
+  params:
+    compartment: vesicle
+  expect:
+    min_rows: 1
+    columns: [doi, derived_metric_count, derived_metric_value_kinds]
+
+- id: list_experiments_compartment_vesicle
+  tool: list_experiments
+  desc: list_experiments filtered to vesicle compartment — DM rollup slice-2
+  params:
+    compartment: vesicle
+  expect:
+    min_rows: 1
+    columns: [experiment_id, derived_metric_count, derived_metric_value_kinds, compartment]
+
+- id: list_filter_values_metric_type
+  tool: list_filter_values
+  desc: list_filter_values for DerivedMetric metric_type tags
+  params:
+    filter_type: metric_type
+  expect:
+    min_rows: 5
+    columns: [value, count]
+
+- id: list_filter_values_value_kind
+  tool: list_filter_values
+  desc: list_filter_values for DerivedMetric value_kind enum
+  params:
+    filter_type: value_kind
+  expect:
+    min_rows: 3
+    columns: [value, count]
+    contains:
+      value: boolean
+
+- id: list_filter_values_compartment
+  tool: list_filter_values
+  desc: list_filter_values for Experiment compartment values
+  params:
+    filter_type: compartment
+  expect:
+    min_rows: 2
+    columns: [value, count]
+    contains:
+      value: whole_cell
+
+- id: gene_overview_dm_bearing
+  tool: gene_overview
+  desc: gene_overview for a DM-bearing MIT1002 gene — verifies DM rollup fields
+  params:
+    locus_tags: ["MIT1002_01809"]
+  expect:
+    min_rows: 1
+    columns: [locus_tag, derived_metric_count, derived_metric_value_kinds]
+    row0:
+      locus_tag: MIT1002_01809

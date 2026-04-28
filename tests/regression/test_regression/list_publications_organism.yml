@@ -11,6 +11,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1101/2025.11.24.690089
   experiment_count: 10
   growth_phases:
@@ -42,6 +46,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1128/spectrum.03275-22
   experiment_count: 60
   growth_phases:
@@ -76,6 +84,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.3389/fmicb.2022.1038136
   experiment_count: 2
   growth_phases:
@@ -104,6 +116,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/ismej.2017.88
   experiment_count: 1
   growth_phases:
@@ -131,6 +147,10 @@ rows:
   - viral
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1371/journal.pone.0165375
   experiment_count: 4
   growth_phases:
@@ -156,6 +176,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/ismej.2016.70
   experiment_count: 5
   growth_phases:
@@ -181,6 +205,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
   growth_phases:
@@ -207,6 +235,13 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 7
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
   doi: 10.1126/science.1243457
   experiment_count: 3
   growth_phases: []
@@ -236,6 +271,10 @@ rows:
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 1
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1186/1471-2180-14-11
   experiment_count: 1
   growth_phases: []
@@ -259,6 +298,11 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 6
+  derived_metric_value_kinds:
+  - numeric
   doi: 10.1371/journal.pone.0043432
   experiment_count: 1
   growth_phases: []
@@ -283,6 +327,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/ismej.2011.49
   experiment_count: 5
   growth_phases:
@@ -320,6 +368,10 @@ rows:
   cluster_types:
   - diel
   clustering_analysis_count: 1
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1371/journal.pone.0005135
   experiment_count: 1
   growth_phases: []
@@ -352,6 +404,10 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/nature06130
   experiment_count: 1
   growth_phases:
@@ -379,6 +435,10 @@ rows:
   - chemical
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1128/JB.01097-06
   experiment_count: 6
   growth_phases:
@@ -408,6 +468,10 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 2
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/msb4100087
   experiment_count: 6
   growth_phases:
@@ -434,6 +498,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1073/pnas.0601301103
   experiment_count: 2
   growth_phases:

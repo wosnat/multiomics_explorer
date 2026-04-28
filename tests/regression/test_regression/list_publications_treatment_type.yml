@@ -11,6 +11,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1101/2025.11.24.690089
   experiment_count: 10
   growth_phases:
@@ -44,6 +48,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/s42003-024-06098-5
   experiment_count: 4
   growth_phases:
@@ -72,6 +80,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1128/spectrum.03275-22
   experiment_count: 60
   growth_phases:
@@ -106,6 +118,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/s43705-022-00197-2
   experiment_count: 10
   growth_phases:
@@ -136,6 +152,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1186/s13068-022-02163-5
   experiment_count: 2
   growth_phases:
@@ -164,6 +184,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1111/1462-2920.14012
   experiment_count: 4
   growth_phases:
@@ -197,6 +221,10 @@ rows:
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 4
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1128/mSystems.00181-16
   experiment_count: 1
   growth_phases: []
@@ -223,6 +251,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/nmicrobiol.2017.100
   experiment_count: 3
   growth_phases:
@@ -247,6 +279,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/ismej.2016.82
   experiment_count: 3
   growth_phases:
@@ -270,6 +306,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/ismej.2016.70
   experiment_count: 5
   growth_phases:
@@ -307,6 +347,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/ismej.2014.69
   experiment_count: 6
   growth_phases:
@@ -334,6 +378,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1111/j.1462-2920.2009.01997.x
   experiment_count: 1
   growth_phases:

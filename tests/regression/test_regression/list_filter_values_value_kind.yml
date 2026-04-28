@@ -1,0 +1,9 @@
+case_id: list_filter_values_value_kind
+row_count: 3
+rows:
+- count: 16
+  value: boolean
+- count: 15
+  value: numeric
+- count: 3
+  value: categorical

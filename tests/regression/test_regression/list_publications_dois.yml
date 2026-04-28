@@ -8,6 +8,10 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   doi: 10.1038/ismej.2016.70
   experiment_count: 5
   growth_phases:

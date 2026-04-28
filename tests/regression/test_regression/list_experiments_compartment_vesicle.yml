@@ -1,0 +1,177 @@
+case_id: list_experiments_compartment_vesicle
+row_count: 5
+rows:
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
+  experiment_name: MED4 vesicle proteome (LC-MS/MS, presence + Mascot probability
+    + PSORTb localization)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: significant_only
+  table_scope_detail: Proteins meeting Mascot >=97% identification probability with
+    >=1 exclusive unique peptide; no whole-cell comparison reported.
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1126/science.1243457_vesicle_dnaseq_med4
+  experiment_name: MED4 vesicle-encapsulated DNA-seq (top-50 ORFs by avg read coverage)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_DNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top 50 ORFs by average read coverage; full set of 1079 covered
+    ORFs not in supplementary.
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
+  experiment_name: MIT9312 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MIT9312
+  publication_doi: 10.1111/1462-2920.15834
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
+  experiment_name: MIT9313 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
+  experiment_name: MIT9313 vesicle proteome (LC-MS/MS, presence + Mascot probability
+    + PSORTb localization)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1126/science.1243457
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: significant_only
+  table_scope_detail: Proteins meeting Mascot identification threshold with >=1 exclusive
+    unique peptide; no whole-cell comparison reported.
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment

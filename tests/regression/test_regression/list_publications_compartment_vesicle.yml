@@ -1,0 +1,74 @@
+case_id: list_publications_compartment_vesicle
+row_count: 2
+rows:
+- authors:
+  - Aldo A. Arellano
+  - Anitra E. Ingalls
+  - Benjamin A. S. Van Mooy
+  - Katherine R. Heal
+  - Keven Dooley
+  - Kevin W. Becker
+  - Laura R. Hmelo
+  - Laura T. Carlson
+  - Rachel A. Lundeen
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 6
+  derived_metric_value_kinds:
+  - numeric
+  doi: 10.1111/1462-2920.15834
+  experiment_count: 2
+  growth_phases: []
+  journal: Environmental Microbiology
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organisms:
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  study_type: Multi-omics (lipidomics, proteomics, metabolomics)
+  title: 'Prochlorococcus extracellular vesicles: molecular composition and adsorption
+    to diverse microbes'
+  treatment_types:
+  - compartment
+  year: 2022
+- authors:
+  - Anne W. Thompson
+  - Florence Schubotz
+  - Roger E. Summons
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 7
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
+  doi: 10.1126/science.1243457
+  experiment_count: 3
+  growth_phases: []
+  journal: Science
+  omics_types:
+  - VESICLE_DNASEQ
+  - VESICLE_PROTEOMICS
+  organisms:
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT9313
+  study_type: Imaging, Proteomics, Genomics, Lipidomics, Nanoparticle tracking analysis
+  title: Bacterial Vesicles in Marine Ecosystems
+  treatment_types:
+  - compartment
+  year: 2014

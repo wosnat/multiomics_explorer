@@ -1,0 +1,9 @@
+case_id: list_filter_values_compartment
+row_count: 3
+rows:
+- count: 160
+  value: whole_cell
+- count: 7
+  value: exoproteome
+- count: 5
+  value: vesicle

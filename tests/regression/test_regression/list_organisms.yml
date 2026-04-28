@@ -5,6 +5,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 0
   gene_count: 0
   genus: Alteromonas
@@ -26,6 +29,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 60
   gene_count: 4305
   genus: Alteromonas
@@ -53,6 +59,11 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 8
+  derived_metric_value_kinds:
+  - boolean
   experiment_count: 13
   gene_count: 4136
   genus: Alteromonas
@@ -79,6 +90,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 15
   gene_count: 4031
   genus: Alteromonas
@@ -108,6 +122,11 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - boolean
   experiment_count: 8
   gene_count: 4028
   genus: Alteromonas
@@ -133,6 +152,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 2
   gene_count: 0
   genus: Escherichia
@@ -158,6 +180,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 60
   gene_count: 4240
   genus: Marinobacter
@@ -181,6 +206,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 1
   gene_count: 0
   genus: Deinococcus
@@ -203,6 +231,9 @@ rows:
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 2
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 1
   gene_count: 2884
   genus: Meiothermus
@@ -228,6 +259,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 6
   gene_count: 0
   genus: null
@@ -255,6 +289,9 @@ rows:
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 1
   gene_count: 1951
   genus: Prochlorococcus
@@ -286,6 +323,14 @@ rows:
   - diel
   - time_course
   clustering_analysis_count: 4
+  compartments:
+  - vesicle
+  - whole_cell
+  derived_metric_count: 10
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
   experiment_count: 112
   gene_count: 1976
   genus: Prochlorococcus
@@ -334,6 +379,9 @@ rows:
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 1
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 2
   gene_count: 1935
   genus: Prochlorococcus
@@ -358,6 +406,9 @@ rows:
   clade: LLIV
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 2
   gene_count: 3114
   genus: Prochlorococcus
@@ -383,6 +434,11 @@ rows:
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
   experiment_count: 22
   gene_count: 1978
   genus: Prochlorococcus
@@ -416,6 +472,13 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
+  compartments:
+  - vesicle
+  derived_metric_count: 6
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
   experiment_count: 26
   gene_count: 2948
   genus: Prochlorococcus
@@ -451,6 +514,9 @@ rows:
   clade: LLII
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 2
   gene_count: 2226
   genus: Prochlorococcus
@@ -478,6 +544,12 @@ rows:
   cluster_types:
   - diel
   clustering_analysis_count: 2
+  compartments:
+  - whole_cell
+  derived_metric_count: 5
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
   experiment_count: 17
   gene_count: 2214
   genus: Prochlorococcus
@@ -509,6 +581,9 @@ rows:
   clade: HLI
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 0
   gene_count: 1870
   genus: Prochlorococcus
@@ -531,6 +606,9 @@ rows:
   clade: LLII
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 64
   gene_count: 1964
   genus: Prochlorococcus
@@ -559,6 +637,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 4
   gene_count: 5487
   genus: Pseudomonas
@@ -582,6 +663,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 7
   gene_count: 4368
   genus: Ruegeria
@@ -604,6 +688,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 6
   gene_count: 4058
   genus: Shewanella
@@ -629,6 +716,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 10
   gene_count: 3052
   genus: Synechococcus
@@ -652,6 +742,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 6
   gene_count: 3207
   genus: Picosynechococcus
@@ -677,6 +770,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 67
   gene_count: 2621
   genus: Synechococcus
@@ -706,6 +802,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 71
   gene_count: 2881
   genus: Parasynechococcus
@@ -733,6 +832,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 4
   gene_count: 2714
   genus: Synechococcus
@@ -756,6 +858,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 2
   gene_count: 2714
   genus: Synechococcus
@@ -781,6 +886,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 60
   gene_count: 2595
   genus: Synechococcus
@@ -805,6 +913,9 @@ rows:
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 2
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 1
   gene_count: 2449
   genus: Thermosynechococcus
@@ -827,6 +938,9 @@ rows:
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   experiment_count: 1
   gene_count: 0
   genus: Vibrio

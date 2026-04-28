@@ -6,6 +6,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: darkness +100 nM glucose vs darkness
@@ -44,6 +47,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: darkness +5 mM glucose vs darkness
@@ -82,6 +88,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: light +100 nM glucose vs light
@@ -120,6 +129,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: light +5 mM glucose vs light (control)'
@@ -157,6 +169,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: darkness +100 nM glucose vs darkness
@@ -195,6 +210,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: darkness +5 mM glucose vs darkness
@@ -233,6 +251,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +100 nM glucose vs light
@@ -271,6 +292,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
@@ -308,6 +332,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: darkness +100 nM glucose vs darkness
@@ -346,6 +373,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: darkness +5 mM glucose vs darkness
@@ -384,6 +414,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: light +100 nM glucose vs light
@@ -422,6 +455,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: light +5 mM glucose vs light (control)'
@@ -459,6 +495,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: darkness +100 nM glucose vs darkness
@@ -497,6 +536,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: darkness +5 mM glucose vs darkness
@@ -535,6 +577,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: light +100 nM glucose vs light
@@ -573,6 +618,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: light +5 mM glucose vs light
@@ -611,6 +659,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: darkness +100 nM glucose vs darkness
@@ -649,6 +700,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: darkness +5 mM glucose vs darkness
@@ -687,6 +741,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: light +100 nM glucose vs light
@@ -725,6 +782,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: light +5 mM glucose vs light
@@ -763,6 +823,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MIT9312
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 419
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 400 ppm pCO2 vs
@@ -800,6 +863,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MIT9312
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 188
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 800 ppm pCO2 vs
@@ -837,6 +903,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus CC9311
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 293
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 at 400 ppm pCO2 vs Axenic
@@ -874,6 +943,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus CC9311
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 83
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 at 800 ppm pCO2 vs Axenic
@@ -911,6 +983,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 136
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 at 400 ppm pCO2 vs Axenic
@@ -948,6 +1023,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 58
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 at 800 ppm pCO2 vs Axenic
@@ -986,6 +1064,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 126
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_ez55_rnaseq
   experiment_name: EZ55 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -1023,6 +1104,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 98
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_axenic
   experiment_name: EZ55 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
@@ -1060,6 +1144,10 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 8
+  derived_metric_value_kinds:
+  - boolean
   distinct_gene_count: 695
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
   experiment_name: EZ55 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
@@ -1103,6 +1191,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 3950
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
@@ -1140,6 +1231,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2226
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -1206,6 +1300,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2226
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -1251,6 +1348,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 3950
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -1317,6 +1417,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 3950
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -1368,6 +1471,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MIT9313
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 0
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
@@ -1397,6 +1503,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MIT9313
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 0
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
@@ -1427,6 +1536,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 3856
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq
   experiment_name: MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle
@@ -1507,6 +1619,10 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - boolean
   distinct_gene_count: 175
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_mit1002_rnaseq
   experiment_name: MIT1002 Extended darkness vs 13:11 diel light:dark cycle control
@@ -1551,6 +1667,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus NATL2A
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 740
   experiment_id: 10.1038/ismej.2016.82_coculture_24_hours_after_coculturing_mit1002_rnaseq
   experiment_name: MIT1002 24 hours after co-culturing with Prochlorococcus NATL2A
@@ -1588,6 +1707,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus NATL2A
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 740
   experiment_id: 10.1038/ismej.2016.82_coculture_48_hours_after_coculturing_mit1002_rnaseq
   experiment_name: MIT1002 48 hours after co-culturing with Prochlorococcus NATL2A
@@ -1626,6 +1748,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 85
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +100 nM glucose vs darkness
@@ -1665,6 +1790,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 85
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +5 mM glucose vs darkness
@@ -1704,6 +1832,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 85
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +100 nM glucose vs light
@@ -1743,6 +1874,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus sp. BL107
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 85
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +5 mM glucose vs light
@@ -1782,6 +1916,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
@@ -1821,6 +1958,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
@@ -1860,6 +2000,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
@@ -1899,6 +2042,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus MED4
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 343
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
@@ -1937,6 +2083,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +100 nM glucose vs darkness
@@ -1976,6 +2125,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +5 mM glucose vs darkness
@@ -2015,6 +2167,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +100 nM glucose vs light
@@ -2054,6 +2209,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +5 mM glucose vs light
@@ -2093,6 +2251,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 148
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +100 nM glucose vs
@@ -2132,6 +2293,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 147
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +5 mM glucose vs darkness
@@ -2171,6 +2335,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 147
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +100 nM glucose vs light
@@ -2210,6 +2377,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 148
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +5 mM glucose vs light
@@ -2249,6 +2419,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 487
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +100 nM glucose vs
@@ -2288,6 +2461,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 488
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +5 mM glucose vs darkness
@@ -2327,6 +2503,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 488
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +100 nM glucose vs light
@@ -2366,6 +2545,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH8102
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 488
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +5 mM glucose vs light
@@ -2405,6 +2587,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1887
   experiment_id: 10.1016/j.micres.2015.04.006_salt_saltacclimated_5_salt_as9601_rnaseq
   experiment_name: AS9601 Salt-acclimated (5% salt) vs Normal seawater control (3.8%
@@ -2442,6 +2627,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
@@ -2479,6 +2667,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -2545,6 +2736,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -2598,6 +2792,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -2664,6 +2861,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
@@ -2702,6 +2902,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -2739,6 +2942,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -2776,6 +2982,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
@@ -2813,6 +3022,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
@@ -2850,6 +3062,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 28
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
   experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
@@ -2888,6 +3103,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 857
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
@@ -2939,6 +3157,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1714
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
@@ -2976,6 +3197,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 32
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
@@ -3033,6 +3257,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 39
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
@@ -3097,6 +3324,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Phage
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 25
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_dark
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in dark
@@ -3148,6 +3378,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Phage
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 30
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in light
@@ -3214,6 +3447,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 166
   experiment_id: 10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray
   experiment_name: MED4 Air (0.036% CO2 / 21% O2) vs Time 0 (pre-shock) (MICROARRAY)
@@ -3252,6 +3488,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 4
   experiment_id: 10.1038/ismej.2015.36_carbon_ambient_co2_no_o2_med4_microarray
   experiment_name: MED4 Ambient CO2, no O2 (0.036% CO2 / 0% O2) vs Air (0.036% CO2
@@ -3291,6 +3530,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 285
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
   experiment_name: MED4 Low CO2 (0.004% CO2 / 21% O2) vs Air (0.036% CO2 / 21% O2)
@@ -3330,6 +3572,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 252
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
   experiment_name: MED4 Low CO2 and no O2 (0.004% CO2 / 0% O2) vs Air (0.036% CO2
@@ -3370,6 +3615,9 @@ rows:
   - condition_comparison
   clustering_analysis_count: 1
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 0
   experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
   experiment_name: MED4 steady-state expression profiling across growth conditions
@@ -3399,6 +3647,12 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
   experiment_name: MED4 vesicle proteome (LC-MS/MS, presence + Mascot probability
@@ -3430,6 +3684,10 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - numeric
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_dnaseq_med4
   experiment_name: MED4 vesicle-encapsulated DNA-seq (top-50 ORFs by avg read coverage)
@@ -3459,6 +3717,10 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 6
+  derived_metric_value_kinds:
+  - numeric
   distinct_gene_count: 0
   experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
   experiment_name: MED4 diel paired transcript-protein analysis (Waldbauer 2012)
@@ -3488,6 +3750,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light_2
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
@@ -3525,6 +3790,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
@@ -3569,6 +3837,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_growth_medium_ironreplete_control_med4_med4_microarray
   experiment_name: MED4 Iron-replete control (MED4) vs Iron starvation (MED4) (MICROARRAY)
@@ -3607,6 +3878,9 @@ rows:
   - diel
   clustering_analysis_count: 1
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 0
   experiment_id: 10.1371/journal.pone.0005135_diel_cycling_med4_microarray
   experiment_name: MED4 diel gene expression profiling over 48h light-dark cycle
@@ -3636,6 +3910,9 @@ rows:
   - time_course
   clustering_analysis_count: 1
   coculture_partner: Phage
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 45
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
   experiment_name: MED4 Phage infected vs Pro99 medium phage infection baseline (MICROARRAY)
@@ -3721,6 +3998,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_blue_light_13_umol_med4_microarray
   experiment_name: MED4 Blue light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
@@ -3759,6 +4039,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_dcmu_white_light_13_med4_microarray
   experiment_name: MED4 DCMU + white light (13 umol photons m-2 s-1) vs White light
@@ -3797,6 +4080,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_green_light_13_umol_med4_microarray
   experiment_name: MED4 Green light (13 umol photons m-2 s-1) vs Darkness control
@@ -3836,6 +4122,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
@@ -3874,6 +4163,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
@@ -3911,6 +4203,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_high_white_light_55_med4_microarray
   experiment_name: MED4 High white light (55 umol photons m-2 s-1) vs Darkness control
@@ -3951,6 +4246,9 @@ rows:
   - time_course
   clustering_analysis_count: 1
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
@@ -4024,6 +4322,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 34
   experiment_id: 10.1073/pnas.0601301103_phosphorus_phosphate_starvation_med4_microarray
   experiment_name: MED4 Phosphate starvation vs P-replete Pro99 medium (MICROARRAY)
@@ -4090,6 +4391,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_red_light_13_umol_med4_microarray
   experiment_name: MED4 Red light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
@@ -4127,6 +4431,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_white_light_13_umol_med4_microarray
   experiment_name: MED4 White light (13 umol photons m-2 s-1) vs Darkness control
@@ -4166,6 +4473,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 234
   experiment_id: 10.1101/2025.08.05.668435_growth_state_freeliving_planktonic_enrichment_mit9301_rnaseq
   experiment_name: MIT9301 Free-living (planktonic) enrichment vs Biofilm (adherent)
@@ -4205,6 +4515,9 @@ rows:
   - condition_comparison
   clustering_analysis_count: 1
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 0
   experiment_id: 10.1128/mbio.03425-22_thermal_acclimation_mit9301_rnaseq
   experiment_name: MIT9301 long-term thermal acclimation RNA-seq across 5 temperatures
@@ -4234,6 +4547,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 25
   experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9303_rnaseq
   experiment_name: MIT9303 chitosan addition RNA-seq (primary degrader, full pathway)
@@ -4271,6 +4587,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 37
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_mit9312_rnaseq
   experiment_name: MIT9312 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -4308,6 +4627,10 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
   experiment_name: MIT9312 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -4337,6 +4660,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 396
   experiment_id: 10.1038/s42003-019-0410-x_plastic_hdpe_plastic_leachate_50_mit9312_rnaseq
   experiment_name: MIT9312 HDPE plastic leachate (50% dilution) vs AMP1 media control
@@ -4375,6 +4701,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 583
   experiment_id: 10.1038/s42003-019-0410-x_plastic_pvc_plastic_leachate_2_mit9312_rnaseq
   experiment_name: MIT9312 PVC plastic leachate (2% dilution) vs AMP1 media control
@@ -4413,6 +4742,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 103
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_mit9312_rnaseq
   experiment_name: MIT9312 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
@@ -4450,6 +4782,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 38
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_mit9312_itraq
   experiment_name: 'MIT9312 proteomics: Pi replete vs Pi deplete (iTRAQ)'
@@ -4488,6 +4823,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 72
   experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_rnaseq
   experiment_name: MIT9313 chitosan addition RNA-seq (secondary degrader, partial
@@ -4526,6 +4864,10 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
   experiment_name: MIT9313 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -4554,6 +4896,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Phage
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 428
   experiment_id: 10.1111/1462-2920.14513_viral_viral_dom_vdom_addition_mit9313_rnaseq
   experiment_name: MIT9313 Viral DOM (vDOM) addition vs Pro99 growth medium control
@@ -4647,6 +4992,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2267
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -4684,6 +5032,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii HOT1A3
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2268
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -4722,6 +5073,12 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  - numeric
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
   experiment_name: MIT9313 vesicle proteome (LC-MS/MS, presence + Mascot probability
@@ -4753,6 +5110,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 98
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_mit9313_mit9313_microarray
   experiment_name: MIT9313 Iron starvation (MIT9313) vs Iron-replete control (MIT9313)
@@ -4806,6 +5166,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 98
   experiment_id: 10.1038/ismej.2011.49_growth_medium_ironreplete_control_mit9313_mit9313_microarray
   experiment_name: MIT9313 Iron-replete control (MIT9313) vs Iron starvation (MIT9313)
@@ -4844,6 +5207,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2241
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
   experiment_name: MIT9313 Growth on nitrite as sole N source (MIT9313) vs N-replete
@@ -4882,6 +5248,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2241
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
   experiment_name: MIT9313 Growth on urea as sole N source (MIT9313) vs N-replete
@@ -4921,6 +5290,9 @@ rows:
   - time_course
   clustering_analysis_count: 1
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2241
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   experiment_name: MIT9313 Nitrogen deprivation (MIT9313) vs N-replete Pro99 medium
@@ -4994,6 +5366,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 177
   experiment_id: 10.1073/pnas.0601301103_phosphorus_phosphate_starvation_mit9313_microarray
   experiment_name: MIT9313 Phosphate starvation vs P-replete Pro99 medium (MICROARRAY)
@@ -5053,6 +5428,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 81
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_natl1a_rnaseq
   experiment_name: NATL1A Low salinity acclimation (28 psu) vs Normal seawater salinity
@@ -5092,6 +5470,9 @@ rows:
   - diel
   clustering_analysis_count: 2
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2015
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
   experiment_name: NATL2A Dark-tolerant co-culture under 13:11 diel light:dark cycle
@@ -5172,6 +5553,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 131
   experiment_id: 10.1038/s42003-019-0410-x_plastic_hdpe_plastic_leachate_50_natl2a_rnaseq
   experiment_name: NATL2A HDPE plastic leachate (50% dilution) vs AMP1 media control
@@ -5210,6 +5594,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 64
   experiment_id: 10.1038/s42003-019-0410-x_plastic_pvc_plastic_leachate_2_natl2a_rnaseq
   experiment_name: NATL2A PVC plastic leachate (2% dilution) vs AMP1 media control
@@ -5248,6 +5635,10 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - boolean
   distinct_gene_count: 1954
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
@@ -5300,6 +5691,11 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
   distinct_gene_count: 1954
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
@@ -5351,6 +5747,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Alteromonas macleodii MIT1002
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 353
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
@@ -5431,6 +5830,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 34
   experiment_id: 10.1111/1462-2920.13104_phosphorus_plimited_natl2a_rnaseq_infected
   experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
@@ -5518,6 +5920,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 34
   experiment_id: 10.1111/1462-2920.13104_phosphorus_plimited_natl2a_rnaseq_uninfected
   experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
@@ -5591,6 +5996,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 63
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_natl2a_itraq
   experiment_name: 'NATL2A proteomics: Pi replete vs Pi deplete (iTRAQ)'
@@ -5629,6 +6037,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 930
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -5666,6 +6077,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 929
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -5703,6 +6117,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 930
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: light +100 nM glucose vs light (control)'
@@ -5740,6 +6157,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 928
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: light +5 mM glucose vs light (control)'
@@ -5777,6 +6197,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 389
   experiment_id: 10.1128/mSystems.00008-17_azaserine_ss120_proteomics
   experiment_name: 'SS120 proteomics: control vs azaserine (N-limitation proxy)'
@@ -5814,6 +6237,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 34
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_ss120_itraq
   experiment_name: 'SS120 proteomics: Pi replete vs Pi deplete (iTRAQ)'
@@ -5851,6 +6277,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus elongatus PCC 7942
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 5103
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_rnaseq
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
@@ -5888,6 +6317,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus elongatus PCC 7942
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 228
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_proteomics
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
@@ -5925,6 +6357,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 222
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_asw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in ASW coculture with
@@ -6005,6 +6440,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 184
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_sw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in SW coculture with
@@ -6085,6 +6523,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus WH7803
+  compartment: exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1724
   experiment_id: 10.1038/nmicrobiol.2017.100_longterm_coculture_rpom_dss3_proteomics
   experiment_name: R. pomeroyi DSS-3 proteome in long-term coculture with Synechococcus
@@ -6123,6 +6564,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus PCC 7002
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1287
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
@@ -6159,6 +6603,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus PCC 7002
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 454
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (lactate) vs axenic (SOLiD RNA-seq)
@@ -6195,6 +6642,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Synechococcus PCC 7002
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1219
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture HCO3- vs coculture lactate (SOLiD
@@ -6234,6 +6684,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 27
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_cc9311_rnaseq
   experiment_name: CC9311 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -6270,6 +6723,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Shewanella sp. W3-18-1
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 670
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
@@ -6306,6 +6762,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Shewanella sp. W3-18-1
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1143
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (lactate) vs axenic (SOLiD RNA-seq)
@@ -6342,6 +6801,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Shewanella sp. W3-18-1
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 673
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture HCO3- vs coculture lactate (SOLiD
@@ -6381,6 +6843,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -6418,6 +6883,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -6455,6 +6923,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: light +100 nM glucose vs light (control)'
@@ -6492,6 +6963,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: light +5 mM glucose vs light (control)'
@@ -6528,6 +7002,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Ruegeria pomeroyi DSS-3
+  compartment: exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 221
   experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_asw
   experiment_name: Synechococcus WH7803 exoproteome time course in ASW coculture with
@@ -6608,6 +7085,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Ruegeria pomeroyi DSS-3
+  compartment: exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 187
   experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_sw
   experiment_name: Synechococcus WH7803 exoproteome time course in SW coculture with
@@ -6688,6 +7168,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Ruegeria pomeroyi DSS-3
+  compartment: exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 564
   experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
   experiment_name: Synechococcus WH7803 proteome in early coculture with R. pomeroyi
@@ -6726,6 +7209,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Ruegeria pomeroyi DSS-3
+  compartment: exoproteome
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 1050
   experiment_id: 10.1038/nmicrobiol.2017.100_late_coculture_syn_wh7803_proteomics
   experiment_name: Synechococcus WH7803 proteome in late coculture with R. pomeroyi
@@ -6765,6 +7251,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -6802,6 +7291,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -6839,6 +7331,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 894
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: light +100 nM glucose vs light (control)'
@@ -6876,6 +7371,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: light +5 mM glucose vs light (control)'
@@ -6913,6 +7411,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 12
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_wh8102_rnaseq
   experiment_name: WH8102 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -6949,6 +7450,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Vibrio parahaemolyticus
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 574
   experiment_id: 10.1111/j.1462-2920.2009.01997.x_vibrio_coculture_wh8102_microarray
   experiment_name: WH8102 coculture with V. parahaemolyticus vs monoculture (microarray)
@@ -6992,6 +7496,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Pseudomonas putida KT2440
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 2627
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_rnaseq
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
@@ -7029,6 +7536,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Pseudomonas putida KT2440
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 527
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
@@ -7066,6 +7576,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Escherichia coli
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 129
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_rnaseq
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
@@ -7111,6 +7624,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: Escherichia coli
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 34
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_proteomics
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
@@ -7150,6 +7666,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 167
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -7187,6 +7706,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 167
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -7224,6 +7746,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 167
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +100 nM glucose vs light (control)'
@@ -7261,6 +7786,9 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 166
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +5 mM glucose vs light (control)'
@@ -7297,6 +7825,9 @@ rows:
   - condition_comparison
   clustering_analysis_count: 4
   coculture_partner: Meiothermus ruber
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
   distinct_gene_count: 0
   experiment_id: 10.1128/mSystems.00181-16_coculture_bp1_mruber_light_oxygen_rnaseq
   experiment_name: BP-1 transcriptome profiling in coculture with M. ruber across

@@ -36,9 +36,12 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_derived_metrics_summary,
     build_list_experiments,
     build_list_experiments_summary,
+    build_list_compartments,
     build_list_gene_categories,
+    build_list_metric_types,
     build_list_organisms,
     build_list_publications,
+    build_list_value_kinds,
     build_resolve_gene,
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
@@ -149,7 +152,15 @@ def test_regression(conn, case, data_regression):
     if tool == "raw_cypher":
         results = conn.execute_query(params["query"])
     elif tool == "list_filter_values":
-        cat_cypher, cat_params = build_list_gene_categories()
+        filter_type = params.get("filter_type", "gene_category")
+        _filter_builders = {
+            "gene_category": build_list_gene_categories,
+            "metric_type": build_list_metric_types,
+            "value_kind": build_list_value_kinds,
+            "compartment": build_list_compartments,
+        }
+        fb = _filter_builders.get(filter_type, build_list_gene_categories)
+        cat_cypher, cat_params = fb()
         results = conn.execute_query(cat_cypher, **cat_params)
     elif tool == "gene_homologs_with_members":
         cypher, params_b = build_gene_homologs(locus_tags=params["locus_tags"])
