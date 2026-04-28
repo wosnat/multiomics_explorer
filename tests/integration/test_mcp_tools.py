@@ -1450,6 +1450,232 @@ def _ctx_with_conn(conn):
     return ctx
 
 
+# ---------------------------------------------------------------------------
+# Slice-2 MCP-wrapper integration tests.
+#
+# The TestListPublications / TestListOrganisms / TestListExperiments /
+# TestGeneOverview classes earlier in this file call api.<func>(...) directly
+# and so bypass the FastMCP wrapper layer (typed Pydantic response/breakdown
+# submodels + ToolError raising). The classes below exercise the wrapper via
+# the `tool_fns` fixture so that breakdown-model field drops or wrapper-only
+# regressions surface as test failures.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.kg
+class TestListPublicationsMcpWrapper:
+    """Wrapper-level integration tests for list_publications."""
+
+    @pytest.mark.asyncio
+    async def test_typed_response_and_breakdowns(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_publications"](
+            ctx, organism="MED4", limit=5)
+        # Envelope counts.
+        assert response.total_matching >= 5
+        assert response.returned == len(response.results)
+        # Typed result rows (Pydantic attribute access, not dict subscript).
+        first = response.results[0]
+        assert isinstance(first.doi, str) and first.doi
+        assert isinstance(first.experiment_count, int)
+        # Typed breakdown submodels — slice-2 added the 3 DM rollups.
+        assert isinstance(response.by_organism, list)
+        if response.by_organism:
+            assert isinstance(response.by_organism[0].organism_name, str)
+            assert isinstance(response.by_organism[0].count, int)
+        assert isinstance(response.by_value_kind, list)
+        assert isinstance(response.by_metric_type, list)
+        assert isinstance(response.by_compartment, list)
+
+    @pytest.mark.asyncio
+    async def test_publication_dois_not_found_typed(self, tool_fns, conn):
+        """Unknown DOI propagates through the typed response as `not_found`."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_publications"](
+            ctx,
+            publication_dois=[
+                "10.1038/ISMEJ.2016.70", "10.9999/does-not-exist",
+            ],
+        )
+        assert response.total_matching == 1
+        assert response.not_found == ["10.9999/does-not-exist"]
+        assert response.results[0].doi.lower() == "10.1038/ismej.2016.70"
+
+    @pytest.mark.asyncio
+    async def test_verbose_surfaces_abstract(self, tool_fns, conn):
+        """verbose=True populates the verbose-only `abstract` field."""
+        ctx = _ctx_with_conn(conn)
+        compact = await tool_fns["list_publications"](ctx, limit=3)
+        verbose = await tool_fns["list_publications"](ctx, limit=3, verbose=True)
+        # Compact rows leave `abstract` at its default (None); verbose rows
+        # surface a string for at least one publication.
+        assert all(r.abstract is None for r in compact.results)
+        assert any(isinstance(r.abstract, str) and r.abstract
+                   for r in verbose.results)
+
+
+@pytest.mark.kg
+class TestListOrganismsMcpWrapper:
+    """Wrapper-level integration tests for list_organisms."""
+
+    @pytest.mark.asyncio
+    async def test_typed_response_and_breakdowns(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_organisms"](ctx, limit=5)
+        assert response.total_entries >= 13
+        assert response.returned == len(response.results)
+        # Typed result rows.
+        first = response.results[0]
+        assert isinstance(first.organism_name, str)
+        assert isinstance(first.organism_type, str)
+        assert isinstance(first.gene_count, int)
+        # Slice-2 envelope keys are typed lists (may be empty in extreme
+        # filter cases but type must be list).
+        assert isinstance(response.by_value_kind, list)
+        assert isinstance(response.by_metric_type, list)
+        assert isinstance(response.by_compartment, list)
+        assert isinstance(response.by_organism_type, list)
+
+    @pytest.mark.asyncio
+    async def test_organism_names_not_found_typed(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_organisms"](
+            ctx,
+            organism_names=[
+                "Prochlorococcus MED4",
+                "Prochlorococcus MIT9301",
+                "Bogus organism",
+            ],
+        )
+        assert response.total_matching == 2
+        assert response.not_found == ["Bogus organism"]
+        names = {r.organism_name for r in response.results}
+        assert names == {"Prochlorococcus MED4", "Prochlorococcus MIT9301"}
+
+    @pytest.mark.asyncio
+    async def test_summary_typed(self, tool_fns, conn):
+        """summary=True returns results=[] but keeps typed envelope rollups."""
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_organisms"](ctx, summary=True)
+        assert response.results == []
+        assert response.returned == 0
+        assert response.truncated is True
+        # Slice-2 DM rollups must round-trip through the typed envelope even
+        # in summary mode (where the detail-row in-memory rollup path is skipped).
+        assert isinstance(response.by_value_kind, list)
+        assert isinstance(response.by_metric_type, list)
+        assert isinstance(response.by_compartment, list)
+
+
+@pytest.mark.kg
+class TestListExperimentsMcpWrapper:
+    """Wrapper-level integration tests for list_experiments."""
+
+    @pytest.mark.asyncio
+    async def test_typed_response_and_breakdowns(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_experiments"](
+            ctx, organism="MED4", limit=5)
+        assert response.total_matching >= 5
+        assert response.returned == len(response.results)
+        first = response.results[0]
+        assert isinstance(first.experiment_id, str)
+        assert isinstance(first.treatment_type, list)
+        assert isinstance(first.is_time_course, bool)
+        # Typed breakdown submodels — slice-2 added the 3 DM rollups +
+        # by_compartment typed list.
+        assert isinstance(response.by_organism, list)
+        if response.by_treatment_type:
+            assert isinstance(response.by_treatment_type[0].treatment_type, str)
+            assert isinstance(response.by_treatment_type[0].count, int)
+        assert isinstance(response.by_value_kind, list)
+        assert isinstance(response.by_metric_type, list)
+        assert isinstance(response.by_compartment, list)
+
+    @pytest.mark.asyncio
+    async def test_experiment_ids_not_found_typed(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        good_id = (
+            "10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq"
+        )
+        response = await tool_fns["list_experiments"](
+            ctx,
+            experiment_ids=[good_id, "FAKE_EXPERIMENT_ID"],
+        )
+        assert response.total_matching == 1
+        assert response.not_found == ["FAKE_EXPERIMENT_ID"]
+        assert response.results[0].experiment_id == good_id
+
+    @pytest.mark.asyncio
+    async def test_summary_typed(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_experiments"](ctx, summary=True)
+        assert response.results == []
+        assert response.returned == 0
+        assert response.truncated is True
+        # Slice-2 DM rollups + compartment must be typed lists.
+        assert isinstance(response.by_value_kind, list)
+        assert isinstance(response.by_metric_type, list)
+        assert isinstance(response.by_compartment, list)
+
+
+@pytest.mark.kg
+class TestGeneOverviewMcpWrapper:
+    """Wrapper-level integration tests for gene_overview."""
+
+    @pytest.mark.asyncio
+    async def test_typed_response_and_breakdowns(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_overview"](
+            ctx, locus_tags=["PMM1428", "EZ55_00275"])
+        assert response.total_matching == 2
+        # Typed result rows.
+        tags = {r.locus_tag for r in response.results}
+        assert tags == {"PMM1428", "EZ55_00275"}
+        for r in response.results:
+            assert isinstance(r.organism_name, str)
+            assert isinstance(r.annotation_types, list)
+            assert isinstance(r.expression_edge_count, int)
+            assert isinstance(r.derived_metric_count, int)
+            assert isinstance(r.derived_metric_value_kinds, list)
+        # Typed breakdowns.
+        assert isinstance(response.by_organism, list)
+        assert {b.organism_name for b in response.by_organism} >= {
+            r.organism_name for r in response.results}
+        for b in response.by_organism:
+            assert isinstance(b.count, int)
+
+    @pytest.mark.asyncio
+    async def test_not_found_typed(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_overview"](
+            ctx, locus_tags=["PMM0001", "FAKE_GENE_XYZ"])
+        assert response.total_matching == 1
+        assert "FAKE_GENE_XYZ" in response.not_found
+        assert response.results[0].locus_tag == "PMM0001"
+
+    @pytest.mark.asyncio
+    async def test_empty_locus_tags_raises_toolerror(self, tool_fns, conn):
+        """Empty locus_tags raises ValueError in api → wrapper translates to ToolError."""
+        from fastmcp.exceptions import ToolError
+        ctx = _ctx_with_conn(conn)
+        with pytest.raises(ToolError):
+            await tool_fns["gene_overview"](ctx, locus_tags=[])
+
+    @pytest.mark.asyncio
+    async def test_verbose_surfaces_extras(self, tool_fns, conn):
+        """verbose=True populates verbose-only fields (gene_summary, all_identifiers)."""
+        ctx = _ctx_with_conn(conn)
+        compact = await tool_fns["gene_overview"](ctx, locus_tags=["PMM0001"])
+        verbose = await tool_fns["gene_overview"](
+            ctx, locus_tags=["PMM0001"], verbose=True)
+        assert compact.results[0].gene_summary is None
+        assert compact.results[0].all_identifiers is None
+        # Verbose row has at least one of the extras populated for an annotated gene.
+        v_row = verbose.results[0]
+        assert v_row.gene_summary is not None or v_row.all_identifiers is not None
+
+
 @pytest.mark.kg
 class TestGeneDerivedMetrics:
     """Integration tests against live KG. Baselines pinned 2026-04-26."""
