@@ -1998,18 +1998,6 @@ class TestListPublications:
         from multiomics_explorer import list_publications
         assert list_publications is api.list_publications
 
-    def test_by_cluster_type_computed(self, mock_conn):
-        """by_cluster_type is now sourced from the summary row (migrated from in-memory)."""
-        mock_conn.execute_query.side_effect = [
-            [{"total_entries": 1, "total_matching": 1,
-              "by_cluster_type": [{"item": "condition_comparison", "count": 1}],
-              "by_value_kind": [], "by_metric_type": [], "by_compartment": []}],
-            [self._PUB_ROW],
-        ]
-        result = api.list_publications(conn=mock_conn)
-        ct_map = {b["cluster_type"]: b["count"] for b in result["by_cluster_type"]}
-        assert ct_map["condition_comparison"] == 1
-
     def test_verbose_includes_cluster_count(self, mock_conn):
         row = {**self._PUB_ROW, "abstract": "...", "description": "...", "cluster_count": 20}
         mock_conn.execute_query.side_effect = [

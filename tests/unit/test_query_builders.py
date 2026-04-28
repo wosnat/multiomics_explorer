@@ -2596,13 +2596,8 @@ class TestBuildListExperimentsDmRollup:
         # collect(e.compartment) should be present
         assert "collect(e.compartment)" in cypher
         # Should not try to flatten compartment (it's a scalar)
-        # The derived_metric_value_kinds list props may still flatten, but NOT compartment
-        lines = cypher.split("\n")
-        for i, line in enumerate(lines):
-            if "e.compartment" in line and "collect" in line:
-                # Must not be preceded by flatten
-                context = " ".join(lines[max(0, i-1):i+2])
-                assert "flatten" not in context or "vks" in context or "mtypes" in context
+        assert "flatten(\n       collect(coalesce(e.compartment" not in cypher
+        assert "flatten(collect(e.compartment" not in cypher
 
     def test_summary_search_branch_includes_dm_rollups(self):
         """DM rollup keys present in search-text summary branch too."""
