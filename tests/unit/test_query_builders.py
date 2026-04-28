@@ -2461,6 +2461,114 @@ class TestBuildListExperimentsSummary:
         assert "by_growth_phase" in cypher
 
 
+class TestBuildListExperimentsDmRollup:
+    """Task 4 — DM rollup per-row fields + compartment filter + summary rollups."""
+
+    # --- Compact per-row DM fields ---
+    def test_compact_includes_derived_metric_count(self):
+        cypher, _ = build_list_experiments()
+        assert "derived_metric_count" in cypher
+
+    def test_compact_includes_derived_metric_value_kinds(self):
+        cypher, _ = build_list_experiments()
+        assert "derived_metric_value_kinds" in cypher
+
+    def test_compact_includes_compartment_scalar(self):
+        """Compact RETURN has singular 'compartment' (scalar, not list)."""
+        cypher, _ = build_list_experiments()
+        assert "e.compartment AS compartment" in cypher
+
+    def test_compact_search_branch_also_has_dm_fields(self):
+        """Both search and non-search branches include DM fields."""
+        cypher, _ = build_list_experiments(search_text="diel")
+        assert "derived_metric_count" in cypher
+        assert "derived_metric_value_kinds" in cypher
+        assert "e.compartment AS compartment" in cypher
+
+    # --- Verbose-only DM fields ---
+    def test_verbose_false_no_dm_extra(self):
+        cypher, _ = build_list_experiments(verbose=False)
+        assert "derived_metric_gene_count" not in cypher
+        assert "derived_metric_types" not in cypher
+        assert "reports_derived_metric_types" not in cypher
+
+    def test_verbose_true_includes_dm_gene_count(self):
+        cypher, _ = build_list_experiments(verbose=True)
+        assert "derived_metric_gene_count" in cypher
+
+    def test_verbose_true_includes_derived_metric_types(self):
+        cypher, _ = build_list_experiments(verbose=True)
+        assert "derived_metric_types" in cypher
+
+    def test_verbose_true_includes_reports_derived_metric_types(self):
+        cypher, _ = build_list_experiments(verbose=True)
+        assert "reports_derived_metric_types" in cypher
+
+    def test_verbose_search_branch_also_has_dm_extras(self):
+        """Verbose DM fields present in search-text branch too."""
+        cypher, _ = build_list_experiments(search_text="diel", verbose=True)
+        assert "derived_metric_gene_count" in cypher
+        assert "derived_metric_types" in cypher
+        assert "reports_derived_metric_types" in cypher
+
+    # --- compartment filter ---
+    def test_compartment_filter_emits_scalar_equality(self):
+        """e.compartment = $compartment (NOT IN-on-list)."""
+        cypher, params = build_list_experiments(compartment="vesicle")
+        assert "e.compartment = $compartment" in cypher
+        assert params["compartment"] == "vesicle"
+
+    def test_compartment_none_no_clause(self):
+        cypher, params = build_list_experiments(compartment=None)
+        assert "$compartment" not in cypher
+        assert "compartment" not in params
+
+    def test_compartment_combines_with_organism(self):
+        cypher, params = build_list_experiments(organism="MED4", compartment="vesicle")
+        assert "e.compartment = $compartment" in cypher
+        assert "organism" in params
+        assert " AND " in cypher
+
+    def test_compartment_filter_summary_builder(self):
+        cypher, params = build_list_experiments_summary(compartment="vesicle")
+        assert "e.compartment = $compartment" in cypher
+        assert params["compartment"] == "vesicle"
+
+    # --- Summary DM rollup keys ---
+    def test_summary_includes_by_value_kind(self):
+        cypher, _ = build_list_experiments_summary()
+        assert "by_value_kind" in cypher
+
+    def test_summary_includes_by_metric_type(self):
+        cypher, _ = build_list_experiments_summary()
+        assert "by_metric_type" in cypher
+
+    def test_summary_includes_by_compartment(self):
+        cypher, _ = build_list_experiments_summary()
+        assert "by_compartment" in cypher
+
+    def test_summary_compartment_uses_collect_not_flatten(self):
+        """e.compartment is scalar — collect(e.compartment), not flatten(collect(...))."""
+        cypher, _ = build_list_experiments_summary()
+        # collect(e.compartment) should be present
+        assert "collect(e.compartment)" in cypher
+        # Should not try to flatten compartment (it's a scalar)
+        # The derived_metric_value_kinds list props may still flatten, but NOT compartment
+        lines = cypher.split("\n")
+        for i, line in enumerate(lines):
+            if "e.compartment" in line and "collect" in line:
+                # Must not be preceded by flatten
+                context = " ".join(lines[max(0, i-1):i+2])
+                assert "flatten" not in context or "vks" in context or "mtypes" in context
+
+    def test_summary_search_branch_includes_dm_rollups(self):
+        """DM rollup keys present in search-text summary branch too."""
+        cypher, _ = build_list_experiments_summary(search_text="diel")
+        assert "by_value_kind" in cypher
+        assert "by_metric_type" in cypher
+        assert "by_compartment" in cypher
+
+
 # ---------------------------------------------------------------------------
 # Organism pre-validation builders
 # ---------------------------------------------------------------------------

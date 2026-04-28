@@ -1159,6 +1159,7 @@ def _list_experiments_where(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     experiment_ids: list[str] | None = None,
+    compartment: str | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for experiment queries.
 
@@ -1227,6 +1228,10 @@ def _list_experiments_where(
         conditions.append("e.id IN $experiment_ids")
         params["experiment_ids"] = experiment_ids
 
+    if compartment is not None:
+        conditions.append("e.compartment = $compartment")
+        params["compartment"] = compartment
+
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
     return where_block, params
 
@@ -1244,6 +1249,7 @@ def build_list_experiments(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     experiment_ids: list[str] | None = None,
+    compartment: str | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -1258,11 +1264,16 @@ def build_list_experiments(
     time_point_orders, time_point_hours, time_point_totals,
     time_point_significant_up, time_point_significant_down,
     clustering_analysis_count, cluster_types, growth_phases,
-    time_point_growth_phases.
+    time_point_growth_phases, derived_metric_count,
+    derived_metric_value_kinds, compartment.
     RETURN keys (verbose): adds publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
-    statistical_test, experimental_context, cluster_count.
+    statistical_test, experimental_context, cluster_count,
+    derived_metric_gene_count, derived_metric_types,
+    reports_derived_metric_types.
     RETURN keys (search_text): adds score.
+    compartment: when provided, restricts to experiments in that wet-lab
+    compartment (scalar equality: e.compartment = $compartment).
     """
     where_block, params = _list_experiments_where(
         organism=organism, treatment_type=treatment_type,
@@ -1270,7 +1281,7 @@ def build_list_experiments(
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         background_factors=background_factors, growth_phases=growth_phases,
-        experiment_ids=experiment_ids,
+        experiment_ids=experiment_ids, compartment=compartment,
     )
 
     verbose_cols = (
@@ -1283,7 +1294,10 @@ def build_list_experiments(
         "\n       e.temperature AS temperature,"
         "\n       e.statistical_test AS statistical_test,"
         "\n       e.experimental_context AS experimental_context,"
-        "\n       coalesce(e.cluster_count, 0) AS cluster_count"
+        "\n       coalesce(e.cluster_count, 0) AS cluster_count,"
+        "\n       coalesce(e.derived_metric_gene_count, 0) AS derived_metric_gene_count,"
+        "\n       coalesce(e.derived_metric_types, []) AS derived_metric_types,"
+        "\n       coalesce(e.reports_derived_metric_types, []) AS reports_derived_metric_types"
         if verbose else ""
     )
 
@@ -1325,6 +1339,9 @@ def build_list_experiments(
         "       coalesce(e.cluster_types, []) AS cluster_types"
         ",\n       coalesce(e.growth_phases, []) AS growth_phases"
         ",\n       coalesce(e.time_point_growth_phases, []) AS time_point_growth_phases"
+        ",\n       coalesce(e.derived_metric_count, 0) AS derived_metric_count"
+        ",\n       coalesce(e.derived_metric_value_kinds, []) AS derived_metric_value_kinds"
+        ",\n       e.compartment AS compartment"
     )
 
     if search_text:
@@ -1363,17 +1380,22 @@ def build_list_experiments_summary(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     experiment_ids: list[str] | None = None,
+    compartment: str | None = None,
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_experiments.
 
     Returns breakdowns by organism, treatment type, omics type,
     publication, table_scope, background_factors, cluster_type,
-    and growth_phase using apoc.coll.frequencies.
+    growth_phase, and DM rollups using apoc.coll.frequencies.
 
     RETURN keys: total_matching, time_course_count, by_organism,
     by_treatment_type, by_background_factors, by_omics_type, by_publication,
-    by_table_scope, by_cluster_type, by_growth_phase.
+    by_table_scope, by_cluster_type, by_growth_phase,
+    by_value_kind, by_metric_type, by_compartment.
     RETURN keys (search_text): adds score_max, score_median.
+
+    Note: e.compartment is a scalar string, so we use collect(e.compartment)
+    directly (no apoc.coll.flatten) for the by_compartment rollup.
     """
     where_block, params = _list_experiments_where(
         organism=organism, treatment_type=treatment_type,
@@ -1381,7 +1403,7 @@ def build_list_experiments_summary(
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         background_factors=background_factors, growth_phases=growth_phases,
-        experiment_ids=experiment_ids,
+        experiment_ids=experiment_ids, compartment=compartment,
     )
 
     collect_cols = (
@@ -1394,6 +1416,11 @@ def build_list_experiments_summary(
         "     collect(e.table_scope) AS scopes,\n"
         "     apoc.coll.flatten(collect(coalesce(e.cluster_types, []))) AS ctypes"
         ",\n     apoc.coll.flatten(collect(coalesce(e.growth_phases, []))) AS gps"
+        ",\n     apoc.coll.flatten(\n"
+        "       collect(coalesce(e.derived_metric_value_kinds, []))) AS vks"
+        ",\n     apoc.coll.flatten(\n"
+        "       collect(coalesce(e.derived_metric_types, []))) AS mtypes"
+        ",\n     collect(e.compartment) AS comps"
     )
 
     return_cols = (
@@ -1407,6 +1434,9 @@ def build_list_experiments_summary(
         "       apoc.coll.frequencies(scopes) AS by_table_scope,\n"
         "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
         ",\n       apoc.coll.frequencies(gps) AS by_growth_phase"
+        ",\n       apoc.coll.frequencies(vks) AS by_value_kind"
+        ",\n       apoc.coll.frequencies(mtypes) AS by_metric_type"
+        ",\n       apoc.coll.frequencies(comps) AS by_compartment"
     )
 
     if search_text:

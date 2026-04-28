@@ -2454,6 +2454,141 @@ class TestListExperiments:
         # Invariant: distinct count never exceeds cumulative.
         assert row["distinct_gene_count"] <= row["gene_count"]
 
+    # --- Task 4: DM rollups + compartment filter ---
+
+    def _summary_result_with_dm(self, total_matching=76, time_course_count=29):
+        """Summary result with DM rollup keys."""
+        base = self._summary_result(total_matching, time_course_count)[0]
+        base.update({
+            "by_value_kind": [
+                {"item": "numeric", "count": 15},
+                {"item": "boolean", "count": 14},
+            ],
+            "by_metric_type": [
+                {"item": "damping_ratio", "count": 4},
+            ],
+            "by_compartment": [
+                {"item": "whole_cell", "count": 60},
+                {"item": "vesicle", "count": 5},
+            ],
+        })
+        return [base]
+
+    def test_dm_envelope_keys_present(self, mock_conn):
+        """by_value_kind, by_metric_type, by_compartment in envelope."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result_with_dm(),
+            self._summary_result_with_dm(),
+        ]
+        result = api.list_experiments(summary=True, conn=mock_conn)
+        assert "by_value_kind" in result
+        assert "by_metric_type" in result
+        assert "by_compartment" in result
+
+    def test_dm_by_value_kind_renamed(self, mock_conn):
+        """by_value_kind uses 'value_kind' key (renamed from apoc 'item')."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result_with_dm(),
+            self._summary_result_with_dm(),
+        ]
+        result = api.list_experiments(summary=True, conn=mock_conn)
+        assert result["by_value_kind"][0]["value_kind"] == "numeric"
+        assert result["by_value_kind"][0]["count"] == 15
+
+    def test_dm_by_metric_type_renamed(self, mock_conn):
+        """by_metric_type uses 'metric_type' key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result_with_dm(),
+            self._summary_result_with_dm(),
+        ]
+        result = api.list_experiments(summary=True, conn=mock_conn)
+        assert result["by_metric_type"][0]["metric_type"] == "damping_ratio"
+
+    def test_dm_by_compartment_renamed(self, mock_conn):
+        """by_compartment uses 'compartment' key."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result_with_dm(),
+            self._summary_result_with_dm(),
+        ]
+        result = api.list_experiments(summary=True, conn=mock_conn)
+        assert result["by_compartment"][0]["compartment"] == "whole_cell"
+        assert result["by_compartment"][0]["count"] == 60
+
+    def test_compartment_filter_passed_to_builders(self, mock_conn):
+        """compartment param is forwarded to summary and detail builder calls."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result_with_dm(total_matching=5),
+            self._summary_result_with_dm(),
+            [self._detail_row()],
+        ]
+        api.list_experiments(compartment="vesicle", conn=mock_conn)
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        assert summary_call.kwargs.get("compartment") == "vesicle"
+        detail_call = mock_conn.execute_query.call_args_list[2]
+        assert detail_call.kwargs.get("compartment") == "vesicle"
+
+    def test_per_row_compartment_field(self, mock_conn):
+        """Per-row 'compartment' scalar field flows through to results."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result_with_dm(),
+            self._summary_result_with_dm(),
+            [self._detail_row(
+                compartment="whole_cell",
+                derived_metric_count=3,
+                derived_metric_value_kinds=["numeric", "boolean"],
+            )],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        row = result["results"][0]
+        assert row["compartment"] == "whole_cell"
+        assert row["derived_metric_count"] == 3
+        assert row["derived_metric_value_kinds"] == ["numeric", "boolean"]
+
+    def test_verbose_dm_extra_fields(self, mock_conn):
+        """Verbose mode includes derived_metric_gene_count, derived_metric_types,
+        reports_derived_metric_types."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result_with_dm(),
+            self._summary_result_with_dm(),
+            [self._detail_row(
+                compartment="whole_cell",
+                derived_metric_count=3,
+                derived_metric_value_kinds=["numeric"],
+                derived_metric_gene_count=450,
+                derived_metric_types=["damping_ratio"],
+                reports_derived_metric_types=["rhythmicity"],
+            )],
+        ]
+        result = api.list_experiments(verbose=True, conn=mock_conn)
+        row = result["results"][0]
+        assert "derived_metric_gene_count" in row
+        assert row["derived_metric_gene_count"] == 450
+        assert "derived_metric_types" in row
+        assert row["derived_metric_types"] == ["damping_ratio"]
+        assert "reports_derived_metric_types" in row
+        assert row["reports_derived_metric_types"] == ["rhythmicity"]
+
+    def test_compact_no_verbose_dm_fields(self, mock_conn):
+        """Compact mode excludes derived_metric_gene_count, derived_metric_types,
+        reports_derived_metric_types."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result_with_dm(),
+            self._summary_result_with_dm(),
+            [self._detail_row(
+                compartment="whole_cell",
+                derived_metric_count=3,
+                derived_metric_value_kinds=["numeric"],
+                derived_metric_gene_count=450,
+                derived_metric_types=["damping_ratio"],
+                reports_derived_metric_types=["rhythmicity"],
+            )],
+        ]
+        result = api.list_experiments(verbose=False, conn=mock_conn)
+        row = result["results"][0]
+        assert "derived_metric_gene_count" not in row
+        assert "derived_metric_types" not in row
+        assert "reports_derived_metric_types" not in row
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene

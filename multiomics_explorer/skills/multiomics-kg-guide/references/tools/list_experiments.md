@@ -28,6 +28,7 @@ report all assayed genes (fair for cross-experiment comparison).
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |
 | experiment_ids | list[string] \| None | None | Restrict to specific experiments by id (exact match). Combines with other filters via AND. `not_found` in the response lists any provided ids that did not match. Mirrors the filter shape on sibling tools (pathway_enrichment, ontology_landscape). |
+| compartment | string \| None | None | Filter by wet-lab fraction (exact match on scalar Experiment.compartment). E.g. 'whole_cell', 'vesicle', 'exoproteome'. Use list_filter_values(filter_type='compartment') to enumerate valid values. |
 | summary | bool | False | When true, return only summary breakdowns (by organism, treatment type, omics type, table scope) with no individual experiments. Use to orient before drilling into detail. |
 | verbose | bool | False | Include publication title, treatment/control descriptions, and experimental conditions (light, medium, temperature, statistical test, context). |
 | limit | int | 5 | Max results. |
@@ -40,7 +41,7 @@ report all assayed genes (fair for cross-experiment comparison).
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, time_course_count, score_max, score_median, not_found, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, time_course_count, score_max, score_median, not_found, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered)
@@ -56,6 +57,9 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted by count descending
 - **by_cluster_type** (list[ClusterTypeBreakdown]): Experiment counts per cluster type, sorted by count descending
 - **by_growth_phase** (list[GrowthPhaseBreakdown]): Experiment counts per growth phase, sorted by count descending
+- **by_value_kind** (list[ExpValueKindBreakdown]): Experiment counts by DerivedMetric value_kind across matching experiments
+- **by_metric_type** (list[ExpMetricTypeBreakdown]): Experiment counts by DerivedMetric metric_type across matching experiments
+- **by_compartment** (list[ExpCompartmentBreakdown]): Experiment counts per wet-lab compartment (e.g. whole_cell, vesicle, exoproteome)
 - **time_course_count** (int): Number of time-course experiments in matching set
 - **score_max** (float | None): Max Lucene relevance score, present only when search_text is used (e.g. 4.52)
 - **score_median** (float | None): Median Lucene relevance score, present only when search_text is used (e.g. 1.23)
@@ -84,7 +88,13 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
 | growth_phases | list[string] (optional) | Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
 | time_point_growth_phases | list[string] (optional) | Growth phase per timepoint, parallel to timepoints array. Same phase for all genes at each timepoint. |
+| derived_metric_count | int (optional) | Number of DerivedMetrics associated with this experiment (e.g. 4) |
+| derived_metric_value_kinds | list[string] (optional) | Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean']) |
+| compartment | string \| None (optional) | Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment. |
 | score | float \| None (optional) | Lucene relevance score, present only when search_text is used (e.g. 2.45) |
+| derived_metric_gene_count | int \| None (optional) | Number of distinct genes with DerivedMetric annotations in this experiment (only with verbose=True, e.g. 450) |
+| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric metric_type values for this experiment (only with verbose=True, e.g. ['damping_ratio', 'diel_amplitude']) |
+| reports_derived_metric_types | list[string] \| None (optional) | DerivedMetric types reported by (not just associated with) this experiment (only with verbose=True) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -226,7 +236,7 @@ list_publications(search_text='Biller') then list_experiments(publication_doi=['
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, time_course_count, score_max, score_median, not_found, results
+# returns dict with keys: total_entries, total_matching, offset, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, time_course_count, score_max, score_median, not_found, results
 ```
 
 Use package import for bulk data extraction in scripts.

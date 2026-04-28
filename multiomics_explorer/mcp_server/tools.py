@@ -1730,6 +1730,9 @@ def register_tools(mcp: FastMCP):
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
         growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
         time_point_growth_phases: list[str] = Field(default_factory=list, description="Growth phase per timepoint, parallel to timepoints array. Same phase for all genes at each timepoint.")
+        derived_metric_count: int = Field(default=0, description="Number of DerivedMetrics associated with this experiment (e.g. 4)")
+        derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean'])")
+        compartment: str | None = Field(default=None, description="Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment.")
         score: float | None = Field(default=None, description="Lucene relevance score, present only when search_text is used (e.g. 2.45)")
         # verbose-only fields
         publication_title: str | None = Field(default=None, description="Publication title")
@@ -1742,6 +1745,9 @@ def register_tools(mcp: FastMCP):
         statistical_test: str | None = Field(default=None, description="Statistical method (e.g. 'Rockhopper')")
         experimental_context: str | None = Field(default=None, description="Context summary (e.g. 'in Pro99 medium under continuous light')")
         cluster_count: int | None = Field(default=None, description="Total gene clusters across analyses (only with verbose=True, e.g. 20)")
+        derived_metric_gene_count: int | None = Field(default=None, description="Number of distinct genes with DerivedMetric annotations in this experiment (only with verbose=True, e.g. 450)")
+        derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric metric_type values for this experiment (only with verbose=True, e.g. ['damping_ratio', 'diel_amplitude'])")
+        reports_derived_metric_types: list[str] | None = Field(default=None, description="DerivedMetric types reported by (not just associated with) this experiment (only with verbose=True)")
 
     class OrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
@@ -1775,6 +1781,18 @@ def register_tools(mcp: FastMCP):
         growth_phase: str = Field(description="Growth phase (e.g. 'exponential'). Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
         count: int = Field(description="Number of experiments with this growth phase")
 
+    class ExpValueKindBreakdown(BaseModel):
+        value_kind: str = Field(description="DerivedMetric value kind (e.g. 'numeric', 'boolean', 'categorical')")
+        count: int = Field(description="Number of experiments whose DMs include this value kind (e.g. 15)")
+
+    class ExpMetricTypeBreakdown(BaseModel):
+        metric_type: str = Field(description="DerivedMetric type name (e.g. 'damping_ratio', 'diel_amplitude_protein_log2')")
+        count: int = Field(description="Number of experiments associated with DMs of this type (e.g. 4)")
+
+    class ExpCompartmentBreakdown(BaseModel):
+        compartment: str = Field(description="Wet-lab fraction (e.g. 'whole_cell', 'vesicle', 'exoproteome')")
+        count: int = Field(description="Number of experiments in this compartment (e.g. 160)")
+
     class ListExperimentsResponse(BaseModel):
         total_entries: int = Field(description="Total experiments in the KG (unfiltered)")
         total_matching: int = Field(description="Experiments matching filters")
@@ -1789,6 +1807,9 @@ def register_tools(mcp: FastMCP):
         by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted by count descending")
         by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted by count descending")
         by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted by count descending")
+        by_value_kind: list[ExpValueKindBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric value_kind across matching experiments")
+        by_metric_type: list[ExpMetricTypeBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric metric_type across matching experiments")
+        by_compartment: list[ExpCompartmentBreakdown] = Field(default_factory=list, description="Experiment counts per wet-lab compartment (e.g. whole_cell, vesicle, exoproteome)")
         time_course_count: int = Field(description="Number of time-course experiments in matching set")
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used (e.g. 4.52)")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used (e.g. 1.23)")
@@ -1857,6 +1878,12 @@ def register_tools(mcp: FastMCP):
             "lists any provided ids that did not match. Mirrors the filter "
             "shape on sibling tools (pathway_enrichment, ontology_landscape).",
         )] = None,
+        compartment: Annotated[str | None, Field(
+            description="Filter by wet-lab fraction (exact match on scalar "
+            "Experiment.compartment). E.g. 'whole_cell', 'vesicle', "
+            "'exoproteome'. Use list_filter_values(filter_type='compartment') "
+            "to enumerate valid values.",
+        )] = None,
         summary: Annotated[bool, Field(
             description="When true, return only summary breakdowns (by organism, "
             "treatment type, omics type, table scope) with no individual "
@@ -1896,7 +1923,7 @@ def register_tools(mcp: FastMCP):
                 omics_type=omics_type, publication_doi=publication_doi,
                 coculture_partner=coculture_partner, search_text=search_text,
                 time_course_only=time_course_only, table_scope=table_scope,
-                experiment_ids=experiment_ids,
+                experiment_ids=experiment_ids, compartment=compartment,
                 summary=summary,
                 verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
@@ -1910,6 +1937,9 @@ def register_tools(mcp: FastMCP):
             by_table_scope = [TableScopeBreakdown(**b) for b in result["by_table_scope"]]
             by_cluster_type = [ClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
             by_growth_phase = [GrowthPhaseBreakdown(**b) for b in result.get("by_growth_phase", [])]
+            by_value_kind = [ExpValueKindBreakdown(**b) for b in result.get("by_value_kind", [])]
+            by_metric_type = [ExpMetricTypeBreakdown(**b) for b in result.get("by_metric_type", [])]
+            by_compartment = [ExpCompartmentBreakdown(**b) for b in result.get("by_compartment", [])]
 
             # Build result models (empty list when summary=True)
             experiments = []
@@ -1941,6 +1971,9 @@ def register_tools(mcp: FastMCP):
                 by_table_scope=by_table_scope,
                 by_cluster_type=by_cluster_type,
                 by_growth_phase=by_growth_phase,
+                by_value_kind=by_value_kind,
+                by_metric_type=by_metric_type,
+                by_compartment=by_compartment,
                 time_course_count=result["time_course_count"],
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),

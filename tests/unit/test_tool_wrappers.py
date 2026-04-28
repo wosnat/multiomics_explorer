@@ -2565,6 +2565,102 @@ class TestListExperimentsWrapper:
         assert row.gene_count == 1696
         assert row.distinct_gene_count <= row.gene_count
 
+    # --- Task 4: DM rollups + compartment filter ---
+
+    _SAMPLE_SUMMARY_DM = {
+        **{k: v for k, v in _SAMPLE_SUMMARY.items()},
+        "by_value_kind": [
+            {"value_kind": "numeric", "count": 15},
+            {"value_kind": "boolean", "count": 14},
+        ],
+        "by_metric_type": [
+            {"metric_type": "damping_ratio", "count": 4},
+        ],
+        "by_compartment": [
+            {"compartment": "whole_cell", "count": 160},
+            {"compartment": "vesicle", "count": 5},
+        ],
+        "by_cluster_type": [{"cluster_type": "condition_comparison", "count": 7}],
+        "by_growth_phase": [{"growth_phase": "exponential", "count": 20}],
+        "not_found": [],
+        "offset": 0,
+    }
+
+    @pytest.mark.asyncio
+    async def test_dm_envelope_keys_in_response(self, tool_fns, mock_ctx):
+        """by_value_kind, by_metric_type, by_compartment present in response."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SAMPLE_SUMMARY_DM,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert len(result.by_value_kind) == 2
+        assert result.by_value_kind[0].value_kind == "numeric"
+        assert result.by_value_kind[0].count == 15
+        assert len(result.by_metric_type) == 1
+        assert result.by_metric_type[0].metric_type == "damping_ratio"
+        assert len(result.by_compartment) == 2
+        assert result.by_compartment[0].compartment == "whole_cell"
+        assert result.by_compartment[0].count == 160
+
+    @pytest.mark.asyncio
+    async def test_compartment_param_forwarded(self, tool_fns, mock_ctx):
+        """compartment filter parameter is forwarded to api.list_experiments."""
+        import copy
+        summary_with_dm = copy.deepcopy(self._SAMPLE_SUMMARY_DM)
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=summary_with_dm,
+        ) as mock_api:
+            await tool_fns["list_experiments"](mock_ctx, compartment="vesicle", summary=True)
+        call_kwargs = mock_api.call_args.kwargs
+        assert call_kwargs.get("compartment") == "vesicle"
+
+    @pytest.mark.asyncio
+    async def test_per_row_compartment_and_dm_fields(self, tool_fns, mock_ctx):
+        """Per-row compartment, derived_metric_count, derived_metric_value_kinds present."""
+        import copy
+        exp = copy.deepcopy(self._SAMPLE_EXP)
+        exp.update({
+            "compartment": "whole_cell",
+            "derived_metric_count": 3,
+            "derived_metric_value_kinds": ["numeric", "boolean"],
+        })
+        detail = {**self._SAMPLE_SUMMARY_DM, "returned": 1, "results": [exp]}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=detail,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        row = result.results[0]
+        assert row.compartment == "whole_cell"
+        assert row.derived_metric_count == 3
+        assert row.derived_metric_value_kinds == ["numeric", "boolean"]
+
+    @pytest.mark.asyncio
+    async def test_verbose_dm_fields_in_pydantic(self, tool_fns, mock_ctx):
+        """Verbose DM fields map to Pydantic ExperimentResult."""
+        import copy
+        exp = copy.deepcopy(self._SAMPLE_EXP)
+        exp.update({
+            "compartment": "vesicle",
+            "derived_metric_count": 2,
+            "derived_metric_value_kinds": ["numeric"],
+            "derived_metric_gene_count": 300,
+            "derived_metric_types": ["damping_ratio"],
+            "reports_derived_metric_types": ["rhythmicity"],
+        })
+        detail = {**self._SAMPLE_SUMMARY_DM, "returned": 1, "results": [exp]}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=detail,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, verbose=True)
+        row = result.results[0]
+        assert row.derived_metric_gene_count == 300
+        assert row.derived_metric_types == ["damping_ratio"]
+        assert row.reports_derived_metric_types == ["rhythmicity"]
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene

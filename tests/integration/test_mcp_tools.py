@@ -538,6 +538,62 @@ class TestListExperiments:
         assert summary["total_matching"] == detail["total_matching"]
         assert summary["total_matching"] == len(detail["results"])
 
+    # --- Task 4: DM rollups + compartment filter ---
+
+    def test_dm_rollups_in_experiment_envelope(self, conn):
+        """by_value_kind, by_metric_type, by_compartment present in summary envelope."""
+        result = api.list_experiments(summary=True, conn=conn)
+        assert "by_value_kind" in result
+        assert "by_metric_type" in result
+        assert "by_compartment" in result
+        # Envelope lists should be non-empty (KG has DMs + compartments)
+        assert len(result["by_value_kind"]) >= 1
+        assert len(result["by_compartment"]) >= 1
+
+    def test_compartment_vesicle_returns_5(self, conn):
+        """compartment='vesicle' filter returns exactly 5 experiments (pinned baseline)."""
+        result = api.list_experiments(compartment="vesicle", summary=True, conn=conn)
+        assert result["total_matching"] == 5
+
+    def test_compartment_exoproteome_returns_7(self, conn):
+        """compartment='exoproteome' filter returns exactly 7 experiments (pinned baseline)."""
+        result = api.list_experiments(compartment="exoproteome", summary=True, conn=conn)
+        assert result["total_matching"] == 7
+
+    def test_per_row_compartment_field(self, conn):
+        """Each result row has 'compartment' field in {whole_cell, vesicle, exoproteome}."""
+        result = api.list_experiments(limit=20, conn=conn)
+        valid_compartments = {"whole_cell", "vesicle", "exoproteome"}
+        for row in result["results"]:
+            assert "compartment" in row, "Missing compartment field"
+            # compartment may be None for experiments without it, or a valid value
+            if row["compartment"] is not None:
+                assert row["compartment"] in valid_compartments, (
+                    f"Unexpected compartment value: {row['compartment']}"
+                )
+
+    def test_per_row_dm_compact_fields(self, conn):
+        """Each result row has derived_metric_count and derived_metric_value_kinds."""
+        result = api.list_experiments(limit=10, conn=conn)
+        for row in result["results"]:
+            assert "derived_metric_count" in row
+            assert "derived_metric_value_kinds" in row
+            assert isinstance(row["derived_metric_count"], int)
+            assert isinstance(row["derived_metric_value_kinds"], list)
+
+    def test_verbose_reports_derived_metric_types(self, conn):
+        """Verbose mode includes reports_derived_metric_types per row."""
+        result = api.list_experiments(verbose=True, limit=5, conn=conn)
+        for row in result["results"]:
+            assert "reports_derived_metric_types" in row
+            assert isinstance(row["reports_derived_metric_types"], list)
+
+    def test_compartment_filter_rows_match_value(self, conn):
+        """All rows returned by compartment filter have the matching compartment value."""
+        result = api.list_experiments(compartment="vesicle", limit=10, conn=conn)
+        for row in result["results"]:
+            assert row["compartment"] == "vesicle"
+
 
 @pytest.mark.kg
 class TestListFilterValues:

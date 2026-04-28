@@ -855,6 +855,7 @@ def list_experiments(
     table_scope: list[str] | None = None,
     growth_phases: list[str] | None = None,
     experiment_ids: list[str] | None = None,
+    compartment: str | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -867,21 +868,30 @@ def list_experiments(
     Always returns: total_entries, total_matching, by_organism,
     by_treatment_type, by_background_factors, by_omics_type,
     by_publication, by_table_scope, by_cluster_type, by_growth_phase,
+    by_value_kind, by_metric_type, by_compartment,
     time_course_count, returned, truncated, not_found, results.
 
     summary=True is sugar for limit=0: results is empty list,
     returned=0, truncated=True.
     When summary=False (default): results populated with experiments.
-    Per result: experiment_id, experiment_name, publication_doi,
+    Per result (compact): experiment_id, experiment_name, publication_doi,
     organism_name, treatment_type, background_factors, coculture_partner,
     omics_type, is_time_course (bool), table_scope, table_scope_detail,
     gene_count, distinct_gene_count, genes_by_status (dict),
     clustering_analysis_count, cluster_types, growth_phases,
-    time_point_growth_phases, timepoints (list, omitted if not time-course).
+    time_point_growth_phases, timepoints (list, omitted if not time-course),
+    derived_metric_count, derived_metric_value_kinds, compartment.
     When verbose=True, also includes: publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
-    statistical_test, experimental_context.
+    statistical_test, experimental_context,
+    derived_metric_gene_count, derived_metric_types,
+    reports_derived_metric_types.
     When search_text is provided, detail results include score.
+
+    compartment: if provided, restricts to experiments in that wet-lab
+    compartment (scalar equality match on e.compartment, e.g. 'vesicle',
+    'whole_cell', 'exoproteome'). Use list_filter_values(filter_type=
+    'compartment') to enumerate values.
 
     growth_phases: if provided, restricts to experiments whose growth_phases
     array contains any of the specified values (case-insensitive).
@@ -912,6 +922,7 @@ def list_experiments(
         coculture_partner=coculture_partner, search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         growth_phases=growth_phases, experiment_ids=experiment_ids,
+        compartment=compartment,
     )
 
     def _run_summary(st=search_text):
@@ -955,6 +966,12 @@ def list_experiments(
         "by_table_scope": _rename_freq(raw_summary["by_table_scope"], "table_scope"),
         "by_cluster_type": _rename_freq(raw_summary["by_cluster_type"], "cluster_type"),
         "by_growth_phase": _rename_freq(raw_summary.get("by_growth_phase", []), "growth_phase"),
+        "by_value_kind": _rename_freq(
+            raw_summary.get("by_value_kind", []), "value_kind"),
+        "by_metric_type": _rename_freq(
+            raw_summary.get("by_metric_type", []), "metric_type"),
+        "by_compartment": _rename_freq(
+            raw_summary.get("by_compartment", []), "compartment"),
         "time_course_count": raw_summary["time_course_count"],
     }
 
@@ -1045,9 +1062,12 @@ def list_experiments(
             r["timepoints"] = timepoints
         # Non-time-course: omit timepoints key entirely
 
-        # Gate verbose-only cluster field
+        # Gate verbose-only fields
         if not verbose:
             r.pop("cluster_count", None)
+            r.pop("derived_metric_gene_count", None)
+            r.pop("derived_metric_types", None)
+            r.pop("reports_derived_metric_types", None)
 
         processed.append(r)
 
