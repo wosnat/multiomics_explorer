@@ -1310,7 +1310,7 @@ def build_list_experiments(
         "\n       e.experimental_context AS experimental_context,"
         "\n       coalesce(e.cluster_count, 0) AS cluster_count,"
         "\n       coalesce(e.derived_metric_gene_count, 0) AS derived_metric_gene_count,"
-        "\n       coalesce(e.derived_metric_types, []) AS derived_metric_types,"
+        "\n       coalesce(e.reports_derived_metric_types, []) AS derived_metric_types,"
         "\n       coalesce(e.reports_derived_metric_types, []) AS reports_derived_metric_types"
         if verbose else ""
     )
@@ -1433,7 +1433,7 @@ def build_list_experiments_summary(
         ",\n     apoc.coll.flatten(\n"
         "       collect(coalesce(e.derived_metric_value_kinds, []))) AS vks"
         ",\n     apoc.coll.flatten(\n"
-        "       collect(coalesce(e.derived_metric_types, []))) AS mtypes"
+        "       collect(coalesce(e.reports_derived_metric_types, []))) AS mtypes"
         ",\n     collect(e.compartment) AS comps"
     )
 
