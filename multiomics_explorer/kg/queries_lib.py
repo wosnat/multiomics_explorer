@@ -891,8 +891,9 @@ def build_list_publications_summary(
 ) -> tuple[str, dict]:
     """Build summary Cypher for matching publications.
 
-    RETURN keys: total_entries, total_matching, by_value_kind, by_metric_type,
-    by_compartment, by_cluster_type.
+    RETURN keys: total_entries, total_matching, by_organism,
+    by_treatment_type, by_background_factors, by_omics_type,
+    by_cluster_type, by_value_kind, by_metric_type, by_compartment.
     total_entries is the unfiltered count of all publications.
     total_matching is the count after applying filters.
     The rollup envelope keys use apoc.coll.flatten + apoc.coll.frequencies over
@@ -905,26 +906,45 @@ def build_list_publications_summary(
         publication_dois=publication_dois, compartment=compartment,
     )
 
+    collect_cols = (
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(p.organisms, []))) AS orgs,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(p.treatment_types, []))) AS tts,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(p.background_factors, []))) AS bfs,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(p.omics_types, []))) AS omics,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(p.derived_metric_value_kinds, []))) AS vks,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(p.derived_metric_types, []))) AS mtypes,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(p.compartments, []))) AS comps,\n"
+        "     apoc.coll.flatten(\n"
+        "       collect(coalesce(p.cluster_types, []))) AS ctypes"
+    )
+    return_cols = (
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(tts) AS by_treatment_type,\n"
+        "       apoc.coll.frequencies(bfs) AS by_background_factors,\n"
+        "       apoc.coll.frequencies(omics) AS by_omics_type,\n"
+        "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
+        "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
+        "       apoc.coll.frequencies(comps) AS by_compartment,\n"
+        "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
+    )
+
     if search_text:
         cypher = (
             "CALL db.index.fulltext.queryNodes('publicationFullText', $search_text)\n"
             "YIELD node AS p, score\n"
             f"{where_block}"
             "WITH count(p) AS total_matching,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(coalesce(p.derived_metric_value_kinds, []))) AS vks,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(coalesce(p.derived_metric_types, []))) AS mtypes,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(coalesce(p.compartments, []))) AS comps,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(coalesce(p.cluster_types, []))) AS ctypes\n"
+            f"{collect_cols}\n"
             "MATCH (p2:Publication)\n"
             "RETURN count(p2) AS total_entries, total_matching,\n"
-            "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
-            "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
-            "       apoc.coll.frequencies(comps) AS by_compartment,\n"
-            "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
+            f"{return_cols}"
         )
     else:
         # OPTIONAL MATCH preserves the total_entries row when the filtered
@@ -937,19 +957,9 @@ def build_list_publications_summary(
             f"{where_block}"
             "WITH total_entries,\n"
             "     count(p) AS total_matching,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(coalesce(p.derived_metric_value_kinds, []))) AS vks,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(coalesce(p.derived_metric_types, []))) AS mtypes,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(coalesce(p.compartments, []))) AS comps,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(coalesce(p.cluster_types, []))) AS ctypes\n"
+            f"{collect_cols}\n"
             "RETURN total_entries, total_matching,\n"
-            "       apoc.coll.frequencies(vks) AS by_value_kind,\n"
-            "       apoc.coll.frequencies(mtypes) AS by_metric_type,\n"
-            "       apoc.coll.frequencies(comps) AS by_compartment,\n"
-            "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
+            f"{return_cols}"
         )
 
     return cypher, params

@@ -775,7 +775,7 @@ def list_publications(
         summary_cypher, summary_params = build_list_publications_summary(**kw)
         summary_row = conn.execute_query(summary_cypher, **summary_params)[0]
 
-        # Fetch all matching for per-row breakdowns, then slice for results
+        # Fetch all matching detail rows, then slice for results.
         data_cypher, data_params = build_list_publications(
             **kw, verbose=verbose,
         )
@@ -791,30 +791,6 @@ def list_publications(
             summary, all_results = _execute(st=escaped)
         else:
             raise
-
-    # Compute per-row breakdowns from all matching publications
-    # (by_organism, by_treatment_type, by_background_factors, by_omics_type
-    # remain in-memory from detail rows; by_cluster_type sourced from summary).
-    org_counts: dict[str, int] = {}
-    tt_counts: dict[str, int] = {}
-    bf_counts: dict[str, int] = {}
-    omics_counts: dict[str, int] = {}
-    for pub in all_results:
-        for org in pub.get("organisms", []):
-            org_counts[org] = org_counts.get(org, 0) + 1
-        for tt in pub.get("treatment_types", []):
-            tt_counts[tt] = tt_counts.get(tt, 0) + 1
-        for bf in pub.get("background_factors", []):
-            bf_counts[bf] = bf_counts.get(bf, 0) + 1
-        for ot in pub.get("omics_types", []):
-            omics_counts[ot] = omics_counts.get(ot, 0) + 1
-
-    def _sorted_breakdown(counts, key_name):
-        return sorted(
-            [{key_name: k, "count": v} for k, v in counts.items()],
-            key=lambda x: x["count"],
-            reverse=True,
-        )
 
     results = all_results[offset:offset + limit] if limit else all_results[offset:]
 
@@ -844,10 +820,14 @@ def list_publications(
     return {
         "total_entries": summary["total_entries"],
         "total_matching": summary["total_matching"],
-        "by_organism": _sorted_breakdown(org_counts, "organism_name"),
-        "by_treatment_type": _sorted_breakdown(tt_counts, "treatment_type"),
-        "by_background_factors": _sorted_breakdown(bf_counts, "background_factor"),
-        "by_omics_type": _sorted_breakdown(omics_counts, "omics_type"),
+        "by_organism": _rename_freq(
+            summary.get("by_organism", []), "organism_name"),
+        "by_treatment_type": _rename_freq(
+            summary.get("by_treatment_type", []), "treatment_type"),
+        "by_background_factors": _rename_freq(
+            summary.get("by_background_factors", []), "background_factor"),
+        "by_omics_type": _rename_freq(
+            summary.get("by_omics_type", []), "omics_type"),
         "by_cluster_type": _rename_freq(
             summary.get("by_cluster_type", []), "cluster_type"),
         "by_value_kind": _rename_freq(
