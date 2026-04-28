@@ -123,6 +123,19 @@ Step 3: gene_ontology_terms(locus_tags=["PMM0845"])
         → drill into annotations for genes with rich annotation_types
 ```
 
+### Example 5: DM-bearing gene — see rhythmicity flags
+
+```example-call
+gene_overview(locus_tags=["MIT1002_01809"])
+```
+
+```example-response
+{"total_matching": 1, "has_expression": 0, "has_derived_metrics": 1, "returned": 1, "truncated": false, "offset": 0, "not_found": [],
+ "results": [
+   {"locus_tag": "MIT1002_01809", "gene_name": null, "product": "MarR family winged helix-turn-helix transcriptional regulator", "organism_name": "Alteromonas macleodii MIT1002", "derived_metric_count": 1, "derived_metric_value_kinds": ["boolean"]}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -132,9 +145,13 @@ gene_overview → gene_ontology_terms
 gene_overview → gene_homologs
 gene_overview → differential_expression_by_gene
 gene_overview → gene_clusters_by_gene
+gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric
+gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage
 ```
 
 ## Common mistakes
+
+- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this gene.
 
 - annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms
 

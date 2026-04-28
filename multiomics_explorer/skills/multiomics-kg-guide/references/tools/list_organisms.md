@@ -153,6 +153,19 @@ Step 3: list_publications(organism="MED4")
         → find publications studying that organism
 ```
 
+### Example 6: Find organisms with vesicle-fraction DM evidence
+
+```example-call
+list_organisms(compartment="vesicle")
+```
+
+```example-response
+{"total_matching": 3, "by_compartment": [{"compartment": "vesicle", "count": 3}, {"compartment": "whole_cell", "count": 1}], "returned": 3, "truncated": false, "offset": 0, "not_found": [],
+ "results": [
+   {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "derived_metric_count": 10, "derived_metric_value_kinds": ["boolean", "categorical", "numeric"], "compartments": ["vesicle", "whole_cell"]}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -161,9 +174,13 @@ list_organisms → list_publications
 list_organisms → resolve_gene
 list_organisms → genes_by_ontology
 list_organisms → list_clustering_analyses(organism=...)
+list_organisms(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
+list_filter_values(filter_type='metric_type') → list_organisms(search_text='<metric_type>') to find organisms with that metric
 ```
 
 ## Good to know
+
+- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this organism.
 
 - gene_count and publication_count are counts of data in the KG, not biological totals
 

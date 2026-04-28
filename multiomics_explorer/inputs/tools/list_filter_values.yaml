@@ -52,11 +52,44 @@ examples:
       Step 3: pathway_enrichment(organism="MED4", experiment_ids=[...], ontology="brite", tree="transporters", level=1)
               → run enrichment scoped to transporter categories
 
+  - title: Discover available DerivedMetric tags
+    call: list_filter_values(filter_type="metric_type")
+    response: |
+      {"filter_type": "metric_type", "total_entries": 26, "returned": 26, "truncated": false,
+       "results": [
+         {"value": "cell_abundance_biovolume_normalized", "count": 2},
+         {"value": "log2_vesicle_cell_enrichment", "count": 2},
+         {"value": "mascot_identification_probability", "count": 2}
+       ]}
+
+  - title: Enumerate DerivedMetric value kinds
+    call: list_filter_values(filter_type="value_kind")
+    response: |
+      {"filter_type": "value_kind", "total_entries": 3, "returned": 3, "truncated": false,
+       "results": [
+         {"value": "boolean", "count": 16},
+         {"value": "numeric", "count": 15},
+         {"value": "categorical", "count": 3}
+       ]}
+
+  - title: List wet-lab compartments (for compartment filter)
+    call: list_filter_values(filter_type="compartment")
+    response: |
+      {"filter_type": "compartment", "total_entries": 3, "returned": 3, "truncated": false,
+       "results": [
+         {"value": "whole_cell", "count": 160},
+         {"value": "exoproteome", "count": 7},
+         {"value": "vesicle", "count": 5}
+       ]}
+
 chaining:
   - "list_filter_values → genes_by_function(category=...)"
   - "list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_enrichment(tree=...)"
+  - "list_filter_values(filter_type='metric_type') → list_derived_metrics(metric_types=[...]) → genes_by_{kind}_metric"
+  - "list_filter_values(filter_type='compartment') → list_experiments(compartment=...) / list_organisms(compartment=...) / list_publications(compartment=...)"
 
 mistakes:
+  - "Use filter_type='metric_type' to discover DerivedMetric tags before passing them to genes_by_{kind}_metric or list_derived_metrics. filter_type='value_kind' enumerates {numeric, boolean, categorical}. filter_type='compartment' enumerates wet-lab fractions (whole_cell, vesicle, exoproteome, ...)."
   - "count is summed across all organisms — a category with count=770 may cover genes in 10+ organisms"
   - "For brite_tree: count is the number of ontology terms in the tree, not genes. Use ontology_landscape to check gene coverage."
   - wrong: "list_filter_values(category='Photosynthesis')  # no such param"

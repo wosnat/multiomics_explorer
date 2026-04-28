@@ -130,6 +130,19 @@ Step 3: genes_by_function(search_text="photosystem", organism="MED4")
 list_publications(publication_dois=["10.1038/ismej.2016.70", "10.1101/2025.11.24.690089"], verbose=True)
 ```
 
+### Example 5: Find vesicle-fraction publications with DM evidence
+
+```example-call
+list_publications(compartment="vesicle")
+```
+
+```example-response
+{"total_matching": 2, "by_value_kind": [{"value_kind": "numeric", "count": 2}], "by_compartment": [{"compartment": "vesicle", "count": 2}], "returned": 2, "truncated": false, "offset": 0,
+ "results": [
+   {"doi": "10.1111/1462-2920.15834", "title": "Prochlorococcus extracellular vesicles: molecular composition and adsorption to diverse microbes", "year": 2022, "derived_metric_count": 6, "derived_metric_value_kinds": ["numeric"], "compartments": ["vesicle"]}
+ ]}
+```
+
 ## Chaining patterns
 
 ```
@@ -137,9 +150,13 @@ list_publications → list_experiments → differential_expression_by_gene
 list_publications → genes_by_function
 list_publications → list_clustering_analyses(publication_doi=[...])
 list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset
+list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
+list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric
 ```
 
 ## Common mistakes
+
+- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this publication.
 
 - treatment_type is a string filter, not a list — use treatment_type='coculture' not treatment_type=['coculture']
 
