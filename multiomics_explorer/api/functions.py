@@ -880,8 +880,10 @@ def list_experiments(
     omics_type, is_time_course (bool), table_scope, table_scope_detail,
     gene_count, distinct_gene_count, genes_by_status (dict),
     clustering_analysis_count, cluster_types, growth_phases,
-    time_point_growth_phases, timepoints (list, omitted if not time-course),
+    timepoints (list, omitted if not time-course),
     derived_metric_count, derived_metric_value_kinds, compartment.
+    Per timepoint dict: timepoint, timepoint_order, timepoint_hours,
+    growth_phase (str | None), gene_count, genes_by_status.
     When verbose=True, also includes: publication_title, treatment,
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context,
@@ -893,6 +895,10 @@ def list_experiments(
     with a future KG distinction between "DMs reported by this experiment"
     and "DMs associated with this experiment" (slice-2 D5).
     When search_text is provided, detail results include score.
+
+    organism: case-insensitive substring match against profiled organism
+        (e.organism_name only). For partner-side filtering, use
+        coculture_partner=; the two filters AND-compose.
 
     compartment: if provided, restricts to experiments in that wet-lab
     compartment (scalar equality match on e.compartment, e.g. 'vesicle',
@@ -1046,6 +1052,9 @@ def list_experiments(
         tp_totals = r.pop("time_point_totals", [])
         tp_sig_up = r.pop("time_point_significant_up", [])
         tp_sig_down = r.pop("time_point_significant_down", [])
+        # Pop (don't get) — strips the experiment-level field from r so it
+        # doesn't leak into the response. Per-TP growth_phase below replaces it.
+        tp_growth_phases = r.pop("time_point_growth_phases", [])
 
         if r["is_time_course"] and tp_count > 0:
             timepoints = []
@@ -1057,6 +1066,11 @@ def list_experiments(
                     "timepoint": tp_labels[i] if tp_labels[i] != "" else None,
                     "timepoint_order": tp_orders[i],
                     "timepoint_hours": tp_hours[i] if tp_hours[i] != -1.0 else None,
+                    "growth_phase": (
+                        tp_growth_phases[i]
+                        if i < len(tp_growth_phases) and tp_growth_phases[i]
+                        else None
+                    ),
                     "gene_count": tp_total,
                     "genes_by_status": {
                         "significant_up": tp_up,
@@ -1066,7 +1080,8 @@ def list_experiments(
                 }
                 timepoints.append(tp)
             r["timepoints"] = timepoints
-        # Non-time-course: omit timepoints key entirely
+        # Non-time-course: omit timepoints key entirely. tp_growth_phases is
+        # popped above so the experiment-level field never leaks into r.
 
         # Gate verbose-only fields
         if not verbose:

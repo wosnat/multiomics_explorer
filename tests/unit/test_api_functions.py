@@ -2708,6 +2708,66 @@ class TestListExperiments:
         assert "derived_metric_types" not in row
         assert "reports_derived_metric_types" not in row
 
+    def test_per_tp_growth_phase_populated(self, mock_conn):
+        """Per-TP growth_phase is zipped from time_point_growth_phases parallel array."""
+        tc_row = self._tc_detail_row()
+        tc_row["time_point_growth_phases"] = [
+            "exponential", "nutrient_limited", "death",
+        ]
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [tc_row],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        timepoints = result["results"][0]["timepoints"]
+        assert [tp["growth_phase"] for tp in timepoints] == [
+            "exponential", "nutrient_limited", "death",
+        ]
+
+    def test_experiment_level_time_point_growth_phases_absent(self, mock_conn):
+        """Experiment-level time_point_growth_phases is removed from the response."""
+        tc_row = self._tc_detail_row()
+        tc_row["time_point_growth_phases"] = [
+            "exponential", "nutrient_limited", "death",
+        ]
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [tc_row],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        assert "time_point_growth_phases" not in result["results"][0]
+
+    def test_per_tp_growth_phase_none_when_array_short(self, mock_conn):
+        """If time_point_growth_phases has fewer entries than time_point_count, missing TPs get None."""
+        tc_row = self._tc_detail_row()
+        # 3 TPs declared, only 1 phase
+        tc_row["time_point_growth_phases"] = ["exponential"]
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [tc_row],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        timepoints = result["results"][0]["timepoints"]
+        assert timepoints[0]["growth_phase"] == "exponential"
+        assert timepoints[1]["growth_phase"] is None
+        assert timepoints[2]["growth_phase"] is None
+
+    def test_per_tp_growth_phase_none_when_array_missing(self, mock_conn):
+        """If Cypher returns no time_point_growth_phases key at all, every TP gets None."""
+        tc_row = self._tc_detail_row()
+        # Do not add time_point_growth_phases — simulates pre-Cypher-coalesce or empty data
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),
+            self._summary_result(),
+            [tc_row],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        timepoints = result["results"][0]["timepoints"]
+        assert all(tp["growth_phase"] is None for tp in timepoints)
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene
