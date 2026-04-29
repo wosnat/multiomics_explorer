@@ -589,6 +589,30 @@ class TestListExperiments:
         for row in result["results"]:
             assert row["compartment"] == "vesicle"
 
+    def test_per_tp_growth_phase(self, conn):
+        """Per-TP growth_phase populated on time-course experiments with phase data."""
+        result = api.list_experiments(
+            experiment_ids=[
+                "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic"
+            ],
+            conn=conn,
+        )
+        assert result["results"], "Expected at least one experiment"
+        exp = result["results"][0]
+        assert exp["is_time_course"] is True
+        timepoints = exp.get("timepoints") or []
+        assert timepoints, "Expected at least one timepoint"
+        phases = [tp.get("growth_phase") for tp in timepoints]
+        # At least one TP has a non-null phase
+        assert any(p is not None for p in phases), \
+            f"No growth_phase populated on TPs: {phases}"
+        # Stronger: this specific experiment should have phase-varying TPs
+        nonnull = [p for p in phases if p]
+        assert len(set(nonnull)) >= 2, \
+            f"Expected phase-varying TPs on axenic proteomics, got: {phases}"
+        # Experiment-level field is gone (post-F3)
+        assert "time_point_growth_phases" not in exp
+
 
 @pytest.mark.kg
 class TestListFilterValues:
