@@ -1131,7 +1131,6 @@ class TestListExperimentsCorrectness:
              "gene_count": 1696,
              "distinct_gene_count": 1696,
              "growth_phases": ["exponential"],
-             "time_point_growth_phases": [],
              "genes_by_status": {"significant_up": 245, "significant_down": 178, "not_significant": 1273}},
             {"experiment_id": "exp_002",
              "experiment_name": "MED4 Light Stress Time Course",
@@ -1147,13 +1146,14 @@ class TestListExperimentsCorrectness:
              "gene_count": 3392,
              "distinct_gene_count": 1696,
              "growth_phases": ["exponential"],
-             "time_point_growth_phases": ["exponential", "exponential"],
              "genes_by_status": {"significant_up": 450, "significant_down": 320, "not_significant": 926},
              "timepoints": [
                  {"timepoint": "2h", "timepoint_order": 1, "timepoint_hours": 2.0,
+                  "growth_phase": "exponential",
                   "gene_count": 1696,
                   "genes_by_status": {"significant_up": 50, "significant_down": 30, "not_significant": 1616}},
                  {"timepoint": "24h", "timepoint_order": 2, "timepoint_hours": 24.0,
+                  "growth_phase": "exponential",
                   "gene_count": 1696,
                   "genes_by_status": {"significant_up": 400, "significant_down": 290, "not_significant": 1006}},
              ]},
@@ -1205,7 +1205,10 @@ class TestListExperimentsCorrectness:
         # growth_phases on the experiment result
         assert result.results[0].growth_phases == ["exponential"]
         assert result.results[1].growth_phases == ["exponential"]
-        assert result.results[1].time_point_growth_phases == ["exponential", "exponential"]
+        # per-timepoint growth_phase replaces the experiment-level
+        # time_point_growth_phases field (dropped in F3)
+        assert result.results[1].timepoints[0].growth_phase == "exponential"
+        assert result.results[1].timepoints[1].growth_phase == "exponential"
         # by_growth_phase breakdown on the response envelope
         assert len(result.by_growth_phase) == 1
         assert result.by_growth_phase[0].growth_phase == "exponential"

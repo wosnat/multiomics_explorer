@@ -2670,6 +2670,37 @@ class TestListExperimentsWrapper:
         assert row.derived_metric_types == ["damping_ratio"]
         assert row.reports_derived_metric_types == ["rhythmicity"]
 
+    @pytest.mark.asyncio
+    async def test_per_tp_growth_phase_in_response_model(self, tool_fns, mock_ctx):
+        """Per-timepoint growth_phase round-trips through TimePoint; experiment-level
+        time_point_growth_phases field is gone from ExperimentResult."""
+        import copy
+        tc_exp = {
+            **copy.deepcopy(self._SAMPLE_EXP),
+            "is_time_course": True,
+            "timepoints": [
+                {"timepoint": "2h", "timepoint_order": 1, "timepoint_hours": 2.0,
+                 "growth_phase": "exponential",
+                 "gene_count": 353,
+                 "genes_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 353}},
+                {"timepoint": "24h", "timepoint_order": 2, "timepoint_hours": 24.0,
+                 "growth_phase": "nutrient_limited",
+                 "gene_count": 353,
+                 "genes_by_status": {"significant_up": 150, "significant_down": 108, "not_significant": 95}},
+            ],
+        }
+        detail = {**self._SAMPLE_SUMMARY, "returned": 1, "truncated": False,
+                  "results": [tc_exp]}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=detail,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        r = result.results[0]
+        assert r.timepoints[0].growth_phase == "exponential"
+        assert r.timepoints[1].growth_phase == "nutrient_limited"
+        assert not hasattr(r, "time_point_growth_phases")
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene

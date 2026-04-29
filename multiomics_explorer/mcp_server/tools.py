@@ -1743,6 +1743,7 @@ def register_tools(mcp: FastMCP):
         timepoint: str | None = Field(default=None, description="Time point label, null if unlabeled (e.g. '24h', '5h extended darkness (40h)')")
         timepoint_order: int = Field(description="Sort order within experiment (e.g. 1, 2, 3)")
         timepoint_hours: float | None = Field(default=None, description="Time in hours, null if unknown (e.g. 24.0)")
+        growth_phase: str | None = Field(default=None, description="Growth phase observed at this timepoint (e.g. 'exponential', 'nutrient_limited', 'death'). Null when not annotated.")
         gene_count: int = Field(description="Total genes with expression data at this time point (e.g. 1696)")
         genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status at this time point")
 
@@ -1766,7 +1767,6 @@ def register_tools(mcp: FastMCP):
         clustering_analysis_count: int = Field(default=0, description="Number of clustering analyses for this experiment (e.g. 4)")
         cluster_types: list[str] = Field(default_factory=list, description="Distinct cluster types (e.g. ['condition_comparison'])")
         growth_phases: list[str] = Field(default_factory=list, description="Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific.")
-        time_point_growth_phases: list[str] = Field(default_factory=list, description="Growth phase per timepoint, parallel to timepoints array. Same phase for all genes at each timepoint.")
         derived_metric_count: int = Field(default=0, description="Number of DerivedMetrics associated with this experiment (e.g. 4)")
         derived_metric_value_kinds: list[str] = Field(default_factory=list, description="Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean'])")
         compartment: str | None = Field(default=None, description="Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment.")
@@ -1860,9 +1860,12 @@ def register_tools(mcp: FastMCP):
     async def list_experiments(
         ctx: Context,
         organism: Annotated[str | None, Field(
-            description="Filter by organism name (case-insensitive partial match "
-            "on profiled organism and coculture partner). "
-            "E.g. 'MED4', 'Alteromonas'.",
+            description=(
+                "Filter to experiments where this organism is the profiled "
+                "organism (case-insensitive substring on organism_name). "
+                "For partner-side filtering, use coculture_partner=; the two "
+                "filters AND-compose."
+            ),
         )] = None,
         treatment_type: Annotated[list[str] | None, Field(
             description="Filter by treatment type(s) (case-insensitive exact match). "
