@@ -123,6 +123,7 @@ def experiments_to_dataframe(result: dict) -> pd.DataFrame:
                 record["timepoint_order"] = tp.get("timepoint_order")
                 record["timepoint_hours"] = tp.get("timepoint_hours")
                 record["tp_gene_count"] = tp.get("gene_count")
+                record["tp_growth_phase"] = tp.get("growth_phase")
                 tp_gbs = tp.get("genes_by_status", {})
                 record["tp_significant_up"] = tp_gbs.get("significant_up")
                 record["tp_significant_down"] = tp_gbs.get("significant_down")
@@ -134,6 +135,7 @@ def experiments_to_dataframe(result: dict) -> pd.DataFrame:
             record["timepoint_order"] = None
             record["timepoint_hours"] = None
             record["tp_gene_count"] = None
+            record["tp_growth_phase"] = None
             record["tp_significant_up"] = None
             record["tp_significant_down"] = None
             record["tp_not_significant"] = None

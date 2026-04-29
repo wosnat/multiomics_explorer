@@ -93,6 +93,7 @@ _EXPERIMENTS_RESULT = {
             "timepoints": [
                 {
                     "timepoint": "T0", "timepoint_order": 0, "timepoint_hours": 0.0,
+                    "growth_phase": "exponential",
                     "gene_count": 180,
                     "genes_by_status": {
                         "significant_up": 40, "significant_down": 20, "not_significant": 120,
@@ -100,6 +101,7 @@ _EXPERIMENTS_RESULT = {
                 },
                 {
                     "timepoint": "T1", "timepoint_order": 1, "timepoint_hours": 2.0,
+                    "growth_phase": "nutrient_limited",
                     "gene_count": 200,
                     "genes_by_status": {
                         "significant_up": 50, "significant_down": 30, "not_significant": 120,
@@ -393,6 +395,19 @@ class TestExperimentsToDataFrame:
     def test_missing_results_key(self):
         with pytest.raises(ValueError, match="results"):
             experiments_to_dataframe({"data": []})
+
+    def test_tp_growth_phase_per_row(self):
+        """tp_growth_phase column is populated from timepoints[].growth_phase per TP."""
+        df = experiments_to_dataframe(_EXPERIMENTS_RESULT)
+        exp1_rows = df[df["experiment_id"] == "exp1"].sort_values("timepoint_order")
+        assert exp1_rows.iloc[0]["tp_growth_phase"] == "exponential"
+        assert exp1_rows.iloc[1]["tp_growth_phase"] == "nutrient_limited"
+
+    def test_tp_growth_phase_nan_for_non_time_course(self):
+        """Non-time-course experiments have NaN tp_growth_phase (single-row branch)."""
+        df = experiments_to_dataframe(_EXPERIMENTS_RESULT)
+        exp2_row = df[df["experiment_id"] == "exp2"].iloc[0]
+        assert pd.isna(exp2_row["tp_growth_phase"])
 
 
 # ---------------------------------------------------------------------------

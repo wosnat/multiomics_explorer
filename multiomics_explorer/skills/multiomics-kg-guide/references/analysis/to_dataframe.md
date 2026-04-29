@@ -136,8 +136,9 @@ fields. `genes_by_status` dicts are inlined at both levels.
 
 `pd.DataFrame` with all scalar experiment fields plus:
 `timepoint`, `timepoint_order`, `timepoint_hours`,
-`tp_gene_count`, `tp_significant_up`, `tp_significant_down`,
-`tp_not_significant`.
+`tp_gene_count`, `tp_growth_phase` (nullable string, sourced from
+`timepoints[].growth_phase`), `tp_significant_up`,
+`tp_significant_down`, `tp_not_significant`.
 
 Experiment-level `genes_by_status` is inlined as
 `genes_by_status_significant_up`, etc.
