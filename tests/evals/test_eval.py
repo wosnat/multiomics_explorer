@@ -124,6 +124,12 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
             api_params["limit"] = limit
         return api.pathway_enrichment(**api_params, conn=conn).to_envelope().get("results", [])
 
+    if tool == "gene_overview":
+        # Dispatch via api (L2) — derived_metric_count + value_kinds are
+        # synthesized from per-kind builder counts at the api layer; the
+        # raw builder doesn't expose those fields.
+        return api.gene_overview(**params, conn=conn).get("results", [])
+
     if tool == "genes_by_numeric_metric":
         # Dispatch via api (L2) — detail builder requires resolved
         # derived_metric_ids; api handles metric_types → ID resolution +

@@ -17,21 +17,23 @@ rows:
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 619, ''name'': ''Energy production and
     conversion''}'
-  - '{''id'': ''cog.category:K'', ''count'': 29, ''name'': ''Transcription''}'
-  - '{''id'': ''cog.category:N'', ''count'': 11, ''name'': ''Cell motility''}'
+  - '{''id'': ''cog.category:G'', ''count'': 91, ''name'': ''Carbohydrate transport
+    and metabolism''}'
+  - '{''id'': ''cog.category:H'', ''count'': 86, ''name'': ''Coenzyme transport and
+    metabolism''}'
   - '{''id'': ''cog.category:S'', ''count'': 755, ''name'': ''Function unknown''}'
   - '{''id'': ''cog.category:U'', ''count'': 67, ''name'': ''Intracellular trafficking,
     secretion, and vesicular transport''}'
   top_cyanorak_roles:
-  - '{''id'': ''cyanorak.role:D.1.1'', ''count'': 89, ''name'': ''Cellular processes
-    > Adaptation/acclimation to atypical conditions and detoxification > Iron''}'
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 235, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
-  - '{''id'': ''cyanorak.role:J.7'', ''count'': 121, ''name'': ''Photosynthesis and
-    respiration > Photosystem I''}'
+  - '{''id'': ''cyanorak.role:G.2'', ''count'': 220, ''name'': ''Energy metabolism
+    > Electron transport''}'
+  - '{''id'': ''cyanorak.role:J'', ''count'': 168, ''name'': ''Photosynthesis and
+    respiration''}'
+  - '{''id'': ''cyanorak.role:J.2'', ''count'': 169, ''name'': ''Photosynthesis and
+    respiration > CO2 fixation''}'
   - '{''id'': ''cyanorak.role:J.8'', ''count'': 228, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  - '{''id'': ''cyanorak.role:L.3'', ''count'': 26, ''name'': ''Protein fate > Protein
-    folding and stabilization''}'
   total_entries: 45438
   total_matching: 1126

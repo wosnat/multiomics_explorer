@@ -12,20 +12,20 @@ rows:
     conversion''}'
   - '{''id'': ''cog.category:G'', ''count'': 26, ''name'': ''Carbohydrate transport
     and metabolism''}'
-  - '{''id'': ''cog.category:K'', ''count'': 6, ''name'': ''Transcription''}'
-  - '{''id'': ''cog.category:O'', ''count'': 10, ''name'': ''Post-translational modification,
-    protein turnover, chaperones''}'
+  - '{''id'': ''cog.category:H'', ''count'': 20, ''name'': ''Coenzyme transport and
+    metabolism''}'
+  - '{''id'': ''cog.category:P'', ''count'': 19, ''name'': ''Inorganic ion transport
+    and metabolism''}'
   - '{''id'': ''cog.category:S'', ''count'': 134, ''name'': ''Function unknown''}'
   top_cyanorak_roles:
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 41, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
+  - '{''id'': ''cyanorak.role:G.2'', ''count'': 52, ''name'': ''Energy metabolism
+    > Electron transport''}'
+  - '{''id'': ''cyanorak.role:J'', ''count'': 35, ''name'': ''Photosynthesis and respiration''}'
   - '{''id'': ''cyanorak.role:J.2'', ''count'': 40, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
-  - '{''id'': ''cyanorak.role:J.7'', ''count'': 21, ''name'': ''Photosynthesis and
-    respiration > Photosystem I''}'
   - '{''id'': ''cyanorak.role:J.8'', ''count'': 41, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  - '{''id'': ''cyanorak.role:P.3'', ''count'': 1, ''name'': ''Transcription > Transcription
-    factors''}'
   total_entries: 45438
   total_matching: 239
