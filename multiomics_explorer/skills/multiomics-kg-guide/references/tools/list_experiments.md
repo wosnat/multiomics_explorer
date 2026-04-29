@@ -247,7 +247,7 @@ list_experiments(publication='Biller 2018')
 list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])
 ```
 
-- `organism=` filters the profiled organism only (case-insensitive substring on `organism_name`). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. Prior versions OR'd the two; if you have notes from earlier sessions assuming the OR-semantics, the count will now be lower (e.g. MED4 returns 39 experiments, was 48).
+- `organism=` filters the profiled organism only (case-insensitive substring on `organism_name`). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. Prior versions OR'd the two; if you have notes from earlier sessions assuming the OR-semantics, the count will now be lower (the OR-leak silently included experiments where the queried organism was the coculture partner, not the profiled one).
 
 ```mistake
 result['results'][0]['time_point_growth_phases']
