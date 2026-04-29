@@ -17,7 +17,7 @@ report all assayed genes (fair for cross-experiment comparison).
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Filter by organism name (case-insensitive partial match on profiled organism and coculture partner). E.g. 'MED4', 'Alteromonas'. |
+| organism | string \| None | None | Filter to experiments where this organism is the profiled organism (case-insensitive substring on organism_name). For partner-side filtering, use coculture_partner=; the two filters AND-compose. |
 | treatment_type | list[string] \| None | None | Filter by treatment type(s) (case-insensitive exact match). E.g. ['coculture', 'nitrogen_stress']. Use list_filter_values to see valid values. |
 | background_factors | list[string] \| None | None | Filter by background experimental factors (case-insensitive exact match). E.g. ['axenic', 'diel_cycle']. Background factors describe experimental context beyond the primary treatment. |
 | growth_phases | list[string] \| None | None | Filter by growth phase(s) (case-insensitive). Physiological state of the culture at sampling time. E.g. ['exponential', 'nutrient_limited']. |
@@ -87,7 +87,6 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this experiment (e.g. 4) |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison']) |
 | growth_phases | list[string] (optional) | Distinct growth phases in this experiment. Physiological state of the culture at sampling — timepoint-level, not gene-specific. |
-| time_point_growth_phases | list[string] (optional) | Growth phase per timepoint, parallel to timepoints array. Same phase for all genes at each timepoint. |
 | derived_metric_count | int (optional) | Number of DerivedMetrics associated with this experiment (e.g. 4) |
 | derived_metric_value_kinds | list[string] (optional) | Distinct DerivedMetric value kinds for this experiment (e.g. ['numeric', 'boolean']) |
 | compartment | string \| None (optional) | Wet-lab fraction this experiment profiles (e.g. 'whole_cell', 'vesicle', 'exoproteome'). Scalar per experiment. |
@@ -246,6 +245,16 @@ list_experiments(publication='Biller 2018')
 
 ```correction
 list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])
+```
+
+- `organism=` filters the profiled organism only (case-insensitive substring on `organism_name`). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. Prior versions OR'd the two; if you have notes from earlier sessions assuming the OR-semantics, the count will now be lower (e.g. MED4 returns 39 experiments, was 48).
+
+```mistake
+result['results'][0]['time_point_growth_phases']
+```
+
+```correction
+[tp['growth_phase'] for tp in result['results'][0]['timepoints']]
 ```
 
 ## Package import equivalent

@@ -104,3 +104,7 @@ mistakes:
   - "For time-course experiments, top-level `gene_count` is the **cumulative row count across timepoints** (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`."
   - wrong: "list_experiments(publication='Biller 2018')"
     right: "list_publications(search_text='Biller') then list_experiments(publication_doi=['10.1038/...'])"
+  - "`organism=` filters the profiled organism only (case-insensitive substring on `organism_name`). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. Prior versions OR'd the two; if you have notes from earlier sessions assuming the OR-semantics, the count will now be lower (e.g. MED4 returns 39 experiments, was 48)."
+
+  - wrong: "result['results'][0]['time_point_growth_phases']"
+    right: "[tp['growth_phase'] for tp in result['results'][0]['timepoints']]"
