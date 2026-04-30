@@ -1,7 +1,11 @@
 case_id: list_experiments_coculture_partner
 row_count: 5
 rows:
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -40,7 +44,10 @@ rows:
   - '1849'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -80,7 +87,10 @@ rows:
   - '1714'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -120,7 +130,10 @@ rows:
   - '2267'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -160,7 +173,11 @@ rows:
   - '2268'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Allison Coe
+  - Sallie W Chisholm
+  - Steven J Biller
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0

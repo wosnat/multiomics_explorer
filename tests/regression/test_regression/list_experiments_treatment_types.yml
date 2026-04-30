@@ -1,7 +1,12 @@
 case_id: list_experiments_treatment_types
 row_count: 77
 rows:
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -42,7 +47,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -83,7 +93,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -124,7 +139,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -164,7 +184,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -205,7 +230,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -246,7 +276,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -287,7 +322,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -327,7 +367,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -368,7 +413,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -409,7 +459,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -450,7 +505,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -490,7 +550,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -531,7 +596,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -572,7 +642,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -613,7 +688,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -654,7 +734,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -695,7 +780,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -736,7 +826,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -777,7 +872,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -818,7 +918,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -858,7 +963,12 @@ rows:
   - '419'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -898,7 +1008,12 @@ rows:
   - '188'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -938,7 +1053,12 @@ rows:
   - '293'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -978,7 +1098,12 @@ rows:
   - '83'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1018,7 +1143,12 @@ rows:
   - '136'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1058,7 +1188,11 @@ rows:
   - '58'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1097,7 +1231,10 @@ rows:
   - '3950'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1129,7 +1266,10 @@ rows:
   time_point_totals: []
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1161,7 +1301,11 @@ rows:
   time_point_totals: []
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Allison Coe
+  - Sallie W Chisholm
+  - Steven J Biller
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1201,7 +1345,11 @@ rows:
   - '740'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Allison Coe
+  - Sallie W Chisholm
+  - Steven J Biller
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1241,7 +1389,12 @@ rows:
   - '740'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1283,7 +1436,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1325,7 +1483,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1367,7 +1530,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1409,7 +1577,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1451,7 +1624,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1493,7 +1671,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1535,7 +1718,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1576,7 +1764,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1618,7 +1811,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1660,7 +1858,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1702,7 +1905,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1744,7 +1952,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1786,7 +1999,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1828,7 +2046,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1870,7 +2093,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1912,7 +2140,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1954,7 +2187,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -1996,7 +2234,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -2038,7 +2281,12 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -2080,7 +2328,11 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2119,7 +2371,10 @@ rows:
   - '1849'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2159,7 +2414,10 @@ rows:
   - '1714'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2199,7 +2457,10 @@ rows:
   - '2267'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2239,7 +2500,11 @@ rows:
   - '2268'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Allison Coe
+  - Sallie W Chisholm
+  - Steven J Biller
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2321,7 +2586,16 @@ rows:
   - '353'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Andreas Kremling
+  - Chen Meng
+  - Franziska Kratzl
+  - Jagroop Pandhal
+  - Karin Kleigrewe
+  - Katharina Pflüger-Grau
+  - Marlene Urban
+  - Mengxun Shi
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2361,7 +2635,16 @@ rows:
   - '5103'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Andreas Kremling
+  - Chen Meng
+  - Franziska Kratzl
+  - Jagroop Pandhal
+  - Karin Kleigrewe
+  - Katharina Pflüger-Grau
+  - Marlene Urban
+  - Mengxun Shi
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2401,7 +2684,13 @@ rows:
   - '228'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2484,7 +2773,13 @@ rows:
   - '222'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2567,7 +2862,13 @@ rows:
   - '184'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - David J. Scanlan
+  - Despoina Sousoni
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Matthew Lloyd
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2608,7 +2909,23 @@ rows:
   - '1724'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Alexander S Beliaev
+  - Allan Konopka
+  - Bryan E Linggi
+  - Donald A Bryant
+  - Eric A Hill
+  - Grigoriy E Pinchuk
+  - H Steven Wiley
+  - Hans C Bernstein
+  - Jim K Fredrickson
+  - Leo A Kucek
+  - Lye M Markillie
+  - Margie F Romine
+  - Margrethe Serres
+  - Nancy G Isern
+  - William B Chrisler
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2647,7 +2964,23 @@ rows:
   - '1287'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Alexander S Beliaev
+  - Allan Konopka
+  - Bryan E Linggi
+  - Donald A Bryant
+  - Eric A Hill
+  - Grigoriy E Pinchuk
+  - H Steven Wiley
+  - Hans C Bernstein
+  - Jim K Fredrickson
+  - Leo A Kucek
+  - Lye M Markillie
+  - Margie F Romine
+  - Margrethe Serres
+  - Nancy G Isern
+  - William B Chrisler
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2686,7 +3019,23 @@ rows:
   - '454'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Alexander S Beliaev
+  - Allan Konopka
+  - Bryan E Linggi
+  - Donald A Bryant
+  - Eric A Hill
+  - Grigoriy E Pinchuk
+  - H Steven Wiley
+  - Hans C Bernstein
+  - Jim K Fredrickson
+  - Leo A Kucek
+  - Lye M Markillie
+  - Margie F Romine
+  - Margrethe Serres
+  - Nancy G Isern
+  - William B Chrisler
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2727,7 +3076,23 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Alexander S Beliaev
+  - Allan Konopka
+  - Bryan E Linggi
+  - Donald A Bryant
+  - Eric A Hill
+  - Grigoriy E Pinchuk
+  - H Steven Wiley
+  - Hans C Bernstein
+  - Jim K Fredrickson
+  - Leo A Kucek
+  - Lye M Markillie
+  - Margie F Romine
+  - Margrethe Serres
+  - Nancy G Isern
+  - William B Chrisler
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2766,7 +3131,23 @@ rows:
   - '670'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Alexander S Beliaev
+  - Allan Konopka
+  - Bryan E Linggi
+  - Donald A Bryant
+  - Eric A Hill
+  - Grigoriy E Pinchuk
+  - H Steven Wiley
+  - Hans C Bernstein
+  - Jim K Fredrickson
+  - Leo A Kucek
+  - Lye M Markillie
+  - Margie F Romine
+  - Margrethe Serres
+  - Nancy G Isern
+  - William B Chrisler
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2805,7 +3186,23 @@ rows:
   - '1143'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Alexander S Beliaev
+  - Allan Konopka
+  - Bryan E Linggi
+  - Donald A Bryant
+  - Eric A Hill
+  - Grigoriy E Pinchuk
+  - H Steven Wiley
+  - Hans C Bernstein
+  - Jim K Fredrickson
+  - Leo A Kucek
+  - Lye M Markillie
+  - Margie F Romine
+  - Margrethe Serres
+  - Nancy G Isern
+  - William B Chrisler
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2846,7 +3243,13 @@ rows:
   treatment_type:
   - carbon
   - coculture
-- background_factors:
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2929,7 +3332,13 @@ rows:
   - '221'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -3012,7 +3421,13 @@ rows:
   - '187'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - David J. Scanlan
+  - Despoina Sousoni
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Matthew Lloyd
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -3053,7 +3468,13 @@ rows:
   - '564'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - David J. Scanlan
+  - Despoina Sousoni
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Matthew Lloyd
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -3094,7 +3515,13 @@ rows:
   - '1050'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Brian Palenik
+  - D. Aaron Johnson
+  - Ian T. Paulsen
+  - Katherine Phillippy
+  - Vera Tai
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -3140,7 +3567,16 @@ rows:
   - '294'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Andreas Kremling
+  - Chen Meng
+  - Franziska Kratzl
+  - Jagroop Pandhal
+  - Karin Kleigrewe
+  - Katharina Pflüger-Grau
+  - Marlene Urban
+  - Mengxun Shi
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -3180,7 +3616,16 @@ rows:
   - '2627'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Andreas Kremling
+  - Chen Meng
+  - Franziska Kratzl
+  - Jagroop Pandhal
+  - Karin Kleigrewe
+  - Katharina Pflüger-Grau
+  - Marlene Urban
+  - Mengxun Shi
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -3220,7 +3665,14 @@ rows:
   - '527'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Jiajia Ma
+  - Lei Chen
+  - Meijin Ren
+  - Taohong Guo
+  - Weiwen Zhang
+  - Xinyu Song
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -3268,7 +3720,14 @@ rows:
   - '75'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Jiajia Ma
+  - Lei Chen
+  - Meijin Ren
+  - Taohong Guo
+  - Weiwen Zhang
+  - Xinyu Song
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -3309,7 +3768,20 @@ rows:
   - '34'
   treatment_type:
   - coculture
-- background_factors: []
+- authors:
+  - Alexander S. Beliaev
+  - Donald A. Bryant
+  - Eric A. Hill
+  - Hans C. Bernstein
+  - Janet K. Jansson
+  - Jim K. Fredrickson
+  - Margaret F. Romine
+  - Natalie C. Sadler
+  - Ryan S. McClure
+  - Vera Thiel
+  - William B. Chrisler
+  - Young-Mo Kim
+  background_factors: []
   cluster_types:
   - condition_comparison
   clustering_analysis_count: 4

@@ -1,7 +1,11 @@
 case_id: list_experiments_time_course
 row_count: 32
 rows:
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -49,7 +53,11 @@ rows:
   - '2226'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -118,7 +126,11 @@ rows:
   - '2226'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -173,7 +185,11 @@ rows:
   - '3950'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -242,7 +258,20 @@ rows:
   - '3950'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Aldo Arellano
+  - Allison Coe
+  - Christina Bliem
+  - Claudia Steglich
+  - Elaina Thomas
+  - Jef Huisman
+  - Konnor von Emster
+  - Michelle DeMers
+  - Nhi N. Vo
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
   - coculture
   - diel
   cluster_types: []
@@ -325,7 +354,12 @@ rows:
   - '3856'
   treatment_type:
   - darkness
-- background_factors:
+- authors:
+  - Allison Coe
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
   - coculture
   - diel
   cluster_types: []
@@ -374,7 +408,11 @@ rows:
   - '175'
   treatment_type:
   - darkness
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -430,7 +468,11 @@ rows:
   - '1424'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -499,7 +541,11 @@ rows:
   - '1424'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -568,7 +614,15 @@ rows:
   - '1849'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Andres Cubillos-Ruiz
+  - Iva Neveux
+  - Joseph J Grzymski
+  - Paul M Berube
+  - Robert W Read
+  - Sallie W Chisholm
+  - Steven J Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -623,7 +677,11 @@ rows:
   - '853'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - viral
   cluster_types: []
   clustering_analysis_count: 0
@@ -690,7 +748,11 @@ rows:
   - '8'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
@@ -750,7 +812,11 @@ rows:
   - '31'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -804,7 +870,11 @@ rows:
   - '8'
   treatment_type:
   - viral
-- background_factors:
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -872,7 +942,12 @@ rows:
   - '8'
   treatment_type:
   - viral
-- background_factors:
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -919,7 +994,20 @@ rows:
   - '112'
   treatment_type:
   - iron
-- background_factors:
+- authors:
+  - Debbie Lindell
+  - George M. Church
+  - Gregory Kettler
+  - Ilka M. Axmann
+  - Jacob D. Jaffe
+  - Matthew B. Sullivan
+  - Matthias E. Futschik
+  - Maureen L. Coleman
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  - Wolfgang R. Hess
+  background_factors:
   - light
   cluster_types:
   - time_course
@@ -1008,7 +1096,16 @@ rows:
   - '45'
   treatment_type:
   - viral
-- background_factors:
+- authors:
+  - Andrew C Tolonen
+  - Debbie Lindell
+  - George M Church
+  - John Aach
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  - Zackary I Johnson
+  background_factors:
   - axenic
   - light
   cluster_types:
@@ -1085,7 +1182,11 @@ rows:
   - '1697'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Adam C. Martiny
+  - Maureen L. Coleman
+  - Sallie W. Chisholm
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1155,7 +1256,19 @@ rows:
   - '34'
   treatment_type:
   - phosphorus
-- background_factors:
+- authors:
+  - Gang Li
+  - Qi-Long Qin
+  - Qinglu Zeng
+  - Riyue Liu
+  - Wan Chan
+  - Wolfgang R. Hess
+  - Xiaoting Fang
+  - Yao Zhao
+  - Yaxin Liu
+  - Yu-Zhong Zhang
+  - Yue Chen
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1251,7 +1364,12 @@ rows:
   - '428'
   treatment_type:
   - viral
-- background_factors:
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1307,7 +1425,16 @@ rows:
   - '98'
   treatment_type:
   - iron
-- background_factors:
+- authors:
+  - Andrew C Tolonen
+  - Debbie Lindell
+  - George M Church
+  - John Aach
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  - Zackary I Johnson
+  background_factors:
   - axenic
   - light
   cluster_types:
@@ -1384,7 +1511,11 @@ rows:
   - '2241'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Adam C. Martiny
+  - Maureen L. Coleman
+  - Sallie W. Chisholm
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1446,7 +1577,20 @@ rows:
   - '177'
   treatment_type:
   - phosphorus
-- background_factors:
+- authors:
+  - Aldo Arellano
+  - Allison Coe
+  - Christina Bliem
+  - Claudia Steglich
+  - Elaina Thomas
+  - Jef Huisman
+  - Konnor von Emster
+  - Michelle DeMers
+  - Nhi N. Vo
+  - Rogier Braakman
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
   - coculture
   - diel
   cluster_types:
@@ -1530,7 +1674,12 @@ rows:
   - '2015'
   treatment_type:
   - darkness
-- background_factors:
+- authors:
+  - Allison Coe
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
   - axenic
   - diel
   cluster_types: []
@@ -1587,7 +1736,12 @@ rows:
   - '1954'
   treatment_type:
   - darkness
-- background_factors:
+- authors:
+  - Allison Coe
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
   - coculture
   - diel
   cluster_types: []
@@ -1643,7 +1797,11 @@ rows:
   - '1954'
   treatment_type:
   - darkness
-- background_factors:
+- authors:
+  - Allison Coe
+  - Sallie W Chisholm
+  - Steven J Biller
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1725,7 +1883,11 @@ rows:
   - '353'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Huiming Ding
+  - Qinglu Zeng
+  - Xingqin Lin
+  background_factors:
   - axenic
   - diel
   cluster_types: []
@@ -1801,7 +1963,11 @@ rows:
   - '34'
   treatment_type:
   - phosphorus
-- background_factors:
+- authors:
+  - Huiming Ding
+  - Qinglu Zeng
+  - Xingqin Lin
+  background_factors:
   - diel
   - viral
   cluster_types: []
@@ -1891,7 +2057,13 @@ rows:
   - '34'
   treatment_type:
   - phosphorus
-- background_factors:
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -1974,7 +2146,13 @@ rows:
   - '222'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2057,7 +2235,13 @@ rows:
   - '184'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -2140,7 +2324,13 @@ rows:
   - '221'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Amandeep Kaur
+  - Elizabeth M. Wellington
+  - Joseph A. Christie-Oleza
+  - Juan R. Hernandez-Fernaud
+  - Maria del Mar Aguilo-Ferretjans
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0

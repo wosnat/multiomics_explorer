@@ -1,7 +1,11 @@
 case_id: list_experiments_organism
 row_count: 39
 rows:
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -40,7 +44,11 @@ rows:
   - '1849'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -109,7 +117,11 @@ rows:
   - '1424'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -165,7 +177,11 @@ rows:
   - '1424'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -234,7 +250,11 @@ rows:
   - '1849'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -275,7 +295,12 @@ rows:
   - '1849'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -315,7 +340,12 @@ rows:
   - '327'
   treatment_type:
   - carbon
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - darkness
   cluster_types: []
@@ -355,7 +385,12 @@ rows:
   - '327'
   treatment_type:
   - carbon
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -395,7 +430,12 @@ rows:
   - '327'
   treatment_type:
   - carbon
-- background_factors:
+- authors:
+  - Guadalupe Gómez-Baena
+  - Jesús Díez
+  - José Manuel García-Fernández
+  - José Ángel Moreno-Cabezuelo
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -435,7 +475,13 @@ rows:
   - '327'
   treatment_type:
   - carbon
-- background_factors:
+- authors:
+  - Huan Liu
+  - Junde Dong
+  - Lijuan Long
+  - Sijun Huang
+  - Xiayu He
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -476,7 +522,15 @@ rows:
   - '28'
   treatment_type:
   - salt
-- background_factors:
+- authors:
+  - Andres Cubillos-Ruiz
+  - Iva Neveux
+  - Joseph J Grzymski
+  - Paul M Berube
+  - Robert W Read
+  - Sallie W Chisholm
+  - Steven J Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -531,7 +585,10 @@ rows:
   - '853'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -571,7 +628,11 @@ rows:
   - '1714'
   treatment_type:
   - coculture
-- background_factors:
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
@@ -631,7 +692,11 @@ rows:
   - '31'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - viral
   cluster_types: []
   clustering_analysis_count: 0
@@ -698,7 +763,11 @@ rows:
   - '8'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
@@ -752,7 +821,11 @@ rows:
   - '8'
   treatment_type:
   - viral
-- background_factors:
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - light
   cluster_types: []
   clustering_analysis_count: 0
@@ -820,7 +893,10 @@ rows:
   - '8'
   treatment_type:
   - viral
-- background_factors:
+- authors:
+  - Sallie W Chisholm
+  - Sarah C Bagby
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -861,7 +937,10 @@ rows:
   - '166'
   treatment_type:
   - carbon
-- background_factors:
+- authors:
+  - Sallie W Chisholm
+  - Sarah C Bagby
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -903,7 +982,10 @@ rows:
   - '4'
   treatment_type:
   - carbon
-- background_factors:
+- authors:
+  - Sallie W Chisholm
+  - Sarah C Bagby
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -945,7 +1027,10 @@ rows:
   - '285'
   treatment_type:
   - carbon
-- background_factors:
+- authors:
+  - Sallie W Chisholm
+  - Sarah C Bagby
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -987,7 +1072,15 @@ rows:
   - '252'
   treatment_type:
   - carbon
-- background_factors:
+- authors:
+  - Bang Wang
+  - Chaoguang Tian
+  - GeQu
+  - Hexin Lv
+  - Huifeng Jiang
+  - Lina Lu
+  - Yanhe Ma
+  background_factors:
   - axenic
   - light
   cluster_types:
@@ -1020,7 +1113,14 @@ rows:
   time_point_totals: []
   treatment_type:
   - growth_phase
-- background_factors:
+- authors:
+  - Anne W. Thompson
+  - Florence Schubotz
+  - Roger E. Summons
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1057,7 +1157,14 @@ rows:
   time_point_totals: []
   treatment_type:
   - compartment
-- background_factors:
+- authors:
+  - Anne W. Thompson
+  - Florence Schubotz
+  - Roger E. Summons
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1091,7 +1198,12 @@ rows:
   time_point_totals: []
   treatment_type:
   - compartment
-- background_factors:
+- authors:
+  - Jacob R. Waldbauer
+  - Maureen L. Coleman
+  - Sallie W. Chisholm
+  - Sébastien Rodrigue
+  background_factors:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
@@ -1123,7 +1235,12 @@ rows:
   time_point_totals: []
   treatment_type:
   - diel
-- background_factors:
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1163,7 +1280,12 @@ rows:
   - '112'
   treatment_type:
   - iron
-- background_factors:
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1210,7 +1332,12 @@ rows:
   - '112'
   treatment_type:
   - iron
-- background_factors:
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1250,7 +1377,20 @@ rows:
   - '112'
   treatment_type:
   - iron
-- background_factors:
+- authors:
+  - Claudia Steglich
+  - Debbie Lindell
+  - Erik R. Zinser
+  - Luke R. Thompson
+  - Matthew A. Wright
+  - Matthias E. Futschik
+  - Maureen L. Coleman
+  - Nathan McNulty
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  - Zackary I. Johnson
+  background_factors:
   - axenic
   - diel
   cluster_types:
@@ -1283,7 +1423,20 @@ rows:
   time_point_totals: []
   treatment_type:
   - diel
-- background_factors:
+- authors:
+  - Debbie Lindell
+  - George M. Church
+  - Gregory Kettler
+  - Ilka M. Axmann
+  - Jacob D. Jaffe
+  - Matthew B. Sullivan
+  - Matthias E. Futschik
+  - Maureen L. Coleman
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  - Wolfgang R. Hess
+  background_factors:
   - light
   cluster_types:
   - time_course
@@ -1372,7 +1525,13 @@ rows:
   - '45'
   treatment_type:
   - viral
-- background_factors:
+- authors:
+  - Claudia Steglich
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  background_factors:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
@@ -1412,7 +1571,13 @@ rows:
   - '198'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Claudia Steglich
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  background_factors:
   - axenic
   - chemical
   cluster_types: []
@@ -1454,7 +1619,13 @@ rows:
   - '198'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Claudia Steglich
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  background_factors:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
@@ -1495,7 +1666,16 @@ rows:
   - '198'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Andrew C Tolonen
+  - Debbie Lindell
+  - George M Church
+  - John Aach
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  - Zackary I Johnson
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1536,7 +1716,16 @@ rows:
   - '1697'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Andrew C Tolonen
+  - Debbie Lindell
+  - George M Church
+  - John Aach
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  - Zackary I Johnson
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1577,7 +1766,13 @@ rows:
   - '1697'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Claudia Steglich
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  background_factors:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
@@ -1618,7 +1813,16 @@ rows:
   - '198'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Andrew C Tolonen
+  - Debbie Lindell
+  - George M Church
+  - John Aach
+  - Robert Steen
+  - Sallie W Chisholm
+  - Trent Rector
+  - Zackary I Johnson
+  background_factors:
   - axenic
   - light
   cluster_types:
@@ -1695,7 +1899,11 @@ rows:
   - '1697'
   treatment_type:
   - nitrogen
-- background_factors:
+- authors:
+  - Adam C. Martiny
+  - Maureen L. Coleman
+  - Sallie W. Chisholm
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -1765,7 +1973,13 @@ rows:
   - '34'
   treatment_type:
   - phosphorus
-- background_factors:
+- authors:
+  - Claudia Steglich
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  background_factors:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
@@ -1805,7 +2019,13 @@ rows:
   - '198'
   treatment_type:
   - light
-- background_factors:
+- authors:
+  - Claudia Steglich
+  - Matthias Futschik
+  - Robert Steen
+  - Sallie W. Chisholm
+  - Trent Rector
+  background_factors:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0

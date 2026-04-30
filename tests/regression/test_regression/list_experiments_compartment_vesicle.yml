@@ -1,7 +1,14 @@
 case_id: list_experiments_compartment_vesicle
 row_count: 5
 rows:
-- background_factors:
+- authors:
+  - Anne W. Thompson
+  - Florence Schubotz
+  - Roger E. Summons
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -38,7 +45,14 @@ rows:
   time_point_totals: []
   treatment_type:
   - compartment
-- background_factors:
+- authors:
+  - Anne W. Thompson
+  - Florence Schubotz
+  - Roger E. Summons
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -72,7 +86,19 @@ rows:
   time_point_totals: []
   treatment_type:
   - compartment
-- background_factors:
+- authors:
+  - Aldo A. Arellano
+  - Anitra E. Ingalls
+  - Benjamin A. S. Van Mooy
+  - Katherine R. Heal
+  - Keven Dooley
+  - Kevin W. Becker
+  - Laura R. Hmelo
+  - Laura T. Carlson
+  - Rachel A. Lundeen
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -105,7 +131,19 @@ rows:
   time_point_totals: []
   treatment_type:
   - compartment
-- background_factors:
+- authors:
+  - Aldo A. Arellano
+  - Anitra E. Ingalls
+  - Benjamin A. S. Van Mooy
+  - Katherine R. Heal
+  - Keven Dooley
+  - Kevin W. Becker
+  - Laura R. Hmelo
+  - Laura T. Carlson
+  - Rachel A. Lundeen
+  - Sallie W. Chisholm
+  - Steven J. Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
@@ -138,7 +176,14 @@ rows:
   time_point_totals: []
   treatment_type:
   - compartment
-- background_factors:
+- authors:
+  - Anne W. Thompson
+  - Florence Schubotz
+  - Roger E. Summons
+  - Sallie W. Chisholm
+  - Sara E. Roggensack
+  - Steven J. Biller
+  background_factors:
   - axenic
   - light
   cluster_types: []
