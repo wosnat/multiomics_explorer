@@ -2241,6 +2241,7 @@ class TestListExperimentsWrapper:
         "experiment_id": "test_exp_1",
         "experiment_name": "MED4 Coculture with Alteromonas HOT1A3 (RNASEQ)",
         "publication_doi": "10.1234/test",
+        "authors": ["Smith J", "Jones K"],
         "organism_name": "Prochlorococcus MED4",
         "treatment_type": ["coculture"],
         "background_factors": [],
@@ -2292,6 +2293,16 @@ class TestListExperimentsWrapper:
         assert result.results[0].experiment_id == "test_exp_1"
         # Breakdowns also present
         assert len(result.by_organism) == 1
+
+    @pytest.mark.asyncio
+    async def test_authors_propagates_to_response(self, tool_fns, mock_ctx):
+        """authors field from api dict reaches the Pydantic ExperimentResult."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._make_detail(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        assert result.results[0].authors == ["Smith J", "Jones K"]
 
     @pytest.mark.asyncio
     async def test_default_is_detail(self, tool_fns, mock_ctx):

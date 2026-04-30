@@ -1771,6 +1771,7 @@ def register_tools(mcp: FastMCP):
         experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq')")
         experiment_name: str = Field(description="Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)')")
         publication_doi: str = Field(description="Publication DOI (e.g. '10.1038/ismej.2016.70')")
+        authors: list[str] = Field(default_factory=list, description="Publication authors (e.g. ['Smith J', 'Jones K']). Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution.")
         organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4')")
         treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture'])")
         background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'continuous_light']). Empty list when none specified.")
