@@ -1697,7 +1697,7 @@ def register_tools(mcp: FastMCP):
 
         After this tool, drill in via:
         - list_experiments(publication_doi=[doi]) for per-experiment detail
-        - genes_by_function / genes_by_ontology for in-publication gene discovery
+        - genes_by_function(organism=...) / genes_by_ontology(organism=..., term_ids=...) for gene discovery scoped to the publication's organism(s)
         - list_clustering_analyses(publication_doi=[doi]) for clustering analyses
         - list_derived_metrics(publication_doi=[doi]) for non-DE evidence
         """
