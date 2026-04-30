@@ -78,6 +78,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | experiment_id | string | Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq') |
 | experiment_name | string | Experiment display name (e.g. 'MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions (RNASEQ)') |
 | publication_doi | string | Publication DOI (e.g. '10.1038/ismej.2016.70') |
+| authors | list[string] (optional) | Publication authors (e.g. ['Smith J', 'Jones K']). Sourced from Publication.authors via the Has_experiment edge — no need to join with list_publications for author attribution. |
 | organism_name | string | Profiled organism (e.g. 'Prochlorococcus MED4') |
 | treatment_type | list[string] | Treatment categories (e.g. ['coculture'], ['nitrogen_stress', 'coculture']) |
 | background_factors | list[string] (optional) | Background experimental factors (e.g. ['axenic', 'continuous_light']). Empty list when none specified. |
@@ -244,6 +245,8 @@ list_filter_values(filter_type='metric_type') → list_experiments(search_text='
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
 - For time-course experiments, top-level `gene_count` is the **cumulative row count across timepoints** (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`.
+
+- `authors` is on every result row — no need to join with list_publications when you only need author attribution. list_publications is still the right call for richer publication metadata (abstract, journal, year).
 
 ```mistake
 list_experiments(publication='Biller 2018')
