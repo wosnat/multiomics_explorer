@@ -576,6 +576,12 @@ def register_tools(mcp: FastMCP):
         organism_names filter on this tool uses exact match (case-
         insensitive) on preferred_name; unknown names are reported in
         not_found.
+
+        After this tool, scope deeper queries to the chosen organism via the
+        organism / locus_tags filters on per-gene tools (gene_overview,
+        gene_ontology_terms, gene_homologs) and on list_experiments
+        / list_publications. Use list_filter_values for categorical
+        field enumeration.
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -906,6 +912,14 @@ def register_tools(mcp: FastMCP):
         Use after resolve_gene, genes_by_function, genes_by_ontology, or
         gene_homologs to understand what each gene is and what follow-up
         data exists.
+
+        After this tool, drill into the rich axes when the per-gene signal
+        is present: gene_ontology_terms (when annotation_types is non-empty),
+        gene_homologs (when closest_ortholog_group_size > 0),
+        gene_clusters_by_gene (when cluster_membership_count > 0),
+        differential_expression_by_gene or gene_response_profile (when
+        expression_edge_count > 0), gene_derived_metrics (when
+        derived_metric_count > 0).
         """
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
@@ -1679,8 +1693,13 @@ def register_tools(mcp: FastMCP):
         """List publications with expression data in the knowledge graph.
 
         Returns publication metadata and experiment summaries. Use this as
-        an entry point to discover what studies exist, then drill into
-        specific experiments with list_experiments or genes with genes_by_function.
+        an entry point to discover what studies exist.
+
+        After this tool, drill in via:
+        - list_experiments(publication_doi=[doi]) for per-experiment detail
+        - genes_by_function / genes_by_ontology for in-publication gene discovery
+        - list_clustering_analyses(publication_doi=[doi]) for clustering analyses
+        - list_derived_metrics(publication_doi=[doi]) for non-DE evidence
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"growth_phases={growth_phases} search_text={search_text} author={author} "
@@ -1951,6 +1970,12 @@ def register_tools(mcp: FastMCP):
         contains — critical for interpreting missing genes. Use
         table_scope=['all_detected_genes'] to restrict to experiments that
         report all assayed genes (fair for cross-experiment comparison).
+
+        After this tool, drill in via:
+        - differential_expression_by_gene(experiment_ids=[id]) for per-gene DE
+        - list_clustering_analyses(experiment_ids=[id]) for clusters built from this experiment
+        - list_derived_metrics(experiment_ids=[id]) for DM evidence on this experiment
+        - pathway_enrichment(experiment_ids=[id]) for ORA on DE results
         """
         await ctx.info(f"list_experiments summary={summary} organism={organism} "
                        f"treatment_type={treatment_type} search_text={search_text}")
@@ -3408,6 +3433,12 @@ def register_tools(mcp: FastMCP):
         Each analysis groups related gene clusters from one study/organism.
         Returns analysis IDs for use with genes_in_cluster(analysis_id=...).
         Inline clusters included — use genes_in_cluster to drill into members.
+
+        After this tool, drill in via:
+        - genes_in_cluster(cluster_ids=[id]) for per-cluster member genes
+        - genes_in_cluster(analysis_id=...) for all clusters from one analysis
+        - gene_clusters_by_gene(locus_tags=[...], analysis_ids=[id]) to scope a
+          per-gene cluster lookup to this analysis
         """
         await ctx.info(f"list_clustering_analyses search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
@@ -3992,6 +4023,12 @@ def register_tools(mcp: FastMCP):
         `allowed_categories` (for categorical DMs) here — drill-down tools
         will raise if you pass filters that the selected DM set doesn't
         support.
+
+        After this tool, drill in via:
+        - gene_derived_metrics(locus_tags=[...]) for per-gene DM lookup across all kinds
+        - genes_by_numeric_metric(derived_metric_ids=[id], ...) for numeric drill-down
+        - genes_by_boolean_metric(derived_metric_ids=[id], ...) for flag drill-down
+        - genes_by_categorical_metric(derived_metric_ids=[id], ...) for categorical drill-down
         """
         await ctx.info(f"list_derived_metrics search_text={search_text!r} "
                        f"organism={organism} limit={limit}")
