@@ -876,7 +876,7 @@ def list_experiments(
     returned=0, truncated=True.
     When summary=False (default): results populated with experiments.
     Per result (compact): experiment_id, experiment_name, publication_doi,
-    organism_name, treatment_type, background_factors, coculture_partner,
+    authors, organism_name, treatment_type, background_factors, coculture_partner,
     omics_type, is_time_course (bool), table_scope, table_scope_detail,
     gene_count, distinct_gene_count, genes_by_status (dict),
     clustering_analysis_count, cluster_types, growth_phases,

@@ -2768,6 +2768,16 @@ class TestListExperiments:
         timepoints = result["results"][0]["timepoints"]
         assert all(tp["growth_phase"] is None for tp in timepoints)
 
+    def test_authors_passes_through_from_builder(self, mock_conn):
+        """Authors column from builder appears in api result rows verbatim."""
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(),   # filtered summary
+            self._summary_result(),   # unfiltered total_entries
+            [self._detail_row(authors=["Smith J", "Jones K"])],  # detail query
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        assert result["results"][0]["authors"] == ["Smith J", "Jones K"]
+
 
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene
