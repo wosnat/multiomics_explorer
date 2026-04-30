@@ -15,6 +15,12 @@ you to the right drill-down), `rankable` (gates bucket / percentile
 will raise if you pass filters that the selected DM set doesn't
 support.
 
+After this tool, drill in via:
+- gene_derived_metrics(locus_tags=[...]) for per-gene DM lookup across all kinds
+- genes_by_numeric_metric(derived_metric_ids=[id], ...) for numeric drill-down
+- genes_by_boolean_metric(derived_metric_ids=[id], ...) for flag drill-down
+- genes_by_categorical_metric(derived_metric_ids=[id], ...) for categorical drill-down
+
 ## Parameters
 
 | Name | Type | Default | Description |

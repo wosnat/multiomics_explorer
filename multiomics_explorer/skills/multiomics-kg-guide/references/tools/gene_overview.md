@@ -8,6 +8,14 @@ Use after resolve_gene, genes_by_function, genes_by_ontology, or
 gene_homologs to understand what each gene is and what follow-up
 data exists.
 
+After this tool, drill into the rich axes when the per-gene signal
+is present: gene_ontology_terms (when annotation_types is non-empty),
+gene_homologs (when closest_ortholog_group_size > 0),
+gene_clusters_by_gene (when cluster_membership_count > 0),
+differential_expression_by_gene or gene_response_profile (when
+expression_edge_count > 0), gene_derived_metrics (when
+derived_metric_count > 0).
+
 ## Parameters
 
 | Name | Type | Default | Description |
@@ -50,14 +58,14 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 | gene_category | string \| None (optional) | Functional category (e.g. 'Replication and repair') |
 | annotation_quality | int \| None (optional) | Annotation quality score 0-3 (e.g. 3) |
 | organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
-| annotation_types | list[string] (optional) | Ontology types with annotations (e.g. ['go_bp', 'ec', 'kegg']) |
-| expression_edge_count | int (optional) | Number of expression data points (e.g. 36) |
-| significant_up_count | int (optional) | Significant up-regulated DE observations (e.g. 3) |
-| significant_down_count | int (optional) | Significant down-regulated DE observations (e.g. 2) |
-| closest_ortholog_group_size | int \| None (optional) | Size of tightest ortholog group (e.g. 9) |
-| closest_ortholog_genera | list[string] \| None (optional) | Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus']) |
-| cluster_membership_count | int (optional) | Number of cluster memberships (e.g. 3) |
-| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']) |
+| annotation_types | list[string] (optional) | Ontology source types where this gene has at least one annotation (e.g. ['go_bp', 'ec', 'kegg']). Presence-only — does NOT indicate content informativeness; a 'cog_category' entry may be 'Function unknown'. For term content, call gene_ontology_terms. |
+| expression_edge_count | int (optional) | Number of expression data points (e.g. 36). When > 0, drill into differential_expression_by_gene or gene_response_profile. |
+| significant_up_count | int (optional) | Significant up-regulated DE observations (e.g. 3). When > 0, use differential_expression_by_gene with direction='up' for per-experiment detail. |
+| significant_down_count | int (optional) | Significant down-regulated DE observations (e.g. 2). When > 0, use differential_expression_by_gene with direction='down' for per-experiment detail. |
+| closest_ortholog_group_size | int \| None (optional) | Size of tightest ortholog group (e.g. 9). Use gene_homologs for full per-group membership and source/level metadata. |
+| closest_ortholog_genera | list[string] \| None (optional) | Genera in tightest ortholog group (e.g. ['Prochlorococcus', 'Synechococcus']). Use gene_homologs for full membership; genes_by_homolog_group to expand a specific group. |
+| cluster_membership_count | int (optional) | Number of cluster memberships (e.g. 3). When > 0, drill into gene_clusters_by_gene for per-cluster details. |
+| cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']). Use gene_clusters_by_gene with cluster_type filter to scope drill-down. |
 | derived_metric_count | int (optional) | Total DerivedMetric annotations on this gene (sum across numeric/boolean/categorical kinds). |
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs. |
 | numeric_metric_count | int \| None (optional) | Numeric DM count (verbose). |
@@ -72,8 +80,8 @@ total_matching, by_organism, by_category, by_annotation_type, has_expression, ha
 
 | Field | Type | Description |
 |---|---|---|
-| gene_summary | string \| None (optional) | Concatenated summary text (e.g. 'dnaN :: DNA polymerase III subunit beta :: Alternative locus ID') |
-| function_description | string \| None (optional) | Curated functional description (e.g. 'Alternative locus ID') |
+| gene_summary | string \| None (optional) | Concatenated summary text (e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11') |
+| function_description | string \| None (optional) | Curated functional description (e.g. 'Methylates ribosomal protein L11'). May be null when no curated text exists. |
 | all_identifiers | list[string] \| None (optional) | Cross-references: UniProt, CyanorakID, RefSeq, etc. (e.g. ['CK_Pro_MED4_00845', 'Q7V1M0', 'WP_011132479.1']) |
 
 ## Few-shot examples

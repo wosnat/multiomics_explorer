@@ -13,6 +13,12 @@ contains — critical for interpreting missing genes. Use
 table_scope=['all_detected_genes'] to restrict to experiments that
 report all assayed genes (fair for cross-experiment comparison).
 
+After this tool, drill in via:
+- differential_expression_by_gene(experiment_ids=[id]) for per-gene DE
+- list_clustering_analyses(experiment_ids=[id]) for clusters built from this experiment
+- list_derived_metrics(experiment_ids=[id]) for DM evidence on this experiment
+- pathway_enrichment(experiment_ids=[id]) for ORA on DE results
+
 ## Parameters
 
 | Name | Type | Default | Description |

@@ -5,8 +5,13 @@
 List publications with expression data in the knowledge graph.
 
 Returns publication metadata and experiment summaries. Use this as
-an entry point to discover what studies exist, then drill into
-specific experiments with list_experiments or genes with genes_by_function.
+an entry point to discover what studies exist.
+
+After this tool, drill in via:
+- list_experiments(publication_doi=[doi]) for per-experiment detail
+- genes_by_function / genes_by_ontology for in-publication gene discovery
+- list_clustering_analyses(publication_doi=[doi]) for clustering analyses
+- list_derived_metrics(publication_doi=[doi]) for non-DE evidence
 
 ## Parameters
 

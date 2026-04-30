@@ -5,8 +5,13 @@
 Browse, search, and filter clustering analyses.
 
 Each analysis groups related gene clusters from one study/organism.
-Returns analysis IDs for use with genes_in_cluster(analysis_id=...).
-Inline clusters included — use genes_in_cluster to drill into members.
+Inline clusters are included in each result row.
+
+After this tool, drill in via:
+- genes_in_cluster(cluster_ids=[id]) for per-cluster member genes
+- genes_in_cluster(analysis_id=...) for all clusters from one analysis
+- gene_clusters_by_gene(locus_tags=[...], analysis_ids=[id]) to scope a
+  per-gene cluster lookup to this analysis
 
 ## Parameters
 

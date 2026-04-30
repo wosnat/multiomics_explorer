@@ -18,6 +18,12 @@ organism_names filter on this tool uses exact match (case-
 insensitive) on preferred_name; unknown names are reported in
 not_found.
 
+After this tool, scope deeper queries to the chosen organism: use the
+locus_tags filter on per-gene tools (gene_overview, gene_homologs)
+and the organism filter on gene_ontology_terms, list_experiments,
+and list_publications. Use list_filter_values for categorical
+field enumeration.
+
 ## Parameters
 
 | Name | Type | Default | Description |
