@@ -8,6 +8,9 @@ argument-hint: "[tool name and description, e.g. 'list_experiments - new tool' o
 # Add or update a tool
 
 See [checklist](references/checklist.md) for templates and file paths.
+See [field-rubric](references/field-rubric.md) for response-schema
+quality criteria — apply on every new tool and every response-schema
+change.
 See the **testing** skill for per-layer test patterns and fixtures.
 
 ## Phase 1: Definition (iterative, user-driven)
