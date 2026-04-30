@@ -2176,6 +2176,11 @@ class TestBuildListExperiments:
         assert "fulltext" not in cypher
         assert params == {}
 
+    def test_returns_authors_column(self):
+        """RETURN columns include authors sourced from Publication.authors (null-safe)."""
+        cypher, _ = build_list_experiments()
+        assert "coalesce(p.authors, []) AS authors" in cypher
+
     def test_organism_filter(self):
         """Organism filter matches profiled organism only (no OR against coculture_partner)."""
         cypher, params = build_list_experiments(organism="MED4")

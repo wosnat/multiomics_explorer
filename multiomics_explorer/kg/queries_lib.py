@@ -1281,7 +1281,7 @@ def build_list_experiments(
     """Build Cypher for listing experiments with precomputed gene count stats.
 
     RETURN keys (compact): experiment_id, experiment_name, publication_doi,
-    organism_name, treatment_type, coculture_partner, omics_type,
+    authors, organism_name, treatment_type, coculture_partner, omics_type,
     is_time_course, table_scope, table_scope_detail,
     gene_count, distinct_gene_count, significant_up_count,
     significant_down_count, time_point_count, time_point_labels,
@@ -1348,6 +1348,7 @@ def build_list_experiments(
         "e.id AS experiment_id,\n"
         "       e.name AS experiment_name,\n"
         "       p.doi AS publication_doi,\n"
+        "       coalesce(p.authors, []) AS authors,\n"
         "       e.organism_name AS organism_name,\n"
         "       e.treatment_type AS treatment_type,\n"
         "       coalesce(e.background_factors, []) AS background_factors,\n"
