@@ -835,8 +835,8 @@ def register_tools(mcp: FastMCP):
             description="Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs.",
         )
         # verbose-only
-        gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'dnaN :: DNA polymerase III subunit beta :: Alternative locus ID')")
-        function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Alternative locus ID')")
+        gene_summary: str | None = Field(default=None, description="Concatenated summary text (e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11')")
+        function_description: str | None = Field(default=None, description="Curated functional description (e.g. 'Methylates ribosomal protein L11'). May be null when no curated text exists.")
         all_identifiers: list[str] | None = Field(default=None, description="Cross-references: UniProt, CyanorakID, RefSeq, etc. (e.g. ['CK_Pro_MED4_00845', 'Q7V1M0', 'WP_011132479.1'])")
         # Verbose-only DM fields (None on compact responses)
         numeric_metric_count: int | None = Field(default=None, description="Numeric DM count (verbose).")
