@@ -817,7 +817,7 @@ def register_tools(mcp: FastMCP):
         gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair')")
         annotation_quality: int | None = Field(default=None, description="Annotation quality score 0-3 (e.g. 3)")
         organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
-        annotation_types: list[str] = Field(default_factory=list, description="Ontology types with annotations (e.g. ['go_bp', 'ec', 'kegg'])")
+        annotation_types: list[str] = Field(default_factory=list, description="Ontology source types where this gene has at least one annotation (e.g. ['go_bp', 'ec', 'kegg']). Presence-only — does NOT indicate content informativeness; a 'cog_category' entry may be 'Function unknown'. For term content, call gene_ontology_terms.")
         expression_edge_count: int = Field(default=0, description="Number of expression data points (e.g. 36)")
         significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations (e.g. 3)")
         significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations (e.g. 2)")
