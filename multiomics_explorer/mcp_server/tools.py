@@ -577,10 +577,10 @@ def register_tools(mcp: FastMCP):
         insensitive) on preferred_name; unknown names are reported in
         not_found.
 
-        After this tool, scope deeper queries to the chosen organism via the
-        organism / locus_tags filters on per-gene tools (gene_overview,
-        gene_ontology_terms, gene_homologs) and on list_experiments
-        / list_publications. Use list_filter_values for categorical
+        After this tool, scope deeper queries to the chosen organism: use the
+        locus_tags filter on per-gene tools (gene_overview, gene_homologs)
+        and the organism filter on gene_ontology_terms, list_experiments,
+        and list_publications. Use list_filter_values for categorical
         field enumeration.
         """
         await ctx.info(
@@ -3431,8 +3431,7 @@ def register_tools(mcp: FastMCP):
         """Browse, search, and filter clustering analyses.
 
         Each analysis groups related gene clusters from one study/organism.
-        Returns analysis IDs for use with genes_in_cluster(analysis_id=...).
-        Inline clusters included — use genes_in_cluster to drill into members.
+        Inline clusters are included in each result row.
 
         After this tool, drill in via:
         - genes_in_cluster(cluster_ids=[id]) for per-cluster member genes
