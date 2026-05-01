@@ -553,7 +553,7 @@ Pydantic field-rubric compliance:
 ### Layer 4 — Integration (`tests/integration/`, `pytest -m kg`)
 
 One end-to-end test per tool against live KG:
-- `gene_metabolic_role`: PMM0807 (pyruvate kinase, R00200) for known-good fixture
+- `gene_metabolic_role`: PMM0912 (pyk, pyruvate kinase, R00200) for known-good fixture
 - `genes_by_metabolite`: C00031 (glucose) for high-coverage metabolite
 - `list_metabolites`: `elements=["N"]` for the N-source acceptance fixture
 - `list_organisms` extension: MED4 reaction_count + metabolite_count populate
@@ -627,6 +627,28 @@ Items below are **not** in slice 1. They are tracked in `project_backlog.md` (me
 - **`Gene.metabolite_count` UNION definition coordination.** If the TCDB-CAZy spec lands first and defines this differently (e.g. catalysis-only), there's a brief window of semantic divergence. Mitigation: pre-coordinate via this design doc's S3 schema suggestion before either spec ships.
 - **Empty-name reactions.** 32 reactions have `name = ""`. They still produce edges and surface in queries. If a user runs an exact-text Lucene search, they're invisible. Acceptable today; revisit if KG team enriches downstream.
 - **Cross-organism `list_metabolites` regression sensitivity.** Baselines are sensitive to organism-name ordering and KG-rebuild ties. Document the regen workflow explicitly in the regression test header.
+
+## Note: `Gene.catalytic_activities` (out of slice-1 scope, future opportunity)
+
+The 2026-05-02 KG rebuild that landed the chemistry-slice-1 asks also surfaced an existing-but-newly-noticed Gene property: `Gene.catalytic_activities: list[str]`. Populated on ~6,170 genes (max 13 entries per gene). Each entry is a UniProt-derived structured text record carrying:
+
+- Reaction equation (text, with stoichiometry)
+- **Rhea cross-reference** — Rhea IS direction-aware in the source data
+- ChEBI cross-references for substrate/product metabolites
+- EC number
+- Evidence tag
+
+Example (PMM0004 / purF):
+```
+Reaction=5-phospho-beta-D-ribosylamine + L-glutamate + diphosphate
+       = 5-phospho-alpha-D-ribose 1-diphosphate + L-glutamine + H2O;
+Xref=Rhea:RHEA:14905, ChEBI:CHEBI:15377, ChEBI:CHEBI:29985, ...;
+EC=2.4.2.14; Evidence=
+```
+
+**Slice-1 treatment:** explicitly **not consumed** by chemistry slice-1 tools. The chemistry layer's graph-modeled `Gene_catalyzes_reaction → Reaction → Reaction_has_metabolite → Metabolite` traversal is the source of truth for gene-anchored chemistry. `catalytic_activities` is text, requires per-row parsing, and overlaps in coverage with the graph layer for catalytic genes that also have KEGG annotation. Surfacing it via `gene_overview` would inflate row size for limited routing benefit (`reaction_count > 0` already routes to `gene_metabolic_role`).
+
+**Future opportunity (backlog):** parse `catalytic_activities` into structured edges with Rhea-derived direction information. This is the first place in the KG where substrate-vs-product direction is recoverable for catalytic activity. Pairs naturally with the future metabolomics-DM layer for full-direction-aware chemistry exploration. Out of scope for slice 1; tracked as a pre-spec opportunity.
 
 ## References
 

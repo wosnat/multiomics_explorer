@@ -5,7 +5,9 @@
 **Companion to:** `multiomics_explorer/docs/superpowers/specs/2026-05-01-metabolism-chemistry-mcp-tools-design.md`
 **Verification state:** all current-state facts checked against live KG (`bolt://localhost:7687`) on 2026-05-01.
 
-**Acceptance update (2026-05-01, post initial filing):** all 5 TCDB-S coordination suggestions and MET-M4 below have been **accepted into the TCDB-CAZy spec scope** by the KG team — see `multiomics_biocypher_kg/docs/kg-changes/tcdb-cazy-ontologies.md` (the property-changes summary table cross-references TCDB-S1..S5 by name, and `evidence_sources` is documented as the open-ended set-membership-filter pattern from MET-M4). The 4 direct asks (KG-A1..A4) below remain owned by the chemistry-slice-1 KG-side PR; M1/M2/M3/M5 remain pre-spec for whenever the metabolomics-DM spec is written.
+**Acceptance update (2026-05-01, post initial filing):** all 5 TCDB-S coordination suggestions and MET-M4 below have been **accepted into the TCDB-CAZy spec scope** by the KG team — see `multiomics_biocypher_kg/docs/kg-changes/tcdb-cazy-ontologies.md` (the property-changes summary table cross-references TCDB-S1..S5 by name, and `evidence_sources` is documented as the open-ended set-membership-filter pattern from MET-M4). M1/M2/M3/M5 remain pre-spec for whenever the metabolomics-DM spec is written.
+
+**Build update (2026-05-02):** all 4 direct asks (KG-A1..A4) **landed in the live KG**. Verified live: `Gene.reaction_count` populated on 97,513 genes (21,117 > 0; max 39); `Gene.metabolite_count` populated (max 66); `Metabolite.elements` populated (1,212 N-bearing, 695 P-bearing, 538 with both); `KeggTerm.reaction_count` / `metabolite_count` populated (ko00910 = 23 reactions / 18 metabolites). Chemistry slice-1 explorer build is unblocked.
 
 This is the KG-side concentrate of the chemistry-slice-1 design. It collects:
 
