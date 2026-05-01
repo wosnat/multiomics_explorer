@@ -5,11 +5,13 @@
 **Companion to:** `multiomics_explorer/docs/superpowers/specs/2026-05-01-metabolism-chemistry-mcp-tools-design.md`
 **Verification state:** all current-state facts checked against live KG (`bolt://localhost:7687`) on 2026-05-01.
 
+**Acceptance update (2026-05-01, post initial filing):** all 5 TCDB-S coordination suggestions and MET-M4 below have been **accepted into the TCDB-CAZy spec scope** by the KG team — see `multiomics_biocypher_kg/docs/kg-changes/tcdb-cazy-ontologies.md` (the property-changes summary table cross-references TCDB-S1..S5 by name, and `evidence_sources` is documented as the open-ended set-membership-filter pattern from MET-M4). The 4 direct asks (KG-A1..A4) below remain owned by the chemistry-slice-1 KG-side PR; M1/M2/M3/M5 remain pre-spec for whenever the metabolomics-DM spec is written.
+
 This is the KG-side concentrate of the chemistry-slice-1 design. It collects:
 
 1. **Direct asks** — small, mechanical schema additions the chemistry slice 1 explorer surface depends on. Solution-shaped because the patterns are unambiguous (mirrors of existing rollups).
-2. **Coordination suggestions** for the in-flight TCDB-CAZy spec — where chemistry slice 1 needs hooks that fit naturally into TCDB scope.
-3. **Pre-spec suggestions** for the future metabolomics-DM spec — placeholder shape so the chemistry slice 1 row classes stay forward-compatible.
+2. **Coordination suggestions** for the in-flight TCDB-CAZy spec — where chemistry slice 1 needs hooks that fit naturally into TCDB scope. *All 5 accepted as of 2026-05-01.*
+3. **Pre-spec suggestions** for the future metabolomics-DM spec — placeholder shape so the chemistry slice 1 row classes stay forward-compatible. *M4 (open-ended enum) confirmed in TCDB-CAZy doc; M1/M2/M3/M5 remain pre-spec.*
 
 Slice 1 explorer code is **forward-compatible via `coalesce`** with everything below — KG asks land first, in parallel, or slightly after; nothing in the explorer is blocked.
 
