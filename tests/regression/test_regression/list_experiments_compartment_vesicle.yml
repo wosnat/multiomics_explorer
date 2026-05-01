@@ -1,6 +1,258 @@
 case_id: list_experiments_compartment_vesicle
-row_count: 5
+row_count: 11
 rows:
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_ad45
+  experiment_name: AD45 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii AD45
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_atcc27126
+  experiment_name: ATCC27126 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bgp6
+  experiment_name: BGP6 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BGP6
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bs11
+  experiment_name: BS11 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BS11
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_hot1a3
+  experiment_name: HOT1A3 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_mit1002
+  experiment_name: MIT1002 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - authors:
   - Anne W. Thompson
   - Florence Schubotz

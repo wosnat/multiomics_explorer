@@ -4,18 +4,18 @@ rows:
 - by_level:
   - '{''count'': 1, ''item'': ''Alteromonadaceae''}'
   - '{''count'': 2, ''item'': ''Proteobacteria''}'
-  - '{''count'': 304, ''item'': ''Bacteria''}'
+  - '{''count'': 300, ''item'': ''Bacteria''}'
   - '{''count'': 352, ''item'': ''Synechococcus''}'
   - '{''count'': 395, ''item'': ''Prochloraceae''}'
   - '{''count'': 420, ''item'': ''curated''}'
   - '{''count'': 498, ''item'': ''Cyanobacteria''}'
   by_source:
-  - '{''count'': 1552, ''item'': ''eggnog''}'
+  - '{''count'': 1548, ''item'': ''eggnog''}'
   - '{''count'': 420, ''item'': ''cyanorak''}'
-  score_max: 6.663
-  score_median: 1.0719
+  score_max: 6.6389
+  score_median: 1.0722
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 619, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 615, ''name'': ''Energy production and
     conversion''}'
   - '{''id'': ''cog.category:G'', ''count'': 91, ''name'': ''Carbohydrate transport
     and metabolism''}'
@@ -27,7 +27,7 @@ rows:
   top_cyanorak_roles:
   - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 235, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
-  - '{''id'': ''cyanorak.role:G.2'', ''count'': 220, ''name'': ''Energy metabolism
+  - '{''id'': ''cyanorak.role:G.2'', ''count'': 219, ''name'': ''Energy metabolism
     > Electron transport''}'
   - '{''id'': ''cyanorak.role:J'', ''count'': 168, ''name'': ''Photosynthesis and
     respiration''}'
@@ -35,5 +35,5 @@ rows:
     respiration > CO2 fixation''}'
   - '{''id'': ''cyanorak.role:J.8'', ''count'': 228, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  total_entries: 45438
-  total_matching: 1126
+  total_entries: 46170
+  total_matching: 1124

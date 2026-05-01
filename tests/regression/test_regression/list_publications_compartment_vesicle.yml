@@ -1,6 +1,43 @@
 case_id: list_publications_compartment_vesicle
-row_count: 2
+row_count: 3
 rows:
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 18
+  derived_metric_value_kinds:
+  - numeric
+  doi: 10.1093/femsml/uqac025
+  experiment_count: 6
+  growth_phases: []
+  journal: microLife
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organisms:
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  study_type: Proteomics, Microscopy, Extracellular vesicle analysis
+  title: Characterization of membrane vesicles in Alteromonas macleodii indicates
+    potential roles in their copiotrophic lifestyle
+  treatment_types:
+  - compartment
+  year: 2023
 - authors:
   - Aldo A. Arellano
   - Anitra E. Ingalls

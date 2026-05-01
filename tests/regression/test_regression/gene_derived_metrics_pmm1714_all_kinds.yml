@@ -1,5 +1,5 @@
 case_id: gene_derived_metrics_pmm1714_all_kinds
-row_count: 9
+row_count: 11
 rows:
 - derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
   gene_name: null
@@ -12,6 +12,28 @@ rows:
   rankable: false
   value: 'true'
   value_kind: boolean
+- derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:expression_level_class
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: MED4 RPKM expression-level class (Wang 2014)
+  rank_by_metric: null
+  rankable: false
+  value: MEG
+  value_kind: categorical
+- derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:pangenome_membership
+  gene_name: null
+  has_p_value: false
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  name: MED4 core vs flexible genome assignment (Wang 2014)
+  rank_by_metric: null
+  rankable: false
+  value: Core
+  value_kind: categorical
 - derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
   gene_name: null
   has_p_value: false

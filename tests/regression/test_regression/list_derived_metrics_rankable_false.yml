@@ -1,5 +1,5 @@
 case_id: list_derived_metrics_rankable_false
-row_count: 23
+row_count: 32
 rows:
 - allowed_categories: null
   background_factors:
@@ -181,6 +181,54 @@ rows:
   value_kind: boolean
 - allowed_categories: null
   background_factors:
+  - axenic
+  compartment: exoproteome
+  derived_metric_id: derived_metric:2025.05.28.656624:table_s1_exudate_detection:exoproteome_detection_replicates
+  experiment_id: 10.1101/2025.05.28.656624_ez55_exudate_proteome
+  field_description: 'Number of EZ55-evolved sublines (out of 3: LTPE26 = ancestor,
+    LTPE397 = 400 ppm pCO2 evolved, LTPE403 = 800 ppm pCO2 evolved) in which this
+    protein was detected by LC-MS/MS in the >50 kDa cell-free supernatant fraction.
+    Integer 0-3; 0 = absent in all 3 sublines, 3 = high-confidence detection across
+    all sublines. Rolled up to the EZ55 parent organism.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_replicates
+  name: Detection in EZ55 exudate proteome (replicates out of 3 sublines)
+  omics_type: EXOPROTEOMICS
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1101/2025.05.28.656624
+  rankable: false
+  total_gene_count: 234
+  treatment_type:
+  - compartment
+  unit: replicates
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:2025.05.28.656624:table_s1_whole_cell_detection:whole_cell_detection_replicates
+  experiment_id: 10.1101/2025.05.28.656624_ez55_whole_cell_proteome
+  field_description: 'Number of EZ55-evolved sublines (out of 3: LTPE26 = ancestor,
+    LTPE397 = 400 ppm pCO2 evolved, LTPE403 = 800 ppm pCO2 evolved) in which this
+    protein was detected by LC-MS/MS in the crude cell lysate. Integer 0-3; 0 = absent
+    in all 3 sublines, 3 = high-confidence detection across all sublines. Rolled up
+    to the EZ55 parent organism.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: whole_cell_detection_replicates
+  name: Detection in EZ55 whole-cell proteome (replicates out of 3 sublines)
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1101/2025.05.28.656624
+  rankable: false
+  total_gene_count: 234
+  treatment_type:
+  - compartment
+  unit: replicates
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
   - coculture
   - diel
   compartment: whole_cell
@@ -228,6 +276,52 @@ rows:
   background_factors:
   - axenic
   - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2015.36:s2_concordance_low_co2:rapid_recovery_low_co2_shock
+  experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
+  field_description: Rapid recovery under -CO2 shock (cluster 3 membership). Empty
+    = no rapid recovery.
+  growth_phases:
+  - acute_stress
+  has_p_value: false
+  metric_type: rapid_recovery_low_co2_shock
+  name: MED4 rapid recovery under -CO2 shock (Bagby 2015 Table S2)
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2015.36
+  rankable: false
+  total_gene_count: 51
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2015.36:s2_concordance_low_co2_no_o2:rapid_recovery_low_co2_no_o2_shock
+  experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
+  field_description: Rapid recovery under -CO2/-O2 shock (cluster 3 membership). Empty
+    = no rapid recovery.
+  growth_phases:
+  - acute_stress
+  has_p_value: false
+  metric_type: rapid_recovery_low_co2_no_o2_shock
+  name: MED4 rapid recovery under -CO2/-O2 shock (Bagby 2015 Table S2)
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2015.36
+  rankable: false
+  total_gene_count: 51
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
   compartment: vesicle
   derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
@@ -246,6 +340,153 @@ rows:
   - compartment
   unit: ''
   value_kind: boolean
+- allowed_categories:
+  - --
+  - HEG
+  - LEG
+  - MEG
+  - NEG
+  - VEG
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:expression_level_class
+  experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
+  field_description: 'Per-gene expression-level class assigned from RPKM quartiles
+    aggregated across 10 RNA-seq samples (MED4 in Pro99 and AMP media, exponential
+    and log-phase; 21C, continuous light at 28 umol quanta m-2 s-1). Class meanings
+    reported in Wang 2014: VEG = very highly expressed (top RPKM quartile across conditions);
+    HEG = highly expressed, enriched for COG "C" energy production and conversion,
+    "J" translation and ribosomal structure, and "O" protein modification, folding
+    and turnover (Figure 4c) and showing significantly lower nonsynonymous substitution
+    rate (Ka) than MEG or LEG (P<0.001, Figure 3a); MEG = moderately expressed, significantly
+    enriched for essential genes with homologs in the Database of Essential Genes
+    (DEG-hit rate, P<0.001, Figure 4b); LEG = lowly expressed, slightly enriched for
+    COG "R" general function (P=0.023); NEG = not expressed, under-represented in
+    the core genome (1.5% core vs 6.6% flexible, P<0.001, Figure 3c); -- = unclassified
+    (RPKM did not fit any quartile bin).'
+  growth_phases: []
+  has_p_value: false
+  metric_type: expression_level_class
+  name: MED4 RPKM expression-level class (Wang 2014)
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/1471-2180-14-11
+  rankable: false
+  total_gene_count: 1953
+  treatment_type:
+  - growth_phase
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - Core
+  - Flexible
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:pangenome_membership
+  experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
+  field_description: 'Pangenome membership for each MED4 CDS gene. Core = present
+    across sequenced Prochlorococcus genomes (Prochlorococcus core gene set); Flexible
+    = strain-specific or variably present across Prochlorococcus genomes (flexible/accessory
+    gene set). Wang 2014 reports that the core genome contains significantly fewer
+    NEG and VEG genes than the flexible genome (NEG: 1.5% < 6.6%; VEG: 49.6% < 64.6%;
+    both P<0.001, Figure 3c), indicating that conserved core genes cluster around
+    moderate expression while flexible genes are enriched at the high and low extremes.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: pangenome_membership
+  name: MED4 core vs flexible genome assignment (Wang 2014)
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/1471-2180-14-11
+  rankable: false
+  total_gene_count: 1953
+  treatment_type:
+  - growth_phase
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - '-'
+  - down
+  - up
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2015.36:s2_concordance_low_co2:expression_change_high_light_shock
+  experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
+  field_description: Direction of MED4 transcriptional response to high light shock
+    at t=45 min, from prior literature (Steglich 2006, 2008). Concordance reference
+    for the -CO2 shock gene set.
+  growth_phases:
+  - acute_stress
+  has_p_value: false
+  metric_type: expression_change_high_light_shock
+  name: MED4 expression change under high light shock (Bagby 2015 Table S2)
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2015.36
+  rankable: false
+  total_gene_count: 51
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - '-'
+  - down
+  - up
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2015.36:s2_concordance_low_co2:expression_change_low_co2_shock
+  experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
+  field_description: Direction of initial change under -CO2 shock as indicated by
+    cluster membership (cluster 1 = up; clusters 2,3,4 = down).
+  growth_phases:
+  - acute_stress
+  has_p_value: false
+  metric_type: expression_change_low_co2_shock
+  name: MED4 expression change under -CO2 shock (Bagby 2015 Table S2)
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2015.36
+  rankable: false
+  total_gene_count: 51
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - '-'
+  - down
+  - up
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2015.36:s2_concordance_low_co2_no_o2:expression_change_low_co2_no_o2_shock
+  experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
+  field_description: Direction of initial change under -CO2/-O2 shock as indicated
+    by cluster membership (cluster 1 = up; clusters 2,3,4 = down).
+  growth_phases:
+  - acute_stress
+  has_p_value: false
+  metric_type: expression_change_low_co2_no_o2_shock
+  name: MED4 expression change under -CO2/-O2 shock (Bagby 2015 Table S2)
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2015.36
+  rankable: false
+  total_gene_count: 51
+  treatment_type:
+  - carbon
+  unit: ''
+  value_kind: categorical
 - allowed_categories:
   - Cytoplasmic
   - Cytoplasmic Membrane

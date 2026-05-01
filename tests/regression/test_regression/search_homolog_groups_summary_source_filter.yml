@@ -5,8 +5,8 @@ rows:
   - '{''count'': 420, ''item'': ''curated''}'
   by_source:
   - '{''count'': 420, ''item'': ''cyanorak''}'
-  score_max: 3.8878
-  score_median: 1.0719
+  score_max: 3.8927
+  score_median: 1.0722
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 153, ''name'': ''Energy production and
     conversion''}'
@@ -27,5 +27,5 @@ rows:
     respiration > CO2 fixation''}'
   - '{''id'': ''cyanorak.role:J.8'', ''count'': 41, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  total_entries: 45438
+  total_entries: 46170
   total_matching: 239

@@ -4,186 +4,186 @@ rows:
 - id: go:0000076
   level: 6
   name: DNA replication checkpoint signaling
-  score: 2.1206
+  score: 2.1207
   tree: null
   tree_code: null
 - id: go:0006260
   level: 6
   name: DNA replication
-  score: 2.666
+  score: 2.6662
   tree: null
   tree_code: null
 - id: go:0006261
   level: 7
   name: DNA-templated DNA replication
-  score: 2.1206
+  score: 2.1207
   tree: null
   tree_code: null
 - id: go:0006269
   level: 7
   name: DNA replication, synthesis of primer
-  score: 1.9238
+  score: 1.9239
   tree: null
   tree_code: null
 - id: go:0006270
   level: 6
   name: DNA replication initiation
-  score: 2.3622
+  score: 2.3624
   tree: null
   tree_code: null
 - id: go:0006271
   level: 7
   name: DNA strand elongation involved in DNA replication
-  score: 1.6226
+  score: 1.6227
   tree: null
   tree_code: null
 - id: go:0006274
   level: 6
   name: DNA replication termination
-  score: 2.3622
+  score: 2.3624
   tree: null
   tree_code: null
 - id: go:0006275
   level: 7
   name: regulation of DNA replication
-  score: 2.1206
+  score: 2.1207
   tree: null
   tree_code: null
 - id: go:0008156
   level: 8
   name: negative regulation of DNA replication
-  score: 1.9238
+  score: 1.9239
   tree: null
   tree_code: null
 - id: go:0019045
   level: 2
   name: latent virus replication
-  score: 2.3622
+  score: 2.3624
   tree: null
   tree_code: null
 - id: go:0030174
   level: 9
   name: regulation of DNA-templated DNA replication initiation
-  score: 1.6226
+  score: 1.6227
   tree: null
   tree_code: null
 - id: go:0031297
   level: 7
   name: replication fork processing
-  score: 2.3622
+  score: 2.3624
   tree: null
   tree_code: null
 - id: go:0032297
   level: 10
   name: negative regulation of DNA-templated DNA replication initiation
-  score: 1.5048
+  score: 1.5049
   tree: null
   tree_code: null
 - id: go:0032298
   level: 10
   name: positive regulation of DNA-templated DNA replication initiation
-  score: 1.5048
+  score: 1.5049
   tree: null
   tree_code: null
 - id: go:0033567
   level: 6
   name: DNA replication, Okazaki fragment processing
-  score: 1.9238
+  score: 1.9239
   tree: null
   tree_code: null
 - id: go:0043111
   level: 7
   name: replication fork arrest
-  score: 2.3622
+  score: 2.3624
   tree: null
   tree_code: null
 - id: go:0043137
   level: 7
   name: DNA replication, removal of RNA primer
-  score: 1.7604
+  score: 1.7605
   tree: null
   tree_code: null
 - id: go:0044786
   level: 3
   name: cell cycle DNA replication
-  score: 2.1206
+  score: 2.1207
   tree: null
   tree_code: null
 - id: go:0044787
   level: 4
   name: bacterial-type DNA replication
-  score: 2.1206
+  score: 2.1207
   tree: null
   tree_code: null
 - id: go:0045004
   level: 6
   name: DNA replication proofreading
-  score: 2.3622
+  score: 2.3624
   tree: null
   tree_code: null
 - id: go:0045005
   level: 6
   name: DNA-templated DNA replication maintenance of fidelity
-  score: 1.6226
+  score: 1.6227
   tree: null
   tree_code: null
 - id: go:0045740
   level: 8
   name: positive regulation of DNA replication
-  score: 1.9238
+  score: 1.9239
   tree: null
   tree_code: null
 - id: go:0070581
   level: 8
   name: rolling circle DNA replication
-  score: 2.1206
+  score: 2.1207
   tree: null
   tree_code: null
 - id: go:0071807
   level: 7
   name: replication fork arrest involved in DNA replication termination
-  score: 2.2757
+  score: 2.2759
   tree: null
   tree_code: null
 - id: go:0071932
   level: 8
   name: replication fork reversal
-  score: 2.3622
+  score: 2.3624
   tree: null
   tree_code: null
 - id: go:0090329
   level: 8
   name: regulation of DNA-templated DNA replication
-  score: 1.7604
+  score: 1.7605
   tree: null
   tree_code: null
 - id: go:0090592
   level: 7
   name: DNA synthesis involved in DNA replication
-  score: 1.7604
+  score: 1.7605
   tree: null
   tree_code: null
 - id: go:1902292
   level: 3
   name: cell cycle DNA replication initiation
-  score: 1.9238
+  score: 1.9239
   tree: null
   tree_code: null
 - id: go:1902328
   level: 4
   name: bacterial-type DNA replication initiation
-  score: 1.9238
+  score: 1.9239
   tree: null
   tree_code: null
 - id: go:2000104
   level: 9
   name: negative regulation of DNA-templated DNA replication
-  score: 1.6226
+  score: 1.6227
   tree: null
   tree_code: null
 - id: go:2000105
   level: 9
   name: positive regulation of DNA-templated DNA replication
-  score: 1.6226
+  score: 1.6227
   tree: null
   tree_code: null

@@ -1,5 +1,5 @@
 case_id: de_by_gene_direction_up
-row_count: 4377
+row_count: 4595
 rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
@@ -16,6 +16,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00055
+  log2fc: 11.4738
+  padj: 0.0
+  rank: 727
+  rank_down: null
+  rank_up: 141
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -646,6 +661,36 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: SO1372
+  growth_phase: exponential
+  locus_tag: ACZ81_00395
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 181
+  rank_down: null
+  rank_up: 66
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00405
+  log2fc: 15.9254
+  padj: 0.0
+  rank: 700
+  rank_down: null
+  rank_up: 119
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: VP0880
@@ -796,6 +841,36 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00465
+  log2fc: 36.6436
+  padj: 0.0
+  rank: 669
+  rank_down: null
+  rank_up: 88
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: hemC
+  growth_phase: exponential
+  locus_tag: ACZ81_00520
+  log2fc: 12.6976
+  padj: 0.0
+  rank: 719
+  rank_down: null
+  rank_up: 135
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: gmk
@@ -886,6 +961,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: rsmJ
+  growth_phase: exponential
+  locus_tag: ACZ81_00565
+  log2fc: 82.0945
+  padj: 0.0
+  rank: 657
+  rank_down: null
+  rank_up: 76
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: sfuB
@@ -901,6 +991,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00605
+  log2fc: 2201.0
+  padj: 0.0
+  rank: 149
+  rank_down: null
+  rank_up: 44
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -946,6 +1051,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00615
+  log2fc: 9.9701
+  padj: 0.0013
+  rank: 743
+  rank_down: null
+  rank_up: 155
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -1096,6 +1216,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00680
+  log2fc: 6.867
+  padj: 0.0077
+  rank: 790
+  rank_down: null
+  rank_up: 185
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: sugE
@@ -1171,6 +1306,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00705
+  log2fc: 2401.0
+  padj: 0.0
+  rank: 137
+  rank_down: null
+  rank_up: 36
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -1366,6 +1516,36 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00735
+  log2fc: 70.3069
+  padj: 0.0
+  rank: 660
+  rank_down: null
+  rank_up: 79
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_00745
+  log2fc: 7.9535
+  padj: 0.0013
+  rank: 774
+  rank_down: null
+  rank_up: 173
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: mgtE
@@ -1486,6 +1666,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: cysE
+  growth_phase: exponential
+  locus_tag: ACZ81_00810
+  log2fc: 13.1875
+  padj: 0.0
+  rank: 716
+  rank_down: null
+  rank_up: 133
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: lysA
@@ -2086,6 +2281,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01015
+  log2fc: 13.2217
+  padj: 0.0
+  rank: 715
+  rank_down: null
+  rank_up: 132
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -2461,6 +2671,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: tldD
+  growth_phase: exponential
+  locus_tag: ACZ81_01165
+  log2fc: 8.1072
+  padj: 0.0034
+  rank: 769
+  rank_down: null
+  rank_up: 170
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -2806,6 +3031,36 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01355
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 167
+  rank_down: null
+  rank_up: 54
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01365
+  log2fc: 2401.0
+  padj: 0.0
+  rank: 138
+  rank_down: null
+  rank_up: 37
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: czcA
@@ -2851,6 +3106,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01390
+  log2fc: 8.9734
+  padj: 0.0022
+  rank: 753
+  rank_down: null
+  rank_up: 162
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: cheW
@@ -2956,6 +3226,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: cheB
+  growth_phase: exponential
+  locus_tag: ACZ81_01450
+  log2fc: 19.9055
+  padj: 0.0
+  rank: 203
+  rank_down: null
+  rank_up: 11
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: cheB
@@ -3013,6 +3298,51 @@ rows:
   rank_up: 81
   timepoint: day 11
   timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01455
+  log2fc: 11.7285
+  padj: 0.0
+  rank: 725
+  rank_down: null
+  rank_up: 139
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: cheA
+  growth_phase: exponential
+  locus_tag: ACZ81_01465
+  log2fc: 12.0113
+  padj: 0.0
+  rank: 722
+  rank_down: null
+  rank_up: 138
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01505
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 182
+  rank_down: null
+  rank_up: 67
+  timepoint: 20h
+  timepoint_hours: 20.0
   timepoint_order: 1
   treatment_type:
   - coculture
@@ -3331,6 +3661,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01570
+  log2fc: 15.4638
+  padj: 0.0
+  rank: 705
+  rank_down: null
+  rank_up: 123
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -3661,6 +4006,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: acnA
+  growth_phase: exponential
+  locus_tag: ACZ81_01650
+  log2fc: 17.4941
+  padj: 0.0
+  rank: 695
+  rank_down: null
+  rank_up: 114
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: acnA
@@ -5191,6 +5551,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01845
+  log2fc: 8.1327
+  padj: 0.0052
+  rank: 768
+  rank_down: null
+  rank_up: 169
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: pyrB
@@ -5251,6 +5626,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_01895
+  log2fc: 9.3073
+  padj: 0.0002
+  rank: 749
+  rank_down: null
+  rank_up: 158
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   expression_status: significant_up
   gene_name: null
@@ -5686,6 +6076,36 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02030
+  log2fc: 15.7579
+  padj: 0.0
+  rank: 703
+  rank_down: null
+  rank_up: 121
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02035
+  log2fc: 10.6346
+  padj: 0.0005
+  rank: 738
+  rank_down: null
+  rank_up: 150
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: argA
@@ -5731,6 +6151,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: trmL
+  growth_phase: exponential
+  locus_tag: ACZ81_02115
+  log2fc: 3301.0
+  padj: 0.0
+  rank: 106
+  rank_down: null
+  rank_up: 18
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: gpsA
@@ -6256,6 +6691,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02350
+  log2fc: 28.7228
+  padj: 0.0
+  rank: 677
+  rank_down: null
+  rank_up: 96
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: trxA
@@ -6481,6 +6931,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02400
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 168
+  rank_down: null
+  rank_up: 55
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: ggt
@@ -6586,6 +7051,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02450
+  log2fc: 8.3928
+  padj: 0.0043
+  rank: 767
+  rank_down: null
+  rank_up: 168
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -6931,6 +7411,36 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02510
+  log2fc: 4801.0
+  padj: 0.0
+  rank: 76
+  rank_down: null
+  rank_up: 8
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02530
+  log2fc: 4301.0
+  padj: 0.0
+  rank: 2
+  rank_down: null
+  rank_up: 2
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -6976,6 +7486,51 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02570
+  log2fc: 2401.0
+  padj: 0.0
+  rank: 139
+  rank_down: null
+  rank_up: 38
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02595
+  log2fc: 6601.0
+  padj: 0.0
+  rank: 51
+  rank_down: null
+  rank_up: 3
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02595
+  log2fc: 3401.0
+  padj: 0.0
+  rank: 4
+  rank_down: null
+  rank_up: 3
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -7276,6 +7831,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: cgtA
+  growth_phase: exponential
+  locus_tag: ACZ81_02695
+  log2fc: 9.854
+  padj: 0.0
+  rank: 747
+  rank_down: null
+  rank_up: 157
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: sodN
@@ -7426,6 +7996,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: nlpD
+  growth_phase: exponential
+  locus_tag: ACZ81_02730
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 12
+  rank_down: null
+  rank_up: 7
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02735
+  log2fc: 2001.0
+  padj: 0.0
+  rank: 162
+  rank_down: null
+  rank_up: 51
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -7501,6 +8101,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02770
+  log2fc: 17.1022
+  padj: 0.0
+  rank: 696
+  rank_down: null
+  rank_up: 115
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -7546,6 +8161,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ygiF
+  growth_phase: exponential
+  locus_tag: ACZ81_02800
+  log2fc: 17.4179
+  padj: 0.0
+  rank: 205
+  rank_down: null
+  rank_up: 13
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -7561,6 +8191,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: mutH
+  growth_phase: exponential
+  locus_tag: ACZ81_02810
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 169
+  rank_down: null
+  rank_up: 56
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: ptsP
@@ -7636,6 +8281,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_02825
+  log2fc: 2701.0
+  padj: 0.0
+  rank: 128
+  rank_down: null
+  rank_up: 30
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -8101,6 +8761,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: prnA
+  growth_phase: exponential
+  locus_tag: ACZ81_02915
+  log2fc: 2201.0
+  padj: 0.0
+  rank: 6
+  rank_down: null
+  rank_up: 5
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: tolC
@@ -8341,6 +9016,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03030
+  log2fc: 2701.0
+  padj: 0.0
+  rank: 125
+  rank_down: null
+  rank_up: 27
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -8446,6 +9136,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03055
+  log2fc: 8.663
+  padj: 0.0001
+  rank: 762
+  rank_down: null
+  rank_up: 166
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -8506,6 +9211,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ppiA
+  growth_phase: exponential
+  locus_tag: ACZ81_03070
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 170
+  rank_down: null
+  rank_up: 57
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: nasR
@@ -9226,6 +9946,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03180
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 171
+  rank_down: null
+  rank_up: 58
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: btuB
@@ -9286,6 +10021,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03210
+  log2fc: 22.8588
+  padj: 0.0
+  rank: 685
+  rank_down: null
+  rank_up: 104
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -9706,6 +10456,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03265
+  log2fc: 12.8235
+  padj: 0.0
+  rank: 718
+  rank_down: null
+  rank_up: 134
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: lporfX
@@ -9871,6 +10636,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: uppP
+  growth_phase: exponential
+  locus_tag: ACZ81_03315
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 183
+  rank_down: null
+  rank_up: 68
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: uppP
@@ -10081,6 +10861,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03350
+  log2fc: 10.8431
+  padj: 0.0
+  rank: 221
+  rank_down: null
+  rank_up: 18
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: phoB
@@ -10786,6 +11581,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03410
+  log2fc: 16.8281
+  padj: 0.0
+  rank: 698
+  rank_down: null
+  rank_up: 117
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -11026,6 +11836,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03545
+  log2fc: 4701.0
+  padj: 0.0
+  rank: 79
+  rank_down: null
+  rank_up: 9
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: mazG
@@ -11053,6 +11878,21 @@ rows:
   rank_up: 112
   timepoint: day 11
   timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03585
+  log2fc: 13.9568
+  padj: 0.0
+  rank: 710
+  rank_down: null
+  rank_up: 127
+  timepoint: 20h
+  timepoint_hours: 20.0
   timepoint_order: 1
   treatment_type:
   - coculture
@@ -11476,6 +12316,66 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ttg2D
+  growth_phase: exponential
+  locus_tag: ACZ81_03790
+  log2fc: 10.7176
+  padj: 0.0
+  rank: 737
+  rank_down: null
+  rank_up: 149
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ttg2D
+  growth_phase: exponential
+  locus_tag: ACZ81_03790
+  log2fc: 7.822
+  padj: 0.0021
+  rank: 239
+  rank_down: null
+  rank_up: 21
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yrbA
+  growth_phase: exponential
+  locus_tag: ACZ81_03800
+  log2fc: 7.8537
+  padj: 0.0069
+  rank: 776
+  rank_down: null
+  rank_up: 174
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: degQ
+  growth_phase: exponential
+  locus_tag: ACZ81_03820
+  log2fc: 11.7066
+  padj: 0.0
+  rank: 726
+  rank_down: null
+  rank_up: 140
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: yeeN
@@ -11911,6 +12811,66 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03910
+  log2fc: 26.7426
+  padj: 0.0
+  rank: 680
+  rank_down: null
+  rank_up: 99
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03925
+  log2fc: 59.4158
+  padj: 0.0
+  rank: 664
+  rank_down: null
+  rank_up: 83
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_03930
+  log2fc: 19.4954
+  padj: 0.0
+  rank: 692
+  rank_down: null
+  rank_up: 111
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: metK
+  growth_phase: exponential
+  locus_tag: ACZ81_03935
+  log2fc: 6501.0
+  padj: 0.0
+  rank: 54
+  rank_down: null
+  rank_up: 5
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: gapA
@@ -11986,6 +12946,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04005
+  log2fc: 246.6359
+  padj: 0.0
+  rank: 555
+  rank_down: null
+  rank_up: 74
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -12136,6 +13111,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04065
+  log2fc: 2501.0
+  padj: 0.0
+  rank: 132
+  rank_down: null
+  rank_up: 32
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -12181,6 +13171,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: trhA
+  growth_phase: exponential
+  locus_tag: ACZ81_04085
+  log2fc: 6.9801
+  padj: 0.0014
+  rank: 241
+  rank_down: null
+  rank_up: 23
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: pepN
@@ -12451,6 +13456,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: gspK
+  growth_phase: exponential
+  locus_tag: ACZ81_04195
+  log2fc: 25.8756
+  padj: 0.0
+  rank: 681
+  rank_down: null
+  rank_up: 100
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: gspK
@@ -12586,6 +13606,36 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04265
+  log2fc: 15.0514
+  padj: 0.0
+  rank: 707
+  rank_down: null
+  rank_up: 125
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04275
+  log2fc: 59.7065
+  padj: 0.0
+  rank: 663
+  rank_down: null
+  rank_up: 82
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -12601,6 +13651,36 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04285
+  log2fc: 29.7129
+  padj: 0.0
+  rank: 675
+  rank_down: null
+  rank_up: 94
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04315
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 172
+  rank_down: null
+  rank_up: 59
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -13576,6 +14656,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ygaD
+  growth_phase: exponential
+  locus_tag: ACZ81_04595
+  log2fc: 2401.0
+  padj: 0.0
+  rank: 140
+  rank_down: null
+  rank_up: 39
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: ygaD
@@ -13696,6 +14791,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ccmA
+  growth_phase: exponential
+  locus_tag: ACZ81_04625
+  log2fc: 30.703
+  padj: 0.0
+  rank: 673
+  rank_down: null
+  rank_up: 92
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: ccmC
@@ -13711,6 +14821,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ccmD
+  growth_phase: exponential
+  locus_tag: ACZ81_04640
+  log2fc: 4101.0
+  padj: 0.0
+  rank: 88
+  rank_down: null
+  rank_up: 11
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: ccmD
@@ -14161,6 +15286,36 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: queF
+  growth_phase: exponential
+  locus_tag: ACZ81_04770
+  log2fc: 20.9601
+  padj: 0.0
+  rank: 688
+  rank_down: null
+  rank_up: 107
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04780
+  log2fc: 3501.0
+  padj: 0.0
+  rank: 101
+  rank_down: null
+  rank_up: 17
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -14236,6 +15391,51 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yqcC
+  growth_phase: exponential
+  locus_tag: ACZ81_04805
+  log2fc: 2201.0
+  padj: 0.0
+  rank: 150
+  rank_down: null
+  rank_up: 45
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yqcA
+  growth_phase: exponential
+  locus_tag: ACZ81_04815
+  log2fc: 2701.0
+  padj: 0.0
+  rank: 126
+  rank_down: null
+  rank_up: 28
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: dapD
+  growth_phase: exponential
+  locus_tag: ACZ81_04820
+  log2fc: 12.4428
+  padj: 0.0
+  rank: 215
+  rank_down: null
+  rank_up: 15
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: dapD
@@ -14731,6 +15931,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04930
+  log2fc: 7.6892
+  padj: 0.0006
+  rank: 781
+  rank_down: null
+  rank_up: 178
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -14806,6 +16021,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: mltF
+  growth_phase: exponential
+  locus_tag: ACZ81_04940
+  log2fc: 2801.0
+  padj: 0.0
+  rank: 121
+  rank_down: null
+  rank_up: 26
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: purL
@@ -14851,6 +16081,51 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: smrA
+  growth_phase: exponential
+  locus_tag: ACZ81_04955
+  log2fc: 41.1993
+  padj: 0.0
+  rank: 668
+  rank_down: null
+  rank_up: 87
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: flgT
+  growth_phase: exponential
+  locus_tag: ACZ81_04965
+  log2fc: 8.0919
+  padj: 0.0024
+  rank: 770
+  rank_down: null
+  rank_up: 171
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_04970
+  log2fc: 29.3582
+  padj: 0.0
+  rank: 676
+  rank_down: null
+  rank_up: 95
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -14866,6 +16141,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: flgA
+  growth_phase: exponential
+  locus_tag: ACZ81_04985
+  log2fc: 7.3123
+  padj: 0.0005
+  rank: 240
+  rank_down: null
+  rank_up: 22
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: flgE
@@ -14926,6 +16216,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: flgG
+  growth_phase: exponential
+  locus_tag: ACZ81_05025
+  log2fc: 22.6167
+  padj: 0.0
+  rank: 687
+  rank_down: null
+  rank_up: 106
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: flgG
@@ -15166,6 +16471,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: flaA
+  growth_phase: exponential
+  locus_tag: ACZ81_05060
+  log2fc: 35.8845
+  padj: 0.0
+  rank: 670
+  rank_down: null
+  rank_up: 89
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: flaA
@@ -15226,6 +16546,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: flaA
+  growth_phase: exponential
+  locus_tag: ACZ81_05065
+  log2fc: 8.7172
+  padj: 0.0
+  rank: 761
+  rank_down: null
+  rank_up: 165
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: flaA
@@ -15286,6 +16621,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: flaA
+  growth_phase: exponential
+  locus_tag: ACZ81_05070
+  log2fc: 7.4656
+  padj: 0.0004
+  rank: 784
+  rank_down: null
+  rank_up: 181
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: flaA
@@ -15346,6 +16696,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_05075
+  log2fc: 22.6998
+  padj: 0.0
+  rank: 686
+  rank_down: null
+  rank_up: 105
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: fliD
+  growth_phase: exponential
+  locus_tag: ACZ81_05080
+  log2fc: 8.8105
+  padj: 0.0
+  rank: 760
+  rank_down: null
+  rank_up: 164
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: acpP
@@ -15361,6 +16741,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: fleR
+  growth_phase: exponential
+  locus_tag: ACZ81_05160
+  log2fc: 13.5625
+  padj: 0.0
+  rank: 714
+  rank_down: null
+  rank_up: 131
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: fliE
@@ -15451,6 +16846,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: fliQ
+  growth_phase: exponential
+  locus_tag: ACZ81_05225
+  log2fc: 2401.0
+  padj: 0.0
+  rank: 141
+  rank_down: null
+  rank_up: 40
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: fliQ
@@ -15481,6 +16891,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: VP2226
+  growth_phase: exponential
+  locus_tag: ACZ81_05295
+  log2fc: 6.8711
+  padj: 0.0077
+  rank: 789
+  rank_down: null
+  rank_up: 184
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: oxyR
@@ -16036,6 +17461,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: pspC
+  growth_phase: exponential
+  locus_tag: ACZ81_05480
+  log2fc: 7.5065
+  padj: 0.0042
+  rank: 783
+  rank_down: null
+  rank_up: 180
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: pspC
@@ -16171,6 +17611,36 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: maiA
+  growth_phase: exponential
+  locus_tag: ACZ81_05500
+  log2fc: 13.786
+  padj: 0.0
+  rank: 711
+  rank_down: null
+  rank_up: 128
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ldh
+  growth_phase: exponential
+  locus_tag: ACZ81_05510
+  log2fc: 18.207
+  padj: 0.0
+  rank: 694
+  rank_down: null
+  rank_up: 113
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: ldh
@@ -16876,6 +18346,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_05605
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 173
+  rank_down: null
+  rank_up: 60
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -17461,6 +18946,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: cds1
+  growth_phase: exponential
+  locus_tag: ACZ81_05740
+  log2fc: 2101.0
+  padj: 0.0
+  rank: 159
+  rank_down: null
+  rank_up: 50
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -17476,6 +18976,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_05780
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 174
+  rank_down: null
+  rank_up: 61
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -17566,6 +19081,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_05790
+  log2fc: 6.9801
+  padj: 0.0037
+  rank: 242
+  rank_down: null
+  rank_up: 24
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -17761,6 +19291,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_05845
+  log2fc: 16.8267
+  padj: 0.0
+  rank: 699
+  rank_down: null
+  rank_up: 118
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: prmB
@@ -17791,6 +19336,51 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ycgB
+  growth_phase: exponential
+  locus_tag: ACZ81_05875
+  log2fc: 15.8949
+  padj: 0.0
+  rank: 701
+  rank_down: null
+  rank_up: 120
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yeaH
+  growth_phase: exponential
+  locus_tag: ACZ81_05880
+  log2fc: 12.3928
+  padj: 0.0
+  rank: 721
+  rank_down: null
+  rank_up: 137
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yeaG
+  growth_phase: exponential
+  locus_tag: ACZ81_05885
+  log2fc: 27.9488
+  padj: 0.0
+  rank: 678
+  rank_down: null
+  rank_up: 97
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: yeaG
@@ -18106,6 +19696,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: rnt
+  growth_phase: exponential
+  locus_tag: ACZ81_05930
+  log2fc: 10.4527
+  padj: 0.0
+  rank: 741
+  rank_down: null
+  rank_up: 153
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: gloA
+  growth_phase: exponential
+  locus_tag: ACZ81_05945
+  log2fc: 3001.0
+  padj: 0.0
+  rank: 113
+  rank_down: null
+  rank_up: 20
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -18136,6 +19756,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: rsxC
+  growth_phase: exponential
+  locus_tag: ACZ81_05990
+  log2fc: 6.2164
+  padj: 0.0024
+  rank: 251
+  rank_down: null
+  rank_up: 27
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: rnfA
@@ -18301,6 +19936,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06120
+  log2fc: 11.4478
+  padj: 0.0016
+  rank: 729
+  rank_down: null
+  rank_up: 143
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -18436,6 +20086,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: fadI
+  growth_phase: exponential
+  locus_tag: ACZ81_06155
+  log2fc: 10.8501
+  padj: 0.0
+  rank: 736
+  rank_down: null
+  rank_up: 148
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -18586,6 +20251,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06180
+  log2fc: 4501.0
+  padj: 0.0
+  rank: 81
+  rank_down: null
+  rank_up: 10
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: yfjD
@@ -18661,6 +20341,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06200
+  log2fc: 30.2135
+  padj: 0.0
+  rank: 674
+  rank_down: null
+  rank_up: 93
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -18763,6 +20458,21 @@ rows:
   rank_up: 109
   timepoint: day 11
   timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: VP2116
+  growth_phase: exponential
+  locus_tag: ACZ81_06245
+  log2fc: 10.9668
+  padj: 0.0
+  rank: 733
+  rank_down: null
+  rank_up: 147
+  timepoint: 20h
+  timepoint_hours: 20.0
   timepoint_order: 1
   treatment_type:
   - coculture
@@ -18961,6 +20671,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06275
+  log2fc: 2201.0
+  padj: 0.0
+  rank: 151
+  rank_down: null
+  rank_up: 46
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -18976,6 +20701,51 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06335
+  log2fc: 19.9632
+  padj: 0.0
+  rank: 690
+  rank_down: null
+  rank_up: 109
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06340
+  log2fc: 7.9772
+  padj: 0.0002
+  rank: 771
+  rank_down: null
+  rank_up: 172
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06345
+  log2fc: 3701.0
+  padj: 0.0
+  rank: 97
+  rank_down: null
+  rank_up: 14
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -19276,6 +21046,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: pal
+  growth_phase: exponential
+  locus_tag: ACZ81_06435
+  log2fc: 7.7074
+  padj: 0.0002
+  rank: 780
+  rank_down: null
+  rank_up: 177
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06480
+  log2fc: 2801.0
+  padj: 0.0
+  rank: 119
+  rank_down: null
+  rank_up: 24
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -19336,6 +21136,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06505
+  log2fc: 30.703
+  padj: 0.0
+  rank: 672
+  rank_down: null
+  rank_up: 91
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -19426,6 +21241,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06530
+  log2fc: 50.1694
+  padj: 0.0
+  rank: 666
+  rank_down: null
+  rank_up: 85
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -19441,6 +21271,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06540
+  log2fc: 2901.0
+  padj: 0.0
+  rank: 115
+  rank_down: null
+  rank_up: 21
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -19816,6 +21661,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: pqiA
+  growth_phase: exponential
+  locus_tag: ACZ81_06615
+  log2fc: 10.9751
+  padj: 0.0008
+  rank: 731
+  rank_down: null
+  rank_up: 145
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: bioA
@@ -19831,6 +21691,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: bioD
+  growth_phase: exponential
+  locus_tag: ACZ81_06680
+  log2fc: 6.3946
+  padj: 0.0025
+  rank: 249
+  rank_down: null
+  rank_up: 25
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: pepE
@@ -19846,6 +21721,36 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ypeB
+  growth_phase: exponential
+  locus_tag: ACZ81_06735
+  log2fc: 3901.0
+  padj: 0.0
+  rank: 90
+  rank_down: null
+  rank_up: 12
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06760
+  log2fc: 7.1476
+  padj: 0.0012
+  rank: 786
+  rank_down: null
+  rank_up: 183
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -19936,6 +21841,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_06820
+  log2fc: 3701.0
+  padj: 0.0
+  rank: 98
+  rank_down: null
+  rank_up: 15
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: ybbP
@@ -20086,6 +22006,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: rluB
+  growth_phase: exponential
+  locus_tag: ACZ81_06940
+  log2fc: 41.399
+  padj: 0.0
+  rank: 667
+  rank_down: null
+  rank_up: 86
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: dkgB
@@ -20281,6 +22216,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: arsC
+  growth_phase: exponential
+  locus_tag: ACZ81_06960
+  log2fc: 6.2208
+  padj: 0.0001
+  rank: 250
+  rank_down: null
+  rank_up: 26
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: arsC
@@ -20386,6 +22336,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: bamE
+  growth_phase: exponential
+  locus_tag: ACZ81_06975
+  log2fc: 8201.0
+  padj: 0.0
+  rank: 40
+  rank_down: null
+  rank_up: 2
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: bamE
@@ -20581,6 +22546,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07025
+  log2fc: 4801.0
+  padj: 0.0
+  rank: 1
+  rank_down: null
+  rank_up: 1
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -20641,6 +22621,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: dnaK
+  growth_phase: exponential
+  locus_tag: ACZ81_07045
+  log2fc: 75.2574
+  padj: 0.0
+  rank: 659
+  rank_down: null
+  rank_up: 78
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: dnaJ
@@ -20656,6 +22651,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07055
+  log2fc: 14.9535
+  padj: 0.0
+  rank: 207
+  rank_down: null
+  rank_up: 14
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -20791,6 +22801,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07065
+  log2fc: 6.0317
+  padj: 0.0095
+  rank: 805
+  rank_down: null
+  rank_up: 187
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -21421,6 +23446,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07215
+  log2fc: 3101.0
+  padj: 0.0
+  rank: 110
+  rank_down: null
+  rank_up: 19
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -21451,6 +23491,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ychF
+  growth_phase: exponential
+  locus_tag: ACZ81_07280
+  log2fc: 8.9602
+  padj: 0.0
+  rank: 226
+  rank_down: null
+  rank_up: 20
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: ychF
@@ -21856,6 +23911,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: rlmM
+  growth_phase: exponential
+  locus_tag: ACZ81_07375
+  log2fc: 20.9336
+  padj: 0.0
+  rank: 689
+  rank_down: null
+  rank_up: 108
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: rlmM
@@ -22261,6 +24331,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: hit1
+  growth_phase: exponential
+  locus_tag: ACZ81_07440
+  log2fc: 3901.0
+  padj: 0.0
+  rank: 91
+  rank_down: null
+  rank_up: 13
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: hit1
@@ -22546,6 +24631,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07485
+  log2fc: 2501.0
+  padj: 0.0
+  rank: 133
+  rank_down: null
+  rank_up: 33
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -22576,6 +24676,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07500
+  log2fc: 2901.0
+  padj: 0.0
+  rank: 116
+  rank_down: null
+  rank_up: 22
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -22681,6 +24796,36 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07750
+  log2fc: 13.7182
+  padj: 0.0
+  rank: 713
+  rank_down: null
+  rank_up: 130
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07760
+  log2fc: 7.8463
+  padj: 0.0022
+  rank: 778
+  rank_down: null
+  rank_up: 175
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -22801,6 +24946,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: uraH
+  growth_phase: exponential
+  locus_tag: ACZ81_07785
+  log2fc: 2101.0
+  padj: 0.0
+  rank: 157
+  rank_down: null
+  rank_up: 48
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   expression_status: significant_up
   gene_name: uraH
@@ -22816,6 +24976,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: uraD
+  growth_phase: exponential
+  locus_tag: ACZ81_07790
+  log2fc: 2701.0
+  padj: 0.0
+  rank: 127
+  rank_down: null
+  rank_up: 29
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   expression_status: significant_up
   gene_name: uraD
@@ -22828,6 +25003,21 @@ rows:
   rank_up: 83
   timepoint: day 11
   timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: xdhC
+  growth_phase: exponential
+  locus_tag: ACZ81_07795
+  log2fc: 10.4527
+  padj: 0.0
+  rank: 739
+  rank_down: null
+  rank_up: 151
+  timepoint: 20h
+  timepoint_hours: 20.0
   timepoint_order: 1
   treatment_type:
   - coculture
@@ -22861,6 +25051,36 @@ rows:
   timepoint_order: 1
   treatment_type:
   - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07810
+  log2fc: 13.7745
+  padj: 0.0
+  rank: 712
+  rank_down: null
+  rank_up: 129
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: puuE
+  growth_phase: exponential
+  locus_tag: ACZ81_07815
+  log2fc: 10.4527
+  padj: 0.0
+  rank: 740
+  rank_down: null
+  rank_up: 152
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -22876,6 +25096,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yjcD
+  growth_phase: exponential
+  locus_tag: ACZ81_07825
+  log2fc: 10.9668
+  padj: 0.0
+  rank: 732
+  rank_down: null
+  rank_up: 146
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: add
@@ -22891,6 +25126,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_07840
+  log2fc: 7.6393
+  padj: 0.0003
+  rank: 782
+  rank_down: null
+  rank_up: 179
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: luxQ
+  growth_phase: exponential
+  locus_tag: ACZ81_07850
+  log2fc: 5.9583
+  padj: 0.0012
+  rank: 809
+  rank_down: null
+  rank_up: 188
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -23296,6 +25561,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: wcaJ
+  growth_phase: exponential
+  locus_tag: ACZ81_07970
+  log2fc: 9601.0
+  padj: 0.0
+  rank: 35
+  rank_down: null
+  rank_up: 1
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: wcaJ
@@ -23386,6 +25666,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08020
+  log2fc: 2301.0
+  padj: 0.0
+  rank: 146
+  rank_down: null
+  rank_up: 41
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -23656,6 +25951,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: ybaK
+  growth_phase: exponential
+  locus_tag: ACZ81_08130
+  log2fc: 5.6628
+  padj: 0.0019
+  rank: 258
+  rank_down: null
+  rank_up: 28
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: nagZ
+  growth_phase: exponential
+  locus_tag: ACZ81_08140
+  log2fc: 8.6412
+  padj: 0.0011
+  rank: 763
+  rank_down: null
+  rank_up: 167
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: hpt
@@ -23821,6 +26146,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08225
+  log2fc: 43.2886
+  padj: 0.0
+  rank: 201
+  rank_down: null
+  rank_up: 9
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -23866,6 +26206,66 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08240
+  log2fc: 12.6279
+  padj: 0.0
+  rank: 720
+  rank_down: null
+  rank_up: 136
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: liuB
+  growth_phase: exponential
+  locus_tag: ACZ81_08265
+  log2fc: 35.3284
+  padj: 0.0
+  rank: 671
+  rank_down: null
+  rank_up: 90
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: atoB
+  growth_phase: exponential
+  locus_tag: ACZ81_08280
+  log2fc: 24.9401
+  padj: 0.0
+  rank: 683
+  rank_down: null
+  rank_up: 102
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08320
+  log2fc: 16.8947
+  padj: 0.0
+  rank: 697
+  rank_down: null
+  rank_up: 116
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -23941,6 +26341,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08355
+  log2fc: 8.9771
+  padj: 0.0003
+  rank: 752
+  rank_down: null
+  rank_up: 161
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -24001,6 +26416,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yjcC
+  growth_phase: exponential
+  locus_tag: ACZ81_08410
+  log2fc: 7.1541
+  padj: 0.001
+  rank: 785
+  rank_down: null
+  rank_up: 182
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -24136,6 +26566,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: fdhD
+  growth_phase: exponential
+  locus_tag: ACZ81_08465
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 184
+  rank_down: null
+  rank_up: 69
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: ydeP
@@ -24856,6 +27301,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: pabC
+  growth_phase: exponential
+  locus_tag: ACZ81_08580
+  log2fc: 15.7132
+  padj: 0.0
+  rank: 704
+  rank_down: null
+  rank_up: 122
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: pabC
@@ -24931,6 +27391,21 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08605
+  log2fc: 2301.0
+  padj: 0.0
+  rank: 147
+  rank_down: null
+  rank_up: 42
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -25441,6 +27916,81 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08675
+  log2fc: 170.2865
+  padj: 0.0
+  rank: 603
+  rank_down: null
+  rank_up: 75
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08685
+  log2fc: 2001.0
+  padj: 0.0
+  rank: 163
+  rank_down: null
+  rank_up: 52
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08700
+  log2fc: 54.7521
+  padj: 0.0
+  rank: 665
+  rank_down: null
+  rank_up: 84
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: nodN
+  growth_phase: exponential
+  locus_tag: ACZ81_08710
+  log2fc: 11.4738
+  padj: 0.0
+  rank: 728
+  rank_down: null
+  rank_up: 142
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08720
+  log2fc: 11.9453
+  padj: 0.0
+  rank: 216
+  rank_down: null
+  rank_up: 16
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -25531,6 +28081,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: phhB
+  growth_phase: exponential
+  locus_tag: ACZ81_08725
+  log2fc: 5201.0
+  padj: 0.0
+  rank: 72
+  rank_down: null
+  rank_up: 7
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: phhB
@@ -26266,6 +28831,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08945
+  log2fc: 2801.0
+  padj: 0.0
+  rank: 120
+  rank_down: null
+  rank_up: 25
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -26281,6 +28861,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_08985
+  log2fc: 6.7486
+  padj: 0.0022
+  rank: 794
+  rank_down: null
+  rank_up: 186
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   expression_status: significant_up
   gene_name: null
@@ -26476,6 +29071,36 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09095
+  log2fc: 15.3609
+  padj: 0.0
+  rank: 706
+  rank_down: null
+  rank_up: 124
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09095
+  log2fc: 11.4478
+  padj: 0.0
+  rank: 217
+  rank_down: null
+  rank_up: 17
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -26716,6 +29341,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09150
+  log2fc: 17.8317
+  padj: 0.0
+  rank: 204
+  rank_down: null
+  rank_up: 12
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: ycfD
@@ -26941,6 +29581,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: cspD
+  growth_phase: exponential
+  locus_tag: ACZ81_09195
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 10
+  rank_down: null
+  rank_up: 6
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: cspD
@@ -26956,6 +29611,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: clpA
+  growth_phase: exponential
+  locus_tag: ACZ81_09205
+  log2fc: 9.0407
+  padj: 0.0
+  rank: 751
+  rank_down: null
+  rank_up: 160
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: infA
@@ -27001,6 +29671,36 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yfbV
+  growth_phase: exponential
+  locus_tag: ACZ81_09230
+  log2fc: 11.4296
+  padj: 0.0
+  rank: 730
+  rank_down: null
+  rank_up: 144
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: sppA
+  growth_phase: exponential
+  locus_tag: ACZ81_09240
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 13
+  rank_down: null
+  rank_up: 8
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: sppA
@@ -27181,6 +29881,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: nadD
+  growth_phase: exponential
+  locus_tag: ACZ81_09315
+  log2fc: 27.1845
+  padj: 0.0
+  rank: 679
+  rank_down: null
+  rank_up: 98
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: lptE
@@ -27571,6 +30286,36 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: putP
+  growth_phase: exponential
+  locus_tag: ACZ81_09445
+  log2fc: 25.4389
+  padj: 0.0
+  rank: 682
+  rank_down: null
+  rank_up: 101
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: proA
+  growth_phase: exponential
+  locus_tag: ACZ81_09455
+  log2fc: 59.7065
+  padj: 0.0
+  rank: 662
+  rank_down: null
+  rank_up: 81
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: proA
@@ -27766,6 +30511,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09540
+  log2fc: 2201.0
+  padj: 0.0
+  rank: 152
+  rank_down: null
+  rank_up: 47
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -27781,6 +30541,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09560
+  log2fc: 3701.0
+  padj: 0.0
+  rank: 99
+  rank_down: null
+  rank_up: 16
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -27841,6 +30616,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yhjX
+  growth_phase: exponential
+  locus_tag: ACZ81_09595
+  log2fc: 7.7332
+  padj: 0.0023
+  rank: 779
+  rank_down: null
+  rank_up: 176
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: yhjX
@@ -28111,6 +30901,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09700
+  log2fc: 76.2475
+  padj: 0.0
+  rank: 658
+  rank_down: null
+  rank_up: 77
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: rimO
+  growth_phase: exponential
+  locus_tag: ACZ81_09710
+  log2fc: 3001.0
+  padj: 0.0
+  rank: 5
+  rank_down: null
+  rank_up: 4
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: rimO
@@ -28186,6 +31006,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yqjG
+  growth_phase: exponential
+  locus_tag: ACZ81_09730
+  log2fc: 8.9568
+  padj: 0.0008
+  rank: 756
+  rank_down: null
+  rank_up: 163
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: yqjG
@@ -28231,6 +31066,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09755
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 175
+  rank_down: null
+  rank_up: 62
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: gltA
@@ -28681,6 +31531,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09835
+  log2fc: 60.4059
+  padj: 0.0
+  rank: 661
+  rank_down: null
+  rank_up: 80
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_09840
+  log2fc: 20.9336
+  padj: 0.0
+  rank: 202
+  rank_down: null
+  rank_up: 10
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -29476,6 +32356,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_10000
+  log2fc: 23.8856
+  padj: 0.0
+  rank: 684
+  rank_down: null
+  rank_up: 103
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -29491,6 +32386,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_10015
+  log2fc: 6601.0
+  padj: 0.0
+  rank: 52
+  rank_down: null
+  rank_up: 4
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -29986,6 +32896,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_10200
+  log2fc: 9.6379
+  padj: 0.0001
+  rank: 225
+  rank_down: null
+  rank_up: 19
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -35101,6 +38026,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_12055
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 176
+  rank_down: null
+  rank_up: 63
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -36976,6 +39916,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_12615
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 185
+  rank_down: null
+  rank_up: 70
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -39091,6 +42046,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_13265
+  log2fc: 19.8119
+  padj: 0.0
+  rank: 691
+  rank_down: null
+  rank_up: 110
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -39796,6 +42766,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_13635
+  log2fc: 5.099
+  padj: 0.0018
+  rank: 267
+  rank_down: null
+  rank_up: 30
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -42106,6 +45091,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: srtA
+  growth_phase: exponential
+  locus_tag: ACZ81_14270
+  log2fc: 2301.0
+  padj: 0.0
+  rank: 148
+  rank_down: null
+  rank_up: 43
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: czcB
@@ -44251,6 +47251,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_14810
+  log2fc: 9.3056
+  padj: 0.0011
+  rank: 750
+  rank_down: null
+  rank_up: 159
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -46396,6 +49411,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_15520
+  log2fc: 2101.0
+  padj: 0.0
+  rank: 158
+  rank_down: null
+  rank_up: 49
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: mntH
@@ -51931,6 +54961,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_16620
+  log2fc: 18.4129
+  padj: 0.0
+  rank: 693
+  rank_down: null
+  rank_up: 112
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -61126,6 +64171,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_18950
+  log2fc: 2501.0
+  padj: 0.0
+  rank: 134
+  rank_down: null
+  rank_up: 34
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -62476,6 +65536,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: gspJ
+  growth_phase: exponential
+  locus_tag: ACZ81_19310
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 186
+  rank_down: null
+  rank_up: 71
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -63511,6 +66586,21 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_19760
+  log2fc: 9.9552
+  padj: 0.0
+  rank: 744
+  rank_down: null
+  rank_up: 156
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -64231,6 +67321,21 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_19905
+  log2fc: 2001.0
+  padj: 0.0
+  rank: 164
+  rank_down: null
+  rank_up: 53
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: yidC
@@ -64546,6 +67651,36 @@ rows:
   timepoint_order: 4
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: hypC
+  growth_phase: exponential
+  locus_tag: ACZ81_20250
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 187
+  rank_down: null
+  rank_up: 72
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_20255
+  log2fc: 2901.0
+  padj: 0.0
+  rank: 117
+  rank_down: null
+  rank_up: 23
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
   gene_name: null
@@ -64561,6 +67696,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_20300
+  log2fc: 1801.0
+  padj: 0.0
+  rank: 188
+  rank_down: null
+  rank_up: 73
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -64606,6 +67756,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_20425
+  log2fc: 5.2207
+  padj: 0.001
+  rank: 266
+  rank_down: null
+  rank_up: 29
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: paaA
@@ -65011,6 +68176,21 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: cydX
+  growth_phase: exponential
+  locus_tag: ACZ81_RS18600
+  log2fc: 2601.0
+  padj: 0.0
+  rank: 131
+  rank_down: null
+  rank_up: 31
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
   gene_name: null
@@ -65161,6 +68341,36 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_RS20800
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 177
+  rank_down: null
+  rank_up: 64
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: yqaE
+  growth_phase: exponential
+  locus_tag: ACZ81_RS20845
+  log2fc: 10.0594
+  padj: 0.0002
+  rank: 742
+  rank_down: null
+  rank_up: 154
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
   gene_name: null
@@ -65338,6 +68548,21 @@ rows:
   rank_up: 30
   timepoint: day 11
   timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_RS21215
+  log2fc: 2501.0
+  padj: 0.0
+  rank: 135
+  rank_down: null
+  rank_up: 35
+  timepoint: 20h
+  timepoint_hours: 20.0
   timepoint_order: 1
   treatment_type:
   - coculture
@@ -65626,6 +68851,21 @@ rows:
   timepoint_order: 5
   treatment_type:
   - nitrogen
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_RS21495
+  log2fc: 14.7085
+  padj: 0.0
+  rank: 709
+  rank_down: null
+  rank_up: 126
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   expression_status: significant_up
   gene_name: null
@@ -65653,6 +68893,36 @@ rows:
   rank_up: 107
   timepoint: day 11
   timepoint_hours: 264.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_RS21635
+  log2fc: 1901.0
+  padj: 0.0
+  rank: 178
+  rank_down: null
+  rank_up: 65
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
+- experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
+  expression_status: significant_up
+  gene_name: null
+  growth_phase: exponential
+  locus_tag: ACZ81_RS21735
+  log2fc: 5701.0
+  padj: 0.0
+  rank: 64
+  rank_down: null
+  rank_up: 6
+  timepoint: 20h
+  timepoint_hours: 20.0
   timepoint_order: 1
   treatment_type:
   - coculture

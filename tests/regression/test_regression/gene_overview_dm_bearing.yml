@@ -11,7 +11,7 @@ rows:
   categorical_metric_count: 0
   closest_ortholog_genera:
   - Alteromonas
-  closest_ortholog_group_size: 3
+  closest_ortholog_group_size: 7
   cluster_membership_count: 0
   cluster_types: []
   expression_edge_count: 9

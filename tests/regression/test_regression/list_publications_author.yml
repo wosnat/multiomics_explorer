@@ -289,8 +289,10 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
+  derived_metric_count: 5
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
   growth_phases:
@@ -375,8 +377,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 2
   compartments:
   - whole_cell
   derived_metric_count: 0

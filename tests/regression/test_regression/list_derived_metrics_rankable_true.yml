@@ -1,6 +1,420 @@
 case_id: list_derived_metrics_rankable_true
-row_count: 11
+row_count: 29
 rows:
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_ad45:log2_mv_cell_enrichment
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_ad45
+  field_description: log2 ratio of vesicle-fraction over cell-fraction proportional
+    abundance; computed by build_fadeev2022_modified_csv.py for proteins detected
+    in both fractions; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_mv_cell_enrichment
+  name: AD45 log2(MV / cell) abundance enrichment (Fadeev 2022 Table S1, derived)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii AD45
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 15
+  treatment_type:
+  - compartment
+  unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_ad45:prop_abund_cells_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_ad45
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the whole-cell fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_cells_percent
+  name: AD45 protein proportional abundance in whole-cell fraction (Fadeev 2022 Table
+    S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii AD45
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 59
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in whole-cell fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_ad45:prop_abund_mvs_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_ad45
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the purified MV fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_mvs_percent
+  name: AD45 protein proportional abundance in vesicle fraction (Fadeev 2022 Table
+    S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii AD45
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 29
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in vesicle fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_atcc27126:log2_mv_cell_enrichment
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_atcc27126
+  field_description: log2 ratio of vesicle-fraction over cell-fraction proportional
+    abundance; computed by build_fadeev2022_modified_csv.py for proteins detected
+    in both fractions; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_mv_cell_enrichment
+  name: ATCC27126 log2(MV / cell) abundance enrichment (Fadeev 2022 Table S1, derived)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 31
+  treatment_type:
+  - compartment
+  unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_atcc27126:prop_abund_cells_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_atcc27126
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the whole-cell fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_cells_percent
+  name: ATCC27126 protein proportional abundance in whole-cell fraction (Fadeev 2022
+    Table S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 69
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in whole-cell fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_atcc27126:prop_abund_mvs_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_atcc27126
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the purified MV fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_mvs_percent
+  name: ATCC27126 protein proportional abundance in vesicle fraction (Fadeev 2022
+    Table S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 50
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in vesicle fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_bgp6:log2_mv_cell_enrichment
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bgp6
+  field_description: log2 ratio of vesicle-fraction over cell-fraction proportional
+    abundance; computed by build_fadeev2022_modified_csv.py for proteins detected
+    in both fractions; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_mv_cell_enrichment
+  name: BGP6 log2(MV / cell) abundance enrichment (Fadeev 2022 Table S1, derived)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BGP6
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 30
+  treatment_type:
+  - compartment
+  unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_bgp6:prop_abund_cells_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bgp6
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the whole-cell fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_cells_percent
+  name: BGP6 protein proportional abundance in whole-cell fraction (Fadeev 2022 Table
+    S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BGP6
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 61
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in whole-cell fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_bgp6:prop_abund_mvs_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bgp6
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the purified MV fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_mvs_percent
+  name: BGP6 protein proportional abundance in vesicle fraction (Fadeev 2022 Table
+    S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BGP6
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 45
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in vesicle fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_bs11:log2_mv_cell_enrichment
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bs11
+  field_description: log2 ratio of vesicle-fraction over cell-fraction proportional
+    abundance; computed by build_fadeev2022_modified_csv.py for proteins detected
+    in both fractions; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_mv_cell_enrichment
+  name: BS11 log2(MV / cell) abundance enrichment (Fadeev 2022 Table S1, derived)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BS11
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 41
+  treatment_type:
+  - compartment
+  unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_bs11:prop_abund_cells_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bs11
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the whole-cell fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_cells_percent
+  name: BS11 protein proportional abundance in whole-cell fraction (Fadeev 2022 Table
+    S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BS11
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 73
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in whole-cell fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_bs11:prop_abund_mvs_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bs11
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the purified MV fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_mvs_percent
+  name: BS11 protein proportional abundance in vesicle fraction (Fadeev 2022 Table
+    S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BS11
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 58
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in vesicle fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_hot1a3:log2_mv_cell_enrichment
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_hot1a3
+  field_description: log2 ratio of vesicle-fraction over cell-fraction proportional
+    abundance; computed by build_fadeev2022_modified_csv.py for proteins detected
+    in both fractions; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_mv_cell_enrichment
+  name: HOT1A3 log2(MV / cell) abundance enrichment (Fadeev 2022 Table S1, derived)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 5
+  treatment_type:
+  - compartment
+  unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_hot1a3:prop_abund_cells_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_hot1a3
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the whole-cell fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_cells_percent
+  name: HOT1A3 protein proportional abundance in whole-cell fraction (Fadeev 2022
+    Table S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 53
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in whole-cell fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_hot1a3:prop_abund_mvs_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_hot1a3
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the purified MV fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_mvs_percent
+  name: HOT1A3 protein proportional abundance in vesicle fraction (Fadeev 2022 Table
+    S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 15
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in vesicle fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_mit1002:log2_mv_cell_enrichment
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_mit1002
+  field_description: log2 ratio of vesicle-fraction over cell-fraction proportional
+    abundance; computed by build_fadeev2022_modified_csv.py for proteins detected
+    in both fractions; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: log2_mv_cell_enrichment
+  name: MIT1002 log2(MV / cell) abundance enrichment (Fadeev 2022 Table S1, derived)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 31
+  treatment_type:
+  - compartment
+  unit: log2 ratio
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_mit1002:prop_abund_cells_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_mit1002
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the whole-cell fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_cells_percent
+  name: MIT1002 protein proportional abundance in whole-cell fraction (Fadeev 2022
+    Table S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 71
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in whole-cell fraction
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - darkness
+  compartment: vesicle
+  derived_metric_id: derived_metric:uqac025:s1_mit1002:prop_abund_mvs_percent
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_mit1002
+  field_description: Per-protein NSAF-style proportional abundance (% of summed spectral
+    counts) in the purified MV fraction; Fadeev 2022 Table S1
+  growth_phases: []
+  has_p_value: false
+  metric_type: prop_abund_mvs_percent
+  name: MIT1002 protein proportional abundance in vesicle fraction (Fadeev 2022 Table
+    S1)
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1093/femsml/uqac025
+  rankable: true
+  total_gene_count: 52
+  treatment_type:
+  - compartment
+  unit: percent of summed PSM intensity in vesicle fraction
+  value_kind: numeric
 - allowed_categories: null
   background_factors:
   - axenic

@@ -950,8 +950,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
   coculture_partner: null
   compartment: whole_cell
   derived_metric_count: 0
@@ -1372,8 +1373,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
   coculture_partner: null
   compartment: whole_cell
   derived_metric_count: 0

@@ -1,5 +1,5 @@
 case_id: resolve_gene_by_name
-row_count: 27
+row_count: 31
 rows:
 - gene_name: dnaN
   locus_tag: A9601_00001
@@ -8,6 +8,18 @@ rows:
 - gene_name: dnaN
   locus_tag: ACZ81_00010
   organism_name: Alteromonas macleodii HOT1A3
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: ALTBGP6_00002
+  organism_name: Alteromonas macleodii BGP6
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: AMBAS45_00010
+  organism_name: Alteromonas macleodii AD45
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: AMBLS11_00010
+  organism_name: Alteromonas macleodii BS11
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
   locus_tag: BL107_06649
@@ -40,6 +52,10 @@ rows:
 - gene_name: dnaN
   locus_tag: M8001_00055
   organism_name: Pseudomonas putida KT2440
+  product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: MASE_00010
+  organism_name: Alteromonas macleodii ATCC27126
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
   locus_tag: MIT1002_00002

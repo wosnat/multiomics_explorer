@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 38
+row_count: 40
 rows:
 - authors:
   - James I. Mullet
@@ -31,6 +31,37 @@ rows:
   title: Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus
   treatment_types:
   - growth_phase
+  year: 2025
+- authors:
+  - J. Jeffrey Morris
+  - James Kizziah
+  - Steven J. Biller
+  - Sydney Plummer
+  - Zhiying Lu
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - exoproteome
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - numeric
+  doi: 10.1101/2025.05.28.656624
+  experiment_count: 2
+  growth_phases: []
+  journal: bioRxiv
+  omics_types:
+  - EXOPROTEOMICS
+  - PROTEOMICS
+  organisms:
+  - Alteromonas macleodii EZ55
+  study_type: Proteomics; Microbial interactions; Vesicle analysis
+  title: Enzymatically active exudates from Alteromonas facilitate Prochlorococcus
+    survival in stationary phase
+  treatment_types:
+  - compartment
   year: 2025
 - authors:
   - Daniel Sher
@@ -139,6 +170,43 @@ rows:
   treatment_types:
   - coculture
   year: 2024
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 18
+  derived_metric_value_kinds:
+  - numeric
+  doi: 10.1093/femsml/uqac025
+  experiment_count: 6
+  growth_phases: []
+  journal: microLife
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organisms:
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  study_type: Proteomics, Microscopy, Extracellular vesicle analysis
+  title: Characterization of membrane vesicles in Alteromonas macleodii indicates
+    potential roles in their copiotrophic lifestyle
+  treatment_types:
+  - compartment
+  year: 2023
 - authors:
   - Alessandro Mongero
   - Alexis Yelton
@@ -298,7 +366,7 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   doi: 10.1038/s43705-022-00197-2
-  experiment_count: 10
+  experiment_count: 11
   growth_phases:
   - exponential
   journal: ISME Communications
@@ -812,8 +880,10 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
+  derived_metric_count: 5
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
   doi: 10.1038/ismej.2015.36
   experiment_count: 4
   growth_phases:
@@ -944,13 +1014,13 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types:
-  - condition_comparison
-  clustering_analysis_count: 1
+  cluster_types: []
+  clustering_analysis_count: 0
   compartments:
   - whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
   doi: 10.1186/1471-2180-14-11
   experiment_count: 1
   growth_phases: []
@@ -1032,8 +1102,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 2
   compartments:
   - whole_cell
   derived_metric_count: 0

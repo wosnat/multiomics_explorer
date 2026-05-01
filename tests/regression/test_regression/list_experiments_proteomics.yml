@@ -1,5 +1,5 @@
 case_id: list_experiments_proteomics
-row_count: 71
+row_count: 72
 rows:
 - authors:
   - Guadalupe Gómez-Baena
@@ -918,6 +918,44 @@ rows:
   treatment_type:
   - carbon
   - coculture
+- authors:
+  - J. Jeffrey Morris
+  - James Kizziah
+  - Steven J. Biller
+  - Sydney Plummer
+  - Zhiying Lu
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1101/2025.05.28.656624_ez55_whole_cell_proteome
+  experiment_name: EZ55 whole-cell proteome (crude cell lysate)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1101/2025.05.28.656624
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - authors:
   - Daniel Sher
   - Dikla Aharonovich

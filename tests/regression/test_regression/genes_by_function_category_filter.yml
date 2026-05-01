@@ -7,2153 +7,2153 @@ rows:
   locus_tag: A9601_00741
   organism_name: Prochlorococcus AS9601
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: A9601_02441
   organism_name: Prochlorococcus AS9601
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: A9601_02731
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: A9601_02741
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: A9601_02751
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: A9601_02941
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center protein PsbK
-  score: 11.2795
+  score: 11.416
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: A9601_03201
   organism_name: Prochlorococcus AS9601
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: A9601_03211
   organism_name: Prochlorococcus AS9601
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: A9601_03221
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: A9601_03231
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: A9601_03381
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: A9601_03411
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: A9601_03551
   organism_name: Prochlorococcus AS9601
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: A9601_05241
   organism_name: Prochlorococcus AS9601
   product: photosystem I reaction centre PsaF protein
-  score: 6.9449
+  score: 6.9464
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: A9601_09341
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: A9601_09551
   organism_name: Prochlorococcus AS9601
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: A9601_12041
   organism_name: Prochlorococcus AS9601
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: A9601_12431
   organism_name: Prochlorococcus AS9601
   product: photosystem II reaction center assembly factor PsbN-like protein
-  score: 7.1353
+  score: 7.5604
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: A9601_12521
   organism_name: Prochlorococcus AS9601
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: A9601_13341
   organism_name: Prochlorococcus AS9601
   product: photosystem II D2 protein
-  score: 2.9274
+  score: 2.8838
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: A9601_13351
   organism_name: Prochlorococcus AS9601
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: A9601_17851
   organism_name: Prochlorococcus AS9601
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2762
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: A9601_18531
   organism_name: Prochlorococcus AS9601
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: A9601_RS11640
   organism_name: Prochlorococcus AS9601
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: BL107_05049
   organism_name: Synechococcus sp. BL107
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: BL107_05314
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: BL107_05504
   organism_name: Synechococcus sp. BL107
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: BL107_05509
   organism_name: Synechococcus sp. BL107
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: BL107_05514
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: BL107_05519
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: BL107_06219
   organism_name: Synechococcus sp. BL107
   product: photosystem II protein PsbZ (Ycf9)
-  score: 1.7221
+  score: 1.7142
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: BL107_07924
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: BL107_07934
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: BL107_08771
   organism_name: Synechococcus sp. BL107
   product: photosystem I reaction center subunit II
-  score: 4.7751
+  score: 4.8273
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: BL107_09111
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: BL107_09211
   organism_name: Synechococcus sp. BL107
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: BL107_09957
   organism_name: Synechococcus sp. BL107
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: BL107_09962
   organism_name: Synechococcus sp. BL107
   product: photosystem I reaction centre PsaF protein
-  score: 10.9788
+  score: 11.0956
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: BL107_11736
   organism_name: Synechococcus sp. BL107
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: BL107_12730
   organism_name: Synechococcus sp. BL107
   product: photosystem I reaction center subunit X
-  score: 4.8894
+  score: 4.9482
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb30
   locus_tag: BL107_13195
   organism_name: Synechococcus sp. BL107
   product: photosystem II biogenesis protein Psb30
-  score: 1.7931
+  score: 1.7883
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: BL107_13780
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction centre Psb28 protein
-  score: 9.8013
+  score: 9.8901
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: BL107_14260
   organism_name: Synechococcus sp. BL107
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: BL107_15730
   organism_name: Synechococcus sp. BL107
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: BL107_15735
   organism_name: Synechococcus sp. BL107
   product: photosystem II CP43 protein
-  score: 1.005
+  score: 0.9824
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: BL107_17100
   organism_name: Synechococcus sp. BL107
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: BL107_RS04170
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: BL107_RS12135
   organism_name: Synechococcus sp. BL107
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: NATL1_01261
   organism_name: Prochlorococcus NATL1A
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: NATL1_03031
   organism_name: Prochlorococcus NATL1A
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: NATL1_03301
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: NATL1_03311
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: NATL1_03511
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: NATL1_03771
   organism_name: Prochlorococcus NATL1A
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: NATL1_03781
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: NATL1_03791
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: NATL1_04041
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: NATL1_04071
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: NATL1_04211
   organism_name: Prochlorococcus NATL1A
   product: photosystem I reaction centre subunit IV
-  score: 7.7164
+  score: 7.7346
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: NATL1_04671
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction center assembly factor PsbN-like protein
-  score: 7.1353
+  score: 7.5604
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: NATL1_05231
   organism_name: Prochlorococcus NATL1A
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: NATL1_05241
   organism_name: Prochlorococcus NATL1A
   product: photosystem I reaction centre PsaF protein
-  score: 6.9449
+  score: 6.9464
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: NATL1_07671
   organism_name: Prochlorococcus NATL1A
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: NATL1_09731
   organism_name: Prochlorococcus NATL1A
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb30
   locus_tag: NATL1_10391
   organism_name: Prochlorococcus NATL1A
   product: photosystem II biogenesis protein Psb30
-  score: 1.9545
+  score: 1.9573
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ2
   locus_tag: NATL1_13041
   organism_name: Prochlorococcus NATL1A
   product: photosystem I reaction centre subunit IX
-  score: 10.8858
+  score: 11.0349
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: NATL1_13251
   organism_name: Prochlorococcus NATL1A
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: NATL1_14821
   organism_name: Prochlorococcus NATL1A
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: NATL1_15721
   organism_name: Prochlorococcus NATL1A
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: NATL1_16071
   organism_name: Prochlorococcus NATL1A
   product: photosystem II D2 protein
-  score: 2.9274
+  score: 2.8838
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: NATL1_16081
   organism_name: Prochlorococcus NATL1A
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: NATL1_20241
   organism_name: Prochlorococcus NATL1A
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2762
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: NATL1_21121
   organism_name: Prochlorococcus NATL1A
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: P9301_00731
   organism_name: Prochlorococcus MIT9301
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: P9301_02451
   organism_name: Prochlorococcus MIT9301
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: P9301_02741
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: P9301_02761
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: P9301_02771
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: P9301_02951
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction center protein PsbK
-  score: 11.2795
+  score: 11.416
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: P9301_03211
   organism_name: Prochlorococcus MIT9301
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: P9301_03221
   organism_name: Prochlorococcus MIT9301
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: P9301_03231
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: P9301_03241
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: P9301_03391
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: P9301_03421
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: P9301_03561
   organism_name: Prochlorococcus MIT9301
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: P9301_04931
   organism_name: Prochlorococcus MIT9301
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: P9301_04941
   organism_name: Prochlorococcus MIT9301
   product: photosystem I reaction centre PsaF protein
-  score: 6.9449
+  score: 6.9464
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: P9301_09331
   organism_name: Prochlorococcus MIT9301
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: P9301_09531
   organism_name: Prochlorococcus MIT9301
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: P9301_12051
   organism_name: Prochlorococcus MIT9301
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: P9301_13491
   organism_name: Prochlorococcus MIT9301
   product: photosystem II D2 protein
-  score: 2.9274
+  score: 2.8838
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: P9301_13501
   organism_name: Prochlorococcus MIT9301
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: P9301_17691
   organism_name: Prochlorococcus MIT9301
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2762
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: P9301_18341
   organism_name: Prochlorococcus MIT9301
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb30
   locus_tag: P9301_RS18980
   organism_name: Prochlorococcus MIT9301
   product: photosystem II biogenesis protein Psb30
-  score: 1.9545
+  score: 1.9573
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: P9303_00891
   organism_name: Prochlorococcus MIT9303
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: P9303_03201
   organism_name: Prochlorococcus MIT9303
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: P9303_04091
   organism_name: Prochlorococcus MIT9303
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: P9303_06691
   organism_name: Prochlorococcus MIT9303
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: P9303_06701
   organism_name: Prochlorococcus MIT9303
   product: photosystem I reaction centre PsaF protein
-  score: 6.9449
+  score: 6.9464
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: P9303_08421
   organism_name: Prochlorococcus MIT9303
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: P9303_08431
   organism_name: Prochlorococcus MIT9303
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: P9303_09721
   organism_name: Prochlorococcus MIT9303
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: P9303_15351
   organism_name: Prochlorococcus MIT9303
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: P9303_16381
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: P9303_18681
   organism_name: Prochlorococcus MIT9303
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: P9303_21751
   organism_name: Prochlorococcus MIT9303
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: P9303_22101
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: P9303_22131
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: P9303_22711
   organism_name: Prochlorococcus MIT9303
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2358
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: P9303_24621
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: P9303_24631
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: P9303_24651
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: P9303_24911
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: P9303_25291
   organism_name: Prochlorococcus MIT9303
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: P9303_25301
   organism_name: Prochlorococcus MIT9303
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: P9303_25311
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: P9303_25321
   organism_name: Prochlorococcus MIT9303
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: PMM0062
   organism_name: Prochlorococcus MED4
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: PMM0223
   organism_name: Prochlorococcus MED4
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: PMM0251
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: PMM0252
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: PMM0253
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: PMM0272
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: PMM0297
   organism_name: Prochlorococcus MED4
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: PMM0298
   organism_name: Prochlorococcus MED4
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: PMM0299
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: PMM0300
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: PMM0314
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: PMM0317
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: PMM0329
   organism_name: Prochlorococcus MED4
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: PMM0468
   organism_name: Prochlorococcus MED4
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: PMM0469
   organism_name: Prochlorococcus MED4
   product: photosystem I reaction centre PsaF protein
-  score: 6.9449
+  score: 6.9464
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: PMM0906
   organism_name: Prochlorococcus MED4
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: PMM0926
   organism_name: Prochlorococcus MED4
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: PMM1098
   organism_name: Prochlorococcus MED4
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: PMM1157
   organism_name: Prochlorococcus MED4
   product: photosystem II D2 protein
-  score: 2.9274
+  score: 2.8838
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: PMM1158
   organism_name: Prochlorococcus MED4
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: PMM1578
   organism_name: Prochlorococcus MED4
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2762
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: PMM1644
   organism_name: Prochlorococcus MED4
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: PMN2A_0135
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: PMN2A_0301
   organism_name: Prochlorococcus NATL2A
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ2
   locus_tag: PMN2A_0546
   organism_name: Prochlorococcus NATL2A
   product: photosystem I reaction centre subunit IX
-  score: 10.8858
+  score: 11.0349
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: PMN2A_0558
   organism_name: Prochlorococcus NATL2A
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: PMN2A_0650
   organism_name: Prochlorococcus NATL2A
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: PMN2A_0735
   organism_name: Prochlorococcus NATL2A
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: PMN2A_0767
   organism_name: Prochlorococcus NATL2A
   product: photosystem II D2 protein
-  score: 2.9274
+  score: 2.8838
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: PMN2A_0768
   organism_name: Prochlorococcus NATL2A
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: PMN2A_1150
   organism_name: Prochlorococcus NATL2A
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2762
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: PMN2A_1242
   organism_name: Prochlorococcus NATL2A
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: PMN2A_1425
   organism_name: Prochlorococcus NATL2A
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: PMN2A_1592
   organism_name: Prochlorococcus NATL2A
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: PMN2A_1618
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: PMN2A_1619
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: PMN2A_1638
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: PMN2A_1663
   organism_name: Prochlorococcus NATL2A
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: PMN2A_1664
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: PMN2A_1665
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: PMN2A_1691
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: PMN2A_1693
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: PMN2A_1706
   organism_name: Prochlorococcus NATL2A
   product: photosystem I reaction centre subunit IV
-  score: 7.7164
+  score: 7.7346
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: PMN2A_1749
   organism_name: Prochlorococcus NATL2A
   product: photosystem II reaction center assembly factor PsbN-like protein
-  score: 7.1353
+  score: 7.5604
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: PMN2A_1800
   organism_name: Prochlorococcus NATL2A
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: PMN2A_1801
   organism_name: Prochlorococcus NATL2A
   product: photosystem I reaction centre PsaF protein
-  score: 6.9449
+  score: 6.9464
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: PMT0080
   organism_name: Prochlorococcus MIT9313
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: PMT0187
   organism_name: Prochlorococcus MIT9313
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: PMT0419
   organism_name: Prochlorococcus MIT9313
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: PMT0604
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: PMT0687
   organism_name: Prochlorococcus MIT9313
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: PMT1078
   organism_name: Prochlorococcus MIT9313
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: PMT1179
   organism_name: Prochlorococcus MIT9313
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: PMT1180
   organism_name: Prochlorococcus MIT9313
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: PMT1316
   organism_name: Prochlorococcus MIT9313
   product: photosystem I reaction centre PsaF protein
-  score: 6.9449
+  score: 6.9464
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: PMT1532
   organism_name: Prochlorococcus MIT9313
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: PMT1590
   organism_name: Prochlorococcus MIT9313
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: PMT1666
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: PMT1710
   organism_name: Prochlorococcus MIT9313
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2358
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: PMT1837
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: PMT1838
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: PMT1863
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: PMT1896
   organism_name: Prochlorococcus MIT9313
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: PMT9312_0064
   organism_name: Prochlorococcus MIT9312
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: PMT9312_0225
   organism_name: Prochlorococcus MIT9312
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: PMT9312_0253
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: PMT9312_0254
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: PMT9312_0255
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: PMT9312_0274
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction center protein PsbK
-  score: 11.2795
+  score: 11.416
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: PMT9312_0299
   organism_name: Prochlorococcus MIT9312
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: PMT9312_0300
   organism_name: Prochlorococcus MIT9312
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: PMT9312_0301
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: PMT9312_0302
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: PMT9312_0320
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: PMT9312_0323
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: PMT9312_0335
   organism_name: Prochlorococcus MIT9312
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: PMT9312_0468
   organism_name: Prochlorococcus MIT9312
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: PMT9312_0469
   organism_name: Prochlorococcus MIT9312
   product: photosystem I reaction centre PsaF protein
-  score: 6.9449
+  score: 6.9464
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: PMT9312_0874
   organism_name: Prochlorococcus MIT9312
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: PMT9312_0894
   organism_name: Prochlorococcus MIT9312
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: PMT9312_1109
   organism_name: Prochlorococcus MIT9312
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: PMT9312_1144
   organism_name: Prochlorococcus MIT9312
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: PMT9312_1256
   organism_name: Prochlorococcus MIT9312
   product: photosystem II D2 protein
-  score: 2.9274
+  score: 2.8838
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: PMT9312_1257
   organism_name: Prochlorococcus MIT9312
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: PMT9312_1670
   organism_name: Prochlorococcus MIT9312
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2762
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: PMT9312_1736
   organism_name: Prochlorococcus MIT9312
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: PMT_1317
   organism_name: Prochlorococcus MIT9313
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: PMT_1663
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: PMT_1840
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: PMT_1897
   organism_name: Prochlorococcus MIT9313
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: PMT_1898
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: PMT_1899
   organism_name: Prochlorococcus MIT9313
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb30
   locus_tag: PRO_RS09530
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II biogenesis protein Psb30
-  score: 1.9545
+  score: 1.9573
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: Pro0076
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: Pro0252
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: Pro0283
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: Pro0284
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: Pro0285
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: Pro0304
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: Pro0329
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: Pro0330
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: Pro0331
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: Pro0353
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: Pro0357
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: Pro0371
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: Pro0466
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: Pro0467
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem I reaction centre PsaF protein
-  score: 10.101
+  score: 10.1908
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: Pro0771
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction centre Psb28 protein
-  score: 10.0089
+  score: 10.1019
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: Pro0929
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem I reaction center subunit X
-  score: 3.9309
+  score: 3.9596
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: Pro1097
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: Pro1254
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II D2 protein
-  score: 2.9274
+  score: 2.8838
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: Pro1255
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: null
   locus_tag: Pro1500
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II reaction center assembly factor PsbN-like protein
-  score: 7.0516
+  score: 7.5118
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: Pro1733
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem I reaction center subunit II
-  score: 4.2049
+  score: 4.2762
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: Pro1804
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: photosystem II protein PsbZ (Ycf9)
-  score: 2.5595
+  score: 2.5518
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb30
   locus_tag: SYNC_RS06090
   organism_name: Synechococcus CC9311
   product: photosystem II biogenesis protein Psb30
-  score: 1.7931
+  score: 1.7883
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: SYNW0081
   organism_name: Synechococcus WH8102
   product: photosystem II protein PsbZ (Ycf9)
-  score: 1.7221
+  score: 1.7142
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: SYNW0201
   organism_name: Synechococcus WH8102
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: SYNW0202
   organism_name: Synechococcus WH8102
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: SYNW0203
   organism_name: Synechococcus WH8102
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: SYNW0204
   organism_name: Synechococcus WH8102
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: SYNW0243
   organism_name: Synechococcus WH8102
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: SYNW0266
   organism_name: Synechococcus WH8102
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: SYNW0268
   organism_name: Synechococcus WH8102
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: SYNW0269
   organism_name: Synechococcus WH8102
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: SYNW0334
   organism_name: Synechococcus WH8102
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: SYNW0676
   organism_name: Synechococcus WH8102
   product: photosystem II CP43 protein
-  score: 0.7592
+  score: 0.7375
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: SYNW0677
   organism_name: Synechococcus WH8102
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: SYNW0927
   organism_name: Synechococcus WH8102
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: SYNW1065
   organism_name: Synechococcus WH8102
   product: photosystem II reaction centre Psb28 protein
-  score: 9.1638
+  score: 9.2319
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: SYNW1290
   organism_name: Synechococcus WH8102
   product: photosystem I reaction center subunit X
-  score: 4.8894
+  score: 4.9482
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: SYNW1470
   organism_name: Synechococcus WH8102
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: SYNW1835
   organism_name: Synechococcus WH8102
   product: photosystem I reaction centre PsaF protein
-  score: 7.5792
+  score: 7.5983
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: SYNW1836
   organism_name: Synechococcus WH8102
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: SYNW1960
   organism_name: Synechococcus WH8102
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: SYNW1980
   organism_name: Synechococcus WH8102
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: SYNW1983
   organism_name: Synechococcus WH8102
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: SYNW2044
   organism_name: Synechococcus WH8102
   product: photosystem I reaction center subunit II
-  score: 4.4177
+  score: 4.457
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: SYNW2232
   organism_name: Synechococcus WH8102
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 2
   gene_category: Photosynthesis
   gene_name: psb30
   locus_tag: SYNWH7803_RS05465
   organism_name: Synechococcus WH7803
   product: photosystem II biogenesis protein Psb30
-  score: 1.8118
+  score: 1.8078
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: SynWH7803_0087
   organism_name: Synechococcus WH7803
   product: photosystem II protein PsbZ (Ycf9)
-  score: 1.7221
+  score: 1.7142
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: SynWH7803_0246
   organism_name: Synechococcus WH7803
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: SynWH7803_0247
   organism_name: Synechococcus WH7803
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: SynWH7803_0248
   organism_name: Synechococcus WH7803
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: SynWH7803_0249
   organism_name: Synechococcus WH7803
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: SynWH7803_0287
   organism_name: Synechococcus WH7803
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: SynWH7803_0310
   organism_name: Synechococcus WH7803
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: SynWH7803_0312
   organism_name: Synechococcus WH7803
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: SynWH7803_0313
   organism_name: Synechococcus WH7803
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: SynWH7803_0457
   organism_name: Synechococcus WH7803
   product: photosystem I reaction center subunit II
-  score: 4.7751
+  score: 4.8273
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cpeC
   locus_tag: SynWH7803_0503
   organism_name: Synechococcus WH7803
   product: phycobilisome rod linker polypeptide (Lr), C-phycoerythrin class I-associated
-  score: 1.4864
+  score: 1.4707
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: SynWH7803_0517
   organism_name: Synechococcus WH7803
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: SynWH7803_0520
   organism_name: Synechococcus WH7803
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: SynWH7803_0540
   organism_name: Synechococcus WH7803
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: SynWH7803_0784
   organism_name: Synechococcus WH7803
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: SynWH7803_1224
   organism_name: Synechococcus WH7803
   product: photosystem I reaction center subunit X
-  score: 4.8894
+  score: 4.9482
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: SynWH7803_1355
   organism_name: Synechococcus WH7803
   product: photosystem II reaction centre Psb28 protein
-  score: 9.1638
+  score: 9.2319
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: SynWH7803_1647
   organism_name: Synechococcus WH7803
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: SynWH7803_1648
   organism_name: Synechococcus WH7803
   product: photosystem II CP43 protein
-  score: 1.005
+  score: 0.9824
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: SynWH7803_1844
   organism_name: Synechococcus WH7803
   product: photosystem I reaction centre PsaF protein
-  score: 11.529
+  score: 11.6675
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: SynWH7803_1845
   organism_name: Synechococcus WH7803
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: apcC
   locus_tag: SynWH7803_2028
   organism_name: Synechococcus WH7803
   product: phycobilisome core linker polypeptide (Lc), allophycocyanin-associated
-  score: 1.167
+  score: 1.1454
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: SynWH7803_2130
   organism_name: Synechococcus WH7803
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: SynWH7803_2239
   organism_name: Synechococcus WH7803
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb30
   locus_tag: TX72_RS06035
   organism_name: Synechococcus WH8102
   product: photosystem II biogenesis protein Psb30
-  score: 1.7931
+  score: 1.7883
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbZ
   locus_tag: sync_0080
   organism_name: Synechococcus CC9311
   product: photosystem II protein PsbZ (Ycf9)
-  score: 1.7221
+  score: 1.7142
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbJ
   locus_tag: sync_0236
   organism_name: Synechococcus CC9311
   product: photosystem II reaction center protein PsbJ
-  score: 2.2124
+  score: 2.1975
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbL
   locus_tag: sync_0237
   organism_name: Synechococcus CC9311
   product: photosystem II reaction center protein PsbL
-  score: 2.0117
+  score: 1.9935
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbF1
   locus_tag: sync_0238
   organism_name: Synechococcus CC9311
   product: cytochrome b559, beta subunit
-  score: 1.5915
+  score: 1.574
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbE
   locus_tag: sync_0239
   organism_name: Synechococcus CC9311
   product: cytochrome b559, alpha subunit
-  score: 1.5135
+  score: 1.4961
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbK
   locus_tag: sync_0283
   organism_name: Synechococcus CC9311
   product: photosystem II reaction center protein PsbK
-  score: 4.0929
+  score: 4.0605
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbI
   locus_tag: sync_0307
   organism_name: Synechococcus CC9311
   product: photosystem II reaction center protein PsbI
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbN
   locus_tag: sync_0309
   organism_name: Synechococcus CC9311
   product: photosystem II reaction center assembly factor
-  score: 5.8256
+  score: 5.8336
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbH
   locus_tag: sync_0310
   organism_name: Synechococcus CC9311
   product: photosystem II reaction center protein PsbH
-  score: 2.0547
+  score: 2.037
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaD
   locus_tag: sync_0463
   organism_name: Synechococcus CC9311
   product: photosystem I reaction center subunit II
-  score: 4.7751
+  score: 4.8273
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbT
   locus_tag: sync_0533
   organism_name: Synechococcus CC9311
   product: photosystem II reaction center T protein
-  score: 6.8253
+  score: 6.8776
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbM
   locus_tag: sync_0536
   organism_name: Synechococcus CC9311
   product: photosystem II reaction center protein PsbM
-  score: 3.9189
+  score: 3.8835
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaE
   locus_tag: sync_0562
   organism_name: Synechococcus CC9311
   product: photosystem I reaction centre subunit IV
-  score: 8.336
+  score: 8.3789
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: sync_0874
   organism_name: Synechococcus CC9311
   product: photosystem I reaction center subunit X
-  score: 4.8894
+  score: 4.9482
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbC
   locus_tag: sync_0896
   organism_name: Synechococcus CC9311
   product: photosystem II CP43 protein
-  score: 1.005
+  score: 0.9824
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: sync_0897
   organism_name: Synechococcus CC9311
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
   locus_tag: sync_1039
   organism_name: Synechococcus CC9311
   product: photosystem II protein CyanoP
-  score: 1.4372
+  score: 1.4203
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaK
   locus_tag: sync_1409
   organism_name: Synechococcus CC9311
   product: photosystem I reaction center subunit X
-  score: 4.8894
+  score: 4.9482
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psb28
   locus_tag: sync_1583
   organism_name: Synechococcus CC9311
   product: photosystem II reaction centre Psb28 protein
-  score: 9.1638
+  score: 9.2319
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
   locus_tag: sync_1858
   organism_name: Synechococcus CC9311
   product: photosystem II protein D1.1
-  score: 3.4114
+  score: 3.3674
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaJ
   locus_tag: sync_2154
   organism_name: Synechococcus CC9311
   product: photosystem I reaction centre subunit IX
-  score: 9.4584
+  score: 9.5302
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psaF
   locus_tag: sync_2155
   organism_name: Synechococcus CC9311
   product: photosystem I reaction centre PsaF protein
-  score: 10.9788
+  score: 11.0956
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbX
   locus_tag: sync_2461
   organism_name: Synechococcus CC9311
   product: photosystem II PsbX protein
-  score: 4.6969
+  score: 4.7
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbD
   locus_tag: sync_2586
   organism_name: Synechococcus CC9311
   product: photosystem II D2 protein
-  score: 3.0991
+  score: 3.0527

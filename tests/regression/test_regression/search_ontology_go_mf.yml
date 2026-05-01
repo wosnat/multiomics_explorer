@@ -4,1806 +4,1806 @@ rows:
 - id: go:0000035
   level: 3
   name: acyl binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0000049
   level: 4
   name: tRNA binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0000062
   level: 4
   name: fatty-acyl-CoA binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0000166
   level: 3
   name: nucleotide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0000217
   level: 4
   name: DNA secondary structure binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0000287
   level: 6
   name: magnesium ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0000400
   level: 5
   name: four-way junction DNA binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0000403
   level: 5
   name: Y-form DNA binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0000900
   level: 3
   name: mRNA regulatory element binding translation repressor activity
-  score: 0.8407
+  score: 0.8419
   tree: null
   tree_code: null
 - id: go:0000976
   level: 4
   name: transcription cis-regulatory region binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0000987
   level: 5
   name: cis-regulatory region sequence-specific DNA binding
-  score: 0.8407
+  score: 0.8419
   tree: null
   tree_code: null
 - id: go:0001000
   level: 6
   name: bacterial-type RNA polymerase core enzyme binding
-  score: 0.8407
+  score: 0.8419
   tree: null
   tree_code: null
 - id: go:0001046
   level: 5
   name: core promoter sequence-specific DNA binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0001067
   level: 3
   name: transcription regulatory region nucleic acid binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0001072
   level: 2
   name: transcription antitermination factor activity, RNA binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0001073
   level: 2
   name: transcription antitermination factor activity, DNA binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0001098
   level: 3
   name: basal transcription machinery binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0001108
   level: 4
   name: bacterial-type RNA polymerase holo enzyme binding
-  score: 0.8407
+  score: 0.8419
   tree: null
   tree_code: null
 - id: go:0001216
   level: 3
   name: DNA-binding transcription activator activity
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0001217
   level: 3
   name: DNA-binding transcription repressor activity
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0001530
   level: 3
   name: lipopolysaccharide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0001882
   level: 3
   name: nucleoside binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0001883
   level: 4
   name: purine nucleoside binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0001884
   level: 4
   name: pyrimidine nucleoside binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0001968
   level: 3
   name: fibronectin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0002020
   level: 4
   name: protease binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0002054
   level: 4
   name: nucleobase binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0002055
   level: 6
   name: adenine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0002057
   level: 6
   name: guanine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0002058
   level: 6
   name: uracil binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0002060
   level: 5
   name: purine nucleobase binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0002061
   level: 5
   name: pyrimidine nucleobase binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0002134
   level: 5
   name: UTP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0003676
   level: 2
   name: nucleic acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0003677
   level: 3
   name: DNA binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0003680
   level: 5
   name: minor groove of adenine-thymine-rich DNA binding
-  score: 0.7834
+  score: 0.7845
   tree: null
   tree_code: null
 - id: go:0003681
   level: 4
   name: bent DNA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0003682
   level: 2
   name: chromatin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0003684
   level: 4
   name: damaged DNA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0003688
   level: 6
   name: DNA replication origin binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0003690
   level: 4
   name: double-stranded DNA binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0003697
   level: 4
   name: single-stranded DNA binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0003700
   level: 2
   name: DNA-binding transcription factor activity
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0003723
   level: 3
   name: RNA binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0003725
   level: 4
   name: double-stranded RNA binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0003727
   level: 4
   name: single-stranded RNA binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0003729
   level: 4
   name: mRNA binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0003730
   level: 5
   name: mRNA 3^-UTR binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0003779
   level: 4
   name: actin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005047
   level: 4
   name: signal recognition particle binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0005048
   level: 3
   name: signal sequence binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0005080
   level: 6
   name: protein kinase C binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0005488
   level: 1
   name: binding
-  score: 1.4975
+  score: 1.4998
   tree: null
   tree_code: null
 - id: go:0005496
   level: 3
   name: steroid binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005504
   level: 3
   name: fatty acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0005506
   level: 7
   name: iron ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0005507
   level: 7
   name: copper ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0005509
   level: 6
   name: calcium ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0005515
   level: 2
   name: protein binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005516
   level: 3
   name: calmodulin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005524
   level: 4
   name: ATP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005525
   level: 4
   name: GTP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005527
   level: 2
   name: macrolide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005528
   level: 3
   name: FK506 binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005534
   level: 4
   name: galactose binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005536
   level: 4
   name: D-glucose binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0005539
   level: 3
   name: glycosaminoglycan binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0005542
   level: 3
   name: folic acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0005543
   level: 3
   name: phospholipid binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0008061
   level: 3
   name: chitin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0008092
   level: 3
   name: cytoskeletal protein binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008097
   level: 5
   name: 5S rRNA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008134
   level: 3
   name: transcription factor binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008135
   level: 2
   name: translation factor activity, RNA binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0008143
   level: 6
   name: poly(A) binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008179
   level: 4
   name: adenylate cyclase binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008198
   level: 8
   name: ferrous iron binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008199
   level: 8
   name: ferric iron binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008270
   level: 7
   name: zinc ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008289
   level: 2
   name: lipid binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0008301
   level: 4
   name: DNA binding, bending
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008312
   level: 4
   name: 7S RNA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0008430
   level: 3
   name: selenium binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0008658
   level: 3
   name: penicillin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0009374
   level: 3
   name: biotin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0010181
   level: 4
   name: FMN binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0010385
   level: 5
   name: double-stranded methylated DNA binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0015643
   level: 2
   name: toxic substance binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0016018
   level: 2
   name: cyclosporin A binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0016151
   level: 7
   name: nickel cation binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0016168
   level: 3
   name: chlorophyll binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0016208
   level: 5
   name: AMP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0016594
   level: 3
   name: glycine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0016595
   level: 3
   name: glutamate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0016597
   level: 2
   name: amino acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0017076
   level: 4
   name: purine nucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0017151
   level: 4
   name: DEAD/H-box RNA helicase binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0019001
   level: 5
   name: guanyl nucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0019003
   level: 5
   name: GDP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019103
   level: 4
   name: pyrimidine nucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0019808
   level: 3
   name: polyamine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019809
   level: 4
   name: spermidine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019810
   level: 4
   name: putrescine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019825
   level: 3
   name: oxygen binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019842
   level: 3
   name: vitamin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019843
   level: 4
   name: rRNA binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019894
   level: 4
   name: kinesin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019899
   level: 3
   name: enzyme binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019900
   level: 4
   name: kinase binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0019901
   level: 5
   name: protein kinase binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0019904
   level: 3
   name: protein domain specific binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0019992
   level: 3
   name: diacylglycerol binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0020037
   level: 3
   name: heme binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0030145
   level: 7
   name: manganese ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030151
   level: 7
   name: molybdenum ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030170
   level: 5
   name: pyridoxal phosphate binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030246
   level: 2
   name: carbohydrate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0030247
   level: 3
   name: polysaccharide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0030395
   level: 5
   name: lactose binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0030544
   level: 4
   name: Hsp70 protein binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030551
   level: 4
   name: cyclic nucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030552
   level: 5
   name: cAMP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0030554
   level: 5
   name: adenyl nucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030955
   level: 7
   name: potassium ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030973
   level: 5
   name: molybdate ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030975
   level: 3
   name: thiamine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0030976
   level: 3
   name: thiamine pyrophosphate binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0030977
   level: 4
   name: taurine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0030983
   level: 5
   name: mismatched DNA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0031072
   level: 3
   name: heat shock protein binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0031177
   level: 3
   name: phosphopantetheine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0031249
   level: 3
   name: denatured protein binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0031267
   level: 5
   name: small GTPase binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0031402
   level: 7
   name: sodium ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0031403
   level: 7
   name: lithium ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0031404
   level: 5
   name: chloride ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0031405
   level: 3
   name: lipoic acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0031406
   level: 4
   name: carboxylic acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0031409
   level: 2
   name: pigment binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0031418
   level: 4
   name: L-ascorbic acid binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0031419
   level: 3
   name: cobalamin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0031420
   level: 6
   name: alkali metal ion binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0031593
   level: 4
   name: polyubiquitin modification-dependent protein binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0031683
   level: 3
   name: G-protein beta/gamma-subunit complex binding
-  score: 0.8407
+  score: 0.8419
   tree: null
   tree_code: null
 - id: go:0032131
   level: 5
   name: alkylated DNA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032135
   level: 6
   name: DNA insertion or deletion binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0032136
   level: 6
   name: adenine/cytosine mispair binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0032356
   level: 5
   name: oxidized DNA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032357
   level: 6
   name: oxidized purine DNA binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0032549
   level: 4
   name: ribonucleoside binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0032550
   level: 5
   name: purine ribonucleoside binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032551
   level: 5
   name: pyrimidine ribonucleoside binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032552
   level: 3
   name: deoxyribonucleotide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0032553
   level: 3
   name: ribonucleotide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0032554
   level: 4
   name: purine deoxyribonucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032555
   level: 4
   name: purine ribonucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032556
   level: 4
   name: pyrimidine deoxyribonucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032557
   level: 4
   name: pyrimidine ribonucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032558
   level: 5
   name: adenyl deoxyribonucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032559
   level: 5
   name: adenyl ribonucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032560
   level: 5
   name: guanyl deoxyribonucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032561
   level: 5
   name: guanyl ribonucleotide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032564
   level: 5
   name: dATP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0032567
   level: 5
   name: dGTP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0032791
   level: 6
   name: lead ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0032794
   level: 3
   name: GTPase activating protein binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0032934
   level: 4
   name: sterol binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0033219
   level: 3
   name: urea binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0033222
   level: 4
   name: xylose binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0033226
   level: 3
   name: 2-aminoethylphosphonate binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0033265
   level: 5
   name: choline binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0033293
   level: 5
   name: monocarboxylic acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0033294
   level: 4
   name: ectoine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0033295
   level: 4
   name: hydroxyectoine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0034236
   level: 4
   name: protein kinase A catalytic subunit binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0034237
   level: 4
   name: protein kinase A regulatory subunit binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0034336
   level: 4
   name: misfolded RNA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0034618
   level: 3
   name: arginine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0035091
   level: 4
   name: phosphatidylinositol binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0035368
   level: 5
   name: selenocysteine insertion sequence binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0035438
   level: 5
   name: cyclic-di-GMP binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0035485
   level: 6
   name: adenine/guanine mispair binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0035639
   level: 3
   name: purine ribonucleoside triphosphate binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0035925
   level: 6
   name: mRNA 3^-UTR AU-rich region binding
-  score: 0.8407
+  score: 0.8419
   tree: null
   tree_code: null
 - id: go:0036094
   level: 2
   name: small molecule binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0036173
   level: 3
   name: thiosulfate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0042277
   level: 2
   name: peptide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0042301
   level: 5
   name: phosphate ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0042802
   level: 3
   name: identical protein binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0042834
   level: 4
   name: peptidoglycan binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043021
   level: 3
   name: ribonucleoprotein complex binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0043022
   level: 4
   name: ribosome binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043023
   level: 5
   name: ribosomal large subunit binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0043024
   level: 5
   name: ribosomal small subunit binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0043167
   level: 3
   name: ion binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043168
   level: 4
   name: anion binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043169
   level: 4
   name: cation binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043175
   level: 5
   name: RNA polymerase core enzyme binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0043176
   level: 2
   name: amine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043177
   level: 3
   name: organic acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0043178
   level: 3
   name: alcohol binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043199
   level: 3
   name: sulfate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043210
   level: 3
   name: alkanesulfonate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043295
   level: 3
   name: glutathione binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043424
   level: 6
   name: protein histidine kinase binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0043531
   level: 5
   name: ADP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0043546
   level: 2
   name: molybdopterin cofactor binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0043565
   level: 4
   name: sequence-specific DNA binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0044374
   level: 5
   name: sequence-specific DNA binding, bending
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0044620
   level: 3
   name: ACP phosphopantetheine attachment site binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0044729
   level: 5
   name: hemi-methylated DNA-binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0044877
   level: 2
   name: protein-containing complex binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0045027
   level: 4
   name: DNA end binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0045152
   level: 3
   name: antisigma factor binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0045340
   level: 7
   name: mercury ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0046790
   level: 3
   name: virion binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0046870
   level: 7
   name: cadmium ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0046871
   level: 3
   name: N-acetylgalactosamine binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0046872
   level: 5
   name: metal ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0046906
   level: 2
   name: tetrapyrrole binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0046914
   level: 6
   name: transition metal ion binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0048027
   level: 5
   name: mRNA 5^-UTR binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0048029
   level: 3
   name: monosaccharide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0048030
   level: 4
   name: disaccharide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0048038
   level: 3
   name: quinone binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0048039
   level: 4
   name: ubiquinone binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0050656
   level: 3
   name: 3^-phosphoadenosine 5^-phosphosulfate binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0050660
   level: 4
   name: flavin adenine dinucleotide binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0050661
   level: 6
   name: NADP binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0050897
   level: 7
   name: cobalt ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0050997
   level: 3
   name: quaternary ammonium group binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0051015
   level: 3
   name: actin filament binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0051018
   level: 3
   name: protein kinase A binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0051020
   level: 4
   name: GTPase binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0051082
   level: 3
   name: unfolded protein binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0051087
   level: 3
   name: protein-folding chaperone binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0051117
   level: 4
   name: ATPase binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0051192
   level: 2
   name: prosthetic group binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0051219
   level: 3
   name: phosphoprotein binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0051287
   level: 6
   name: NAD binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0051536
   level: 4
   name: iron-sulfur cluster binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0051537
   level: 5
   name: 2 iron, 2 sulfur cluster binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0051538
   level: 5
   name: 3 iron, 4 sulfur cluster binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0051539
   level: 5
   name: 4 iron, 4 sulfur cluster binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0051540
   level: 3
   name: metal cluster binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0051787
   level: 3
   name: misfolded protein binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0051870
   level: 4
   name: methotrexate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0051871
   level: 3
   name: dihydrofolic acid binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0070025
   level: 3
   name: carbon monoxide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0070026
   level: 3
   name: nitric oxide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0070063
   level: 4
   name: RNA polymerase binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0070064
   level: 3
   name: proline-rich region binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0070095
   level: 3
   name: fructose-6-phosphate binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0070180
   level: 5
   name: large ribosomal subunit rRNA binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0070181
   level: 5
   name: small ribosomal subunit rRNA binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:0070273
   level: 5
   name: phosphatidylinositol-4-phosphate binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0070279
   level: 4
   name: vitamin B6 binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0070335
   level: 3
   name: aspartate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0070401
   level: 5
   name: NADP+ binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0070402
   level: 5
   name: NADPH binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0070403
   level: 5
   name: NAD+ binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0070404
   level: 5
   name: NADH binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0070405
   level: 5
   name: ammonium ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0070492
   level: 3
   name: oligosaccharide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0070717
   level: 5
   name: poly-purine tract binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0070905
   level: 3
   name: serine binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0070967
   level: 3
   name: coenzyme F420 binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0070968
   level: 4
   name: pyrroloquinoline quinone binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0071723
   level: 3
   name: lipopeptide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0071890
   level: 5
   name: bicarbonate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0071949
   level: 5
   name: FAD binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:0072341
   level: 2
   name: modified amino acid binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0072570
   level: 3
   name: ADP-D-ribose binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0097110
   level: 3
   name: scaffold protein binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0097216
   level: 5
   name: guanosine tetraphosphate binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0097367
   level: 2
   name: carbohydrate derivative binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0097718
   level: 4
   name: disordered domain specific binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0098847
   level: 5
   name: sequence-specific single stranded DNA binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:0120225
   level: 3
   name: coenzyme A binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0120227
   level: 3
   name: acyl-CoA binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:0140030
   level: 3
   name: modification-dependent protein binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:0140032
   level: 4
   name: glycosylation-dependent protein binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:1900750
   level: 2
   name: oligopeptide binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1901265
   level: 2
   name: nucleoside phosphate binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:1901359
   level: 5
   name: tungstate binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1901363
   level: 3
   name: heterocyclic compound binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:1901567
   level: 3
   name: fatty acid derivative binding
-  score: 1.0768
+  score: 1.0784
   tree: null
   tree_code: null
 - id: go:1901611
   level: 4
   name: phosphatidylglycerol binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1901612
   level: 5
   name: cardiolipin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1901681
   level: 2
   name: sulfur compound binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:1901973
   level: 3
   name: proline binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1901981
   level: 5
   name: phosphatidylinositol phosphate binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:1901982
   level: 5
   name: maltose binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1902444
   level: 4
   name: riboflavin binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1902670
   level: 3
   name: carbon dioxide binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:1903136
   level: 8
   name: cuprous ion binding
-  score: 1.1881
+  score: 1.1898
   tree: null
   tree_code: null
 - id: go:1904047
   level: 3
   name: S-adenosyl-L-methionine binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null
 - id: go:1990275
   level: 4
   name: preribosome binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1990827
   level: 4
   name: deaminase binding
-  score: 1.325
+  score: 1.327
   tree: null
   tree_code: null
 - id: go:1990837
   level: 5
   name: sequence-specific double-stranded DNA binding
-  score: 0.907
+  score: 0.9083
   tree: null
   tree_code: null
 - id: go:1990856
   level: 5
   name: methionyl-initiator methionine tRNA binding
-  score: 0.9846
+  score: 0.986
   tree: null
   tree_code: null

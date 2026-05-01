@@ -10,9 +10,8 @@ rows:
   - '{''count'': 3, ''item'': ''darkness''}'
   - '{''count'': 6, ''item'': ''coculture''}'
   by_cluster_type:
-  - '{''count'': 1, ''item'': ''condition_comparison''}'
   - '{''count'': 1, ''item'': ''diel''}'
-  - '{''count'': 2, ''item'': ''time_course''}'
+  - '{''count'': 5, ''item'': ''time_course''}'
   by_compartment:
   - '{''count'': 2, ''item'': ''vesicle''}'
   - '{''count'': 37, ''item'': ''whole_cell''}'
@@ -30,11 +29,18 @@ rows:
   - '{''count'': 1, ''item'': ''damping_ratio''}'
   - '{''count'': 1, ''item'': ''diel_amplitude_protein_log2''}'
   - '{''count'': 1, ''item'': ''diel_amplitude_transcript_log2''}'
+  - '{''count'': 1, ''item'': ''expression_change_high_light_shock''}'
+  - '{''count'': 1, ''item'': ''expression_change_low_co2_no_o2_shock''}'
+  - '{''count'': 1, ''item'': ''expression_change_low_co2_shock''}'
+  - '{''count'': 1, ''item'': ''expression_level_class''}'
   - '{''count'': 1, ''item'': ''mascot_identification_probability''}'
+  - '{''count'': 1, ''item'': ''pangenome_membership''}'
   - '{''count'': 1, ''item'': ''peak_time_protein_h''}'
   - '{''count'': 1, ''item'': ''peak_time_transcript_h''}'
   - '{''count'': 1, ''item'': ''predicted_subcellular_localization''}'
   - '{''count'': 1, ''item'': ''protein_transcript_lag_h''}'
+  - '{''count'': 1, ''item'': ''rapid_recovery_low_co2_no_o2_shock''}'
+  - '{''count'': 1, ''item'': ''rapid_recovery_low_co2_shock''}'
   - '{''count'': 1, ''item'': ''vesicle_dna_avg_read_coverage''}'
   - '{''count'': 1, ''item'': ''vesicle_proteome_member''}'
   by_omics_type:
@@ -83,8 +89,8 @@ rows:
   - '{''count'': 8, ''item'': ''light''}'
   - '{''count'': 8, ''item'': ''nitrogen''}'
   by_value_kind:
-  - '{''count'': 1, ''item'': ''boolean''}'
-  - '{''count'': 1, ''item'': ''categorical''}'
+  - '{''count'': 3, ''item'': ''boolean''}'
   - '{''count'': 3, ''item'': ''numeric''}'
+  - '{''count'': 4, ''item'': ''categorical''}'
   time_course_count: 12
   total_matching: 39

@@ -1,6 +1,188 @@
 case_id: list_organisms_compartment_vesicle
-row_count: 3
+row_count: 9
 rows:
+- background_factors:
+  - axenic
+  - darkness
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 6
+  gene_count: 3929
+  genus: Alteromonas
+  growth_phases: []
+  ncbi_taxon_id: 1004787
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii AD45
+  organism_type: genome_strain
+  publication_count: 1
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: AD45
+  treatment_types:
+  - compartment
+- background_factors:
+  - axenic
+  - darkness
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 6
+  gene_count: 3834
+  genus: Alteromonas
+  growth_phases: []
+  ncbi_taxon_id: 529120
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii ATCC27126
+  organism_type: genome_strain
+  publication_count: 1
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: ATCC27126
+  treatment_types:
+  - compartment
+- background_factors:
+  - axenic
+  - darkness
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 6
+  gene_count: 4063
+  genus: Alteromonas
+  growth_phases: []
+  ncbi_taxon_id: 28108
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BGP6
+  organism_type: genome_strain
+  publication_count: 1
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: BGP6
+  treatment_types:
+  - compartment
+- background_factors:
+  - axenic
+  - darkness
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 6
+  gene_count: 3741
+  genus: Alteromonas
+  growth_phases: []
+  ncbi_taxon_id: 1004785
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BS11
+  organism_type: genome_strain
+  publication_count: 1
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: BS11
+  treatment_types:
+  - compartment
+- background_factors:
+  - axenic
+  - coculture
+  - darkness
+  - light
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 21
+  gene_count: 4031
+  genus: Alteromonas
+  growth_phases:
+  - death
+  - exponential
+  - nutrient_limited
+  ncbi_taxon_id: 28108
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii HOT1A3
+  organism_type: genome_strain
+  publication_count: 3
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: HOT1A3
+  treatment_types:
+  - coculture
+  - compartment
+  - nitrogen
+- background_factors:
+  - axenic
+  - coculture
+  - darkness
+  - diel
+  - light
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  - whole_cell
+  derived_metric_count: 5
+  derived_metric_value_kinds:
+  - boolean
+  - numeric
+  experiment_count: 14
+  gene_count: 4028
+  genus: Alteromonas
+  growth_phases:
+  - darkness
+  - diel
+  - exponential
+  ncbi_taxon_id: 28108
+  omics_types:
+  - RNASEQ
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii MIT1002
+  organism_type: genome_strain
+  publication_count: 4
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: MIT1002
+  treatment_types:
+  - coculture
+  - compartment
+  - darkness
 - background_factors:
   - axenic
   - chemical
@@ -11,14 +193,13 @@ rows:
   - viral
   clade: HLI
   cluster_types:
-  - condition_comparison
   - diel
   - time_course
   clustering_analysis_count: 4
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 10
+  derived_metric_count: 17
   derived_metric_value_kinds:
   - boolean
   - categorical
@@ -76,7 +257,7 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 22
+  experiment_count: 23
   gene_count: 1978
   genus: Prochlorococcus
   growth_phases:
@@ -108,7 +289,7 @@ rows:
   clade: LLIV
   cluster_types:
   - time_course
-  clustering_analysis_count: 1
+  clustering_analysis_count: 2
   compartments:
   - vesicle
   derived_metric_count: 6

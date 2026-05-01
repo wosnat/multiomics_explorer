@@ -4,342 +4,342 @@ rows:
 - id: pfam:PF00078
   level: 1
   name: Reverse transcriptase (RNA-dependent DNA polymerase)
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF00136
   level: 1
   name: DNA polymerase family B
-  score: 2.1995
+  score: 2.2032
   tree: null
   tree_code: null
 - id: pfam:PF00476
   level: 1
   name: DNA polymerase family A
-  score: 2.1995
+  score: 2.2032
   tree: null
   tree_code: null
 - id: pfam:PF00562
   level: 1
   name: RNA polymerase Rpb2, domain 6
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF00623
   level: 1
   name: RNA polymerase Rpb1, domain 2
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF00644
   level: 1
   name: Poly(ADP-ribose) polymerase catalytic domain
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF00712
   level: 1
   name: DNA polymerase III beta subunit, N-terminal domain
-  score: 1.5968
+  score: 1.5995
   tree: null
   tree_code: null
 - id: pfam:PF00940
   level: 1
   name: DNA-dependent RNA polymerase
-  score: 2.1995
+  score: 2.2032
   tree: null
   tree_code: null
 - id: pfam:PF01000
   level: 1
   name: RNA polymerase Rpb3/RpoA insert domain
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF01192
   level: 1
   name: RNA polymerase Rpb6
-  score: 2.4287
+  score: 2.4328
   tree: null
   tree_code: null
 - id: pfam:PF01193
   level: 1
   name: RNA polymerase Rpb3/Rpb11 dimerisation domain
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF01743
   level: 1
   name: Poly A polymerase head domain
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF02767
   level: 1
   name: DNA polymerase III beta subunit, central domain
-  score: 1.7142
+  score: 1.7171
   tree: null
   tree_code: null
 - id: pfam:PF02768
   level: 1
   name: DNA polymerase III beta subunit, C-terminal domain
-  score: 1.5968
+  score: 1.5995
   tree: null
   tree_code: null
 - id: pfam:PF03104
   level: 1
   name: DNA polymerase family B, exonuclease domain
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF03118
   level: 1
   name: Bacterial RNA polymerase, alpha chain C terminal domain
-  score: 1.5968
+  score: 1.5995
   tree: null
   tree_code: null
 - id: pfam:PF03603
   level: 1
   name: DNA polymerase III psi subunit
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF04353
   level: 1
   name: Regulator of RNA polymerase sigma(70) subunit, Rsd/AlgQ
-  score: 1.4944
+  score: 1.4969
   tree: null
   tree_code: null
 - id: pfam:PF04364
   level: 1
   name: DNA polymerase III chi subunit, HolC
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF04560
   level: 1
   name: RNA polymerase Rpb2, domain 7
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF04561
   level: 1
   name: RNA polymerase Rpb2, domain 2
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF04563
   level: 1
   name: RNA polymerase beta subunit
-  score: 2.1995
+  score: 2.2032
   tree: null
   tree_code: null
 - id: pfam:PF04565
   level: 1
   name: RNA polymerase Rpb2, domain 3
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF04983
   level: 1
   name: RNA polymerase Rpb1, domain 3
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF04997
   level: 1
   name: RNA polymerase Rpb1, domain 1
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF04998
   level: 1
   name: RNA polymerase Rpb1, domain 5
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF05000
   level: 1
   name: RNA polymerase Rpb1, domain 4
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF06144
   level: 1
   name: DNA polymerase III, delta subunit
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF06850
   level: 1
   name: PHB de-polymerase C-terminus
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF07167
   level: 1
   name: Poly-beta-hydroxybutyrate polymerase (PhaC) N-terminus
-  score: 1.7142
+  score: 1.7171
   tree: null
   tree_code: null
 - id: pfam:PF07733
   level: 1
   name: Bacterial DNA polymerase III alpha NTPase domain
-  score: 1.7142
+  score: 1.7171
   tree: null
   tree_code: null
 - id: pfam:PF09115
   level: 1
   name: DNA polymerase III, delta subunit, C terminal
-  score: 1.7142
+  score: 1.7171
   tree: null
   tree_code: null
 - id: pfam:PF09250
   level: 1
   name: Bifunctional DNA primase/polymerase, N-terminal
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF09281
   level: 1
   name: Taq polymerase, exonuclease
-  score: 2.4287
+  score: 2.4328
   tree: null
   tree_code: null
 - id: pfam:PF10385
   level: 1
   name: RNA polymerase beta subunit external 1 domain
-  score: 1.7142
+  score: 1.7171
   tree: null
   tree_code: null
 - id: pfam:PF10789
   level: 1
   name: Phage RNA polymerase binding, RpbA
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF11781
   level: 1
   name: Zinc-finger of RNA-polymerase I-specific TFIIB, Rrn7
-  score: 1.4944
+  score: 1.4969
   tree: null
   tree_code: null
 - id: pfam:PF12137
   level: 1
   name: RNA polymerase recycling family C-terminal
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF12168
   level: 1
   name: DNA polymerase III subunits tau domain IV DnaB-binding
-  score: 1.4944
+  score: 1.4969
   tree: null
   tree_code: null
 - id: pfam:PF12169
   level: 1
   name: DNA polymerase III subunits gamma and tau domain III
-  score: 1.4944
+  score: 1.4969
   tree: null
   tree_code: null
 - id: pfam:PF12170
   level: 1
   name: DNA polymerase III tau subunit V interacting with alpha
-  score: 1.4944
+  score: 1.4969
   tree: null
   tree_code: null
 - id: pfam:PF12362
   level: 1
   name: DNA polymerase III gamma and tau subunits C terminal
-  score: 1.4944
+  score: 1.4969
   tree: null
   tree_code: null
 - id: pfam:PF12551
   level: 1
   name: Poly-beta-hydroxybutyrate polymerase N terminal
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF12626
   level: 1
   name: Polymerase A arginine-rich C-terminus
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF12627
   level: 1
   name: Probable RNA and SrmB- binding site of polymerase A
-  score: 1.4944
+  score: 1.4969
   tree: null
   tree_code: null
 - id: pfam:PF13177
   level: 1
   name: DNA polymerase III, delta subunit
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF14700
   level: 1
   name: DNA-directed RNA polymerase N-terminal
-  score: 1.8503
+  score: 1.8534
   tree: null
   tree_code: null
 - id: pfam:PF14791
   level: 1
   name: DNA polymerase beta thumb
-  score: 2.1995
+  score: 2.2032
   tree: null
   tree_code: null
 - id: pfam:PF17657
   level: 1
   name: Bacterial DNA polymerase III alpha subunit finger domain
-  score: 1.5968
+  score: 1.5995
   tree: null
   tree_code: null
 - id: pfam:PF18765
   level: 1
   name: Polymerase beta, Nucleotidyltransferase
-  score: 2.4287
+  score: 2.4328
   tree: null
   tree_code: null
 - id: pfam:PF20914
   level: 1
   name: DNA polymerase III subunit alpha, C-terminal domain
-  score: 1.5968
+  score: 1.5995
   tree: null
   tree_code: null
 - id: pfam:PF21474
   level: 1
   name: DNA polymerase II, N-terminal
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF21686
   level: 1
   name: LigD, primase-polymerase domain
-  score: 2.1995
+  score: 2.2032
   tree: null
   tree_code: null
 - id: pfam:PF21694
   level: 1
   name: DNA polymerase III delta subunit, C-terminal domain
-  score: 1.5968
+  score: 1.5995
   tree: null
   tree_code: null
 - id: pfam:PF21999
   level: 1
   name: DNA polymerase-iota, thumb domain
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF22587
   level: 1
   name: DNA polymerase II, insertion domain
-  score: 2.0099
+  score: 2.0132
   tree: null
   tree_code: null
 - id: pfam:PF22608
   level: 1
   name: DNA polymerase III clamp loader subunit, ATPase lid domain
-  score: 1.4944
+  score: 1.4969
   tree: null
   tree_code: null

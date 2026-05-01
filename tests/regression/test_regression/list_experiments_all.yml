@@ -1,5 +1,5 @@
 case_id: list_experiments_all
-row_count: 172
+row_count: 181
 rows:
 - authors:
   - Guadalupe Gómez-Baena
@@ -919,6 +919,250 @@ rows:
   - carbon
   - coculture
 - authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_ad45
+  experiment_name: AD45 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii AD45
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_atcc27126
+  experiment_name: ATCC27126 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bgp6
+  experiment_name: BGP6 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BGP6
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bs11
+  experiment_name: BS11 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BS11
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - J. Jeffrey Morris
+  - James Kizziah
+  - Steven J. Biller
+  - Sydney Plummer
+  - Zhiying Lu
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: exoproteome
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1101/2025.05.28.656624_ez55_exudate_proteome
+  experiment_name: EZ55 exudate (>50 kDa cell-free supernatant) proteome
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: EXOPROTEOMICS
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1101/2025.05.28.656624
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - J. Jeffrey Morris
+  - James Kizziah
+  - Steven J. Biller
+  - Sydney Plummer
+  - Zhiying Lu
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1101/2025.05.28.656624_ez55_whole_cell_proteome
+  experiment_name: EZ55 whole-cell proteome (crude cell lysate)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1101/2025.05.28.656624
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
   - J. Jeffrey Morris
   - Marcelo Malisano Barreto Filho
   - Melissa Walker
@@ -1231,6 +1475,51 @@ rows:
   - '14'
   time_point_totals:
   - '126'
+  treatment_type:
+  - carbon
+- authors:
+  - J. Jeffrey Morris
+  - Marcelo Malisano Barreto Filho
+  - Melissa Walker
+  - Zhiying Lu
+  background_factors:
+  - axenic
+  - coculture
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 437
+  experiment_id: 10.1038/s43705-022-00197-2_interaction_pco2_coculture_ez55_rnaseq
+  experiment_name: EZ55 pCO2 x Coculture Interaction Effect (RNASEQ)
+  gene_count: 437
+  growth_phases:
+  - exponential
+  is_time_course: 'false'
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/s43705-022-00197-2
+  significant_down_count: 124
+  significant_up_count: 313
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-exponential
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '124'
+  time_point_significant_up:
+  - '313'
+  time_point_totals:
+  - '437'
   treatment_type:
   - carbon
 - authors:
@@ -1640,6 +1929,48 @@ rows:
   treatment_type:
   - nitrogen
 - authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_hot1a3
+  experiment_name: HOT1A3 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
   - Daniel Sher
   - Dikla Aharonovich
   background_factors:
@@ -1650,28 +1981,36 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 0
+  distinct_gene_count: 1880
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
     inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
-  gene_count: 0
-  growth_phases: []
+  gene_count: 1880
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 0
-  significant_up_count: 0
+  significant_up_count: 188
   table_scope: all_detected_genes
   table_scope_detail: ''
-  time_point_count: 0
-  time_point_growth_phases: []
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '20.0'
+  time_point_labels:
+  - 20h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '188'
+  time_point_totals:
+  - '1880'
   treatment_type:
   - coculture
 - authors:
@@ -1685,28 +2024,36 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 0
+  distinct_gene_count: 2296
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
     conditions (RNASEQ)
-  gene_count: 0
-  growth_phases: []
+  gene_count: 2296
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 0
-  significant_up_count: 0
+  significant_up_count: 30
   table_scope: all_detected_genes
   table_scope_detail: ''
-  time_point_count: 0
-  time_point_growth_phases: []
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '20.0'
+  time_point_labels:
+  - 20h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '30'
+  time_point_totals:
+  - '2296'
   treatment_type:
   - coculture
 - authors:
@@ -1805,6 +2152,48 @@ rows:
   - '3856'
   treatment_type:
   - darkness
+- authors:
+  - Cécile Carpaneto Bastos
+  - Daniel Sher
+  - Eduard Fadeev
+  - Gerhard J. Herndl
+  - Jennifer H. Hennenfeind
+  - Matthias Wietz
+  - Steven J. Biller
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  distinct_gene_count: 0
+  experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_mit1002
+  experiment_name: MIT1002 vesicle vs whole-cell proteome (label-free LC-MS/MS)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: 'false'
+  omics_type: VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1093/femsml/uqac025
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: top_n
+  table_scope_detail: Top-N most-abundant MV proteins per strain; complementary cell-fraction
+    percentages provided where the protein was also detected in the whole-cell fraction
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - authors:
   - Allison Coe
   - Sallie W. Chisholm
@@ -3923,8 +4312,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: null
   compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
   distinct_gene_count: 285
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
   experiment_name: MED4 Low CO2 (0.004% CO2 / 21% O2) vs Air (0.036% CO2 / 21% O2)
@@ -3968,8 +4359,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: null
   compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
   distinct_gene_count: 252
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
   experiment_name: MED4 Low CO2 and no O2 (0.004% CO2 / 0% O2) vs Air (0.036% CO2
@@ -4014,13 +4407,13 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types:
-  - condition_comparison
-  clustering_analysis_count: 1
+  cluster_types: []
+  clustering_analysis_count: 0
   coculture_partner: null
   compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
   distinct_gene_count: 0
   experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
   experiment_name: MED4 steady-state expression profiling across growth conditions
@@ -4174,8 +4567,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
   coculture_partner: null
   compartment: whole_cell
   derived_metric_count: 0
@@ -4219,8 +4613,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
   coculture_partner: null
   compartment: whole_cell
   derived_metric_count: 0
@@ -4271,8 +4666,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
   coculture_partner: null
   compartment: whole_cell
   derived_metric_count: 0
@@ -5779,8 +6175,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
   coculture_partner: null
   compartment: whole_cell
   derived_metric_count: 0
@@ -5840,8 +6237,9 @@ rows:
   background_factors:
   - axenic
   - light
-  cluster_types: []
-  clustering_analysis_count: 0
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
   coculture_partner: null
   compartment: whole_cell
   derived_metric_count: 0

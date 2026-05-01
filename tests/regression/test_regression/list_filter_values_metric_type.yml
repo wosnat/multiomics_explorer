@@ -1,6 +1,12 @@
 case_id: list_filter_values_metric_type
-row_count: 26
+row_count: 38
 rows:
+- count: 6
+  value: log2_mv_cell_enrichment
+- count: 6
+  value: prop_abund_cells_percent
+- count: 6
+  value: prop_abund_mvs_percent
 - count: 2
   value: cell_abundance_biovolume_normalized
 - count: 2
@@ -42,6 +48,18 @@ rows:
 - count: 1
   value: enrichment_tonb_associated_genes
 - count: 1
+  value: exoproteome_detection_replicates
+- count: 1
+  value: expression_change_high_light_shock
+- count: 1
+  value: expression_change_low_co2_no_o2_shock
+- count: 1
+  value: expression_change_low_co2_shock
+- count: 1
+  value: expression_level_class
+- count: 1
+  value: pangenome_membership
+- count: 1
   value: peak_time_protein_h
 - count: 1
   value: peak_time_transcript_h
@@ -52,4 +70,10 @@ rows:
 - count: 1
   value: protein_transcript_lag_h
 - count: 1
+  value: rapid_recovery_low_co2_no_o2_shock
+- count: 1
+  value: rapid_recovery_low_co2_shock
+- count: 1
   value: vesicle_dna_avg_read_coverage
+- count: 1
+  value: whole_cell_detection_replicates

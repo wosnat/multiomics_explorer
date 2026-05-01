@@ -11,14 +11,13 @@ rows:
   - viral
   clade: HLI
   cluster_types:
-  - condition_comparison
   - diel
   - time_course
   clustering_analysis_count: 4
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 10
+  derived_metric_count: 17
   derived_metric_value_kinds:
   - boolean
   - categorical

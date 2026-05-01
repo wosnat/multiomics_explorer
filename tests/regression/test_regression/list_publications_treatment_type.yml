@@ -123,7 +123,7 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   doi: 10.1038/s43705-022-00197-2
-  experiment_count: 10
+  experiment_count: 11
   growth_phases:
   - exponential
   journal: ISME Communications

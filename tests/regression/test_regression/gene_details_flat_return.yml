@@ -57,15 +57,16 @@ rows:
   - tigr_role
   boolean_metric_count: 0
   boolean_metric_types_observed: []
-  categorical_metric_count: 0
-  categorical_metric_types_observed: []
+  categorical_metric_count: 2
+  categorical_metric_types_observed:
+  - expression_level_class
+  - pangenome_membership
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
   closest_ortholog_group_size: 13
-  cluster_membership_count: 2
+  cluster_membership_count: 1
   cluster_types:
-  - condition_comparison
   - diel
   compartments_observed:
   - whole_cell
@@ -105,6 +106,7 @@ rows:
   product: DNA polymerase III, beta subunit
   protein_family: Beta sliding clamp family
   protein_id: WP_011131639.1
+  sequence: MEIVCNQNEFNYAIQLVSKAVASRPTHPILANLLLTADQGTNKISLTGFDLNLGIQTSFDATVNKSGAITIPSKLLSEIVNKLPSETPVSLDVDESSDNILIKSDRGSFNIKGIPSDDYPSLPFVESGTSLNIDPSSFLKALKLTIFASSSDDSKQLLTGVNFTFNLKYLESAATDGHRLAVVLVDNKENFDEKEDFASNEENLSVTIPTRSLREIEKLVSLRSSENSIKLFYDKGQVVFISSNQIITTRTLEGSYPNYSQLIPDNFTKIFTFNTKKIIESLERIAVLADQQSSVVKIKLNEKDLALVSADAQDIGNASELVPVSFYFDQFDIAFNVRYLLEGLKVISSENVIFKCNLPTTPAVLVPEDNINSFTYLVMPVQVRS
   significant_down_count: 0
   significant_up_count: 3
   start: 174

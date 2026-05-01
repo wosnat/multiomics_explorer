@@ -8,14 +8,13 @@ rows:
   - pfam
   - tigr_role
   boolean_metric_count: 0
-  categorical_metric_count: 0
+  categorical_metric_count: 2
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
   closest_ortholog_group_size: 13
-  cluster_membership_count: 3
+  cluster_membership_count: 2
   cluster_types:
-  - condition_comparison
   - diel
   - time_course
   expression_edge_count: 35

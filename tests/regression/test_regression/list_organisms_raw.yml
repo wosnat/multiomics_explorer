@@ -1,5 +1,5 @@
 case_id: list_organisms_raw
-row_count: 32
+row_count: 36
 rows:
 - clade: null
   experiment_count: 0
@@ -27,47 +27,106 @@ rows:
   - carbon
   - coculture
 - clade: null
-  experiment_count: 13
+  experiment_count: 6
+  gene_count: 3929
+  genus: Alteromonas
+  ncbi_taxon_id: 1004787
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii AD45
+  publication_count: 1
+  species: Alteromonas macleodii
+  strain: AD45
+  treatment_types:
+  - compartment
+- clade: null
+  experiment_count: 6
+  gene_count: 3834
+  genus: Alteromonas
+  ncbi_taxon_id: 529120
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_count: 1
+  species: Alteromonas macleodii
+  strain: ATCC27126
+  treatment_types:
+  - compartment
+- clade: null
+  experiment_count: 6
+  gene_count: 4063
+  genus: Alteromonas
+  ncbi_taxon_id: 28108
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BGP6
+  publication_count: 1
+  species: Alteromonas macleodii
+  strain: BGP6
+  treatment_types:
+  - compartment
+- clade: null
+  experiment_count: 6
+  gene_count: 3741
+  genus: Alteromonas
+  ncbi_taxon_id: 1004785
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BS11
+  publication_count: 1
+  species: Alteromonas macleodii
+  strain: BS11
+  treatment_types:
+  - compartment
+- clade: null
+  experiment_count: 16
   gene_count: 4136
   genus: Alteromonas
   ncbi_taxon_id: 28108
   omics_types:
+  - EXOPROTEOMICS
+  - PROTEOMICS
   - RNASEQ
   organism_name: Alteromonas macleodii EZ55
-  publication_count: 2
+  publication_count: 3
   species: Alteromonas macleodii
   strain: EZ55
   treatment_types:
   - carbon
   - coculture
+  - compartment
 - clade: null
-  experiment_count: 15
+  experiment_count: 21
   gene_count: 4031
   genus: Alteromonas
   ncbi_taxon_id: 28108
   omics_types:
   - PROTEOMICS
   - RNASEQ
+  - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
-  publication_count: 2
+  publication_count: 3
   species: Alteromonas macleodii
   strain: HOT1A3
   treatment_types:
   - coculture
+  - compartment
   - nitrogen
 - clade: null
-  experiment_count: 8
+  experiment_count: 14
   gene_count: 4028
   genus: Alteromonas
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
+  - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii MIT1002
-  publication_count: 3
+  publication_count: 4
   species: Alteromonas macleodii
   strain: MIT1002
   treatment_types:
   - coculture
+  - compartment
   - darkness
 - clade: null
   experiment_count: 2
@@ -209,7 +268,7 @@ rows:
   treatment_types:
   - carbon
 - clade: HLII
-  experiment_count: 22
+  experiment_count: 23
   gene_count: 1978
   genus: Prochlorococcus
   ncbi_taxon_id: 74546
@@ -348,7 +407,7 @@ rows:
   - carbon
   - coculture
 - clade: null
-  experiment_count: 10
+  experiment_count: 11
   gene_count: 3052
   genus: Synechococcus
   ncbi_taxon_id: 64471
@@ -391,7 +450,7 @@ rows:
   - carbon
   - coculture
 - clade: null
-  experiment_count: 71
+  experiment_count: 72
   gene_count: 2881
   genus: Parasynechococcus
   ncbi_taxon_id: 84588

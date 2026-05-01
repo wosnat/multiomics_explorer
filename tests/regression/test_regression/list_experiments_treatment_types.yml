@@ -1242,28 +1242,36 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 0
+  distinct_gene_count: 1880
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
     inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
-  gene_count: 0
-  growth_phases: []
+  gene_count: 1880
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 0
-  significant_up_count: 0
+  significant_up_count: 188
   table_scope: all_detected_genes
   table_scope_detail: ''
-  time_point_count: 0
-  time_point_growth_phases: []
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '20.0'
+  time_point_labels:
+  - 20h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '188'
+  time_point_totals:
+  - '1880'
   treatment_type:
   - coculture
 - authors:
@@ -1277,28 +1285,36 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 0
+  distinct_gene_count: 2296
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
     conditions (RNASEQ)
-  gene_count: 0
-  growth_phases: []
+  gene_count: 2296
+  growth_phases:
+  - exponential
   is_time_course: 'false'
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
   significant_down_count: 0
-  significant_up_count: 0
+  significant_up_count: 30
   table_scope: all_detected_genes
   table_scope_detail: ''
-  time_point_count: 0
-  time_point_growth_phases: []
-  time_point_hours: []
-  time_point_labels: []
-  time_point_orders: []
-  time_point_significant_down: []
-  time_point_significant_up: []
-  time_point_totals: []
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '20.0'
+  time_point_labels:
+  - 20h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '0'
+  time_point_significant_up:
+  - '30'
+  time_point_totals:
+  - '2296'
   treatment_type:
   - coculture
 - authors:

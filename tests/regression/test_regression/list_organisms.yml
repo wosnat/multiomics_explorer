@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 32
+row_count: 36
 rows:
 - background_factors: []
   clade: null
@@ -53,6 +53,114 @@ rows:
   - coculture
 - background_factors:
   - axenic
+  - darkness
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 6
+  gene_count: 3929
+  genus: Alteromonas
+  growth_phases: []
+  ncbi_taxon_id: 1004787
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii AD45
+  organism_type: genome_strain
+  publication_count: 1
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: AD45
+  treatment_types:
+  - compartment
+- background_factors:
+  - axenic
+  - darkness
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 6
+  gene_count: 3834
+  genus: Alteromonas
+  growth_phases: []
+  ncbi_taxon_id: 529120
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii ATCC27126
+  organism_type: genome_strain
+  publication_count: 1
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: ATCC27126
+  treatment_types:
+  - compartment
+- background_factors:
+  - axenic
+  - darkness
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 6
+  gene_count: 4063
+  genus: Alteromonas
+  growth_phases: []
+  ncbi_taxon_id: 28108
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BGP6
+  organism_type: genome_strain
+  publication_count: 1
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: BGP6
+  treatment_types:
+  - compartment
+- background_factors:
+  - axenic
+  - darkness
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 6
+  gene_count: 3741
+  genus: Alteromonas
+  growth_phases: []
+  ncbi_taxon_id: 1004785
+  omics_types:
+  - VESICLE_PROTEOMICS
+  organism_name: Alteromonas macleodii BS11
+  organism_type: genome_strain
+  publication_count: 1
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: BS11
+  treatment_types:
+  - compartment
+- background_factors:
+  - axenic
   - coculture
   - diel
   - light
@@ -60,11 +168,13 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 8
+  derived_metric_count: 10
   derived_metric_value_kinds:
   - boolean
-  experiment_count: 13
+  - numeric
+  experiment_count: 16
   gene_count: 4136
   genus: Alteromonas
   growth_phases:
@@ -72,10 +182,12 @@ rows:
   - exponential
   ncbi_taxon_id: 28108
   omics_types:
+  - EXOPROTEOMICS
+  - PROTEOMICS
   - RNASEQ
   organism_name: Alteromonas macleodii EZ55
   organism_type: genome_strain
-  publication_count: 2
+  publication_count: 3
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -83,17 +195,21 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - compartment
 - background_factors:
   - axenic
   - coculture
+  - darkness
   - light
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 15
+  compartments:
+  - vesicle
+  derived_metric_count: 3
+  derived_metric_value_kinds:
+  - numeric
+  experiment_count: 21
   gene_count: 4031
   genus: Alteromonas
   growth_phases:
@@ -104,30 +220,35 @@ rows:
   omics_types:
   - PROTEOMICS
   - RNASEQ
+  - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   organism_type: genome_strain
-  publication_count: 2
+  publication_count: 3
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
   strain: HOT1A3
   treatment_types:
   - coculture
+  - compartment
   - nitrogen
 - background_factors:
   - axenic
   - coculture
+  - darkness
   - diel
   - light
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - vesicle
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 5
   derived_metric_value_kinds:
   - boolean
-  experiment_count: 8
+  - numeric
+  experiment_count: 14
   gene_count: 4028
   genus: Alteromonas
   growth_phases:
@@ -137,15 +258,17 @@ rows:
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
+  - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii MIT1002
   organism_type: genome_strain
-  publication_count: 3
+  publication_count: 4
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
   strain: MIT1002
   treatment_types:
   - coculture
+  - compartment
   - darkness
 - background_factors:
   - light
@@ -319,14 +442,13 @@ rows:
   - viral
   clade: HLI
   cluster_types:
-  - condition_comparison
   - diel
   - time_course
   clustering_analysis_count: 4
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 10
+  derived_metric_count: 17
   derived_metric_value_kinds:
   - boolean
   - categorical
@@ -439,7 +561,7 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 22
+  experiment_count: 23
   gene_count: 1978
   genus: Prochlorococcus
   growth_phases:
@@ -471,7 +593,7 @@ rows:
   clade: LLIV
   cluster_types:
   - time_course
-  clustering_analysis_count: 1
+  clustering_analysis_count: 2
   compartments:
   - vesicle
   derived_metric_count: 6
@@ -719,7 +841,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 10
+  experiment_count: 11
   gene_count: 3052
   genus: Synechococcus
   growth_phases:
@@ -805,7 +927,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 71
+  experiment_count: 72
   gene_count: 2881
   genus: Parasynechococcus
   growth_phases:
