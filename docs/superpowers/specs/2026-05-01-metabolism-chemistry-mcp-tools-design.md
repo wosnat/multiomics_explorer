@@ -67,6 +67,8 @@ Three-layer, mirroring the established discovery-tool + drill-down-tool split (c
 
 ## KG asks for slice 1
 
+> **KG-team-facing companion doc** with friction → resolution narrative for each ask: [`2026-05-01-kg-side-chemistry-slice1-asks.md`](2026-05-01-kg-side-chemistry-slice1-asks.md). The summary below is the explorer-side concentrate; the companion doc is what the KG team uses for triage/build.
+
 Four schema additions in `multiomics_biocypher_kg`. All are small, follow established patterns, and should land before (or in parallel with) explorer slice-1 work. Explorer code is forward-compatible: any rollup property reads as `coalesce(g.<prop>, 0)` until the KG ships.
 
 ### KG-1: `Gene.reaction_count: int` post-import rollup
