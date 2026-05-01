@@ -35,6 +35,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
+  metabolite_count: 1039
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -46,6 +47,7 @@ rows:
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
   publication_count: 16
+  reaction_count: 943
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -78,12 +80,14 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
+  metabolite_count: 1052
   ncbi_taxon_id: 167546
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
   publication_count: 2
+  reaction_count: 945
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus

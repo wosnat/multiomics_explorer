@@ -12,11 +12,13 @@ rows:
   gene_count: 0
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 0
   ncbi_taxon_id: 28108
   omics_types: []
   organism_name: Alteromonas
   organism_type: treatment
   publication_count: 0
+  reaction_count: 0
   reference_database: null
   reference_proteome: null
   species: null
@@ -38,12 +40,14 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  metabolite_count: 1359
   ncbi_taxon_id: 232
   omics_types:
   - PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   organism_type: reference_proteome_match
   publication_count: 1
+  reaction_count: 1263
   reference_database: MarRef v6
   reference_proteome: UP000262181
   species: null
@@ -66,12 +70,14 @@ rows:
   gene_count: 3929
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 1328
   ncbi_taxon_id: 1004787
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii AD45
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1259
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -93,12 +99,14 @@ rows:
   gene_count: 3834
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 1309
   ncbi_taxon_id: 529120
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii ATCC27126
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1251
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -120,12 +128,14 @@ rows:
   gene_count: 4063
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 1341
   ncbi_taxon_id: 28108
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BGP6
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1275
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -147,12 +157,14 @@ rows:
   gene_count: 3741
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 1282
   ncbi_taxon_id: 1004785
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BS11
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1228
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -180,6 +192,7 @@ rows:
   growth_phases:
   - acclimated_steady_state
   - exponential
+  metabolite_count: 1428
   ncbi_taxon_id: 28108
   omics_types:
   - EXOPROTEOMICS
@@ -188,6 +201,7 @@ rows:
   organism_name: Alteromonas macleodii EZ55
   organism_type: genome_strain
   publication_count: 3
+  reaction_count: 1348
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -216,6 +230,7 @@ rows:
   - death
   - exponential
   - nutrient_limited
+  metabolite_count: 1336
   ncbi_taxon_id: 28108
   omics_types:
   - PROTEOMICS
@@ -224,6 +239,7 @@ rows:
   organism_name: Alteromonas macleodii HOT1A3
   organism_type: genome_strain
   publication_count: 3
+  reaction_count: 1266
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -255,6 +271,7 @@ rows:
   - darkness
   - diel
   - exponential
+  metabolite_count: 1354
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
@@ -262,6 +279,7 @@ rows:
   organism_name: Alteromonas macleodii MIT1002
   organism_type: genome_strain
   publication_count: 4
+  reaction_count: 1288
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -283,6 +301,7 @@ rows:
   genus: Escherichia
   growth_phases:
   - acclimated_steady_state
+  metabolite_count: 0
   ncbi_taxon_id: 562
   omics_types:
   - PROTEOMICS
@@ -290,6 +309,7 @@ rows:
   organism_name: Escherichia coli
   organism_type: treatment
   publication_count: 1
+  reaction_count: 0
   reference_database: null
   reference_proteome: null
   species: null
@@ -312,12 +332,14 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  metabolite_count: 1346
   ncbi_taxon_id: 225937
   omics_types:
   - PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   organism_type: reference_proteome_match
   publication_count: 1
+  reaction_count: 1278
   reference_database: MarRef v6
   reference_proteome: GCF_000166295.1
   species: Marinobacter adhaerens
@@ -336,12 +358,14 @@ rows:
   gene_count: 0
   genus: Deinococcus
   growth_phases: []
+  metabolite_count: 0
   ncbi_taxon_id: 1299
   omics_types:
   - RNASEQ
   organism_name: Meiothermus ruber
   organism_type: treatment
   publication_count: 1
+  reaction_count: 0
   reference_database: null
   reference_proteome: null
   species: null
@@ -361,12 +385,14 @@ rows:
   gene_count: 2884
   genus: Meiothermus
   growth_phases: []
+  metabolite_count: 1215
   ncbi_taxon_id: 172827
   omics_types:
   - RNASEQ
   organism_name: Meiothermus ruber
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1138
   reference_database: null
   reference_proteome: null
   species: null
@@ -392,6 +418,7 @@ rows:
   - acute_stress
   - exponential
   - infected
+  metabolite_count: 0
   ncbi_taxon_id: 10239
   omics_types:
   - MICROARRAY
@@ -399,6 +426,7 @@ rows:
   organism_name: Phage
   organism_type: treatment
   publication_count: 3
+  reaction_count: 0
   reference_database: null
   reference_proteome: null
   species: null
@@ -420,12 +448,14 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
+  metabolite_count: 1017
   ncbi_taxon_id: 146891
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus AS9601
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 924
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -466,6 +496,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
+  metabolite_count: 1039
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -477,6 +508,7 @@ rows:
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
   publication_count: 16
+  reaction_count: 943
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -509,12 +541,14 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
+  metabolite_count: 1052
   ncbi_taxon_id: 167546
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
   publication_count: 2
+  reaction_count: 945
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -536,12 +570,14 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
+  metabolite_count: 1135
   ncbi_taxon_id: 59922
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus MIT9303
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 993
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -569,6 +605,7 @@ rows:
   - acute_stress
   - exponential
   - stationary
+  metabolite_count: 1047
   ncbi_taxon_id: 74546
   omics_types:
   - PROTEOMICS
@@ -577,6 +614,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   organism_type: genome_strain
   publication_count: 5
+  reaction_count: 943
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -609,6 +647,7 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
+  metabolite_count: 1081
   ncbi_taxon_id: 74547
   omics_types:
   - MICROARRAY
@@ -618,6 +657,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   organism_type: genome_strain
   publication_count: 8
+  reaction_count: 953
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -644,12 +684,14 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
+  metabolite_count: 1039
   ncbi_taxon_id: 167555
   omics_types:
   - RNASEQ
   organism_name: Prochlorococcus NATL1A
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 935
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -683,6 +725,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
+  metabolite_count: 1029
   ncbi_taxon_id: 59920
   omics_types:
   - PROTEOMICS
@@ -690,6 +733,7 @@ rows:
   organism_name: Prochlorococcus NATL2A
   organism_type: genome_strain
   publication_count: 6
+  reaction_count: 927
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -710,11 +754,13 @@ rows:
   gene_count: 1870
   genus: Prochlorococcus
   growth_phases: []
+  metabolite_count: 1043
   ncbi_taxon_id: 1924285
   omics_types: []
   organism_name: Prochlorococcus RSP50
   organism_type: genome_strain
   publication_count: 0
+  reaction_count: 948
   reference_database: null
   reference_proteome: null
   species: null
@@ -739,12 +785,14 @@ rows:
   - darkness
   - exponential
   - stationary
+  metabolite_count: 1046
   ncbi_taxon_id: 167539
   omics_types:
   - PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   organism_type: genome_strain
   publication_count: 3
+  reaction_count: 919
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -767,6 +815,7 @@ rows:
   genus: Pseudomonas
   growth_phases:
   - exponential
+  metabolite_count: 1490
   ncbi_taxon_id: 160488
   omics_types:
   - PROTEOMICS
@@ -774,6 +823,7 @@ rows:
   organism_name: Pseudomonas putida KT2440
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1449
   reference_database: null
   reference_proteome: null
   species: Pseudomonas putida
@@ -793,12 +843,14 @@ rows:
   genus: Ruegeria
   growth_phases:
   - acclimated_steady_state
+  metabolite_count: 1468
   ncbi_taxon_id: 89184
   omics_types:
   - EXOPROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   organism_type: genome_strain
   publication_count: 2
+  reaction_count: 1377
   reference_database: null
   reference_proteome: null
   species: Ruegeria pomeroyi
@@ -818,12 +870,14 @@ rows:
   genus: Shewanella
   growth_phases:
   - acclimated_steady_state
+  metabolite_count: 1306
   ncbi_taxon_id: 351745
   omics_types:
   - RNASEQ
   organism_name: Shewanella sp. W3-18-1
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1260
   reference_database: null
   reference_proteome: null
   species: Shewanella sp.
@@ -846,12 +900,14 @@ rows:
   genus: Synechococcus
   growth_phases:
   - exponential
+  metabolite_count: 1129
   ncbi_taxon_id: 64471
   omics_types:
   - RNASEQ
   organism_name: Synechococcus CC9311
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1039
   reference_database: null
   reference_proteome: null
   species: null
@@ -872,12 +928,14 @@ rows:
   genus: Picosynechococcus
   growth_phases:
   - acclimated_steady_state
+  metabolite_count: 1105
   ncbi_taxon_id: 32049
   omics_types:
   - RNASEQ
   organism_name: Synechococcus PCC 7002
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 977
   reference_database: null
   reference_proteome: null
   species: null
@@ -902,6 +960,7 @@ rows:
   - acclimated_steady_state
   - darkness
   - stationary
+  metabolite_count: 1145
   ncbi_taxon_id: 32051
   omics_types:
   - EXOPROTEOMICS
@@ -909,6 +968,7 @@ rows:
   organism_name: Synechococcus WH7803
   organism_type: genome_strain
   publication_count: 3
+  reaction_count: 1045
   reference_database: null
   reference_proteome: null
   species: null
@@ -934,6 +994,7 @@ rows:
   - darkness
   - exponential
   - stationary
+  metabolite_count: 1120
   ncbi_taxon_id: 84588
   omics_types:
   - MICROARRAY
@@ -942,6 +1003,7 @@ rows:
   organism_name: Synechococcus WH8102
   organism_type: genome_strain
   publication_count: 3
+  reaction_count: 1027
   reference_database: null
   reference_proteome: null
   species: Parasynechococcus marenigrum
@@ -962,6 +1024,7 @@ rows:
   genus: Synechococcus
   growth_phases:
   - exponential
+  metabolite_count: 1175
   ncbi_taxon_id: 1140
   omics_types:
   - PROTEOMICS
@@ -969,6 +1032,7 @@ rows:
   organism_name: Synechococcus elongatus PCC 7942
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1058
   reference_database: null
   reference_proteome: null
   species: Synechococcus elongatus
@@ -988,6 +1052,7 @@ rows:
   genus: Synechococcus
   growth_phases:
   - acclimated_steady_state
+  metabolite_count: 1175
   ncbi_taxon_id: 1350461
   omics_types:
   - PROTEOMICS
@@ -995,6 +1060,7 @@ rows:
   organism_name: Synechococcus elongatus UTEX 2973
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1058
   reference_database: null
   reference_proteome: null
   species: Synechococcus elongatus
@@ -1017,12 +1083,14 @@ rows:
   growth_phases:
   - darkness
   - stationary
+  metabolite_count: 1068
   ncbi_taxon_id: 313625
   omics_types:
   - PROTEOMICS
   organism_name: Synechococcus sp. BL107
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 989
   reference_database: null
   reference_proteome: null
   species: Synechococcus sp.
@@ -1042,12 +1110,14 @@ rows:
   gene_count: 2449
   genus: Thermosynechococcus
   growth_phases: []
+  metabolite_count: 1003
   ncbi_taxon_id: 197221
   omics_types:
   - RNASEQ
   organism_name: Thermosynechococcus vestitus BP-1
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 894
   reference_database: null
   reference_proteome: null
   species: Thermosynechococcus vestitus
@@ -1068,12 +1138,14 @@ rows:
   genus: Vibrio
   growth_phases:
   - exponential
+  metabolite_count: 0
   ncbi_taxon_id: 670
   omics_types:
   - MICROARRAY
   organism_name: Vibrio parahaemolyticus
   organism_type: treatment
   publication_count: 1
+  reaction_count: 0
   reference_database: null
   reference_proteome: null
   species: null

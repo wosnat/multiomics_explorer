@@ -627,15 +627,18 @@ def list_organisms(
 
     Returns dict with keys: total_entries, total_matching, returned, offset,
     truncated, by_cluster_type, by_organism_type, by_value_kind, by_metric_type,
-    by_compartment, not_found, results.
+    by_compartment, by_metabolic_capability, not_found, results.
     Per result (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, omics_types, clustering_analysis_count,
-    cluster_types, derived_metric_count, derived_metric_value_kinds, compartments.
+    cluster_types, derived_metric_count, derived_metric_value_kinds, compartments,
+    reaction_count, metabolite_count.
     Sparse fields (omitted when null): reference_database, reference_proteome.
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
+    by_metabolic_capability: top 10 organisms (within matched set) by
+    metabolite_count, sorted desc; excludes zero-chemistry organisms.
     """
     conn = _default_conn(conn)
     if summary:
@@ -657,19 +660,41 @@ def list_organisms(
     total_entries = summary_row["total_entries"]
     total_matching = summary_row["total_matching"]
 
-    if limit == 0:
-        results = []
-    else:
+    # Always fetch matched rows when there are matches — needed for
+    # by_metabolic_capability rollup. Cheap (≤36 organisms in current KG).
+    matched: list[dict] = []
+    if total_matching > 0:
         detail_cypher, detail_params = build_list_organisms(
             organism_names_lc=names_lc, compartment=compartment, verbose=verbose,
         )
         matched = conn.execute_query(detail_cypher, **detail_params)
 
+    # by_metabolic_capability: top 10 organisms by metabolite_count in the
+    # matched set; excludes zero-chemistry rows. Sourced from matched rows
+    # before any limit/offset slicing so the rollup reflects the full match.
+    chemistry_capable = [
+        {
+            "organism_name": r["organism_name"],
+            "reaction_count": r.get("reaction_count", 0),
+            "metabolite_count": r.get("metabolite_count", 0),
+        }
+        for r in matched
+        if r.get("metabolite_count", 0) > 0 or r.get("reaction_count", 0) > 0
+    ]
+    chemistry_capable.sort(key=lambda r: r["metabolite_count"], reverse=True)
+    by_metabolic_capability = chemistry_capable[:10]
+
+    # Slice matched for results: summary mode returns []; otherwise apply
+    # offset + limit.
+    if limit == 0:
+        results: list[dict] = []
+    else:
+        sliced = matched
         if offset:
-            matched = matched[offset:]
+            sliced = sliced[offset:]
         if limit is not None:
-            matched = matched[:limit]
-        results = list(matched)
+            sliced = sliced[:limit]
+        results = list(sliced)
 
         # Sparse-strip reference fields when null
         for r in results:
@@ -711,6 +736,7 @@ def list_organisms(
                                        "metric_type"),
         "by_compartment": _rename_freq(summary_row.get("by_compartment", []),
                                        "compartment"),
+        "by_metabolic_capability": by_metabolic_capability,
         "returned": len(results),
         "offset": offset,
         "truncated": total_matching > offset + len(results),

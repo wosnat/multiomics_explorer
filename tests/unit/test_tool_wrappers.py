@@ -487,6 +487,52 @@ class TestListOrganismsWrapper:
         assert org.derived_metric_value_kinds == ["numeric", "boolean"]
         assert org.compartments == ["whole_cell"]
 
+    @pytest.mark.asyncio
+    async def test_per_row_chemistry_fields_present(self, tool_fns, mock_ctx):
+        """Each result row includes reaction_count and metabolite_count."""
+        sample_org_with_chem = {
+            **self._SAMPLE_ORG,
+            "reaction_count": 943,
+            "metabolite_count": 1039,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 1, "total_matching": 1, "returned": 1,
+                "truncated": False, "not_found": [], "results": [sample_org_with_chem],
+                "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+                "by_metabolic_capability": [],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        org = result.results[0]
+        assert org.reaction_count == 943
+        assert org.metabolite_count == 1039
+
+    @pytest.mark.asyncio
+    async def test_by_metabolic_capability_envelope(self, tool_fns, mock_ctx):
+        """Response includes by_metabolic_capability rollup with typed entries."""
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 2, "total_matching": 2, "returned": 0,
+                "truncated": True, "not_found": [], "results": [],
+                "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+                "by_metabolic_capability": [
+                    {"organism_name": "Alteromonas macleodii EZ55",
+                     "reaction_count": 1348, "metabolite_count": 1428},
+                    {"organism_name": "Prochlorococcus MED4",
+                     "reaction_count": 943, "metabolite_count": 1039},
+                ],
+            },
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx, summary=True)
+        assert len(result.by_metabolic_capability) == 2
+        top = result.by_metabolic_capability[0]
+        assert top.organism_name == "Alteromonas macleodii EZ55"
+        assert top.reaction_count == 1348
+        assert top.metabolite_count == 1428
+
 
 # ---------------------------------------------------------------------------
 # resolve_gene

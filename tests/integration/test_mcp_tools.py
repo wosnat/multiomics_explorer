@@ -386,6 +386,36 @@ class TestListOrganisms:
             "by_organism_type empty in summary mode (regression)"
         )
 
+    def test_per_row_chemistry_rollups_present(self, conn):
+        """Each result row carries the chemistry rollups (slice 1)."""
+        result = api.list_organisms(
+            organism_names=[
+                "Prochlorococcus MED4",
+                "Alteromonas macleodii EZ55",
+            ],
+            conn=conn,
+        )
+        names = {r["organism_name"]: r for r in result["results"]}
+        for org_name in ("Prochlorococcus MED4", "Alteromonas macleodii EZ55"):
+            row = names[org_name]
+            assert "reaction_count" in row
+            assert "metabolite_count" in row
+            assert row["reaction_count"] > 0
+            assert row["metabolite_count"] > 0
+
+    def test_by_metabolic_capability_top_organisms(self, conn):
+        """by_metabolic_capability is populated with top organisms in summary mode,
+        sorted desc by metabolite_count, excluding zero-chemistry organisms."""
+        result = api.list_organisms(summary=True, conn=conn)
+        cap = result["by_metabolic_capability"]
+        assert len(cap) > 0 and len(cap) <= 10
+        # Sorted descending by metabolite_count
+        metabolite_counts = [r["metabolite_count"] for r in cap]
+        assert metabolite_counts == sorted(metabolite_counts, reverse=True)
+        # All entries have non-zero chemistry
+        for entry in cap:
+            assert entry["metabolite_count"] > 0 or entry["reaction_count"] > 0
+
 
 @pytest.mark.kg
 class TestListExperiments:

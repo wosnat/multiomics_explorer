@@ -16,12 +16,14 @@ rows:
   gene_count: 3929
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 1328
   ncbi_taxon_id: 1004787
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii AD45
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1259
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -43,12 +45,14 @@ rows:
   gene_count: 3834
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 1309
   ncbi_taxon_id: 529120
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii ATCC27126
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1251
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -70,12 +74,14 @@ rows:
   gene_count: 4063
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 1341
   ncbi_taxon_id: 28108
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BGP6
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1275
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -97,12 +103,14 @@ rows:
   gene_count: 3741
   genus: Alteromonas
   growth_phases: []
+  metabolite_count: 1282
   ncbi_taxon_id: 1004785
   omics_types:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BS11
   organism_type: genome_strain
   publication_count: 1
+  reaction_count: 1228
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -129,6 +137,7 @@ rows:
   - death
   - exponential
   - nutrient_limited
+  metabolite_count: 1336
   ncbi_taxon_id: 28108
   omics_types:
   - PROTEOMICS
@@ -137,6 +146,7 @@ rows:
   organism_name: Alteromonas macleodii HOT1A3
   organism_type: genome_strain
   publication_count: 3
+  reaction_count: 1266
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -168,6 +178,7 @@ rows:
   - darkness
   - diel
   - exponential
+  metabolite_count: 1354
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
@@ -175,6 +186,7 @@ rows:
   organism_name: Alteromonas macleodii MIT1002
   organism_type: genome_strain
   publication_count: 4
+  reaction_count: 1288
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -217,6 +229,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
+  metabolite_count: 1039
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -228,6 +241,7 @@ rows:
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
   publication_count: 16
+  reaction_count: 943
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -265,6 +279,7 @@ rows:
   - acute_stress
   - exponential
   - stationary
+  metabolite_count: 1047
   ncbi_taxon_id: 74546
   omics_types:
   - PROTEOMICS
@@ -273,6 +288,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   organism_type: genome_strain
   publication_count: 5
+  reaction_count: 943
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -305,6 +321,7 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
+  metabolite_count: 1081
   ncbi_taxon_id: 74547
   omics_types:
   - MICROARRAY
@@ -314,6 +331,7 @@ rows:
   organism_name: Prochlorococcus MIT9313
   organism_type: genome_strain
   publication_count: 8
+  reaction_count: 953
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus

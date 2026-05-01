@@ -1074,6 +1074,93 @@ class TestListOrganisms:
         assert result["not_found"] == []
         assert result["total_matching"] == 2
 
+    # Chemistry rollup propagation + by_metabolic_capability envelope (slice 1)
+
+    _CHEMISTRY_ROWS = [
+        {**dict(_ROWS[0]), "reaction_count": 943, "metabolite_count": 1039},
+        {**dict(_ROWS[1]), "reaction_count": 1348, "metabolite_count": 1428},
+    ]
+
+    def test_reaction_count_propagates_to_results(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        assert result["results"][0]["reaction_count"] == 943
+        assert result["results"][1]["reaction_count"] == 1348
+
+    def test_metabolite_count_propagates_to_results(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        assert result["results"][0]["metabolite_count"] == 1039
+        assert result["results"][1]["metabolite_count"] == 1428
+
+    def test_by_metabolic_capability_sorted_desc_by_metabolite_count(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
+        ]
+        result = api.list_organisms(conn=mock_conn)
+        cap = result["by_metabolic_capability"]
+        assert len(cap) == 2
+        # EZ55 has higher metabolite_count (1428 > 1039) — should be first
+        assert cap[0]["organism_name"] == "Alteromonas macleodii EZ55"
+        assert cap[0]["metabolite_count"] == 1428
+        assert cap[0]["reaction_count"] == 1348
+        assert cap[1]["organism_name"] == "Prochlorococcus MED4"
+
+    def test_by_metabolic_capability_excludes_zero_chemistry(self, mock_conn):
+        rows = [
+            {**dict(self._ROWS[0]), "reaction_count": 943, "metabolite_count": 1039},
+            {**dict(self._ROWS[1]), "reaction_count": 0, "metabolite_count": 0},
+        ]
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], rows]
+        result = api.list_organisms(conn=mock_conn)
+        cap = result["by_metabolic_capability"]
+        assert len(cap) == 1
+        assert cap[0]["organism_name"] == "Prochlorococcus MED4"
+
+    def test_by_metabolic_capability_empty_when_no_matches(self, mock_conn):
+        empty_summary = {**self._SUMMARY_ROW, "total_entries": 0, "total_matching": 0}
+        mock_conn.execute_query.side_effect = [[empty_summary], []]
+        result = api.list_organisms(conn=mock_conn)
+        assert result["by_metabolic_capability"] == []
+
+    def test_by_metabolic_capability_summary_mode(self, mock_conn):
+        """summary=True still populates by_metabolic_capability via detail fetch."""
+        mock_conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
+        ]
+        result = api.list_organisms(summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert len(result["by_metabolic_capability"]) == 2
+        assert result["by_metabolic_capability"][0]["metabolite_count"] == 1428
+
+    def test_by_metabolic_capability_top_10_cap(self, mock_conn):
+        """When matched set has > 10 chemistry-capable organisms, only top 10 returned."""
+        rows = [
+            {
+                "organism_name": f"Org{i:02d}", "genus": "G", "species": "S",
+                "strain": f"s{i}", "clade": None, "ncbi_taxon_id": i,
+                "gene_count": 100, "publication_count": 1, "experiment_count": 1,
+                "treatment_types": [], "omics_types": [],
+                "clustering_analysis_count": 0, "cluster_types": [],
+                "derived_metric_count": 0, "derived_metric_value_kinds": [],
+                "compartments": [], "background_factors": [],
+                "reaction_count": i, "metabolite_count": i * 10,
+            }
+            for i in range(15)  # 15 organisms; org00 has metabolite_count=0 so excluded
+        ]
+        summary = {**self._SUMMARY_ROW, "total_entries": 15, "total_matching": 15}
+        mock_conn.execute_query.side_effect = [[summary], rows]
+        result = api.list_organisms(conn=mock_conn)
+        cap = result["by_metabolic_capability"]
+        assert len(cap) == 10  # capped
+        # Top entry should be Org14 (highest metabolite_count = 140)
+        assert cap[0]["organism_name"] == "Org14"
+        assert cap[0]["metabolite_count"] == 140
+
     def test_summary_flag_zeros_results(self, mock_conn):
         """summary=True → results=[], summary fields populated from summary builder."""
         mock_conn.execute_query.return_value = [self._SUMMARY_ROW]

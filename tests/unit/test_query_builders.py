@@ -980,6 +980,15 @@ class TestBuildListOrganisms:
         assert "$compartment IN coalesce(o.compartments, [])" in cypher
         assert params["compartment"] == "vesicle"
 
+    def test_compact_returns_chemistry_rollups(self):
+        """Chemistry rollups (reaction_count, metabolite_count) are surfaced
+        as compact RETURN columns, coalesced to 0 for organisms without
+        chemistry coverage."""
+        from multiomics_explorer.kg.queries_lib import build_list_organisms
+        cypher, _ = build_list_organisms()
+        assert "coalesce(o.reaction_count, 0) AS reaction_count" in cypher
+        assert "coalesce(o.metabolite_count, 0) AS metabolite_count" in cypher
+
 
 class TestBuildListOrganismsSummary:
     def test_returns_count(self):

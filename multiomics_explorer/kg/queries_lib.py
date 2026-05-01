@@ -1065,8 +1065,9 @@ def build_list_organisms(
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
     experiment_count, treatment_types, background_factors, omics_types,
     clustering_analysis_count, cluster_types, derived_metric_count,
-    derived_metric_value_kinds, compartments, reference_database,
-    reference_proteome, growth_phases.
+    derived_metric_value_kinds, compartments, reaction_count,
+    metabolite_count, reference_database, reference_proteome,
+    growth_phases.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
@@ -1117,6 +1118,8 @@ def build_list_organisms(
         "       coalesce(o.derived_metric_count, 0) AS derived_metric_count,\n"
         "       coalesce(o.derived_metric_value_kinds, []) AS derived_metric_value_kinds,\n"
         "       coalesce(o.compartments, []) AS compartments,\n"
+        "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
+        "       coalesce(o.metabolite_count, 0) AS metabolite_count,\n"
         "       o.reference_database AS reference_database,\n"
         "       o.reference_proteome AS reference_proteome,\n"
         "       coalesce(o.growth_phases, []) AS growth_phases"
