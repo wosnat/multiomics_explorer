@@ -990,6 +990,43 @@ class TestBuildListOrganisms:
         assert "coalesce(o.metabolite_count, 0) AS metabolite_count" in cypher
 
 
+class TestBuildListOrganismsCapability:
+    """Small-projection builder used by api/list_organisms in summary mode
+    so the by_metabolic_capability rollup doesn't drag the full detail
+    builder along."""
+
+    def test_returns_only_three_columns(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_capability
+        cypher, _ = build_list_organisms_capability()
+        assert "o.preferred_name AS organism_name" in cypher
+        assert "coalesce(o.reaction_count, 0) AS reaction_count" in cypher
+        assert "coalesce(o.metabolite_count, 0) AS metabolite_count" in cypher
+        # Stays small — no verbose / DM / cluster / reference columns
+        for absent in ("lineage", "derived_metric_count", "cluster_count",
+                        "reference_database", "treatment_types"):
+            assert absent not in cypher
+
+    def test_organism_names_filter_clause(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_capability
+        cypher, params = build_list_organisms_capability(
+            organism_names_lc=["prochlorococcus med4"],
+        )
+        assert "$organism_names_lc IS NULL" in cypher
+        assert "toLower(o.preferred_name) IN $organism_names_lc" in cypher
+        assert params["organism_names_lc"] == ["prochlorococcus med4"]
+
+    def test_compartment_filter_param(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_capability
+        cypher, params = build_list_organisms_capability(compartment="vesicle")
+        assert "$compartment IN coalesce(o.compartments, [])" in cypher
+        assert params["compartment"] == "vesicle"
+
+    def test_ordered_by_genus_and_name(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_capability
+        cypher, _ = build_list_organisms_capability()
+        assert "ORDER BY o.genus, o.preferred_name" in cypher
+
+
 class TestBuildListOrganismsSummary:
     def test_returns_count(self):
         cypher, params = build_list_organisms_summary()

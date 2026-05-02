@@ -491,7 +491,7 @@ def register_tools(mcp: FastMCP):
         compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']).")
         # Chemistry rollups (slice 1)
         reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism (e.g. 943). When > 0, drill in via list_metabolites(organism_names=[organism_name]) to enumerate metabolites this organism is capable of metabolizing.")
-        metabolite_count: int = Field(default=0, description="Distinct metabolites reachable via Organism_has_metabolite (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. When TCDB-CAZy ships, this count will grow to include transport-substrate metabolites.")
+        metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can act on (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. Today reflects gene catalysis only; will grow to include transport substrates when the TCDB-CAZy ontology ships, with no schema change. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
         # DM verbose-only fields
         derived_metric_gene_count: int | None = Field(default=None, description="Total gene-level DM annotation count (verbose-only).")
         derived_metric_types: list[str] | None = Field(default=None, description="Distinct metric_type tags observed (verbose-only).")
@@ -522,7 +522,7 @@ def register_tools(mcp: FastMCP):
     class OrgMetabolicCapabilityBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4')")
         reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes (e.g. 943)")
-        metabolite_count: int = Field(description="Distinct metabolites reachable via gene catalysis (e.g. 1039)")
+        metabolite_count: int = Field(description="Distinct metabolites this organism's genes can act on (e.g. 1039). Same semantics as OrganismResult.metabolite_count.")
 
     class ListOrganismsResponse(BaseModel):
         total_entries: int = Field(description="Total organisms in the KG")
@@ -532,7 +532,7 @@ def register_tools(mcp: FastMCP):
         by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.")
         by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.")
         by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.")
-        by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry.")
+        by_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.")
         returned: int = Field(description="Number of results returned")
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > offset + returned")

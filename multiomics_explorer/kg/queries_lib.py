@@ -1175,6 +1175,47 @@ def build_list_organisms_summary(
     return cypher, params
 
 
+def build_list_organisms_capability(
+    *,
+    organism_names_lc: list[str] | None = None,
+    compartment: str | None = None,
+) -> tuple[str, dict]:
+    """Build Cypher for the small chemistry-capability projection used by
+    list_organisms's by_metabolic_capability envelope rollup in summary mode.
+
+    Returns only (organism_name, reaction_count, metabolite_count) per matched
+    organism — the minimum needed to compute the rollup without pulling the
+    full detail row set. Used when limit=0 so the summary fast path stays
+    cheap; detail-mode callers (limit>0) source the same data from the
+    regular detail builder rows already in flight.
+
+    Same WHERE clause as build_list_organisms / build_list_organisms_summary
+    so the matched set is identical.
+
+    RETURN keys: organism_name, reaction_count, metabolite_count.
+    """
+    conditions = [
+        "($organism_names_lc IS NULL"
+        " OR toLower(o.preferred_name) IN $organism_names_lc)"
+    ]
+    params: dict = {"organism_names_lc": organism_names_lc}
+    if compartment is not None:
+        conditions.append("$compartment IN coalesce(o.compartments, [])")
+        params["compartment"] = compartment
+
+    where_block = "WHERE " + "\n  AND ".join(conditions) + "\n"
+
+    cypher = (
+        "MATCH (o:OrganismTaxon)\n"
+        f"{where_block}"
+        "RETURN o.preferred_name AS organism_name,\n"
+        "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
+        "       coalesce(o.metabolite_count, 0) AS metabolite_count\n"
+        "ORDER BY o.genus, o.preferred_name"
+    )
+    return cypher, params
+
+
 def _list_experiments_where(
     *,
     organism: str | None = None,

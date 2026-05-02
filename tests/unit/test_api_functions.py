@@ -1128,14 +1128,30 @@ class TestListOrganisms:
         assert result["by_metabolic_capability"] == []
 
     def test_by_metabolic_capability_summary_mode(self, mock_conn):
-        """summary=True still populates by_metabolic_capability via detail fetch."""
+        """summary=True populates by_metabolic_capability via the dedicated
+        capability builder, NOT the detail builder. Asserts call count = 2
+        (summary + capability) so the summary fast path stays cheap."""
+        capability_rows = [
+            {"organism_name": r["organism_name"],
+             "reaction_count": r["reaction_count"],
+             "metabolite_count": r["metabolite_count"]}
+            for r in self._CHEMISTRY_ROWS
+        ]
         mock_conn.execute_query.side_effect = [
-            [self._SUMMARY_ROW], self._CHEMISTRY_ROWS,
+            [self._SUMMARY_ROW], capability_rows,
         ]
         result = api.list_organisms(summary=True, conn=mock_conn)
         assert result["results"] == []
         assert len(result["by_metabolic_capability"]) == 2
         assert result["by_metabolic_capability"][0]["metabolite_count"] == 1428
+        # Exactly 2 Cypher calls: summary + capability. No detail builder.
+        assert mock_conn.execute_query.call_count == 2
+        # Verify the second call used the capability builder (3-column projection)
+        second_cypher = mock_conn.execute_query.call_args_list[1][0][0]
+        assert "metabolite_count" in second_cypher
+        # Capability builder doesn't pull verbose detail columns
+        assert "lineage" not in second_cypher
+        assert "derived_metric_count" not in second_cypher
 
     def test_by_metabolic_capability_top_10_cap(self, mock_conn):
         """When matched set has > 10 chemistry-capable organisms, only top 10 returned."""

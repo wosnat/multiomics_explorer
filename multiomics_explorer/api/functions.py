@@ -50,6 +50,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_metric_types,
     build_list_value_kinds,
     build_list_organisms,
+    build_list_organisms_capability,
     build_list_organisms_summary,
     build_list_publications,
     build_list_publications_summary,
@@ -660,35 +661,27 @@ def list_organisms(
     total_entries = summary_row["total_entries"]
     total_matching = summary_row["total_matching"]
 
-    # Always fetch matched rows when there are matches — needed for
-    # by_metabolic_capability rollup. Cheap (≤36 organisms in current KG).
+    # by_metabolic_capability source: detail-mode callers reuse matched rows
+    # (avoids a second round-trip); summary-mode callers run a small dedicated
+    # capability projection so the summary fast path stays cheap and doesn't
+    # pull verbose detail columns just to throw them away.
     matched: list[dict] = []
-    if total_matching > 0:
+    if limit == 0:
+        results: list[dict] = []
+        if total_matching > 0:
+            cap_cypher, cap_params = build_list_organisms_capability(
+                organism_names_lc=names_lc, compartment=compartment,
+            )
+            capability_rows = conn.execute_query(cap_cypher, **cap_params)
+        else:
+            capability_rows = []
+    else:
         detail_cypher, detail_params = build_list_organisms(
             organism_names_lc=names_lc, compartment=compartment, verbose=verbose,
         )
         matched = conn.execute_query(detail_cypher, **detail_params)
+        capability_rows = matched
 
-    # by_metabolic_capability: top 10 organisms by metabolite_count in the
-    # matched set; excludes zero-chemistry rows. Sourced from matched rows
-    # before any limit/offset slicing so the rollup reflects the full match.
-    chemistry_capable = [
-        {
-            "organism_name": r["organism_name"],
-            "reaction_count": r.get("reaction_count", 0),
-            "metabolite_count": r.get("metabolite_count", 0),
-        }
-        for r in matched
-        if r.get("metabolite_count", 0) > 0 or r.get("reaction_count", 0) > 0
-    ]
-    chemistry_capable.sort(key=lambda r: r["metabolite_count"], reverse=True)
-    by_metabolic_capability = chemistry_capable[:10]
-
-    # Slice matched for results: summary mode returns []; otherwise apply
-    # offset + limit.
-    if limit == 0:
-        results: list[dict] = []
-    else:
         sliced = matched
         if offset:
             sliced = sliced[offset:]
@@ -708,6 +701,20 @@ def list_organisms(
                         if k not in ("cluster_count", "derived_metric_gene_count",
                                      "derived_metric_types")}
                        for r in results]
+
+    # by_metabolic_capability: top 10 organisms by metabolite_count in the
+    # matched set; excludes zero-chemistry rows.
+    chemistry_capable = [
+        {
+            "organism_name": r["organism_name"],
+            "reaction_count": r.get("reaction_count", 0),
+            "metabolite_count": r.get("metabolite_count", 0),
+        }
+        for r in capability_rows
+        if r.get("metabolite_count", 0) > 0 or r.get("reaction_count", 0) > 0
+    ]
+    chemistry_capable.sort(key=lambda r: r["metabolite_count"], reverse=True)
+    by_metabolic_capability = chemistry_capable[:10]
 
     # not_found: input names that didn't match any OrganismTaxon
     # (case-insensitive). Original casing preserved in the returned list.

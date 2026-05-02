@@ -50,7 +50,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 - **by_value_kind** (list[OrgValueKindBreakdown]): DM value_kind frequency rollup across matched organisms. Each entry: {value_kind, count}.
 - **by_metric_type** (list[OrgMetricTypeBreakdown]): DM metric_type frequency rollup across matched organisms. Each entry: {metric_type, count}.
 - **by_compartment** (list[OrgCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched organisms. Each entry: {compartment, count}.
-- **by_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry.
+- **by_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites.
 - **returned** (int): Number of results returned
 - **offset** (int): Offset into full result set (e.g. 0)
 - **truncated** (bool): True if total_matching > offset + returned
@@ -80,7 +80,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} present across this organism's DMs. Use to route to genes_by_{numeric,boolean,categorical}_metric. |
 | compartments | list[string] (optional) | Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']). |
 | reaction_count | int (optional) | Distinct reactions catalyzed by genes in this organism (e.g. 943). When > 0, drill in via list_metabolites(organism_names=[organism_name]) to enumerate metabolites this organism is capable of metabolizing. |
-| metabolite_count | int (optional) | Distinct metabolites reachable via Organism_has_metabolite (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. When TCDB-CAZy ships, this count will grow to include transport-substrate metabolites. |
+| metabolite_count | int (optional) | Distinct metabolites this organism's genes can act on (e.g. 1039). Capability signal — does NOT mean these metabolites were measured. Today reflects gene catalysis only; will grow to include transport substrates when the TCDB-CAZy ontology ships, with no schema change. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
 | derived_metric_gene_count | int \| None (optional) | Total gene-level DM annotation count (verbose-only). |
 | derived_metric_types | list[string] \| None (optional) | Distinct metric_type tags observed (verbose-only). |
 | reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
