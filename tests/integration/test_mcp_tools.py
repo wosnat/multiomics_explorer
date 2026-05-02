@@ -575,15 +575,15 @@ class TestListExperiments:
         assert len(result["by_value_kind"]) >= 1
         assert len(result["by_compartment"]) >= 1
 
-    def test_compartment_vesicle_returns_5(self, conn):
-        """compartment='vesicle' filter returns exactly 5 experiments (pinned baseline)."""
+    def test_compartment_vesicle_returns_11(self, conn):
+        """compartment='vesicle' filter returns exactly 11 experiments (pinned baseline)."""
         result = api.list_experiments(compartment="vesicle", summary=True, conn=conn)
-        assert result["total_matching"] == 5
+        assert result["total_matching"] == 11
 
-    def test_compartment_exoproteome_returns_7(self, conn):
-        """compartment='exoproteome' filter returns exactly 7 experiments (pinned baseline)."""
+    def test_compartment_exoproteome_returns_8(self, conn):
+        """compartment='exoproteome' filter returns exactly 8 experiments (pinned baseline)."""
         result = api.list_experiments(compartment="exoproteome", summary=True, conn=conn)
-        assert result["total_matching"] == 7
+        assert result["total_matching"] == 8
 
     def test_per_row_compartment_field(self, conn):
         """Each result row has 'compartment' field in {whole_cell, vesicle, exoproteome}."""
@@ -1344,22 +1344,22 @@ class TestListDerivedMetrics:
     def test_no_filters_13_dms(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(conn=conn, limit=None)
-        assert out["total_entries"] == 34
-        assert out["total_matching"] == 34
-        assert len(out["results"]) == 34
+        assert out["total_entries"] == 61
+        assert out["total_matching"] == 61
+        assert len(out["results"]) == 61
 
     def test_value_kind_numeric_6(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="numeric", conn=conn, limit=None)
-        assert out["total_matching"] == 15
+        assert out["total_matching"] == 35
         assert all(r["value_kind"] == "numeric" for r in out["results"])
         compartments = {r["compartment"] for r in out["results"]}
-        assert compartments == {"whole_cell", "vesicle"}
+        assert compartments == {"whole_cell", "vesicle", "exoproteome"}
 
     def test_value_kind_boolean_6(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="boolean", conn=conn, limit=None)
-        assert out["total_matching"] == 16
+        assert out["total_matching"] == 18
         organisms = {r["organism_name"] for r in out["results"]}
         assert "Prochlorococcus NATL2A" in organisms
         assert "Alteromonas macleodii MIT1002" in organisms
@@ -1367,7 +1367,7 @@ class TestListDerivedMetrics:
     def test_value_kind_categorical_1(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(value_kind="categorical", conn=conn, limit=None)
-        assert out["total_matching"] == 3
+        assert out["total_matching"] == 8
         metric_types = {r["metric_type"] for r in out["results"]}
         assert "darkness_survival_class" in metric_types
         assert all(r["allowed_categories"] is not None for r in out["results"])
@@ -1375,14 +1375,14 @@ class TestListDerivedMetrics:
     def test_rankable_true_4(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=True, conn=conn, limit=None)
-        assert out["total_matching"] == 11
+        assert out["total_matching"] == 29
         assert all(r["rankable"] is True for r in out["results"])
 
     def test_rankable_false_9(self, conn):
         """Sanity-checks bool→'false' string coercion path."""
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(rankable=False, conn=conn, limit=None)
-        assert out["total_matching"] == 23
+        assert out["total_matching"] == 32
         metric_types = {r["metric_type"] for r in out["results"]}
         # The two non-rankable numeric DMs are always in this set
         assert "peak_time_protein_h" in metric_types
@@ -1399,7 +1399,7 @@ class TestListDerivedMetrics:
     def test_organism_short_code(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(organism="MED4", conn=conn, limit=None)
-        assert out["total_matching"] == 10
+        assert out["total_matching"] == 17
         assert all(r["organism_name"] == "Prochlorococcus MED4" for r in out["results"])
 
     def test_organism_full_name(self, conn):
@@ -1411,7 +1411,7 @@ class TestListDerivedMetrics:
     def test_organism_alteromonas(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(organism="MIT1002", conn=conn, limit=None)
-        assert out["total_matching"] == 2
+        assert out["total_matching"] == 5
 
     def test_search_text_diel_amplitude(self, conn):
         from multiomics_explorer.api import list_derived_metrics
@@ -1445,7 +1445,7 @@ class TestListDerivedMetrics:
         assert out["results"] == []
         assert out["returned"] == 0
         assert len(out["by_value_kind"]) == 3  # numeric, boolean, categorical
-        assert len(out["by_organism"]) == 6
+        assert len(out["by_organism"]) == 11
 
     def test_verbose_adds_fields(self, conn):
         from multiomics_explorer.api import list_derived_metrics
@@ -1739,10 +1739,10 @@ class TestGeneDerivedMetrics:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"], limit=20)
-        assert response.total_matching == 9
-        assert response.total_derived_metrics == 9
+        assert response.total_matching == 11
+        assert response.total_derived_metrics == 11
         assert response.genes_with_metrics == 1
-        assert response.returned == 9
+        assert response.returned == 11
         kinds = {r.value_kind for r in response.results}
         assert kinds == {"numeric", "boolean", "categorical"}
         # Polymorphic value typing
@@ -1756,9 +1756,11 @@ class TestGeneDerivedMetrics:
 
     @pytest.mark.asyncio
     async def test_pmm0001_diel_only(self, tool_fns, conn):
+        # value_kind='numeric' filters out the gene-level categorical DMs
+        # (expression_level_class, pangenome_membership) that aren't diel-related.
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
-            ctx, locus_tags=["PMM0001"], limit=20)
+            ctx, locus_tags=["PMM0001"], value_kind="numeric", limit=20)
         assert response.total_matching == 6
         assert all(r.value_kind == "numeric" for r in response.results)
         # 4 rankable (damping_ratio, diel_amp_*, protein_transcript_lag),
@@ -1860,7 +1862,7 @@ class TestGeneDerivedMetrics:
         ctx = _ctx_with_conn(conn)
         response = await tool_fns["gene_derived_metrics"](
             ctx, locus_tags=["PMM1714"], summary=True)
-        assert len(response.by_metric) == 9  # one per DM touching the gene
+        assert len(response.by_metric) == 11  # one per DM touching the gene
         for entry in response.by_metric:
             assert entry.derived_metric_id  # non-empty
             assert entry.name
@@ -1896,7 +1898,7 @@ class TestGeneDerivedMetrics:
             ctx, locus_tags=["PMM1714"], limit=2)
         assert response.returned == 2
         assert response.truncated is True
-        assert response.total_matching == 9
+        assert response.total_matching == 11
 
 
 @pytest.mark.kg

@@ -186,7 +186,7 @@
   params: {}
   expect:
     min_rows: 13
-    max_rows: 35
+    max_rows: 36
     columns: [organism_name, genus, species, strain, clade, ncbi_taxon_id,
               gene_count, publication_count, experiment_count,
               treatment_types, omics_types]
@@ -987,8 +987,8 @@
   params:
     rankable: true
   expect:
-    min_rows: 11
-    max_rows: 11
+    min_rows: 29
+    max_rows: 29
 
 - id: list_derived_metrics_rankable_false
   tool: list_derived_metrics
@@ -996,8 +996,8 @@
   params:
     rankable: false
   expect:
-    min_rows: 23
-    max_rows: 23
+    min_rows: 32
+    max_rows: 32
 
 - id: list_derived_metrics_has_p_value_empty
   tool: list_derived_metrics
