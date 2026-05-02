@@ -109,10 +109,10 @@ list_organisms()
 
 ```example-response
 {
-  "total_entries": 32,
-  "total_matching": 32,
+  "total_entries": 36,
+  "total_matching": 36,
   "by_organism_type": [
-    {"organism_type": "genome_strain", "count": 25},
+    {"organism_type": "genome_strain", "count": 29},
     {"organism_type": "treatment", "count": 5},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
@@ -121,35 +121,28 @@ list_organisms()
   "offset": 0,
   "not_found": [],
   "results": [
-    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 11, "experiment_count": 46, "treatment_types": ["coculture", "carbon_stress", "salt_stress", "viral", ...], "omics_types": ["RNASEQ", "MICROARRAY", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["condition_comparison", "diel", "time_course"]},
-    {"organism_name": "Alteromonas (MarRef v6)", "organism_type": "reference_proteome_match", "genus": "Alteromonas", "gene_count": 500, "reference_database": "MarRef v6", "reference_proteome": "UP000262181", ...}
+    {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "genus": "Prochlorococcus", "species": "Prochlorococcus marinus", "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919, "gene_count": 1976, "publication_count": 16, "experiment_count": 112, "treatment_types": ["coculture", "carbon", "nitrogen", ...], "omics_types": ["RNASEQ", "PROTEOMICS"], "clustering_analysis_count": 4, "cluster_types": ["diel", "time_course"], "reaction_count": 943, "metabolite_count": 1039}
   ]
 }
 ```
 
-### Example 2: Summary only (no rows)
-
-```example-call
-list_organisms(summary=True)
-```
-
-### Example 3: Full taxonomy
+### Example 2: Full taxonomy
 
 ```example-call
 list_organisms(verbose=True)
 ```
 
-### Example 4: Look up specific organisms by name
+### Example 3: Look up specific organisms by name
 
 ```example-call
 list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301", "Bogus organism"])
 ```
 
 ```example-response
-{"total_entries": 32, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, ...}]}
+{"total_entries": 36, "total_matching": 2, "returned": 2, "truncated": false, "not_found": ["Bogus organism"], "by_organism_type": [{"organism_type": "genome_strain", "count": 2}], "by_metabolic_capability": [{"organism_name": "Prochlorococcus MED4", "reaction_count": 943, "metabolite_count": 1039}, {"organism_name": "Prochlorococcus MIT9301", "reaction_count": 916, "metabolite_count": 1018}], "results": [{"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "gene_count": 1976, "reaction_count": 943, "metabolite_count": 1039, ...}, {"organism_name": "Prochlorococcus MIT9301", "organism_type": "genome_strain", "gene_count": 1935, "reaction_count": 916, "metabolite_count": 1018, ...}]}
 ```
 
-### Example 5: Chaining to genes and publications
+### Example 4: Chaining to genes and publications
 
 ```
 Step 1: list_organisms()
@@ -162,7 +155,7 @@ Step 3: list_publications(organism="MED4")
         → find publications studying that organism
 ```
 
-### Example 6: Find organisms with vesicle-fraction DM evidence
+### Example 5: Find organisms with vesicle-fraction DM evidence
 
 ```example-call
 list_organisms(compartment="vesicle")
@@ -171,11 +164,11 @@ list_organisms(compartment="vesicle")
 ```example-response
 {"total_matching": 3, "by_compartment": [{"compartment": "vesicle", "count": 3}, {"compartment": "whole_cell", "count": 1}], "returned": 3, "truncated": false, "offset": 0, "not_found": [],
  "results": [
-   {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "derived_metric_count": 10, "derived_metric_value_kinds": ["boolean", "categorical", "numeric"], "compartments": ["vesicle", "whole_cell"]}
+   {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain", "derived_metric_count": 17, "derived_metric_value_kinds": ["boolean", "categorical", "numeric"], "compartments": ["vesicle", "whole_cell"], "reaction_count": 943, "metabolite_count": 1039}
  ]}
 ```
 
-### Example 7: Identify chemistry-rich organisms (capability ranking)
+### Example 6: Identify chemistry-rich organisms (capability ranking)
 
 ```example-call
 list_organisms(summary=True)
@@ -194,7 +187,6 @@ list_organisms → resolve_gene
 list_organisms → genes_by_ontology
 list_organisms → list_clustering_analyses(organism=...)
 list_organisms(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
-list_filter_values(filter_type='metric_type') → list_organisms(search_text='<metric_type>') to find organisms with that metric
 list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_names=[organism_name]) for chemistry drill-down
 ```
 
