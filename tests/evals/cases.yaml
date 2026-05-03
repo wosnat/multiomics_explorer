@@ -1551,7 +1551,7 @@
 - id: list_metabolites_all
   tool: list_metabolites
   desc: All metabolites returned when no filters
-  params: {}
+  params: {limit: 5}
   expect:
     min_rows: 1
     columns: [metabolite_id, name, formula, elements, gene_count,
@@ -1560,7 +1560,7 @@
 - id: list_metabolites_n_elements
   tool: list_metabolites
   desc: N-bearing metabolites filter
-  params: {elements: [N]}
+  params: {elements: [N], limit: 5}
   expect:
     min_rows: 1
 
@@ -1574,7 +1574,7 @@
 - id: list_metabolites_med4_n
   tool: list_metabolites
   desc: MED4 + N elements (the N-source workflow primitive)
-  params: {organism_names: [Prochlorococcus MED4], elements: [N]}
+  params: {organism_names: [Prochlorococcus MED4], elements: [N], limit: 5}
   expect:
     min_rows: 1
 
