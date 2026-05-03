@@ -1077,7 +1077,7 @@ RETURN total_matching, gene_count_total, reaction_count_total,
 | Combined rows: urea+glutamine+nitrite × MED4 | 79 (36 metabolism + 43 transport: 15 sc + 28 fi) | **79 (36 / 43 / 15 / 28)** ✓ |
 | Per-metabolite gene_count (urea × MED4) | 18 distinct genes (4 metabolism arm distinct genes + 14 distinct transport genes, no overlap) | **18 (4 + 14)** ✓ |
 | `not_found` discrimination: chebi:9314 (sucrose) | true (not in KG) | **true** ✓ |
-| `not_matched`: kegg.compound:C00001 (water) × Alteromonas | true (no Alteromonas water rows) | **true** ✓ |
+| `not_matched`: kegg.compound:C00069 (alcohol) × Alteromonas ATCC27126 | true (Metabolite node exists; no gene reach via either arm) | **true** ✓ (water/C00001 was the original probe but turned out to have 770 reachable rows — Alteromonas ATCC27126 catalyzes 333 water-touching reactions; spec drift discovered during Phase 2 build, swapped to alcohol which is genuinely unreachable) |
 | Filter narrow: metabolite_pathway_ids=['kegg.pathway:ko00910'] reduces 79 → 56 | yes | **56** ✓ |
 | Filter narrow: gene_categories=['Transport'] reduces 79 → 15 | yes | **15** ✓ |
 | Filter narrow: ec_numbers=['6.3.1.2'] (glutamine synthetase) → 1 row | yes (glnA × glutamine) | **1** ✓ |
@@ -1452,8 +1452,11 @@ Two complementary live-KG smoke tests:
 5. **Mixed input `[urea, chebi:9314, kegg.compound:C99999]` × MED4** —
    `not_found.metabolite_ids = ['chebi:9314', 'kegg.compound:C99999']`;
    urea returns 23 rows; no auto-warning.
-6. **C00001 (water) × Alteromonas macleodii ATCC27126** — empty result with
-   `not_matched=['kegg.compound:C00001']`, `not_found.metabolite_ids=[]`.
+6. **C00069 (alcohol) × Alteromonas macleodii ATCC27126** — empty result
+   with `not_matched=['kegg.compound:C00069']`, `not_found.metabolite_ids=[]`.
+   (Originally drafted with water/C00001; swapped during Phase 2 build —
+   ATCC27126 has 333 water-catalyzing genes. Alcohol's Metabolite node
+   exists in KG but has no gene reach in this organism via either arm.)
 7. **Pathway-anchored: `metabolite_pathway_ids=['kegg.pathway:ko00910']`**
    (nitrogen metabolism) + N-bearing metabolites × MED4 — both arms
    narrowed uniformly via `m.pathway_ids` denorm. 56 rows.

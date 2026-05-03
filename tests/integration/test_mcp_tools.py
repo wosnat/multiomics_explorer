@@ -2445,3 +2445,72 @@ class TestListMetabolites:
         )
         assert result["not_found"]["organism_names"] == ["Bogus organism"]
         assert result["total_matching"] > 0
+
+
+@pytest.mark.kg
+class TestGenesByMetabolite:
+    """Live-KG round-trip smokes for genes_by_metabolite.
+
+    Each test pipes the api result through `GenesByMetaboliteResponse(**r)`.
+    This is the contract-drift guard: mocked unit tests can't catch a
+    summary-Cypher RETURN-key rename, but Pydantic validation here will
+    raise if any future change to the summary builder emits a field name
+    or shape that diverges from the response model. (Caught the B1/B2/B3
+    drift during the genes_by_metabolite Phase 2 build, 2026-05-03.)
+    """
+
+    def test_urea_med4_both_arms_round_trip(self, conn):
+        """Urea × MED4: both arms exercised, sc > fi, warning DOES NOT fire.
+
+        Pins the spec § Live-KG state snapshot probes (verified 2026-05-03):
+        total_matching=23, gene_count_total=18, metabolism_rows=4,
+        transport_substrate_confirmed_rows=10, transport_family_inferred_rows=9.
+        """
+        from multiomics_explorer.mcp_server.tools import (
+            GenesByMetaboliteResponse,
+        )
+
+        result = api.genes_by_metabolite(
+            metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4",
+            conn=conn,
+        )
+        model = GenesByMetaboliteResponse(**result)
+        assert model.total_matching == 23
+        assert model.gene_count_total == 18
+        urea_row = next(
+            r for r in model.by_metabolite
+            if r.metabolite_id == "kegg.compound:C00086"
+        )
+        assert urea_row.metabolism_rows == 4
+        assert urea_row.transport_substrate_confirmed_rows == 10
+        assert urea_row.transport_family_inferred_rows == 9
+        assert model.warnings == []
+
+    def test_nitrite_med4_transport_only_warning_fires(self, conn):
+        """Nitrite × MED4: transport-only, fi > sc, auto-warning fires.
+
+        Pins spec smoke 2: total_matching=14, no metabolism rows,
+        substrate_confirmed=5, family_inferred=9, family-inferred-dominance
+        warning present.
+        """
+        from multiomics_explorer.mcp_server.tools import (
+            GenesByMetaboliteResponse,
+        )
+
+        result = api.genes_by_metabolite(
+            metabolite_ids=["kegg.compound:C00088"],
+            organism="Prochlorococcus MED4",
+            conn=conn,
+        )
+        model = GenesByMetaboliteResponse(**result)
+        assert model.total_matching == 14
+        es_counts = {r.evidence_source: r.count for r in model.by_evidence_source}
+        assert "metabolism" not in es_counts
+        assert es_counts.get("transport") == 14
+        tc_counts = {
+            r.transport_confidence: r.count
+            for r in model.by_transport_confidence
+        }
+        assert tc_counts == {"substrate_confirmed": 5, "family_inferred": 9}
+        assert any("family_inferred" in w for w in model.warnings)
