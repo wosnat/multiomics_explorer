@@ -85,6 +85,8 @@ Once scope, KG schema, and Cypher are stable, write the spec at `docs/tool-specs
 
 Optional: open a worktree via `superpowers:using-git-worktrees` if the build will run alongside other work.
 
+**Before dispatching any agent, verify the worktree branch HEAD matches main HEAD** (`git log --oneline -1` on each). `EnterWorktree` re-uses an existing branch by name if one already exists, so a stale branch surviving from a previous session can leave you on an outdated base — agents will faithfully implement the spec but fail Stage 3 against the live KG. If they differ, `git reset --hard main` (safe in a fresh worktree with no work) and re-baseline before proceeding.
+
 Phase 2 is three stages. Pytest invocations in the orchestrator: 3 (plus scoped self-verifies inside each agent).
 
 ### Stage 1 — RED
@@ -106,6 +108,8 @@ Dispatch the 4 implementer agents in **one** message, in parallel. Each owns a d
 
 Each agent is briefed with: the frozen spec, its file(s), a pointer to `layer-rules` skill, "tests are red in your scope; make them green," and its scoped self-verify command.
 
+**Anti-scope-creep guardrail (mandatory in every brief):** "ADD only — do NOT modify, rename, or rebaseline any existing test, case, or yml. If an unrelated test fails in your environment, REPORT AS A CONCERN; do not silently retune. Pinned baselines are KG-state guards." Without this, agents that observe pre-existing failures (e.g. from a stale base, KG drift, or sibling work) will "fix" them by editing baselines downward — silently masking real signals.
+
 For Mode B (cross-tool), each brief gains: "Implement tool 1 as the template within your file, then extend to tools 2..N."
 
 Each agent reports `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:subagent-driven-development`.
@@ -114,7 +118,7 @@ Each agent reports `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:su
 
 Once all 4 agents report green:
 
-1. **Background**: dispatch the standard `code-reviewer` subagent via `superpowers:requesting-code-review` against the diff + spec.
+1. **Background**: dispatch the standard `code-reviewer` subagent via `superpowers:requesting-code-review` against the diff + spec. **Hard gate, not optional** — mocked unit tests can't validate actual Cypher (the mock returns fake rows regardless of label correctness in the query string), and only the reviewer reading the live Cypher catches things like wrong node labels in `MATCH` clauses, wrong relationship directions, or filter clauses that match-everything. The list_metabolites smoke test caught a `MATCH (o:Organism)` typo (label is `OrganismTaxon`) that all 1676 unit tests missed.
 2. **Foreground**: `pytest tests/unit/ -q`
 3. **Foreground**: `pytest tests/integration/ -m kg -q`
 4. **Foreground**: `pytest tests/regression/ -m kg -q`
