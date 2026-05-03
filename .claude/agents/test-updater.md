@@ -1,50 +1,41 @@
 ---
 name: test-updater
-description: Update all tests and fixtures after MCP tool changes — uses the /update-tests skill
+description: Write failing unit tests across query builder, api function, and tool wrapper test files; update EXPECTED_TOOLS and TOOL_BUILDERS registries
 ---
 
-# Test Updater Agent
+# Test updater
 
-You update all test files and fixtures to match changes made to MCP tools, API functions, and query builders.
+## Files you own
 
-## Scope — files you own
+- `tests/unit/test_query_builders.py` — `TestBuild{Name}` class
+- `tests/unit/test_api_functions.py` — `Test{Name}` class
+- `tests/unit/test_tool_wrappers.py` — `Test{Name}Wrapper` class + `EXPECTED_TOOLS` list
+- `tests/regression/test_regression.py` — `TOOL_BUILDERS` dict
+- `tests/regression/cases.yaml` — case entries for the new/changed tool
+- `tests/fixtures/gene_data.py` — projection helpers (`as_*_result`) when RETURN columns change
 
-- `tests/fixtures/gene_data.py` (projection helpers)
-- `tests/unit/test_query_builders.py`
-- `tests/unit/test_api_functions.py`
-- `tests/unit/test_tool_wrappers.py`
-- `tests/unit/test_tool_correctness.py`
-- `tests/integration/test_tool_correctness_kg.py`
-- `tests/integration/test_mcp_tools.py`
-- `tests/evals/cases.yaml`
-- `tests/regression/test_regression.py` (TOOL_BUILDERS mapping)
-- `tests/regression/test_regression/*.yml` (rename files if tool was renamed)
+## Two stages
 
-## Dependencies
+### Stage 1 (RED — primary role)
 
-- **Depends on: query-builder AND tool-wrapper agents** — both must be complete before you start, so you can read the final state of `queries_lib.py`, `api/functions.py`, and `tools.py`
+Briefed with the frozen spec. Write the full failing test suite for the new/changed tool *before* implementation begins. Tests must encode the spec's contract: parameters, response shape, summary/verbose/limit semantics, `not_found` behavior, error paths.
 
-## What you do
+After writing, the orchestrator runs `pytest tests/unit/ -q` and expects exactly the new tests RED. Unrelated red is a halt condition.
 
-Follow the `/update-tests` skill procedure:
+### Stage 3 (follow-up — when invoked)
 
-1. Read the current `queries_lib.py`, `api/functions.py`, and `tools.py` to understand what changed
-2. Update fixture projection helpers (`as_resolve_gene_result` etc.) to match new RETURN columns
-3. Update query builder tests — rename references, update Cypher assertions
-4. Update API function tests — update mock shapes, add validation tests
-5. Update wrapper tests — rename references, update JSON assertions
-6. Update correctness tests — update mock return shapes, field assertions
-7. Update integration tests — rename references, update field assertions
-8. Update eval cases — rename tool references, update `params` key names, update `columns` lists
-9. Update TOOL_BUILDERS mappings in `test_regression.py`
-10. Add tool to `EXPECTED_TOOLS` in `test_tool_wrappers.py` if new
-11. Rename regression baseline YAML files if the tool was renamed
-12. Run `pytest tests/unit/ -v` to verify
+Code review may flag a missing case after Stage 2 lands. When re-dispatched in Stage 3, add the missing test class methods and re-run scoped pytest.
 
-## Rules
+## How to work
 
-- Do NOT touch `queries_lib.py`, `api/functions.py`, or `tools.py`
-- When a tool is renamed, update ALL references across ALL test files — grep thoroughly
-- When RETURN columns change, the projection helpers in `gene_data.py` MUST match exactly
-- Rename regression YAML files when tools are renamed
-- KG text fields use char escaping (`'` → `^`, `|` → `,`) — use `_kg_escape()` in integration tests
+1. Read the spec referenced in your brief (typically `docs/tool-specs/{name}.md`).
+2. Follow the `testing` skill for per-layer test patterns and fixtures (mock_conn, tool_fns, EXPECTED_TOOLS, TOOL_BUILDERS, char-escape rules).
+3. In Stage 1, write tests as red — the implementation files do not yet contain the tool.
+4. Before reporting back, run `pytest tests/unit/ -q --tb=no` and confirm exactly your new tests are red and the rest of the suite is green.
+5. Report `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:subagent-driven-development`.
+
+## Out of scope
+
+- Do not edit production code under `multiomics_explorer/`.
+- Do not edit input YAML, generated about markdown, analysis md, or example pythons.
+- Do not change the spec — flag scope concerns instead.

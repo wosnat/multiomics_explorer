@@ -1,46 +1,39 @@
 ---
 name: doc-updater
-description: Update documentation and skill files to reflect MCP tool changes (renames, new signatures, changed behavior)
+description: Update tool YAML inputs (regenerates about-content), analysis methodology docs, runnable example pythons, and the CLAUDE.md tool table
 ---
 
-# Doc Updater Agent
+# Doc updater
 
-You update all markdown documentation and skill files to reflect changes made to MCP tools.
+## Files you own
 
-## Scope — files you own
+- `multiomics_explorer/inputs/tools/{name}.yaml` — human-authored sections (examples, mistakes, chaining, verbose_fields).
+- `multiomics_explorer/skills/multiomics-kg-guide/references/analysis/{name}.md` — hand-authored analysis methodology (e.g. enrichment, expression). Update when an analysis utility's signature, return shape, or behavior changes.
+- `examples/{name}.py` — runnable example pythons served as MCP resource `docs://examples/{name}.py`.
+- `CLAUDE.md` — the per-tool entry in the tool table.
 
-- `CLAUDE.md`
-- `README.md`
-- `docs/architecture_target_v2.md`
-- `docs/methodology/llm_omics_analysis_v2.md`
-- `docs/transition_plan_v2.md`
-- `.claude/skills/*/SKILL.md` and `.claude/skills/*/references/*.md`
+You also run `scripts/build_about_content.py` to regenerate
+`multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`
+from the YAML + Pydantic models. Never edit the generated `tools/{name}.md` directly.
 
-## Dependencies
+## How to work
 
-- **Depends on: query-builder AND tool-wrapper** — the production code changes must be complete so you can read the final state
-- **Can run in parallel with: test-updater** — you don't touch test files, they don't touch docs
+1. Read the spec referenced in your brief (typically `docs/tool-specs/{name}.md`).
+2. Update or create the input YAML in `multiomics_explorer/inputs/tools/{name}.yaml`. New tool? Generate skeleton first:
+   `uv run python scripts/build_about_content.py --skeleton {name}`
+3. Regenerate the about markdown:
+   `uv run python scripts/build_about_content.py {name}`
+4. If the spec touches analysis utilities, hand-edit the matching `references/analysis/*.md` and the corresponding `examples/*.py`.
+5. Update the CLAUDE.md tool-table row for the tool (purpose, key params, summary fields).
+6. Before reporting back, run scoped pytest and confirm green:
+   - `pytest tests/unit/test_about_content.py -q`
+   - `pytest tests/integration/test_about_examples.py -m kg -q`
+   - If analysis md changed: `pytest tests/unit/test_analysis_about_content.py -q` and `pytest tests/integration/test_examples.py -m kg -q`
+7. Report `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:subagent-driven-development`.
 
-## What you do
+## Out of scope
 
-Given an implementation plan (in `docs/tool-specs/`), update all documentation to reflect the changes:
-
-1. **Read the plan** to understand what changed (tool renames, parameter renames, new tools, new behavior)
-2. **Read each doc file** listed in scope above
-3. **For each file**, find and update:
-   - Tool name references
-   - Parameter references
-   - Tool tables listing tool names and descriptions
-   - Code examples showing tool usage
-   - Skill files that mention tool names, function names, or parameter names
-4. **Update descriptions** where the tool's purpose changed
-5. **Update tool counts** if a tool was added/removed
-6. **Update about content** (MCP resource files) in skill reference files if tool behavior changed
-
-## Rules
-
-- Do NOT touch Python source files or test files
-- Do NOT change the structure or organization of docs — only update references
-- Preserve existing formatting and style of each document
-- When a tool is renamed, update both the tool name and its description to match the new docstring
-- Check skill files carefully — they contain code examples that reference tool names and function names
+- Do not edit Python source under `multiomics_explorer/api/`, `kg/`, `mcp_server/`, or `analysis/`.
+- Do not edit test files.
+- Do not edit the generated `references/tools/*.md` directly — regenerate from YAML.
+- Do not change the spec — flag scope concerns instead.

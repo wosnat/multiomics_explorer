@@ -1,58 +1,52 @@
 ---
 name: add-or-update-tool
-description: Complete lifecycle for adding a new MCP tool or modifying an existing one. Two phases — definition (scope, KG exploration, schema iteration) then build (query builder, API, MCP wrapper, skills (about tool), tests, docs, review).
+description: Complete lifecycle for adding a new MCP tool or modifying an existing one. Phase 1 is user-driven scope + KG iteration; Phase 2 is parallel TDD build via 4 file-owned agents.
 disable-model-invocation: true
 argument-hint: "[tool name and description, e.g. 'list_experiments - new tool' or 'genes_by_function - add min_quality param']"
 ---
 
 # Add or update a tool
 
-See [checklist](references/checklist.md) for templates and file paths.
-See [field-rubric](references/field-rubric.md) for response-schema
-quality criteria — apply on every new tool and every response-schema
-change.
-See the **testing** skill for per-layer test patterns and fixtures.
+This skill orchestrates two phases. Phase 1 is project-specific (scope, KG
+iteration, Cypher verification, frozen spec). Phase 2 reuses `superpowers:`
+skills for TDD, parallel dispatch, and code review.
 
-## Phase 1: Definition (iterative, user-driven)
+References:
+- [field-rubric](references/field-rubric.md) — response-schema quality criteria
+- [checklist](references/checklist.md) — per-layer file paths + templates
+- `layer-rules` skill — Cypher conventions, file ownership, rename cascades
+- `testing` skill — per-layer test patterns, EXPECTED_TOOLS, TOOL_BUILDERS, fixtures
 
-All steps in this phase require user review and approval before
-proceeding. Do not move to Phase 2 without explicit user sign-off.
+## Two execution modes
 
-**Before starting:** ask clarifying questions about the tool's
-purpose, intended behavior, expected data shape, and how it fits
-into existing tool chains. Do not assume scope.
+The skill handles both shapes from one orchestration:
 
-**If modifying an existing tool,** first read all 4 layers:
+| Mode | Trigger | Phase 1 cost | Phase 2 briefing |
+|---|---|---|---|
+| A: single tool deep build | One tool, new or significant change | Heavy (KG iteration loop) | One entity per agent |
+| B: cross-tool small change | Spec names ≥2 tools | Light (one-page spec, no KG iteration) | N entities per agent — "do tool 1 as template, extend to 2..N within your file" |
 
-| Layer | What to read |
-|---|---|
-| queries_lib.py | Builder signature, Cypher, RETURN columns, params |
-| api/functions.py | Function signature, validation, response dict assembly |
-| mcp_server/tools.py | Pydantic models, wrapper, docstring |
-| Skills | About YAML in `multiomics_explorer/inputs/tools/` |
-| Tests | All test classes for this tool across test files |
-| Fixtures | `tests/fixtures/gene_data.py` projection helpers if applicable |
+Mode detection rule: if the spec lists ≥2 tools by name, use Mode B briefings.
 
-Steps 1–2 loop until scope and KG schema are stable.
+## Phase 1: Definition (user-driven, gated)
+
+All steps require user review before proceeding. Phase 2 does not begin
+without an explicit spec freeze.
+
+If modifying an existing tool, first read all 4 layers (queries_lib.py, api/functions.py, mcp_server/tools.py, inputs/tools/{name}.yaml) plus tests for that tool.
 
 ### Step 1: Define what's needed
 
-- What the tool does (or what's changing), who calls it, what chains
-  it participates in
-- Decide on result-size controls — see **Deciding result-size controls**
+- What the tool does (or what's changing), who calls it, what chains it participates in
+- Result-size controls (see below)
 - These requirements drive what the KG needs to support
-- → **Review:** present requirements to user for feedback
+- → User review
 
 #### Deciding result-size controls
 
-All tools return the uniform response shape: summary fields + `results`
-list. The question is which summary fields are useful and what
-defaults to use.
+All tools return summary fields + `results` list. The question is which summary fields and what defaults.
 
-**ID params are always lists.** Any tool accepting an ID list is a
-batch tool — batch input can be arbitrarily large. Therefore every
-ID-list tool supports `limit`, `summary`, summary fields, and
-`not_found`.
+**ID params are always lists.** Any tool accepting an ID list is a batch tool — every ID-list tool supports `limit`, `summary`, summary fields, and `not_found`.
 
 | Result size | Controls | Examples |
 |---|---|---|
@@ -60,266 +54,91 @@ ID-list tool supports `limit`, `summary`, summary fields, and
 | Batch input (ID lists) | `summary`, `verbose`, `limit`. Rich summary fields. `not_found` for missing IDs. | `gene_overview`, `gene_ontology_terms`, `gene_homologs` |
 | Frequently large (100+ rows) | `summary`, `verbose`, `limit`. Rich summary fields (breakdowns, distributions). | `differential_expression_by_gene`, `genes_by_function`, `genes_by_ontology` |
 
-**`summary`** (bool, default False): Sugar for `limit=0`. Returns
-summary fields only, `results=[]`. Useful when the LLM just needs
-counts/breakdowns without any rows.
-
-**`verbose`** (bool, default False): Controls per-row column width.
-Omits secondary columns by default — heavy text (abstract, description),
-taxonomy hierarchies, or other fields not needed for routing. The builder
-adds/removes RETURN columns based on this flag. Orthogonal to summary —
-`verbose` controls which columns, `limit` controls which rows.
-
-**Compact vs verbose field placement:** Short categorical fields
-(`gene_category`, `annotation_quality`, `term_type`) go in compact —
-they're lightweight and useful for routing/filtering decisions. Heavy
-text blobs (`gene_summary`, `function_description`, `abstract`) go in
-verbose. Match sibling tools for consistency (e.g. `genes_by_ontology`
-matches `genes_by_function`).
-
-**`limit`** (int | None): Caps `results` length. Default None in api/
-(all rows), small default in MCP (e.g. 5) so the LLM gets summary
-fields + a few example rows in one call.
-
-**About content**: Served via MCP resource `docs://tools/{tool_name}`,
-not as a tool parameter. Auto-generated from Pydantic models + input
-YAML.
+`summary=True` is sugar for `limit=0`. `verbose=True` adds heavy text columns; short categoricals stay in compact. About content is served via MCP resource `docs://tools/{name}`, not as a tool parameter.
 
 ### Step 2: KG exploration + iteration
 
-- Query live KG (`run_cypher`) to check whether current nodes,
-  edges, properties, and data volumes support the requirements
-- If schema changes needed, write a KG change spec at
-  **`docs/kg-specs/kg-spec-{tool-name}.md`** using [template](assets/kg-spec-template.md)
-- User coordinates with KG repo (manual — may involve KG rebuild)
-- After KG changes land, re-query live KG to verify
-- Refine requirements based on what the KG can actually support —
-  this may reveal new needs
-- → **Review:** present updated findings to user. Repeat steps 1–2.
+- Query live KG (`run_cypher`) to check whether nodes/edges/properties/data volumes support the requirements.
+- If schema changes needed, write a KG-side spec at `docs/kg-specs/kg-spec-{tool-name}.md` using [template](assets/kg-spec-template.md). User coordinates with the KG repo (manual; may involve KG rebuild).
+- Re-query after KG changes land. Refine requirements.
+- → User review. Loop with Step 1 until stable.
 
 ### Step 3: Draft and verify Cypher
 
-Before writing the spec, draft the actual Cypher queries and verify
-them against the live KG. This catches design problems before build.
+Before writing the spec, draft the actual Cypher and verify against the live KG:
 
-- **Detail query:** Run with representative inputs. Verify columns,
-  row counts, sort order, and values are correct.
-- **Summary query:** Run and compare `total_matching` against detail
-  row count. They must match — if they don't, the summary query has
-  a bug. Fix before writing the spec.
-- **Filters:** If the query uses NOT EXISTS, level restrictions, or
-  hierarchy expansion, run with and without. Confirm the filter
-  actually changes results. If it doesn't, it's a no-op — document
-  why or remove it.
-- **Edge cases:** Test with a gene/entity that has no results. Test
-  with a nonexistent input. Test batch with mixed found/not-found.
-- **Multi-dimension tools:** If the tool spans multiple entity types
-  (e.g. 9 ontology types), decide the orchestration pattern now:
-  single-dimension builders with api/ loop, or multi-dimension UNION.
-  Verify summary builders return per-entity identity for cross-
-  dimension merging (e.g. `{locus_tag, count}` not `[count]`).
+- Detail query with representative inputs — verify columns, row counts, sort order, values.
+- Summary query — `total_matching` must equal detail row count.
+- Filter no-ops — run with and without each filter; if it doesn't change results, document why or remove it.
+- Edge cases — gene/entity with no results; nonexistent input; mixed found/not-found batch.
+- Multi-dimension tools (e.g. ontologies) — decide orchestration pattern (per-dimension builders + api loop, vs. UNION).
 
 Mark verified queries in the spec as "verified against live KG".
-Unverified Cypher in specs leads to rework during build.
 
-- → **Review:** present query results to user if non-obvious.
+### Output: frozen spec
 
-### Output: implementation plan
+Once scope, KG schema, and Cypher are stable, write the spec at `docs/tool-specs/{tool-name}.md` using [template](assets/tool-spec-template.md). Spec covers purpose, use cases, tool chains, result-size controls, return field names (per `layer-rules`), verified Cypher, special handling.
 
-Once scope, KG schema, and Cypher are stable, write the implementation
-plan at **`docs/tool-specs/{tool-name}.md`** using
-[template](assets/tool-spec-template.md). Document:
-- Purpose, use cases, tool chains
-- Result-size controls: summary, verbose, limit — or "none needed"
-- Return field names (use standard names from layer-rules)
-- Verified Cypher queries (detail + summary)
-- Any special handling (caching, multi-query orchestration, etc.)
-- → **Gate:** user approves implementation plan before proceeding
-  to build. **Spec is frozen after approval** — adding fields,
-  removing parameters, or changing the query architecture during
-  build requires re-approval. Design iteration belongs in Phase 1.
+→ **Gate:** user approves frozen spec. **Spec is frozen after approval.** Adding fields, removing parameters, or changing query architecture during build requires re-approval and bumps back to Phase 1.
 
-## Phase 2: Build (gated steps)
+## Phase 2: Build (parallel, TDD-disciplined)
 
-For new tools, create at each layer. For existing tools, update.
+Optional: open a worktree via `superpowers:using-git-worktrees` if the build will run alongside other work.
 
-**Optional: parallelize with agents.** For changes spanning all layers,
-use the specialized agents (`.claude/agents/`) to work in parallel:
-query-builder → api-updater → tool-wrapper → test-updater +
-doc-updater in parallel → code-reviewer last.
+Phase 2 is three stages. Pytest invocations in the orchestrator: 3 (plus scoped self-verifies inside each agent).
 
-### Layer 1: Query builder → `kg/queries_lib.py`
+### Stage 1 — RED
 
-- `def build_{name}(*, ...) -> tuple[str, dict]`
-- Add summary variant `build_{name}_summary()` if tool has rich
-  summary fields. Summary builder uses `apoc.coll.frequencies()` for
-  per-dimension breakdowns. For fulltext search tools, also collect
-  `score_max` and `score_median`.
-- If tool has `verbose`, use conditional RETURN columns (see checklist)
-- Keyword-only args, `$param` placeholders, `AS snake_case` aliases
-- WHERE clause: build conditions list + params dict, join with AND
-- ID params are always `list[str] | None` with Cypher `IN`.
-  CONTAINS filters stay as `str`.
-- Every query MUST have `ORDER BY` — use natural sort key or alphabetical fallback
-- APOC is available — use `apoc.coll.*` for aggregations,
-  `apoc.map.*` for dynamic result construction,
-  `apoc.convert.fromJsonMap` for JSON properties
-- → **Gate:** `pytest tests/unit/test_query_builders.py::TestBuild{Name} -v`
+Dispatch `test-updater` agent with the frozen spec. It writes failing tests across `test_query_builders.py`, `test_api_functions.py`, `test_tool_wrappers.py` and updates `EXPECTED_TOOLS` and `TOOL_BUILDERS`.
 
-### Layer 2: API function → `api/functions.py`
+Run `pytest tests/unit/ -q --tb=no`. Expect exactly the new tests red, rest green. Unrelated red → halt and investigate.
 
-- Calls builder + `conn.execute_query`
-- **Assembles the complete response dict** — summary fields, results,
-  `returned`, `truncated`, `not_found` (for batch tools). MCP just
-  wraps it.
-- Accepts `summary`, `verbose`, `limit` as applicable
-- `summary=True` → sets `limit=0` internally
-- 2-query pattern: summary query always runs, detail query skipped
-  when `limit=0`
-- `conn: GraphConnection | None = None` as keyword-only last param
-- Document return dict keys in docstring (note verbose-only keys)
-- Wire exports: add to `api/__init__.py` and
-  `multiomics_explorer/__init__.py` `__all__`
-- → **Gate:** `pytest tests/unit/test_api_functions.py::Test{Name} -v`
+### Stage 2 — GREEN (parallel)
 
-### Layer 3: MCP wrapper → `mcp_server/tools.py`
+Dispatch the 4 implementer agents in **one** message, in parallel. Each owns a different file → collision-safe by construction. (`superpowers:subagent-driven-development` warns against parallel implementers in the general case; the layer-cut here is the exception.)
 
-- Thin wrapper — calls api/, validates via `Response(**data)`
-- `@mcp.tool(tags={...}, annotations={"readOnlyHint": True})` inside `register_tools(mcp)`
-- `ctx: Context` first, then tool params, then structural params
-  (`summary`, `verbose`, `limit`)
-- Default `limit` is small (e.g. 5) — LLM gets summary + example rows
-- Use `Annotated[type, Field(description=...)]` for all params —
-  descriptions go in Field, not in docstring `Args:` section
-- Use `Literal["val1", "val2"]` for params with fixed valid values
-  known at code time. Not for KG-derived values — those use
-  `list_filter_values` for discovery.
-- Use `Field(ge=..., le=...)` for numeric constraints (e.g. limit)
-- Use `ToolError` for errors instead of returning error strings
-- `async def` — tools are async. Use `await ctx.info()`, `await ctx.warning()`,
-  `await ctx.error()` for MCP client-visible logging
-- Define Pydantic `BaseModel` classes for response: `{Name}Result` (per-row)
-  and `{Name}Response` (envelope). Envelope fields:
-  - `total_matching` — always (count matching all filters)
-  - `total_entries` — tools with filters only (total in KG before
-    filtering; gives selectivity context: "3 of 15")
-  - `returned` — always (len of results list)
-  - `truncated` — always (`True` when `total_matching > returned`,
-    including when `summary=True` with matches)
-  - `not_found` — batch tools (accept ID lists). Empty list when
-    all matched. Not on search tools.
-  - `results` — always (list of `{Name}Result`)
-- Include examples in `Field(description=...)` for all result fields
-  (e.g. `"Genus (e.g. 'Prochlorococcus')"`)
-- Docstring is tool-level purpose only — return schema in Pydantic models
-- No field computation — api/ dict → `Response(**data)`
-- → **Gate:** `pytest tests/unit/test_tool_wrappers.py::Test{Name}Wrapper -v`
-
-### Layer 4: About content (MCP resource)
-
-About content is auto-generated from Pydantic models + human-authored
-input YAML, then served via MCP resource at `docs://tools/{name}`.
-
-1. Create input YAML (or generate skeleton):
-   ```bash
-   uv run python scripts/build_about_content.py --skeleton {name}
-   ```
-   Edit `multiomics_explorer/inputs/tools/{name}.yaml`:
-
-   ```yaml
-   examples:
-     - title: Short description of this example
-       call: tool_name(locus_tags=["PMM0001"])    # tool call to show
-       response: |                                 # optional example response
-         {"total_matching": 1, "results": [{"locus_tag": "PMM0001", ...}]}
-         # IMPORTANT: result objects inside "results" must be single-line.
-         # Multi-line objects cause test_about_examples key-extraction regex
-         # to match nested fields (e.g. "product") as top-level keys.
-
-     - title: Multi-step chaining example
-       steps: |                                    # use steps for chains
-         Step 1: first_tool(param="value")
-                 → what to extract from result
-
-         Step 2: tool_name(locus_tags=extracted_tags)
-                 → what to do next
-
-   verbose_fields:                            # fields only returned with verbose=True
-     - abstract                               # splits per-result table in generated about
-     - description
-
-   chaining:                                  # tool flow patterns
-     - "previous_tool → tool_name → next_tool"
-
-   mistakes:                                  # notes/gotchas or wrong/right pairs
-     - "plain note renders as bullet"         # → "Good to know" section
-     - wrong: "len(results)  # wrong"         # → "Common mistakes" section
-       right: "response['total_matching']"
-   ```
-
-2. Build the about markdown:
-   ```bash
-   uv run python scripts/build_about_content.py {name}
-   ```
-   Outputs to `multiomics_explorer/skills/multiomics-kg-guide/references/tools/{name}.md`.
-   Params table, response format, expected-keys are auto-generated from
-   Pydantic models. Examples and chaining come from the input YAML.
-
-3. Verify:
-   - → **Gate:** `pytest tests/unit/test_about_content.py -v` (consistency)
-   - → **Gate:** `pytest tests/integration/test_about_examples.py -v` (examples execute against KG)
-
-### Unit tests (all three layers)
-
-Run alongside or after each layer. Each layer has its own test class:
-
-| Layer | Test file | Test class |
-|---|---|---|
-| Query builder | `tests/unit/test_query_builders.py` | `TestBuild{Name}` |
-| API function | `tests/unit/test_api_functions.py` | `Test{Name}` |
-| MCP wrapper | `tests/unit/test_tool_wrappers.py` | `Test{Name}Wrapper` + update `EXPECTED_TOOLS` |
-
-→ **Gate:** `pytest tests/unit/ -v`
-
-### Integration + regression tests
-
-- Integration: add/update in `tests/integration/test_mcp_tools.py`
-- Regression: add/update cases in `tests/evals/cases.yaml`,
-  add builder to `TOOL_BUILDERS` in `tests/regression/test_regression.py`
-- **Regenerate baselines** (required for renames or column changes):
-  `pytest tests/regression/ --force-regen -m kg`
-- Verify baselines match: `pytest tests/regression/ -m kg`
-- → **Gate:** all tests pass:
-  ```bash
-  pytest tests/unit/ -v
-  pytest tests/integration/ -v
-  pytest tests/regression/ -m kg
-  ```
-
-### Documentation
-
-- Update `CLAUDE.md` tool table with new/changed tool
-
-### Code review
-
-Run through code-review checklist.
-Layer boundaries, signatures, tests, naming, docs all verified.
-
-## Cascading renames (modify only)
-
-When renaming affects multiple layers:
-
-| What's renamed | Files to update |
+| Agent | Owns |
 |---|---|
-| Builder function | queries_lib.py, api/functions.py imports, test imports, TOOL_BUILDERS |
-| API function | api/functions.py, `__init__.py` (both), tools.py import, all tests |
-| MCP tool | tools.py, EXPECTED_TOOLS in test_tool_wrappers.py, cases.yaml |
-| MCP tool name | **Other tools' docstrings** that reference this tool by name (e.g. resolve_gene docstring says "use get_homologs") |
-| RETURN column | Builder Cypher, fixture projection helpers (`as_*_result`), all test assertions |
-| Parameter name | Builder, API, MCP wrapper, all test call sites |
-| Regression baselines | `tests/regression/test_regression/` golden files — must regenerate with `--force-regen` |
+| `query-builder` | `kg/queries_lib.py` |
+| `api-updater` | `api/functions.py` (+ `__init__.py` exports, `analysis/*.py` if touched) |
+| `tool-wrapper` | `mcp_server/tools.py` |
+| `doc-updater` | `inputs/tools/*.yaml` (regen via `build_about_content.py`), `references/analysis/*.md`, `examples/*.py`, `CLAUDE.md` tool table |
 
-Use grep to find all references before renaming:
-```bash
-grep -r "old_name" multiomics_explorer/ tests/
-```
+Each agent is briefed with: the frozen spec, its file(s), a pointer to `layer-rules` skill, "tests are red in your scope; make them green," and its scoped self-verify command.
+
+For Mode B (cross-tool), each brief gains: "Implement tool 1 as the template within your file, then extend to tools 2..N."
+
+Each agent reports `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:subagent-driven-development`.
+
+### Stage 3 — VERIFY
+
+Once all 4 agents report green:
+
+1. **Background**: dispatch the standard `code-reviewer` subagent via `superpowers:requesting-code-review` against the diff + spec.
+2. **Foreground**: `pytest tests/unit/ -q`
+3. **Foreground**: `pytest tests/integration/ -m kg -q`
+4. **Foreground**: `pytest tests/regression/ -m kg -q`
+   If the spec declared new or renamed columns, run `pytest tests/regression/ --force-regen -m kg -q` first, then verify.
+
+Code review report returns alongside or after the KG gates. Findings either land clean or trigger one fix loop (re-dispatch the relevant agent with feedback as additional brief).
+
+Then `superpowers:verification-before-completion` for the claim of done, and `superpowers:finishing-a-development-branch` for branch close + PR.
+
+## Skills + agents map
+
+| Concern | Use |
+|---|---|
+| Phase 1 scope brainstorm | `superpowers:brainstorming` |
+| Phase 1 plan from spec | `superpowers:writing-plans` |
+| Phase 2 RED → GREEN discipline | `superpowers:test-driven-development` |
+| Phase 2 parallel dispatch | `superpowers:dispatching-parallel-agents` (inside `superpowers:subagent-driven-development`) |
+| Code review | `superpowers:requesting-code-review` |
+| Verify before claiming done | `superpowers:verification-before-completion` |
+| Branch isolation (optional) | `superpowers:using-git-worktrees` |
+| Branch close + PR | `superpowers:finishing-a-development-branch` |
+| Layer conventions | `layer-rules` skill |
+| Test patterns | `testing` skill |
+
+## When something doesn't fit
+
+If a layer ownership question doesn't have a clear answer (e.g. a new helper that crosses files), pause and surface to the user. Do not let an agent expand scope unilaterally.

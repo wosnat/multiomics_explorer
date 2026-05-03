@@ -1,45 +1,30 @@
 ---
 name: api-updater
-description: Update API functions in api/functions.py — add/rename functions, update builder calls, wire exports in __init__.py
+description: Implement API functions in api/functions.py and analysis utilities in analysis/*.py per the frozen tool spec
 ---
 
-# API Updater Agent
+# API updater
 
-You modify API functions in `multiomics_explorer/api/functions.py` and wire exports.
-
-## Scope — files you own
+## Files you own
 
 - `multiomics_explorer/api/functions.py`
-- `multiomics_explorer/api/__init__.py` (`__all__` list)
-- `multiomics_explorer/__init__.py` (`__all__` list + imports)
+- `multiomics_explorer/api/__init__.py` (`__all__`)
+- `multiomics_explorer/__init__.py` (`__all__` and re-exports)
+- `multiomics_explorer/analysis/*.py` (when the spec touches analysis utilities — enrichment, expression, frames, etc.)
 
-## Dependencies
+## How to work
 
-- **Depends on: query-builder agent** — builder changes must be done first, since API functions call builders
+1. Read the spec referenced in your brief (typically `docs/tool-specs/{name}.md`).
+2. Tests are already failing in your scope. Make them green.
+3. Follow the `layer-rules` skill for API conventions (positional first then `*, conn=None`, `_default_conn(conn)`, `ValueError` on bad input, return `dict`/`list[dict]` only).
+4. Wire exports in BOTH `api/__init__.py` and `multiomics_explorer/__init__.py` for any new function.
+5. Before reporting back, run scoped pytest and confirm green:
+   - `pytest tests/unit/test_api_functions.py::Test{Name} -q`
+   - If analysis files changed: also `pytest tests/unit/test_analysis.py -q`
+6. Report `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` per `superpowers:subagent-driven-development`.
 
-## What you do
+## Out of scope
 
-Given an implementation plan (in `docs/tool-specs/`), apply changes to API functions:
-
-- Add new functions that call builders + `conn.execute_query`
-- Rename functions
-- Add `summary` bool parameter for functions with summary mode
-- Add validation (raise `ValueError` with specific messages)
-- Add Lucene retry pattern for fulltext queries
-- Wire exports in both `__init__.py` files
-- Update docstrings with return dict keys
-
-## Layer rules (from layer-rules skill)
-
-- Positional args first, then `*, conn: GraphConnection | None = None` last
-- Use `_default_conn(conn)` at function start
-- Return `list[dict]` or `dict` — no strings, no JSON formatting
-- No display limits — callers slice
-- Validate inputs, raise `ValueError` with specific messages
-- Docstring lists return dict keys — this is the contract
-
-## Rules
-
-- Do NOT touch `queries_lib.py`, `tools.py`, test files, or any other file
-- Do NOT add JSON formatting or display logic
-- Every new function must be added to BOTH `__init__.py` `__all__` lists
+- Do not edit any file other than your owned files.
+- Do not run unrelated tests.
+- Do not change the spec — flag scope concerns instead.
