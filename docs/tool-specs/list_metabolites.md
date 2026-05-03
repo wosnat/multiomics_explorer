@@ -1220,6 +1220,12 @@ uv run python scripts/build_about_content.py list_metabolites
   for non-MCP callers. Per field-rubric: "Use Literal[...] for params
   with fixed valid values known at code time" — the open-ended
   rationale was overruled in favor of MCP-boundary safety.
+- **KG-A9 / KG-A10 indexes — RESOLVED:** `kegg_term_id_idx` (RANGE
+  on KeggTerm.id) and `metabolite_hmdb_idx` (RANGE on
+  Metabolite.hmdb_id) both LANDED 2026-05-03 (verified ONLINE via
+  `SHOW INDEXES`). Summary `top_pathways` KeggTerm lookup is now an
+  index seek; `hmdb_ids` filter has sibling-index parity with
+  chebi/kegg/mnxm. No remaining KG-side dependencies for Phase 2.
 
 ## References
 

@@ -20,10 +20,17 @@ for `list_metabolites`. Both are 1-line `CREATE INDEX` statements,
 
 ## Summary
 
-| # | Item | Class | Severity |
-|---|---|---|---|
-| **KG-A9** | `kegg_term_id_idx` RANGE on `KeggTerm.id` | Schema addition (online index) | MED — load-bearing for `list_metabolites.top_pathways` summary CALL + `not_found.pathway_ids` existence check |
-| **KG-A10** | `metabolite_hmdb_idx` RANGE on `Metabolite.hmdb_id` | Schema addition (online index) | LOW — consistency with sibling chebi/kegg/mnxm indexes; affects `list_metabolites.hmdb_ids` filter only |
+| # | Item | Class | Severity | Status |
+|---|---|---|---|---|
+| **KG-A9** | `kegg_term_id_idx` RANGE on `KeggTerm.id` | Schema addition (online index) | MED — load-bearing for `list_metabolites.top_pathways` summary CALL + `not_found.pathway_ids` existence check | **LANDED 2026-05-03** |
+| **KG-A10** | `metabolite_hmdb_idx` RANGE on `Metabolite.hmdb_id` | Schema addition (online index) | LOW — consistency with sibling chebi/kegg/mnxm indexes; affects `list_metabolites.hmdb_ids` filter only | **LANDED 2026-05-03** |
+
+**Build update (2026-05-03):** both indexes live and ONLINE. Verified
+via `SHOW INDEXES`: `kegg_term_id_idx` (RANGE on KeggTerm.id) and
+`metabolite_hmdb_idx` (RANGE on Metabolite.hmdb_id) both
+`state: ONLINE`. `list_metabolites` Phase 2 build is fully unblocked
+on the performance front; the `top_pathways` summary CALL's KeggTerm
+lookup is now an index seek instead of a 5K-node label scan.
 
 ---
 
