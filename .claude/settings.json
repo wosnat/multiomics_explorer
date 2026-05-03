@@ -13,7 +13,11 @@
       "Bash(pytest:*)",
       "Bash(python -m pytest:*)",
       "Bash(uv run python -m pytest:*)",
-      "mcp__multiomics-kg__differential_expression_by_gene"
+      "Bash(uv run pytest:*)",
+      "mcp__multiomics-kg__differential_expression_by_gene",
+      "mcp__multiomics-kg__run_cypher",
+      "mcp__multiomics-kg__kg_schema",
+      "mcp__multiomics-kg__list_experiments"
     ]
   },
   "enabledPlugins": {
