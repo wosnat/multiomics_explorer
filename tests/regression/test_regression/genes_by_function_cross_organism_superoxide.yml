@@ -7,452 +7,452 @@ rows:
   locus_tag: A9601_14931
   organism_name: Prochlorococcus AS9601
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: A9601_14941
   organism_name: Prochlorococcus AS9601
   product: nickel-type superoxide dismutase maturation protease
-  score: 13.3598
+  score: 13.3603
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: sodN
   locus_tag: ACZ81_02705
   organism_name: Alteromonas macleodii HOT1A3
   product: superoxide dismutase, Ni
-  score: 22.3895
+  score: 22.39
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: ACZ81_05890
   organism_name: Alteromonas macleodii HOT1A3
   product: superoxide dismutase [Fe]
-  score: 14.721
+  score: 14.7217
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodC
   locus_tag: ACZ81_14980
   organism_name: Alteromonas macleodii HOT1A3
   product: superoxide dismutase family protein
-  score: 15.3162
+  score: 15.3169
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: sodN
   locus_tag: ALTBGP6_00556
   organism_name: Alteromonas macleodii BGP6
   product: superoxide dismutase, Ni
-  score: 22.3895
+  score: 22.39
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: ALTBGP6_01232
   organism_name: Alteromonas macleodii BGP6
   product: superoxide dismutase [Fe]
-  score: 14.721
+  score: 14.7217
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodC
   locus_tag: ALTBGP6_03071
   organism_name: Alteromonas macleodii BGP6
   product: superoxide dismutase family protein
-  score: 15.3162
+  score: 15.3169
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: sodN
   locus_tag: AMBAS45_02650
   organism_name: Alteromonas macleodii AD45
   product: superoxide dismutase, Ni
-  score: 22.3895
+  score: 22.39
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: AMBAS45_05760
   organism_name: Alteromonas macleodii AD45
   product: superoxide dismutase [Fe]
-  score: 14.1527
+  score: 14.1534
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodC
   locus_tag: AMBAS45_14935
   organism_name: Alteromonas macleodii AD45
   product: superoxide dismutase family protein
-  score: 15.3162
+  score: 15.3169
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: AMBLS11_05615
   organism_name: Alteromonas macleodii BS11
   product: superoxide dismutase [Fe]
-  score: 14.1527
+  score: 14.1534
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodC
   locus_tag: AMBLS11_14265
   organism_name: Alteromonas macleodii BS11
   product: superoxide dismutase family protein
-  score: 15.3162
+  score: 15.3169
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: BL107_11111
   organism_name: Synechococcus sp. BL107
   product: nickel-type superoxide dismutase maturation protease
-  score: 12.5219
+  score: 12.5226
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: BL107_11116
   organism_name: Synechococcus sp. BL107
   product: superoxide dismutase [Ni]
-  score: 22.5335
+  score: 22.5339
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodC
   locus_tag: BL107_14050
   organism_name: Synechococcus sp. BL107
   product: superoxide dismutase [Cu-Zn]
-  score: 16.516
+  score: 16.5167
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sodN
   locus_tag: BSR22_00950
   organism_name: Prochlorococcus RSP50
   product: superoxide dismutase, Ni
-  score: 20.9206
+  score: 20.921
 - annotation_quality: 3
   gene_category: Intracellular trafficking
   gene_name: sodX
   locus_tag: BSR22_00955
   organism_name: Prochlorococcus RSP50
   product: nickel-type superoxide dismutase maturation protease
-  score: 17.5905
+  score: 17.591
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: DEH24_01655
   organism_name: Alteromonas (MarRef v6)
   product: superoxide dismutase [Fe]
-  score: 14.1527
+  score: 14.1534
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: sodN
   locus_tag: EZ55_00595
   organism_name: Alteromonas macleodii EZ55
   product: superoxide dismutase, Ni
-  score: 22.3895
+  score: 22.39
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: EZ55_01223
   organism_name: Alteromonas macleodii EZ55
   product: superoxide dismutase [Fe]
-  score: 14.721
+  score: 14.7217
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodC
   locus_tag: EZ55_03092
   organism_name: Alteromonas macleodii EZ55
   product: superoxide dismutase family protein
-  score: 15.2172
+  score: 15.2179
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: H6G84_RS12345
   locus_tag: H6G84_12345
   organism_name: Synechococcus elongatus PCC 7942
   product: superoxide dismutase
-  score: 14.5778
+  score: 14.5785
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: HP15_2351
   organism_name: Marinobacter (MarRef v6)
   product: superoxide dismutase [Fe]
-  score: 14.721
+  score: 14.7217
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sodB
   locus_tag: M744_12745
   organism_name: Synechococcus elongatus UTEX 2973
   product: superoxide dismutase
-  score: 14.5778
+  score: 14.5785
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sodB
   locus_tag: M8001_04830
   organism_name: Pseudomonas putida KT2440
   product: superoxide dismutase
-  score: 14.5778
+  score: 14.5785
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sodA
   locus_tag: M8001_04985
   organism_name: Pseudomonas putida KT2440
   product: superoxide dismutase
-  score: 14.3609
+  score: 14.3616
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: sodN
   locus_tag: MASE_02360
   organism_name: Alteromonas macleodii ATCC27126
   product: superoxide dismutase, Ni
-  score: 22.3895
+  score: 22.39
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: MASE_05550
   organism_name: Alteromonas macleodii ATCC27126
   product: superoxide dismutase [Fe]
-  score: 14.1527
+  score: 14.1534
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodC
   locus_tag: MASE_14460
   organism_name: Alteromonas macleodii ATCC27126
   product: superoxide dismutase family protein
-  score: 15.3162
+  score: 15.3169
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: sodN
   locus_tag: MIT1002_00621
   organism_name: Alteromonas macleodii MIT1002
   product: superoxide dismutase, Ni
-  score: 22.3895
+  score: 22.39
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: MIT1002_01234
   organism_name: Alteromonas macleodii MIT1002
   product: superoxide dismutase [Fe]
-  score: 14.721
+  score: 14.7217
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodC
   locus_tag: MIT1002_03069
   organism_name: Alteromonas macleodii MIT1002
   product: superoxide dismutase family protein
-  score: 15.3162
+  score: 15.3169
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: NATL1_17141
   organism_name: Prochlorococcus NATL1A
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: NATL1_17151
   organism_name: Prochlorococcus NATL1A
   product: nickel-type superoxide dismutase maturation protease
-  score: 13.3598
+  score: 13.3603
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: P9301_14791
   organism_name: Prochlorococcus MIT9301
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: P9301_14801
   organism_name: Prochlorococcus MIT9301
   product: nickel-type superoxide dismutase maturation protease
-  score: 13.3598
+  score: 13.3603
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: P9303_19731
   organism_name: Prochlorococcus MIT9303
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: P9303_19741
   organism_name: Prochlorococcus MIT9303
   product: nickel-type superoxide dismutase maturation protease
-  score: 13.3598
+  score: 13.3603
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: PMM1294
   organism_name: Prochlorococcus MED4
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: PMM1295
   organism_name: Prochlorococcus MED4
   product: nickel-type superoxide dismutase maturation protease
-  score: 12.5219
+  score: 12.5226
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: PMN2A_0861
   organism_name: Prochlorococcus NATL2A
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: PMN2A_0862
   organism_name: Prochlorococcus NATL2A
   product: nickel-type superoxide dismutase maturation protease
-  score: 13.3598
+  score: 13.3603
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: PMT0339
   organism_name: Prochlorococcus MIT9313
   product: nickel-type superoxide dismutase maturation protease
-  score: 13.3598
+  score: 13.3603
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: PMT0340
   organism_name: Prochlorococcus MIT9313
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: PMT9312_1390
   organism_name: Prochlorococcus MIT9312
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: PMT9312_1391
   organism_name: Prochlorococcus MIT9312
   product: nickel-type superoxide dismutase maturation protease
-  score: 13.3598
+  score: 13.3603
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: Pro1368
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: superoxide dismutase [Ni]
-  score: 20.9612
+  score: 20.9616
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: Pro1369
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: nickel-type superoxide dismutase maturation protease
-  score: 13.3598
+  score: 13.3603
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sodB
   locus_tag: SPO2340
   organism_name: Ruegeria pomeroyi DSS-3
   product: superoxide dismutase
-  score: 14.8653
+  score: 14.866
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: SY28_10125
   organism_name: Meiothermus ruber
   product: chlorite dismutase family protein
-  score: 11.383
+  score: 11.3832
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodA
   locus_tag: SY28_13305
   organism_name: Meiothermus ruber
   product: superoxide dismutase
-  score: 14.8653
+  score: 14.866
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sodB
   locus_tag: SYNPCC7002_A0242
   organism_name: Synechococcus PCC 7002
   product: superoxide dismutase
-  score: 14.5778
+  score: 14.5785
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: SYNW1626
   organism_name: Synechococcus WH8102
   product: superoxide dismutase [Ni]
-  score: 22.5335
+  score: 22.5339
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: SYNW1627
   organism_name: Synechococcus WH8102
   product: nickel-type superoxide dismutase maturation protease
-  score: 12.5219
+  score: 12.5226
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sodB
   locus_tag: Sputw3181_2338
   organism_name: Shewanella sp. W3-18-1
   product: superoxide dismutase [Fe]
-  score: 14.1527
+  score: 14.1534
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodC
   locus_tag: Sputw3181_3778
   organism_name: Shewanella sp. W3-18-1
   product: superoxide dismutase family protein
-  score: 15.3162
+  score: 15.3169
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodC
   locus_tag: SynWH7803_0951
   organism_name: Synechococcus WH7803
   product: superoxide dismutase [Cu-Zn]
-  score: 16.6907
+  score: 16.6914
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodB
   locus_tag: SynWH7803_1742
   organism_name: Synechococcus WH7803
   product: superoxide dismutase [Fe]
-  score: 16.6541
+  score: 16.6548
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: sync_0754
   organism_name: Synechococcus CC9311
   product: nickel-type superoxide dismutase maturation protease
-  score: 12.5219
+  score: 12.5226
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
   locus_tag: sync_0755
   organism_name: Synechococcus CC9311
   product: superoxide dismutase [Ni]
-  score: 22.5335
+  score: 22.5339
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodC
   locus_tag: sync_1771
   organism_name: Synechococcus CC9311
   product: superoxide dismutase [Cu-Zn]
-  score: 16.516
+  score: 16.5167
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
   locus_tag: sync_2434
   organism_name: Synechococcus CC9311
   product: nickel-type superoxide dismutase
-  score: 22.0769
+  score: 22.0774
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sodB
   locus_tag: tll1519
   organism_name: Thermosynechococcus vestitus BP-1
   product: superoxide dismutase
-  score: 14.8653
+  score: 14.866
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: tlr0036
   organism_name: Thermosynechococcus vestitus BP-1
   product: superoxide dismutase
-  score: 14.8653
+  score: 14.866

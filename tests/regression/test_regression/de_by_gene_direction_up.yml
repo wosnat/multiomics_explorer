@@ -1,5 +1,5 @@
 case_id: de_by_gene_direction_up
-row_count: 4595
+row_count: 4594
 rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
@@ -8,7 +8,7 @@ rows:
   locus_tag: ACZ81_00035
   log2fc: 1.0174
   padj: 0.0001
-  rank: 1287
+  rank: 1286
   rank_down: null
   rank_up: 440
   timepoint: days 60+89
@@ -23,7 +23,7 @@ rows:
   locus_tag: ACZ81_00055
   log2fc: 11.4738
   padj: 0.0
-  rank: 727
+  rank: 726
   rank_down: null
   rank_up: 141
   timepoint: 20h
@@ -68,7 +68,7 @@ rows:
   locus_tag: ACZ81_00055
   log2fc: 1.0767
   padj: 0.0027
-  rank: 1205
+  rank: 1204
   rank_down: null
   rank_up: 403
   timepoint: days 60+89
@@ -98,7 +98,7 @@ rows:
   locus_tag: ACZ81_00070
   log2fc: 1.3307
   padj: 0.0011
-  rank: 861
+  rank: 860
   rank_down: null
   rank_up: 244
   timepoint: days 60+89
@@ -158,7 +158,7 @@ rows:
   locus_tag: ACZ81_00075
   log2fc: 1.5938
   padj: 0.0009
-  rank: 190
+  rank: 189
   rank_down: null
   rank_up: 100
   timepoint: day 31
@@ -233,9 +233,9 @@ rows:
   locus_tag: ACZ81_00200
   log2fc: 1.165
   padj: 0.0338
-  rank: 394
+  rank: 393
   rank_down: null
-  rank_up: 96
+  rank_up: 95
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -338,7 +338,7 @@ rows:
   locus_tag: ACZ81_00265
   log2fc: 1.0835
   padj: 0.0309
-  rank: 1184
+  rank: 1183
   rank_down: null
   rank_up: 394
   timepoint: days 60+89
@@ -413,7 +413,7 @@ rows:
   locus_tag: ACZ81_00285
   log2fc: 1.008
   padj: 0.0273
-  rank: 705
+  rank: 704
   rank_down: null
   rank_up: 353
   timepoint: day 89
@@ -443,7 +443,7 @@ rows:
   locus_tag: ACZ81_00300
   log2fc: 1.0611
   padj: 0.0284
-  rank: 668
+  rank: 667
   rank_down: null
   rank_up: 341
   timepoint: day 89
@@ -458,7 +458,7 @@ rows:
   locus_tag: ACZ81_00300
   log2fc: 1.0318
   padj: 0.0119
-  rank: 650
+  rank: 649
   rank_down: null
   rank_up: 325
   timepoint: days 60+89
@@ -533,7 +533,7 @@ rows:
   locus_tag: ACZ81_00310
   log2fc: 1.4809
   padj: 0.0
-  rank: 233
+  rank: 232
   rank_down: null
   rank_up: 121
   timepoint: day 31
@@ -578,7 +578,7 @@ rows:
   locus_tag: ACZ81_00315
   log2fc: 1.0939
   padj: 0.0084
-  rank: 635
+  rank: 634
   rank_down: null
   rank_up: 327
   timepoint: day 89
@@ -593,7 +593,7 @@ rows:
   locus_tag: ACZ81_00315
   log2fc: 1.0305
   padj: 0.0021
-  rank: 1265
+  rank: 1264
   rank_down: null
   rank_up: 429
   timepoint: days 60+89
@@ -638,7 +638,7 @@ rows:
   locus_tag: ACZ81_00360
   log2fc: 1.0138
   padj: 0.0453
-  rank: 1063
+  rank: 1062
   rank_down: null
   rank_up: 374
   timepoint: day 31
@@ -683,7 +683,7 @@ rows:
   locus_tag: ACZ81_00405
   log2fc: 15.9254
   padj: 0.0
-  rank: 700
+  rank: 699
   rank_down: null
   rank_up: 119
   timepoint: 20h
@@ -833,7 +833,7 @@ rows:
   locus_tag: ACZ81_00440
   log2fc: 1.4328
   padj: 0.0364
-  rank: 334
+  rank: 333
   rank_down: null
   rank_up: 59
   timepoint: day 31
@@ -848,7 +848,7 @@ rows:
   locus_tag: ACZ81_00465
   log2fc: 36.6436
   padj: 0.0
-  rank: 669
+  rank: 668
   rank_down: null
   rank_up: 88
   timepoint: 20h
@@ -863,7 +863,7 @@ rows:
   locus_tag: ACZ81_00520
   log2fc: 12.6976
   padj: 0.0
-  rank: 719
+  rank: 718
   rank_down: null
   rank_up: 135
   timepoint: 20h
@@ -878,7 +878,7 @@ rows:
   locus_tag: ACZ81_00535
   log2fc: 1.0752
   padj: 0.0065
-  rank: 652
+  rank: 651
   rank_down: null
   rank_up: 335
   timepoint: day 89
@@ -968,7 +968,7 @@ rows:
   locus_tag: ACZ81_00565
   log2fc: 82.0945
   padj: 0.0
-  rank: 657
+  rank: 656
   rank_down: null
   rank_up: 76
   timepoint: 20h
@@ -1058,7 +1058,7 @@ rows:
   locus_tag: ACZ81_00615
   log2fc: 9.9701
   padj: 0.0013
-  rank: 743
+  rank: 742
   rank_down: null
   rank_up: 155
   timepoint: 20h
@@ -1148,7 +1148,7 @@ rows:
   locus_tag: ACZ81_00640
   log2fc: 1.3729
   padj: 0.015
-  rank: 371
+  rank: 370
   rank_down: null
   rank_up: 71
   timepoint: day 31
@@ -1178,7 +1178,7 @@ rows:
   locus_tag: ACZ81_00650
   log2fc: 1.2132
   padj: 0.0064
-  rank: 508
+  rank: 507
   rank_down: null
   rank_up: 98
   timepoint: day 31
@@ -1193,7 +1193,7 @@ rows:
   locus_tag: ACZ81_00655
   log2fc: 1.1121
   padj: 0.0024
-  rank: 740
+  rank: 739
   rank_down: null
   rank_up: 298
   timepoint: day 18
@@ -1223,7 +1223,7 @@ rows:
   locus_tag: ACZ81_00680
   log2fc: 6.867
   padj: 0.0077
-  rank: 790
+  rank: 789
   rank_down: null
   rank_up: 185
   timepoint: 20h
@@ -1328,7 +1328,7 @@ rows:
   locus_tag: ACZ81_00720
   log2fc: 1.1399
   padj: 0.0234
-  rank: 583
+  rank: 582
   rank_down: null
   rank_up: 304
   timepoint: day 89
@@ -1343,7 +1343,7 @@ rows:
   locus_tag: ACZ81_00720
   log2fc: 1.0776
   padj: 0.04
-  rank: 446
+  rank: 445
   rank_down: null
   rank_up: 218
   timepoint: day 31
@@ -1358,7 +1358,7 @@ rows:
   locus_tag: ACZ81_00720
   log2fc: 1.0013
   padj: 0.0186
-  rank: 674
+  rank: 673
   rank_down: null
   rank_up: 337
   timepoint: days 60+89
@@ -1418,7 +1418,7 @@ rows:
   locus_tag: ACZ81_00725
   log2fc: 1.2476
   padj: 0.0005
-  rank: 764
+  rank: 763
   rank_down: null
   rank_up: 279
   timepoint: day 31
@@ -1508,7 +1508,7 @@ rows:
   locus_tag: ACZ81_00730
   log2fc: 1.083
   padj: 0.0153
-  rank: 966
+  rank: 965
   rank_down: null
   rank_up: 348
   timepoint: day 31
@@ -1523,7 +1523,7 @@ rows:
   locus_tag: ACZ81_00735
   log2fc: 70.3069
   padj: 0.0
-  rank: 660
+  rank: 659
   rank_down: null
   rank_up: 79
   timepoint: 20h
@@ -1538,7 +1538,7 @@ rows:
   locus_tag: ACZ81_00745
   log2fc: 7.9535
   padj: 0.0013
-  rank: 774
+  rank: 773
   rank_down: null
   rank_up: 173
   timepoint: 20h
@@ -1598,7 +1598,7 @@ rows:
   locus_tag: ACZ81_00795
   log2fc: 1.3029
   padj: 0.0119
-  rank: 713
+  rank: 712
   rank_down: null
   rank_up: 267
   timepoint: day 31
@@ -1673,7 +1673,7 @@ rows:
   locus_tag: ACZ81_00810
   log2fc: 13.1875
   padj: 0.0
-  rank: 716
+  rank: 715
   rank_down: null
   rank_up: 133
   timepoint: 20h
@@ -1793,7 +1793,7 @@ rows:
   locus_tag: ACZ81_00895
   log2fc: 1.2666
   padj: 0.0
-  rank: 750
+  rank: 749
   rank_down: null
   rank_up: 277
   timepoint: day 31
@@ -1898,7 +1898,7 @@ rows:
   locus_tag: ACZ81_00925
   log2fc: 1.1822
   padj: 0.0254
-  rank: 843
+  rank: 842
   rank_down: null
   rank_up: 309
   timepoint: day 31
@@ -2018,7 +2018,7 @@ rows:
   locus_tag: ACZ81_00970
   log2fc: 1.0637
   padj: 0.0028
-  rank: 784
+  rank: 783
   rank_down: null
   rank_up: 311
   timepoint: day 18
@@ -2033,7 +2033,7 @@ rows:
   locus_tag: ACZ81_00970
   log2fc: 1.0122
   padj: 0.0379
-  rank: 700
+  rank: 699
   rank_down: null
   rank_up: 351
   timepoint: day 89
@@ -2093,7 +2093,7 @@ rows:
   locus_tag: ACZ81_00975
   log2fc: 1.1275
   padj: 0.0171
-  rank: 602
+  rank: 601
   rank_down: null
   rank_up: 312
   timepoint: day 89
@@ -2138,7 +2138,7 @@ rows:
   locus_tag: ACZ81_00985
   log2fc: 1.0383
   padj: 0.0001
-  rank: 1024
+  rank: 1023
   rank_down: null
   rank_up: 364
   timepoint: day 31
@@ -2168,7 +2168,7 @@ rows:
   locus_tag: ACZ81_00990
   log2fc: 1.2936
   padj: 0.0016
-  rank: 312
+  rank: 311
   rank_down: null
   rank_up: 165
   timepoint: day 31
@@ -2213,7 +2213,7 @@ rows:
   locus_tag: ACZ81_00995
   log2fc: 1.3911
   padj: 0.0013
-  rank: 813
+  rank: 812
   rank_down: null
   rank_up: 226
   timepoint: days 60+89
@@ -2228,7 +2228,7 @@ rows:
   locus_tag: ACZ81_00995
   log2fc: 1.2094
   padj: 0.031
-  rank: 800
+  rank: 799
   rank_down: null
   rank_up: 292
   timepoint: day 31
@@ -2258,7 +2258,7 @@ rows:
   locus_tag: ACZ81_01005
   log2fc: 1.1909
   padj: 0.0
-  rank: 376
+  rank: 375
   rank_down: null
   rank_up: 192
   timepoint: day 31
@@ -2273,7 +2273,7 @@ rows:
   locus_tag: ACZ81_01005
   log2fc: 1.0044
   padj: 0.0001
-  rank: 709
+  rank: 708
   rank_down: null
   rank_up: 354
   timepoint: day 89
@@ -2288,7 +2288,7 @@ rows:
   locus_tag: ACZ81_01015
   log2fc: 13.2217
   padj: 0.0
-  rank: 715
+  rank: 714
   rank_down: null
   rank_up: 132
   timepoint: 20h
@@ -2588,7 +2588,7 @@ rows:
   locus_tag: ACZ81_01100
   log2fc: 1.2261
   padj: 0.0263
-  rank: 352
+  rank: 351
   rank_down: null
   rank_up: 181
   timepoint: day 31
@@ -2663,7 +2663,7 @@ rows:
   locus_tag: ACZ81_01135
   log2fc: 1.1005
   padj: 0.0001
-  rank: 1154
+  rank: 1153
   rank_down: null
   rank_up: 378
   timepoint: days 60+89
@@ -2678,7 +2678,7 @@ rows:
   locus_tag: ACZ81_01165
   log2fc: 8.1072
   padj: 0.0034
-  rank: 769
+  rank: 768
   rank_down: null
   rank_up: 170
   timepoint: 20h
@@ -2888,7 +2888,7 @@ rows:
   locus_tag: ACZ81_01215
   log2fc: 1.0745
   padj: 0.0051
-  rank: 774
+  rank: 773
   rank_down: null
   rank_up: 307
   timepoint: day 18
@@ -2918,7 +2918,7 @@ rows:
   locus_tag: ACZ81_01225
   log2fc: 1.1458
   padj: 0.0078
-  rank: 709
+  rank: 708
   rank_down: null
   rank_up: 288
   timepoint: day 18
@@ -2933,7 +2933,7 @@ rows:
   locus_tag: ACZ81_01230
   log2fc: 1.0875
   padj: 0.0446
-  rank: 960
+  rank: 959
   rank_down: null
   rank_up: 346
   timepoint: day 31
@@ -2993,7 +2993,7 @@ rows:
   locus_tag: ACZ81_01250
   log2fc: 1.1432
   padj: 0.0163
-  rank: 1099
+  rank: 1098
   rank_down: null
   rank_up: 351
   timepoint: days 60+89
@@ -3008,7 +3008,7 @@ rows:
   locus_tag: ACZ81_01270
   log2fc: 1.6503
   padj: 0.0384
-  rank: 172
+  rank: 171
   rank_down: null
   rank_up: 90
   timepoint: day 31
@@ -3083,9 +3083,9 @@ rows:
   locus_tag: ACZ81_01375
   log2fc: 1.0207
   padj: 0.0448
-  rank: 523
+  rank: 522
   rank_down: null
-  rank_up: 111
+  rank_up: 110
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -3113,7 +3113,7 @@ rows:
   locus_tag: ACZ81_01390
   log2fc: 8.9734
   padj: 0.0022
-  rank: 753
+  rank: 752
   rank_down: null
   rank_up: 162
   timepoint: 20h
@@ -3158,7 +3158,7 @@ rows:
   locus_tag: ACZ81_01440
   log2fc: 1.4634
   padj: 0.0378
-  rank: 308
+  rank: 307
   rank_down: null
   rank_up: 52
   timepoint: day 31
@@ -3173,7 +3173,7 @@ rows:
   locus_tag: ACZ81_01440
   log2fc: 1.2667
   padj: 0.0139
-  rank: 936
+  rank: 935
   rank_down: null
   rank_up: 275
   timepoint: days 60+89
@@ -3218,7 +3218,7 @@ rows:
   locus_tag: ACZ81_01445
   log2fc: 1.2191
   padj: 0.0201
-  rank: 996
+  rank: 995
   rank_down: null
   rank_up: 308
   timepoint: days 60+89
@@ -3263,7 +3263,7 @@ rows:
   locus_tag: ACZ81_01450
   log2fc: 1.3864
   padj: 0.0007
-  rank: 814
+  rank: 813
   rank_down: null
   rank_up: 227
   timepoint: days 60+89
@@ -3278,7 +3278,7 @@ rows:
   locus_tag: ACZ81_01450
   log2fc: 1.3751
   padj: 0.0119
-  rank: 367
+  rank: 366
   rank_down: null
   rank_up: 69
   timepoint: day 31
@@ -3293,9 +3293,9 @@ rows:
   locus_tag: ACZ81_01450
   log2fc: 1.3455
   padj: 0.0298
-  rank: 281
+  rank: 280
   rank_down: null
-  rank_up: 81
+  rank_up: 80
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -3308,7 +3308,7 @@ rows:
   locus_tag: ACZ81_01455
   log2fc: 11.7285
   padj: 0.0
-  rank: 725
+  rank: 724
   rank_down: null
   rank_up: 139
   timepoint: 20h
@@ -3323,7 +3323,7 @@ rows:
   locus_tag: ACZ81_01465
   log2fc: 12.0113
   padj: 0.0
-  rank: 722
+  rank: 721
   rank_down: null
   rank_up: 138
   timepoint: 20h
@@ -3383,7 +3383,7 @@ rows:
   locus_tag: ACZ81_01505
   log2fc: 1.4619
   padj: 0.0311
-  rank: 246
+  rank: 245
   rank_down: null
   rank_up: 130
   timepoint: day 31
@@ -3488,7 +3488,7 @@ rows:
   locus_tag: ACZ81_01515
   log2fc: 1.2549
   padj: 0.0037
-  rank: 327
+  rank: 326
   rank_down: null
   rank_up: 171
   timepoint: day 31
@@ -3503,7 +3503,7 @@ rows:
   locus_tag: ACZ81_01515
   log2fc: 1.1853
   padj: 0.0003
-  rank: 1037
+  rank: 1036
   rank_down: null
   rank_up: 326
   timepoint: days 60+89
@@ -3533,7 +3533,7 @@ rows:
   locus_tag: ACZ81_01540
   log2fc: 1.1652
   padj: 0.0302
-  rank: 553
+  rank: 552
   rank_down: null
   rank_up: 111
   timepoint: day 31
@@ -3563,7 +3563,7 @@ rows:
   locus_tag: ACZ81_01540
   log2fc: 1.0598
   padj: 0.0397
-  rank: 997
+  rank: 996
   rank_down: null
   rank_up: 356
   timepoint: day 31
@@ -3593,7 +3593,7 @@ rows:
   locus_tag: ACZ81_01560
   log2fc: 1.5845
   padj: 0.001
-  rank: 198
+  rank: 197
   rank_down: null
   rank_up: 102
   timepoint: day 31
@@ -3668,7 +3668,7 @@ rows:
   locus_tag: ACZ81_01570
   log2fc: 15.4638
   padj: 0.0
-  rank: 705
+  rank: 704
   rank_down: null
   rank_up: 123
   timepoint: 20h
@@ -3833,7 +3833,7 @@ rows:
   locus_tag: ACZ81_01575
   log2fc: 1.3009
   padj: 0.0035
-  rank: 122
+  rank: 121
   rank_down: null
   rank_up: 60
   timepoint: day 18
@@ -3848,7 +3848,7 @@ rows:
   locus_tag: ACZ81_01585
   log2fc: 1.4179
   padj: 0.0019
-  rank: 263
+  rank: 262
   rank_down: null
   rank_up: 139
   timepoint: day 31
@@ -3863,7 +3863,7 @@ rows:
   locus_tag: ACZ81_01590
   log2fc: 1.4992
   padj: 0.002
-  rank: 224
+  rank: 223
   rank_down: null
   rank_up: 114
   timepoint: day 31
@@ -3878,7 +3878,7 @@ rows:
   locus_tag: ACZ81_01595
   log2fc: 1.6709
   padj: 0.0009
-  rank: 166
+  rank: 165
   rank_down: null
   rank_up: 86
   timepoint: day 31
@@ -3893,7 +3893,7 @@ rows:
   locus_tag: ACZ81_01600
   log2fc: 1.4842
   padj: 0.0001
-  rank: 232
+  rank: 231
   rank_down: null
   rank_up: 120
   timepoint: day 31
@@ -3923,9 +3923,9 @@ rows:
   locus_tag: ACZ81_01600
   log2fc: 1.4667
   padj: 0.0315
-  rank: 238
+  rank: 237
   rank_down: null
-  rank_up: 70
+  rank_up: 69
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -3938,7 +3938,7 @@ rows:
   locus_tag: ACZ81_01600
   log2fc: 1.1739
   padj: 0.0004
-  rank: 558
+  rank: 557
   rank_down: null
   rank_up: 293
   timepoint: day 89
@@ -3953,7 +3953,7 @@ rows:
   locus_tag: ACZ81_01600
   log2fc: 1.0408
   padj: 0.0003
-  rank: 642
+  rank: 641
   rank_down: null
   rank_up: 323
   timepoint: days 60+89
@@ -3968,7 +3968,7 @@ rows:
   locus_tag: ACZ81_01635
   log2fc: 1.2177
   padj: 0.0
-  rank: 528
+  rank: 527
   rank_down: null
   rank_up: 280
   timepoint: day 89
@@ -3998,7 +3998,7 @@ rows:
   locus_tag: ACZ81_01640
   log2fc: 1.042
   padj: 0.0198
-  rank: 1021
+  rank: 1020
   rank_down: null
   rank_up: 363
   timepoint: day 31
@@ -4013,7 +4013,7 @@ rows:
   locus_tag: ACZ81_01650
   log2fc: 17.4941
   padj: 0.0
-  rank: 695
+  rank: 694
   rank_down: null
   rank_up: 114
   timepoint: 20h
@@ -4028,7 +4028,7 @@ rows:
   locus_tag: ACZ81_01650
   log2fc: 1.084
   padj: 0.0
-  rank: 643
+  rank: 642
   rank_down: null
   rank_up: 332
   timepoint: day 89
@@ -4043,7 +4043,7 @@ rows:
   locus_tag: ACZ81_01655
   log2fc: 1.0929
   padj: 0.0051
-  rank: 1168
+  rank: 1167
   rank_down: null
   rank_up: 383
   timepoint: days 60+89
@@ -4733,7 +4733,7 @@ rows:
   locus_tag: ACZ81_01695
   log2fc: 1.4624
   padj: 0.0279
-  rank: 312
+  rank: 311
   rank_down: null
   rank_up: 55
   timepoint: day 31
@@ -4808,7 +4808,7 @@ rows:
   locus_tag: ACZ81_01700
   log2fc: 1.4148
   padj: 0.0393
-  rank: 346
+  rank: 345
   rank_down: null
   rank_up: 65
   timepoint: day 31
@@ -4838,7 +4838,7 @@ rows:
   locus_tag: ACZ81_01700
   log2fc: 1.2706
   padj: 0.0492
-  rank: 747
+  rank: 746
   rank_down: null
   rank_up: 276
   timepoint: day 31
@@ -4898,7 +4898,7 @@ rows:
   locus_tag: ACZ81_01705
   log2fc: 1.4064
   padj: 0.0193
-  rank: 352
+  rank: 351
   rank_down: null
   rank_up: 68
   timepoint: day 31
@@ -4928,7 +4928,7 @@ rows:
   locus_tag: ACZ81_01705
   log2fc: 1.1752
   padj: 0.0403
-  rank: 852
+  rank: 851
   rank_down: null
   rank_up: 314
   timepoint: day 31
@@ -5003,7 +5003,7 @@ rows:
   locus_tag: ACZ81_01710
   log2fc: 1.2125
   padj: 0.0367
-  rank: 510
+  rank: 509
   rank_down: null
   rank_up: 99
   timepoint: day 31
@@ -5018,7 +5018,7 @@ rows:
   locus_tag: ACZ81_01710
   log2fc: 1.1363
   padj: 0.0363
-  rank: 904
+  rank: 903
   rank_down: null
   rank_up: 332
   timepoint: day 31
@@ -5243,7 +5243,7 @@ rows:
   locus_tag: ACZ81_01765
   log2fc: 1.3499
   padj: 0.0345
-  rank: 846
+  rank: 845
   rank_down: null
   rank_up: 238
   timepoint: days 60+89
@@ -5258,7 +5258,7 @@ rows:
   locus_tag: ACZ81_01770
   log2fc: 1.1357
   padj: 0.0201
-  rank: 589
+  rank: 588
   rank_down: null
   rank_up: 117
   timepoint: day 31
@@ -5303,7 +5303,7 @@ rows:
   locus_tag: ACZ81_01775
   log2fc: 1.4416
   padj: 0.0129
-  rank: 253
+  rank: 252
   rank_down: null
   rank_up: 132
   timepoint: day 31
@@ -5558,7 +5558,7 @@ rows:
   locus_tag: ACZ81_01845
   log2fc: 8.1327
   padj: 0.0052
-  rank: 768
+  rank: 767
   rank_down: null
   rank_up: 169
   timepoint: 20h
@@ -5633,7 +5633,7 @@ rows:
   locus_tag: ACZ81_01895
   log2fc: 9.3073
   padj: 0.0002
-  rank: 749
+  rank: 748
   rank_down: null
   rank_up: 158
   timepoint: 20h
@@ -5753,7 +5753,7 @@ rows:
   locus_tag: ACZ81_01905
   log2fc: 1.0933
   padj: 0.0001
-  rank: 636
+  rank: 635
   rank_down: null
   rank_up: 328
   timepoint: day 89
@@ -5768,9 +5768,9 @@ rows:
   locus_tag: ACZ81_01910
   log2fc: 1.9625
   padj: 0.0025
-  rank: 122
+  rank: 121
   rank_down: null
-  rank_up: 39
+  rank_up: 38
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -5798,7 +5798,7 @@ rows:
   locus_tag: ACZ81_01910
   log2fc: 1.2693
   padj: 0.0001
-  rank: 489
+  rank: 488
   rank_down: null
   rank_up: 268
   timepoint: day 89
@@ -5843,9 +5843,9 @@ rows:
   locus_tag: ACZ81_01915
   log2fc: 1.7354
   padj: 0.0011
-  rank: 163
+  rank: 162
   rank_down: null
-  rank_up: 50
+  rank_up: 49
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -6038,7 +6038,7 @@ rows:
   locus_tag: ACZ81_01950
   log2fc: 1.2181
   padj: 0.0
-  rank: 997
+  rank: 996
   rank_down: null
   rank_up: 309
   timepoint: days 60+89
@@ -6083,7 +6083,7 @@ rows:
   locus_tag: ACZ81_02030
   log2fc: 15.7579
   padj: 0.0
-  rank: 703
+  rank: 702
   rank_down: null
   rank_up: 121
   timepoint: 20h
@@ -6098,7 +6098,7 @@ rows:
   locus_tag: ACZ81_02035
   log2fc: 10.6346
   padj: 0.0005
-  rank: 738
+  rank: 737
   rank_down: null
   rank_up: 150
   timepoint: 20h
@@ -6128,7 +6128,7 @@ rows:
   locus_tag: ACZ81_02065
   log2fc: 1.4773
   padj: 0.0002
-  rank: 235
+  rank: 234
   rank_down: null
   rank_up: 123
   timepoint: day 31
@@ -6248,7 +6248,7 @@ rows:
   locus_tag: ACZ81_02155
   log2fc: 1.2721
   padj: 0.0148
-  rank: 743
+  rank: 742
   rank_down: null
   rank_up: 275
   timepoint: day 31
@@ -6353,7 +6353,7 @@ rows:
   locus_tag: ACZ81_02160
   log2fc: 1.1302
   padj: 0.0142
-  rank: 1115
+  rank: 1114
   rank_down: null
   rank_up: 355
   timepoint: days 60+89
@@ -6488,7 +6488,7 @@ rows:
   locus_tag: ACZ81_02215
   log2fc: 1.1961
   padj: 0.0186
-  rank: 150
+  rank: 149
   rank_down: null
   rank_up: 78
   timepoint: day 18
@@ -6518,7 +6518,7 @@ rows:
   locus_tag: ACZ81_02215
   log2fc: 1.0114
   padj: 0.0026
-  rank: 1297
+  rank: 1296
   rank_down: null
   rank_up: 444
   timepoint: days 60+89
@@ -6593,7 +6593,7 @@ rows:
   locus_tag: ACZ81_02280
   log2fc: 1.0272
   padj: 0.0121
-  rank: 831
+  rank: 830
   rank_down: null
   rank_up: 327
   timepoint: day 18
@@ -6623,7 +6623,7 @@ rows:
   locus_tag: ACZ81_02300
   log2fc: 1.2758
   padj: 0.0005
-  rank: 454
+  rank: 453
   rank_down: null
   rank_up: 87
   timepoint: day 31
@@ -6653,7 +6653,7 @@ rows:
   locus_tag: ACZ81_02300
   log2fc: 1.1657
   padj: 0.0001
-  rank: 1066
+  rank: 1065
   rank_down: null
   rank_up: 337
   timepoint: days 60+89
@@ -6698,7 +6698,7 @@ rows:
   locus_tag: ACZ81_02350
   log2fc: 28.7228
   padj: 0.0
-  rank: 677
+  rank: 676
   rank_down: null
   rank_up: 96
   timepoint: 20h
@@ -6713,7 +6713,7 @@ rows:
   locus_tag: ACZ81_02360
   log2fc: 1.0546
   padj: 0.0017
-  rank: 795
+  rank: 794
   rank_down: null
   rank_up: 313
   timepoint: day 18
@@ -6728,7 +6728,7 @@ rows:
   locus_tag: ACZ81_02360
   log2fc: 1.0293
   padj: 0.0081
-  rank: 479
+  rank: 478
   rank_down: null
   rank_up: 230
   timepoint: day 31
@@ -6788,7 +6788,7 @@ rows:
   locus_tag: ACZ81_02370
   log2fc: 1.6662
   padj: 0.0003
-  rank: 167
+  rank: 166
   rank_down: null
   rank_up: 87
   timepoint: day 31
@@ -6803,7 +6803,7 @@ rows:
   locus_tag: ACZ81_02370
   log2fc: 1.0433
   padj: 0.0226
-  rank: 222
+  rank: 221
   rank_down: null
   rank_up: 114
   timepoint: day 18
@@ -6893,7 +6893,7 @@ rows:
   locus_tag: ACZ81_02380
   log2fc: 1.1999
   padj: 0.0119
-  rank: 521
+  rank: 520
   rank_down: null
   rank_up: 104
   timepoint: day 31
@@ -6908,7 +6908,7 @@ rows:
   locus_tag: ACZ81_02380
   log2fc: 1.0023
   padj: 0.0045
-  rank: 1314
+  rank: 1313
   rank_down: null
   rank_up: 450
   timepoint: days 60+89
@@ -6953,7 +6953,7 @@ rows:
   locus_tag: ACZ81_02405
   log2fc: 1.1462
   padj: 0.0005
-  rank: 1095
+  rank: 1094
   rank_down: null
   rank_up: 349
   timepoint: days 60+89
@@ -7058,7 +7058,7 @@ rows:
   locus_tag: ACZ81_02450
   log2fc: 8.3928
   padj: 0.0043
-  rank: 767
+  rank: 766
   rank_down: null
   rank_up: 168
   timepoint: 20h
@@ -7178,7 +7178,7 @@ rows:
   locus_tag: ACZ81_02460
   log2fc: 1.1766
   padj: 0.0404
-  rank: 162
+  rank: 161
   rank_down: null
   rank_up: 84
   timepoint: day 18
@@ -7208,7 +7208,7 @@ rows:
   locus_tag: ACZ81_02465
   log2fc: 1.463
   padj: 0.0006
-  rank: 310
+  rank: 309
   rank_down: null
   rank_up: 54
   timepoint: day 31
@@ -7253,7 +7253,7 @@ rows:
   locus_tag: ACZ81_02465
   log2fc: 1.0108
   padj: 0.0201
-  rank: 849
+  rank: 848
   rank_down: null
   rank_up: 331
   timepoint: day 18
@@ -7388,9 +7388,9 @@ rows:
   locus_tag: ACZ81_02485
   log2fc: 1.5122
   padj: 0.0474
-  rank: 218
+  rank: 217
   rank_down: null
-  rank_up: 62
+  rank_up: 61
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -7403,7 +7403,7 @@ rows:
   locus_tag: ACZ81_02485
   log2fc: 1.2242
   padj: 0.0254
-  rank: 138
+  rank: 137
   rank_down: null
   rank_up: 69
   timepoint: day 18
@@ -7463,9 +7463,9 @@ rows:
   locus_tag: ACZ81_02530
   log2fc: 1.0874
   padj: 0.0197
-  rank: 455
+  rank: 454
   rank_down: null
-  rank_up: 101
+  rank_up: 100
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -7478,7 +7478,7 @@ rows:
   locus_tag: ACZ81_02530
   log2fc: 1.0449
   padj: 0.0006
-  rank: 1245
+  rank: 1244
   rank_down: null
   rank_up: 420
   timepoint: days 60+89
@@ -7553,7 +7553,7 @@ rows:
   locus_tag: ACZ81_02610
   log2fc: 1.1842
   padj: 0.006
-  rank: 1039
+  rank: 1038
   rank_down: null
   rank_up: 327
   timepoint: days 60+89
@@ -7613,7 +7613,7 @@ rows:
   locus_tag: ACZ81_02655
   log2fc: 1.1282
   padj: 0.0008
-  rank: 419
+  rank: 418
   rank_down: null
   rank_up: 210
   timepoint: day 31
@@ -7688,7 +7688,7 @@ rows:
   locus_tag: ACZ81_02660
   log2fc: 1.3724
   padj: 0.0
-  rank: 284
+  rank: 283
   rank_down: null
   rank_up: 149
   timepoint: day 31
@@ -7748,7 +7748,7 @@ rows:
   locus_tag: ACZ81_02685
   log2fc: 1.1161
   padj: 0.0092
-  rank: 1136
+  rank: 1135
   rank_down: null
   rank_up: 367
   timepoint: days 60+89
@@ -7808,7 +7808,7 @@ rows:
   locus_tag: ACZ81_02690
   log2fc: 1.1432
   padj: 0.0026
-  rank: 1098
+  rank: 1097
   rank_down: null
   rank_up: 350
   timepoint: days 60+89
@@ -7838,7 +7838,7 @@ rows:
   locus_tag: ACZ81_02695
   log2fc: 9.854
   padj: 0.0
-  rank: 747
+  rank: 746
   rank_down: null
   rank_up: 157
   timepoint: 20h
@@ -7913,7 +7913,7 @@ rows:
   locus_tag: ACZ81_02705
   log2fc: 1.3258
   padj: 0.0032
-  rank: 298
+  rank: 297
   rank_down: null
   rank_up: 158
   timepoint: day 31
@@ -7988,7 +7988,7 @@ rows:
   locus_tag: ACZ81_02720
   log2fc: 1.2412
   padj: 0.0135
-  rank: 968
+  rank: 967
   rank_down: null
   rank_up: 294
   timepoint: days 60+89
@@ -8063,7 +8063,7 @@ rows:
   locus_tag: ACZ81_02735
   log2fc: 1.4093
   padj: 0.001
-  rank: 349
+  rank: 348
   rank_down: null
   rank_up: 67
   timepoint: day 31
@@ -8078,9 +8078,9 @@ rows:
   locus_tag: ACZ81_02735
   log2fc: 1.383
   padj: 0.0045
-  rank: 260
+  rank: 259
   rank_down: null
-  rank_up: 76
+  rank_up: 75
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -8108,7 +8108,7 @@ rows:
   locus_tag: ACZ81_02770
   log2fc: 17.1022
   padj: 0.0
-  rank: 696
+  rank: 695
   rank_down: null
   rank_up: 115
   timepoint: 20h
@@ -8138,7 +8138,7 @@ rows:
   locus_tag: ACZ81_02795
   log2fc: 1.1892
   padj: 0.0006
-  rank: 834
+  rank: 833
   rank_down: null
   rank_up: 307
   timepoint: day 31
@@ -8183,7 +8183,7 @@ rows:
   locus_tag: ACZ81_02805
   log2fc: 1.1589
   padj: 0.0007
-  rank: 1081
+  rank: 1080
   rank_down: null
   rank_up: 345
   timepoint: days 60+89
@@ -8213,7 +8213,7 @@ rows:
   locus_tag: ACZ81_02820
   log2fc: 1.4648
   padj: 0.0
-  rank: 244
+  rank: 243
   rank_down: null
   rank_up: 129
   timepoint: day 31
@@ -8258,7 +8258,7 @@ rows:
   locus_tag: ACZ81_02820
   log2fc: 1.3407
   padj: 0.0
-  rank: 852
+  rank: 851
   rank_down: null
   rank_up: 241
   timepoint: days 60+89
@@ -8333,7 +8333,7 @@ rows:
   locus_tag: ACZ81_02825
   log2fc: 1.0292
   padj: 0.0022
-  rank: 716
+  rank: 715
   rank_down: null
   rank_up: 139
   timepoint: day 31
@@ -8348,9 +8348,9 @@ rows:
   locus_tag: ACZ81_02825
   log2fc: 1.0212
   padj: 0.0082
-  rank: 520
+  rank: 519
   rank_down: null
-  rank_up: 110
+  rank_up: 109
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -8408,7 +8408,7 @@ rows:
   locus_tag: ACZ81_02830
   log2fc: 1.117
   padj: 0.0145
-  rank: 187
+  rank: 186
   rank_down: null
   rank_up: 98
   timepoint: day 18
@@ -8423,7 +8423,7 @@ rows:
   locus_tag: ACZ81_02830
   log2fc: 1.1096
   padj: 0.0
-  rank: 1146
+  rank: 1145
   rank_down: null
   rank_up: 372
   timepoint: days 60+89
@@ -8528,7 +8528,7 @@ rows:
   locus_tag: ACZ81_02835
   log2fc: 1.0549
   padj: 0.0058
-  rank: 686
+  rank: 685
   rank_down: null
   rank_up: 132
   timepoint: day 31
@@ -8543,7 +8543,7 @@ rows:
   locus_tag: ACZ81_02835
   log2fc: 1.042
   padj: 0.0034
-  rank: 1020
+  rank: 1019
   rank_down: null
   rank_up: 362
   timepoint: day 31
@@ -8588,7 +8588,7 @@ rows:
   locus_tag: ACZ81_02840
   log2fc: 1.0965
   padj: 0.0156
-  rank: 632
+  rank: 631
   rank_down: null
   rank_up: 123
   timepoint: day 31
@@ -8648,7 +8648,7 @@ rows:
   locus_tag: ACZ81_02845
   log2fc: 1.1429
   padj: 0.0372
-  rank: 892
+  rank: 891
   rank_down: null
   rank_up: 329
   timepoint: day 31
@@ -8678,7 +8678,7 @@ rows:
   locus_tag: ACZ81_02845
   log2fc: 1.066
   padj: 0.0105
-  rank: 1217
+  rank: 1216
   rank_down: null
   rank_up: 407
   timepoint: days 60+89
@@ -8753,7 +8753,7 @@ rows:
   locus_tag: ACZ81_02885
   log2fc: 1.0913
   padj: 0.0001
-  rank: 1171
+  rank: 1170
   rank_down: null
   rank_up: 386
   timepoint: days 60+89
@@ -8843,7 +8843,7 @@ rows:
   locus_tag: ACZ81_02945
   log2fc: 1.0116
   padj: 0.0045
-  rank: 701
+  rank: 700
   rank_down: null
   rank_up: 352
   timepoint: day 89
@@ -8903,7 +8903,7 @@ rows:
   locus_tag: ACZ81_02950
   log2fc: 1.2265
   padj: 0.0483
-  rank: 351
+  rank: 350
   rank_down: null
   rank_up: 180
   timepoint: day 31
@@ -8918,7 +8918,7 @@ rows:
   locus_tag: ACZ81_02970
   log2fc: 1.0236
   padj: 0.0001
-  rank: 1274
+  rank: 1273
   rank_down: null
   rank_up: 434
   timepoint: days 60+89
@@ -8978,7 +8978,7 @@ rows:
   locus_tag: ACZ81_02990
   log2fc: 1.0794
   padj: 0.001
-  rank: 1194
+  rank: 1193
   rank_down: null
   rank_up: 400
   timepoint: days 60+89
@@ -9008,7 +9008,7 @@ rows:
   locus_tag: ACZ81_03000
   log2fc: 1.2334
   padj: 0.0008
-  rank: 977
+  rank: 976
   rank_down: null
   rank_up: 298
   timepoint: days 60+89
@@ -9128,7 +9128,7 @@ rows:
   locus_tag: ACZ81_03045
   log2fc: 1.0113
   padj: 0.0005
-  rank: 668
+  rank: 667
   rank_down: null
   rank_up: 332
   timepoint: days 60+89
@@ -9143,7 +9143,7 @@ rows:
   locus_tag: ACZ81_03055
   log2fc: 8.663
   padj: 0.0001
-  rank: 762
+  rank: 761
   rank_down: null
   rank_up: 166
   timepoint: 20h
@@ -9203,7 +9203,7 @@ rows:
   locus_tag: ACZ81_03055
   log2fc: 1.1199
   padj: 0.0165
-  rank: 611
+  rank: 610
   rank_down: null
   rank_up: 316
   timepoint: day 89
@@ -9323,7 +9323,7 @@ rows:
   locus_tag: ACZ81_03115
   log2fc: 1.1036
   padj: 0.0058
-  rank: 940
+  rank: 939
   rank_down: null
   rank_up: 342
   timepoint: day 31
@@ -9338,7 +9338,7 @@ rows:
   locus_tag: ACZ81_03115
   log2fc: 1.0847
   padj: 0.0122
-  rank: 647
+  rank: 646
   rank_down: null
   rank_up: 126
   timepoint: day 31
@@ -9638,7 +9638,7 @@ rows:
   locus_tag: ACZ81_03140
   log2fc: 1.0916
   padj: 0.0
-  rank: 1169
+  rank: 1168
   rank_down: null
   rank_up: 384
   timepoint: days 60+89
@@ -10013,7 +10013,7 @@ rows:
   locus_tag: ACZ81_03190
   log2fc: 1.2258
   padj: 0.0025
-  rank: 522
+  rank: 521
   rank_down: null
   rank_up: 277
   timepoint: day 89
@@ -10028,7 +10028,7 @@ rows:
   locus_tag: ACZ81_03210
   log2fc: 22.8588
   padj: 0.0
-  rank: 685
+  rank: 684
   rank_down: null
   rank_up: 104
   timepoint: 20h
@@ -10133,7 +10133,7 @@ rows:
   locus_tag: ACZ81_03220
   log2fc: 1.4931
   padj: 0.0118
-  rank: 227
+  rank: 226
   rank_down: null
   rank_up: 117
   timepoint: day 31
@@ -10193,9 +10193,9 @@ rows:
   locus_tag: ACZ81_03240
   log2fc: 1.4877
   padj: 0.0051
-  rank: 225
+  rank: 224
   rank_down: null
-  rank_up: 65
+  rank_up: 64
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -10298,7 +10298,7 @@ rows:
   locus_tag: ACZ81_03250
   log2fc: 1.3159
   padj: 0.0
-  rank: 701
+  rank: 700
   rank_down: null
   rank_up: 262
   timepoint: day 31
@@ -10313,7 +10313,7 @@ rows:
   locus_tag: ACZ81_03250
   log2fc: 1.2032
   padj: 0.0
-  rank: 1019
+  rank: 1018
   rank_down: null
   rank_up: 318
   timepoint: days 60+89
@@ -10433,7 +10433,7 @@ rows:
   locus_tag: ACZ81_03260
   log2fc: 1.0558
   padj: 0.0307
-  rank: 216
+  rank: 215
   rank_down: null
   rank_up: 112
   timepoint: day 18
@@ -10448,7 +10448,7 @@ rows:
   locus_tag: ACZ81_03260
   log2fc: 1.0339
   padj: 0.0142
-  rank: 476
+  rank: 475
   rank_down: null
   rank_up: 229
   timepoint: day 31
@@ -10463,7 +10463,7 @@ rows:
   locus_tag: ACZ81_03265
   log2fc: 12.8235
   padj: 0.0
-  rank: 718
+  rank: 717
   rank_down: null
   rank_up: 134
   timepoint: 20h
@@ -10508,7 +10508,7 @@ rows:
   locus_tag: ACZ81_03280
   log2fc: 1.0648
   padj: 0.0104
-  rank: 675
+  rank: 674
   rank_down: null
   rank_up: 128
   timepoint: day 31
@@ -10583,7 +10583,7 @@ rows:
   locus_tag: ACZ81_03295
   log2fc: 1.4099
   padj: 0.0
-  rank: 348
+  rank: 347
   rank_down: null
   rank_up: 66
   timepoint: day 31
@@ -10598,7 +10598,7 @@ rows:
   locus_tag: ACZ81_03295
   log2fc: 1.2814
   padj: 0.0
-  rank: 910
+  rank: 909
   rank_down: null
   rank_up: 269
   timepoint: days 60+89
@@ -10628,7 +10628,7 @@ rows:
   locus_tag: ACZ81_03300
   log2fc: 1.0195
   padj: 0.0016
-  rank: 1285
+  rank: 1284
   rank_down: null
   rank_up: 438
   timepoint: days 60+89
@@ -10673,7 +10673,7 @@ rows:
   locus_tag: ACZ81_03315
   log2fc: 1.118
   padj: 0.0216
-  rank: 616
+  rank: 615
   rank_down: null
   rank_up: 319
   timepoint: day 89
@@ -10733,7 +10733,7 @@ rows:
   locus_tag: ACZ81_03320
   log2fc: 1.1085
   padj: 0.0166
-  rank: 1147
+  rank: 1146
   rank_down: null
   rank_up: 373
   timepoint: days 60+89
@@ -10823,7 +10823,7 @@ rows:
   locus_tag: ACZ81_03340
   log2fc: 1.4212
   padj: 0.0019
-  rank: 261
+  rank: 260
   rank_down: null
   rank_up: 138
   timepoint: day 31
@@ -10883,7 +10883,7 @@ rows:
   locus_tag: ACZ81_03355
   log2fc: 1.2308
   padj: 0.0008
-  rank: 781
+  rank: 780
   rank_down: null
   rank_up: 286
   timepoint: day 31
@@ -10898,7 +10898,7 @@ rows:
   locus_tag: ACZ81_03355
   log2fc: 1.0291
   padj: 0.0084
-  rank: 829
+  rank: 828
   rank_down: null
   rank_up: 326
   timepoint: day 18
@@ -10913,7 +10913,7 @@ rows:
   locus_tag: ACZ81_03360
   log2fc: 1.0798
   padj: 0.0
-  rank: 1192
+  rank: 1191
   rank_down: null
   rank_up: 398
   timepoint: days 60+89
@@ -11048,7 +11048,7 @@ rows:
   locus_tag: ACZ81_03375
   log2fc: 1.0397
   padj: 0.0105
-  rank: 223
+  rank: 222
   rank_down: null
   rank_up: 115
   timepoint: day 18
@@ -11573,7 +11573,7 @@ rows:
   locus_tag: ACZ81_03405
   log2fc: 1.0749
   padj: 0.0272
-  rank: 772
+  rank: 771
   rank_down: null
   rank_up: 305
   timepoint: day 18
@@ -11588,7 +11588,7 @@ rows:
   locus_tag: ACZ81_03410
   log2fc: 16.8281
   padj: 0.0
-  rank: 698
+  rank: 697
   rank_down: null
   rank_up: 117
   timepoint: 20h
@@ -11603,7 +11603,7 @@ rows:
   locus_tag: ACZ81_03420
   log2fc: 1.5364
   padj: 0.0
-  rank: 214
+  rank: 213
   rank_down: null
   rank_up: 108
   timepoint: day 31
@@ -11693,9 +11693,9 @@ rows:
   locus_tag: ACZ81_03460
   log2fc: 1.0325
   padj: null
-  rank: 505
+  rank: 504
   rank_down: null
-  rank_up: 108
+  rank_up: 107
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -11708,7 +11708,7 @@ rows:
   locus_tag: ACZ81_03465
   log2fc: 1.2312
   padj: 0.0
-  rank: 343
+  rank: 342
   rank_down: null
   rank_up: 176
   timepoint: day 31
@@ -11723,7 +11723,7 @@ rows:
   locus_tag: ACZ81_03465
   log2fc: 1.1884
   padj: 0.0
-  rank: 551
+  rank: 550
   rank_down: null
   rank_up: 290
   timepoint: day 89
@@ -11783,7 +11783,7 @@ rows:
   locus_tag: ACZ81_03470
   log2fc: 1.0705
   padj: 0.0001
-  rank: 984
+  rank: 983
   rank_down: null
   rank_up: 355
   timepoint: day 31
@@ -11828,7 +11828,7 @@ rows:
   locus_tag: ACZ81_03535
   log2fc: 1.5284
   padj: 0.0338
-  rank: 218
+  rank: 217
   rank_down: null
   rank_up: 111
   timepoint: day 31
@@ -11858,7 +11858,7 @@ rows:
   locus_tag: ACZ81_03575
   log2fc: 1.1301
   padj: 0.0
-  rank: 1116
+  rank: 1115
   rank_down: null
   rank_up: 356
   timepoint: days 60+89
@@ -11873,9 +11873,9 @@ rows:
   locus_tag: ACZ81_03575
   log2fc: 1.0165
   padj: 0.0125
-  rank: 528
+  rank: 527
   rank_down: null
-  rank_up: 112
+  rank_up: 111
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -11888,7 +11888,7 @@ rows:
   locus_tag: ACZ81_03585
   log2fc: 13.9568
   padj: 0.0
-  rank: 710
+  rank: 709
   rank_down: null
   rank_up: 127
   timepoint: 20h
@@ -12038,7 +12038,7 @@ rows:
   locus_tag: ACZ81_03665
   log2fc: 1.2721
   padj: 0.0151
-  rank: 459
+  rank: 458
   rank_down: null
   rank_up: 89
   timepoint: day 31
@@ -12068,7 +12068,7 @@ rows:
   locus_tag: ACZ81_03665
   log2fc: 1.1763
   padj: 0.0163
-  rank: 849
+  rank: 848
   rank_down: null
   rank_up: 312
   timepoint: day 31
@@ -12083,7 +12083,7 @@ rows:
   locus_tag: ACZ81_03670
   log2fc: 1.278
   padj: 0.001
-  rank: 450
+  rank: 449
   rank_down: null
   rank_up: 85
   timepoint: day 31
@@ -12128,7 +12128,7 @@ rows:
   locus_tag: ACZ81_03670
   log2fc: 1.0507
   padj: 0.0045
-  rank: 1007
+  rank: 1006
   rank_down: null
   rank_up: 359
   timepoint: day 31
@@ -12173,7 +12173,7 @@ rows:
   locus_tag: ACZ81_03685
   log2fc: 1.1294
   padj: 0.0321
-  rank: 726
+  rank: 725
   rank_down: null
   rank_up: 294
   timepoint: day 18
@@ -12323,7 +12323,7 @@ rows:
   locus_tag: ACZ81_03790
   log2fc: 10.7176
   padj: 0.0
-  rank: 737
+  rank: 736
   rank_down: null
   rank_up: 149
   timepoint: 20h
@@ -12353,7 +12353,7 @@ rows:
   locus_tag: ACZ81_03800
   log2fc: 7.8537
   padj: 0.0069
-  rank: 776
+  rank: 775
   rank_down: null
   rank_up: 174
   timepoint: 20h
@@ -12368,7 +12368,7 @@ rows:
   locus_tag: ACZ81_03820
   log2fc: 11.7066
   padj: 0.0
-  rank: 726
+  rank: 725
   rank_down: null
   rank_up: 140
   timepoint: 20h
@@ -12428,7 +12428,7 @@ rows:
   locus_tag: ACZ81_03840
   log2fc: 1.0834
   padj: 0.0018
-  rank: 760
+  rank: 759
   rank_down: null
   rank_up: 302
   timepoint: day 18
@@ -12458,7 +12458,7 @@ rows:
   locus_tag: ACZ81_03845
   log2fc: 1.0132
   padj: 0.0267
-  rank: 239
+  rank: 238
   rank_down: null
   rank_up: 120
   timepoint: day 18
@@ -12578,7 +12578,7 @@ rows:
   locus_tag: ACZ81_03880
   log2fc: 1.2488
   padj: 0.0406
-  rank: 474
+  rank: 473
   rank_down: null
   rank_up: 93
   timepoint: day 31
@@ -12593,7 +12593,7 @@ rows:
   locus_tag: ACZ81_03880
   log2fc: 1.1315
   padj: 0.0002
-  rank: 418
+  rank: 417
   rank_down: null
   rank_up: 209
   timepoint: day 31
@@ -12698,7 +12698,7 @@ rows:
   locus_tag: ACZ81_03900
   log2fc: 1.1058
   padj: 0.0369
-  rank: 192
+  rank: 191
   rank_down: null
   rank_up: 101
   timepoint: day 18
@@ -12713,7 +12713,7 @@ rows:
   locus_tag: ACZ81_03900
   log2fc: 1.0651
   padj: 0.0198
-  rank: 454
+  rank: 453
   rank_down: null
   rank_up: 221
   timepoint: day 31
@@ -12788,7 +12788,7 @@ rows:
   locus_tag: ACZ81_03905
   log2fc: 1.1031
   padj: 0.0024
-  rank: 942
+  rank: 941
   rank_down: null
   rank_up: 343
   timepoint: day 31
@@ -12803,7 +12803,7 @@ rows:
   locus_tag: ACZ81_03905
   log2fc: 1.0512
   padj: 0.008
-  rank: 688
+  rank: 687
   rank_down: null
   rank_up: 134
   timepoint: day 31
@@ -12818,7 +12818,7 @@ rows:
   locus_tag: ACZ81_03910
   log2fc: 26.7426
   padj: 0.0
-  rank: 680
+  rank: 679
   rank_down: null
   rank_up: 99
   timepoint: 20h
@@ -12833,7 +12833,7 @@ rows:
   locus_tag: ACZ81_03925
   log2fc: 59.4158
   padj: 0.0
-  rank: 664
+  rank: 663
   rank_down: null
   rank_up: 83
   timepoint: 20h
@@ -12848,7 +12848,7 @@ rows:
   locus_tag: ACZ81_03930
   log2fc: 19.4954
   padj: 0.0
-  rank: 692
+  rank: 691
   rank_down: null
   rank_up: 111
   timepoint: 20h
@@ -12893,7 +12893,7 @@ rows:
   locus_tag: ACZ81_03945
   log2fc: 1.0032
   padj: 0.0048
-  rank: 859
+  rank: 858
   rank_down: null
   rank_up: 332
   timepoint: day 18
@@ -12908,7 +12908,7 @@ rows:
   locus_tag: ACZ81_03960
   log2fc: 1.1875
   padj: 0.0063
-  rank: 1034
+  rank: 1033
   rank_down: null
   rank_up: 324
   timepoint: days 60+89
@@ -12953,7 +12953,7 @@ rows:
   locus_tag: ACZ81_04005
   log2fc: 246.6359
   padj: 0.0
-  rank: 555
+  rank: 554
   rank_down: null
   rank_up: 74
   timepoint: 20h
@@ -12968,7 +12968,7 @@ rows:
   locus_tag: ACZ81_04010
   log2fc: 1.2429
   padj: 0.0
-  rank: 771
+  rank: 770
   rank_down: null
   rank_up: 283
   timepoint: day 31
@@ -13058,7 +13058,7 @@ rows:
   locus_tag: ACZ81_04050
   log2fc: 1.268
   padj: 0.0201
-  rank: 465
+  rank: 464
   rank_down: null
   rank_up: 90
   timepoint: day 31
@@ -13088,7 +13088,7 @@ rows:
   locus_tag: ACZ81_04050
   log2fc: 1.1115
   padj: 0.0084
-  rank: 1142
+  rank: 1141
   rank_down: null
   rank_up: 370
   timepoint: days 60+89
@@ -13103,7 +13103,7 @@ rows:
   locus_tag: ACZ81_04055
   log2fc: 1.1385
   padj: 0.0
-  rank: 585
+  rank: 584
   rank_down: null
   rank_up: 305
   timepoint: day 89
@@ -13193,7 +13193,7 @@ rows:
   locus_tag: ACZ81_04105
   log2fc: 1.1696
   padj: 0.0007
-  rank: 1059
+  rank: 1058
   rank_down: null
   rank_up: 335
   timepoint: days 60+89
@@ -13253,7 +13253,7 @@ rows:
   locus_tag: ACZ81_04110
   log2fc: 1.0204
   padj: 0.0071
-  rank: 495
+  rank: 494
   rank_down: null
   rank_up: 236
   timepoint: day 31
@@ -13298,7 +13298,7 @@ rows:
   locus_tag: ACZ81_04140
   log2fc: 1.0304
   padj: 0.0048
-  rank: 1266
+  rank: 1265
   rank_down: null
   rank_up: 430
   timepoint: days 60+89
@@ -13358,7 +13358,7 @@ rows:
   locus_tag: ACZ81_04155
   log2fc: 1.1205
   padj: 0.0189
-  rank: 609
+  rank: 608
   rank_down: null
   rank_up: 120
   timepoint: day 31
@@ -13433,7 +13433,7 @@ rows:
   locus_tag: ACZ81_04190
   log2fc: 1.5504
   padj: 0.0016
-  rank: 209
+  rank: 208
   rank_down: null
   rank_up: 106
   timepoint: day 31
@@ -13463,7 +13463,7 @@ rows:
   locus_tag: ACZ81_04195
   log2fc: 25.8756
   padj: 0.0
-  rank: 681
+  rank: 680
   rank_down: null
   rank_up: 100
   timepoint: 20h
@@ -13613,7 +13613,7 @@ rows:
   locus_tag: ACZ81_04265
   log2fc: 15.0514
   padj: 0.0
-  rank: 707
+  rank: 706
   rank_down: null
   rank_up: 125
   timepoint: 20h
@@ -13628,7 +13628,7 @@ rows:
   locus_tag: ACZ81_04275
   log2fc: 59.7065
   padj: 0.0
-  rank: 663
+  rank: 662
   rank_down: null
   rank_up: 82
   timepoint: 20h
@@ -13658,7 +13658,7 @@ rows:
   locus_tag: ACZ81_04285
   log2fc: 29.7129
   padj: 0.0
-  rank: 675
+  rank: 674
   rank_down: null
   rank_up: 94
   timepoint: 20h
@@ -13853,7 +13853,7 @@ rows:
   locus_tag: ACZ81_04335
   log2fc: 1.2039
   padj: 0.0349
-  rank: 1018
+  rank: 1017
   rank_down: null
   rank_up: 317
   timepoint: days 60+89
@@ -13868,7 +13868,7 @@ rows:
   locus_tag: ACZ81_04340
   log2fc: 1.0584
   padj: 0.0002
-  rank: 789
+  rank: 788
   rank_down: null
   rank_up: 312
   timepoint: day 18
@@ -13958,7 +13958,7 @@ rows:
   locus_tag: ACZ81_04360
   log2fc: 1.0433
   padj: 0.0086
-  rank: 811
+  rank: 810
   rank_down: null
   rank_up: 316
   timepoint: day 18
@@ -13973,7 +13973,7 @@ rows:
   locus_tag: ACZ81_04360
   log2fc: 1.007
   padj: 0.0009
-  rank: 509
+  rank: 508
   rank_down: null
   rank_up: 241
   timepoint: day 31
@@ -14003,7 +14003,7 @@ rows:
   locus_tag: ACZ81_04365
   log2fc: 1.162
   padj: 0.0208
-  rank: 558
+  rank: 557
   rank_down: null
   rank_up: 113
   timepoint: day 31
@@ -14018,7 +14018,7 @@ rows:
   locus_tag: ACZ81_04365
   log2fc: 1.0589
   padj: 0.0061
-  rank: 1227
+  rank: 1226
   rank_down: null
   rank_up: 412
   timepoint: days 60+89
@@ -14026,21 +14026,6 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
-- experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
-  expression_status: significant_up
-  gene_name: null
-  growth_phase: exponential
-  locus_tag: ACZ81_04385
-  log2fc: 1.9726
-  padj: null
-  rank: 118
-  rank_down: null
-  rank_up: 38
-  timepoint: day 11
-  timepoint_hours: 264.0
-  timepoint_order: 1
-  treatment_type:
-  - coculture
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
   gene_name: null
@@ -14063,9 +14048,9 @@ rows:
   locus_tag: ACZ81_04405
   log2fc: 1.335
   padj: 0.0094
-  rank: 285
+  rank: 284
   rank_down: null
-  rank_up: 84
+  rank_up: 83
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -14078,7 +14063,7 @@ rows:
   locus_tag: ACZ81_04405
   log2fc: 1.3135
   padj: 0.0003
-  rank: 872
+  rank: 871
   rank_down: null
   rank_up: 249
   timepoint: days 60+89
@@ -14093,7 +14078,7 @@ rows:
   locus_tag: ACZ81_04405
   log2fc: 1.0635
   padj: 0.0224
-  rank: 676
+  rank: 675
   rank_down: null
   rank_up: 129
   timepoint: day 31
@@ -14108,7 +14093,7 @@ rows:
   locus_tag: ACZ81_04410
   log2fc: 1.1555
   padj: 0.0
-  rank: 402
+  rank: 401
   rank_down: null
   rank_up: 202
   timepoint: day 31
@@ -14378,7 +14363,7 @@ rows:
   locus_tag: ACZ81_04470
   log2fc: 1.045
   padj: 0.0156
-  rank: 1017
+  rank: 1016
   rank_down: null
   rank_up: 361
   timepoint: day 31
@@ -14468,7 +14453,7 @@ rows:
   locus_tag: ACZ81_04510
   log2fc: 1.1637
   padj: 0.0068
-  rank: 1070
+  rank: 1069
   rank_down: null
   rank_up: 340
   timepoint: days 60+89
@@ -14483,7 +14468,7 @@ rows:
   locus_tag: ACZ81_04515
   log2fc: 1.284
   padj: 0.0019
-  rank: 903
+  rank: 902
   rank_down: null
   rank_up: 263
   timepoint: days 60+89
@@ -14528,7 +14513,7 @@ rows:
   locus_tag: ACZ81_04515
   log2fc: 1.102
   padj: 0.0008
-  rank: 631
+  rank: 630
   rank_down: null
   rank_up: 325
   timepoint: day 89
@@ -14543,9 +14528,9 @@ rows:
   locus_tag: ACZ81_04525
   log2fc: 1.6734
   padj: null
-  rank: 176
+  rank: 175
   rank_down: null
-  rank_up: 54
+  rank_up: 53
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -14573,7 +14558,7 @@ rows:
   locus_tag: ACZ81_04540
   log2fc: 1.2394
   padj: 0.0008
-  rank: 776
+  rank: 775
   rank_down: null
   rank_up: 285
   timepoint: day 31
@@ -14603,7 +14588,7 @@ rows:
   locus_tag: ACZ81_04580
   log2fc: 1.2681
   padj: 0.0049
-  rank: 931
+  rank: 930
   rank_down: null
   rank_up: 274
   timepoint: days 60+89
@@ -14648,7 +14633,7 @@ rows:
   locus_tag: ACZ81_04585
   log2fc: 1.1644
   padj: 0.0178
-  rank: 1068
+  rank: 1067
   rank_down: null
   rank_up: 338
   timepoint: days 60+89
@@ -14723,7 +14708,7 @@ rows:
   locus_tag: ACZ81_04595
   log2fc: 1.1486
   padj: 0.0127
-  rank: 704
+  rank: 703
   rank_down: null
   rank_up: 287
   timepoint: day 18
@@ -14768,7 +14753,7 @@ rows:
   locus_tag: ACZ81_04610
   log2fc: 1.107
   padj: 0.0003
-  rank: 1150
+  rank: 1149
   rank_down: null
   rank_up: 375
   timepoint: days 60+89
@@ -14798,7 +14783,7 @@ rows:
   locus_tag: ACZ81_04625
   log2fc: 30.703
   padj: 0.0
-  rank: 673
+  rank: 672
   rank_down: null
   rank_up: 92
   timepoint: 20h
@@ -14813,7 +14798,7 @@ rows:
   locus_tag: ACZ81_04635
   log2fc: 1.0941
   padj: 0.0
-  rank: 1165
+  rank: 1164
   rank_down: null
   rank_up: 382
   timepoint: days 60+89
@@ -14903,7 +14888,7 @@ rows:
   locus_tag: ACZ81_04640
   log2fc: 1.2082
   padj: 0.0018
-  rank: 1011
+  rank: 1010
   rank_down: null
   rank_up: 314
   timepoint: days 60+89
@@ -14918,7 +14903,7 @@ rows:
   locus_tag: ACZ81_04640
   log2fc: 1.14
   padj: 0.0318
-  rank: 898
+  rank: 897
   rank_down: null
   rank_up: 331
   timepoint: day 31
@@ -14948,7 +14933,7 @@ rows:
   locus_tag: ACZ81_04645
   log2fc: 1.1858
   padj: 0.0023
-  rank: 1036
+  rank: 1035
   rank_down: null
   rank_up: 325
   timepoint: days 60+89
@@ -14963,7 +14948,7 @@ rows:
   locus_tag: ACZ81_04650
   log2fc: 1.0611
   padj: 0.0
-  rank: 1225
+  rank: 1224
   rank_down: null
   rank_up: 411
   timepoint: days 60+89
@@ -14978,7 +14963,7 @@ rows:
   locus_tag: ACZ81_04665
   log2fc: 1.1635
   padj: 0.0
-  rank: 1071
+  rank: 1070
   rank_down: null
   rank_up: 341
   timepoint: days 60+89
@@ -15038,7 +15023,7 @@ rows:
   locus_tag: ACZ81_04680
   log2fc: 1.0288
   padj: 0.0436
-  rank: 717
+  rank: 716
   rank_down: null
   rank_up: 140
   timepoint: day 31
@@ -15083,9 +15068,9 @@ rows:
   locus_tag: ACZ81_04695
   log2fc: 1.8191
   padj: 0.0026
-  rank: 147
+  rank: 146
   rank_down: null
-  rank_up: 46
+  rank_up: 45
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -15143,7 +15128,7 @@ rows:
   locus_tag: ACZ81_04705
   log2fc: 1.1584
   padj: 0.0001
-  rank: 698
+  rank: 697
   rank_down: null
   rank_up: 285
   timepoint: day 18
@@ -15188,7 +15173,7 @@ rows:
   locus_tag: ACZ81_04715
   log2fc: 1.2368
   padj: 0.0001
-  rank: 490
+  rank: 489
   rank_down: null
   rank_up: 94
   timepoint: day 31
@@ -15218,7 +15203,7 @@ rows:
   locus_tag: ACZ81_04715
   log2fc: 1.0899
   padj: 0.0
-  rank: 1173
+  rank: 1172
   rank_down: null
   rank_up: 388
   timepoint: days 60+89
@@ -15248,7 +15233,7 @@ rows:
   locus_tag: ACZ81_04735
   log2fc: 1.204
   padj: 0.0002
-  rank: 1017
+  rank: 1016
   rank_down: null
   rank_up: 316
   timepoint: days 60+89
@@ -15263,7 +15248,7 @@ rows:
   locus_tag: ACZ81_04740
   log2fc: 1.337
   padj: 0.0368
-  rank: 399
+  rank: 398
   rank_down: null
   rank_up: 77
   timepoint: day 31
@@ -15293,7 +15278,7 @@ rows:
   locus_tag: ACZ81_04770
   log2fc: 20.9601
   padj: 0.0
-  rank: 688
+  rank: 687
   rank_down: null
   rank_up: 107
   timepoint: 20h
@@ -15458,7 +15443,7 @@ rows:
   locus_tag: ACZ81_04820
   log2fc: 1.1637
   padj: 0.001
-  rank: 866
+  rank: 865
   rank_down: null
   rank_up: 319
   timepoint: day 31
@@ -15488,7 +15473,7 @@ rows:
   locus_tag: ACZ81_04830
   log2fc: 1.1686
   padj: 0.0009
-  rank: 560
+  rank: 559
   rank_down: null
   rank_up: 295
   timepoint: day 89
@@ -15563,7 +15548,7 @@ rows:
   locus_tag: ACZ81_04835
   log2fc: 1.1874
   padj: 0.0026
-  rank: 836
+  rank: 835
   rank_down: null
   rank_up: 308
   timepoint: day 31
@@ -15608,7 +15593,7 @@ rows:
   locus_tag: ACZ81_04845
   log2fc: 1.2094
   padj: 0.0
-  rank: 801
+  rank: 800
   rank_down: null
   rank_up: 293
   timepoint: day 31
@@ -15668,7 +15653,7 @@ rows:
   locus_tag: ACZ81_04855
   log2fc: 1.1408
   padj: 0.0006
-  rank: 895
+  rank: 894
   rank_down: null
   rank_up: 330
   timepoint: day 31
@@ -15713,7 +15698,7 @@ rows:
   locus_tag: ACZ81_04860
   log2fc: 1.3199
   padj: 0.0018
-  rank: 696
+  rank: 695
   rank_down: null
   rank_up: 260
   timepoint: day 31
@@ -15788,7 +15773,7 @@ rows:
   locus_tag: ACZ81_04860
   log2fc: 1.0097
   padj: 0.0309
-  rank: 739
+  rank: 738
   rank_down: null
   rank_up: 145
   timepoint: day 31
@@ -15818,7 +15803,7 @@ rows:
   locus_tag: ACZ81_04865
   log2fc: 1.1448
   padj: 0.0277
-  rank: 575
+  rank: 574
   rank_down: null
   rank_up: 116
   timepoint: day 31
@@ -15863,7 +15848,7 @@ rows:
   locus_tag: ACZ81_04885
   log2fc: 1.2079
   padj: 0.0
-  rank: 804
+  rank: 803
   rank_down: null
   rank_up: 295
   timepoint: day 31
@@ -15878,7 +15863,7 @@ rows:
   locus_tag: ACZ81_04905
   log2fc: 1.099
   padj: 0.0005
-  rank: 949
+  rank: 948
   rank_down: null
   rank_up: 345
   timepoint: day 31
@@ -15893,7 +15878,7 @@ rows:
   locus_tag: ACZ81_04910
   log2fc: 1.1703
   padj: 0.0001
-  rank: 859
+  rank: 858
   rank_down: null
   rank_up: 317
   timepoint: day 31
@@ -15908,7 +15893,7 @@ rows:
   locus_tag: ACZ81_04915
   log2fc: 1.2036
   padj: 0.0036
-  rank: 810
+  rank: 809
   rank_down: null
   rank_up: 296
   timepoint: day 31
@@ -15938,7 +15923,7 @@ rows:
   locus_tag: ACZ81_04930
   log2fc: 7.6892
   padj: 0.0006
-  rank: 781
+  rank: 780
   rank_down: null
   rank_up: 178
   timepoint: 20h
@@ -16058,7 +16043,7 @@ rows:
   locus_tag: ACZ81_04945
   log2fc: 1.2527
   padj: 0.0439
-  rank: 470
+  rank: 469
   rank_down: null
   rank_up: 91
   timepoint: day 31
@@ -16073,7 +16058,7 @@ rows:
   locus_tag: ACZ81_04945
   log2fc: 1.2098
   padj: 0.036
-  rank: 799
+  rank: 798
   rank_down: null
   rank_up: 291
   timepoint: day 31
@@ -16088,7 +16073,7 @@ rows:
   locus_tag: ACZ81_04955
   log2fc: 41.1993
   padj: 0.0
-  rank: 668
+  rank: 667
   rank_down: null
   rank_up: 87
   timepoint: 20h
@@ -16103,7 +16088,7 @@ rows:
   locus_tag: ACZ81_04965
   log2fc: 8.0919
   padj: 0.0024
-  rank: 770
+  rank: 769
   rank_down: null
   rank_up: 171
   timepoint: 20h
@@ -16118,7 +16103,7 @@ rows:
   locus_tag: ACZ81_04970
   log2fc: 29.3582
   padj: 0.0
-  rank: 676
+  rank: 675
   rank_down: null
   rank_up: 95
   timepoint: 20h
@@ -16223,7 +16208,7 @@ rows:
   locus_tag: ACZ81_05025
   log2fc: 22.6167
   padj: 0.0
-  rank: 687
+  rank: 686
   rank_down: null
   rank_up: 106
   timepoint: 20h
@@ -16268,7 +16253,7 @@ rows:
   locus_tag: ACZ81_05030
   log2fc: 1.309
   padj: 0.0035
-  rank: 460
+  rank: 459
   rank_down: null
   rank_up: 249
   timepoint: day 89
@@ -16448,7 +16433,7 @@ rows:
   locus_tag: ACZ81_05050
   log2fc: 1.2838
   padj: 0.0216
-  rank: 478
+  rank: 477
   rank_down: null
   rank_up: 257
   timepoint: day 89
@@ -16478,7 +16463,7 @@ rows:
   locus_tag: ACZ81_05060
   log2fc: 35.8845
   padj: 0.0
-  rank: 670
+  rank: 669
   rank_down: null
   rank_up: 89
   timepoint: 20h
@@ -16553,7 +16538,7 @@ rows:
   locus_tag: ACZ81_05065
   log2fc: 8.7172
   padj: 0.0
-  rank: 761
+  rank: 760
   rank_down: null
   rank_up: 165
   timepoint: 20h
@@ -16628,7 +16613,7 @@ rows:
   locus_tag: ACZ81_05070
   log2fc: 7.4656
   padj: 0.0004
-  rank: 784
+  rank: 783
   rank_down: null
   rank_up: 181
   timepoint: 20h
@@ -16703,7 +16688,7 @@ rows:
   locus_tag: ACZ81_05075
   log2fc: 22.6998
   padj: 0.0
-  rank: 686
+  rank: 685
   rank_down: null
   rank_up: 105
   timepoint: 20h
@@ -16718,7 +16703,7 @@ rows:
   locus_tag: ACZ81_05080
   log2fc: 8.8105
   padj: 0.0
-  rank: 760
+  rank: 759
   rank_down: null
   rank_up: 164
   timepoint: 20h
@@ -16748,7 +16733,7 @@ rows:
   locus_tag: ACZ81_05160
   log2fc: 13.5625
   padj: 0.0
-  rank: 714
+  rank: 713
   rank_down: null
   rank_up: 131
   timepoint: 20h
@@ -16868,7 +16853,7 @@ rows:
   locus_tag: ACZ81_05225
   log2fc: 1.1739
   padj: 0.025
-  rank: 855
+  rank: 854
   rank_down: null
   rank_up: 315
   timepoint: day 31
@@ -16898,7 +16883,7 @@ rows:
   locus_tag: ACZ81_05295
   log2fc: 6.8711
   padj: 0.0077
-  rank: 789
+  rank: 788
   rank_down: null
   rank_up: 184
   timepoint: 20h
@@ -16988,9 +16973,9 @@ rows:
   locus_tag: ACZ81_05350
   log2fc: 1.0819
   padj: 0.0056
-  rank: 465
+  rank: 464
   rank_down: null
-  rank_up: 104
+  rank_up: 103
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -17003,9 +16988,9 @@ rows:
   locus_tag: ACZ81_05355
   log2fc: 1.709
   padj: 0.0
-  rank: 169
+  rank: 168
   rank_down: null
-  rank_up: 53
+  rank_up: 52
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -17033,7 +17018,7 @@ rows:
   locus_tag: ACZ81_05355
   log2fc: 1.3487
   padj: 0.0005
-  rank: 292
+  rank: 291
   rank_down: null
   rank_up: 154
   timepoint: day 31
@@ -17063,9 +17048,9 @@ rows:
   locus_tag: ACZ81_05370
   log2fc: 1.3692
   padj: 0.0053
-  rank: 272
+  rank: 271
   rank_down: null
-  rank_up: 80
+  rank_up: 79
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -17153,7 +17138,7 @@ rows:
   locus_tag: ACZ81_05380
   log2fc: 1.334
   padj: 0.0
-  rank: 858
+  rank: 857
   rank_down: null
   rank_up: 243
   timepoint: days 60+89
@@ -17168,7 +17153,7 @@ rows:
   locus_tag: ACZ81_05380
   log2fc: 1.0395
   padj: 0.0046
-  rank: 821
+  rank: 820
   rank_down: null
   rank_up: 322
   timepoint: day 18
@@ -17198,7 +17183,7 @@ rows:
   locus_tag: ACZ81_05385
   log2fc: 1.3233
   padj: 0.0003
-  rank: 866
+  rank: 865
   rank_down: null
   rank_up: 246
   timepoint: days 60+89
@@ -17288,7 +17273,7 @@ rows:
   locus_tag: ACZ81_05440
   log2fc: 1.0877
   padj: 0.0096
-  rank: 1178
+  rank: 1177
   rank_down: null
   rank_up: 392
   timepoint: days 60+89
@@ -17318,7 +17303,7 @@ rows:
   locus_tag: ACZ81_05445
   log2fc: 1.1003
   padj: 0.0
-  rank: 1155
+  rank: 1154
   rank_down: null
   rank_up: 379
   timepoint: days 60+89
@@ -17438,7 +17423,7 @@ rows:
   locus_tag: ACZ81_05470
   log2fc: 1.3251
   padj: 0.0096
-  rank: 115
+  rank: 114
   rank_down: null
   rank_up: 56
   timepoint: day 18
@@ -17468,7 +17453,7 @@ rows:
   locus_tag: ACZ81_05480
   log2fc: 7.5065
   padj: 0.0042
-  rank: 783
+  rank: 782
   rank_down: null
   rank_up: 180
   timepoint: 20h
@@ -17603,7 +17588,7 @@ rows:
   locus_tag: ACZ81_05495
   log2fc: 1.0291
   padj: 0.0011
-  rank: 480
+  rank: 479
   rank_down: null
   rank_up: 231
   timepoint: day 31
@@ -17618,7 +17603,7 @@ rows:
   locus_tag: ACZ81_05500
   log2fc: 13.786
   padj: 0.0
-  rank: 711
+  rank: 710
   rank_down: null
   rank_up: 128
   timepoint: 20h
@@ -17633,7 +17618,7 @@ rows:
   locus_tag: ACZ81_05510
   log2fc: 18.207
   padj: 0.0
-  rank: 694
+  rank: 693
   rank_down: null
   rank_up: 113
   timepoint: 20h
@@ -17693,7 +17678,7 @@ rows:
   locus_tag: ACZ81_05510
   log2fc: 1.2038
   padj: 0.0001
-  rank: 365
+  rank: 364
   rank_down: null
   rank_up: 186
   timepoint: day 31
@@ -17708,7 +17693,7 @@ rows:
   locus_tag: ACZ81_05520
   log2fc: 1.0192
   padj: 0.0406
-  rank: 498
+  rank: 497
   rank_down: null
   rank_up: 238
   timepoint: day 31
@@ -17768,7 +17753,7 @@ rows:
   locus_tag: ACZ81_05525
   log2fc: 1.1387
   padj: 0.0109
-  rank: 179
+  rank: 178
   rank_down: null
   rank_up: 94
   timepoint: day 18
@@ -17783,7 +17768,7 @@ rows:
   locus_tag: ACZ81_05525
   log2fc: 1.114
   padj: 0.0028
-  rank: 621
+  rank: 620
   rank_down: null
   rank_up: 320
   timepoint: day 89
@@ -17918,7 +17903,7 @@ rows:
   locus_tag: ACZ81_05530
   log2fc: 1.438
   padj: 0.0063
-  rank: 255
+  rank: 254
   rank_down: null
   rank_up: 134
   timepoint: day 31
@@ -17948,7 +17933,7 @@ rows:
   locus_tag: ACZ81_05530
   log2fc: 1.1514
   padj: 0.0446
-  rank: 173
+  rank: 172
   rank_down: null
   rank_up: 90
   timepoint: day 18
@@ -18158,7 +18143,7 @@ rows:
   locus_tag: ACZ81_05545
   log2fc: 1.0966
   padj: 0.0067
-  rank: 1162
+  rank: 1161
   rank_down: null
   rank_up: 381
   timepoint: days 60+89
@@ -18203,7 +18188,7 @@ rows:
   locus_tag: ACZ81_05555
   log2fc: 1.2787
   padj: 0.0035
-  rank: 481
+  rank: 480
   rank_down: null
   rank_up: 260
   timepoint: day 89
@@ -18218,7 +18203,7 @@ rows:
   locus_tag: ACZ81_05555
   log2fc: 1.2673
   padj: 0.0054
-  rank: 323
+  rank: 322
   rank_down: null
   rank_up: 170
   timepoint: day 31
@@ -18518,7 +18503,7 @@ rows:
   locus_tag: ACZ81_05695
   log2fc: 1.3686
   padj: 0.0
-  rank: 832
+  rank: 831
   rank_down: null
   rank_up: 231
   timepoint: days 60+89
@@ -18638,7 +18623,7 @@ rows:
   locus_tag: ACZ81_05700
   log2fc: 1.3998
   padj: 0.0
-  rank: 808
+  rank: 807
   rank_down: null
   rank_up: 223
   timepoint: days 60+89
@@ -18653,7 +18638,7 @@ rows:
   locus_tag: ACZ81_05700
   log2fc: 1.0265
   padj: 0.0032
-  rank: 719
+  rank: 718
   rank_down: null
   rank_up: 141
   timepoint: day 31
@@ -18683,7 +18668,7 @@ rows:
   locus_tag: ACZ81_05710
   log2fc: 1.3358
   padj: 0.0
-  rank: 857
+  rank: 856
   rank_down: null
   rank_up: 242
   timepoint: days 60+89
@@ -18713,7 +18698,7 @@ rows:
   locus_tag: ACZ81_05710
   log2fc: 1.0806
   padj: 0.0007
-  rank: 444
+  rank: 443
   rank_down: null
   rank_up: 217
   timepoint: day 31
@@ -18728,7 +18713,7 @@ rows:
   locus_tag: ACZ81_05710
   log2fc: 1.061
   padj: 0.0005
-  rank: 669
+  rank: 668
   rank_down: null
   rank_up: 342
   timepoint: day 89
@@ -18758,7 +18743,7 @@ rows:
   locus_tag: ACZ81_05715
   log2fc: 1.0291
   padj: 0.0002
-  rank: 1269
+  rank: 1268
   rank_down: null
   rank_up: 432
   timepoint: days 60+89
@@ -19283,7 +19268,7 @@ rows:
   locus_tag: ACZ81_05840
   log2fc: 1.0777
   padj: 0.0286
-  rank: 1203
+  rank: 1202
   rank_down: null
   rank_up: 402
   timepoint: days 60+89
@@ -19298,7 +19283,7 @@ rows:
   locus_tag: ACZ81_05845
   log2fc: 16.8267
   padj: 0.0
-  rank: 699
+  rank: 698
   rank_down: null
   rank_up: 118
   timepoint: 20h
@@ -19328,7 +19313,7 @@ rows:
   locus_tag: ACZ81_05860
   log2fc: 1.0508
   padj: 0.0003
-  rank: 1006
+  rank: 1005
   rank_down: null
   rank_up: 358
   timepoint: day 31
@@ -19343,7 +19328,7 @@ rows:
   locus_tag: ACZ81_05875
   log2fc: 15.8949
   padj: 0.0
-  rank: 701
+  rank: 700
   rank_down: null
   rank_up: 120
   timepoint: 20h
@@ -19358,7 +19343,7 @@ rows:
   locus_tag: ACZ81_05880
   log2fc: 12.3928
   padj: 0.0
-  rank: 721
+  rank: 720
   rank_down: null
   rank_up: 137
   timepoint: 20h
@@ -19373,7 +19358,7 @@ rows:
   locus_tag: ACZ81_05885
   log2fc: 27.9488
   padj: 0.0
-  rank: 678
+  rank: 677
   rank_down: null
   rank_up: 97
   timepoint: 20h
@@ -19538,7 +19523,7 @@ rows:
   locus_tag: ACZ81_05900
   log2fc: 1.6193
   padj: 0.0002
-  rank: 185
+  rank: 184
   rank_down: null
   rank_up: 96
   timepoint: day 31
@@ -19553,7 +19538,7 @@ rows:
   locus_tag: ACZ81_05900
   log2fc: 1.3115
   padj: 0.004
-  rank: 117
+  rank: 116
   rank_down: null
   rank_up: 57
   timepoint: day 18
@@ -19583,7 +19568,7 @@ rows:
   locus_tag: ACZ81_05915
   log2fc: 1.2807
   padj: 0.0005
-  rank: 479
+  rank: 478
   rank_down: null
   rank_up: 258
   timepoint: day 89
@@ -19628,7 +19613,7 @@ rows:
   locus_tag: ACZ81_05915
   log2fc: 1.0627
   padj: 0.0101
-  rank: 213
+  rank: 212
   rank_down: null
   rank_up: 110
   timepoint: day 18
@@ -19643,7 +19628,7 @@ rows:
   locus_tag: ACZ81_05915
   log2fc: 1.0407
   padj: 0.0036
-  rank: 471
+  rank: 470
   rank_down: null
   rank_up: 226
   timepoint: day 31
@@ -19673,7 +19658,7 @@ rows:
   locus_tag: ACZ81_05925
   log2fc: 1.082
   padj: 0.022
-  rank: 763
+  rank: 762
   rank_down: null
   rank_up: 303
   timepoint: day 18
@@ -19703,7 +19688,7 @@ rows:
   locus_tag: ACZ81_05930
   log2fc: 10.4527
   padj: 0.0
-  rank: 741
+  rank: 740
   rank_down: null
   rank_up: 153
   timepoint: 20h
@@ -19823,7 +19808,7 @@ rows:
   locus_tag: ACZ81_06050
   log2fc: 1.0642
   padj: 0.0203
-  rank: 782
+  rank: 781
   rank_down: null
   rank_up: 310
   timepoint: day 18
@@ -19838,7 +19823,7 @@ rows:
   locus_tag: ACZ81_06070
   log2fc: 1.0746
   padj: 0.0005
-  rank: 978
+  rank: 977
   rank_down: null
   rank_up: 353
   timepoint: day 31
@@ -19898,9 +19883,9 @@ rows:
   locus_tag: ACZ81_06085
   log2fc: 1.7168
   padj: 0.0221
-  rank: 166
+  rank: 165
   rank_down: null
-  rank_up: 51
+  rank_up: 50
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -19943,7 +19928,7 @@ rows:
   locus_tag: ACZ81_06120
   log2fc: 11.4478
   padj: 0.0016
-  rank: 729
+  rank: 728
   rank_down: null
   rank_up: 143
   timepoint: 20h
@@ -19973,7 +19958,7 @@ rows:
   locus_tag: ACZ81_06120
   log2fc: 1.3162
   padj: 0.0101
-  rank: 699
+  rank: 698
   rank_down: null
   rank_up: 261
   timepoint: day 31
@@ -20003,7 +19988,7 @@ rows:
   locus_tag: ACZ81_06120
   log2fc: 1.1211
   padj: 0.0065
-  rank: 1129
+  rank: 1128
   rank_down: null
   rank_up: 364
   timepoint: days 60+89
@@ -20093,7 +20078,7 @@ rows:
   locus_tag: ACZ81_06155
   log2fc: 10.8501
   padj: 0.0
-  rank: 736
+  rank: 735
   rank_down: null
   rank_up: 148
   timepoint: 20h
@@ -20138,7 +20123,7 @@ rows:
   locus_tag: ACZ81_06165
   log2fc: 1.2786
   padj: 0.0378
-  rank: 483
+  rank: 482
   rank_down: null
   rank_up: 262
   timepoint: day 89
@@ -20183,7 +20168,7 @@ rows:
   locus_tag: ACZ81_06170
   log2fc: 1.4234
   padj: 0.0055
-  rank: 259
+  rank: 258
   rank_down: null
   rank_up: 137
   timepoint: day 31
@@ -20333,7 +20318,7 @@ rows:
   locus_tag: ACZ81_06185
   log2fc: 1.1396
   padj: 0.006
-  rank: 718
+  rank: 717
   rank_down: null
   rank_up: 290
   timepoint: day 18
@@ -20348,7 +20333,7 @@ rows:
   locus_tag: ACZ81_06200
   log2fc: 30.2135
   padj: 0.0
-  rank: 674
+  rank: 673
   rank_down: null
   rank_up: 93
   timepoint: 20h
@@ -20453,9 +20438,9 @@ rows:
   locus_tag: ACZ81_06200
   log2fc: 1.03
   padj: 0.0011
-  rank: 509
+  rank: 508
   rank_down: null
-  rank_up: 109
+  rank_up: 108
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -20468,7 +20453,7 @@ rows:
   locus_tag: ACZ81_06245
   log2fc: 10.9668
   padj: 0.0
-  rank: 733
+  rank: 732
   rank_down: null
   rank_up: 147
   timepoint: 20h
@@ -20633,7 +20618,7 @@ rows:
   locus_tag: ACZ81_06265
   log2fc: 1.315
   padj: 0.0161
-  rank: 702
+  rank: 701
   rank_down: null
   rank_up: 263
   timepoint: day 31
@@ -20708,7 +20693,7 @@ rows:
   locus_tag: ACZ81_06335
   log2fc: 19.9632
   padj: 0.0
-  rank: 690
+  rank: 689
   rank_down: null
   rank_up: 109
   timepoint: 20h
@@ -20723,7 +20708,7 @@ rows:
   locus_tag: ACZ81_06340
   log2fc: 7.9772
   padj: 0.0002
-  rank: 771
+  rank: 770
   rank_down: null
   rank_up: 172
   timepoint: 20h
@@ -20888,7 +20873,7 @@ rows:
   locus_tag: ACZ81_06385
   log2fc: 1.2843
   padj: 0.0067
-  rank: 733
+  rank: 732
   rank_down: null
   rank_up: 271
   timepoint: day 31
@@ -20903,7 +20888,7 @@ rows:
   locus_tag: ACZ81_06385
   log2fc: 1.2253
   padj: 0.0173
-  rank: 501
+  rank: 500
   rank_down: null
   rank_up: 97
   timepoint: day 31
@@ -20918,7 +20903,7 @@ rows:
   locus_tag: ACZ81_06385
   log2fc: 1.199
   padj: 0.0016
-  rank: 1025
+  rank: 1024
   rank_down: null
   rank_up: 320
   timepoint: days 60+89
@@ -21038,7 +21023,7 @@ rows:
   locus_tag: ACZ81_06390
   log2fc: 1.1382
   padj: 0.0008
-  rank: 1106
+  rank: 1105
   rank_down: null
   rank_up: 354
   timepoint: days 60+89
@@ -21053,7 +21038,7 @@ rows:
   locus_tag: ACZ81_06435
   log2fc: 7.7074
   padj: 0.0002
-  rank: 780
+  rank: 779
   rank_down: null
   rank_up: 177
   timepoint: 20h
@@ -21143,7 +21128,7 @@ rows:
   locus_tag: ACZ81_06505
   log2fc: 30.703
   padj: 0.0
-  rank: 672
+  rank: 671
   rank_down: null
   rank_up: 91
   timepoint: 20h
@@ -21173,7 +21158,7 @@ rows:
   locus_tag: ACZ81_06510
   log2fc: 1.4
   padj: 0.0438
-  rank: 97
+  rank: 96
   rank_down: null
   rank_up: 53
   timepoint: day 18
@@ -21218,7 +21203,7 @@ rows:
   locus_tag: ACZ81_06510
   log2fc: 1.2155
   padj: 0.0025
-  rank: 795
+  rank: 794
   rank_down: null
   rank_up: 290
   timepoint: day 31
@@ -21233,7 +21218,7 @@ rows:
   locus_tag: ACZ81_06510
   log2fc: 1.1497
   padj: 0.0417
-  rank: 575
+  rank: 574
   rank_down: null
   rank_up: 302
   timepoint: day 89
@@ -21248,7 +21233,7 @@ rows:
   locus_tag: ACZ81_06530
   log2fc: 50.1694
   padj: 0.0
-  rank: 666
+  rank: 665
   rank_down: null
   rank_up: 85
   timepoint: 20h
@@ -21353,9 +21338,9 @@ rows:
   locus_tag: ACZ81_06560
   log2fc: 1.0947
   padj: 0.0139
-  rank: 449
+  rank: 448
   rank_down: null
-  rank_up: 100
+  rank_up: 99
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -21443,7 +21428,7 @@ rows:
   locus_tag: ACZ81_06575
   log2fc: 1.243
   padj: 0.0144
-  rank: 133
+  rank: 132
   rank_down: null
   rank_up: 66
   timepoint: day 18
@@ -21458,7 +21443,7 @@ rows:
   locus_tag: ACZ81_06575
   log2fc: 1.1667
   padj: 0.0074
-  rank: 395
+  rank: 394
   rank_down: null
   rank_up: 197
   timepoint: day 31
@@ -21473,7 +21458,7 @@ rows:
   locus_tag: ACZ81_06575
   log2fc: 1.0115
   padj: 0.0126
-  rank: 1064
+  rank: 1063
   rank_down: null
   rank_up: 375
   timepoint: day 31
@@ -21563,7 +21548,7 @@ rows:
   locus_tag: ACZ81_06590
   log2fc: 1.1284
   padj: 0.0
-  rank: 1118
+  rank: 1117
   rank_down: null
   rank_up: 357
   timepoint: days 60+89
@@ -21578,7 +21563,7 @@ rows:
   locus_tag: ACZ81_06590
   log2fc: 1.1196
   padj: 0.0001
-  rank: 613
+  rank: 612
   rank_down: null
   rank_up: 317
   timepoint: day 89
@@ -21653,7 +21638,7 @@ rows:
   locus_tag: ACZ81_06595
   log2fc: 1.2243
   padj: 0.0002
-  rank: 523
+  rank: 522
   rank_down: null
   rank_up: 278
   timepoint: day 89
@@ -21668,7 +21653,7 @@ rows:
   locus_tag: ACZ81_06615
   log2fc: 10.9751
   padj: 0.0008
-  rank: 731
+  rank: 730
   rank_down: null
   rank_up: 145
   timepoint: 20h
@@ -21683,7 +21668,7 @@ rows:
   locus_tag: ACZ81_06660
   log2fc: 1.0326
   padj: 0.0153
-  rank: 826
+  rank: 825
   rank_down: null
   rank_up: 325
   timepoint: day 18
@@ -21743,7 +21728,7 @@ rows:
   locus_tag: ACZ81_06760
   log2fc: 7.1476
   padj: 0.0012
-  rank: 786
+  rank: 785
   rank_down: null
   rank_up: 183
   timepoint: 20h
@@ -21773,7 +21758,7 @@ rows:
   locus_tag: ACZ81_06760
   log2fc: 1.1406
   padj: 0.0065
-  rank: 411
+  rank: 410
   rank_down: null
   rank_up: 207
   timepoint: day 31
@@ -21788,7 +21773,7 @@ rows:
   locus_tag: ACZ81_06785
   log2fc: 1.0685
   padj: 0.0006
-  rank: 778
+  rank: 777
   rank_down: null
   rank_up: 309
   timepoint: day 18
@@ -21893,7 +21878,7 @@ rows:
   locus_tag: ACZ81_06855
   log2fc: 1.0555
   padj: 0.0014
-  rank: 671
+  rank: 670
   rank_down: null
   rank_up: 343
   timepoint: day 89
@@ -21938,7 +21923,7 @@ rows:
   locus_tag: ACZ81_06865
   log2fc: 1.2148
   padj: 0.0155
-  rank: 529
+  rank: 528
   rank_down: null
   rank_up: 281
   timepoint: day 89
@@ -21953,7 +21938,7 @@ rows:
   locus_tag: ACZ81_06865
   log2fc: 1.0243
   padj: 0.0163
-  rank: 656
+  rank: 655
   rank_down: null
   rank_up: 327
   timepoint: days 60+89
@@ -21983,7 +21968,7 @@ rows:
   locus_tag: ACZ81_06900
   log2fc: 1.0623
   padj: 0.0246
-  rank: 666
+  rank: 665
   rank_down: null
   rank_up: 340
   timepoint: day 89
@@ -21998,7 +21983,7 @@ rows:
   locus_tag: ACZ81_06900
   log2fc: 1.0016
   padj: 0.0122
-  rank: 673
+  rank: 672
   rank_down: null
   rank_up: 336
   timepoint: days 60+89
@@ -22013,7 +21998,7 @@ rows:
   locus_tag: ACZ81_06940
   log2fc: 41.399
   padj: 0.0
-  rank: 667
+  rank: 666
   rank_down: null
   rank_up: 86
   timepoint: 20h
@@ -22073,7 +22058,7 @@ rows:
   locus_tag: ACZ81_06945
   log2fc: 1.2246
   padj: 0.0001
-  rank: 354
+  rank: 353
   rank_down: null
   rank_up: 182
   timepoint: day 31
@@ -22103,7 +22088,7 @@ rows:
   locus_tag: ACZ81_06950
   log2fc: 1.4393
   padj: 0.0007
-  rank: 254
+  rank: 253
   rank_down: null
   rank_up: 133
   timepoint: day 31
@@ -22148,7 +22133,7 @@ rows:
   locus_tag: ACZ81_06950
   log2fc: 1.2587
   padj: 0.0012
-  rank: 502
+  rank: 501
   rank_down: null
   rank_up: 271
   timepoint: day 89
@@ -22433,7 +22418,7 @@ rows:
   locus_tag: ACZ81_07000
   log2fc: 1.3433
   padj: 0.004
-  rank: 108
+  rank: 107
   rank_down: null
   rank_up: 55
   timepoint: day 18
@@ -22448,7 +22433,7 @@ rows:
   locus_tag: ACZ81_07005
   log2fc: 1.7243
   padj: 0.0088
-  rank: 152
+  rank: 151
   rank_down: null
   rank_up: 80
   timepoint: day 31
@@ -22613,7 +22598,7 @@ rows:
   locus_tag: ACZ81_07025
   log2fc: 1.2943
   padj: 0.0021
-  rank: 472
+  rank: 471
   rank_down: null
   rank_up: 254
   timepoint: day 89
@@ -22628,7 +22613,7 @@ rows:
   locus_tag: ACZ81_07045
   log2fc: 75.2574
   padj: 0.0
-  rank: 659
+  rank: 658
   rank_down: null
   rank_up: 78
   timepoint: 20h
@@ -22703,7 +22688,7 @@ rows:
   locus_tag: ACZ81_07055
   log2fc: 1.2323
   padj: 0.0
-  rank: 979
+  rank: 978
   rank_down: null
   rank_up: 299
   timepoint: days 60+89
@@ -22793,7 +22778,7 @@ rows:
   locus_tag: ACZ81_07060
   log2fc: 1.0216
   padj: 0.0346
-  rank: 492
+  rank: 491
   rank_down: null
   rank_up: 233
   timepoint: day 31
@@ -22808,7 +22793,7 @@ rows:
   locus_tag: ACZ81_07065
   log2fc: 6.0317
   padj: 0.0095
-  rank: 805
+  rank: 804
   rank_down: null
   rank_up: 187
   timepoint: 20h
@@ -22823,7 +22808,7 @@ rows:
   locus_tag: ACZ81_07065
   log2fc: 1.2388
   padj: 0.0198
-  rank: 517
+  rank: 516
   rank_down: null
   rank_up: 274
   timepoint: day 89
@@ -22943,7 +22928,7 @@ rows:
   locus_tag: ACZ81_07070
   log2fc: 1.1137
   padj: 0.0032
-  rank: 622
+  rank: 621
   rank_down: null
   rank_up: 321
   timepoint: day 89
@@ -22973,7 +22958,7 @@ rows:
   locus_tag: ACZ81_07075
   log2fc: 1.1349
   padj: 0.0252
-  rank: 909
+  rank: 908
   rank_down: null
   rank_up: 334
   timepoint: day 31
@@ -23153,7 +23138,7 @@ rows:
   locus_tag: ACZ81_07095
   log2fc: 1.1325
   padj: 0.0193
-  rank: 912
+  rank: 911
   rank_down: null
   rank_up: 336
   timepoint: day 31
@@ -23198,7 +23183,7 @@ rows:
   locus_tag: ACZ81_07140
   log2fc: 1.0045
   padj: 0.0055
-  rank: 1073
+  rank: 1072
   rank_down: null
   rank_up: 376
   timepoint: day 31
@@ -23213,7 +23198,7 @@ rows:
   locus_tag: ACZ81_07165
   log2fc: 1.4
   padj: 0.0231
-  rank: 274
+  rank: 273
   rank_down: null
   rank_up: 144
   timepoint: day 31
@@ -23423,7 +23408,7 @@ rows:
   locus_tag: ACZ81_07200
   log2fc: 1.167
   padj: 0.0066
-  rank: 393
+  rank: 392
   rank_down: null
   rank_up: 196
   timepoint: day 31
@@ -23528,7 +23513,7 @@ rows:
   locus_tag: ACZ81_07280
   log2fc: 1.19
   padj: 0.0141
-  rank: 832
+  rank: 831
   rank_down: null
   rank_up: 305
   timepoint: day 31
@@ -23678,7 +23663,7 @@ rows:
   locus_tag: ACZ81_07290
   log2fc: 1.0563
   padj: 0.0217
-  rank: 1230
+  rank: 1229
   rank_down: null
   rank_up: 414
   timepoint: days 60+89
@@ -23873,7 +23858,7 @@ rows:
   locus_tag: ACZ81_07360
   log2fc: 1.1615
   padj: 0.0
-  rank: 1074
+  rank: 1073
   rank_down: null
   rank_up: 343
   timepoint: days 60+89
@@ -23888,7 +23873,7 @@ rows:
   locus_tag: ACZ81_07360
   log2fc: 1.0863
   padj: 0.0002
-  rank: 644
+  rank: 643
   rank_down: null
   rank_up: 125
   timepoint: day 31
@@ -23918,7 +23903,7 @@ rows:
   locus_tag: ACZ81_07375
   log2fc: 20.9336
   padj: 0.0
-  rank: 689
+  rank: 688
   rank_down: null
   rank_up: 108
   timepoint: 20h
@@ -24248,7 +24233,7 @@ rows:
   locus_tag: ACZ81_07435
   log2fc: 1.3033
   padj: 0.0
-  rank: 886
+  rank: 885
   rank_down: null
   rank_up: 255
   timepoint: days 60+89
@@ -24323,7 +24308,7 @@ rows:
   locus_tag: ACZ81_07435
   log2fc: 1.0741
   padj: 0.0002
-  rank: 655
+  rank: 654
   rank_down: null
   rank_up: 336
   timepoint: day 89
@@ -24668,7 +24653,7 @@ rows:
   locus_tag: ACZ81_07490
   log2fc: 1.0671
   padj: 0.0028
-  rank: 211
+  rank: 210
   rank_down: null
   rank_up: 108
   timepoint: day 18
@@ -24698,7 +24683,7 @@ rows:
   locus_tag: ACZ81_07595
   log2fc: 1.078
   padj: 0.0001
-  rank: 1202
+  rank: 1201
   rank_down: null
   rank_up: 401
   timepoint: days 60+89
@@ -24713,7 +24698,7 @@ rows:
   locus_tag: ACZ81_07600
   log2fc: 1.1684
   padj: 0.0024
-  rank: 1060
+  rank: 1059
   rank_down: null
   rank_up: 336
   timepoint: days 60+89
@@ -24803,7 +24788,7 @@ rows:
   locus_tag: ACZ81_07750
   log2fc: 13.7182
   padj: 0.0
-  rank: 713
+  rank: 712
   rank_down: null
   rank_up: 130
   timepoint: 20h
@@ -24818,7 +24803,7 @@ rows:
   locus_tag: ACZ81_07760
   log2fc: 7.8463
   padj: 0.0022
-  rank: 778
+  rank: 777
   rank_down: null
   rank_up: 175
   timepoint: 20h
@@ -24893,7 +24878,7 @@ rows:
   locus_tag: ACZ81_07765
   log2fc: 1.1974
   padj: 0.0415
-  rank: 1026
+  rank: 1025
   rank_down: null
   rank_up: 321
   timepoint: days 60+89
@@ -24908,7 +24893,7 @@ rows:
   locus_tag: ACZ81_07770
   log2fc: 1.1712
   padj: 0.0142
-  rank: 1057
+  rank: 1056
   rank_down: null
   rank_up: 333
   timepoint: days 60+89
@@ -24938,9 +24923,9 @@ rows:
   locus_tag: ACZ81_07780
   log2fc: 1.48
   padj: 0.0175
-  rank: 228
+  rank: 227
   rank_down: null
-  rank_up: 66
+  rank_up: 65
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -24968,9 +24953,9 @@ rows:
   locus_tag: ACZ81_07785
   log2fc: 1.6707
   padj: 0.0349
-  rank: 178
+  rank: 177
   rank_down: null
-  rank_up: 55
+  rank_up: 54
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -24998,9 +24983,9 @@ rows:
   locus_tag: ACZ81_07790
   log2fc: 1.3378
   padj: 0.0202
-  rank: 284
+  rank: 283
   rank_down: null
-  rank_up: 83
+  rank_up: 82
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -25013,7 +24998,7 @@ rows:
   locus_tag: ACZ81_07795
   log2fc: 10.4527
   padj: 0.0
-  rank: 739
+  rank: 738
   rank_down: null
   rank_up: 151
   timepoint: 20h
@@ -25028,9 +25013,9 @@ rows:
   locus_tag: ACZ81_07795
   log2fc: 1.4184
   padj: 0.0184
-  rank: 252
+  rank: 251
   rank_down: null
-  rank_up: 75
+  rank_up: 74
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -25043,9 +25028,9 @@ rows:
   locus_tag: ACZ81_07800
   log2fc: 1.195
   padj: 0.0244
-  rank: 371
+  rank: 370
   rank_down: null
-  rank_up: 92
+  rank_up: 91
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -25058,7 +25043,7 @@ rows:
   locus_tag: ACZ81_07810
   log2fc: 13.7745
   padj: 0.0
-  rank: 712
+  rank: 711
   rank_down: null
   rank_up: 129
   timepoint: 20h
@@ -25073,7 +25058,7 @@ rows:
   locus_tag: ACZ81_07815
   log2fc: 10.4527
   padj: 0.0
-  rank: 740
+  rank: 739
   rank_down: null
   rank_up: 152
   timepoint: 20h
@@ -25103,7 +25088,7 @@ rows:
   locus_tag: ACZ81_07825
   log2fc: 10.9668
   padj: 0.0
-  rank: 732
+  rank: 731
   rank_down: null
   rank_up: 146
   timepoint: 20h
@@ -25133,7 +25118,7 @@ rows:
   locus_tag: ACZ81_07840
   log2fc: 7.6393
   padj: 0.0003
-  rank: 782
+  rank: 781
   rank_down: null
   rank_up: 179
   timepoint: 20h
@@ -25148,7 +25133,7 @@ rows:
   locus_tag: ACZ81_07850
   log2fc: 5.9583
   padj: 0.0012
-  rank: 809
+  rank: 808
   rank_down: null
   rank_up: 188
   timepoint: 20h
@@ -25358,7 +25343,7 @@ rows:
   locus_tag: ACZ81_07860
   log2fc: 1.0708
   padj: 0.0034
-  rank: 659
+  rank: 658
   rank_down: null
   rank_up: 338
   timepoint: day 89
@@ -25373,7 +25358,7 @@ rows:
   locus_tag: ACZ81_07860
   log2fc: 1.0076
   padj: 0.0186
-  rank: 244
+  rank: 243
   rank_down: null
   rank_up: 122
   timepoint: day 18
@@ -25388,9 +25373,9 @@ rows:
   locus_tag: ACZ81_07875
   log2fc: 1.8798
   padj: 0.0081
-  rank: 134
+  rank: 133
   rank_down: null
-  rank_up: 43
+  rank_up: 42
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -25448,9 +25433,9 @@ rows:
   locus_tag: ACZ81_07895
   log2fc: 1.8039
   padj: 0.0014
-  rank: 148
+  rank: 147
   rank_down: null
-  rank_up: 47
+  rank_up: 46
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -25463,7 +25448,7 @@ rows:
   locus_tag: ACZ81_07895
   log2fc: 1.1657
   padj: 0.0012
-  rank: 166
+  rank: 165
   rank_down: null
   rank_up: 86
   timepoint: day 18
@@ -25493,7 +25478,7 @@ rows:
   locus_tag: ACZ81_07920
   log2fc: 1.2954
   padj: 0.0001
-  rank: 471
+  rank: 470
   rank_down: null
   rank_up: 253
   timepoint: day 89
@@ -25553,9 +25538,9 @@ rows:
   locus_tag: ACZ81_07940
   log2fc: 1.3694
   padj: null
-  rank: 271
+  rank: 270
   rank_down: null
-  rank_up: 79
+  rank_up: 78
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -25658,7 +25643,7 @@ rows:
   locus_tag: ACZ81_07975
   log2fc: 1.2539
   padj: 0.0048
-  rank: 329
+  rank: 328
   rank_down: null
   rank_up: 172
   timepoint: day 31
@@ -25703,7 +25688,7 @@ rows:
   locus_tag: ACZ81_08020
   log2fc: 1.1773
   padj: 0.0
-  rank: 846
+  rank: 845
   rank_down: null
   rank_up: 310
   timepoint: day 31
@@ -25718,7 +25703,7 @@ rows:
   locus_tag: ACZ81_08020
   log2fc: 1.0583
   padj: 0.0
-  rank: 1228
+  rank: 1227
   rank_down: null
   rank_up: 413
   timepoint: days 60+89
@@ -25823,7 +25808,7 @@ rows:
   locus_tag: ACZ81_08075
   log2fc: 1.1404
   padj: 0.0177
-  rank: 178
+  rank: 177
   rank_down: null
   rank_up: 93
   timepoint: day 18
@@ -25973,7 +25958,7 @@ rows:
   locus_tag: ACZ81_08140
   log2fc: 8.6412
   padj: 0.0011
-  rank: 763
+  rank: 762
   rank_down: null
   rank_up: 167
   timepoint: 20h
@@ -25988,7 +25973,7 @@ rows:
   locus_tag: ACZ81_08170
   log2fc: 1.281
   padj: 0.0039
-  rank: 738
+  rank: 737
   rank_down: null
   rank_up: 273
   timepoint: day 31
@@ -26048,7 +26033,7 @@ rows:
   locus_tag: ACZ81_08190
   log2fc: 1.0124
   padj: 0.0215
-  rank: 1291
+  rank: 1290
   rank_down: null
   rank_up: 441
   timepoint: days 60+89
@@ -26093,7 +26078,7 @@ rows:
   locus_tag: ACZ81_08210
   log2fc: 1.2736
   padj: 0.0002
-  rank: 487
+  rank: 486
   rank_down: null
   rank_up: 266
   timepoint: day 89
@@ -26108,7 +26093,7 @@ rows:
   locus_tag: ACZ81_08210
   log2fc: 1.0456
   padj: 0.0012
-  rank: 469
+  rank: 468
   rank_down: null
   rank_up: 225
   timepoint: day 31
@@ -26198,7 +26183,7 @@ rows:
   locus_tag: ACZ81_08235
   log2fc: 1.1316
   padj: 0.0154
-  rank: 590
+  rank: 589
   rank_down: null
   rank_up: 309
   timepoint: day 89
@@ -26213,7 +26198,7 @@ rows:
   locus_tag: ACZ81_08240
   log2fc: 12.6279
   padj: 0.0
-  rank: 720
+  rank: 719
   rank_down: null
   rank_up: 136
   timepoint: 20h
@@ -26228,7 +26213,7 @@ rows:
   locus_tag: ACZ81_08265
   log2fc: 35.3284
   padj: 0.0
-  rank: 671
+  rank: 670
   rank_down: null
   rank_up: 90
   timepoint: 20h
@@ -26243,7 +26228,7 @@ rows:
   locus_tag: ACZ81_08280
   log2fc: 24.9401
   padj: 0.0
-  rank: 683
+  rank: 682
   rank_down: null
   rank_up: 102
   timepoint: 20h
@@ -26258,7 +26243,7 @@ rows:
   locus_tag: ACZ81_08320
   log2fc: 16.8947
   padj: 0.0
-  rank: 697
+  rank: 696
   rank_down: null
   rank_up: 116
   timepoint: 20h
@@ -26333,7 +26318,7 @@ rows:
   locus_tag: ACZ81_08350
   log2fc: 1.0251
   padj: 0.0035
-  rank: 834
+  rank: 833
   rank_down: null
   rank_up: 328
   timepoint: day 18
@@ -26348,7 +26333,7 @@ rows:
   locus_tag: ACZ81_08355
   log2fc: 8.9771
   padj: 0.0003
-  rank: 752
+  rank: 751
   rank_down: null
   rank_up: 161
   timepoint: 20h
@@ -26423,7 +26408,7 @@ rows:
   locus_tag: ACZ81_08410
   log2fc: 7.1541
   padj: 0.001
-  rank: 785
+  rank: 784
   rank_down: null
   rank_up: 182
   timepoint: 20h
@@ -26498,7 +26483,7 @@ rows:
   locus_tag: ACZ81_08430
   log2fc: 1.0089
   padj: 0.023
-  rank: 506
+  rank: 505
   rank_down: null
   rank_up: 240
   timepoint: day 31
@@ -26558,7 +26543,7 @@ rows:
   locus_tag: ACZ81_08440
   log2fc: 1.0008
   padj: 0.0003
-  rank: 1078
+  rank: 1077
   rank_down: null
   rank_up: 377
   timepoint: day 31
@@ -26603,7 +26588,7 @@ rows:
   locus_tag: ACZ81_08470
   log2fc: 1.3812
   padj: 0.0051
-  rank: 281
+  rank: 280
   rank_down: null
   rank_up: 147
   timepoint: day 31
@@ -26618,7 +26603,7 @@ rows:
   locus_tag: ACZ81_08470
   log2fc: 1.2311
   padj: 0.0073
-  rank: 521
+  rank: 520
   rank_down: null
   rank_up: 276
   timepoint: day 89
@@ -26678,7 +26663,7 @@ rows:
   locus_tag: ACZ81_08470
   log2fc: 1.1261
   padj: 0.0002
-  rank: 1122
+  rank: 1121
   rank_down: null
   rank_up: 360
   timepoint: days 60+89
@@ -26978,9 +26963,9 @@ rows:
   locus_tag: ACZ81_08530
   log2fc: 1.4242
   padj: 0.0028
-  rank: 248
+  rank: 247
   rank_down: null
-  rank_up: 72
+  rank_up: 71
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -27023,7 +27008,7 @@ rows:
   locus_tag: ACZ81_08540
   log2fc: 1.1533
   padj: 0.0061
-  rank: 878
+  rank: 877
   rank_down: null
   rank_up: 324
   timepoint: day 31
@@ -27038,7 +27023,7 @@ rows:
   locus_tag: ACZ81_08540
   log2fc: 1.0407
   padj: 0.0188
-  rank: 816
+  rank: 815
   rank_down: null
   rank_up: 320
   timepoint: day 18
@@ -27293,7 +27278,7 @@ rows:
   locus_tag: ACZ81_08575
   log2fc: 1.1513
   padj: 0.0005
-  rank: 1091
+  rank: 1090
   rank_down: null
   rank_up: 348
   timepoint: days 60+89
@@ -27308,7 +27293,7 @@ rows:
   locus_tag: ACZ81_08580
   log2fc: 15.7132
   padj: 0.0
-  rank: 704
+  rank: 703
   rank_down: null
   rank_up: 122
   timepoint: 20h
@@ -27338,7 +27323,7 @@ rows:
   locus_tag: ACZ81_08580
   log2fc: 1.0192
   padj: 0.001
-  rank: 661
+  rank: 660
   rank_down: null
   rank_up: 330
   timepoint: days 60+89
@@ -27473,7 +27458,7 @@ rows:
   locus_tag: ACZ81_08610
   log2fc: 1.1806
   padj: 0.0045
-  rank: 160
+  rank: 159
   rank_down: null
   rank_up: 83
   timepoint: day 18
@@ -27518,7 +27503,7 @@ rows:
   locus_tag: ACZ81_08625
   log2fc: 1.1605
   padj: 0.0316
-  rank: 870
+  rank: 869
   rank_down: null
   rank_up: 320
   timepoint: day 31
@@ -27533,7 +27518,7 @@ rows:
   locus_tag: ACZ81_08625
   log2fc: 1.1302
   padj: 0.0456
-  rank: 724
+  rank: 723
   rank_down: null
   rank_up: 293
   timepoint: day 18
@@ -27683,7 +27668,7 @@ rows:
   locus_tag: ACZ81_08645
   log2fc: 1.146
   padj: 0.0137
-  rank: 577
+  rank: 576
   rank_down: null
   rank_up: 303
   timepoint: day 89
@@ -27893,7 +27878,7 @@ rows:
   locus_tag: ACZ81_08660
   log2fc: 1.6813
   padj: 0.0
-  rank: 163
+  rank: 162
   rank_down: null
   rank_up: 84
   timepoint: day 31
@@ -27908,7 +27893,7 @@ rows:
   locus_tag: ACZ81_08660
   log2fc: 1.2073
   padj: 0.0002
-  rank: 145
+  rank: 144
   rank_down: null
   rank_up: 74
   timepoint: day 18
@@ -27923,7 +27908,7 @@ rows:
   locus_tag: ACZ81_08675
   log2fc: 170.2865
   padj: 0.0
-  rank: 603
+  rank: 602
   rank_down: null
   rank_up: 75
   timepoint: 20h
@@ -27953,7 +27938,7 @@ rows:
   locus_tag: ACZ81_08700
   log2fc: 54.7521
   padj: 0.0
-  rank: 665
+  rank: 664
   rank_down: null
   rank_up: 84
   timepoint: 20h
@@ -27968,7 +27953,7 @@ rows:
   locus_tag: ACZ81_08710
   log2fc: 11.4738
   padj: 0.0
-  rank: 728
+  rank: 727
   rank_down: null
   rank_up: 142
   timepoint: 20h
@@ -28073,7 +28058,7 @@ rows:
   locus_tag: ACZ81_08720
   log2fc: 1.261
   padj: 0.0063
-  rank: 129
+  rank: 128
   rank_down: null
   rank_up: 63
   timepoint: day 18
@@ -28148,7 +28133,7 @@ rows:
   locus_tag: ACZ81_08725
   log2fc: 1.6033
   padj: 0.0027
-  rank: 187
+  rank: 186
   rank_down: null
   rank_up: 97
   timepoint: day 31
@@ -28193,7 +28178,7 @@ rows:
   locus_tag: ACZ81_08725
   log2fc: 1.1722
   padj: 0.0201
-  rank: 857
+  rank: 856
   rank_down: null
   rank_up: 316
   timepoint: day 31
@@ -28373,7 +28358,7 @@ rows:
   locus_tag: ACZ81_08840
   log2fc: 1.3583
   padj: 0.0
-  rank: 288
+  rank: 287
   rank_down: null
   rank_up: 151
   timepoint: day 31
@@ -28448,7 +28433,7 @@ rows:
   locus_tag: ACZ81_08850
   log2fc: 1.3454
   padj: 0.0074
-  rank: 294
+  rank: 293
   rank_down: null
   rank_up: 156
   timepoint: day 31
@@ -28463,7 +28448,7 @@ rows:
   locus_tag: ACZ81_08855
   log2fc: 1.0825
   padj: 0.0061
-  rank: 1187
+  rank: 1186
   rank_down: null
   rank_up: 395
   timepoint: days 60+89
@@ -28523,7 +28508,7 @@ rows:
   locus_tag: ACZ81_08860
   log2fc: 1.0519
   padj: 0.0056
-  rank: 1235
+  rank: 1234
   rank_down: null
   rank_up: 416
   timepoint: days 60+89
@@ -28613,7 +28598,7 @@ rows:
   locus_tag: ACZ81_08875
   log2fc: 1.6413
   padj: 0.0035
-  rank: 178
+  rank: 177
   rank_down: null
   rank_up: 93
   timepoint: day 31
@@ -28688,7 +28673,7 @@ rows:
   locus_tag: ACZ81_08900
   log2fc: 1.5664
   padj: 0.001
-  rank: 203
+  rank: 202
   rank_down: null
   rank_up: 105
   timepoint: day 31
@@ -28793,7 +28778,7 @@ rows:
   locus_tag: ACZ81_08925
   log2fc: 1.1468
   padj: 0.0082
-  rank: 887
+  rank: 886
   rank_down: null
   rank_up: 327
   timepoint: day 31
@@ -28823,9 +28808,9 @@ rows:
   locus_tag: ACZ81_08930
   log2fc: 1.2943
   padj: 0.0111
-  rank: 302
+  rank: 301
   rank_down: null
-  rank_up: 88
+  rank_up: 87
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -28868,7 +28853,7 @@ rows:
   locus_tag: ACZ81_08985
   log2fc: 6.7486
   padj: 0.0022
-  rank: 794
+  rank: 793
   rank_down: null
   rank_up: 186
   timepoint: 20h
@@ -28898,7 +28883,7 @@ rows:
   locus_tag: ACZ81_08995
   log2fc: 1.1628
   padj: 0.0108
-  rank: 566
+  rank: 565
   rank_down: null
   rank_up: 299
   timepoint: day 89
@@ -28958,7 +28943,7 @@ rows:
   locus_tag: ACZ81_09005
   log2fc: 1.2786
   padj: 0.0016
-  rank: 482
+  rank: 481
   rank_down: null
   rank_up: 261
   timepoint: day 89
@@ -28973,7 +28958,7 @@ rows:
   locus_tag: ACZ81_09005
   log2fc: 1.0863
   padj: 0.0185
-  rank: 203
+  rank: 202
   rank_down: null
   rank_up: 107
   timepoint: day 18
@@ -29033,7 +29018,7 @@ rows:
   locus_tag: ACZ81_09035
   log2fc: 1.3036
   padj: 0.0049
-  rank: 308
+  rank: 307
   rank_down: null
   rank_up: 163
   timepoint: day 31
@@ -29078,7 +29063,7 @@ rows:
   locus_tag: ACZ81_09095
   log2fc: 15.3609
   padj: 0.0
-  rank: 706
+  rank: 705
   rank_down: null
   rank_up: 124
   timepoint: 20h
@@ -29153,7 +29138,7 @@ rows:
   locus_tag: ACZ81_09095
   log2fc: 1.3036
   padj: 0.0011
-  rank: 463
+  rank: 462
   rank_down: null
   rank_up: 250
   timepoint: day 89
@@ -29168,7 +29153,7 @@ rows:
   locus_tag: ACZ81_09095
   log2fc: 1.2298
   padj: 0.0027
-  rank: 346
+  rank: 345
   rank_down: null
   rank_up: 177
   timepoint: day 31
@@ -29183,7 +29168,7 @@ rows:
   locus_tag: ACZ81_09095
   log2fc: 1.1609
   padj: 0.0119
-  rank: 168
+  rank: 167
   rank_down: null
   rank_up: 87
   timepoint: day 18
@@ -29258,7 +29243,7 @@ rows:
   locus_tag: ACZ81_09105
   log2fc: 1.1546
   padj: 0.0281
-  rank: 571
+  rank: 570
   rank_down: null
   rank_up: 300
   timepoint: day 89
@@ -29318,7 +29303,7 @@ rows:
   locus_tag: ACZ81_09135
   log2fc: 1.2475
   padj: 0.0099
-  rank: 956
+  rank: 955
   rank_down: null
   rank_up: 284
   timepoint: days 60+89
@@ -29378,7 +29363,7 @@ rows:
   locus_tag: ACZ81_09160
   log2fc: 1.2443
   padj: 0.0031
-  rank: 767
+  rank: 766
   rank_down: null
   rank_up: 280
   timepoint: day 31
@@ -29438,7 +29423,7 @@ rows:
   locus_tag: ACZ81_09175
   log2fc: 1.2526
   padj: 0.0301
-  rank: 758
+  rank: 757
   rank_down: null
   rank_up: 278
   timepoint: day 31
@@ -29513,7 +29498,7 @@ rows:
   locus_tag: ACZ81_09180
   log2fc: 1.2904
   padj: 0.0114
-  rank: 441
+  rank: 440
   rank_down: null
   rank_up: 84
   timepoint: day 31
@@ -29558,7 +29543,7 @@ rows:
   locus_tag: ACZ81_09180
   log2fc: 1.0311
   padj: 0.0066
-  rank: 1262
+  rank: 1261
   rank_down: null
   rank_up: 427
   timepoint: days 60+89
@@ -29618,7 +29603,7 @@ rows:
   locus_tag: ACZ81_09205
   log2fc: 9.0407
   padj: 0.0
-  rank: 751
+  rank: 750
   rank_down: null
   rank_up: 160
   timepoint: 20h
@@ -29678,7 +29663,7 @@ rows:
   locus_tag: ACZ81_09230
   log2fc: 11.4296
   padj: 0.0
-  rank: 730
+  rank: 729
   rank_down: null
   rank_up: 144
   timepoint: 20h
@@ -29708,7 +29693,7 @@ rows:
   locus_tag: ACZ81_09240
   log2fc: 1.192
   padj: 0.0
-  rank: 828
+  rank: 827
   rank_down: null
   rank_up: 302
   timepoint: day 31
@@ -29753,7 +29738,7 @@ rows:
   locus_tag: ACZ81_09250
   log2fc: 1.4929
   padj: 0.0447
-  rank: 228
+  rank: 227
   rank_down: null
   rank_up: 118
   timepoint: day 31
@@ -29768,7 +29753,7 @@ rows:
   locus_tag: ACZ81_09255
   log2fc: 1.1074
   padj: 0.0037
-  rank: 627
+  rank: 626
   rank_down: null
   rank_up: 323
   timepoint: day 89
@@ -29828,7 +29813,7 @@ rows:
   locus_tag: ACZ81_09265
   log2fc: 1.4292
   padj: 0.0393
-  rank: 338
+  rank: 337
   rank_down: null
   rank_up: 60
   timepoint: day 31
@@ -29858,7 +29843,7 @@ rows:
   locus_tag: ACZ81_09275
   log2fc: 1.2069
   padj: 0.0189
-  rank: 540
+  rank: 539
   rank_down: null
   rank_up: 285
   timepoint: day 89
@@ -29888,7 +29873,7 @@ rows:
   locus_tag: ACZ81_09315
   log2fc: 27.1845
   padj: 0.0
-  rank: 679
+  rank: 678
   rank_down: null
   rank_up: 98
   timepoint: 20h
@@ -30068,7 +30053,7 @@ rows:
   locus_tag: ACZ81_09355
   log2fc: 1.1807
   padj: 0.0009
-  rank: 159
+  rank: 158
   rank_down: null
   rank_up: 82
   timepoint: day 18
@@ -30098,7 +30083,7 @@ rows:
   locus_tag: ACZ81_09360
   log2fc: 1.0214
   padj: 0.0099
-  rank: 659
+  rank: 658
   rank_down: null
   rank_up: 329
   timepoint: days 60+89
@@ -30278,7 +30263,7 @@ rows:
   locus_tag: ACZ81_09415
   log2fc: 1.0991
   padj: 0.0001
-  rank: 632
+  rank: 631
   rank_down: null
   rank_up: 326
   timepoint: day 89
@@ -30293,7 +30278,7 @@ rows:
   locus_tag: ACZ81_09445
   log2fc: 25.4389
   padj: 0.0
-  rank: 682
+  rank: 681
   rank_down: null
   rank_up: 101
   timepoint: 20h
@@ -30308,7 +30293,7 @@ rows:
   locus_tag: ACZ81_09455
   log2fc: 59.7065
   padj: 0.0
-  rank: 662
+  rank: 661
   rank_down: null
   rank_up: 81
   timepoint: 20h
@@ -30383,9 +30368,9 @@ rows:
   locus_tag: ACZ81_09455
   log2fc: 1.2123
   padj: 0.0012
-  rank: 361
+  rank: 360
   rank_down: null
-  rank_up: 91
+  rank_up: 90
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -30533,7 +30518,7 @@ rows:
   locus_tag: ACZ81_09540
   log2fc: 1.2458
   padj: 0.0
-  rank: 958
+  rank: 957
   rank_down: null
   rank_up: 285
   timepoint: days 60+89
@@ -30563,7 +30548,7 @@ rows:
   locus_tag: ACZ81_09575
   log2fc: 1.0054
   padj: 0.0035
-  rank: 1308
+  rank: 1307
   rank_down: null
   rank_up: 447
   timepoint: days 60+89
@@ -30623,7 +30608,7 @@ rows:
   locus_tag: ACZ81_09595
   log2fc: 7.7332
   padj: 0.0023
-  rank: 779
+  rank: 778
   rank_down: null
   rank_up: 176
   timepoint: 20h
@@ -30788,7 +30773,7 @@ rows:
   locus_tag: ACZ81_09630
   log2fc: 1.3028
   padj: 0.0204
-  rank: 888
+  rank: 887
   rank_down: null
   rank_up: 257
   timepoint: days 60+89
@@ -30893,7 +30878,7 @@ rows:
   locus_tag: ACZ81_09690
   log2fc: 1.2494
   padj: 0.0108
-  rank: 950
+  rank: 949
   rank_down: null
   rank_up: 281
   timepoint: days 60+89
@@ -30908,7 +30893,7 @@ rows:
   locus_tag: ACZ81_09700
   log2fc: 76.2475
   padj: 0.0
-  rank: 658
+  rank: 657
   rank_down: null
   rank_up: 77
   timepoint: 20h
@@ -30938,7 +30923,7 @@ rows:
   locus_tag: ACZ81_09710
   log2fc: 1.293
   padj: 0.0164
-  rank: 436
+  rank: 435
   rank_down: null
   rank_up: 83
   timepoint: day 31
@@ -30968,7 +30953,7 @@ rows:
   locus_tag: ACZ81_09710
   log2fc: 1.036
   padj: 0.045
-  rank: 1027
+  rank: 1026
   rank_down: null
   rank_up: 367
   timepoint: day 31
@@ -31013,7 +30998,7 @@ rows:
   locus_tag: ACZ81_09730
   log2fc: 8.9568
   padj: 0.0008
-  rank: 756
+  rank: 755
   rank_down: null
   rank_up: 163
   timepoint: 20h
@@ -31028,7 +31013,7 @@ rows:
   locus_tag: ACZ81_09730
   log2fc: 1.1634
   padj: 0.0
-  rank: 565
+  rank: 564
   rank_down: null
   rank_up: 298
   timepoint: day 89
@@ -31118,7 +31103,7 @@ rows:
   locus_tag: ACZ81_09770
   log2fc: 1.0147
   padj: 0.0145
-  rank: 237
+  rank: 236
   rank_down: null
   rank_up: 118
   timepoint: day 18
@@ -31298,7 +31283,7 @@ rows:
   locus_tag: ACZ81_09820
   log2fc: 1.137
   padj: 0.013
-  rank: 413
+  rank: 412
   rank_down: null
   rank_up: 208
   timepoint: day 31
@@ -31523,7 +31508,7 @@ rows:
   locus_tag: ACZ81_09830
   log2fc: 1.4168
   padj: 0.0006
-  rank: 791
+  rank: 790
   rank_down: null
   rank_up: 218
   timepoint: days 60+89
@@ -31538,7 +31523,7 @@ rows:
   locus_tag: ACZ81_09835
   log2fc: 60.4059
   padj: 0.0
-  rank: 661
+  rank: 660
   rank_down: null
   rank_up: 80
   timepoint: 20h
@@ -31703,7 +31688,7 @@ rows:
   locus_tag: ACZ81_09850
   log2fc: 1.0412
   padj: 0.0196
-  rank: 815
+  rank: 814
   rank_down: null
   rank_up: 319
   timepoint: day 18
@@ -31793,7 +31778,7 @@ rows:
   locus_tag: ACZ81_09855
   log2fc: 1.2807
   padj: 0.0385
-  rank: 316
+  rank: 315
   rank_down: null
   rank_up: 167
   timepoint: day 31
@@ -31808,7 +31793,7 @@ rows:
   locus_tag: ACZ81_09860
   log2fc: 1.3111
   padj: 0.0
-  rank: 708
+  rank: 707
   rank_down: null
   rank_up: 266
   timepoint: day 31
@@ -31868,7 +31853,7 @@ rows:
   locus_tag: ACZ81_09885
   log2fc: 1.1961
   padj: 0.0007
-  rank: 545
+  rank: 544
   rank_down: null
   rank_up: 288
   timepoint: day 89
@@ -32003,7 +31988,7 @@ rows:
   locus_tag: ACZ81_09900
   log2fc: 1.1601
   padj: 0.0
-  rank: 1079
+  rank: 1078
   rank_down: null
   rank_up: 344
   timepoint: days 60+89
@@ -32018,7 +32003,7 @@ rows:
   locus_tag: ACZ81_09905
   log2fc: 1.3982
   padj: 0.0006
-  rank: 809
+  rank: 808
   rank_down: null
   rank_up: 224
   timepoint: days 60+89
@@ -32078,7 +32063,7 @@ rows:
   locus_tag: ACZ81_09910
   log2fc: 1.2287
   padj: 0.0193
-  rank: 349
+  rank: 348
   rank_down: null
   rank_up: 178
   timepoint: day 31
@@ -32108,7 +32093,7 @@ rows:
   locus_tag: ACZ81_09910
   log2fc: 1.1237
   padj: 0.0232
-  rank: 606
+  rank: 605
   rank_down: null
   rank_up: 314
   timepoint: day 89
@@ -32183,7 +32168,7 @@ rows:
   locus_tag: ACZ81_09945
   log2fc: 1.1425
   padj: 0.001
-  rank: 410
+  rank: 409
   rank_down: null
   rank_up: 206
   timepoint: day 31
@@ -32198,7 +32183,7 @@ rows:
   locus_tag: ACZ81_09950
   log2fc: 1.2139
   padj: 0.0008
-  rank: 531
+  rank: 530
   rank_down: null
   rank_up: 283
   timepoint: day 89
@@ -32213,7 +32198,7 @@ rows:
   locus_tag: ACZ81_09950
   log2fc: 1.0517
   padj: 0.0008
-  rank: 634
+  rank: 633
   rank_down: null
   rank_up: 319
   timepoint: days 60+89
@@ -32228,7 +32213,7 @@ rows:
   locus_tag: ACZ81_09955
   log2fc: 1.0203
   padj: 0.0079
-  rank: 696
+  rank: 695
   rank_down: null
   rank_up: 350
   timepoint: day 89
@@ -32303,7 +32288,7 @@ rows:
   locus_tag: ACZ81_09980
   log2fc: 1.1846
   padj: 0.0011
-  rank: 552
+  rank: 551
   rank_down: null
   rank_up: 291
   timepoint: day 89
@@ -32348,7 +32333,7 @@ rows:
   locus_tag: ACZ81_09985
   log2fc: 1.124
   padj: 0.0017
-  rank: 183
+  rank: 182
   rank_down: null
   rank_up: 97
   timepoint: day 18
@@ -32363,7 +32348,7 @@ rows:
   locus_tag: ACZ81_10000
   log2fc: 23.8856
   padj: 0.0
-  rank: 684
+  rank: 683
   rank_down: null
   rank_up: 103
   timepoint: 20h
@@ -32408,7 +32393,7 @@ rows:
   locus_tag: ACZ81_10015
   log2fc: 1.4072
   padj: 0.0114
-  rank: 267
+  rank: 266
   rank_down: null
   rank_up: 141
   timepoint: day 31
@@ -32498,7 +32483,7 @@ rows:
   locus_tag: ACZ81_10070
   log2fc: 1.0946
   padj: 0.0361
-  rank: 636
+  rank: 635
   rank_down: null
   rank_up: 124
   timepoint: day 31
@@ -32678,9 +32663,9 @@ rows:
   locus_tag: ACZ81_10105
   log2fc: 1.5275
   padj: 0.0021
-  rank: 214
+  rank: 213
   rank_down: null
-  rank_up: 60
+  rank_up: 59
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -32708,9 +32693,9 @@ rows:
   locus_tag: ACZ81_10135
   log2fc: 1.2985
   padj: 0.0226
-  rank: 300
+  rank: 299
   rank_down: null
-  rank_up: 87
+  rank_up: 86
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -32723,9 +32708,9 @@ rows:
   locus_tag: ACZ81_10140
   log2fc: 1.517
   padj: 0.0271
-  rank: 217
+  rank: 216
   rank_down: null
-  rank_up: 61
+  rank_up: 60
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -32738,9 +32723,9 @@ rows:
   locus_tag: ACZ81_10145
   log2fc: 1.4671
   padj: 0.0151
-  rank: 237
+  rank: 236
   rank_down: null
-  rank_up: 69
+  rank_up: 68
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -32843,7 +32828,7 @@ rows:
   locus_tag: ACZ81_10170
   log2fc: 1.2506
   padj: 0.0009
-  rank: 131
+  rank: 130
   rank_down: null
   rank_up: 64
   timepoint: day 18
@@ -32858,7 +32843,7 @@ rows:
   locus_tag: ACZ81_10180
   log2fc: 1.1573
   padj: 0.006
-  rank: 699
+  rank: 698
   rank_down: null
   rank_up: 286
   timepoint: day 18
@@ -32888,7 +32873,7 @@ rows:
   locus_tag: ACZ81_10195
   log2fc: 1.0246
   padj: 0.0198
-  rank: 486
+  rank: 485
   rank_down: null
   rank_up: 232
   timepoint: day 31
@@ -32948,7 +32933,7 @@ rows:
   locus_tag: ACZ81_10220
   log2fc: 1.0866
   padj: 0.0051
-  rank: 639
+  rank: 638
   rank_down: null
   rank_up: 331
   timepoint: day 89
@@ -32963,7 +32948,7 @@ rows:
   locus_tag: ACZ81_10220
   log2fc: 1.0374
   padj: 0.0092
-  rank: 473
+  rank: 472
   rank_down: null
   rank_up: 228
   timepoint: day 31
@@ -32978,7 +32963,7 @@ rows:
   locus_tag: ACZ81_10220
   log2fc: 1.0114
   padj: 0.0022
-  rank: 667
+  rank: 666
   rank_down: null
   rank_up: 331
   timepoint: days 60+89
@@ -33083,7 +33068,7 @@ rows:
   locus_tag: ACZ81_10265
   log2fc: 1.1461
   padj: 0.0105
-  rank: 409
+  rank: 408
   rank_down: null
   rank_up: 205
   timepoint: day 31
@@ -33098,7 +33083,7 @@ rows:
   locus_tag: ACZ81_10265
   log2fc: 1.0139
   padj: 0.0425
-  rank: 238
+  rank: 237
   rank_down: null
   rank_up: 119
   timepoint: day 18
@@ -33293,7 +33278,7 @@ rows:
   locus_tag: ACZ81_10320
   log2fc: 1.4145
   padj: 0.0009
-  rank: 265
+  rank: 264
   rank_down: null
   rank_up: 140
   timepoint: day 31
@@ -33323,7 +33308,7 @@ rows:
   locus_tag: ACZ81_10350
   log2fc: 1.3912
   padj: 0.0061
-  rank: 279
+  rank: 278
   rank_down: null
   rank_up: 146
   timepoint: day 31
@@ -33338,7 +33323,7 @@ rows:
   locus_tag: ACZ81_10350
   log2fc: 1.1985
   padj: 0.0335
-  rank: 148
+  rank: 147
   rank_down: null
   rank_up: 76
   timepoint: day 18
@@ -33398,7 +33383,7 @@ rows:
   locus_tag: ACZ81_10355
   log2fc: 1.5733
   padj: 0.0011
-  rank: 200
+  rank: 199
   rank_down: null
   rank_up: 103
   timepoint: day 31
@@ -33428,7 +33413,7 @@ rows:
   locus_tag: ACZ81_10355
   log2fc: 1.275
   padj: 0.0138
-  rank: 126
+  rank: 125
   rank_down: null
   rank_up: 61
   timepoint: day 18
@@ -33518,7 +33503,7 @@ rows:
   locus_tag: ACZ81_10420
   log2fc: 1.6632
   padj: 0.008
-  rank: 169
+  rank: 168
   rank_down: null
   rank_up: 88
   timepoint: day 31
@@ -33563,7 +33548,7 @@ rows:
   locus_tag: ACZ81_10480
   log2fc: 1.2417
   padj: 0.0
-  rank: 965
+  rank: 964
   rank_down: null
   rank_up: 292
   timepoint: days 60+89
@@ -33683,7 +33668,7 @@ rows:
   locus_tag: ACZ81_10540
   log2fc: 1.3793
   padj: 0.0009
-  rank: 823
+  rank: 822
   rank_down: null
   rank_up: 229
   timepoint: days 60+89
@@ -33803,7 +33788,7 @@ rows:
   locus_tag: ACZ81_10585
   log2fc: 1.7036
   padj: 0.0003
-  rank: 157
+  rank: 156
   rank_down: null
   rank_up: 82
   timepoint: day 31
@@ -33818,9 +33803,9 @@ rows:
   locus_tag: ACZ81_10585
   log2fc: 1.4734
   padj: 0.0073
-  rank: 232
+  rank: 231
   rank_down: null
-  rank_up: 67
+  rank_up: 66
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -33833,7 +33818,7 @@ rows:
   locus_tag: ACZ81_10585
   log2fc: 1.3042
   padj: 0.0075
-  rank: 119
+  rank: 118
   rank_down: null
   rank_up: 58
   timepoint: day 18
@@ -33863,7 +33848,7 @@ rows:
   locus_tag: ACZ81_10620
   log2fc: 1.1349
   padj: 0.0002
-  rank: 588
+  rank: 587
   rank_down: null
   rank_up: 307
   timepoint: day 89
@@ -33878,7 +33863,7 @@ rows:
   locus_tag: ACZ81_10660
   log2fc: 1.053
   padj: 0.0031
-  rank: 797
+  rank: 796
   rank_down: null
   rank_up: 314
   timepoint: day 18
@@ -33968,7 +33953,7 @@ rows:
   locus_tag: ACZ81_10665
   log2fc: 1.0761
   padj: 0.0181
-  rank: 662
+  rank: 661
   rank_down: null
   rank_up: 127
   timepoint: day 31
@@ -33983,7 +33968,7 @@ rows:
   locus_tag: ACZ81_10670
   log2fc: 1.222
   padj: 0.0
-  rank: 992
+  rank: 991
   rank_down: null
   rank_up: 306
   timepoint: days 60+89
@@ -34013,7 +33998,7 @@ rows:
   locus_tag: ACZ81_10690
   log2fc: 1.5096
   padj: 0.0
-  rank: 223
+  rank: 222
   rank_down: null
   rank_up: 113
   timepoint: day 31
@@ -34028,7 +34013,7 @@ rows:
   locus_tag: ACZ81_10690
   log2fc: 1.3173
   padj: 0.0001
-  rank: 457
+  rank: 456
   rank_down: null
   rank_up: 247
   timepoint: day 89
@@ -34073,7 +34058,7 @@ rows:
   locus_tag: ACZ81_10690
   log2fc: 1.0477
   padj: 0.0032
-  rank: 690
+  rank: 689
   rank_down: null
   rank_up: 135
   timepoint: day 31
@@ -34118,7 +34103,7 @@ rows:
   locus_tag: ACZ81_10695
   log2fc: 1.2296
   padj: 0.0018
-  rank: 982
+  rank: 981
   rank_down: null
   rank_up: 301
   timepoint: days 60+89
@@ -34253,7 +34238,7 @@ rows:
   locus_tag: ACZ81_10750
   log2fc: 1.2519
   padj: 0.0035
-  rank: 947
+  rank: 946
   rank_down: null
   rank_up: 279
   timepoint: days 60+89
@@ -34463,7 +34448,7 @@ rows:
   locus_tag: ACZ81_10840
   log2fc: 1.1754
   padj: 0.0389
-  rank: 851
+  rank: 850
   rank_down: null
   rank_up: 313
   timepoint: day 31
@@ -34493,7 +34478,7 @@ rows:
   locus_tag: ACZ81_10845
   log2fc: 1.0716
   padj: 0.0008
-  rank: 775
+  rank: 774
   rank_down: null
   rank_up: 308
   timepoint: day 18
@@ -34628,7 +34613,7 @@ rows:
   locus_tag: ACZ81_10855
   log2fc: 1.23
   padj: 0.0058
-  rank: 981
+  rank: 980
   rank_down: null
   rank_up: 300
   timepoint: days 60+89
@@ -34748,7 +34733,7 @@ rows:
   locus_tag: ACZ81_10940
   log2fc: 1.3136
   padj: 0.0188
-  rank: 706
+  rank: 705
   rank_down: null
   rank_up: 265
   timepoint: day 31
@@ -34763,7 +34748,7 @@ rows:
   locus_tag: ACZ81_10940
   log2fc: 1.3004
   padj: 0.0288
-  rank: 427
+  rank: 426
   rank_down: null
   rank_up: 81
   timepoint: day 31
@@ -34793,7 +34778,7 @@ rows:
   locus_tag: ACZ81_10955
   log2fc: 1.0067
   padj: 0.0021
-  rank: 1306
+  rank: 1305
   rank_down: null
   rank_up: 446
   timepoint: days 60+89
@@ -34823,7 +34808,7 @@ rows:
   locus_tag: ACZ81_10960
   log2fc: 1.0795
   padj: 0.0002
-  rank: 973
+  rank: 972
   rank_down: null
   rank_up: 351
   timepoint: day 31
@@ -34853,7 +34838,7 @@ rows:
   locus_tag: ACZ81_10965
   log2fc: 1.0356
   padj: 0.0236
-  rank: 824
+  rank: 823
   rank_down: null
   rank_up: 324
   timepoint: day 18
@@ -34868,7 +34853,7 @@ rows:
   locus_tag: ACZ81_10985
   log2fc: 1.3059
   padj: 0.0002
-  rank: 883
+  rank: 882
   rank_down: null
   rank_up: 253
   timepoint: days 60+89
@@ -34898,7 +34883,7 @@ rows:
   locus_tag: ACZ81_10990
   log2fc: 1.2383
   padj: 0.0165
-  rank: 969
+  rank: 968
   rank_down: null
   rank_up: 295
   timepoint: days 60+89
@@ -34913,7 +34898,7 @@ rows:
   locus_tag: ACZ81_11025
   log2fc: 1.0404
   padj: 0.012
-  rank: 818
+  rank: 817
   rank_down: null
   rank_up: 321
   timepoint: day 18
@@ -35033,7 +35018,7 @@ rows:
   locus_tag: ACZ81_11045
   log2fc: 1.0967
   padj: 0.0135
-  rank: 631
+  rank: 630
   rank_down: null
   rank_up: 122
   timepoint: day 31
@@ -35048,7 +35033,7 @@ rows:
   locus_tag: ACZ81_11060
   log2fc: 1.2763
   padj: 0.0
-  rank: 740
+  rank: 739
   rank_down: null
   rank_up: 274
   timepoint: day 31
@@ -35063,7 +35048,7 @@ rows:
   locus_tag: ACZ81_11060
   log2fc: 1.2509
   padj: 0.0
-  rank: 949
+  rank: 948
   rank_down: null
   rank_up: 280
   timepoint: days 60+89
@@ -35123,7 +35108,7 @@ rows:
   locus_tag: ACZ81_11080
   log2fc: 1.2148
   padj: 0.0032
-  rank: 530
+  rank: 529
   rank_down: null
   rank_up: 282
   timepoint: day 89
@@ -35138,7 +35123,7 @@ rows:
   locus_tag: ACZ81_11080
   log2fc: 1.1908
   padj: 0.0053
-  rank: 377
+  rank: 376
   rank_down: null
   rank_up: 193
   timepoint: day 31
@@ -35348,7 +35333,7 @@ rows:
   locus_tag: ACZ81_11100
   log2fc: 1.2777
   padj: 0.0204
-  rank: 452
+  rank: 451
   rank_down: null
   rank_up: 86
   timepoint: day 31
@@ -35363,7 +35348,7 @@ rows:
   locus_tag: ACZ81_11100
   log2fc: 1.2491
   padj: 0.0027
-  rank: 333
+  rank: 332
   rank_down: null
   rank_up: 174
   timepoint: day 31
@@ -35408,7 +35393,7 @@ rows:
   locus_tag: ACZ81_11100
   log2fc: 1.1285
   padj: 0.0145
-  rank: 182
+  rank: 181
   rank_down: null
   rank_up: 96
   timepoint: day 18
@@ -35438,7 +35423,7 @@ rows:
   locus_tag: ACZ81_11130
   log2fc: 1.0017
   padj: 0.023
-  rank: 672
+  rank: 671
   rank_down: null
   rank_up: 335
   timepoint: days 60+89
@@ -35498,7 +35483,7 @@ rows:
   locus_tag: ACZ81_11170
   log2fc: 1.0791
   padj: 0.0043
-  rank: 975
+  rank: 974
   rank_down: null
   rank_up: 352
   timepoint: day 31
@@ -35588,7 +35573,7 @@ rows:
   locus_tag: ACZ81_11195
   log2fc: 1.5717
   padj: 0.0001
-  rank: 201
+  rank: 200
   rank_down: null
   rank_up: 104
   timepoint: day 31
@@ -35603,7 +35588,7 @@ rows:
   locus_tag: ACZ81_11200
   log2fc: 1.0189
   padj: 0.0004
-  rank: 1286
+  rank: 1285
   rank_down: null
   rank_up: 439
   timepoint: days 60+89
@@ -35753,7 +35738,7 @@ rows:
   locus_tag: ACZ81_11210
   log2fc: 1.3473
   padj: 0.0257
-  rank: 293
+  rank: 292
   rank_down: null
   rank_up: 155
   timepoint: day 31
@@ -35918,7 +35903,7 @@ rows:
   locus_tag: ACZ81_11220
   log2fc: 1.0639
   padj: 0.0259
-  rank: 1219
+  rank: 1218
   rank_down: null
   rank_up: 408
   timepoint: days 60+89
@@ -35963,9 +35948,9 @@ rows:
   locus_tag: ACZ81_11260
   log2fc: 1.4196
   padj: 0.0258
-  rank: 250
+  rank: 249
   rank_down: null
-  rank_up: 73
+  rank_up: 72
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -35978,9 +35963,9 @@ rows:
   locus_tag: ACZ81_11265
   log2fc: 1.7746
   padj: 0.0152
-  rank: 153
+  rank: 152
   rank_down: null
-  rank_up: 48
+  rank_up: 47
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -36173,7 +36158,7 @@ rows:
   locus_tag: ACZ81_11280
   log2fc: 1.6896
   padj: 0.0
-  rank: 160
+  rank: 159
   rank_down: null
   rank_up: 83
   timepoint: day 31
@@ -36263,7 +36248,7 @@ rows:
   locus_tag: ACZ81_11285
   log2fc: 1.2136
   padj: 0.0057
-  rank: 141
+  rank: 140
   rank_down: null
   rank_up: 71
   timepoint: day 18
@@ -36338,7 +36323,7 @@ rows:
   locus_tag: ACZ81_11295
   log2fc: 1.1653
   padj: 0.0009
-  rank: 397
+  rank: 396
   rank_down: null
   rank_up: 199
   timepoint: day 31
@@ -36383,7 +36368,7 @@ rows:
   locus_tag: ACZ81_11305
   log2fc: 1.1663
   padj: 0.0227
-  rank: 396
+  rank: 395
   rank_down: null
   rank_up: 198
   timepoint: day 31
@@ -36398,7 +36383,7 @@ rows:
   locus_tag: ACZ81_11305
   log2fc: 1.043
   padj: 0.0207
-  rank: 641
+  rank: 640
   rank_down: null
   rank_up: 322
   timepoint: days 60+89
@@ -36503,7 +36488,7 @@ rows:
   locus_tag: ACZ81_11405
   log2fc: 1.2029
   padj: 0.0002
-  rank: 367
+  rank: 366
   rank_down: null
   rank_up: 188
   timepoint: day 31
@@ -36578,7 +36563,7 @@ rows:
   locus_tag: ACZ81_11430
   log2fc: 1.227
   padj: 0.0088
-  rank: 350
+  rank: 349
   rank_down: null
   rank_up: 179
   timepoint: day 31
@@ -36593,7 +36578,7 @@ rows:
   locus_tag: ACZ81_11430
   log2fc: 1.0494
   padj: 0.043
-  rank: 219
+  rank: 218
   rank_down: null
   rank_up: 113
   timepoint: day 18
@@ -36608,7 +36593,7 @@ rows:
   locus_tag: ACZ81_11435
   log2fc: 1.0217
   padj: 0.0021
-  rank: 1280
+  rank: 1279
   rank_down: null
   rank_up: 436
   timepoint: days 60+89
@@ -36623,7 +36608,7 @@ rows:
   locus_tag: ACZ81_11520
   log2fc: 1.2924
   padj: 0.0001
-  rank: 474
+  rank: 473
   rank_down: null
   rank_up: 255
   timepoint: day 89
@@ -36743,7 +36728,7 @@ rows:
   locus_tag: ACZ81_11545
   log2fc: 1.2349
   padj: 0.0073
-  rank: 495
+  rank: 494
   rank_down: null
   rank_up: 96
   timepoint: day 31
@@ -36758,7 +36743,7 @@ rows:
   locus_tag: ACZ81_11545
   log2fc: 1.1815
   padj: 0.0096
-  rank: 554
+  rank: 553
   rank_down: null
   rank_up: 292
   timepoint: day 89
@@ -36773,7 +36758,7 @@ rows:
   locus_tag: ACZ81_11545
   log2fc: 1.0822
   padj: 0.0148
-  rank: 968
+  rank: 967
   rank_down: null
   rank_up: 350
   timepoint: day 31
@@ -36788,7 +36773,7 @@ rows:
   locus_tag: ACZ81_11545
   log2fc: 1.0081
   padj: 0.0097
-  rank: 669
+  rank: 668
   rank_down: null
   rank_up: 333
   timepoint: days 60+89
@@ -36873,7 +36858,7 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
-  gene_name: maoP
+  gene_name: null
   growth_phase: nutrient_limited
   locus_tag: ACZ81_11555
   log2fc: 1.8704
@@ -36888,7 +36873,7 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   expression_status: significant_up
-  gene_name: maoP
+  gene_name: null
   growth_phase: nutrient_limited
   locus_tag: ACZ81_11555
   log2fc: 1.7405
@@ -36903,7 +36888,7 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
-  gene_name: maoP
+  gene_name: null
   growth_phase: nutrient_limited
   locus_tag: ACZ81_11555
   log2fc: 1.6106
@@ -37028,7 +37013,7 @@ rows:
   locus_tag: ACZ81_11660
   log2fc: 1.1904
   padj: 0.0023
-  rank: 829
+  rank: 828
   rank_down: null
   rank_up: 303
   timepoint: day 31
@@ -37043,7 +37028,7 @@ rows:
   locus_tag: ACZ81_11660
   log2fc: 1.1183
   padj: 0.0062
-  rank: 737
+  rank: 736
   rank_down: null
   rank_up: 297
   timepoint: day 18
@@ -37073,7 +37058,7 @@ rows:
   locus_tag: ACZ81_11675
   log2fc: 1.1367
   padj: 0.0007
-  rank: 719
+  rank: 718
   rank_down: null
   rank_up: 291
   timepoint: day 18
@@ -37088,7 +37073,7 @@ rows:
   locus_tag: ACZ81_11675
   log2fc: 1.0207
   padj: 0.0018
-  rank: 1051
+  rank: 1050
   rank_down: null
   rank_up: 371
   timepoint: day 31
@@ -37163,7 +37148,7 @@ rows:
   locus_tag: ACZ81_11690
   log2fc: 1.5305
   padj: 0.0132
-  rank: 216
+  rank: 215
   rank_down: null
   rank_up: 110
   timepoint: day 31
@@ -37223,7 +37208,7 @@ rows:
   locus_tag: ACZ81_11695
   log2fc: 1.0196
   padj: 0.0069
-  rank: 1052
+  rank: 1051
   rank_down: null
   rank_up: 372
   timepoint: day 31
@@ -37238,7 +37223,7 @@ rows:
   locus_tag: ACZ81_11700
   log2fc: 1.1965
   padj: 0.0003
-  rank: 374
+  rank: 373
   rank_down: null
   rank_up: 191
   timepoint: day 31
@@ -37253,7 +37238,7 @@ rows:
   locus_tag: ACZ81_11700
   log2fc: 1.1267
   padj: 0.0
-  rank: 1121
+  rank: 1120
   rank_down: null
   rank_up: 359
   timepoint: days 60+89
@@ -37268,7 +37253,7 @@ rows:
   locus_tag: ACZ81_11705
   log2fc: 1.2236
   padj: 0.0
-  rank: 987
+  rank: 986
   rank_down: null
   rank_up: 303
   timepoint: days 60+89
@@ -37313,7 +37298,7 @@ rows:
   locus_tag: ACZ81_11710
   log2fc: 1.0205
   padj: 0.0002
-  rank: 494
+  rank: 493
   rank_down: null
   rank_up: 235
   timepoint: day 31
@@ -37343,7 +37328,7 @@ rows:
   locus_tag: ACZ81_11720
   log2fc: 1.3083
   padj: 0.0
-  rank: 882
+  rank: 881
   rank_down: null
   rank_up: 252
   timepoint: days 60+89
@@ -37373,7 +37358,7 @@ rows:
   locus_tag: ACZ81_11720
   log2fc: 1.0088
   padj: 0.0053
-  rank: 742
+  rank: 741
   rank_down: null
   rank_up: 146
   timepoint: day 31
@@ -37448,9 +37433,9 @@ rows:
   locus_tag: ACZ81_11780
   log2fc: 1.6053
   padj: 0.0227
-  rank: 195
+  rank: 194
   rank_down: null
-  rank_up: 57
+  rank_up: 56
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -37523,9 +37508,9 @@ rows:
   locus_tag: ACZ81_11855
   log2fc: 1.3094
   padj: 0.0393
-  rank: 296
+  rank: 295
   rank_down: null
-  rank_up: 85
+  rank_up: 84
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -37538,7 +37523,7 @@ rows:
   locus_tag: ACZ81_11855
   log2fc: 1.2832
   padj: 0.0014
-  rank: 907
+  rank: 906
   rank_down: null
   rank_up: 266
   timepoint: days 60+89
@@ -37733,7 +37718,7 @@ rows:
   locus_tag: ACZ81_11930
   log2fc: 1.1189
   padj: 0.0354
-  rank: 735
+  rank: 734
   rank_down: null
   rank_up: 295
   timepoint: day 18
@@ -37958,7 +37943,7 @@ rows:
   locus_tag: ACZ81_11985
   log2fc: 1.4956
   padj: 0.0001
-  rank: 225
+  rank: 224
   rank_down: null
   rank_up: 115
   timepoint: day 31
@@ -37988,7 +37973,7 @@ rows:
   locus_tag: ACZ81_11985
   log2fc: 1.2153
   padj: 0.0018
-  rank: 140
+  rank: 139
   rank_down: null
   rank_up: 70
   timepoint: day 18
@@ -38093,7 +38078,7 @@ rows:
   locus_tag: ACZ81_12115
   log2fc: 1.289
   padj: 0.0002
-  rank: 726
+  rank: 725
   rank_down: null
   rank_up: 270
   timepoint: day 31
@@ -38153,7 +38138,7 @@ rows:
   locus_tag: ACZ81_12120
   log2fc: 1.1263
   padj: 0.0088
-  rank: 603
+  rank: 602
   rank_down: null
   rank_up: 313
   timepoint: day 89
@@ -38168,7 +38153,7 @@ rows:
   locus_tag: ACZ81_12130
   log2fc: 1.0801
   padj: 0.034
-  rank: 767
+  rank: 766
   rank_down: null
   rank_up: 304
   timepoint: day 18
@@ -38243,7 +38228,7 @@ rows:
   locus_tag: ACZ81_12175
   log2fc: 1.0016
   padj: 0.0201
-  rank: 756
+  rank: 755
   rank_down: null
   rank_up: 150
   timepoint: day 31
@@ -38348,7 +38333,7 @@ rows:
   locus_tag: ACZ81_12205
   log2fc: 1.1602
   padj: 0.0055
-  rank: 399
+  rank: 398
   rank_down: null
   rank_up: 200
   timepoint: day 31
@@ -38363,7 +38348,7 @@ rows:
   locus_tag: ACZ81_12215
   log2fc: 1.3116
   padj: 0.0004
-  rank: 459
+  rank: 458
   rank_down: null
   rank_up: 248
   timepoint: day 89
@@ -38453,9 +38438,9 @@ rows:
   locus_tag: ACZ81_12230
   log2fc: 1.6563
   padj: 0.0297
-  rank: 183
+  rank: 182
   rank_down: null
-  rank_up: 56
+  rank_up: 55
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -38468,7 +38453,7 @@ rows:
   locus_tag: ACZ81_12235
   log2fc: 1.0002
   padj: 0.0002
-  rank: 1079
+  rank: 1078
   rank_down: null
   rank_up: 378
   timepoint: day 31
@@ -38648,7 +38633,7 @@ rows:
   locus_tag: ACZ81_12260
   log2fc: 1.3427
   padj: 0.0149
-  rank: 395
+  rank: 394
   rank_down: null
   rank_up: 75
   timepoint: day 31
@@ -38738,7 +38723,7 @@ rows:
   locus_tag: ACZ81_12270
   log2fc: 1.0703
   padj: 0.0
-  rank: 1213
+  rank: 1212
   rank_down: null
   rank_up: 405
   timepoint: days 60+89
@@ -38873,7 +38858,7 @@ rows:
   locus_tag: ACZ81_12300
   log2fc: 1.1999
   padj: 0.0334
-  rank: 542
+  rank: 541
   rank_down: null
   rank_up: 287
   timepoint: day 89
@@ -38978,7 +38963,7 @@ rows:
   locus_tag: ACZ81_12340
   log2fc: 1.0736
   padj: 0.0453
-  rank: 656
+  rank: 655
   rank_down: null
   rank_up: 337
   timepoint: day 89
@@ -39008,7 +38993,7 @@ rows:
   locus_tag: ACZ81_12360
   log2fc: 1.027
   padj: 0.0017
-  rank: 1270
+  rank: 1269
   rank_down: null
   rank_up: 433
   timepoint: days 60+89
@@ -39053,7 +39038,7 @@ rows:
   locus_tag: ACZ81_12365
   log2fc: 1.3661
   padj: 0.0323
-  rank: 376
+  rank: 375
   rank_down: null
   rank_up: 72
   timepoint: day 31
@@ -39113,7 +39098,7 @@ rows:
   locus_tag: ACZ81_12385
   log2fc: 1.1604
   padj: 0.0186
-  rank: 871
+  rank: 870
   rank_down: null
   rank_up: 321
   timepoint: day 31
@@ -39128,7 +39113,7 @@ rows:
   locus_tag: ACZ81_12420
   log2fc: 1.0911
   padj: 0.002
-  rank: 1172
+  rank: 1171
   rank_down: null
   rank_up: 387
   timepoint: days 60+89
@@ -39173,7 +39158,7 @@ rows:
   locus_tag: ACZ81_12435
   log2fc: 1.2429
   padj: 0.0
-  rank: 964
+  rank: 963
   rank_down: null
   rank_up: 291
   timepoint: days 60+89
@@ -39188,7 +39173,7 @@ rows:
   locus_tag: ACZ81_12435
   log2fc: 1.156
   padj: 0.0418
-  rank: 170
+  rank: 169
   rank_down: null
   rank_up: 88
   timepoint: day 18
@@ -39263,7 +39248,7 @@ rows:
   locus_tag: ACZ81_12440
   log2fc: 1.3123
   padj: 0.0003
-  rank: 875
+  rank: 874
   rank_down: null
   rank_up: 250
   timepoint: days 60+89
@@ -39278,7 +39263,7 @@ rows:
   locus_tag: ACZ81_12440
   log2fc: 1.2003
   padj: 0.0141
-  rank: 815
+  rank: 814
   rank_down: null
   rank_up: 299
   timepoint: day 31
@@ -39398,7 +39383,7 @@ rows:
   locus_tag: ACZ81_12445
   log2fc: 1.1203
   padj: 0.0117
-  rank: 424
+  rank: 423
   rank_down: null
   rank_up: 212
   timepoint: day 31
@@ -39428,7 +39413,7 @@ rows:
   locus_tag: ACZ81_12450
   log2fc: 1.1818
   padj: 0.0
-  rank: 1043
+  rank: 1042
   rank_down: null
   rank_up: 329
   timepoint: days 60+89
@@ -39518,7 +39503,7 @@ rows:
   locus_tag: ACZ81_12460
   log2fc: 1.2903
   padj: 0.0
-  rank: 898
+  rank: 897
   rank_down: null
   rank_up: 261
   timepoint: days 60+89
@@ -39608,7 +39593,7 @@ rows:
   locus_tag: ACZ81_12470
   log2fc: 1.3332
   padj: 0.0204
-  rank: 403
+  rank: 402
   rank_down: null
   rank_up: 78
   timepoint: day 31
@@ -39623,7 +39608,7 @@ rows:
   locus_tag: ACZ81_12470
   log2fc: 1.1236
   padj: 0.0303
-  rank: 1127
+  rank: 1126
   rank_down: null
   rank_up: 363
   timepoint: days 60+89
@@ -39713,7 +39698,7 @@ rows:
   locus_tag: ACZ81_12475
   log2fc: 1.229
   padj: 0.0021
-  rank: 136
+  rank: 135
   rank_down: null
   rank_up: 68
   timepoint: day 18
@@ -39758,7 +39743,7 @@ rows:
   locus_tag: ACZ81_12480
   log2fc: 1.111
   padj: 0.0006
-  rank: 625
+  rank: 624
   rank_down: null
   rank_up: 322
   timepoint: day 89
@@ -39773,7 +39758,7 @@ rows:
   locus_tag: ACZ81_12480
   log2fc: 1.0033
   padj: 0.0021
-  rank: 510
+  rank: 509
   rank_down: null
   rank_up: 242
   timepoint: day 31
@@ -39848,7 +39833,7 @@ rows:
   locus_tag: ACZ81_12535
   log2fc: 1.2441
   padj: 0.0001
-  rank: 768
+  rank: 767
   rank_down: null
   rank_up: 281
   timepoint: day 31
@@ -39878,7 +39863,7 @@ rows:
   locus_tag: ACZ81_12535
   log2fc: 1.1623
   padj: 0.0009
-  rank: 557
+  rank: 556
   rank_down: null
   rank_up: 112
   timepoint: day 31
@@ -39908,7 +39893,7 @@ rows:
   locus_tag: ACZ81_12595
   log2fc: 1.2019
   padj: 0.0161
-  rank: 146
+  rank: 145
   rank_down: null
   rank_up: 75
   timepoint: day 18
@@ -39953,7 +39938,7 @@ rows:
   locus_tag: ACZ81_12645
   log2fc: 1.5959
   padj: 0.0051
-  rank: 189
+  rank: 188
   rank_down: null
   rank_up: 99
   timepoint: day 31
@@ -40043,7 +40028,7 @@ rows:
   locus_tag: ACZ81_12695
   log2fc: 1.0417
   padj: 0.0084
-  rank: 814
+  rank: 813
   rank_down: null
   rank_up: 318
   timepoint: day 18
@@ -40073,7 +40058,7 @@ rows:
   locus_tag: ACZ81_12705
   log2fc: 1.129
   padj: 0.0011
-  rank: 595
+  rank: 594
   rank_down: null
   rank_up: 311
   timepoint: day 89
@@ -40088,7 +40073,7 @@ rows:
   locus_tag: ACZ81_12710
   log2fc: 1.2491
   padj: 0.0028
-  rank: 951
+  rank: 950
   rank_down: null
   rank_up: 282
   timepoint: days 60+89
@@ -40103,7 +40088,7 @@ rows:
   locus_tag: ACZ81_12715
   log2fc: 1.4092
   padj: 0.0001
-  rank: 799
+  rank: 798
   rank_down: null
   rank_up: 219
   timepoint: days 60+89
@@ -40133,7 +40118,7 @@ rows:
   locus_tag: ACZ81_12720
   log2fc: 1.3657
   padj: 0.0001
-  rank: 834
+  rank: 833
   rank_down: null
   rank_up: 233
   timepoint: days 60+89
@@ -40148,7 +40133,7 @@ rows:
   locus_tag: ACZ81_12725
   log2fc: 1.3612
   padj: 0.0
-  rank: 839
+  rank: 838
   rank_down: null
   rank_up: 235
   timepoint: days 60+89
@@ -40178,7 +40163,7 @@ rows:
   locus_tag: ACZ81_12730
   log2fc: 1.2121
   padj: 0.0006
-  rank: 1006
+  rank: 1005
   rank_down: null
   rank_up: 312
   timepoint: days 60+89
@@ -40223,9 +40208,9 @@ rows:
   locus_tag: ACZ81_12735
   log2fc: 1.8848
   padj: 0.0124
-  rank: 133
+  rank: 132
   rank_down: null
-  rank_up: 42
+  rank_up: 41
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -40328,7 +40313,7 @@ rows:
   locus_tag: ACZ81_12760
   log2fc: 1.1964
   padj: 0.035
-  rank: 149
+  rank: 148
   rank_down: null
   rank_up: 77
   timepoint: day 18
@@ -40343,7 +40328,7 @@ rows:
   locus_tag: ACZ81_12760
   log2fc: 1.0197
   padj: 0.0346
-  rank: 496
+  rank: 495
   rank_down: null
   rank_up: 237
   timepoint: day 31
@@ -40403,7 +40388,7 @@ rows:
   locus_tag: ACZ81_12770
   log2fc: 1.2021
   padj: 0.001
-  rank: 813
+  rank: 812
   rank_down: null
   rank_up: 298
   timepoint: day 31
@@ -40433,9 +40418,9 @@ rows:
   locus_tag: ACZ81_12790
   log2fc: 1.1474
   padj: 0.0207
-  rank: 402
+  rank: 401
   rank_down: null
-  rank_up: 97
+  rank_up: 96
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -40448,7 +40433,7 @@ rows:
   locus_tag: ACZ81_12800
   log2fc: 1.6266
   padj: 0.0005
-  rank: 182
+  rank: 181
   rank_down: null
   rank_up: 94
   timepoint: day 31
@@ -40463,7 +40448,7 @@ rows:
   locus_tag: ACZ81_12805
   log2fc: 1.282
   padj: 0.0
-  rank: 736
+  rank: 735
   rank_down: null
   rank_up: 272
   timepoint: day 31
@@ -40478,7 +40463,7 @@ rows:
   locus_tag: ACZ81_12805
   log2fc: 1.0424
   padj: 0.0003
-  rank: 812
+  rank: 811
   rank_down: null
   rank_up: 317
   timepoint: day 18
@@ -40613,7 +40598,7 @@ rows:
   locus_tag: ACZ81_12865
   log2fc: 1.2114
   padj: 0.0163
-  rank: 143
+  rank: 142
   rank_down: null
   rank_up: 73
   timepoint: day 18
@@ -40628,7 +40613,7 @@ rows:
   locus_tag: ACZ81_12865
   log2fc: 1.0189
   padj: 0.0159
-  rank: 500
+  rank: 499
   rank_down: null
   rank_up: 239
   timepoint: day 31
@@ -40748,7 +40733,7 @@ rows:
   locus_tag: ACZ81_12885
   log2fc: 1.1695
   padj: 0.0003
-  rank: 559
+  rank: 558
   rank_down: null
   rank_up: 294
   timepoint: day 89
@@ -40898,7 +40883,7 @@ rows:
   locus_tag: ACZ81_12890
   log2fc: 1.2696
   padj: 0.002
-  rank: 488
+  rank: 487
   rank_down: null
   rank_up: 267
   timepoint: day 89
@@ -41018,7 +41003,7 @@ rows:
   locus_tag: ACZ81_12900
   log2fc: 1.3223
   padj: 0.0006
-  rank: 299
+  rank: 298
   rank_down: null
   rank_up: 159
   timepoint: day 31
@@ -41063,7 +41048,7 @@ rows:
   locus_tag: ACZ81_12900
   log2fc: 1.1677
   padj: 0.0009
-  rank: 562
+  rank: 561
   rank_down: null
   rank_up: 297
   timepoint: day 89
@@ -41123,7 +41108,7 @@ rows:
   locus_tag: ACZ81_12980
   log2fc: 1.1203
   padj: 0.0223
-  rank: 926
+  rank: 925
   rank_down: null
   rank_up: 340
   timepoint: day 31
@@ -41228,7 +41213,7 @@ rows:
   locus_tag: ACZ81_13000
   log2fc: 1.2756
   padj: 0.019
-  rank: 455
+  rank: 454
   rank_down: null
   rank_up: 88
   timepoint: day 31
@@ -41243,7 +41228,7 @@ rows:
   locus_tag: ACZ81_13000
   log2fc: 1.2413
   padj: 0.0022
-  rank: 967
+  rank: 966
   rank_down: null
   rank_up: 293
   timepoint: days 60+89
@@ -41273,7 +41258,7 @@ rows:
   locus_tag: ACZ81_13000
   log2fc: 1.1416
   padj: 0.0375
-  rank: 714
+  rank: 713
   rank_down: null
   rank_up: 289
   timepoint: day 18
@@ -41378,7 +41363,7 @@ rows:
   locus_tag: ACZ81_13005
   log2fc: 1.2352
   padj: 0.0032
-  rank: 493
+  rank: 492
   rank_down: null
   rank_up: 95
   timepoint: day 31
@@ -41573,7 +41558,7 @@ rows:
   locus_tag: ACZ81_13030
   log2fc: 1.4024
   padj: 0.0
-  rank: 804
+  rank: 803
   rank_down: null
   rank_up: 221
   timepoint: days 60+89
@@ -41588,7 +41573,7 @@ rows:
   locus_tag: ACZ81_13030
   log2fc: 1.0008
   padj: 0.0121
-  rank: 863
+  rank: 862
   rank_down: null
   rank_up: 334
   timepoint: day 18
@@ -41633,7 +41618,7 @@ rows:
   locus_tag: ACZ81_13050
   log2fc: 1.1342
   padj: 0.0
-  rank: 589
+  rank: 588
   rank_down: null
   rank_up: 308
   timepoint: day 89
@@ -41678,7 +41663,7 @@ rows:
   locus_tag: ACZ81_13130
   log2fc: 1.0883
   padj: 0.0
-  rank: 1177
+  rank: 1176
   rank_down: null
   rank_up: 391
   timepoint: days 60+89
@@ -41723,7 +41708,7 @@ rows:
   locus_tag: ACZ81_13155
   log2fc: 1.4868
   padj: 0.0002
-  rank: 230
+  rank: 229
   rank_down: null
   rank_up: 119
   timepoint: day 31
@@ -41948,7 +41933,7 @@ rows:
   locus_tag: ACZ81_13255
   log2fc: 1.1962
   padj: 0.0012
-  rank: 525
+  rank: 524
   rank_down: null
   rank_up: 106
   timepoint: day 31
@@ -41978,7 +41963,7 @@ rows:
   locus_tag: ACZ81_13255
   log2fc: 1.0454
   padj: 0.0002
-  rank: 1244
+  rank: 1243
   rank_down: null
   rank_up: 419
   timepoint: days 60+89
@@ -42038,7 +42023,7 @@ rows:
   locus_tag: ACZ81_13260
   log2fc: 1.2231
   padj: 0.0289
-  rank: 989
+  rank: 988
   rank_down: null
   rank_up: 304
   timepoint: days 60+89
@@ -42053,7 +42038,7 @@ rows:
   locus_tag: ACZ81_13265
   log2fc: 19.8119
   padj: 0.0
-  rank: 691
+  rank: 690
   rank_down: null
   rank_up: 110
   timepoint: 20h
@@ -42068,7 +42053,7 @@ rows:
   locus_tag: ACZ81_13265
   log2fc: 1.0235
   padj: 0.0059
-  rank: 1275
+  rank: 1274
   rank_down: null
   rank_up: 435
   timepoint: days 60+89
@@ -42143,7 +42128,7 @@ rows:
   locus_tag: ACZ81_13310
   log2fc: 1.3563
   padj: 0.0415
-  rank: 844
+  rank: 843
   rank_down: null
   rank_up: 237
   timepoint: days 60+89
@@ -42173,7 +42158,7 @@ rows:
   locus_tag: ACZ81_13330
   log2fc: 1.1771
   padj: 0.0114
-  rank: 847
+  rank: 846
   rank_down: null
   rank_up: 311
   timepoint: day 31
@@ -42353,7 +42338,7 @@ rows:
   locus_tag: ACZ81_13445
   log2fc: 1.171
   padj: 0.0
-  rank: 1058
+  rank: 1057
   rank_down: null
   rank_up: 334
   timepoint: days 60+89
@@ -42383,7 +42368,7 @@ rows:
   locus_tag: ACZ81_13460
   log2fc: 1.1902
   padj: 0.0023
-  rank: 831
+  rank: 830
   rank_down: null
   rank_up: 304
   timepoint: day 31
@@ -42413,7 +42398,7 @@ rows:
   locus_tag: ACZ81_13480
   log2fc: 1.2803
   padj: 0.0093
-  rank: 480
+  rank: 479
   rank_down: null
   rank_up: 259
   timepoint: day 89
@@ -42428,7 +42413,7 @@ rows:
   locus_tag: ACZ81_13480
   log2fc: 1.2036
   padj: 0.0175
-  rank: 366
+  rank: 365
   rank_down: null
   rank_up: 187
   timepoint: day 31
@@ -42548,7 +42533,7 @@ rows:
   locus_tag: ACZ81_13485
   log2fc: 1.2169
   padj: 0.0409
-  rank: 999
+  rank: 998
   rank_down: null
   rank_up: 310
   timepoint: days 60+89
@@ -42563,9 +42548,9 @@ rows:
   locus_tag: ACZ81_13495
   log2fc: 1.5045
   padj: 0.0028
-  rank: 221
+  rank: 220
   rank_down: null
-  rank_up: 64
+  rank_up: 63
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -42578,9 +42563,9 @@ rows:
   locus_tag: ACZ81_13500
   log2fc: 1.3771
   padj: 0.0056
-  rank: 266
+  rank: 265
   rank_down: null
-  rank_up: 78
+  rank_up: 77
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -42743,7 +42728,7 @@ rows:
   locus_tag: ACZ81_13605
   log2fc: 1.5966
   padj: 0.0033
-  rank: 188
+  rank: 187
   rank_down: null
   rank_up: 98
   timepoint: day 31
@@ -42788,7 +42773,7 @@ rows:
   locus_tag: ACZ81_13665
   log2fc: 1.0212
   padj: 0.0
-  rank: 1281
+  rank: 1280
   rank_down: null
   rank_up: 437
   timepoint: days 60+89
@@ -42848,7 +42833,7 @@ rows:
   locus_tag: ACZ81_13705
   log2fc: 1.154
   padj: 0.0288
-  rank: 563
+  rank: 562
   rank_down: null
   rank_up: 115
   timepoint: day 31
@@ -42893,7 +42878,7 @@ rows:
   locus_tag: ACZ81_13730
   log2fc: 1.05
   padj: 0.0072
-  rank: 463
+  rank: 462
   rank_down: null
   rank_up: 223
   timepoint: day 31
@@ -42953,7 +42938,7 @@ rows:
   locus_tag: ACZ81_13775
   log2fc: 1.03
   padj: 0.0046
-  rank: 1267
+  rank: 1266
   rank_down: null
   rank_up: 431
   timepoint: days 60+89
@@ -42968,7 +42953,7 @@ rows:
   locus_tag: ACZ81_13800
   log2fc: 1.1124
   padj: 0.0
-  rank: 1140
+  rank: 1139
   rank_down: null
   rank_up: 369
   timepoint: days 60+89
@@ -43043,7 +43028,7 @@ rows:
   locus_tag: ACZ81_13855
   log2fc: 1.2449
   padj: 0.0
-  rank: 960
+  rank: 959
   rank_down: null
   rank_up: 287
   timepoint: days 60+89
@@ -43103,7 +43088,7 @@ rows:
   locus_tag: ACZ81_13860
   log2fc: 1.2832
   padj: 0.0007
-  rank: 906
+  rank: 905
   rank_down: null
   rank_up: 265
   timepoint: days 60+89
@@ -43193,7 +43178,7 @@ rows:
   locus_tag: ACZ81_13870
   log2fc: 1.1448
   padj: 0.012
-  rank: 175
+  rank: 174
   rank_down: null
   rank_up: 91
   timepoint: day 18
@@ -43223,7 +43208,7 @@ rows:
   locus_tag: ACZ81_13870
   log2fc: 1.0332
   padj: 0.0053
-  rank: 683
+  rank: 682
   rank_down: null
   rank_up: 345
   timepoint: day 89
@@ -43238,7 +43223,7 @@ rows:
   locus_tag: ACZ81_13870
   log2fc: 1.0006
   padj: 0.009
-  rank: 511
+  rank: 510
   rank_down: null
   rank_up: 243
   timepoint: day 31
@@ -43253,7 +43238,7 @@ rows:
   locus_tag: ACZ81_13875
   log2fc: 1.0475
   padj: 0.0
-  rank: 1241
+  rank: 1240
   rank_down: null
   rank_up: 417
   timepoint: days 60+89
@@ -43283,7 +43268,7 @@ rows:
   locus_tag: ACZ81_13880
   log2fc: 1.0365
   padj: 0.0039
-  rank: 1026
+  rank: 1025
   rank_down: null
   rank_up: 366
   timepoint: day 31
@@ -43358,7 +43343,7 @@ rows:
   locus_tag: ACZ81_13885
   log2fc: 1.2319
   padj: 0.0046
-  rank: 341
+  rank: 340
   rank_down: null
   rank_up: 175
   timepoint: day 31
@@ -43373,7 +43358,7 @@ rows:
   locus_tag: ACZ81_13885
   log2fc: 1.1798
   padj: 0.0
-  rank: 1047
+  rank: 1046
   rank_down: null
   rank_up: 330
   timepoint: days 60+89
@@ -43388,7 +43373,7 @@ rows:
   locus_tag: ACZ81_13905
   log2fc: 1.2104
   padj: 0.0167
-  rank: 362
+  rank: 361
   rank_down: null
   rank_up: 184
   timepoint: day 31
@@ -43718,7 +43703,7 @@ rows:
   locus_tag: ACZ81_13960
   log2fc: 1.2193
   padj: 0.0001
-  rank: 995
+  rank: 994
   rank_down: null
   rank_up: 307
   timepoint: days 60+89
@@ -43748,9 +43733,9 @@ rows:
   locus_tag: ACZ81_13965
   log2fc: 1.309
   padj: 0.0
-  rank: 297
+  rank: 296
   rank_down: null
-  rank_up: 86
+  rank_up: 85
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -43913,7 +43898,7 @@ rows:
   locus_tag: ACZ81_13985
   log2fc: 1.2973
   padj: 0.0413
-  rank: 718
+  rank: 717
   rank_down: null
   rank_up: 269
   timepoint: day 31
@@ -43928,7 +43913,7 @@ rows:
   locus_tag: ACZ81_13985
   log2fc: 1.1053
   padj: 0.0058
-  rank: 629
+  rank: 628
   rank_down: null
   rank_up: 324
   timepoint: day 89
@@ -43943,7 +43928,7 @@ rows:
   locus_tag: ACZ81_13985
   log2fc: 1.0438
   padj: 0.0023
-  rank: 639
+  rank: 638
   rank_down: null
   rank_up: 321
   timepoint: days 60+89
@@ -44063,7 +44048,7 @@ rows:
   locus_tag: ACZ81_13990
   log2fc: 1.2748
   padj: 0.0009
-  rank: 127
+  rank: 126
   rank_down: null
   rank_up: 62
   timepoint: day 18
@@ -44258,7 +44243,7 @@ rows:
   locus_tag: ACZ81_14085
   log2fc: 1.0421
   padj: 0.002
-  rank: 678
+  rank: 677
   rank_down: null
   rank_up: 344
   timepoint: day 89
@@ -44378,7 +44363,7 @@ rows:
   locus_tag: ACZ81_14105
   log2fc: 1.3092
   padj: 0.0001
-  rank: 306
+  rank: 305
   rank_down: null
   rank_up: 162
   timepoint: day 31
@@ -44468,7 +44453,7 @@ rows:
   locus_tag: ACZ81_14155
   log2fc: 1.5935
   padj: 0.0
-  rank: 191
+  rank: 190
   rank_down: null
   rank_up: 101
   timepoint: day 31
@@ -44498,7 +44483,7 @@ rows:
   locus_tag: ACZ81_14165
   log2fc: 1.07
   padj: 0.027
-  rank: 1214
+  rank: 1213
   rank_down: null
   rank_up: 406
   timepoint: days 60+89
@@ -44618,7 +44603,7 @@ rows:
   locus_tag: ACZ81_14175
   log2fc: 1.3537
   padj: 0.0005
-  rank: 291
+  rank: 290
   rank_down: null
   rank_up: 153
   timepoint: day 31
@@ -44633,7 +44618,7 @@ rows:
   locus_tag: ACZ81_14175
   log2fc: 1.3013
   padj: 0.0104
-  rank: 889
+  rank: 888
   rank_down: null
   rank_up: 258
   timepoint: days 60+89
@@ -44678,7 +44663,7 @@ rows:
   locus_tag: ACZ81_14180
   log2fc: 1.3097
   padj: 0.0
-  rank: 305
+  rank: 304
   rank_down: null
   rank_up: 161
   timepoint: day 31
@@ -44783,7 +44768,7 @@ rows:
   locus_tag: ACZ81_14215
   log2fc: 1.221
   padj: 0.0001
-  rank: 791
+  rank: 790
   rank_down: null
   rank_up: 288
   timepoint: day 31
@@ -44813,7 +44798,7 @@ rows:
   locus_tag: ACZ81_14215
   log2fc: 1.0118
   padj: 0.0
-  rank: 1294
+  rank: 1293
   rank_down: null
   rank_up: 442
   timepoint: days 60+89
@@ -44843,7 +44828,7 @@ rows:
   locus_tag: ACZ81_14220
   log2fc: 1.0172
   padj: 0.0112
-  rank: 732
+  rank: 731
   rank_down: null
   rank_up: 143
   timepoint: day 31
@@ -44963,7 +44948,7 @@ rows:
   locus_tag: ACZ81_14225
   log2fc: 1.1864
   padj: 0.0394
-  rank: 534
+  rank: 533
   rank_down: null
   rank_up: 107
   timepoint: day 31
@@ -45188,7 +45173,7 @@ rows:
   locus_tag: ACZ81_14280
   log2fc: 1.1729
   padj: 0.0164
-  rank: 548
+  rank: 547
   rank_down: null
   rank_up: 109
   timepoint: day 31
@@ -45203,7 +45188,7 @@ rows:
   locus_tag: ACZ81_14280
   log2fc: 1.0433
   padj: 0.0052
-  rank: 1249
+  rank: 1248
   rank_down: null
   rank_up: 423
   timepoint: days 60+89
@@ -45413,7 +45398,7 @@ rows:
   locus_tag: ACZ81_14320
   log2fc: 1.6259
   padj: 0.0191
-  rank: 184
+  rank: 183
   rank_down: null
   rank_up: 95
   timepoint: day 31
@@ -45458,7 +45443,7 @@ rows:
   locus_tag: ACZ81_14320
   log2fc: 1.1515
   padj: 0.0096
-  rank: 1090
+  rank: 1089
   rank_down: null
   rank_up: 347
   timepoint: days 60+89
@@ -45578,7 +45563,7 @@ rows:
   locus_tag: ACZ81_14335
   log2fc: 1.2814
   padj: 0.0085
-  rank: 909
+  rank: 908
   rank_down: null
   rank_up: 268
   timepoint: days 60+89
@@ -45608,7 +45593,7 @@ rows:
   locus_tag: ACZ81_14340
   log2fc: 1.4428
   padj: 0.0225
-  rank: 324
+  rank: 323
   rank_down: null
   rank_up: 58
   timepoint: day 31
@@ -45623,7 +45608,7 @@ rows:
   locus_tag: ACZ81_14340
   log2fc: 1.4076
   padj: 0.0029
-  rank: 800
+  rank: 799
   rank_down: null
   rank_up: 220
   timepoint: days 60+89
@@ -45668,7 +45653,7 @@ rows:
   locus_tag: ACZ81_14360
   log2fc: 1.0031
   padj: 0.0034
-  rank: 753
+  rank: 752
   rank_down: null
   rank_up: 149
   timepoint: day 31
@@ -45713,7 +45698,7 @@ rows:
   locus_tag: ACZ81_14370
   log2fc: 1.0313
   padj: 0.0008
-  rank: 686
+  rank: 685
   rank_down: null
   rank_up: 347
   timepoint: day 89
@@ -45803,7 +45788,7 @@ rows:
   locus_tag: ACZ81_14400
   log2fc: 1.1027
   padj: 0.0012
-  rank: 1151
+  rank: 1150
   rank_down: null
   rank_up: 376
   timepoint: days 60+89
@@ -45863,7 +45848,7 @@ rows:
   locus_tag: ACZ81_14410
   log2fc: 1.2512
   padj: 0.0
-  rank: 332
+  rank: 331
   rank_down: null
   rank_up: 173
   timepoint: day 31
@@ -45923,7 +45908,7 @@ rows:
   locus_tag: ACZ81_14415
   log2fc: 1.1252
   padj: 0.0
-  rank: 422
+  rank: 421
   rank_down: null
   rank_up: 211
   timepoint: day 31
@@ -45968,7 +45953,7 @@ rows:
   locus_tag: ACZ81_14425
   log2fc: 1.2947
   padj: 0.0004
-  rank: 893
+  rank: 892
   rank_down: null
   rank_up: 260
   timepoint: days 60+89
@@ -46028,9 +46013,9 @@ rows:
   locus_tag: ACZ81_14430
   log2fc: 1.0648
   padj: 0.0297
-  rank: 476
+  rank: 475
   rank_down: null
-  rank_up: 106
+  rank_up: 105
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -46043,7 +46028,7 @@ rows:
   locus_tag: ACZ81_14430
   log2fc: 1.0528
   padj: 0.0144
-  rank: 687
+  rank: 686
   rank_down: null
   rank_up: 133
   timepoint: day 31
@@ -46058,7 +46043,7 @@ rows:
   locus_tag: ACZ81_14435
   log2fc: 1.4029
   padj: 0.0149
-  rank: 272
+  rank: 271
   rank_down: null
   rank_up: 143
   timepoint: day 31
@@ -46088,9 +46073,9 @@ rows:
   locus_tag: ACZ81_14440
   log2fc: 1.0821
   padj: 0.0192
-  rank: 464
+  rank: 463
   rank_down: null
-  rank_up: 103
+  rank_up: 102
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -46103,7 +46088,7 @@ rows:
   locus_tag: ACZ81_14450
   log2fc: 1.0837
   padj: 0.0011
-  rank: 644
+  rank: 643
   rank_down: null
   rank_up: 333
   timepoint: day 89
@@ -46178,7 +46163,7 @@ rows:
   locus_tag: ACZ81_14495
   log2fc: 1.1532
   padj: 0.0021
-  rank: 572
+  rank: 571
   rank_down: null
   rank_up: 301
   timepoint: day 89
@@ -46193,7 +46178,7 @@ rows:
   locus_tag: ACZ81_14495
   log2fc: 1.0911
   padj: 0.0134
-  rank: 201
+  rank: 200
   rank_down: null
   rank_up: 106
   timepoint: day 18
@@ -46223,7 +46208,7 @@ rows:
   locus_tag: ACZ81_14525
   log2fc: 1.0914
   padj: 0.0085
-  rank: 1170
+  rank: 1169
   rank_down: null
   rank_up: 385
   timepoint: days 60+89
@@ -46433,7 +46418,7 @@ rows:
   locus_tag: ACZ81_14595
   log2fc: 1.3214
   padj: 0.0167
-  rank: 408
+  rank: 407
   rank_down: null
   rank_up: 79
   timepoint: day 31
@@ -46463,7 +46448,7 @@ rows:
   locus_tag: ACZ81_14595
   log2fc: 1.158
   padj: 0.0269
-  rank: 874
+  rank: 873
   rank_down: null
   rank_up: 322
   timepoint: day 31
@@ -46478,7 +46463,7 @@ rows:
   locus_tag: ACZ81_14595
   log2fc: 1.0712
   padj: 0.0228
-  rank: 451
+  rank: 450
   rank_down: null
   rank_up: 220
   timepoint: day 31
@@ -46553,7 +46538,7 @@ rows:
   locus_tag: ACZ81_14650
   log2fc: 1.1893
   padj: 0.0265
-  rank: 833
+  rank: 832
   rank_down: null
   rank_up: 306
   timepoint: day 31
@@ -46733,7 +46718,7 @@ rows:
   locus_tag: ACZ81_14665
   log2fc: 1.1673
   padj: 0.0168
-  rank: 392
+  rank: 391
   rank_down: null
   rank_up: 195
   timepoint: day 31
@@ -46838,7 +46823,7 @@ rows:
   locus_tag: ACZ81_14700
   log2fc: 1.3558
   padj: 0.0056
-  rank: 290
+  rank: 289
   rank_down: null
   rank_up: 152
   timepoint: day 31
@@ -47063,7 +47048,7 @@ rows:
   locus_tag: ACZ81_14770
   log2fc: 1.3014
   padj: 0.0003
-  rank: 466
+  rank: 465
   rank_down: null
   rank_up: 252
   timepoint: day 89
@@ -47093,7 +47078,7 @@ rows:
   locus_tag: ACZ81_14770
   log2fc: 1.0058
   padj: 0.0021
-  rank: 670
+  rank: 669
   rank_down: null
   rank_up: 334
   timepoint: days 60+89
@@ -47108,7 +47093,7 @@ rows:
   locus_tag: ACZ81_14775
   log2fc: 1.3261
   padj: 0.0005
-  rank: 863
+  rank: 862
   rank_down: null
   rank_up: 245
   timepoint: days 60+89
@@ -47123,7 +47108,7 @@ rows:
   locus_tag: ACZ81_14780
   log2fc: 1.0371
   padj: 0.0007
-  rank: 1258
+  rank: 1257
   rank_down: null
   rank_up: 425
   timepoint: days 60+89
@@ -47198,7 +47183,7 @@ rows:
   locus_tag: ACZ81_14800
   log2fc: 1.11
   padj: 0.0041
-  rank: 1145
+  rank: 1144
   rank_down: null
   rank_up: 371
   timepoint: days 60+89
@@ -47258,7 +47243,7 @@ rows:
   locus_tag: ACZ81_14810
   log2fc: 9.3056
   padj: 0.0011
-  rank: 750
+  rank: 749
   rank_down: null
   rank_up: 159
   timepoint: 20h
@@ -47348,7 +47333,7 @@ rows:
   locus_tag: ACZ81_14810
   log2fc: 1.3638
   padj: 0.0438
-  rank: 102
+  rank: 101
   rank_down: null
   rank_up: 54
   timepoint: day 18
@@ -47438,7 +47423,7 @@ rows:
   locus_tag: ACZ81_14890
   log2fc: 1.6575
   padj: 0.0001
-  rank: 171
+  rank: 170
   rank_down: null
   rank_up: 89
   timepoint: day 31
@@ -47483,7 +47468,7 @@ rows:
   locus_tag: ACZ81_14890
   log2fc: 1.1152
   padj: 0.0062
-  rank: 188
+  rank: 187
   rank_down: null
   rank_up: 99
   timepoint: day 18
@@ -47543,7 +47528,7 @@ rows:
   locus_tag: ACZ81_14905
   log2fc: 1.2448
   padj: 0.0034
-  rank: 961
+  rank: 960
   rank_down: null
   rank_up: 288
   timepoint: days 60+89
@@ -47573,7 +47558,7 @@ rows:
   locus_tag: ACZ81_14970
   log2fc: 1.3684
   padj: 0.0173
-  rank: 833
+  rank: 832
   rank_down: null
   rank_up: 232
   timepoint: days 60+89
@@ -47588,7 +47573,7 @@ rows:
   locus_tag: ACZ81_14970
   log2fc: 1.2105
   padj: 0.0
-  rank: 532
+  rank: 531
   rank_down: null
   rank_up: 284
   timepoint: day 89
@@ -47603,7 +47588,7 @@ rows:
   locus_tag: ACZ81_14970
   log2fc: 1.1976
   padj: 0.0
-  rank: 370
+  rank: 369
   rank_down: null
   rank_up: 189
   timepoint: day 31
@@ -47723,9 +47708,9 @@ rows:
   locus_tag: ACZ81_15000
   log2fc: 1.4463
   padj: 0.0069
-  rank: 242
+  rank: 241
   rank_down: null
-  rank_up: 71
+  rank_up: 70
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -47753,7 +47738,7 @@ rows:
   locus_tag: ACZ81_15045
   log2fc: 1.2374
   padj: 0.0127
-  rank: 971
+  rank: 970
   rank_down: null
   rank_up: 296
   timepoint: days 60+89
@@ -47768,7 +47753,7 @@ rows:
   locus_tag: ACZ81_15055
   log2fc: 1.0821
   padj: 0.0
-  rank: 1188
+  rank: 1187
   rank_down: null
   rank_up: 396
   timepoint: days 60+89
@@ -47873,7 +47858,7 @@ rows:
   locus_tag: ACZ81_15090
   log2fc: 1.2706
   padj: 0.013
-  rank: 322
+  rank: 321
   rank_down: null
   rank_up: 169
   timepoint: day 31
@@ -47903,9 +47888,9 @@ rows:
   locus_tag: ACZ81_15155
   log2fc: 1.5046
   padj: null
-  rank: 220
+  rank: 219
   rank_down: null
-  rank_up: 63
+  rank_up: 62
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -47993,7 +47978,7 @@ rows:
   locus_tag: ACZ81_15165
   log2fc: 1.1333
   padj: 0.0362
-  rank: 911
+  rank: 910
   rank_down: null
   rank_up: 335
   timepoint: day 31
@@ -48098,7 +48083,7 @@ rows:
   locus_tag: ACZ81_15240
   log2fc: 1.0752
   padj: 0.0169
-  rank: 1208
+  rank: 1207
   rank_down: null
   rank_up: 404
   timepoint: days 60+89
@@ -48233,7 +48218,7 @@ rows:
   locus_tag: ACZ81_15275
   log2fc: 1.1356
   padj: 0.0063
-  rank: 180
+  rank: 179
   rank_down: null
   rank_up: 95
   timepoint: day 18
@@ -48248,7 +48233,7 @@ rows:
   locus_tag: ACZ81_15275
   log2fc: 1.0395
   padj: 0.003
-  rank: 472
+  rank: 471
   rank_down: null
   rank_up: 227
   timepoint: day 31
@@ -48263,9 +48248,9 @@ rows:
   locus_tag: ACZ81_15280
   log2fc: 1.7128
   padj: 0.0007
-  rank: 168
+  rank: 167
   rank_down: null
-  rank_up: 52
+  rank_up: 51
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -48413,9 +48398,9 @@ rows:
   locus_tag: ACZ81_15310
   log2fc: 1.1461
   padj: 0.0385
-  rank: 404
+  rank: 403
   rank_down: null
-  rank_up: 98
+  rank_up: 97
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -48428,7 +48413,7 @@ rows:
   locus_tag: ACZ81_15310
   log2fc: 1.0423
   padj: 0.033
-  rank: 697
+  rank: 696
   rank_down: null
   rank_up: 137
   timepoint: day 31
@@ -48593,7 +48578,7 @@ rows:
   locus_tag: ACZ81_15330
   log2fc: 1.0586
   padj: 0.0079
-  rank: 458
+  rank: 457
   rank_down: null
   rank_up: 222
   timepoint: day 31
@@ -48653,7 +48638,7 @@ rows:
   locus_tag: ACZ81_15360
   log2fc: 1.1889
   padj: 0.0011
-  rank: 550
+  rank: 549
   rank_down: null
   rank_up: 289
   timepoint: day 89
@@ -48773,7 +48758,7 @@ rows:
   locus_tag: ACZ81_15395
   log2fc: 1.2645
   padj: 0.003
-  rank: 941
+  rank: 940
   rank_down: null
   rank_up: 277
   timepoint: days 60+89
@@ -48803,7 +48788,7 @@ rows:
   locus_tag: ACZ81_15395
   log2fc: 1.0058
   padj: 0.0142
-  rank: 245
+  rank: 244
   rank_down: null
   rank_up: 123
   timepoint: day 18
@@ -48818,7 +48803,7 @@ rows:
   locus_tag: ACZ81_15400
   log2fc: 1.0349
   padj: 0.0005
-  rank: 1029
+  rank: 1028
   rank_down: null
   rank_up: 368
   timepoint: day 31
@@ -49043,7 +49028,7 @@ rows:
   locus_tag: ACZ81_15440
   log2fc: 1.0804
   padj: 0.0
-  rank: 1190
+  rank: 1189
   rank_down: null
   rank_up: 397
   timepoint: days 60+89
@@ -49133,7 +49118,7 @@ rows:
   locus_tag: ACZ81_15470
   log2fc: 1.4732
   padj: 0.0271
-  rank: 239
+  rank: 238
   rank_down: null
   rank_up: 126
   timepoint: day 31
@@ -49163,7 +49148,7 @@ rows:
   locus_tag: ACZ81_15470
   log2fc: 1.0634
   padj: 0.0
-  rank: 1220
+  rank: 1219
   rank_down: null
   rank_up: 409
   timepoint: days 60+89
@@ -49238,7 +49223,7 @@ rows:
   locus_tag: ACZ81_15480
   log2fc: 1.3987
   padj: 0.0003
-  rank: 276
+  rank: 275
   rank_down: null
   rank_up: 145
   timepoint: day 31
@@ -49268,7 +49253,7 @@ rows:
   locus_tag: ACZ81_15480
   log2fc: 1.1052
   padj: 0.0065
-  rank: 193
+  rank: 192
   rank_down: null
   rank_up: 102
   timepoint: day 18
@@ -49343,7 +49328,7 @@ rows:
   locus_tag: ACZ81_15490
   log2fc: 1.533
   padj: 0.0004
-  rank: 215
+  rank: 214
   rank_down: null
   rank_up: 109
   timepoint: day 31
@@ -49358,7 +49343,7 @@ rows:
   locus_tag: ACZ81_15490
   log2fc: 1.2454
   padj: 0.0065
-  rank: 132
+  rank: 131
   rank_down: null
   rank_up: 65
   timepoint: day 18
@@ -49838,7 +49823,7 @@ rows:
   locus_tag: ACZ81_15575
   log2fc: 1.1054
   padj: 0.0007
-  rank: 939
+  rank: 938
   rank_down: null
   rank_up: 341
   timepoint: day 31
@@ -50033,7 +50018,7 @@ rows:
   locus_tag: ACZ81_15625
   log2fc: 1.1643
   padj: 0.0002
-  rank: 1069
+  rank: 1068
   rank_down: null
   rank_up: 339
   timepoint: days 60+89
@@ -50063,7 +50048,7 @@ rows:
   locus_tag: ACZ81_15630
   log2fc: 1.2694
   padj: 0.0
-  rank: 928
+  rank: 927
   rank_down: null
   rank_up: 273
   timepoint: days 60+89
@@ -50168,9 +50153,9 @@ rows:
   locus_tag: ACZ81_15660
   log2fc: 1.8263
   padj: 0.0035
-  rank: 144
+  rank: 143
   rank_down: null
-  rank_up: 45
+  rank_up: 44
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -50198,7 +50183,7 @@ rows:
   locus_tag: ACZ81_15660
   log2fc: 1.1023
   padj: 0.0146
-  rank: 1152
+  rank: 1151
   rank_down: null
   rank_up: 377
   timepoint: days 60+89
@@ -50468,7 +50453,7 @@ rows:
   locus_tag: ACZ81_15725
   log2fc: 1.1562
   padj: 0.0305
-  rank: 1085
+  rank: 1084
   rank_down: null
   rank_up: 346
   timepoint: days 60+89
@@ -50543,7 +50528,7 @@ rows:
   locus_tag: ACZ81_15760
   log2fc: 1.3416
   padj: 0.0001
-  rank: 296
+  rank: 295
   rank_down: null
   rank_up: 157
   timepoint: day 31
@@ -50603,7 +50588,7 @@ rows:
   locus_tag: ACZ81_15785
   log2fc: 1.087
   padj: 0.0464
-  rank: 1179
+  rank: 1178
   rank_down: null
   rank_up: 393
   timepoint: days 60+89
@@ -50663,7 +50648,7 @@ rows:
   locus_tag: ACZ81_15800
   log2fc: 1.3639
   padj: 0.0031
-  rank: 378
+  rank: 377
   rank_down: null
   rank_up: 73
   timepoint: day 31
@@ -50678,7 +50663,7 @@ rows:
   locus_tag: ACZ81_15800
   log2fc: 1.2489
   padj: 0.0007
-  rank: 952
+  rank: 951
   rank_down: null
   rank_up: 283
   timepoint: days 60+89
@@ -50768,7 +50753,7 @@ rows:
   locus_tag: ACZ81_15815
   log2fc: 1.0454
   padj: 0.016
-  rank: 1243
+  rank: 1242
   rank_down: null
   rank_up: 418
   timepoint: days 60+89
@@ -50843,7 +50828,7 @@ rows:
   locus_tag: ACZ81_15840
   log2fc: 1.3745
   padj: 0.0081
-  rank: 283
+  rank: 282
   rank_down: null
   rank_up: 148
   timepoint: day 31
@@ -50858,7 +50843,7 @@ rows:
   locus_tag: ACZ81_15840
   log2fc: 1.2133
   padj: 0.0369
-  rank: 142
+  rank: 141
   rank_down: null
   rank_up: 72
   timepoint: day 18
@@ -50873,7 +50858,7 @@ rows:
   locus_tag: ACZ81_15840
   log2fc: 1.1362
   padj: 0.0041
-  rank: 905
+  rank: 904
   rank_down: null
   rank_up: 333
   timepoint: day 31
@@ -50888,7 +50873,7 @@ rows:
   locus_tag: ACZ81_15840
   log2fc: 1.0747
   padj: 0.0095
-  rank: 773
+  rank: 772
   rank_down: null
   rank_up: 306
   timepoint: day 18
@@ -50978,7 +50963,7 @@ rows:
   locus_tag: ACZ81_15850
   log2fc: 1.1261
   padj: 0.0043
-  rank: 603
+  rank: 602
   rank_down: null
   rank_up: 119
   timepoint: day 31
@@ -50993,7 +50978,7 @@ rows:
   locus_tag: ACZ81_15850
   log2fc: 1.0024
   padj: 0.0165
-  rank: 861
+  rank: 860
   rank_down: null
   rank_up: 333
   timepoint: day 18
@@ -51038,7 +51023,7 @@ rows:
   locus_tag: ACZ81_15855
   log2fc: 1.0563
   padj: 0.0066
-  rank: 632
+  rank: 631
   rank_down: null
   rank_up: 318
   timepoint: days 60+89
@@ -51053,7 +51038,7 @@ rows:
   locus_tag: ACZ81_15855
   log2fc: 1.0331
   padj: 0.0227
-  rank: 684
+  rank: 683
   rank_down: null
   rank_up: 346
   timepoint: day 89
@@ -51113,7 +51098,7 @@ rows:
   locus_tag: ACZ81_15865
   log2fc: 1.1948
   padj: 0.0012
-  rank: 825
+  rank: 824
   rank_down: null
   rank_up: 300
   timepoint: day 31
@@ -51128,7 +51113,7 @@ rows:
   locus_tag: ACZ81_15865
   log2fc: 1.1188
   padj: 0.0002
-  rank: 1133
+  rank: 1132
   rank_down: null
   rank_up: 366
   timepoint: days 60+89
@@ -51203,7 +51188,7 @@ rows:
   locus_tag: ACZ81_15880
   log2fc: 1.1544
   padj: 0.0397
-  rank: 876
+  rank: 875
   rank_down: null
   rank_up: 323
   timepoint: day 31
@@ -51218,7 +51203,7 @@ rows:
   locus_tag: ACZ81_15880
   log2fc: 1.0032
   padj: 0.0135
-  rank: 1313
+  rank: 1312
   rank_down: null
   rank_up: 449
   timepoint: days 60+89
@@ -51638,7 +51623,7 @@ rows:
   locus_tag: ACZ81_15955
   log2fc: 1.1191
   padj: 0.012
-  rank: 426
+  rank: 425
   rank_down: null
   rank_up: 213
   timepoint: day 31
@@ -51728,7 +51713,7 @@ rows:
   locus_tag: ACZ81_15965
   log2fc: 1.1791
   padj: 0.0409
-  rank: 384
+  rank: 383
   rank_down: null
   rank_up: 194
   timepoint: day 31
@@ -51813,7 +51798,7 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   expression_status: significant_up
-  gene_name: null
+  gene_name: exaC
   growth_phase: nutrient_limited
   locus_tag: ACZ81_15985
   log2fc: 3.3793
@@ -51828,7 +51813,7 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
-  gene_name: null
+  gene_name: exaC
   growth_phase: nutrient_limited
   locus_tag: ACZ81_15985
   log2fc: 3.2105
@@ -51843,7 +51828,7 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
-  gene_name: null
+  gene_name: exaC
   growth_phase: nutrient_limited
   locus_tag: ACZ81_15985
   log2fc: 2.7693
@@ -51858,7 +51843,7 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
-  gene_name: null
+  gene_name: exaC
   growth_phase: nutrient_limited
   locus_tag: ACZ81_15985
   log2fc: 2.3282
@@ -51873,7 +51858,7 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   expression_status: significant_up
-  gene_name: null
+  gene_name: exaC
   growth_phase: nutrient_limited
   locus_tag: ACZ81_15985
   log2fc: 2.0554
@@ -51888,12 +51873,12 @@ rows:
   - nitrogen
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   expression_status: significant_up
-  gene_name: null
+  gene_name: exaC
   growth_phase: nutrient_limited
   locus_tag: ACZ81_15985
   log2fc: 1.4746
   padj: 0.0037
-  rank: 237
+  rank: 236
   rank_down: null
   rank_up: 124
   timepoint: day 31
@@ -52028,7 +52013,7 @@ rows:
   locus_tag: ACZ81_16015
   log2fc: 1.6439
   padj: 0.0001
-  rank: 176
+  rank: 175
   rank_down: null
   rank_up: 92
   timepoint: day 31
@@ -52043,7 +52028,7 @@ rows:
   locus_tag: ACZ81_16015
   log2fc: 1.1864
   padj: 0.0059
-  rank: 152
+  rank: 151
   rank_down: null
   rank_up: 80
   timepoint: day 18
@@ -52118,7 +52103,7 @@ rows:
   locus_tag: ACZ81_16045
   log2fc: 1.1488
   padj: 0.0016
-  rank: 884
+  rank: 883
   rank_down: null
   rank_up: 326
   timepoint: day 31
@@ -52268,7 +52253,7 @@ rows:
   locus_tag: ACZ81_16055
   log2fc: 1.1926
   padj: 0.0001
-  rank: 827
+  rank: 826
   rank_down: null
   rank_up: 301
   timepoint: day 31
@@ -52298,7 +52283,7 @@ rows:
   locus_tag: ACZ81_16055
   log2fc: 1.0889
   padj: 0.0
-  rank: 1175
+  rank: 1174
   rank_down: null
   rank_up: 390
   timepoint: days 60+89
@@ -52373,7 +52358,7 @@ rows:
   locus_tag: ACZ81_16060
   log2fc: 1.2398
   padj: 0.001
-  rank: 775
+  rank: 774
   rank_down: null
   rank_up: 284
   timepoint: day 31
@@ -52793,7 +52778,7 @@ rows:
   locus_tag: ACZ81_16100
   log2fc: 1.3036
   padj: 0.0007
-  rank: 885
+  rank: 884
   rank_down: null
   rank_up: 254
   timepoint: days 60+89
@@ -52823,7 +52808,7 @@ rows:
   locus_tag: ACZ81_16110
   log2fc: 1.3205
   padj: 0.0261
-  rank: 409
+  rank: 408
   rank_down: null
   rank_up: 80
   timepoint: day 31
@@ -52868,7 +52853,7 @@ rows:
   locus_tag: ACZ81_16125
   log2fc: 1.2577
   padj: 0.0003
-  rank: 505
+  rank: 504
   rank_down: null
   rank_up: 272
   timepoint: day 89
@@ -52958,7 +52943,7 @@ rows:
   locus_tag: ACZ81_16130
   log2fc: 1.5365
   padj: 0.0126
-  rank: 213
+  rank: 212
   rank_down: null
   rank_up: 107
   timepoint: day 31
@@ -53003,7 +52988,7 @@ rows:
   locus_tag: ACZ81_16145
   log2fc: 1.3148
   padj: 0.0199
-  rank: 703
+  rank: 702
   rank_down: null
   rank_up: 264
   timepoint: day 31
@@ -53078,7 +53063,7 @@ rows:
   locus_tag: ACZ81_16150
   log2fc: 1.3028
   padj: 0.0058
-  rank: 465
+  rank: 464
   rank_down: null
   rank_up: 251
   timepoint: day 89
@@ -53093,7 +53078,7 @@ rows:
   locus_tag: ACZ81_16150
   log2fc: 1.1857
   padj: 0.0328
-  rank: 153
+  rank: 152
   rank_down: null
   rank_up: 81
   timepoint: day 18
@@ -53303,7 +53288,7 @@ rows:
   locus_tag: ACZ81_16195
   log2fc: 1.447
   padj: 0.0451
-  rank: 320
+  rank: 319
   rank_down: null
   rank_up: 57
   timepoint: day 31
@@ -53348,7 +53333,7 @@ rows:
   locus_tag: ACZ81_16235
   log2fc: 1.374
   padj: 0.0425
-  rank: 370
+  rank: 369
   rank_down: null
   rank_up: 70
   timepoint: day 31
@@ -53363,7 +53348,7 @@ rows:
   locus_tag: ACZ81_16285
   log2fc: 1.0515
   padj: 0.0032
-  rank: 800
+  rank: 799
   rank_down: null
   rank_up: 315
   timepoint: day 18
@@ -53438,7 +53423,7 @@ rows:
   locus_tag: ACZ81_16290
   log2fc: 1.3035
   padj: 0.0376
-  rank: 120
+  rank: 119
   rank_down: null
   rank_up: 59
   timepoint: day 18
@@ -53453,7 +53438,7 @@ rows:
   locus_tag: ACZ81_16290
   log2fc: 1.2054
   padj: 0.0251
-  rank: 364
+  rank: 363
   rank_down: null
   rank_up: 185
   timepoint: day 31
@@ -53468,7 +53453,7 @@ rows:
   locus_tag: ACZ81_16290
   log2fc: 1.1
   padj: 0.0002
-  rank: 946
+  rank: 945
   rank_down: null
   rank_up: 344
   timepoint: day 31
@@ -53723,7 +53708,7 @@ rows:
   locus_tag: ACZ81_16375
   log2fc: 1.4729
   padj: 0.0096
-  rank: 240
+  rank: 239
   rank_down: null
   rank_up: 127
   timepoint: day 31
@@ -53738,7 +53723,7 @@ rows:
   locus_tag: ACZ81_16375
   log2fc: 1.2576
   padj: 0.0172
-  rank: 506
+  rank: 505
   rank_down: null
   rank_up: 273
   timepoint: day 89
@@ -53798,7 +53783,7 @@ rows:
   locus_tag: ACZ81_16400
   log2fc: 1.089
   padj: 0.0021
-  rank: 638
+  rank: 637
   rank_down: null
   rank_up: 330
   timepoint: day 89
@@ -54008,7 +53993,7 @@ rows:
   locus_tag: ACZ81_16475
   log2fc: 1.1229
   padj: 0.0366
-  rank: 607
+  rank: 606
   rank_down: null
   rank_up: 315
   timepoint: day 89
@@ -54113,7 +54098,7 @@ rows:
   locus_tag: ACZ81_16530
   log2fc: 1.2657
   padj: 0.0002
-  rank: 939
+  rank: 938
   rank_down: null
   rank_up: 276
   timepoint: days 60+89
@@ -54203,7 +54188,7 @@ rows:
   locus_tag: ACZ81_16565
   log2fc: 1.2855
   padj: 0.0006
-  rank: 901
+  rank: 900
   rank_down: null
   rank_up: 262
   timepoint: days 60+89
@@ -54353,7 +54338,7 @@ rows:
   locus_tag: ACZ81_16570
   log2fc: 1.0905
   padj: 0.0155
-  rank: 438
+  rank: 437
   rank_down: null
   rank_up: 216
   timepoint: day 31
@@ -54368,7 +54353,7 @@ rows:
   locus_tag: ACZ81_16570
   log2fc: 1.0631
   padj: 0.0392
-  rank: 212
+  rank: 211
   rank_down: null
   rank_up: 109
   timepoint: day 18
@@ -54968,7 +54953,7 @@ rows:
   locus_tag: ACZ81_16620
   log2fc: 18.4129
   padj: 0.0
-  rank: 693
+  rank: 692
   rank_down: null
   rank_up: 112
   timepoint: 20h
@@ -54998,7 +54983,7 @@ rows:
   locus_tag: ACZ81_16680
   log2fc: 1.0624
   padj: 0.0042
-  rank: 1223
+  rank: 1222
   rank_down: null
   rank_up: 410
   timepoint: days 60+89
@@ -55088,7 +55073,7 @@ rows:
   locus_tag: ACZ81_16725
   log2fc: 1.0432
   padj: 0.0003
-  rank: 1250
+  rank: 1249
   rank_down: null
   rank_up: 424
   timepoint: days 60+89
@@ -55118,7 +55103,7 @@ rows:
   locus_tag: ACZ81_16725
   log2fc: 1.0333
   padj: 0.0034
-  rank: 1032
+  rank: 1031
   rank_down: null
   rank_up: 369
   timepoint: day 31
@@ -55193,7 +55178,7 @@ rows:
   locus_tag: ACZ81_16735
   log2fc: 1.0278
   padj: 0.0096
-  rank: 230
+  rank: 229
   rank_down: null
   rank_up: 116
   timepoint: day 18
@@ -55208,7 +55193,7 @@ rows:
   locus_tag: ACZ81_16735
   log2fc: 1.0231
   padj: 0.008
-  rank: 724
+  rank: 723
   rank_down: null
   rank_up: 142
   timepoint: day 31
@@ -55343,7 +55328,7 @@ rows:
   locus_tag: ACZ81_16740
   log2fc: 1.1282
   padj: 0.0047
-  rank: 599
+  rank: 598
   rank_down: null
   rank_up: 118
   timepoint: day 31
@@ -55433,7 +55418,7 @@ rows:
   locus_tag: ACZ81_16755
   log2fc: 1.2898
   padj: 0.01
-  rank: 313
+  rank: 312
   rank_down: null
   rank_up: 166
   timepoint: day 31
@@ -55448,7 +55433,7 @@ rows:
   locus_tag: ACZ81_16755
   log2fc: 1.2509
   padj: 0.0093
-  rank: 472
+  rank: 471
   rank_down: null
   rank_up: 92
   timepoint: day 31
@@ -55463,7 +55448,7 @@ rows:
   locus_tag: ACZ81_16755
   log2fc: 1.2175
   padj: 0.0063
-  rank: 794
+  rank: 793
   rank_down: null
   rank_up: 289
   timepoint: day 31
@@ -55538,7 +55523,7 @@ rows:
   locus_tag: ACZ81_16760
   log2fc: 1.2454
   padj: 0.0018
-  rank: 959
+  rank: 958
   rank_down: null
   rank_up: 286
   timepoint: days 60+89
@@ -55628,9 +55613,9 @@ rows:
   locus_tag: ACZ81_16775
   log2fc: 1.177
   padj: 0.0117
-  rank: 388
+  rank: 387
   rank_down: null
-  rank_up: 95
+  rank_up: 94
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -55643,7 +55628,7 @@ rows:
   locus_tag: ACZ81_16775
   log2fc: 1.1183
   padj: 0.0362
-  rank: 615
+  rank: 614
   rank_down: null
   rank_up: 318
   timepoint: day 89
@@ -56063,7 +56048,7 @@ rows:
   locus_tag: ACZ81_16830
   log2fc: 1.4955
   padj: 0.0014
-  rank: 226
+  rank: 225
   rank_down: null
   rank_up: 116
   timepoint: day 31
@@ -56243,7 +56228,7 @@ rows:
   locus_tag: ACZ81_16850
   log2fc: 1.4709
   padj: 0.0035
-  rank: 241
+  rank: 240
   rank_down: null
   rank_up: 128
   timepoint: day 31
@@ -56288,7 +56273,7 @@ rows:
   locus_tag: ACZ81_16870
   log2fc: 1.4532
   padj: 0.0016
-  rank: 249
+  rank: 248
   rank_down: null
   rank_up: 131
   timepoint: day 31
@@ -56303,7 +56288,7 @@ rows:
   locus_tag: ACZ81_16870
   log2fc: 1.0823
   padj: 0.0076
-  rank: 646
+  rank: 645
   rank_down: null
   rank_up: 334
   timepoint: day 89
@@ -56513,7 +56498,7 @@ rows:
   locus_tag: ACZ81_16965
   log2fc: 1.044
   padj: 0.0
-  rank: 1247
+  rank: 1246
   rank_down: null
   rank_up: 422
   timepoint: days 60+89
@@ -56573,7 +56558,7 @@ rows:
   locus_tag: ACZ81_16975
   log2fc: 1.0337
   padj: 0.0002
-  rank: 1260
+  rank: 1259
   rank_down: null
   rank_up: 426
   timepoint: days 60+89
@@ -56588,9 +56573,9 @@ rows:
   locus_tag: ACZ81_16980
   log2fc: 1.5817
   padj: null
-  rank: 200
+  rank: 199
   rank_down: null
-  rank_up: 58
+  rank_up: 57
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -56648,7 +56633,7 @@ rows:
   locus_tag: ACZ81_17005
   log2fc: 1.2223
   padj: 0.0042
-  rank: 524
+  rank: 523
   rank_down: null
   rank_up: 279
   timepoint: day 89
@@ -56663,7 +56648,7 @@ rows:
   locus_tag: ACZ81_17005
   log2fc: 1.0923
   padj: 0.0283
-  rank: 198
+  rank: 197
   rank_down: null
   rank_up: 104
   timepoint: day 18
@@ -56678,7 +56663,7 @@ rows:
   locus_tag: ACZ81_17010
   log2fc: 1.0117
   padj: 0.0021
-  rank: 1296
+  rank: 1295
   rank_down: null
   rank_up: 443
   timepoint: days 60+89
@@ -56753,7 +56738,7 @@ rows:
   locus_tag: ACZ81_17035
   log2fc: 1.0583
   padj: 0.0019
-  rank: 682
+  rank: 681
   rank_down: null
   rank_up: 131
   timepoint: day 31
@@ -56783,7 +56768,7 @@ rows:
   locus_tag: ACZ81_17045
   log2fc: 1.1968
   padj: 0.023
-  rank: 523
+  rank: 522
   rank_down: null
   rank_up: 105
   timepoint: day 31
@@ -56798,7 +56783,7 @@ rows:
   locus_tag: ACZ81_17050
   log2fc: 1.1901
   padj: 0.0
-  rank: 1031
+  rank: 1030
   rank_down: null
   rank_up: 323
   timepoint: days 60+89
@@ -56843,7 +56828,7 @@ rows:
   locus_tag: ACZ81_17070
   log2fc: 1.223
   padj: 0.0001
-  rank: 990
+  rank: 989
   rank_down: null
   rank_up: 305
   timepoint: days 60+89
@@ -56873,7 +56858,7 @@ rows:
   locus_tag: ACZ81_17090
   log2fc: 1.206
   padj: 0.0049
-  rank: 541
+  rank: 540
   rank_down: null
   rank_up: 286
   timepoint: day 89
@@ -56918,7 +56903,7 @@ rows:
   locus_tag: ACZ81_17090
   log2fc: 1.1074
   padj: 0.0045
-  rank: 1149
+  rank: 1148
   rank_down: null
   rank_up: 374
   timepoint: days 60+89
@@ -56993,7 +56978,7 @@ rows:
   locus_tag: ACZ81_17115
   log2fc: 1.647
   padj: 0.0
-  rank: 175
+  rank: 174
   rank_down: null
   rank_up: 91
   timepoint: day 31
@@ -57038,7 +57023,7 @@ rows:
   locus_tag: ACZ81_17115
   log2fc: 1.2059
   padj: 0.0026
-  rank: 516
+  rank: 515
   rank_down: null
   rank_up: 101
   timepoint: day 31
@@ -57128,7 +57113,7 @@ rows:
   locus_tag: ACZ81_17135
   log2fc: 1.036
   padj: 0.0036
-  rank: 823
+  rank: 822
   rank_down: null
   rank_up: 323
   timepoint: day 18
@@ -57143,7 +57128,7 @@ rows:
   locus_tag: ACZ81_17195
   log2fc: 1.2268
   padj: 0.0
-  rank: 984
+  rank: 983
   rank_down: null
   rank_up: 302
   timepoint: days 60+89
@@ -57173,7 +57158,7 @@ rows:
   locus_tag: ACZ81_17195
   log2fc: 1.1139
   padj: 0.0036
-  rank: 615
+  rank: 614
   rank_down: null
   rank_up: 121
   timepoint: day 31
@@ -57233,7 +57218,7 @@ rows:
   locus_tag: ACZ81_17200
   log2fc: 1.3377
   padj: 0.0106
-  rank: 398
+  rank: 397
   rank_down: null
   rank_up: 76
   timepoint: day 31
@@ -57263,7 +57248,7 @@ rows:
   locus_tag: ACZ81_17200
   log2fc: 1.2244
   padj: 0.0125
-  rank: 788
+  rank: 787
   rank_down: null
   rank_up: 287
   timepoint: day 31
@@ -57488,7 +57473,7 @@ rows:
   locus_tag: ACZ81_17220
   log2fc: 1.1272
   padj: 0.0004
-  rank: 1119
+  rank: 1118
   rank_down: null
   rank_up: 358
   timepoint: days 60+89
@@ -57503,7 +57488,7 @@ rows:
   locus_tag: ACZ81_17220
   log2fc: 1.0045
   padj: 0.0201
-  rank: 750
+  rank: 749
   rank_down: null
   rank_up: 147
   timepoint: day 31
@@ -57548,7 +57533,7 @@ rows:
   locus_tag: ACZ81_17270
   log2fc: 1.2831
   padj: 0.0009
-  rank: 908
+  rank: 907
   rank_down: null
   rank_up: 267
   timepoint: days 60+89
@@ -57683,7 +57668,7 @@ rows:
   locus_tag: ACZ81_17345
   log2fc: 1.2103
   padj: 0.004
-  rank: 513
+  rank: 512
   rank_down: null
   rank_up: 100
   timepoint: day 31
@@ -57698,7 +57683,7 @@ rows:
   locus_tag: ACZ81_17345
   log2fc: 1.1281
   padj: 0.004
-  rank: 916
+  rank: 915
   rank_down: null
   rank_up: 337
   timepoint: day 31
@@ -57788,7 +57773,7 @@ rows:
   locus_tag: ACZ81_17350
   log2fc: 1.2057
   padj: 0.0025
-  rank: 517
+  rank: 516
   rank_down: null
   rank_up: 102
   timepoint: day 31
@@ -57818,7 +57803,7 @@ rows:
   locus_tag: ACZ81_17350
   log2fc: 1.1155
   padj: 0.0002
-  rank: 1137
+  rank: 1136
   rank_down: null
   rank_up: 368
   timepoint: days 60+89
@@ -57833,7 +57818,7 @@ rows:
   locus_tag: ACZ81_17365
   log2fc: 1.0858
   padj: 0.0162
-  rank: 759
+  rank: 758
   rank_down: null
   rank_up: 301
   timepoint: day 18
@@ -57908,7 +57893,7 @@ rows:
   locus_tag: ACZ81_17395
   log2fc: 1.0175
   padj: 0.0252
-  rank: 235
+  rank: 234
   rank_down: null
   rank_up: 117
   timepoint: day 18
@@ -57938,9 +57923,9 @@ rows:
   locus_tag: ACZ81_17410
   log2fc: 1.5642
   padj: 0.0135
-  rank: 204
+  rank: 203
   rank_down: null
-  rank_up: 59
+  rank_up: 58
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -57953,7 +57938,7 @@ rows:
   locus_tag: ACZ81_17410
   log2fc: 1.2777
   padj: 0.0439
-  rank: 915
+  rank: 914
   rank_down: null
   rank_up: 272
   timepoint: days 60+89
@@ -57968,7 +57953,7 @@ rows:
   locus_tag: ACZ81_17425
   log2fc: 1.1969
   padj: 0.0054
-  rank: 372
+  rank: 371
   rank_down: null
   rank_up: 190
   timepoint: day 31
@@ -57998,7 +57983,7 @@ rows:
   locus_tag: ACZ81_17425
   log2fc: 1.0631
   padj: 0.0078
-  rank: 665
+  rank: 664
   rank_down: null
   rank_up: 339
   timepoint: day 89
@@ -58013,7 +57998,7 @@ rows:
   locus_tag: ACZ81_17425
   log2fc: 1.0288
   padj: 0.0026
-  rank: 652
+  rank: 651
   rank_down: null
   rank_up: 326
   timepoint: days 60+89
@@ -58058,7 +58043,7 @@ rows:
   locus_tag: ACZ81_17435
   log2fc: 1.0381
   padj: 0.0057
-  rank: 1025
+  rank: 1024
   rank_down: null
   rank_up: 365
   timepoint: day 31
@@ -58118,7 +58103,7 @@ rows:
   locus_tag: ACZ81_17440
   log2fc: 1.4632
   padj: 0.0343
-  rank: 309
+  rank: 308
   rank_down: null
   rank_up: 53
   timepoint: day 31
@@ -58178,7 +58163,7 @@ rows:
   locus_tag: ACZ81_17445
   log2fc: 1.0109
   padj: 0.0011
-  rank: 1299
+  rank: 1298
   rank_down: null
   rank_up: 445
   timepoint: days 60+89
@@ -58193,7 +58178,7 @@ rows:
   locus_tag: ACZ81_17455
   log2fc: 1.279
   padj: 0.0
-  rank: 912
+  rank: 911
   rank_down: null
   rank_up: 271
   timepoint: days 60+89
@@ -58268,7 +58253,7 @@ rows:
   locus_tag: ACZ81_17460
   log2fc: 1.6778
   padj: 0.006
-  rank: 165
+  rank: 164
   rank_down: null
   rank_up: 85
   timepoint: day 31
@@ -58328,7 +58313,7 @@ rows:
   locus_tag: ACZ81_17475
   log2fc: 1.3016
   padj: 0.026
-  rank: 715
+  rank: 714
   rank_down: null
   rank_up: 268
   timepoint: day 31
@@ -58373,7 +58358,7 @@ rows:
   locus_tag: ACZ81_17480
   log2fc: 1.1376
   padj: 0.0459
-  rank: 586
+  rank: 585
   rank_down: null
   rank_up: 306
   timepoint: day 89
@@ -58388,7 +58373,7 @@ rows:
   locus_tag: ACZ81_17500
   log2fc: 1.2003
   padj: 0.0454
-  rank: 1023
+  rank: 1022
   rank_down: null
   rank_up: 319
   timepoint: days 60+89
@@ -58433,7 +58418,7 @@ rows:
   locus_tag: ACZ81_17560
   log2fc: 1.2751
   padj: 0.0004
-  rank: 486
+  rank: 485
   rank_down: null
   rank_up: 265
   timepoint: day 89
@@ -58598,7 +58583,7 @@ rows:
   locus_tag: ACZ81_17575
   log2fc: 1.1541
   padj: 0.0015
-  rank: 562
+  rank: 561
   rank_down: null
   rank_up: 114
   timepoint: day 31
@@ -58613,9 +58598,9 @@ rows:
   locus_tag: ACZ81_17575
   log2fc: 1.0851
   padj: 0.0078
-  rank: 458
+  rank: 457
   rank_down: null
-  rank_up: 102
+  rank_up: 101
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -58658,7 +58643,7 @@ rows:
   locus_tag: ACZ81_17580
   log2fc: 1.4272
   padj: 0.0393
-  rank: 340
+  rank: 339
   rank_down: null
   rank_up: 62
   timepoint: day 31
@@ -58703,7 +58688,7 @@ rows:
   locus_tag: ACZ81_17585
   log2fc: 1.4273
   padj: 0.0057
-  rank: 339
+  rank: 338
   rank_down: null
   rank_up: 61
   timepoint: day 31
@@ -58718,9 +58703,9 @@ rows:
   locus_tag: ACZ81_17585
   log2fc: 1.2703
   padj: 0.0338
-  rank: 319
+  rank: 318
   rank_down: null
-  rank_up: 89
+  rank_up: 88
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -58763,7 +58748,7 @@ rows:
   locus_tag: ACZ81_17590
   log2fc: 1.0528
   padj: 0.0164
-  rank: 1003
+  rank: 1002
   rank_down: null
   rank_up: 357
   timepoint: day 31
@@ -58778,7 +58763,7 @@ rows:
   locus_tag: ACZ81_17590
   log2fc: 1.0448
   padj: 0.0277
-  rank: 694
+  rank: 693
   rank_down: null
   rank_up: 136
   timepoint: day 31
@@ -58793,7 +58778,7 @@ rows:
   locus_tag: ACZ81_17595
   log2fc: 1.2353
   padj: 0.0031
-  rank: 974
+  rank: 973
   rank_down: null
   rank_up: 297
   timepoint: days 60+89
@@ -58808,7 +58793,7 @@ rows:
   locus_tag: ACZ81_17595
   log2fc: 1.1227
   padj: 0.0379
-  rank: 920
+  rank: 919
   rank_down: null
   rank_up: 338
   timepoint: day 31
@@ -59018,7 +59003,7 @@ rows:
   locus_tag: ACZ81_17665
   log2fc: 1.083
   padj: 0.0192
-  rank: 967
+  rank: 966
   rank_down: null
   rank_up: 349
   timepoint: day 31
@@ -59123,7 +59108,7 @@ rows:
   locus_tag: ACZ81_17740
   log2fc: 1.3
   padj: 0.0
-  rank: 890
+  rank: 889
   rank_down: null
   rank_up: 259
   timepoint: days 60+89
@@ -59138,7 +59123,7 @@ rows:
   locus_tag: ACZ81_17740
   log2fc: 1.1782
   padj: 0.0
-  rank: 545
+  rank: 544
   rank_down: null
   rank_up: 108
   timepoint: day 31
@@ -59168,7 +59153,7 @@ rows:
   locus_tag: ACZ81_17750
   log2fc: 1.1825
   padj: 0.0
-  rank: 1041
+  rank: 1040
   rank_down: null
   rank_up: 328
   timepoint: days 60+89
@@ -59183,7 +59168,7 @@ rows:
   locus_tag: ACZ81_17755
   log2fc: 1.3215
   padj: 0.0001
-  rank: 300
+  rank: 299
   rank_down: null
   rank_up: 160
   timepoint: day 31
@@ -59213,7 +59198,7 @@ rows:
   locus_tag: ACZ81_17755
   log2fc: 1.037
   padj: 0.0
-  rank: 645
+  rank: 644
   rank_down: null
   rank_up: 324
   timepoint: days 60+89
@@ -59228,7 +59213,7 @@ rows:
   locus_tag: ACZ81_17755
   log2fc: 1.0004
   padj: 0.0003
-  rank: 714
+  rank: 713
   rank_down: null
   rank_up: 355
   timepoint: day 89
@@ -59258,7 +59243,7 @@ rows:
   locus_tag: ACZ81_17805
   log2fc: 1.1513
   padj: 0.0003
-  rank: 880
+  rank: 879
   rank_down: null
   rank_up: 325
   timepoint: day 31
@@ -59273,7 +59258,7 @@ rows:
   locus_tag: ACZ81_17805
   log2fc: 1.1185
   padj: 0.0007
-  rank: 736
+  rank: 735
   rank_down: null
   rank_up: 296
   timepoint: day 18
@@ -59318,7 +59303,7 @@ rows:
   locus_tag: ACZ81_17820
   log2fc: 1.1388
   padj: 0.0063
-  rank: 1105
+  rank: 1104
   rank_down: null
   rank_up: 353
   timepoint: days 60+89
@@ -59408,7 +59393,7 @@ rows:
   locus_tag: ACZ81_17825
   log2fc: 1.0442
   padj: 0.0001
-  rank: 1246
+  rank: 1245
   rank_down: null
   rank_up: 421
   timepoint: days 60+89
@@ -59483,7 +59468,7 @@ rows:
   locus_tag: ACZ81_17880
   log2fc: 1.3764
   padj: 0.0
-  rank: 825
+  rank: 824
   rank_down: null
   rank_up: 230
   timepoint: days 60+89
@@ -59528,7 +59513,7 @@ rows:
   locus_tag: ACZ81_17895
   log2fc: 1.3111
   padj: 0.0
-  rank: 876
+  rank: 875
   rank_down: null
   rank_up: 251
   timepoint: days 60+89
@@ -59618,7 +59603,7 @@ rows:
   locus_tag: ACZ81_17900
   log2fc: 1.2956
   padj: 0.0102
-  rank: 434
+  rank: 433
   rank_down: null
   rank_up: 82
   timepoint: day 31
@@ -59663,7 +59648,7 @@ rows:
   locus_tag: ACZ81_17900
   log2fc: 1.0838
   padj: 0.0276
-  rank: 965
+  rank: 964
   rank_down: null
   rank_up: 347
   timepoint: day 31
@@ -59723,7 +59708,7 @@ rows:
   locus_tag: ACZ81_17905
   log2fc: 1.0303
   padj: 0.0055
-  rank: 687
+  rank: 686
   rank_down: null
   rank_up: 348
   timepoint: day 89
@@ -59813,9 +59798,9 @@ rows:
   locus_tag: ACZ81_17950
   log2fc: 1.3395
   padj: null
-  rank: 283
+  rank: 282
   rank_down: null
-  rank_up: 82
+  rank_up: 81
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -59993,7 +59978,7 @@ rows:
   locus_tag: ACZ81_17965
   log2fc: 1.0211
   padj: 0.0088
-  rank: 493
+  rank: 492
   rank_down: null
   rank_up: 234
   timepoint: day 31
@@ -60083,7 +60068,7 @@ rows:
   locus_tag: ACZ81_17980
   log2fc: 1.1152
   padj: 0.0123
-  rank: 429
+  rank: 428
   rank_down: null
   rank_up: 214
   timepoint: day 31
@@ -60098,7 +60083,7 @@ rows:
   locus_tag: ACZ81_17980
   log2fc: 1.1083
   padj: 0.0309
-  rank: 191
+  rank: 190
   rank_down: null
   rank_up: 100
   timepoint: day 18
@@ -60188,7 +60173,7 @@ rows:
   locus_tag: ACZ81_18000
   log2fc: 1.0475
   padj: 0.0009
-  rank: 1014
+  rank: 1013
   rank_down: null
   rank_up: 360
   timepoint: day 31
@@ -60323,7 +60308,7 @@ rows:
   locus_tag: ACZ81_18010
   log2fc: 1.0621
   padj: 0.0201
-  rank: 679
+  rank: 678
   rank_down: null
   rank_up: 130
   timepoint: day 31
@@ -60353,7 +60338,7 @@ rows:
   locus_tag: ACZ81_18015
   log2fc: 1.3483
   padj: 0.0012
-  rank: 847
+  rank: 846
   rank_down: null
   rank_up: 239
   timepoint: days 60+89
@@ -60458,7 +60443,7 @@ rows:
   locus_tag: ACZ81_18025
   log2fc: 1.3646
   padj: 0.0
-  rank: 836
+  rank: 835
   rank_down: null
   rank_up: 234
   timepoint: days 60+89
@@ -60713,7 +60698,7 @@ rows:
   locus_tag: ACZ81_18035
   log2fc: 1.3979
   padj: 0.001
-  rank: 810
+  rank: 809
   rank_down: null
   rank_up: 225
   timepoint: days 60+89
@@ -60848,7 +60833,7 @@ rows:
   locus_tag: ACZ81_18045
   log2fc: 1.2056
   padj: 0.0277
-  rank: 1014
+  rank: 1013
   rank_down: null
   rank_up: 315
   timepoint: days 60+89
@@ -61103,7 +61088,7 @@ rows:
   locus_tag: ACZ81_18080
   log2fc: 1.3031
   padj: 0.0
-  rank: 887
+  rank: 886
   rank_down: null
   rank_up: 256
   timepoint: days 60+89
@@ -61133,7 +61118,7 @@ rows:
   locus_tag: ACZ81_18080
   log2fc: 1.2089
   padj: 0.0
-  rank: 802
+  rank: 801
   rank_down: null
   rank_up: 294
   timepoint: day 31
@@ -61148,7 +61133,7 @@ rows:
   locus_tag: ACZ81_18115
   log2fc: 1.2763
   padj: 0.0011
-  rank: 485
+  rank: 484
   rank_down: null
   rank_up: 264
   timepoint: day 89
@@ -61313,7 +61298,7 @@ rows:
   locus_tag: ACZ81_18135
   log2fc: 1.2902
   padj: 0.0018
-  rank: 475
+  rank: 474
   rank_down: null
   rank_up: 256
   timepoint: day 89
@@ -61328,7 +61313,7 @@ rows:
   locus_tag: ACZ81_18135
   log2fc: 1.1703
   padj: 0.0145
-  rank: 163
+  rank: 162
   rank_down: null
   rank_up: 85
   timepoint: day 18
@@ -61388,7 +61373,7 @@ rows:
   locus_tag: ACZ81_18155
   log2fc: 1.2941
   padj: 0.0361
-  rank: 311
+  rank: 310
   rank_down: null
   rank_up: 164
   timepoint: day 31
@@ -61478,7 +61463,7 @@ rows:
   locus_tag: ACZ81_18180
   log2fc: 1.1784
   padj: 0.0065
-  rank: 1050
+  rank: 1049
   rank_down: null
   rank_up: 331
   timepoint: days 60+89
@@ -61493,7 +61478,7 @@ rows:
   locus_tag: ACZ81_18180
   log2fc: 1.1703
   padj: 0.0489
-  rank: 551
+  rank: 550
   rank_down: null
   rank_up: 110
   timepoint: day 31
@@ -61568,9 +61553,9 @@ rows:
   locus_tag: ACZ81_18205
   log2fc: 1.8283
   padj: 0.0317
-  rank: 143
+  rank: 142
   rank_down: null
-  rank_up: 44
+  rank_up: 43
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -61688,7 +61673,7 @@ rows:
   locus_tag: ACZ81_18230
   log2fc: 1.0095
   padj: 0.0242
-  rank: 242
+  rank: 241
   rank_down: null
   rank_up: 121
   timepoint: day 18
@@ -61718,7 +61703,7 @@ rows:
   locus_tag: ACZ81_18235
   log2fc: 1.3624
   padj: 0.0002
-  rank: 287
+  rank: 286
   rank_down: null
   rank_up: 150
   timepoint: day 31
@@ -61793,9 +61778,9 @@ rows:
   locus_tag: ACZ81_18240
   log2fc: 1.9546
   padj: 0.0151
-  rank: 124
+  rank: 123
   rank_down: null
-  rank_up: 40
+  rank_up: 39
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -61853,7 +61838,7 @@ rows:
   locus_tag: ACZ81_18245
   log2fc: 1.0032
   padj: 0.0307
-  rank: 1312
+  rank: 1311
   rank_down: null
   rank_up: 448
   timepoint: days 60+89
@@ -61883,7 +61868,7 @@ rows:
   locus_tag: ACZ81_18250
   log2fc: 1.0465
   padj: 0.0133
-  rank: 638
+  rank: 637
   rank_down: null
   rank_up: 320
   timepoint: days 60+89
@@ -61988,9 +61973,9 @@ rows:
   locus_tag: ACZ81_18280
   log2fc: 1.1866
   padj: 0.0045
-  rank: 379
+  rank: 378
   rank_down: null
-  rank_up: 93
+  rank_up: 92
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -62003,7 +61988,7 @@ rows:
   locus_tag: ACZ81_18280
   log2fc: 1.0891
   padj: 0.0002
-  rank: 1174
+  rank: 1173
   rank_down: null
   rank_up: 389
   timepoint: days 60+89
@@ -62018,7 +62003,7 @@ rows:
   locus_tag: ACZ81_18355
   log2fc: 1.1591
   padj: 0.0288
-  rank: 400
+  rank: 399
   rank_down: null
   rank_up: 201
   timepoint: day 31
@@ -62078,7 +62063,7 @@ rows:
   locus_tag: ACZ81_18370
   log2fc: 1.1314
   padj: 0.0023
-  rank: 592
+  rank: 591
   rank_down: null
   rank_up: 310
   timepoint: day 89
@@ -62108,7 +62093,7 @@ rows:
   locus_tag: ACZ81_18375
   log2fc: 1.4283
   padj: 0.0
-  rank: 258
+  rank: 257
   rank_down: null
   rank_up: 136
   timepoint: day 31
@@ -62213,7 +62198,7 @@ rows:
   locus_tag: ACZ81_18425
   log2fc: 1.1652
   padj: 0.0199
-  rank: 863
+  rank: 862
   rank_down: null
   rank_up: 318
   timepoint: day 31
@@ -62408,7 +62393,7 @@ rows:
   locus_tag: ACZ81_18455
   log2fc: 1.4593
   padj: 0.0101
-  rank: 315
+  rank: 314
   rank_down: null
   rank_up: 56
   timepoint: day 31
@@ -62483,7 +62468,7 @@ rows:
   locus_tag: ACZ81_18490
   log2fc: 1.284
   padj: 0.0002
-  rank: 904
+  rank: 903
   rank_down: null
   rank_up: 264
   timepoint: days 60+89
@@ -62498,7 +62483,7 @@ rows:
   locus_tag: ACZ81_18495
   log2fc: 1.2609
   padj: 0.0
-  rank: 943
+  rank: 942
   rank_down: null
   rank_up: 278
   timepoint: days 60+89
@@ -62513,9 +62498,9 @@ rows:
   locus_tag: ACZ81_18495
   log2fc: 1.0686
   padj: 0.0041
-  rank: 472
+  rank: 471
   rank_down: null
-  rank_up: 105
+  rank_up: 104
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -62543,9 +62528,9 @@ rows:
   locus_tag: ACZ81_18500
   log2fc: 1.1866
   padj: 0.0078
-  rank: 380
+  rank: 379
   rank_down: null
-  rank_up: 94
+  rank_up: 93
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -62738,7 +62723,7 @@ rows:
   locus_tag: ACZ81_18510
   log2fc: 1.1425
   padj: 0.0017
-  rank: 176
+  rank: 175
   rank_down: null
   rank_up: 92
   timepoint: day 18
@@ -62843,9 +62828,9 @@ rows:
   locus_tag: ACZ81_18525
   log2fc: 1.7506
   padj: 0.0027
-  rank: 157
+  rank: 156
   rank_down: null
-  rank_up: 49
+  rank_up: 48
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -62873,7 +62858,7 @@ rows:
   locus_tag: ACZ81_18530
   log2fc: 1.1244
   padj: 0.0001
-  rank: 1125
+  rank: 1124
   rank_down: null
   rank_up: 361
   timepoint: days 60+89
@@ -63038,7 +63023,7 @@ rows:
   locus_tag: ACZ81_18550
   log2fc: 1.0989
   padj: 0.0446
-  rank: 195
+  rank: 194
   rank_down: null
   rank_up: 103
   timepoint: day 18
@@ -63053,7 +63038,7 @@ rows:
   locus_tag: ACZ81_18550
   log2fc: 1.0912
   padj: 0.0171
-  rank: 637
+  rank: 636
   rank_down: null
   rank_up: 329
   timepoint: day 89
@@ -63068,7 +63053,7 @@ rows:
   locus_tag: ACZ81_18550
   log2fc: 1.0227
   padj: 0.0083
-  rank: 658
+  rank: 657
   rank_down: null
   rank_up: 328
   timepoint: days 60+89
@@ -63353,7 +63338,7 @@ rows:
   locus_tag: ACZ81_18645
   log2fc: 1.1557
   padj: 0.0341
-  rank: 171
+  rank: 170
   rank_down: null
   rank_up: 89
   timepoint: day 18
@@ -63368,9 +63353,9 @@ rows:
   locus_tag: ACZ81_18670
   log2fc: 1.1217
   padj: 0.0343
-  rank: 422
+  rank: 421
   rank_down: null
-  rank_up: 99
+  rank_up: 98
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -63443,7 +63428,7 @@ rows:
   locus_tag: ACZ81_18675
   log2fc: 1.1906
   padj: 0.0
-  rank: 1029
+  rank: 1028
   rank_down: null
   rank_up: 322
   timepoint: days 60+89
@@ -63458,9 +63443,9 @@ rows:
   locus_tag: ACZ81_18690
   log2fc: 1.4192
   padj: 0.0018
-  rank: 251
+  rank: 250
   rank_down: null
-  rank_up: 74
+  rank_up: 73
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -63488,7 +63473,7 @@ rows:
   locus_tag: ACZ81_18700
   log2fc: 1.2636
   padj: 0.0273
-  rank: 497
+  rank: 496
   rank_down: null
   rank_up: 270
   timepoint: day 89
@@ -63623,7 +63608,7 @@ rows:
   locus_tag: ACZ81_18775
   log2fc: 1.2008
   padj: 0.0004
-  rank: 520
+  rank: 519
   rank_down: null
   rank_up: 103
   timepoint: day 31
@@ -63638,7 +63623,7 @@ rows:
   locus_tag: ACZ81_18775
   log2fc: 1.1618
   padj: 0.0
-  rank: 1073
+  rank: 1072
   rank_down: null
   rank_up: 342
   timepoint: days 60+89
@@ -63653,7 +63638,7 @@ rows:
   locus_tag: ACZ81_18775
   log2fc: 1.1478
   padj: 0.0016
-  rank: 408
+  rank: 407
   rank_down: null
   rank_up: 204
   timepoint: day 31
@@ -63668,7 +63653,7 @@ rows:
   locus_tag: ACZ81_18780
   log2fc: 1.0311
   padj: 0.0
-  rank: 1263
+  rank: 1262
   rank_down: null
   rank_up: 428
   timepoint: days 60+89
@@ -63743,7 +63728,7 @@ rows:
   locus_tag: ACZ81_18785
   log2fc: 1.103
   padj: 0.0067
-  rank: 432
+  rank: 431
   rank_down: null
   rank_up: 215
   timepoint: day 31
@@ -63758,7 +63743,7 @@ rows:
   locus_tag: ACZ81_18785
   log2fc: 1.0607
   padj: 0.0225
-  rank: 214
+  rank: 213
   rank_down: null
   rank_up: 111
   timepoint: day 18
@@ -63848,7 +63833,7 @@ rows:
   locus_tag: ACZ81_18800
   log2fc: 1.2791
   padj: 0.0
-  rank: 911
+  rank: 910
   rank_down: null
   rank_up: 270
   timepoint: days 60+89
@@ -64073,9 +64058,9 @@ rows:
   locus_tag: ACZ81_18920
   log2fc: 1.4679
   padj: 0.0089
-  rank: 236
+  rank: 235
   rank_down: null
-  rank_up: 68
+  rank_up: 67
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -64088,7 +64073,7 @@ rows:
   locus_tag: ACZ81_18920
   log2fc: 1.3999
   padj: 0.0005
-  rank: 807
+  rank: 806
   rank_down: null
   rank_up: 222
   timepoint: days 60+89
@@ -64103,7 +64088,7 @@ rows:
   locus_tag: ACZ81_18930
   log2fc: 1.3156
   padj: 0.0377
-  rank: 870
+  rank: 869
   rank_down: null
   rank_up: 248
   timepoint: days 60+89
@@ -64268,7 +64253,7 @@ rows:
   locus_tag: ACZ81_18985
   log2fc: 1.357
   padj: 0.0214
-  rank: 843
+  rank: 842
   rank_down: null
   rank_up: 236
   timepoint: days 60+89
@@ -64493,7 +64478,7 @@ rows:
   locus_tag: ACZ81_19105
   log2fc: 1.2334
   padj: 0.0369
-  rank: 135
+  rank: 134
   rank_down: null
   rank_up: 67
   timepoint: day 18
@@ -64523,7 +64508,7 @@ rows:
   locus_tag: ACZ81_19110
   log2fc: 1.2436
   padj: 0.0002
-  rank: 770
+  rank: 769
   rank_down: null
   rank_up: 282
   timepoint: day 31
@@ -64643,7 +64628,7 @@ rows:
   locus_tag: ACZ81_19180
   log2fc: 1.2786
   padj: 0.0009
-  rank: 484
+  rank: 483
   rank_down: null
   rank_up: 263
   timepoint: day 89
@@ -64778,7 +64763,7 @@ rows:
   locus_tag: ACZ81_19210
   log2fc: 1.097
   padj: 0.0322
-  rank: 748
+  rank: 747
   rank_down: null
   rank_up: 299
   timepoint: day 18
@@ -64868,7 +64853,7 @@ rows:
   locus_tag: ACZ81_19220
   log2fc: 1.14
   padj: 0.0
-  rank: 1103
+  rank: 1102
   rank_down: null
   rank_up: 352
   timepoint: days 60+89
@@ -64883,7 +64868,7 @@ rows:
   locus_tag: ACZ81_19220
   log2fc: 1.1208
   padj: 0.0031
-  rank: 924
+  rank: 923
   rank_down: null
   rank_up: 339
   timepoint: day 31
@@ -64898,7 +64883,7 @@ rows:
   locus_tag: ACZ81_19220
   log2fc: 1.0032
   padj: 0.0061
-  rank: 752
+  rank: 751
   rank_down: null
   rank_up: 148
   timepoint: day 31
@@ -64943,7 +64928,7 @@ rows:
   locus_tag: ACZ81_19225
   log2fc: 1.3446
   padj: 0.0
-  rank: 850
+  rank: 849
   rank_down: null
   rank_up: 240
   timepoint: days 60+89
@@ -64973,7 +64958,7 @@ rows:
   locus_tag: ACZ81_19225
   log2fc: 1.01
   padj: 0.0021
-  rank: 738
+  rank: 737
   rank_down: null
   rank_up: 144
   timepoint: day 31
@@ -65063,7 +65048,7 @@ rows:
   locus_tag: ACZ81_19235
   log2fc: 1.4778
   padj: 0.0
-  rank: 234
+  rank: 233
   rank_down: null
   rank_up: 122
   timepoint: day 31
@@ -65108,7 +65093,7 @@ rows:
   locus_tag: ACZ81_19235
   log2fc: 1.1683
   padj: 0.0001
-  rank: 561
+  rank: 560
   rank_down: null
   rank_up: 296
   timepoint: day 89
@@ -65138,7 +65123,7 @@ rows:
   locus_tag: ACZ81_19235
   log2fc: 1.1196
   padj: 0.0003
-  rank: 1131
+  rank: 1130
   rank_down: null
   rank_up: 365
   timepoint: days 60+89
@@ -65153,7 +65138,7 @@ rows:
   locus_tag: ACZ81_19235
   log2fc: 1.0868
   padj: 0.0006
-  rank: 758
+  rank: 757
   rank_down: null
   rank_up: 300
   timepoint: day 18
@@ -65213,7 +65198,7 @@ rows:
   locus_tag: ACZ81_19240
   log2fc: 1.4212
   padj: 0.0173
-  rank: 343
+  rank: 342
   rank_down: null
   rank_up: 63
   timepoint: day 31
@@ -65303,7 +65288,7 @@ rows:
   locus_tag: ACZ81_19250
   log2fc: 1.5135
   padj: 0.0001
-  rank: 222
+  rank: 221
   rank_down: null
   rank_up: 112
   timepoint: day 31
@@ -65393,7 +65378,7 @@ rows:
   locus_tag: ACZ81_19250
   log2fc: 1.0189
   padj: 0.0206
-  rank: 840
+  rank: 839
   rank_down: null
   rank_up: 329
   timepoint: day 18
@@ -65438,7 +65423,7 @@ rows:
   locus_tag: ACZ81_19260
   log2fc: 1.4357
   padj: 0.0006
-  rank: 256
+  rank: 255
   rank_down: null
   rank_up: 135
   timepoint: day 31
@@ -65663,7 +65648,7 @@ rows:
   locus_tag: ACZ81_19390
   log2fc: 1.2441
   padj: 0.0225
-  rank: 962
+  rank: 961
   rank_down: null
   rank_up: 289
   timepoint: days 60+89
@@ -65678,7 +65663,7 @@ rows:
   locus_tag: ACZ81_19395
   log2fc: 1.1242
   padj: 0.0
-  rank: 1126
+  rank: 1125
   rank_down: null
   rank_up: 362
   timepoint: days 60+89
@@ -65963,7 +65948,7 @@ rows:
   locus_tag: ACZ81_19495
   log2fc: 1.4048
   padj: 0.0014
-  rank: 270
+  rank: 269
   rank_down: null
   rank_up: 142
   timepoint: day 31
@@ -66128,7 +66113,7 @@ rows:
   locus_tag: ACZ81_19555
   log2fc: 1.0797
   padj: 0.0089
-  rank: 1193
+  rank: 1192
   rank_down: null
   rank_up: 399
   timepoint: days 60+89
@@ -66173,7 +66158,7 @@ rows:
   locus_tag: ACZ81_19610
   log2fc: 1.1513
   padj: 0.0154
-  rank: 406
+  rank: 405
   rank_down: null
   rank_up: 203
   timepoint: day 31
@@ -66278,7 +66263,7 @@ rows:
   locus_tag: ACZ81_19620
   log2fc: 1.0011
   padj: 0.0094
-  rank: 758
+  rank: 757
   rank_down: null
   rank_up: 151
   timepoint: day 31
@@ -66353,7 +66338,7 @@ rows:
   locus_tag: ACZ81_19665
   log2fc: 1.0244
   padj: 0.021
-  rank: 693
+  rank: 692
   rank_down: null
   rank_up: 349
   timepoint: day 89
@@ -66458,7 +66443,7 @@ rows:
   locus_tag: ACZ81_19710
   log2fc: 1.269
   padj: 0.0102
-  rank: 490
+  rank: 489
   rank_down: null
   rank_up: 269
   timepoint: day 89
@@ -66518,7 +66503,7 @@ rows:
   locus_tag: ACZ81_19715
   log2fc: 1.0478
   padj: 0.0009
-  rank: 466
+  rank: 465
   rank_down: null
   rank_up: 224
   timepoint: day 31
@@ -66533,7 +66518,7 @@ rows:
   locus_tag: ACZ81_19720
   log2fc: 1.0164
   padj: 0.0066
-  rank: 1060
+  rank: 1059
   rank_down: null
   rank_up: 373
   timepoint: day 31
@@ -66548,7 +66533,7 @@ rows:
   locus_tag: ACZ81_19745
   log2fc: 1.2331
   padj: 0.0001
-  rank: 519
+  rank: 518
   rank_down: null
   rank_up: 275
   timepoint: day 89
@@ -66593,7 +66578,7 @@ rows:
   locus_tag: ACZ81_19760
   log2fc: 9.9552
   padj: 0.0
-  rank: 744
+  rank: 743
   rank_down: null
   rank_up: 156
   timepoint: 20h
@@ -66683,7 +66668,7 @@ rows:
   locus_tag: ACZ81_19770
   log2fc: 1.0917
   padj: 0.0075
-  rank: 199
+  rank: 198
   rank_down: null
   rank_up: 105
   timepoint: day 18
@@ -66698,7 +66683,7 @@ rows:
   locus_tag: ACZ81_19770
   log2fc: 1.0744
   padj: 0.0025
-  rank: 449
+  rank: 448
   rank_down: null
   rank_up: 219
   timepoint: day 31
@@ -66758,7 +66743,7 @@ rows:
   locus_tag: ACZ81_19775
   log2fc: 1.2153
   padj: 0.0037
-  rank: 359
+  rank: 358
   rank_down: null
   rank_up: 183
   timepoint: day 31
@@ -67028,7 +67013,7 @@ rows:
   locus_tag: ACZ81_19860
   log2fc: 1.1437
   padj: 0.0088
-  rank: 890
+  rank: 889
   rank_down: null
   rank_up: 328
   timepoint: day 31
@@ -67133,7 +67118,7 @@ rows:
   locus_tag: ACZ81_19865
   log2fc: 1.0972
   padj: 0.0154
-  rank: 1160
+  rank: 1159
   rank_down: null
   rank_up: 380
   timepoint: days 60+89
@@ -67223,7 +67208,7 @@ rows:
   locus_tag: ACZ81_19890
   log2fc: 1.3476
   padj: 0.0049
-  rank: 393
+  rank: 392
   rank_down: null
   rank_up: 74
   timepoint: day 31
@@ -67238,7 +67223,7 @@ rows:
   locus_tag: ACZ81_19890
   log2fc: 1.1755
   padj: 0.0009
-  rank: 1054
+  rank: 1053
   rank_down: null
   rank_up: 332
   timepoint: days 60+89
@@ -67298,7 +67283,7 @@ rows:
   locus_tag: ACZ81_19890
   log2fc: 1.0242
   padj: 0.0263
-  rank: 1048
+  rank: 1047
   rank_down: null
   rank_up: 370
   timepoint: day 31
@@ -67343,7 +67328,7 @@ rows:
   locus_tag: ACZ81_19925
   log2fc: 1.1303
   padj: 0.0018
-  rank: 723
+  rank: 722
   rank_down: null
   rank_up: 292
   timepoint: day 18
@@ -67568,7 +67553,7 @@ rows:
   locus_tag: ACZ81_19950
   log2fc: 1.7204
   padj: 0.0009
-  rank: 153
+  rank: 152
   rank_down: null
   rank_up: 81
   timepoint: day 31
@@ -67583,7 +67568,7 @@ rows:
   locus_tag: ACZ81_19950
   log2fc: 1.196
   padj: 0.0247
-  rank: 151
+  rank: 150
   rank_down: null
   rank_up: 79
   timepoint: day 18
@@ -67628,7 +67613,7 @@ rows:
   locus_tag: ACZ81_20170
   log2fc: 1.2036
   padj: 0.0332
-  rank: 811
+  rank: 810
   rank_down: null
   rank_up: 297
   timepoint: day 31
@@ -67718,7 +67703,7 @@ rows:
   locus_tag: ACZ81_20340
   log2fc: 1.4152
   padj: 0.0168
-  rank: 345
+  rank: 344
   rank_down: null
   rank_up: 64
   timepoint: day 31
@@ -67733,7 +67718,7 @@ rows:
   locus_tag: ACZ81_20340
   log2fc: 1.3837
   padj: 0.0028
-  rank: 818
+  rank: 817
   rank_down: null
   rank_up: 228
   timepoint: days 60+89
@@ -67838,9 +67823,9 @@ rows:
   locus_tag: ACZ81_20580
   log2fc: 1.2525
   padj: null
-  rank: 335
+  rank: 334
   rank_down: null
-  rank_up: 90
+  rank_up: 89
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -67913,7 +67898,7 @@ rows:
   locus_tag: ACZ81_20625
   log2fc: 1.4739
   padj: 0.0
-  rank: 238
+  rank: 237
   rank_down: null
   rank_up: 125
   timepoint: day 31
@@ -67928,7 +67913,7 @@ rows:
   locus_tag: ACZ81_20680
   log2fc: 1.0126
   padj: 0.0407
-  rank: 844
+  rank: 843
   rank_down: null
   rank_up: 330
   timepoint: day 18
@@ -68018,7 +68003,7 @@ rows:
   locus_tag: ACZ81_RS04395
   log2fc: 1.0728
   padj: 0.0421
-  rank: 983
+  rank: 982
   rank_down: null
   rank_up: 354
   timepoint: day 31
@@ -68033,7 +68018,7 @@ rows:
   locus_tag: ACZ81_RS07605
   log2fc: 1.3183
   padj: 0.0
-  rank: 869
+  rank: 868
   rank_down: null
   rank_up: 247
   timepoint: days 60+89
@@ -68063,7 +68048,7 @@ rows:
   locus_tag: ACZ81_RS13720
   log2fc: 1.278
   padj: 0.0159
-  rank: 318
+  rank: 317
   rank_down: null
   rank_up: 168
   timepoint: day 31
@@ -68093,7 +68078,7 @@ rows:
   locus_tag: ACZ81_RS15685
   log2fc: 1.2088
   padj: 0.0025
-  rank: 1010
+  rank: 1009
   rank_down: null
   rank_up: 313
   timepoint: days 60+89
@@ -68123,7 +68108,7 @@ rows:
   locus_tag: ACZ81_RS15925
   log2fc: 1.2431
   padj: 0.042
-  rank: 963
+  rank: 962
   rank_down: null
   rank_up: 290
   timepoint: days 60+89
@@ -68168,7 +68153,7 @@ rows:
   locus_tag: ACZ81_RS17235
   log2fc: 1.0342
   padj: 0.0444
-  rank: 707
+  rank: 706
   rank_down: null
   rank_up: 138
   timepoint: day 31
@@ -68363,7 +68348,7 @@ rows:
   locus_tag: ACZ81_RS20845
   log2fc: 10.0594
   padj: 0.0002
-  rank: 742
+  rank: 741
   rank_down: null
   rank_up: 154
   timepoint: 20h
@@ -68498,9 +68483,9 @@ rows:
   locus_tag: ACZ81_RS21200
   log2fc: 1.3815
   padj: null
-  rank: 261
+  rank: 260
   rank_down: null
-  rank_up: 77
+  rank_up: 76
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -68618,7 +68603,7 @@ rows:
   locus_tag: ACZ81_RS21280
   log2fc: 1.2144
   padj: 0.0035
-  rank: 1002
+  rank: 1001
   rank_down: null
   rank_up: 311
   timepoint: days 60+89
@@ -68798,7 +68783,7 @@ rows:
   locus_tag: ACZ81_RS21370
   log2fc: 1.0556
   padj: 0.0089
-  rank: 1231
+  rank: 1230
   rank_down: null
   rank_up: 415
   timepoint: days 60+89
@@ -68858,7 +68843,7 @@ rows:
   locus_tag: ACZ81_RS21495
   log2fc: 14.7085
   padj: 0.0
-  rank: 709
+  rank: 708
   rank_down: null
   rank_up: 126
   timepoint: 20h
@@ -68873,9 +68858,9 @@ rows:
   locus_tag: ACZ81_RS21535
   log2fc: 1.9118
   padj: null
-  rank: 128
+  rank: 127
   rank_down: null
-  rank_up: 41
+  rank_up: 40
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1
@@ -68888,9 +68873,9 @@ rows:
   locus_tag: ACZ81_RS21570
   log2fc: 1.0528
   padj: null
-  rank: 485
+  rank: 484
   rank_down: null
-  rank_up: 107
+  rank_up: 106
   timepoint: day 11
   timepoint_hours: 264.0
   timepoint_order: 1

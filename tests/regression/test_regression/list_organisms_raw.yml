@@ -97,7 +97,7 @@ rows:
   - compartment
 - clade: null
   experiment_count: 21
-  gene_count: 4031
+  gene_count: 4028
   genus: Alteromonas
   ncbi_taxon_id: 28108
   omics_types:
@@ -467,7 +467,7 @@ rows:
   - coculture
 - clade: null
   experiment_count: 4
-  gene_count: 2714
+  gene_count: 2717
   genus: Synechococcus
   ncbi_taxon_id: 1140
   omics_types:

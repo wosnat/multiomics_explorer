@@ -552,11 +552,6 @@ GENES = [
             "46..67",
             "88..108"
         ],
-        "transporter_classification": [
-            "3.D.4.2",
-            "3.D.4.4",
-            "3.D.4.6"
-        ],
         "uniprot_accession": "Q7V2M9"
     },
     {
@@ -1805,10 +1800,6 @@ GENES = [
         ],
         "tIGR_Role_description": [
             "Biosynthesis of cofactors, prosthetic groups, and carriers / Glutathione and analogs"
-        ],
-        "transporter_classification": [
-            "1.A.12.2.2",
-            "1.A.12.3.2"
         ],
         "uniprot_accession": "Q7V256"
     },

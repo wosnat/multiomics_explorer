@@ -14,11 +14,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 2226
+  distinct_gene_count: 2225
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
-  gene_count: 4452
+  gene_count: 4450
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
@@ -49,8 +49,8 @@ rows:
   - '0'
   - '433'
   time_point_totals:
-  - '2226'
-  - '2226'
+  - '2225'
+  - '2225'
   treatment_type:
   - nitrogen
 - authors:
@@ -66,11 +66,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 2226
+  distinct_gene_count: 2225
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
-  gene_count: 11130
+  gene_count: 11125
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
@@ -119,11 +119,11 @@ rows:
   - '337'
   - '355'
   time_point_totals:
-  - '2226'
-  - '2226'
-  - '2226'
-  - '2226'
-  - '2226'
+  - '2225'
+  - '2225'
+  - '2225'
+  - '2225'
+  - '2225'
   treatment_type:
   - nitrogen
 - authors:
@@ -139,11 +139,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 3950
+  distinct_gene_count: 3947
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (RNASEQ)
-  gene_count: 11850
+  gene_count: 11841
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
@@ -180,9 +180,9 @@ rows:
   - '177'
   - '450'
   time_point_totals:
-  - '3950'
-  - '3950'
-  - '3950'
+  - '3947'
+  - '3947'
+  - '3947'
   treatment_type:
   - nitrogen
 - authors:
@@ -198,11 +198,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 3950
+  distinct_gene_count: 3947
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (RNASEQ)
-  gene_count: 19750
+  gene_count: 19735
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
@@ -251,11 +251,11 @@ rows:
   - '346'
   - '378'
   time_point_totals:
-  - '3950'
-  - '3950'
-  - '3950'
-  - '3950'
-  - '3950'
+  - '3947'
+  - '3947'
+  - '3947'
+  - '3947'
+  - '3947'
   treatment_type:
   - nitrogen
 - authors:

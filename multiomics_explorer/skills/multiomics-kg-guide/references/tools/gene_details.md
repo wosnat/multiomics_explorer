@@ -6,7 +6,8 @@ Get all properties for genes.
 
 This is a deep-dive tool — use gene_overview for the common case.
 Returns all Gene node properties including sparse fields
-(catalytic_activities, transporter_classification, cazy_ids, etc.).
+(catalytic_activities, ec_numbers, etc.). TCDB and CAZy memberships
+live on Gene_has_tcdb_family / Gene_has_cazy_family edges instead.
 
 For organism taxonomy, use list_organisms. For homologs, use
 gene_homologs. For ontology annotations, use gene_ontology_terms.
@@ -80,7 +81,9 @@ Step 1: gene_overview(locus_tags=["PMM0001", "PMM0845"])
 
 Step 2: gene_details(locus_tags=["PMM0001"])
         → inspect all properties including sparse fields
-        (catalytic_activities, transporter_classification, cazy_ids, etc.)
+        (catalytic_activities, ec_numbers, etc.). TCDB and CAZy
+        memberships traverse Gene_has_tcdb_family / Gene_has_cazy_family
+        edges, not Gene properties.
 ```
 
 ## Chaining patterns
@@ -95,7 +98,7 @@ genes_by_function → gene_details
 
 - This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields
 
-- Sparse fields (ec_numbers, cazy_ids, transporter_classification) are only present when the gene has them — check with gene_overview first
+- Sparse fields (ec_numbers, catalytic_activities, ko_terms) are only present when the gene has them — check with gene_overview first. TCDB / CAZy memberships are graph edges, not properties — use gene_overview's annotation_types or traverse Gene_has_tcdb_family / Gene_has_cazy_family.
 
 ```mistake
 gene_details(locus_tags='PMM0001')

@@ -32,6 +32,7 @@ rows:
     cytoplasmic and membrane proteins. Plays a role in the quality control of integral
     membrane proteins'
   annotation_quality: 3
+  annotation_state: informative_multi
   annotation_types:
   - brite
   - cog_category
@@ -47,6 +48,7 @@ rows:
   boolean_metric_types_observed: []
   categorical_metric_count: 0
   categorical_metric_types_observed: []
+  cazy_family_count: 0
   closest_ortholog_genera:
   - Prochlorococcus
   - Synechococcus
@@ -54,6 +56,12 @@ rows:
   cluster_membership_count: 0
   cluster_types: []
   compartments_observed: []
+  contig: NC_005070.1
+  contributing_sources:
+  - cyanorak
+  - eggnog
+  - ncbi
+  - uniprot
   end: 304589
   expression_edge_count: 5
   function_description: Acts as a processive, ATP-dependent zinc metallopeptidase
@@ -69,6 +77,17 @@ rows:
     zinc metallopeptidase for both cytoplasmic and membrane proteins. Plays a role
     in the quality control of integral membrane proteins'
   id: ncbigene:SYNW0305
+  informative_annotation_types:
+  - brite
+  - cog_category
+  - cyanorak_role
+  - ec
+  - go_bp
+  - go_cc
+  - go_mf
+  - kegg
+  - pfam
+  - tigr_role
   locus_tag: SYNW0305
   metabolite_count: 0
   numeric_metric_count: 0
@@ -79,8 +98,11 @@ rows:
   protein_family: AAA ATPase family; Peptidase M41 family; AAA ATPase family
   protein_id: WP_011127179.1
   reaction_count: 0
+  seed_ortholog: 84588.SYNW0305
+  seed_ortholog_evalue: 0.0
   sequence: MNKRWRNIGLTALLVLAIVVIAPAFLGGGNTQQEARTMRYSDFVEAVEDNQISRVLISPDRGTAQVVENDGRRAQVNLAPDKELLGLLTQHDVDIAVQPTRQAPAWQQAAGSLIFPLLLLGGLFFLFRRAQGGGGGNPAMQFGKSKARVQMEPSTQVTFTDVAGIEGAKLELTEVVDFLKNPDRFTAVGAKIPKGVLLVGPPGTGKTLLAKAVAGEAGVPFFSISGSEFVEMFVGVGASRVRDLFEQAKKNAPCIVFIDEIDAVGRQRGAGLGGGNDEREQTLNQLLTEMDGFEGNTGIIIVAATNRPDVLDAALMRPGRFDRQVTVDRPDYAGRLQILNVHARGKTLSKDVDLDKVARRTPGYTGADLANLLNEAAILAARRELTEVSNDEISDAIERVMAGPEKKDRVMSERRKRLVAYHEAGHALVGALMPDYDPVQKISIIPRGNAGGLTFFTPSEERMESGLYSRAYLQNQMAVALGGRVAEEIVYGEDEVTTGASNDLQQVASTARQMITRFGMSDTLGPVALGRAQGGMFLGRDIAAERDFSEDTAATIDQEVSELVDVAYKRATKVLVDNRAVLDELADMLVEQETVDAEELQELLITRDVRVAEYI
   significant_down_count: 1
   significant_up_count: 0
   start: 302742
   strand: +
+  tcdb_family_count: 0

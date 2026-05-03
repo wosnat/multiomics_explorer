@@ -1200,10 +1200,10 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 3950
+  distinct_gene_count: 3947
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
-  gene_count: 3950
+  gene_count: 3947
   growth_phases:
   - exponential
   is_time_course: 'false'
@@ -1211,7 +1211,7 @@ rows:
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
   significant_down_count: 163
-  significant_up_count: 112
+  significant_up_count: 111
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1226,9 +1226,9 @@ rows:
   time_point_significant_down:
   - '163'
   time_point_significant_up:
-  - '112'
+  - '111'
   time_point_totals:
-  - '3950'
+  - '3947'
   treatment_type:
   - coculture
 - authors:
@@ -1242,11 +1242,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 1880
+  distinct_gene_count: 1879
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
     inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
-  gene_count: 1880
+  gene_count: 1879
   growth_phases:
   - exponential
   is_time_course: 'false'
@@ -1271,7 +1271,7 @@ rows:
   time_point_significant_up:
   - '188'
   time_point_totals:
-  - '1880'
+  - '1879'
   treatment_type:
   - coculture
 - authors:
@@ -1285,11 +1285,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 2296
+  distinct_gene_count: 2295
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
     conditions (RNASEQ)
-  gene_count: 2296
+  gene_count: 2295
   growth_phases:
   - exponential
   is_time_course: 'false'
@@ -1314,7 +1314,7 @@ rows:
   time_point_significant_up:
   - '30'
   time_point_totals:
-  - '2296'
+  - '2295'
   treatment_type:
   - coculture
 - authors:
@@ -3600,11 +3600,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 2627
+  distinct_gene_count: 2626
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_rnaseq
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (RNA-seq)
-  gene_count: 2627
+  gene_count: 2626
   growth_phases:
   - exponential
   is_time_course: 'false'
@@ -3629,7 +3629,7 @@ rows:
   time_point_significant_up:
   - '323'
   time_point_totals:
-  - '2627'
+  - '2626'
   treatment_type:
   - coculture
 - authors:
@@ -3649,11 +3649,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 527
+  distinct_gene_count: 526
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (proteomics)
-  gene_count: 527
+  gene_count: 526
   growth_phases:
   - exponential
   is_time_course: 'false'
@@ -3678,7 +3678,7 @@ rows:
   time_point_significant_up:
   - '71'
   time_point_totals:
-  - '527'
+  - '526'
   treatment_type:
   - coculture
 - authors:

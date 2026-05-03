@@ -42,7 +42,7 @@ rows:
   locus_tag: A9601_13151
   organism_name: Prochlorococcus AS9601
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -56,35 +56,35 @@ rows:
   locus_tag: A9601_18671
   organism_name: Prochlorococcus AS9601
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: ACZ81_07415
   organism_name: Alteromonas macleodii HOT1A3
   product: replication initiation negative regulator SeqA
-  score: 3.5742
+  score: 3.5745
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: ALTBGP6_01546
   organism_name: Alteromonas macleodii BGP6
   product: replication initiation negative regulator SeqA
-  score: 3.5742
+  score: 3.5745
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: AMBAS45_07300
   organism_name: Alteromonas macleodii AD45
   product: replication initiation negative regulator SeqA
-  score: 3.5742
+  score: 3.5745
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: AMBLS11_06990
   organism_name: Alteromonas macleodii BS11
   product: replication initiation negative regulator SeqA
-  score: 3.5742
+  score: 3.5745
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -112,7 +112,7 @@ rows:
   locus_tag: BL107_06649
   organism_name: Synechococcus sp. BL107
   product: DNA polymerase III, beta subunit
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -147,21 +147,21 @@ rows:
   locus_tag: EZ55_01557
   organism_name: Alteromonas macleodii EZ55
   product: replication initiation negative regulator SeqA
-  score: 3.5742
+  score: 3.5745
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: MASE_06970
   organism_name: Alteromonas macleodii ATCC27126
   product: replication initiation negative regulator SeqA
-  score: 3.5742
-- annotation_quality: 1
+  score: 3.5745
+- annotation_quality: 3
   gene_category: Replication and repair
   gene_name: seqA
   locus_tag: MIT1002_01533
   organism_name: Alteromonas macleodii MIT1002
   product: hypothetical protein
-  score: 3.638
+  score: 3.6383
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -203,7 +203,7 @@ rows:
   locus_tag: NATL1_15881
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -217,7 +217,7 @@ rows:
   locus_tag: NATL1_21271
   organism_name: Prochlorococcus NATL1A
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -259,7 +259,7 @@ rows:
   locus_tag: P9301_13291
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -273,7 +273,7 @@ rows:
   locus_tag: P9301_18481
   organism_name: Prochlorococcus MIT9301
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -287,7 +287,7 @@ rows:
   locus_tag: P9303_00641
   organism_name: Prochlorococcus MIT9303
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -301,7 +301,7 @@ rows:
   locus_tag: P9303_08691
   organism_name: Prochlorococcus MIT9303
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -371,7 +371,7 @@ rows:
   locus_tag: PMM1140
   organism_name: Prochlorococcus MED4
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -385,7 +385,7 @@ rows:
   locus_tag: PMM1658
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -413,7 +413,7 @@ rows:
   locus_tag: PMN2A_0748
   organism_name: Prochlorococcus NATL2A
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -427,7 +427,7 @@ rows:
   locus_tag: PMN2A_1256
   organism_name: Prochlorococcus NATL2A
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -455,7 +455,7 @@ rows:
   locus_tag: PMT0059
   organism_name: Prochlorococcus MIT9313
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -490,7 +490,7 @@ rows:
   locus_tag: PMT1157
   organism_name: Prochlorococcus MIT9313
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holB
@@ -539,7 +539,7 @@ rows:
   locus_tag: PMT9312_1236
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -553,7 +553,7 @@ rows:
   locus_tag: PMT9312_1750
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -595,7 +595,7 @@ rows:
   locus_tag: Pro1234
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -609,7 +609,7 @@ rows:
   locus_tag: Pro1818
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -623,7 +623,7 @@ rows:
   locus_tag: SYNW0061
   organism_name: Synechococcus WH8102
   product: DNA polymerase III, gamma and tau subunits
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -637,7 +637,7 @@ rows:
   locus_tag: SYNW0702
   organism_name: Synechococcus WH8102
   product: DNA polymerase I
-  score: 0.9286
+  score: 0.9287
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -672,14 +672,14 @@ rows:
   locus_tag: Sputw3181_2127
   organism_name: Shewanella sp. W3-18-1
   product: replication initiation negative regulator SeqA
-  score: 3.5742
+  score: 3.5745
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
   locus_tag: SynWH7803_0001
   organism_name: Synechococcus WH7803
   product: DNA polymerase III, beta subunit
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
@@ -735,7 +735,7 @@ rows:
   locus_tag: sync_0001
   organism_name: Synechococcus CC9311
   product: DNA polymerase III, beta subunit
-  score: 0.8196
+  score: 0.8197
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX

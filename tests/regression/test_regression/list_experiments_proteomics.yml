@@ -969,11 +969,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 2226
+  distinct_gene_count: 2225
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
-  gene_count: 11130
+  gene_count: 11125
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
@@ -1022,11 +1022,11 @@ rows:
   - '337'
   - '355'
   time_point_totals:
-  - '2226'
-  - '2226'
-  - '2226'
-  - '2226'
-  - '2226'
+  - '2225'
+  - '2225'
+  - '2225'
+  - '2225'
+  - '2225'
   treatment_type:
   - nitrogen
 - authors:
@@ -1042,11 +1042,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 2226
+  distinct_gene_count: 2225
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
-  gene_count: 4452
+  gene_count: 4450
   growth_phases:
   - nutrient_limited
   is_time_course: 'true'
@@ -1077,8 +1077,8 @@ rows:
   - '0'
   - '433'
   time_point_totals:
-  - '2226'
-  - '2226'
+  - '2225'
+  - '2225'
   treatment_type:
   - nitrogen
 - authors:
@@ -3121,11 +3121,11 @@ rows:
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  distinct_gene_count: 527
+  distinct_gene_count: 526
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
     elongatus cscB (proteomics)
-  gene_count: 527
+  gene_count: 526
   growth_phases:
   - exponential
   is_time_course: 'false'
@@ -3150,7 +3150,7 @@ rows:
   time_point_significant_up:
   - '71'
   time_point_totals:
-  - '527'
+  - '526'
   treatment_type:
   - coculture
 - authors:

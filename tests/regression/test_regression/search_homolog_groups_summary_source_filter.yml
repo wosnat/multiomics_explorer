@@ -5,7 +5,7 @@ rows:
   - '{''count'': 420, ''item'': ''curated''}'
   by_source:
   - '{''count'': 420, ''item'': ''cyanorak''}'
-  score_max: 3.8927
+  score_max: 3.8941
   score_median: 1.0722
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 153, ''name'': ''Energy production and

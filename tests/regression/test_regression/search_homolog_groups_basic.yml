@@ -167,7 +167,7 @@ rows:
   group_name: CK_00000646
   member_count: 13
   organism_count: 13
-  score: 3.8927
+  score: 3.8941
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -177,7 +177,7 @@ rows:
   group_name: 1GZI7@1129
   member_count: 7
   organism_count: 7
-  score: 3.8927
+  score: 3.8941
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -187,7 +187,7 @@ rows:
   group_name: 1MMHE@1212
   member_count: 10
   organism_count: 10
-  score: 3.8927
+  score: 3.8941
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -197,7 +197,7 @@ rows:
   group_name: 1GC3C@1117
   member_count: 10
   organism_count: 10
-  score: 3.8927
+  score: 3.8941
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -207,7 +207,7 @@ rows:
   group_name: 33TEJ@2
   member_count: 10
   organism_count: 10
-  score: 3.8927
+  score: 3.8941
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -228,7 +228,7 @@ rows:
   group_name: CK_00000010
   member_count: 18
   organism_count: 13
-  score: 3.7668
+  score: 3.7682
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -239,7 +239,7 @@ rows:
   group_name: 1H0EA@1129
   member_count: 1
   organism_count: 1
-  score: 3.7668
+  score: 3.7682
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -250,7 +250,7 @@ rows:
   group_name: 1H0GZ@1129
   member_count: 12
   organism_count: 7
-  score: 3.7668
+  score: 3.7682
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -261,7 +261,7 @@ rows:
   group_name: 1MME1@1212
   member_count: 10
   organism_count: 9
-  score: 3.7668
+  score: 3.7682
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -272,7 +272,7 @@ rows:
   group_name: 1G5PU@1117
   member_count: 13
   organism_count: 8
-  score: 3.7668
+  score: 3.7682
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -283,7 +283,7 @@ rows:
   group_name: 1GDC4@1117
   member_count: 10
   organism_count: 9
-  score: 3.7668
+  score: 3.7682
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -294,7 +294,7 @@ rows:
   group_name: 1GN5B@1117
   member_count: 1
   organism_count: 1
-  score: 3.7668
+  score: 3.7682
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -334,7 +334,7 @@ rows:
   group_name: 1GYG2@1129
   member_count: 3
   organism_count: 3
-  score: 2.9034
+  score: 2.9048
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -344,7 +344,7 @@ rows:
   group_name: 1GZSQ@1129
   member_count: 3
   organism_count: 3
-  score: 2.9034
+  score: 2.9048
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -354,7 +354,7 @@ rows:
   group_name: 1FZZD@1117
   member_count: 3
   organism_count: 3
-  score: 2.9034
+  score: 2.9048
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -364,7 +364,7 @@ rows:
   group_name: 1G133@1117
   member_count: 4
   organism_count: 4
-  score: 2.9034
+  score: 2.9048
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -374,7 +374,7 @@ rows:
   group_name: 1G4ZF@1117
   member_count: 8
   organism_count: 8
-  score: 2.9034
+  score: 2.9048
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -384,7 +384,7 @@ rows:
   group_name: 2ZBJ3@2
   member_count: 8
   organism_count: 8
-  score: 2.9034
+  score: 2.9048
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -405,7 +405,7 @@ rows:
   group_name: COG2002@2
   member_count: 46
   organism_count: 21
-  score: 2.4786
+  score: 2.48
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -8236,8 +8236,8 @@ rows:
   consensus_product: ribose 5-phosphate isomerase A
   group_id: eggnog:1GYUV@1129
   group_name: 1GYUV@1129
-  member_count: 7
-  organism_count: 7
+  member_count: 6
+  organism_count: 6
   score: 1.0291
   source: eggnog
   specificity_rank: 1
@@ -8556,8 +8556,8 @@ rows:
   consensus_product: ribose 5-phosphate isomerase A
   group_id: eggnog:1G2DW@1117
   group_name: 1G2DW@1117
-  member_count: 18
-  organism_count: 18
+  member_count: 17
+  organism_count: 17
   score: 1.0291
   source: eggnog
   specificity_rank: 2

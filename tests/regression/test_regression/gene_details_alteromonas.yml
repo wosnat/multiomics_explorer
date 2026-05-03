@@ -9,6 +9,7 @@ rows:
   - '[pfam] DDE_3: DDE superfamily endonuclease'
   - '[pfam] HTH_32: Homeodomain-like domain'
   annotation_quality: 3
+  annotation_state: informative_multi
   annotation_types:
   - cog_category
   - go_mf
@@ -17,18 +18,27 @@ rows:
   boolean_metric_types_observed: []
   categorical_metric_count: 0
   categorical_metric_types_observed: []
+  cazy_family_count: 0
   closest_ortholog_genera:
   - Alteromonas
   closest_ortholog_group_size: 9
   cluster_membership_count: 0
   cluster_types: []
   compartments_observed: []
+  contig: NZ_OX359241.1
+  contributing_sources:
+  - eggnog
+  - ncbi
   end: 40258
   expression_edge_count: 0
   function_description: Winged helix-turn helix
   gene_category: Replication and repair
   gene_summary: 'IS630 family transposase :: Winged helix-turn helix'
   id: ncbigene:ALT831_RS00180
+  informative_annotation_types:
+  - cog_category
+  - go_mf
+  - pfam
   locus_tag: ALT831_RS00180
   metabolite_count: 0
   numeric_metric_count: 0
@@ -38,7 +48,10 @@ rows:
   product: IS630 family transposase
   protein_id: WP_197047964.1
   reaction_count: 0
+  seed_ortholog: 211586.SO_2275
+  seed_ortholog_evalue: 0.0
   sequence: MHTADDFKQLAKQTSNGQLRTRYLALYLFKNGETRTQIATYLGVARGSVNTWVSNYLAHGLEGLQSKPSPGRPCQLSVSQREQIAHFIKENAVKKEGGRLIAQDVRQYISDTFQIDYQLRNVYRIMDALGFSWITSRSKHPKQSQQTQDTFKKNFLLETILHTPGHLPLDRVDVWFQDEARFGQQNQTSRIWAAKGSRPRVVKQQQFDYGYVFGAVCPSNGNTQALISPLVNKEVMKQHLKLISEATEPGRHAVVVMDGAGWHTIDTASPFTNVSLLKLPPYSPELNPMEQVWQWLRQRCLSNRVFRGYEEIVEQVSRAWNTFIADVERVKNLCWREWIKLVN
   significant_down_count: 0
   significant_up_count: 0
   start: 39682
+  tcdb_family_count: 0

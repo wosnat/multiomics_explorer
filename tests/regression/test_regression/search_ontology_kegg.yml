@@ -4,438 +4,438 @@ rows:
 - id: kegg.category:09100
   level: 0
   name: Metabolism
-  score: 2.9416
+  score: 2.9489
   tree: null
   tree_code: null
 - id: kegg.orthology:K03402
   level: 3
   name: argR, ahrC; transcriptional regulator of arginine metabolism
-  score: 1.8841
+  score: 1.885
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00051
   level: 2
   name: Fructose and mannose metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00052
   level: 2
   name: Galactose metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00053
   level: 2
   name: Ascorbate and aldarate metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00230
   level: 2
   name: Purine metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00232
   level: 2
   name: Caffeine metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00240
   level: 2
   name: Pyrimidine metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00250
   level: 2
   name: Alanine, aspartate and glutamate metabolism
-  score: 2.1406
+  score: 2.1426
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00260
   level: 2
   name: Glycine, serine and threonine metabolism
-  score: 2.1406
+  score: 2.1426
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00270
   level: 2
   name: Cysteine and methionine metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00330
   level: 2
   name: Arginine and proline metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00340
   level: 2
   name: Histidine metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00350
   level: 2
   name: Tyrosine metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00360
   level: 2
   name: Phenylalanine metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00380
   level: 2
   name: Tryptophan metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00410
   level: 2
   name: beta-Alanine metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00430
   level: 2
   name: Taurine and hypotaurine metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00440
   level: 2
   name: Phosphonate and phosphinate metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00450
   level: 2
   name: Selenocompound metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00460
   level: 2
   name: Cyanoamino acid metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00470
   level: 2
   name: D-Amino acid metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00480
   level: 2
   name: Glutathione metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00500
   level: 2
   name: Starch and sucrose metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00520
   level: 2
   name: Amino sugar and nucleotide sugar metabolism
-  score: 2.0042
+  score: 2.0056
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00561
   level: 2
   name: Glycerolipid metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00562
   level: 2
   name: Inositol phosphate metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00564
   level: 2
   name: Glycerophospholipid metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00565
   level: 2
   name: Ether lipid metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00566
   level: 2
   name: Sulfoquinovose metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00590
   level: 2
   name: Arachidonic acid metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00591
   level: 2
   name: Linoleic acid metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00592
   level: 2
   name: alpha-Linolenic acid metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00600
   level: 2
   name: Sphingolipid metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00620
   level: 2
   name: Pyruvate metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00630
   level: 2
   name: Glyoxylate and dicarboxylate metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00640
   level: 2
   name: Propanoate metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00650
   level: 2
   name: Butanoate metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00660
   level: 2
   name: C5-Branched dibasic acid metabolism
-  score: 2.1406
+  score: 2.1426
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00680
   level: 2
   name: Methane metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00730
   level: 2
   name: Thiamine metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00740
   level: 2
   name: Riboflavin metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00750
   level: 2
   name: Vitamin B6 metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00760
   level: 2
   name: Nicotinate and nicotinamide metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00780
   level: 2
   name: Biotin metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00785
   level: 2
   name: Lipoic acid metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00830
   level: 2
   name: Retinol metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00860
   level: 2
   name: Porphyrin metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00910
   level: 2
   name: Nitrogen metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00920
   level: 2
   name: Sulfur metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00980
   level: 2
   name: Metabolism of xenobiotics by cytochrome P450
-  score: 2.0042
+  score: 2.0056
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00982
   level: 2
   name: Drug metabolism - cytochrome P450
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko00983
   level: 2
   name: Drug metabolism - other enzymes
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko01120
   level: 2
   name: Microbial metabolism in diverse environments
-  score: 2.1406
+  score: 2.1426
   tree: null
   tree_code: null
 - id: kegg.pathway:ko01200
   level: 2
   name: Carbon metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko01210
   level: 2
   name: 2-Oxocarboxylic acid metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko01212
   level: 2
   name: Fatty acid metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.pathway:ko01232
   level: 2
   name: Nucleotide metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko04979
   level: 2
   name: Cholesterol metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.pathway:ko04980
   level: 2
   name: Cobalamin transport and metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko04981
   level: 2
   name: Folate transport and metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.pathway:ko05230
   level: 2
   name: Central carbon metabolism in cancer
-  score: 2.1406
+  score: 2.1426
   tree: null
   tree_code: null
 - id: kegg.pathway:ko05231
   level: 2
   name: Choline metabolism in cancer
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.subcategory:09101
   level: 1
   name: Carbohydrate metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.subcategory:09102
   level: 1
   name: Energy metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.subcategory:09103
   level: 1
   name: Lipid metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.subcategory:09104
   level: 1
   name: Nucleotide metabolism
-  score: 2.69
+  score: 2.6953
   tree: null
   tree_code: null
 - id: kegg.subcategory:09105
   level: 1
   name: Amino acid metabolism
-  score: 2.478
+  score: 2.4819
   tree: null
   tree_code: null
 - id: kegg.subcategory:09106
   level: 1
   name: Metabolism of other amino acids
-  score: 2.1406
+  score: 2.1426
   tree: null
   tree_code: null
 - id: kegg.subcategory:09107
   level: 1
   name: Glycan biosynthesis and metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null
 - id: kegg.subcategory:09108
   level: 1
   name: Metabolism of cofactors and vitamins
-  score: 2.1406
+  score: 2.1426
   tree: null
   tree_code: null
 - id: kegg.subcategory:09109
   level: 1
   name: Metabolism of terpenoids and polyketides
-  score: 2.1406
+  score: 2.1426
   tree: null
   tree_code: null
 - id: kegg.subcategory:09111
   level: 1
   name: Xenobiotics biodegradation and metabolism
-  score: 2.297
+  score: 2.2998
   tree: null
   tree_code: null

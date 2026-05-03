@@ -15,7 +15,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 7.1764
+  score: 7.1775
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -33,7 +33,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 6.5277
+  score: 6.5289
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -51,7 +51,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 6.5277
+  score: 6.5289
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -69,7 +69,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 5.9182
+  score: 5.9195
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -90,7 +90,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 11
   organism_count: 11
-  score: 5.9182
+  score: 5.9195
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -116,7 +116,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 109
   organism_count: 31
-  score: 5.3607
+  score: 5.362
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -137,7 +137,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 11
   organism_count: 11
-  score: 5.3133
+  score: 5.3145
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -163,7 +163,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 13
   organism_count: 13
-  score: 5.2709
+  score: 5.2721
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -189,7 +189,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 7
   organism_count: 7
-  score: 5.2709
+  score: 5.2721
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -214,7 +214,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 10
   organism_count: 10
-  score: 5.2709
+  score: 5.2721
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -242,7 +242,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 19
   organism_count: 18
-  score: 5.2709
+  score: 5.2721
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -268,7 +268,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 13
   organism_count: 13
-  score: 4.9247
+  score: 4.926
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -293,7 +293,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 7
   organism_count: 7
-  score: 4.9247
+  score: 4.926
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -318,7 +318,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 10
   organism_count: 10
-  score: 4.9247
+  score: 4.926
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -345,7 +345,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 18
   organism_count: 18
-  score: 4.9247
+  score: 4.926
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -377,7 +377,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 3
   organism_count: 3
-  score: 4.6309
+  score: 4.6321
   source: cyanorak
   specificity_rank: 0
   taxonomic_level: curated
@@ -408,7 +408,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 2
   organism_count: 2
-  score: 4.6309
+  score: 4.6321
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Prochloraceae
@@ -468,7 +468,7 @@ rows:
   group_id: eggnog:COG0601@2
   group_name: COG0601@2
   has_cross_genus_members: cross_genus
-  member_count: 67
+  member_count: 66
   organism_count: 31
   score: 3.716
   source: eggnog
@@ -488,7 +488,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 3.4604
+  score: 3.4615
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -507,7 +507,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 3
   organism_count: 3
-  score: 3.4604
+  score: 3.4615
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -525,7 +525,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 3.4604
+  score: 3.4615
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -627,7 +627,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 7
   organism_count: 7
-  score: 3.1025
+  score: 3.1037
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -650,7 +650,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 7
   organism_count: 7
-  score: 3.1025
+  score: 3.1037
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -668,7 +668,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -687,7 +687,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 9
   organism_count: 8
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -705,7 +705,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -723,7 +723,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -741,7 +741,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -759,7 +759,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -780,7 +780,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 12
   organism_count: 11
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -798,7 +798,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -816,7 +816,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -834,7 +834,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -855,7 +855,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 23
   organism_count: 11
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria
@@ -881,7 +881,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 60
   organism_count: 31
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -903,7 +903,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 15
   organism_count: 12
-  score: 2.8117
+  score: 2.8129
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1037,7 +1037,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 3
   organism_count: 3
-  score: 2.5707
+  score: 2.572
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1055,7 +1055,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.5707
+  score: 2.572
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1073,7 +1073,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 1
   organism_count: 1
-  score: 2.5707
+  score: 2.572
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1113,7 +1113,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 4
   organism_count: 4
-  score: 2.3678
+  score: 2.369
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1131,7 +1131,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 4
   organism_count: 4
-  score: 2.3678
+  score: 2.369
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Synechococcus
@@ -1150,7 +1150,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 2.3678
+  score: 2.369
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -1169,7 +1169,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 5
   organism_count: 5
-  score: 2.3678
+  score: 2.369
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1188,7 +1188,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 5
   organism_count: 5
-  score: 2.3678
+  score: 2.369
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
@@ -1210,7 +1210,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 12
   organism_count: 12
-  score: 2.3678
+  score: 2.369
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -1231,7 +1231,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 9
   organism_count: 9
-  score: 2.3678
+  score: 2.369
   source: eggnog
   specificity_rank: 3
   taxonomic_level: Bacteria
@@ -3112,7 +3112,7 @@ rows:
   has_cross_genus_members: single_genus
   member_count: 8
   organism_count: 8
-  score: 1.9144
+  score: 1.9156
   source: eggnog
   specificity_rank: 1
   taxonomic_level: Alteromonadaceae
@@ -3133,7 +3133,7 @@ rows:
   has_cross_genus_members: cross_genus
   member_count: 10
   organism_count: 10
-  score: 1.9144
+  score: 1.9156
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Proteobacteria

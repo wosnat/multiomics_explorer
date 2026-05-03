@@ -975,7 +975,7 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
-        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*}. ~30 fields including locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, transporter_classification, cazy_ids, etc. Sparse fields only present when populated.")
+        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*}. ~30 fields including locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, ec_numbers, etc. Sparse fields only present when populated. TCDB and CAZy memberships traverse Gene_has_tcdb_family / Gene_has_cazy_family edges instead.")
 
     @mcp.tool(
         tags={"genes"},
@@ -1001,7 +1001,8 @@ def register_tools(mcp: FastMCP):
 
         This is a deep-dive tool — use gene_overview for the common case.
         Returns all Gene node properties including sparse fields
-        (catalytic_activities, transporter_classification, cazy_ids, etc.).
+        (catalytic_activities, ec_numbers, etc.). TCDB and CAZy memberships
+        live on Gene_has_tcdb_family / Gene_has_cazy_family edges instead.
 
         For organism taxonomy, use list_organisms. For homologs, use
         gene_homologs. For ontology annotations, use gene_ontology_terms.

@@ -40,7 +40,7 @@ rows:
   growth_phases:
   - darkness
   - stationary
-  metabolite_count: 1359
+  metabolite_count: 2212
   ncbi_taxon_id: 232
   omics_types:
   - PROTEOMICS
@@ -70,7 +70,7 @@ rows:
   gene_count: 3929
   genus: Alteromonas
   growth_phases: []
-  metabolite_count: 1328
+  metabolite_count: 2061
   ncbi_taxon_id: 1004787
   omics_types:
   - VESICLE_PROTEOMICS
@@ -99,7 +99,7 @@ rows:
   gene_count: 3834
   genus: Alteromonas
   growth_phases: []
-  metabolite_count: 1309
+  metabolite_count: 2062
   ncbi_taxon_id: 529120
   omics_types:
   - VESICLE_PROTEOMICS
@@ -128,7 +128,7 @@ rows:
   gene_count: 4063
   genus: Alteromonas
   growth_phases: []
-  metabolite_count: 1341
+  metabolite_count: 2092
   ncbi_taxon_id: 28108
   omics_types:
   - VESICLE_PROTEOMICS
@@ -157,7 +157,7 @@ rows:
   gene_count: 3741
   genus: Alteromonas
   growth_phases: []
-  metabolite_count: 1282
+  metabolite_count: 2038
   ncbi_taxon_id: 1004785
   omics_types:
   - VESICLE_PROTEOMICS
@@ -192,7 +192,7 @@ rows:
   growth_phases:
   - acclimated_steady_state
   - exponential
-  metabolite_count: 1428
+  metabolite_count: 2172
   ncbi_taxon_id: 28108
   omics_types:
   - EXOPROTEOMICS
@@ -224,13 +224,13 @@ rows:
   derived_metric_value_kinds:
   - numeric
   experiment_count: 21
-  gene_count: 4031
+  gene_count: 4028
   genus: Alteromonas
   growth_phases:
   - death
   - exponential
   - nutrient_limited
-  metabolite_count: 1336
+  metabolite_count: 2079
   ncbi_taxon_id: 28108
   omics_types:
   - PROTEOMICS
@@ -271,7 +271,7 @@ rows:
   - darkness
   - diel
   - exponential
-  metabolite_count: 1354
+  metabolite_count: 2095
   ncbi_taxon_id: 28108
   omics_types:
   - RNASEQ
@@ -332,7 +332,7 @@ rows:
   growth_phases:
   - darkness
   - stationary
-  metabolite_count: 1346
+  metabolite_count: 2048
   ncbi_taxon_id: 225937
   omics_types:
   - PROTEOMICS
@@ -385,7 +385,7 @@ rows:
   gene_count: 2884
   genus: Meiothermus
   growth_phases: []
-  metabolite_count: 1215
+  metabolite_count: 1809
   ncbi_taxon_id: 172827
   omics_types:
   - RNASEQ
@@ -448,7 +448,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
-  metabolite_count: 1017
+  metabolite_count: 1528
   ncbi_taxon_id: 146891
   omics_types:
   - RNASEQ
@@ -496,7 +496,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
-  metabolite_count: 1039
+  metabolite_count: 1550
   ncbi_taxon_id: 59919
   omics_types:
   - MICROARRAY
@@ -541,7 +541,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
-  metabolite_count: 1052
+  metabolite_count: 1559
   ncbi_taxon_id: 167546
   omics_types:
   - RNASEQ
@@ -570,7 +570,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - exponential
-  metabolite_count: 1135
+  metabolite_count: 1696
   ncbi_taxon_id: 59922
   omics_types:
   - RNASEQ
@@ -605,7 +605,7 @@ rows:
   - acute_stress
   - exponential
   - stationary
-  metabolite_count: 1047
+  metabolite_count: 1559
   ncbi_taxon_id: 74546
   omics_types:
   - PROTEOMICS
@@ -647,7 +647,7 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
-  metabolite_count: 1081
+  metabolite_count: 1643
   ncbi_taxon_id: 74547
   omics_types:
   - MICROARRAY
@@ -684,7 +684,7 @@ rows:
   genus: Prochlorococcus
   growth_phases:
   - acclimated_steady_state
-  metabolite_count: 1039
+  metabolite_count: 1548
   ncbi_taxon_id: 167555
   omics_types:
   - RNASEQ
@@ -725,7 +725,7 @@ rows:
   - nutrient_limited
   - recovery
   - stationary
-  metabolite_count: 1029
+  metabolite_count: 1536
   ncbi_taxon_id: 59920
   omics_types:
   - PROTEOMICS
@@ -754,7 +754,7 @@ rows:
   gene_count: 1870
   genus: Prochlorococcus
   growth_phases: []
-  metabolite_count: 1043
+  metabolite_count: 1553
   ncbi_taxon_id: 1924285
   omics_types: []
   organism_name: Prochlorococcus RSP50
@@ -785,7 +785,7 @@ rows:
   - darkness
   - exponential
   - stationary
-  metabolite_count: 1046
+  metabolite_count: 1555
   ncbi_taxon_id: 167539
   omics_types:
   - PROTEOMICS
@@ -815,7 +815,7 @@ rows:
   genus: Pseudomonas
   growth_phases:
   - exponential
-  metabolite_count: 1490
+  metabolite_count: 2258
   ncbi_taxon_id: 160488
   omics_types:
   - PROTEOMICS
@@ -843,7 +843,7 @@ rows:
   genus: Ruegeria
   growth_phases:
   - acclimated_steady_state
-  metabolite_count: 1468
+  metabolite_count: 2294
   ncbi_taxon_id: 89184
   omics_types:
   - EXOPROTEOMICS
@@ -870,7 +870,7 @@ rows:
   genus: Shewanella
   growth_phases:
   - acclimated_steady_state
-  metabolite_count: 1306
+  metabolite_count: 2186
   ncbi_taxon_id: 351745
   omics_types:
   - RNASEQ
@@ -900,7 +900,7 @@ rows:
   genus: Synechococcus
   growth_phases:
   - exponential
-  metabolite_count: 1129
+  metabolite_count: 1727
   ncbi_taxon_id: 64471
   omics_types:
   - RNASEQ
@@ -928,7 +928,7 @@ rows:
   genus: Picosynechococcus
   growth_phases:
   - acclimated_steady_state
-  metabolite_count: 1105
+  metabolite_count: 1723
   ncbi_taxon_id: 32049
   omics_types:
   - RNASEQ
@@ -960,7 +960,7 @@ rows:
   - acclimated_steady_state
   - darkness
   - stationary
-  metabolite_count: 1145
+  metabolite_count: 1769
   ncbi_taxon_id: 32051
   omics_types:
   - EXOPROTEOMICS
@@ -994,7 +994,7 @@ rows:
   - darkness
   - exponential
   - stationary
-  metabolite_count: 1120
+  metabolite_count: 1698
   ncbi_taxon_id: 84588
   omics_types:
   - MICROARRAY
@@ -1020,11 +1020,11 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 4
-  gene_count: 2714
+  gene_count: 2717
   genus: Synechococcus
   growth_phases:
   - exponential
-  metabolite_count: 1175
+  metabolite_count: 1798
   ncbi_taxon_id: 1140
   omics_types:
   - PROTEOMICS
@@ -1032,7 +1032,7 @@ rows:
   organism_name: Synechococcus elongatus PCC 7942
   organism_type: genome_strain
   publication_count: 1
-  reaction_count: 1058
+  reaction_count: 1033
   reference_database: null
   reference_proteome: null
   species: Synechococcus elongatus
@@ -1052,7 +1052,7 @@ rows:
   genus: Synechococcus
   growth_phases:
   - acclimated_steady_state
-  metabolite_count: 1175
+  metabolite_count: 1803
   ncbi_taxon_id: 1350461
   omics_types:
   - PROTEOMICS
@@ -1083,7 +1083,7 @@ rows:
   growth_phases:
   - darkness
   - stationary
-  metabolite_count: 1068
+  metabolite_count: 1651
   ncbi_taxon_id: 313625
   omics_types:
   - PROTEOMICS
@@ -1110,7 +1110,7 @@ rows:
   gene_count: 2449
   genus: Thermosynechococcus
   growth_phases: []
-  metabolite_count: 1003
+  metabolite_count: 1591
   ncbi_taxon_id: 197221
   omics_types:
   - RNASEQ
