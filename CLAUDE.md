@@ -31,6 +31,12 @@ pytest -m kg -v                # requires Neo4j at localhost:7687
 
 ## MCP Server
 
+**Adding or modifying a tool?** Use the `add-or-update-tool` skill — it
+orchestrates Phase 1 (scope + KG iteration + Cypher verification) and
+Phase 2 (parallel TDD build with file-owned agents). See
+`docs/superpowers/specs/2026-05-03-add-or-update-tool-redesign.md` for the
+design.
+
 The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for Claude Code.
 
 ### Tools
