@@ -35,6 +35,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_gene_categories,
     build_list_experiments,
     build_list_experiments_summary,
+    build_genes_by_metabolite_metabolism,
     build_list_metabolites,
     build_list_organisms,
     build_list_publications,
@@ -73,6 +74,7 @@ TOOL_BUILDERS = {
     "gene_ontology_terms": build_gene_ontology_terms,
     "list_publications": build_list_publications,
     "list_metabolites": build_list_metabolites,
+    "genes_by_metabolite": build_genes_by_metabolite_metabolism,
     "list_experiments": build_list_experiments,
     "list_experiments_summary": build_list_experiments_summary,
     "list_derived_metrics": build_list_derived_metrics,
@@ -148,6 +150,11 @@ def run_case(conn, tool: str, params: dict) -> list[dict]:
         # Dispatch via api (L2) — organism_names lowercasing + summary/detail
         # split + not_found computation live above the builder.
         return api.list_metabolites(**params, conn=conn).get("results", [])
+
+    if tool == "genes_by_metabolite":
+        # Dispatch via api (L2) — two-arm dispatch + global sort + slice
+        # + not_found / not_matched + auto-warning live above the builders.
+        return api.genes_by_metabolite(**params, conn=conn).get("results", [])
 
     builder = TOOL_BUILDERS[tool]
     limit = params.get("limit")

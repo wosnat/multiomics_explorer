@@ -1,0 +1,379 @@
+by_evidence_source:
+- count: 32
+  evidence_source: metabolism
+- count: 24
+  evidence_source: transport
+by_metabolite:
+- formula: C5H10N2O3
+  gene_count: 33
+  metabolism_rows: 32
+  metabolite_id: kegg.compound:C00064
+  name: L-Glutamine
+  reaction_count: 19
+  rows: 42
+  transport_family_inferred_rows: 10
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 2
+- formula: NO2
+  gene_count: 12
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00088
+  name: Nitrite
+  reaction_count: 0
+  rows: 14
+  transport_family_inferred_rows: 9
+  transport_substrate_confirmed_rows: 5
+  transporter_count: 3
+by_transport_confidence:
+- count: 19
+  transport_confidence: family_inferred
+- count: 5
+  transport_confidence: substrate_confirmed
+case_id: genes_by_metabolite_pathway_anchored_n_metabolism
+gene_count_total: 36
+metabolite_count_total: 2
+not_found:
+  metabolite_ids: []
+  metabolite_pathway_ids: []
+  organism: null
+not_matched:
+- kegg.compound:C00086
+offset: 0
+reaction_count_total: 19
+results:
+- ec_numbers:
+  - 1.4.1.13
+  - 1.4.1.14
+  - 1.4.7.1
+  - 2.4.2
+  - 2.4.2.14
+  - 2.6.1.85
+  - 3.5.1.2
+  - 3.5.1.38
+  - 4.3.1
+  - 4.3.3.6
+  - 6.3.4.2
+  - 6.3.5.2
+  - 6.3.5.4
+  - 6.3.5.5
+  - 6.3.5.7
+  evidence_source: metabolism
+  gene_name: carB
+  locus_tag: PMM0825
+  mass_balance: balanced
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: carbamoyl-phosphate synthase, large subunit
+  reaction_id: kegg.reaction:R00256
+  reaction_name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
+- ec_numbers:
+  - 6.3.1.2
+  evidence_source: metabolism
+  gene_name: glnA
+  locus_tag: PMM0920
+  mass_balance: balanced
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: glutamine synthetase, type I
+  reaction_id: kegg.reaction:R00253
+  reaction_name: L-glutamate:ammonia ligase (ADP-forming); ATP + L-Glutamate + Ammonia
+    <=> ADP + Orthophosphate + L-Glutamine
+- ec_numbers:
+  - 1.4.1.13
+  - 1.4.1.14
+  - 1.4.7.1
+  - 2.4.2
+  - 2.4.2.14
+  - 2.6.1.85
+  - 3.5.1.2
+  - 3.5.1.38
+  - 4.3.1
+  - 4.3.3.6
+  - 6.3.4.2
+  - 6.3.5.2
+  - 6.3.5.4
+  - 6.3.5.5
+  - 6.3.5.7
+  evidence_source: metabolism
+  gene_name: carA
+  locus_tag: PMM0951
+  mass_balance: balanced
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: carbamoyl-phosphate synthase small subunit
+  reaction_id: kegg.reaction:R00256
+  reaction_name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
+- ec_numbers:
+  - 6.3.5.1
+  evidence_source: metabolism
+  gene_name: nadE
+  locus_tag: PMM1446
+  mass_balance: balanced
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: NAD+ synthase (glutamine-hydrolysing)
+  reaction_id: kegg.reaction:R00257
+  reaction_name: deamido-NAD+:L-glutamine amido-ligase (AMP-forming); ATP + Deamino-NAD+
+    + L-Glutamine + H2O <=> AMP + Diphosphate + NAD+ + L-Glutamate
+- ec_numbers:
+  - 1.4.7.1
+  evidence_source: metabolism
+  gene_name: glsF
+  locus_tag: PMM1512
+  mass_balance: balanced
+  metabolite_chebi_id: '13110'
+  metabolite_formula: C5H10N2O3
+  metabolite_id: kegg.compound:C00064
+  metabolite_mass: 146.146
+  metabolite_name: L-Glutamine
+  product: ferredoxin-dependent glutamate synthase
+  reaction_id: kegg.reaction:R00021
+  reaction_name: L-glutamate:ferredoxin oxidoreductase (transaminating); 2 L-Glutamate
+    + 2 Oxidized ferredoxin <=> L-Glutamine + 2-Oxoglutarate + 2 Reduced ferredoxin
+    + 2 H+
+returned: 5
+row_count: 5
+top_gene_categories:
+- category: Nucleotide metabolism
+  gene_count: 7
+- category: Amino acid metabolism
+  gene_count: 5
+- category: Coenzyme metabolism
+  gene_count: 5
+- category: Stress response and adaptation
+  gene_count: 5
+- category: Transport
+  gene_count: 5
+- category: Central intermediary metabolism
+  gene_count: 4
+- category: Translation
+  gene_count: 2
+- category: Cell wall and membrane
+  gene_count: 1
+- category: Cellular processes
+  gene_count: 1
+- category: Post-translational modification
+  gene_count: 1
+top_genes:
+- gene_name: guaA
+  locus_tag: PMM0037
+  metabolism_rows: 2
+  metabolite_count: 1
+  reaction_count: 2
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 0
+- gene_name: gatB
+  locus_tag: PMM0048
+  metabolism_rows: 2
+  metabolite_count: 1
+  reaction_count: 2
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 0
+- gene_name: pabC
+  locus_tag: PMM0184
+  metabolism_rows: 2
+  metabolite_count: 1
+  reaction_count: 2
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 0
+- gene_name: gatC
+  locus_tag: PMM0235
+  metabolism_rows: 2
+  metabolite_count: 1
+  reaction_count: 2
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 0
+- gene_name: cynA
+  locus_tag: PMM0370
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+- gene_name: cynB
+  locus_tag: PMM0371
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+- gene_name: null
+  locus_tag: PMM0695
+  metabolism_rows: 2
+  metabolite_count: 1
+  reaction_count: 2
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 0
+- gene_name: carB
+  locus_tag: PMM0825
+  metabolism_rows: 2
+  metabolite_count: 1
+  reaction_count: 2
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 0
+- gene_name: gatA
+  locus_tag: PMM0946
+  metabolism_rows: 2
+  metabolite_count: 1
+  reaction_count: 2
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 0
+- gene_name: carA
+  locus_tag: PMM0951
+  metabolism_rows: 2
+  metabolite_count: 1
+  reaction_count: 2
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 0
+top_reactions:
+- ec_numbers:
+  - 6.3.5.7
+  gene_count: 3
+  metabolite_count: 1
+  name: Glu-tRNA(Gln):L-glutamine amido-ligase (ADP-forming); Glutaminyl-tRNA + L-Glutamate
+    + Orthophosphate + ADP <=> L-Glutamyl-tRNA(Gln) + L-Glutamine + ATP + H2O
+  reaction_id: kegg.reaction:R03905
+- ec_numbers:
+  - 6.3.5.6
+  gene_count: 3
+  metabolite_count: 1
+  name: Asp-tRNA(Asn):L-glutamine amido-ligase (ADP-forming); L-Asparaginyl-tRNA(Asn)
+    + L-Glutamate + Orthophosphate + ADP <=> L-Aspartyl-tRNA(Asn) + L-Glutamine +
+    ATP + H2O
+  reaction_id: kegg.reaction:R04212
+- ec_numbers:
+  - 6.3.5.3
+  gene_count: 3
+  metabolite_count: 1
+  name: 5^-phosphoribosylformylglycinamide:L-glutamine amido-ligase (ADP-forming);
+    ATP + 5^-Phosphoribosyl-N-formylglycinamide + L-Glutamine + H2O <=> ADP + Orthophosphate
+    + 2-(Formamido)-N1-(5^-phosphoribosyl)acetamidine + L-Glutamate
+  reaction_id: kegg.reaction:R04463
+- ec_numbers:
+  - 1.4.1.13
+  - 1.4.1.14
+  - 1.4.7.1
+  - 2.4.2
+  - 2.4.2.14
+  - 2.6.1.85
+  - 3.5.1.2
+  - 3.5.1.38
+  - 4.3.1
+  - 4.3.3.6
+  - 6.3.4.2
+  - 6.3.5.2
+  - 6.3.5.4
+  - 6.3.5.5
+  - 6.3.5.7
+  gene_count: 2
+  metabolite_count: 1
+  name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
+  reaction_id: kegg.reaction:R00256
+- ec_numbers:
+  - 6.3.4.16
+  - 6.3.5.5
+  gene_count: 2
+  metabolite_count: 1
+  name: HCO3-:L-glutamine amido-ligase (ADP-forming, carbamate-phosphorylating); 2
+    ATP + L-Glutamine + HCO3- + H2O <=> 2 ADP + Orthophosphate + L-Glutamate + Carbamoyl
+    phosphate
+  reaction_id: kegg.reaction:R00575
+- ec_numbers:
+  - 4.1.3.27
+  gene_count: 2
+  metabolite_count: 1
+  name: chorismate pyruvate-lyase (amino-accepting); Chorismate + L-Glutamine <=>
+    Anthranilate + Pyruvate + L-Glutamate
+  reaction_id: kegg.reaction:R00986
+- ec_numbers:
+  - 6.3.5.2
+  gene_count: 2
+  metabolite_count: 1
+  name: xanthosine-5^-phosphate:L-glutamine amido-ligase (AMP-forming); ATP + Xanthosine
+    5^-phosphate + L-Glutamine + H2O <=> AMP + Diphosphate + GMP + L-Glutamate
+  reaction_id: kegg.reaction:R01231
+- ec_numbers:
+  - 2.6.1.85
+  - 6.3.5.8
+  gene_count: 2
+  metabolite_count: 1
+  name: chorismate:L-glutamine aminotransferase; Chorismate + L-Glutamine <=> 4-Amino-4-deoxychorismate
+    + L-Glutamate
+  reaction_id: kegg.reaction:R01716
+- ec_numbers:
+  - 2.4.2
+  - 2.4.2.-
+  - 4.1.3.-
+  - 4.3.1
+  - 4.3.2.10
+  - 4.3.2.M2
+  gene_count: 2
+  metabolite_count: 1
+  name: 5-[(5-phospho-1-deoxy-D-ribulos-1-ylamino)methylideneamino]-1-(5-phospho-beta-D-ribosyl)imidazole-4-carboxamide
+    D-erythro-1-(imidazol-4-yl)glycerol 3-phosphate-lyase (L-glutamine-hydrolysing;
+    5-amino-1-(5-phospho-beta-D-ribosyl)imidazole-4-carboxamide-forming); N-(5^-Phospho-D-1^-ribulosylformimino)-5-amino-1-(5^^-phospho-D-ribosyl)-4-imidazolecarboxamide
+    + L-Glutamine <=> D-erythro-1-(Imidazol-4-yl)glycerol 3-phosphate + 1-(5^-Phosphoribosyl)-5-amino-4-imidazolecarboxamide
+    + L-Glutamate
+  reaction_id: kegg.reaction:R04558
+- ec_numbers:
+  - 6.3.5.2
+  gene_count: 2
+  metabolite_count: 1
+  name: 6-thioxanthine 5^-monophosphate:L-glutamine amido-ligase (AMP-forming); 6-Thioxanthine
+    5^-monophosphate + ATP + L-Glutamine + H2O <=> 6-Thioguanosine monophosphate +
+    AMP + Diphosphate + L-Glutamate
+  reaction_id: kegg.reaction:R08244
+top_tcdb_families:
+- gene_count: 9
+  level_kind: tc_family
+  metabolite_count: 2
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_confidence: family_inferred
+- gene_count: 3
+  level_kind: tc_specificity
+  metabolite_count: 1
+  tcdb_family_id: tcdb:3.A.1.16.1
+  tcdb_family_name: 3.A.1.16.1
+  transport_confidence: substrate_confirmed
+- gene_count: 2
+  level_kind: tc_specificity
+  metabolite_count: 1
+  tcdb_family_id: tcdb:3.A.1.16.2
+  tcdb_family_name: 3.A.1.16.2
+  transport_confidence: substrate_confirmed
+- gene_count: 1
+  level_kind: tc_subfamily
+  metabolite_count: 1
+  tcdb_family_id: tcdb:2.A.66.4
+  tcdb_family_name: 2.A.66.4
+  transport_confidence: family_inferred
+total_matching: 56
+transporter_count_total: 4
+truncated: true
+warnings:
+- Majority of transport rows are family_inferred (rolled-up from broad TCDB families).
+  Re-run with transport_confidence='substrate_confirmed' for substrate-curated transporter
+  genes only.

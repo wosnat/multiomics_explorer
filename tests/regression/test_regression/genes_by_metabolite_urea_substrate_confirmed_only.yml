@@ -1,0 +1,212 @@
+by_evidence_source:
+- count: 10
+  evidence_source: transport
+by_metabolite:
+- formula: CH4N2O
+  gene_count: 5
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00086
+  name: Urea
+  reaction_count: 0
+  rows: 10
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 10
+  transporter_count: 2
+by_transport_confidence:
+- count: 10
+  transport_confidence: substrate_confirmed
+case_id: genes_by_metabolite_urea_substrate_confirmed_only
+gene_count_total: 5
+metabolite_count_total: 1
+not_found:
+  metabolite_ids: []
+  metabolite_pathway_ids: []
+  organism: null
+not_matched: []
+offset: 0
+reaction_count_total: 0
+results:
+- evidence_source: transport
+  gene_name: urtA
+  locus_tag: PMM0970
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, substrate binding component
+  tcdb_family_id: tcdb:3.A.1.4.4
+  tcdb_family_name: 3.A.1.4.4
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtA
+  locus_tag: PMM0970
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, substrate binding component
+  tcdb_family_id: tcdb:3.A.1.4.5
+  tcdb_family_name: 3.A.1.4.5
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtB
+  locus_tag: PMM0971
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, permease component
+  tcdb_family_id: tcdb:3.A.1.4.4
+  tcdb_family_name: 3.A.1.4.4
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtB
+  locus_tag: PMM0971
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, permease component
+  tcdb_family_id: tcdb:3.A.1.4.5
+  tcdb_family_name: 3.A.1.4.5
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtC
+  locus_tag: PMM0972
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, membrane component
+  tcdb_family_id: tcdb:3.A.1.4.4
+  tcdb_family_name: 3.A.1.4.4
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtC
+  locus_tag: PMM0972
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, membrane component
+  tcdb_family_id: tcdb:3.A.1.4.5
+  tcdb_family_name: 3.A.1.4.5
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtD
+  locus_tag: PMM0973
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, ATP-binding component UrtD
+  tcdb_family_id: tcdb:3.A.1.4.4
+  tcdb_family_name: 3.A.1.4.4
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtD
+  locus_tag: PMM0973
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, ATP-binding component UrtD
+  tcdb_family_id: tcdb:3.A.1.4.5
+  tcdb_family_name: 3.A.1.4.5
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtE
+  locus_tag: PMM0974
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, ATPase component UrtE
+  tcdb_family_id: tcdb:3.A.1.4.4
+  tcdb_family_name: 3.A.1.4.4
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: urtE
+  locus_tag: PMM0974
+  metabolite_chebi_id: '134711'
+  metabolite_formula: CH4N2O
+  metabolite_id: kegg.compound:C00086
+  metabolite_mass: 60.056
+  metabolite_name: Urea
+  product: ABC-type urea transporter, ATPase component UrtE
+  tcdb_family_id: tcdb:3.A.1.4.5
+  tcdb_family_name: 3.A.1.4.5
+  transport_confidence: substrate_confirmed
+returned: 10
+row_count: 10
+top_gene_categories:
+- category: Stress response and adaptation
+  gene_count: 5
+top_genes:
+- gene_name: urtA
+  locus_tag: PMM0970
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+- gene_name: urtB
+  locus_tag: PMM0971
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+- gene_name: urtC
+  locus_tag: PMM0972
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+- gene_name: urtD
+  locus_tag: PMM0973
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+- gene_name: urtE
+  locus_tag: PMM0974
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+top_reactions: []
+top_tcdb_families:
+- gene_count: 5
+  level_kind: tc_specificity
+  metabolite_count: 1
+  tcdb_family_id: tcdb:3.A.1.4.4
+  tcdb_family_name: 3.A.1.4.4
+  transport_confidence: substrate_confirmed
+- gene_count: 5
+  level_kind: tc_specificity
+  metabolite_count: 1
+  tcdb_family_id: tcdb:3.A.1.4.5
+  tcdb_family_name: 3.A.1.4.5
+  transport_confidence: substrate_confirmed
+total_matching: 10
+transporter_count_total: 2
+truncated: false
+warnings: []

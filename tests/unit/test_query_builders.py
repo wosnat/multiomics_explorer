@@ -6433,3 +6433,405 @@ class TestBuildListMetabolitesSummary:
         assert "apoc.coll.max(scores)" in cypher
         assert "apoc.coll.sort(scores)" in cypher
         assert params["search"] == "glucose"
+
+
+# ---------------------------------------------------------------------------
+# genes_by_metabolite — Phase 1 (Stage 1 RED)
+# ---------------------------------------------------------------------------
+
+
+class TestBuildGenesByMetaboliteMetabolism:
+    """Detail-builder tests for the metabolism arm of genes_by_metabolite.
+
+    Imports happen inside each test so pre-impl test collection still passes.
+    """
+
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_metabolism,
+        )
+        kwargs.setdefault("metabolite_ids", self._METS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_genes_by_metabolite_metabolism(**kwargs)
+
+    def test_match_path_metabolism_arm(self):
+        """Metabolism arm: Gene → Reaction → Metabolite."""
+        cypher, _ = self._build()
+        assert (
+            "(g:Gene)-[:Gene_catalyzes_reaction]->"
+            "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)"
+            in cypher
+        )
+
+    def test_metabolite_ids_in_where(self):
+        cypher, params = self._build()
+        assert "m.id IN $metabolite_ids" in cypher
+        assert params["metabolite_ids"] == self._METS
+
+    def test_organism_fuzzy_word_match_in_where(self):
+        """Mirrors the differential_expression_by_gene fuzzy organism match."""
+        cypher, params = self._build()
+        assert "split(toLower($organism), ' ')" in cypher
+        assert "toLower(g.organism_name) CONTAINS word" in cypher
+        # Wrapped in ALL(...) so all input words must be present
+        assert "ALL(word IN split" in cypher
+        assert params["organism"] == self._ORG
+
+    def test_ec_numbers_filter(self):
+        cypher, params = self._build(ec_numbers=["6.3.1.2"])
+        assert (
+            "ANY(ec IN $ec_numbers WHERE ec IN coalesce(r.ec_numbers, []))"
+            in cypher
+        )
+        assert params["ec_numbers"] == ["6.3.1.2"]
+
+    def test_mass_balance_filter(self):
+        cypher, params = self._build(mass_balance="balanced")
+        assert "r.mass_balance = $mass_balance" in cypher
+        assert params["mass_balance"] == "balanced"
+
+    def test_metabolite_pathway_ids_filter(self):
+        cypher, params = self._build(
+            metabolite_pathway_ids=["kegg.pathway:ko00910"],
+        )
+        assert (
+            "ANY(p IN $metabolite_pathway_ids "
+            "WHERE p IN coalesce(m.pathway_ids, []))"
+            in cypher
+        )
+        assert params["metabolite_pathway_ids"] == ["kegg.pathway:ko00910"]
+
+    def test_gene_categories_filter(self):
+        cypher, params = self._build(gene_categories=["Transport"])
+        assert "g.gene_category IN $gene_categories" in cypher
+        assert params["gene_categories"] == ["Transport"]
+
+    def test_compact_return_columns(self):
+        """Compact RETURN list per spec — 13 entries plus the two
+        per-arm-null padding columns (transport_confidence, tcdb_*)."""
+        cypher, _ = self._build()
+        for col in [
+            "g.locus_tag AS locus_tag",
+            "g.gene_name AS gene_name",
+            "g.product AS product",
+            "'metabolism' AS evidence_source",
+            "null AS transport_confidence",
+            "r.id AS reaction_id",
+            "r.name AS reaction_name",
+            "coalesce(r.ec_numbers, []) AS ec_numbers",
+            "r.mass_balance AS mass_balance",
+            "null AS tcdb_family_id",
+            "null AS tcdb_family_name",
+            "m.id AS metabolite_id",
+            "m.name AS metabolite_name",
+            "m.formula AS metabolite_formula",
+            "m.mass AS metabolite_mass",
+            "m.chebi_id AS metabolite_chebi_id",
+        ]:
+            assert col in cypher, f"missing compact column: {col}"
+        # verbose-only columns absent in compact mode
+        assert "metabolite_inchikey" not in cypher
+        assert "reaction_mnxr_id" not in cypher
+        assert "tcdb_level_kind" not in cypher
+
+    def test_verbose_return_columns(self):
+        cypher, _ = self._build(verbose=True)
+        for col in [
+            "g.gene_category AS gene_category",
+            "m.inchikey AS metabolite_inchikey",
+            "m.smiles AS metabolite_smiles",
+            "m.mnxm_id AS metabolite_mnxm_id",
+            "m.hmdb_id AS metabolite_hmdb_id",
+            "r.mnxr_id AS reaction_mnxr_id",
+            "r.rhea_ids AS reaction_rhea_ids",
+            "null AS tcdb_level_kind",
+            "null AS tc_class_id",
+        ]:
+            assert col in cypher, f"missing verbose column: {col}"
+
+    def test_order_by(self):
+        """Per spec: ORDER BY metabolite_id, reaction_id, locus_tag."""
+        cypher, _ = self._build()
+        assert "ORDER BY metabolite_id, reaction_id, locus_tag" in cypher
+
+    def test_limit_and_offset_clauses(self):
+        cypher, params = self._build(limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+        assert params["offset"] == 5
+
+    def test_no_transport_confidence_param(self):
+        """Metabolism arm must not accept transport_confidence — that is
+        a transport-arm-only filter per the per-arm filter scope rule."""
+        with pytest.raises(TypeError):
+            self._build(transport_confidence="substrate_confirmed")
+
+
+class TestBuildGenesByMetaboliteTransport:
+    """Detail-builder tests for the transport arm of genes_by_metabolite."""
+
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_transport,
+        )
+        kwargs.setdefault("metabolite_ids", self._METS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_genes_by_metabolite_transport(**kwargs)
+
+    def test_match_path_transport_arm(self):
+        """Transport arm: Gene → TcdbFamily → Metabolite (single-hop, post-rollup)."""
+        cypher, _ = self._build()
+        assert (
+            "(g:Gene)-[:Gene_has_tcdb_family]->"
+            "(tf:TcdbFamily)-[:Tcdb_family_transports_metabolite]->(m:Metabolite)"
+            in cypher
+        )
+
+    def test_metabolite_ids_in_where(self):
+        cypher, params = self._build()
+        assert "m.id IN $metabolite_ids" in cypher
+        assert params["metabolite_ids"] == self._METS
+
+    def test_organism_fuzzy_word_match_in_where(self):
+        cypher, params = self._build()
+        assert "split(toLower($organism), ' ')" in cypher
+        assert "toLower(g.organism_name) CONTAINS word" in cypher
+        assert params["organism"] == self._ORG
+
+    def test_metabolite_pathway_ids_filter(self):
+        cypher, params = self._build(
+            metabolite_pathway_ids=["kegg.pathway:ko00910"],
+        )
+        assert (
+            "ANY(p IN $metabolite_pathway_ids "
+            "WHERE p IN coalesce(m.pathway_ids, []))"
+            in cypher
+        )
+        assert params["metabolite_pathway_ids"] == ["kegg.pathway:ko00910"]
+
+    def test_gene_categories_filter(self):
+        cypher, params = self._build(gene_categories=["Transport"])
+        assert "g.gene_category IN $gene_categories" in cypher
+        assert params["gene_categories"] == ["Transport"]
+
+    def test_transport_confidence_substrate_confirmed(self):
+        """substrate_confirmed → tf.level_kind = 'tc_specificity'."""
+        cypher, _ = self._build(transport_confidence="substrate_confirmed")
+        assert "tf.level_kind = 'tc_specificity'" in cypher
+
+    def test_transport_confidence_family_inferred(self):
+        """family_inferred → tf.level_kind <> 'tc_specificity'."""
+        cypher, _ = self._build(transport_confidence="family_inferred")
+        assert "tf.level_kind <> 'tc_specificity'" in cypher
+
+    def test_no_transport_confidence_filter_when_none(self):
+        """Default (no transport_confidence) → no level_kind WHERE clause.
+
+        The substring `tf.level_kind = 'tc_specificity'` legitimately appears
+        twice in the unconditional cypher (RETURN CASE + ORDER BY CASE per
+        spec), so substring-absence is too coarse. We pin: WHERE block has
+        no level_kind predicate; the substring count stays at 2 in default
+        mode (vs. 3 when `transport_confidence='substrate_confirmed'` adds a
+        WHERE clause).
+        """
+        cypher, _ = self._build()
+        where_block = cypher.split("RETURN")[0]
+        assert "tf.level_kind" not in where_block
+        assert cypher.count("tf.level_kind = 'tc_specificity'") == 2
+        assert "tf.level_kind <> 'tc_specificity'" not in cypher
+
+    def test_no_metabolism_filters(self):
+        """Transport arm must not accept metabolism-arm-only filters."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_transport,
+        )
+        with pytest.raises(TypeError):
+            build_genes_by_metabolite_transport(
+                metabolite_ids=self._METS,
+                organism=self._ORG,
+                ec_numbers=["6.3.1.2"],
+            )
+        with pytest.raises(TypeError):
+            build_genes_by_metabolite_transport(
+                metabolite_ids=self._METS,
+                organism=self._ORG,
+                mass_balance="balanced",
+            )
+
+    def test_compact_return_columns(self):
+        cypher, _ = self._build()
+        for col in [
+            "g.locus_tag AS locus_tag",
+            "g.gene_name AS gene_name",
+            "g.product AS product",
+            "'transport' AS evidence_source",
+            "tf.id AS tcdb_family_id",
+            "tf.name AS tcdb_family_name",
+            "null AS reaction_id",
+            "null AS reaction_name",
+            "null AS ec_numbers",
+            "null AS mass_balance",
+            "m.id AS metabolite_id",
+            "m.name AS metabolite_name",
+            "m.formula AS metabolite_formula",
+            "m.mass AS metabolite_mass",
+            "m.chebi_id AS metabolite_chebi_id",
+        ]:
+            assert col in cypher, f"missing compact column: {col}"
+        # verbose-only absent
+        assert "metabolite_inchikey" not in cypher
+        assert "tcdb_level_kind" not in cypher
+
+    def test_verbose_return_columns(self):
+        cypher, _ = self._build(verbose=True)
+        for col in [
+            "g.gene_category AS gene_category",
+            "m.inchikey AS metabolite_inchikey",
+            "m.smiles AS metabolite_smiles",
+            "m.mnxm_id AS metabolite_mnxm_id",
+            "m.hmdb_id AS metabolite_hmdb_id",
+            "tf.level_kind AS tcdb_level_kind",
+            "tf.tc_class_id AS tc_class_id",
+            "null AS reaction_mnxr_id",
+            "null AS reaction_rhea_ids",
+        ]:
+            assert col in cypher, f"missing verbose column: {col}"
+
+    def test_transport_confidence_case_expression_in_return(self):
+        """`transport_confidence` is a derived column from level_kind."""
+        cypher, _ = self._build()
+        # Per spec:
+        #   CASE WHEN tf.level_kind = 'tc_specificity'
+        #        THEN 'substrate_confirmed' ELSE 'family_inferred' END AS transport_confidence
+        assert "tf.level_kind = 'tc_specificity'" in cypher
+        assert "'substrate_confirmed'" in cypher
+        assert "'family_inferred'" in cypher
+        assert "AS transport_confidence" in cypher
+
+    def test_order_by_substrate_confirmed_first(self):
+        """Per spec: ORDER BY metabolite_id, CASE…tc_specificity = 0 else 1,
+        tcdb_family_id, locus_tag — ensures substrate_confirmed transports
+        sort ahead of family_inferred within each metabolite group."""
+        cypher, _ = self._build()
+        assert "ORDER BY metabolite_id" in cypher
+        # The CASE-on-tc_specificity inside ORDER BY block
+        assert "CASE WHEN tf.level_kind = 'tc_specificity' THEN 0 ELSE 1 END" in cypher
+        assert "tcdb_family_id" in cypher
+        assert "locus_tag" in cypher
+
+    def test_limit_and_offset_clauses(self):
+        cypher, params = self._build(limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+        assert params["offset"] == 5
+
+
+class TestBuildGenesByMetaboliteSummary:
+    """Single-pass envelope-builder tests for genes_by_metabolite."""
+
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_summary,
+        )
+        kwargs.setdefault("metabolite_ids", self._METS)
+        kwargs.setdefault("organism", self._ORG)
+        return build_genes_by_metabolite_summary(**kwargs)
+
+    def test_unioned_match_paths_present(self):
+        """Both arms appear inside a CALL{...UNION...} subquery —
+        the only place a UNION is allowed (detail uses two arms api-side)."""
+        cypher, _ = self._build()
+        # Both MATCH paths
+        assert (
+            "(g:Gene)-[:Gene_catalyzes_reaction]->"
+            "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)"
+            in cypher
+        )
+        assert (
+            "(g:Gene)-[:Gene_has_tcdb_family]->"
+            "(tf:TcdbFamily)-[:Tcdb_family_transports_metabolite]->(m:Metabolite)"
+            in cypher
+        )
+        assert "UNION" in cypher
+
+    def test_returns_envelope_keys(self):
+        """Per spec § build_genes_by_metabolite_summary."""
+        cypher, _ = self._build()
+        for key in [
+            "total_matching",
+            "gene_count_total",
+            "reaction_count_total",
+            "transporter_count_total",
+            "metabolite_count_total",
+            "rows_by_evidence_source",
+            "rows_by_transport_confidence",
+            "by_metabolite",
+            "top_reactions",
+            "top_tcdb_families",
+            "top_gene_categories",
+            "top_genes",
+        ]:
+            assert key in cypher, f"missing envelope key: {key}"
+
+    def test_metabolite_ids_in_params(self):
+        cypher, params = self._build()
+        assert "m.id IN $metabolite_ids" in cypher
+        assert params["metabolite_ids"] == self._METS
+
+    def test_organism_fuzzy_match_in_params(self):
+        cypher, params = self._build()
+        assert "split(toLower($organism), ' ')" in cypher
+        assert params["organism"] == self._ORG
+
+    def test_metabolism_only_filters_propagate_to_metabolism_arm(self):
+        """ec_numbers / mass_balance reach the WHERE block — and only the
+        metabolism side of the UNION carries them (transport arm runs unfiltered)."""
+        cypher, params = self._build(
+            ec_numbers=["6.3.1.2"], mass_balance="balanced",
+        )
+        assert "$ec_numbers" in cypher
+        assert "$mass_balance" in cypher
+        assert params["ec_numbers"] == ["6.3.1.2"]
+        assert params["mass_balance"] == "balanced"
+
+    def test_transport_only_filter_propagates_to_transport_arm(self):
+        """transport_confidence reaches the WHERE block (transport-arm only)."""
+        cypher, _ = self._build(transport_confidence="substrate_confirmed")
+        assert "tf.level_kind = 'tc_specificity'" in cypher
+
+    def test_uniform_filters_propagate_to_both_arms(self):
+        """metabolite_pathway_ids and gene_categories narrow both arms."""
+        cypher, params = self._build(
+            metabolite_pathway_ids=["kegg.pathway:ko00910"],
+            gene_categories=["Transport"],
+        )
+        assert "$metabolite_pathway_ids" in cypher
+        assert "$gene_categories" in cypher
+        assert params["metabolite_pathway_ids"] == ["kegg.pathway:ko00910"]
+        assert params["gene_categories"] == ["Transport"]
+
+    def test_arms_filter_skips_metabolism_arm(self):
+        """arms=('transport',) suppresses the metabolism arm of the UNION."""
+        cypher, _ = self._build(arms=("transport",))
+        # Transport arm present
+        assert "Gene_has_tcdb_family" in cypher
+        # Metabolism arm path absent
+        assert "Gene_catalyzes_reaction" not in cypher
+
+    def test_arms_filter_skips_transport_arm(self):
+        """arms=('metabolism',) suppresses the transport arm of the UNION."""
+        cypher, _ = self._build(arms=("metabolism",))
+        assert "Gene_catalyzes_reaction" in cypher
+        assert "Gene_has_tcdb_family" not in cypher
+

@@ -69,6 +69,7 @@ EXPECTED_TOOLS = [
     "pathway_enrichment",
     "cluster_enrichment",
     "list_metabolites",
+    "genes_by_metabolite",
 ]
 
 
@@ -4992,3 +4993,454 @@ class TestListMetabolitesWrapper:
         ):
             with pytest.raises(ToolError, match="search must not be empty"):
                 await tool_fns["list_metabolites"](mock_ctx, search="")
+
+
+# ---------------------------------------------------------------------------
+# genes_by_metabolite — Phase 1 (Stage 1 RED)
+# ---------------------------------------------------------------------------
+
+
+_GBM_METAB_ROW = {
+    "locus_tag": "PMM0944",
+    "gene_name": "ureC",
+    "product": "urease",
+    "evidence_source": "metabolism",
+    # Sparse-stripped at api/ — surface as None by Pydantic default
+    "reaction_id": "kegg.reaction:R00131",
+    "reaction_name": "Urea + 2H2O => CO2 + 2NH3",
+    "ec_numbers": ["3.5.1.5"],
+    "mass_balance": "balanced",
+    "metabolite_id": "kegg.compound:C00086",
+    "metabolite_name": "Urea",
+    "metabolite_formula": "CH4N2O",
+    "metabolite_mass": 60.032,
+    "metabolite_chebi_id": "16199",
+}
+
+_GBM_TRANS_ROW = {
+    "locus_tag": "PMM0974",
+    "gene_name": "urtE",
+    "product": "ABC-type urea transporter",
+    "evidence_source": "transport",
+    "transport_confidence": "substrate_confirmed",
+    "tcdb_family_id": "tcdb:3.A.1.4.5",
+    "tcdb_family_name": "tcdb:3.A.1.4.5",
+    "metabolite_id": "kegg.compound:C00086",
+    "metabolite_name": "Urea",
+    "metabolite_formula": "CH4N2O",
+    "metabolite_mass": 60.032,
+    "metabolite_chebi_id": "16199",
+}
+
+_GBM_SAMPLE_API_RETURN = {
+    "total_matching": 23,
+    "returned": 2,
+    "offset": 0,
+    "truncated": True,
+    "warnings": [],
+    "not_found": {
+        "metabolite_ids": [],
+        "organism": None,
+        "metabolite_pathway_ids": [],
+    },
+    "not_matched": [],
+    "by_metabolite": [
+        {
+            "metabolite_id": "kegg.compound:C00086",
+            "name": "Urea",
+            "formula": "CH4N2O",
+            "rows": 23,
+            "gene_count": 18,
+            "reaction_count": 4,
+            "transporter_count": 14,
+            "metabolism_rows": 4,
+            "transport_substrate_confirmed_rows": 10,
+            "transport_family_inferred_rows": 9,
+        },
+    ],
+    "by_evidence_source": [
+        {"evidence_source": "metabolism", "count": 4},
+        {"evidence_source": "transport", "count": 19},
+    ],
+    "by_transport_confidence": [
+        {"transport_confidence": "substrate_confirmed", "count": 10},
+        {"transport_confidence": "family_inferred", "count": 9},
+    ],
+    "top_reactions": [
+        {
+            "reaction_id": "kegg.reaction:R00131",
+            "name": "Urea + 2H2O => CO2 + 2NH3",
+            "ec_numbers": ["3.5.1.5"],
+            "gene_count": 4,
+            "metabolite_count": 1,
+        },
+    ],
+    "top_tcdb_families": [
+        {
+            "tcdb_family_id": "tcdb:3.A.1.4.5",
+            "tcdb_family_name": "tcdb:3.A.1.4.5",
+            "level_kind": "tc_specificity",
+            "transport_confidence": "substrate_confirmed",
+            "gene_count": 5,
+            "metabolite_count": 1,
+        },
+    ],
+    "top_gene_categories": [
+        {"category": "Transport", "gene_count": 14},
+    ],
+    "top_genes": [
+        {
+            "locus_tag": "PMM0974",
+            "gene_name": "urtE",
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolite_count": 1,
+            "metabolism_rows": 0,
+            "transport_substrate_confirmed_rows": 2,
+            "transport_family_inferred_rows": 0,
+        },
+    ],
+    "gene_count_total": 18,
+    "reaction_count_total": 4,
+    "transporter_count_total": 14,
+    "metabolite_count_total": 1,
+    "results": [_GBM_METAB_ROW, _GBM_TRANS_ROW],
+}
+
+
+class TestGenesByMetaboliteWrapper:
+    """MCP-wrapper tests for genes_by_metabolite."""
+
+    _SAMPLE_API_RETURN = _GBM_SAMPLE_API_RETURN
+
+    @pytest.mark.asyncio
+    async def test_returns_response_type(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        assert result.total_matching == 23
+        assert result.returned == 2
+        assert result.truncated is True
+        assert len(result.results) == 2
+
+    @pytest.mark.asyncio
+    async def test_compact_metabolism_row_fields(self, tool_fns, mock_ctx):
+        """Metabolism row populates reaction_*, ec_numbers, mass_balance;
+        per-arm-specific transport fields are None (sparse-strip behavior)."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        metab = next(
+            r for r in result.results if r.evidence_source == "metabolism"
+        )
+        assert metab.locus_tag == "PMM0944"
+        assert metab.gene_name == "ureC"
+        assert metab.reaction_id == "kegg.reaction:R00131"
+        assert metab.ec_numbers == ["3.5.1.5"]
+        assert metab.mass_balance == "balanced"
+        assert metab.metabolite_id == "kegg.compound:C00086"
+        # Sparse: per-arm-specific fields on the OTHER arm are None
+        assert metab.tcdb_family_id is None
+        assert metab.tcdb_family_name is None
+        assert metab.transport_confidence is None
+
+    @pytest.mark.asyncio
+    async def test_compact_transport_row_fields(self, tool_fns, mock_ctx):
+        """Transport row populates tcdb_*, transport_confidence; metabolism
+        per-arm-specific fields are None."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        trans = next(
+            r for r in result.results if r.evidence_source == "transport"
+        )
+        assert trans.locus_tag == "PMM0974"
+        assert trans.tcdb_family_id == "tcdb:3.A.1.4.5"
+        assert trans.transport_confidence == "substrate_confirmed"
+        # Sparse: metabolism-specific fields are None on transport rows
+        assert trans.reaction_id is None
+        assert trans.reaction_name is None
+        assert trans.ec_numbers is None
+        assert trans.mass_balance is None
+
+    @pytest.mark.asyncio
+    async def test_verbose_fields_optional(self, tool_fns, mock_ctx):
+        """Verbose-only fields default to None / surface when populated."""
+        verbose_metab = {
+            **_GBM_METAB_ROW,
+            "gene_category": "Amino acid metabolism",
+            "metabolite_inchikey": "XSQUKJJJFZCRTK-UHFFFAOYSA-N",
+            "metabolite_smiles": "NC(N)=O",
+            "metabolite_mnxm_id": "MNXM731",
+            "metabolite_hmdb_id": "HMDB0000294",
+            "reaction_mnxr_id": "MNXR104471",
+            "reaction_rhea_ids": ["20557"],
+        }
+        verbose_trans = {
+            **_GBM_TRANS_ROW,
+            "gene_category": "Transport",
+            "metabolite_inchikey": "XSQUKJJJFZCRTK-UHFFFAOYSA-N",
+            "metabolite_smiles": "NC(N)=O",
+            "metabolite_mnxm_id": "MNXM731",
+            "metabolite_hmdb_id": "HMDB0000294",
+            "tcdb_level_kind": "tc_specificity",
+            "tc_class_id": "tcdb:3",
+        }
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "results": [verbose_metab, verbose_trans],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+                verbose=True,
+            )
+        m = next(
+            r for r in result.results if r.evidence_source == "metabolism"
+        )
+        t = next(
+            r for r in result.results if r.evidence_source == "transport"
+        )
+        assert m.gene_category == "Amino acid metabolism"
+        assert m.metabolite_inchikey == "XSQUKJJJFZCRTK-UHFFFAOYSA-N"
+        assert m.metabolite_mnxm_id == "MNXM731"
+        assert m.reaction_mnxr_id == "MNXR104471"
+        assert m.reaction_rhea_ids == ["20557"]
+        # Sparse: TCDB verbose fields stay None on metabolism row
+        assert m.tcdb_level_kind is None
+        assert m.tc_class_id is None
+
+        assert t.gene_category == "Transport"
+        assert t.tcdb_level_kind == "tc_specificity"
+        assert t.tc_class_id == "tcdb:3"
+        # Sparse: reaction verbose fields stay None on transport row
+        assert t.reaction_mnxr_id is None
+        assert t.reaction_rhea_ids is None
+
+    @pytest.mark.asyncio
+    async def test_not_found_structure(self, tool_fns, mock_ctx):
+        """not_found is a typed dict with metabolite_ids / organism /
+        metabolite_pathway_ids buckets."""
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "not_found": {
+                "metabolite_ids": ["kegg.compound:C99999"],
+                "organism": "Bogus organism",
+                "metabolite_pathway_ids": ["kegg.pathway:bogus"],
+            },
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        assert result.not_found.metabolite_ids == ["kegg.compound:C99999"]
+        assert result.not_found.organism == "Bogus organism"
+        assert (
+            result.not_found.metabolite_pathway_ids == ["kegg.pathway:bogus"]
+        )
+
+    @pytest.mark.asyncio
+    async def test_not_matched_top_level(self, tool_fns, mock_ctx):
+        """not_matched is a top-level list[str] (distinct from not_found)."""
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "not_matched": ["kegg.compound:C00001"],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        assert result.not_matched == ["kegg.compound:C00001"]
+
+    @pytest.mark.asyncio
+    async def test_envelope_breakdowns_present(self, tool_fns, mock_ctx):
+        """All envelope rollups surface on the Pydantic envelope."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        assert len(result.by_metabolite) == 1
+        assert result.by_metabolite[0].metabolite_id == "kegg.compound:C00086"
+        assert result.by_metabolite[0].metabolism_rows == 4
+        assert result.by_metabolite[0].transport_substrate_confirmed_rows == 10
+        assert result.by_metabolite[0].transport_family_inferred_rows == 9
+
+        assert len(result.by_evidence_source) == 2
+        es_set = {e.evidence_source for e in result.by_evidence_source}
+        assert es_set == {"metabolism", "transport"}
+
+        assert len(result.by_transport_confidence) == 2
+        tc_set = {
+            e.transport_confidence for e in result.by_transport_confidence
+        }
+        assert tc_set == {"substrate_confirmed", "family_inferred"}
+
+        assert len(result.top_reactions) == 1
+        assert result.top_reactions[0].reaction_id == "kegg.reaction:R00131"
+
+        assert len(result.top_tcdb_families) == 1
+        assert (
+            result.top_tcdb_families[0].tcdb_family_id == "tcdb:3.A.1.4.5"
+        )
+        assert (
+            result.top_tcdb_families[0].transport_confidence
+            == "substrate_confirmed"
+        )
+
+        assert len(result.top_gene_categories) == 1
+        assert result.top_gene_categories[0].category == "Transport"
+
+        assert len(result.top_genes) == 1
+        assert result.top_genes[0].locus_tag == "PMM0974"
+
+    @pytest.mark.asyncio
+    async def test_total_count_fields(self, tool_fns, mock_ctx):
+        """gene_count_total / reaction_count_total / transporter_count_total /
+        metabolite_count_total surface on the envelope."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        assert result.gene_count_total == 18
+        assert result.reaction_count_total == 4
+        assert result.transporter_count_total == 14
+        assert result.metabolite_count_total == 1
+
+    @pytest.mark.asyncio
+    async def test_warnings_field_default_empty(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        assert result.warnings == []
+
+    @pytest.mark.asyncio
+    async def test_warnings_field_carries_family_inferred_string(
+        self, tool_fns, mock_ctx,
+    ):
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "warnings": [
+                "Majority of transport rows are family_inferred (rolled-up "
+                "from broad TCDB families). Re-run with "
+                "transport_confidence='substrate_confirmed' for substrate-"
+                "curated transporter genes only."
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00088"],
+                organism="Prochlorococcus MED4",
+            )
+        assert any("family_inferred" in w for w in result.warnings)
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """All filter params flow from MCP wrapper into api.genes_by_metabolite."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+                ec_numbers=["6.3.1.2"],
+                metabolite_pathway_ids=["kegg.pathway:ko00910"],
+                mass_balance="balanced",
+                gene_categories=["Transport"],
+                transport_confidence="substrate_confirmed",
+                evidence_sources=["transport"],
+                summary=False,
+                verbose=True,
+                limit=10,
+                offset=5,
+            )
+        mock_api.assert_called_once()
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["metabolite_ids"] == ["kegg.compound:C00086"]
+        assert kwargs["organism"] == "Prochlorococcus MED4"
+        assert kwargs["ec_numbers"] == ["6.3.1.2"]
+        assert (
+            kwargs["metabolite_pathway_ids"] == ["kegg.pathway:ko00910"]
+        )
+        assert kwargs["mass_balance"] == "balanced"
+        assert kwargs["gene_categories"] == ["Transport"]
+        assert kwargs["transport_confidence"] == "substrate_confirmed"
+        assert kwargs["evidence_sources"] == ["transport"]
+        assert kwargs["verbose"] is True
+        assert kwargs["limit"] == 10
+        assert kwargs["offset"] == 5
+
+    @pytest.mark.asyncio
+    async def test_validation_error_raises_tool_error(
+        self, tool_fns, mock_ctx,
+    ):
+        """ValueError from api.genes_by_metabolite becomes a ToolError."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            side_effect=ValueError(
+                "evidence_sources contains invalid value(s)"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["genes_by_metabolite"](
+                    mock_ctx,
+                    metabolite_ids=["kegg.compound:C00086"],
+                    organism="Prochlorococcus MED4",
+                    evidence_sources=["bogus"],
+                )
+
+    def test_in_expected_tools(self):
+        assert "genes_by_metabolite" in EXPECTED_TOOLS

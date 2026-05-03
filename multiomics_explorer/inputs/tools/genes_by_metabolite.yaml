@@ -1,0 +1,129 @@
+# Human-authored content for genes_by_metabolite about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: Discovery → drill-down — urea catalysts and transporters in MED4
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochlorococcus MED4")
+    # response shape: 23 rows total
+    # — 4 metabolism rows (urease subunits)
+    # — 10 transport rows at substrate_confirmed (urtA-urtE × 2 specificity-leaf annotations)
+    # — 9 transport rows at family_inferred (broad ABC superfamily rollup)
+    # warnings = []  (substrate_confirmed=10 > family_inferred=9, so the auto-warning does NOT fire)
+
+  - title: Cross-feeding pair (Workflow B) — call once per organism, intersect locus_tags client-side
+    steps: |
+      Step 1: genes_by_metabolite(metabolite_ids=["kegg.compound:C00064"],
+                                  organism="Prochlorococcus MED4")
+              → MED4 genes touching glutamine (catalysts + transporters)
+
+      Step 2: genes_by_metabolite(metabolite_ids=["kegg.compound:C00064"],
+                                  organism="Alteromonas macleodii MIT1002")
+              → MIT1002 genes touching glutamine
+
+      Step 3: intersect / diff the two locus_tag sets client-side. Pair with
+              differential_expression_by_gene(experiment filter='coculture',
+              locus_tags=...) per organism to test whether one side's
+              catalysts go up while the other's transporters do too.
+
+  - title: High-precision transporter hunt — substrate_confirmed only
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochlorococcus MED4", transport_confidence="substrate_confirmed", evidence_sources=["transport"])
+    # response shape: 10 rows (5 distinct genes urtA-urtE × 2 tc_specificity-leaf annotations).
+    # No metabolism rows (evidence_sources excludes them) and no family_inferred noise
+    # (transport_confidence drops the rolled-up ABC superfamily annotations).
+
+  - title: Pathway-anchored — N-metabolism only
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00086", "kegg.compound:C00064", "kegg.compound:C00088"], organism="Prochlorococcus MED4", metabolite_pathway_ids=["kegg.pathway:ko00910"])
+    # metabolite_pathway_ids narrows BOTH arms uniformly via Metabolite.pathway_ids
+    # (KG-A5 denorm). Result: only rows whose metabolite is annotated to
+    # KEGG nitrogen-metabolism pathway survive — useful when batch-querying
+    # mixed metabolites and you want only the N-pathway slice.
+
+  - title: EC-anchored metabolism narrowing (transport rows still returned)
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00064"], organism="Prochlorococcus MED4", ec_numbers=["6.3.1.2"])
+    # ec_numbers narrows the metabolism arm WHERE only — transport rows are
+    # returned UNCHANGED (per-arm filter scope, not soft-exclude). Result:
+    # 1 metabolism row (glnA × glutamine, R00253) plus 10 family_inferred
+    # transport rows (broad ABC family rollup). Auto-warning fires (10 fi > 0 sc).
+    # To restrict to metabolism alone, add evidence_sources=["metabolism"].
+
+verbose_fields:
+  - gene_category
+  - metabolite_inchikey
+  - metabolite_smiles
+  - metabolite_mnxm_id
+  - metabolite_hmdb_id
+  - reaction_mnxr_id
+  - reaction_rhea_ids
+  - tcdb_level_kind
+  - tc_class_id
+
+chaining:
+  # upstream
+  - "list_metabolites(...) → genes_by_metabolite(metabolite_ids=[chosen_ids], organism=...)"
+  - "differential_expression_by_gene(...) → top hits → metabolites_by_gene(locus_tags=...) (Tool 3, planned) → genes_by_metabolite for the symmetric metabolite-anchored view"
+  - "Workflow A (N-source): list_metabolites(elements=['N']) → genes_by_metabolite(metabolite_ids=[N-bearing IDs], organism=...) for catalysts + transporters"
+  - "Workflow B (cross-feeding): genes_by_metabolite called once per organism on the same metabolite_ids; intersect/diff locus_tag result sets client-side"
+  # downstream from rows
+  - "genes_by_metabolite → top_genes → differential_expression_by_gene(locus_tags=top_genes_locus_tags, organism=...) for transcriptional response"
+  - "genes_by_metabolite → top_genes → gene_overview(locus_tags=...) for richer per-gene routing context"
+  # downstream from envelope
+  - "genes_by_metabolite → top_tcdb_families → genes_by_ontology(ontology='tcdb', term_ids=[top_tcdb_families[i].tcdb_family_id], organism=...) for sibling genes in the same family"
+  - "genes_by_metabolite → top_reactions → genes_by_ontology(ontology='ec', term_ids=[ec_number], organism=...) for genes in adjacent reactions"
+  - "genes_by_metabolite → top_reactions / top_genes → pathway_enrichment for KEGG-pathway context"
+
+mistakes:
+  - >-
+    "I want all transporter genes for substrate X." Default fires both arms
+    AND keeps family_inferred transport rows (rolled up from broad TCDB
+    families like ABC superfamily — they appear to "transport" every
+    substrate of every member system). For the precise, substrate-curated
+    set, set BOTH `transport_confidence='substrate_confirmed'` (drops
+    family_inferred rows) AND `evidence_sources=['transport']` (drops
+    metabolism rows). The auto-warning fires when family_inferred dominates
+    transport rows — heed it before reasoning over the result.
+  - >-
+    Filtering by `ec_numbers` does NOT restrict to metabolism only.
+    Per-arm filter scope: `ec_numbers` and `mass_balance` narrow the
+    metabolism arm WHERE; transport rows are returned UNCHANGED (no
+    soft-exclude). Symmetrically, `transport_confidence` narrows transport
+    only and metabolism rows are unaffected. To restrict to one arm, set
+    `evidence_sources=['metabolism']` (or `['transport']`) explicitly.
+    `metabolite_pathway_ids` and `gene_categories` are the only filters
+    that narrow both arms uniformly.
+  - >-
+    Single-organism enforced (mirrors `differential_expression_by_gene`).
+    There is no `organisms` list. For cross-organism / cross-feeding work,
+    call once per organism with the same metabolite_ids and combine
+    locus_tag result sets client-side (Workflow B).
+  - >-
+    `'metabolomics'` is NOT accepted in `evidence_sources` here — the
+    Pydantic Literal allows only `('metabolism', 'transport')`. The
+    metabolomics path (DerivedMetric → Metabolite) has no Gene anchor and
+    surfaces only in `list_metabolites` (where `'metabolomics'` is a valid
+    forward-compat filter value). Same `_VALID_EVIDENCE_SOURCES`
+    validator pattern, intentionally divergent value set per the tool's
+    biology.
+  - >-
+    TCDB-class filtering does NOT belong here. There is no
+    `tcdb_class_ids` parameter. TCDB is now a first-class ontology — for
+    "all genes in TCDB class 3.A.1 (ABC superfamily) for organism X", route
+    through `genes_by_ontology(ontology='tcdb', term_ids=['tcdb:3.A.1'],
+    organism=...)`. From here the drill-out path is `top_tcdb_families[i].tcdb_family_id`
+    → `genes_by_ontology(ontology='tcdb', term_ids=[that_id], organism=...)`.
+  - >-
+    `not_found.metabolite_ids` vs `not_matched`. `not_found.metabolite_ids`
+    = IDs that don't exist as a Metabolite node at all (typo, wrong prefix,
+    ChEBI ID not in our KG). `not_matched` = IDs whose Metabolite exists
+    but produced zero rows in this organism slice under the active filters
+    (e.g. transport-only metabolite curated for non-MED4 strains). Don't
+    conflate them — `not_matched` may go to zero by relaxing filters or
+    swapping organism; `not_found` won't.
+  - >-
+    Transport rows are direction-agnostic. The `Tcdb_family_transports_metabolite`
+    edge does not distinguish substrate from product, and the metabolism
+    arm's `Reaction_has_metabolite` edge doesn't either (KEGG equation
+    order is arbitrary). To distinguish substrate vs product, layer
+    transcriptional evidence (`differential_expression_by_gene`) and
+    functional annotation (`gene_overview` Pfam / KEGG KO names like
+    `*-synthase` vs `*-permease`).

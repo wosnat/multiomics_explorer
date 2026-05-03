@@ -1592,3 +1592,108 @@
   params: {metabolite_ids: [kegg.compound:C00031, kegg.compound:C99999]}
   expect:
     min_rows: 1
+
+# ── genes_by_metabolite — chemistry slice-1 Tool #2 ──
+- id: genes_by_metabolite_urea_med4_default
+  tool: genes_by_metabolite
+  desc: |
+    urea × MED4 default — both arms exercised; both transport_confidence
+    levels present (10 sc + 9 fi); auto-warning does NOT fire (sc > fi for
+    urea). 23 rows total (4 metabolism + 19 transport).
+  params:
+    metabolite_ids: [kegg.compound:C00086]
+    organism: Prochlorococcus MED4
+    limit: 5
+  expect:
+    min_rows: 1
+    columns:
+      [locus_tag, evidence_source, metabolite_id, metabolite_name]
+
+- id: genes_by_metabolite_nitrite_med4_warning
+  tool: genes_by_metabolite
+  desc: |
+    nitrite × MED4 default — transport-only (no metabolism rows; 5 sc + 9 fi).
+    Family-inferred-dominance auto-warning DOES fire (fi > sc).
+  params:
+    metabolite_ids: [kegg.compound:C00088]
+    organism: Prochlorococcus MED4
+    limit: 5
+  expect:
+    min_rows: 1
+    columns: [locus_tag, evidence_source, transport_confidence]
+
+- id: genes_by_metabolite_urea_substrate_confirmed_only
+  tool: genes_by_metabolite
+  desc: |
+    urea × MED4 with transport_confidence=substrate_confirmed +
+    evidence_sources=[transport] — high-precision transporter hunt;
+    returns 10 rows (5 distinct genes urtA-urtE × 2 specificity-leaf
+    annotations); no auto-warning.
+  params:
+    metabolite_ids: [kegg.compound:C00086]
+    organism: Prochlorococcus MED4
+    transport_confidence: substrate_confirmed
+    evidence_sources: [transport]
+    limit: 10
+  expect:
+    min_rows: 1
+    columns: [locus_tag, evidence_source, transport_confidence]
+
+- id: genes_by_metabolite_glutamine_ec_filter
+  tool: genes_by_metabolite
+  desc: |
+    glutamine × MED4 with ec_numbers=['6.3.1.2'] (glutamine synthetase) —
+    metabolism arm narrows to 1 row (glnA × glutamine, R00253) while
+    transport rows (10 family_inferred ABC) are returned UNCHANGED. Auto-
+    warning fires (10 fi > 0 sc on transport).
+  params:
+    metabolite_ids: [kegg.compound:C00064]
+    organism: Prochlorococcus MED4
+    ec_numbers: ['6.3.1.2']
+    limit: 5
+  expect:
+    min_rows: 1
+
+- id: genes_by_metabolite_mixed_unknown_ids
+  tool: genes_by_metabolite
+  desc: |
+    Mixed input [urea, chebi:9314, kegg.compound:C99999] × MED4 —
+    not_found.metabolite_ids = ['chebi:9314', 'kegg.compound:C99999'];
+    urea returns 23 rows.
+  params:
+    metabolite_ids:
+      [kegg.compound:C00086, chebi:9314, kegg.compound:C99999]
+    organism: Prochlorococcus MED4
+    limit: 5
+  expect:
+    min_rows: 1
+
+- id: genes_by_metabolite_alcohol_alteromonas_not_matched
+  tool: genes_by_metabolite
+  desc: |
+    Alcohol (C00069) × Alteromonas ATCC27126 — Metabolite node exists in KG
+    but no gene reach via either arm. Verifies not_matched discrimination
+    (KG-present, organism-unreachable) vs not_found (KG-absent).
+    Spec § "Empty-result reachability"; the spec's water example was stale
+    against current KG state (water has 333 ATCC27126 metabolism genes).
+  params:
+    metabolite_ids: [kegg.compound:C00069]
+    organism: Alteromonas macleodii ATCC27126
+    limit: 5
+  expect:
+    max_rows: 0
+
+- id: genes_by_metabolite_pathway_anchored_n_metabolism
+  tool: genes_by_metabolite
+  desc: |
+    Pathway-anchored: metabolite_pathway_ids=['kegg.pathway:ko00910']
+    (nitrogen metabolism) + N-bearing metabolites × MED4. Both arms
+    narrowed uniformly via m.pathway_ids denorm.
+  params:
+    metabolite_ids:
+      [kegg.compound:C00086, kegg.compound:C00064, kegg.compound:C00088]
+    organism: Prochlorococcus MED4
+    metabolite_pathway_ids: [kegg.pathway:ko00910]
+    limit: 5
+  expect:
+    min_rows: 1

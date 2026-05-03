@@ -1,0 +1,209 @@
+by_evidence_source:
+- count: 14
+  evidence_source: transport
+by_metabolite:
+- formula: NO2
+  gene_count: 12
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00088
+  name: Nitrite
+  reaction_count: 0
+  rows: 14
+  transport_family_inferred_rows: 9
+  transport_substrate_confirmed_rows: 5
+  transporter_count: 3
+by_transport_confidence:
+- count: 9
+  transport_confidence: family_inferred
+- count: 5
+  transport_confidence: substrate_confirmed
+case_id: genes_by_metabolite_nitrite_med4_warning
+gene_count_total: 12
+metabolite_count_total: 1
+not_found:
+  metabolite_ids: []
+  metabolite_pathway_ids: []
+  organism: null
+not_matched: []
+offset: 0
+reaction_count_total: 0
+results:
+- evidence_source: transport
+  gene_name: cynA
+  locus_tag: PMM0370
+  metabolite_chebi_id: '14658'
+  metabolite_formula: NO2
+  metabolite_id: kegg.compound:C00088
+  metabolite_mass: 46.005
+  metabolite_name: Nitrite
+  product: cyanate ABC transporter, substrate-binding protein
+  tcdb_family_id: tcdb:3.A.1.16.1
+  tcdb_family_name: 3.A.1.16.1
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: cynA
+  locus_tag: PMM0370
+  metabolite_chebi_id: '14658'
+  metabolite_formula: NO2
+  metabolite_id: kegg.compound:C00088
+  metabolite_mass: 46.005
+  metabolite_name: Nitrite
+  product: cyanate ABC transporter, substrate-binding protein
+  tcdb_family_id: tcdb:3.A.1.16.2
+  tcdb_family_name: 3.A.1.16.2
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: cynB
+  locus_tag: PMM0371
+  metabolite_chebi_id: '14658'
+  metabolite_formula: NO2
+  metabolite_id: kegg.compound:C00088
+  metabolite_mass: 46.005
+  metabolite_name: Nitrite
+  product: cyanate ABC transporter, permease protein
+  tcdb_family_id: tcdb:3.A.1.16.1
+  tcdb_family_name: 3.A.1.16.1
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: cynB
+  locus_tag: PMM0371
+  metabolite_chebi_id: '14658'
+  metabolite_formula: NO2
+  metabolite_id: kegg.compound:C00088
+  metabolite_mass: 46.005
+  metabolite_name: Nitrite
+  product: cyanate ABC transporter, permease protein
+  tcdb_family_id: tcdb:3.A.1.16.2
+  tcdb_family_name: 3.A.1.16.2
+  transport_confidence: substrate_confirmed
+- evidence_source: transport
+  gene_name: cynD
+  locus_tag: PMM0372
+  metabolite_chebi_id: '14658'
+  metabolite_formula: NO2
+  metabolite_id: kegg.compound:C00088
+  metabolite_mass: 46.005
+  metabolite_name: Nitrite
+  product: cyanate ABC transporter ATP-binding protein
+  tcdb_family_id: tcdb:3.A.1.16.1
+  tcdb_family_name: 3.A.1.16.1
+  transport_confidence: substrate_confirmed
+returned: 5
+row_count: 5
+top_gene_categories:
+- category: Transport
+  gene_count: 5
+- category: Central intermediary metabolism
+  gene_count: 3
+- category: Stress response and adaptation
+  gene_count: 3
+- category: Cellular processes
+  gene_count: 1
+top_genes:
+- gene_name: cynA
+  locus_tag: PMM0370
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+- gene_name: cynB
+  locus_tag: PMM0371
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 2
+  transporter_count: 2
+- gene_name: cynD
+  locus_tag: PMM0372
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 0
+  transport_substrate_confirmed_rows: 1
+  transporter_count: 1
+- gene_name: ftsE
+  locus_tag: PMM0434
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+- gene_name: ccmA
+  locus_tag: PMM0449
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+- gene_name: ycf38
+  locus_tag: PMM0450
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+- gene_name: devC
+  locus_tag: PMM0749
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+- gene_name: devA
+  locus_tag: PMM0750
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+- gene_name: salY
+  locus_tag: PMM0913
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+- gene_name: evrA
+  locus_tag: PMM0976
+  metabolism_rows: 0
+  metabolite_count: 1
+  reaction_count: 0
+  transport_family_inferred_rows: 1
+  transport_substrate_confirmed_rows: 0
+  transporter_count: 1
+top_reactions: []
+top_tcdb_families:
+- gene_count: 9
+  level_kind: tc_family
+  metabolite_count: 1
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_confidence: family_inferred
+- gene_count: 3
+  level_kind: tc_specificity
+  metabolite_count: 1
+  tcdb_family_id: tcdb:3.A.1.16.1
+  tcdb_family_name: 3.A.1.16.1
+  transport_confidence: substrate_confirmed
+- gene_count: 2
+  level_kind: tc_specificity
+  metabolite_count: 1
+  tcdb_family_id: tcdb:3.A.1.16.2
+  tcdb_family_name: 3.A.1.16.2
+  transport_confidence: substrate_confirmed
+total_matching: 14
+transporter_count_total: 3
+truncated: true
+warnings:
+- Majority of transport rows are family_inferred (rolled-up from broad TCDB families).
+  Re-run with transport_confidence='substrate_confirmed' for substrate-curated transporter
+  genes only.

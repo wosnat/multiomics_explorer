@@ -1,0 +1,25 @@
+by_evidence_source: []
+by_metabolite: []
+by_transport_confidence: []
+case_id: genes_by_metabolite_alcohol_alteromonas_not_matched
+gene_count_total: 0
+metabolite_count_total: 0
+not_found:
+  metabolite_ids: []
+  metabolite_pathway_ids: []
+  organism: Alteromonas macleodii ATCC27126
+not_matched:
+- kegg.compound:C00069
+offset: 0
+reaction_count_total: 0
+results: []
+returned: 0
+row_count: 0
+top_gene_categories: []
+top_genes: []
+top_reactions: []
+top_tcdb_families: []
+total_matching: 0
+transporter_count_total: 0
+truncated: false
+warnings: []

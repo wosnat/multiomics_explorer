@@ -6460,3 +6460,922 @@ class TestListMetabolites:
         from multiomics_explorer import list_metabolites as pkg_lm
         from multiomics_explorer.api import list_metabolites as api_direct
         assert pkg_lm is api_direct
+
+
+# ---------------------------------------------------------------------------
+# genes_by_metabolite — Phase 1 (Stage 1 RED)
+# ---------------------------------------------------------------------------
+
+
+class TestGenesByMetabolite:
+    """Tests for api.genes_by_metabolite.
+
+    Mirrors `TestListMetabolites`'s mocked-conn pattern. Each test
+    constructs a `_mock_conn` with a defined sequence of execute_query
+    return values matching the expected per-call order in the api layer:
+
+    1. summary builder (always)
+    2. metabolism-arm detail (when summary=False AND metabolism arm fires)
+    3. transport-arm detail   (when summary=False AND transport arm fires)
+    4. existence probes (one per filter that has unknown-input diagnostics)
+
+    The exact order in steps 2/3/4 matches the api implementation; tests
+    that care about ordering use .call_args_list inspection. Tests that
+    only care about the envelope use simpler probes via .return_value or
+    side_effect.
+    """
+
+    _METS = ["kegg.compound:C00086"]  # urea
+    _ORG = "Prochlorococcus MED4"
+
+    # ---- Canned summary row (envelope payload from build_*_summary) ----
+    _SUMMARY_ROW_BOTH_ARMS = {
+        "total_matching": 23,
+        "gene_count_total": 18,
+        "reaction_count_total": 4,
+        "transporter_count_total": 14,
+        "metabolite_count_total": 1,
+        # 4 metabolism + 19 transport rows
+        "rows_by_evidence_source": [
+            {"evidence_source": "metabolism", "count": 4},
+            {"evidence_source": "transport", "count": 19},
+        ],
+        # 10 substrate_confirmed + 9 family_inferred (transport-only — 23 total
+        # transport-confidence rows)
+        "rows_by_transport_confidence": [
+            {"transport_confidence": "substrate_confirmed", "count": 10},
+            {"transport_confidence": "family_inferred", "count": 9},
+        ],
+        "by_metabolite": [
+            {
+                "metabolite_id": "kegg.compound:C00086",
+                "name": "Urea",
+                "formula": "CH4N2O",
+                "rows": 23,
+                "gene_count": 18,
+                "reaction_count": 4,
+                "transporter_count": 14,
+                "metabolism_rows": 4,
+                "transport_substrate_confirmed_rows": 10,
+                "transport_family_inferred_rows": 9,
+            },
+        ],
+        "top_reactions": [],
+        "top_tcdb_families": [],
+        "top_gene_categories": [],
+        "top_genes": [],
+    }
+
+    # Family-inferred dominates — for the auto-warning trigger test
+    _SUMMARY_ROW_FI_DOMINATES = {
+        **_SUMMARY_ROW_BOTH_ARMS,
+        "total_matching": 14,
+        "gene_count_total": 14,
+        "reaction_count_total": 0,
+        "transporter_count_total": 14,
+        "metabolite_count_total": 1,
+        "rows_by_evidence_source": [
+            {"evidence_source": "transport", "count": 14},
+        ],
+        "rows_by_transport_confidence": [
+            {"transport_confidence": "substrate_confirmed", "count": 5},
+            {"transport_confidence": "family_inferred", "count": 9},
+        ],
+        "by_metabolite": [
+            {
+                "metabolite_id": "kegg.compound:C00088",
+                "name": "Nitrite",
+                "formula": "HNO2",
+                "rows": 14,
+                "gene_count": 14,
+                "reaction_count": 0,
+                "transporter_count": 14,
+                "metabolism_rows": 0,
+                "transport_substrate_confirmed_rows": 5,
+                "transport_family_inferred_rows": 9,
+            },
+        ],
+    }
+
+    # Sample metabolism-arm detail row (substrate_confirmed-by-definition)
+    _METAB_ROW = {
+        "locus_tag": "PMM0944",
+        "gene_name": "ureC",
+        "product": "urease",
+        "evidence_source": "metabolism",
+        "transport_confidence": None,
+        "reaction_id": "kegg.reaction:R00131",
+        "reaction_name": "Urea + 2H2O => CO2 + 2NH3",
+        "ec_numbers": ["3.5.1.5"],
+        "mass_balance": "balanced",
+        "tcdb_family_id": None,
+        "tcdb_family_name": None,
+        "metabolite_id": "kegg.compound:C00086",
+        "metabolite_name": "Urea",
+        "metabolite_formula": "CH4N2O",
+        "metabolite_mass": 60.032,
+        "metabolite_chebi_id": "16199",
+    }
+
+    # Sample transport-arm detail row (substrate_confirmed)
+    _TRANS_ROW_SC = {
+        "locus_tag": "PMM0974",
+        "gene_name": "urtE",
+        "product": "ABC-type urea transporter, ATPase component",
+        "evidence_source": "transport",
+        "transport_confidence": "substrate_confirmed",
+        "reaction_id": None,
+        "reaction_name": None,
+        "ec_numbers": None,
+        "mass_balance": None,
+        "tcdb_family_id": "tcdb:3.A.1.4.5",
+        "tcdb_family_name": "tcdb:3.A.1.4.5",
+        "metabolite_id": "kegg.compound:C00086",
+        "metabolite_name": "Urea",
+        "metabolite_formula": "CH4N2O",
+        "metabolite_mass": 60.032,
+        "metabolite_chebi_id": "16199",
+    }
+
+    # Sample transport-arm detail row (family_inferred)
+    _TRANS_ROW_FI = {
+        "locus_tag": "PMM0234",
+        "gene_name": None,
+        "product": "ABC superfamily ATP-binding cassette transporter",
+        "evidence_source": "transport",
+        "transport_confidence": "family_inferred",
+        "reaction_id": None,
+        "reaction_name": None,
+        "ec_numbers": None,
+        "mass_balance": None,
+        "tcdb_family_id": "tcdb:3.A.1",
+        "tcdb_family_name": "The ATP-binding Cassette (ABC) Superfamily",
+        "metabolite_id": "kegg.compound:C00086",
+        "metabolite_name": "Urea",
+        "metabolite_formula": "CH4N2O",
+        "metabolite_mass": 60.032,
+        "metabolite_chebi_id": "16199",
+    }
+
+    # ---- Helpers ----
+
+    def _mock_conn(self, *side_effect):
+        """Conn whose .execute_query yields the provided sequence."""
+        conn = MagicMock()
+        conn.execute_query.side_effect = list(side_effect)
+        return conn
+
+    def _api(self):
+        from multiomics_explorer.api.functions import genes_by_metabolite
+        return genes_by_metabolite
+
+    # ---- Tests ----
+
+    def test_returns_dict_envelope(self):
+        gbm = self._api()
+        # summary, metab arm, transport arm, met-id existence probe
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        assert isinstance(out, dict)
+        assert out["total_matching"] == 23
+        assert "by_metabolite" in out
+        assert "by_evidence_source" in out
+        assert "by_transport_confidence" in out
+        assert "top_reactions" in out
+        assert "top_tcdb_families" in out
+        assert "top_gene_categories" in out
+        assert "top_genes" in out
+        assert "not_found" in out
+        assert "not_matched" in out
+        assert "warnings" in out
+        assert "results" in out
+
+    def test_default_fires_both_arms(self):
+        """No `evidence_sources` filter → both arm builders dispatched."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        # 1 summary + 2 detail (one per arm) + 1 existence probe = 4
+        assert conn.execute_query.call_count >= 3
+        # Both rows surface in the result
+        evidence = {r["evidence_source"] for r in out["results"]}
+        assert evidence == {"metabolism", "transport"}
+
+    def test_evidence_sources_metabolism_only_skips_transport_arm(self):
+        """evidence_sources=['metabolism'] suppresses the transport arm.
+        No warning is emitted."""
+        gbm = self._api()
+        # summary (single arm), metabolism detail, met-id probe
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(
+            self._METS, self._ORG,
+            evidence_sources=["metabolism"], conn=conn,
+        )
+        # Only metabolism rows
+        for r in out["results"]:
+            assert r["evidence_source"] == "metabolism"
+        assert out["warnings"] == []
+
+    def test_evidence_sources_transport_only_skips_metabolism_arm(self):
+        """evidence_sources=['transport'] suppresses the metabolism arm."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(
+            self._METS, self._ORG,
+            evidence_sources=["transport"], conn=conn,
+        )
+        for r in out["results"]:
+            assert r["evidence_source"] == "transport"
+        assert out["warnings"] == []
+
+    def test_ec_numbers_does_not_suppress_transport_arm(self):
+        """Per-arm filter scope: ec_numbers narrows only the metabolism
+        arm WHERE; transport-arm rows still appear in the result."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],   # metabolism arm narrowed but row returned
+            [self._TRANS_ROW_SC],  # transport arm UNCHANGED
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(
+            self._METS, self._ORG,
+            ec_numbers=["3.5.1.5"], conn=conn,
+        )
+        evidence = {r["evidence_source"] for r in out["results"]}
+        assert "transport" in evidence  # transport arm STILL fired
+        # No "soft-exclude" warning (per spec, this pattern was abandoned)
+        assert all("soft-exclude" not in w for w in out["warnings"])
+
+    def test_mass_balance_does_not_suppress_transport_arm(self):
+        """Same per-arm filter scope as ec_numbers."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(
+            self._METS, self._ORG,
+            mass_balance="balanced", conn=conn,
+        )
+        evidence = {r["evidence_source"] for r in out["results"]}
+        assert "transport" in evidence
+
+    def test_transport_confidence_substrate_confirmed_no_warning(self):
+        """transport_confidence='substrate_confirmed' narrows transport arm
+        only AND suppresses the family-inferred-dominance warning (since user
+        chose explicitly)."""
+        gbm = self._api()
+        # SC-only summary so transport rows are exclusively SC
+        sc_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "rows_by_transport_confidence": [
+                {"transport_confidence": "substrate_confirmed", "count": 10},
+            ],
+            "by_metabolite": [
+                {
+                    **self._SUMMARY_ROW_BOTH_ARMS["by_metabolite"][0],
+                    "transport_substrate_confirmed_rows": 10,
+                    "transport_family_inferred_rows": 0,
+                },
+            ],
+        }
+        conn = self._mock_conn(
+            [sc_summary],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(
+            self._METS, self._ORG,
+            transport_confidence="substrate_confirmed", conn=conn,
+        )
+        # Metabolism rows still present (transport_confidence does NOT touch
+        # metabolism arm)
+        evidence = {r["evidence_source"] for r in out["results"]}
+        assert evidence == {"metabolism", "transport"}
+        # No auto-warning (user explicitly set transport_confidence)
+        assert out["warnings"] == []
+
+    def test_transport_confidence_family_inferred_no_warning(self):
+        """transport_confidence='family_inferred' likewise suppresses the
+        auto-warning (user chose explicitly)."""
+        gbm = self._api()
+        fi_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "rows_by_transport_confidence": [
+                {"transport_confidence": "family_inferred", "count": 9},
+            ],
+            "by_metabolite": [
+                {
+                    **self._SUMMARY_ROW_BOTH_ARMS["by_metabolite"][0],
+                    "transport_substrate_confirmed_rows": 0,
+                    "transport_family_inferred_rows": 9,
+                },
+            ],
+        }
+        conn = self._mock_conn(
+            [fi_summary],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_FI],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(
+            self._METS, self._ORG,
+            transport_confidence="family_inferred", conn=conn,
+        )
+        assert out["warnings"] == []
+
+    def test_family_inferred_dominance_warning_fires(self):
+        """Warning fires when:
+        - transport rows present in result AND
+        - transport_family_inferred_rows > transport_substrate_confirmed_rows AND
+        - user did NOT set transport_confidence."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_FI_DOMINATES],
+            # Note: transport-only — no metabolism rows from spec § probe:
+            # "MED4 has no nitrite-anchored metabolism reactions today"
+            [],  # metabolism arm fires but returns nothing
+            [self._TRANS_ROW_FI],
+            [{"found": ["kegg.compound:C00088"]}],
+        )
+        out = gbm(["kegg.compound:C00088"], self._ORG, conn=conn)
+        assert any(
+            "family_inferred" in w for w in out["warnings"]
+        ), f"expected family-inferred warning, got {out['warnings']!r}"
+
+    def test_no_warning_when_substrate_confirmed_majority(self):
+        """sc >= fi → no auto-warning even with default both-arm mode."""
+        gbm = self._api()
+        # urea slice: 10 SC > 9 FI on transport
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        # 10 SC > 9 FI — no warning
+        assert all(
+            "family_inferred" not in w for w in out["warnings"]
+        )
+
+    def test_no_warning_when_no_transport_rows(self):
+        """Metabolism-only result → no transport check → no warning."""
+        gbm = self._api()
+        # Suppress transport arm via evidence_sources
+        no_transport_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "rows_by_evidence_source": [
+                {"evidence_source": "metabolism", "count": 4},
+            ],
+            "rows_by_transport_confidence": [],
+            "by_metabolite": [
+                {
+                    **self._SUMMARY_ROW_BOTH_ARMS["by_metabolite"][0],
+                    "transport_substrate_confirmed_rows": 0,
+                    "transport_family_inferred_rows": 0,
+                },
+            ],
+        }
+        conn = self._mock_conn(
+            [no_transport_summary],
+            [self._METAB_ROW],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(
+            self._METS, self._ORG,
+            evidence_sources=["metabolism"], conn=conn,
+        )
+        assert out["warnings"] == []
+
+    def test_not_found_metabolite_ids(self):
+        """Input metabolite_ids that don't resolve to a Metabolite node
+        surface in not_found.metabolite_ids."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # Existence probe returns only one of the two as found
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(
+            ["kegg.compound:C00086", "kegg.compound:C99999"],
+            self._ORG, conn=conn,
+        )
+        assert out["not_found"]["metabolite_ids"] == ["kegg.compound:C99999"]
+
+    def test_not_matched_for_resolved_but_no_rows(self):
+        """Input metabolite_id that exists as Metabolite but produces zero
+        rows in this organism slice → not_matched (NOT not_found)."""
+        gbm = self._api()
+        # Summary's by_metabolite carries only urea — water resolves but
+        # produces no rows.
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # Both IDs exist in KG
+            [{"found": ["kegg.compound:C00086", "kegg.compound:C00001"]}],
+        )
+        out = gbm(
+            ["kegg.compound:C00086", "kegg.compound:C00001"],
+            self._ORG, conn=conn,
+        )
+        # water exists as Metabolite (so not in not_found) but produced no
+        # rows for this organism (so it's in not_matched).
+        assert "kegg.compound:C00001" in out["not_matched"]
+        assert "kegg.compound:C00001" not in out["not_found"]["metabolite_ids"]
+
+    def test_not_found_organism_when_zero_genes(self):
+        """When the fuzzy organism match produces 0 genes (i.e. summary's
+        gene_count_total == 0), not_found.organism is set to the input."""
+        gbm = self._api()
+        empty_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "total_matching": 0,
+            "gene_count_total": 0,
+            "rows_by_evidence_source": [],
+            "rows_by_transport_confidence": [],
+            "by_metabolite": [],
+        }
+        conn = self._mock_conn(
+            [empty_summary],
+            [],  # metab detail (empty)
+            [],  # transport detail (empty)
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, "Bogus organism", conn=conn)
+        assert out["not_found"]["organism"] == "Bogus organism"
+
+    def test_not_found_organism_none_on_success(self):
+        """gene_count_total > 0 → not_found.organism is None."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        assert out["not_found"]["organism"] is None
+
+    def test_not_found_metabolite_pathway_ids(self):
+        """Input metabolite_pathway_ids that don't resolve to KeggTerm
+        surface in not_found.metabolite_pathway_ids."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            # metabolite_id existence probe
+            [{"found": ["kegg.compound:C00086"]}],
+            # pathway-id existence probe
+            [{"found": ["kegg.pathway:ko00910"]}],
+        )
+        out = gbm(
+            self._METS, self._ORG,
+            metabolite_pathway_ids=[
+                "kegg.pathway:ko00910", "kegg.pathway:bogus",
+            ],
+            conn=conn,
+        )
+        assert (
+            out["not_found"]["metabolite_pathway_ids"]
+            == ["kegg.pathway:bogus"]
+        )
+
+    def test_summary_true_skips_detail_dispatch(self):
+        """summary=True returns envelope only; detail builders not called."""
+        gbm = self._api()
+        conn = MagicMock()
+        # Only summary should run — detail should not be invoked. We seed
+        # only one return value; if detail dispatched, the next call would
+        # raise StopIteration.
+        conn.execute_query.side_effect = [
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [{"found": ["kegg.compound:C00086"]}],
+        ]
+        out = gbm(self._METS, self._ORG, summary=True, conn=conn)
+        assert out["results"] == []
+        assert out["returned"] == 0
+
+    def test_evidence_sources_validator_rejects_bogus(self):
+        """Defense-in-depth ValueError from the api validator."""
+        gbm = self._api()
+        conn = MagicMock()
+        with pytest.raises(ValueError):
+            gbm(
+                self._METS, self._ORG,
+                evidence_sources=["bogus"], conn=conn,
+            )
+
+    def test_evidence_sources_validator_rejects_metabolomics(self):
+        """`metabolomics` is accepted by list_metabolites but NOT here —
+        gene-anchored tools have no metabolomics path. Per spec § Resolved
+        ('evidence_sources Literal divergence with list_metabolites')."""
+        gbm = self._api()
+        conn = MagicMock()
+        with pytest.raises(ValueError):
+            gbm(
+                self._METS, self._ORG,
+                evidence_sources=["metabolomics"], conn=conn,
+            )
+
+    def test_limit_offset_paging_across_arms(self):
+        """Arms over-fetch limit+offset, api concatenates and slices.
+        Verify the global slice returns the correct prefix."""
+        gbm = self._api()
+        # Mock returns metabolism + 2 transport rows; with limit=2/offset=0
+        # the returned slice should be the first 2 rows in global sort
+        # order ('metabolism' < 'transport' alphabetically → metab row,
+        # then SC transport row).
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC, self._TRANS_ROW_FI],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, limit=2, offset=0, conn=conn)
+        assert len(out["results"]) == 2
+        # Sort key: metabolite_id, evidence_source ('metabolism' < 'transport'),
+        # transport_confidence_priority — first row metab, second transport.
+        assert out["results"][0]["evidence_source"] == "metabolism"
+        assert out["results"][1]["evidence_source"] == "transport"
+
+    def test_truncated_flag(self):
+        """When total_matching > offset + len(results), truncated=True."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],  # total_matching=23
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, limit=2, conn=conn)
+        assert out["truncated"] is True
+
+    def test_offset_echoed_in_envelope(self):
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, offset=3, conn=conn)
+        assert out["offset"] == 3
+
+    def test_creates_conn_when_none(self):
+        """When conn=None, default GraphConnection is created."""
+        gbm = self._api()
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                [self._SUMMARY_ROW_BOTH_ARMS],
+                [self._METAB_ROW],
+                [self._TRANS_ROW_SC],
+                [{"found": ["kegg.compound:C00086"]}],
+            ]
+            out = gbm(self._METS, self._ORG)
+        MockConn.assert_called_once()
+        assert out["total_matching"] == 23
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import (
+            genes_by_metabolite as pkg_gbm,
+        )
+        from multiomics_explorer.api import (
+            genes_by_metabolite as api_direct,
+        )
+        assert pkg_gbm is api_direct
+
+    # ---- Top-N sort + truncate contract (B2/C11 fixes) ----
+
+    def _summary_with_top_arrays(self):
+        """Synthesize a summary row with >10 entries in each top_* array,
+        in shuffled order, using the post-fix Cypher field names.
+
+        The api layer must (a) sort each top_* by gene_count/breadth desc
+        with stable tiebreaker, and (b) slice to top 10. APOC's
+        coll.toSet() does not preserve order, so the api-side sort is
+        the only thing standing between the user and snapshot flakes.
+        """
+        # 12 reactions (intentionally shuffled; counts include a tie on 5)
+        top_reactions = [
+            {
+                "reaction_id": f"kegg.reaction:R{i:05d}",
+                "name": f"Reaction R{i:05d}",
+                "ec_numbers": ["1.1.1.1"],
+                "gene_count": gc,
+                "metabolite_count": 1,
+            }
+            for i, gc in zip(
+                # shuffled IDs, mixed counts incl. a 5/5 tie at the boundary
+                [3, 11, 7, 1, 9, 4, 12, 5, 2, 8, 6, 10],
+                [9, 1, 7, 12, 3, 8, 0, 11, 10, 5, 5, 4],
+            )
+        ]
+        # 12 TCDB families
+        top_tcdb_families = [
+            {
+                "tcdb_family_id": f"tcdb:3.A.1.{i}.1",
+                "tcdb_family_name": f"Family {i}",
+                "level_kind": "tc_specificity" if i % 2 == 0 else "tc_family",
+                "transport_confidence": (
+                    "substrate_confirmed" if i % 2 == 0 else "family_inferred"
+                ),
+                "gene_count": gc,
+                "metabolite_count": 1,
+            }
+            for i, gc in zip(
+                [5, 1, 11, 3, 9, 7, 12, 2, 8, 4, 10, 6],
+                [4, 12, 2, 9, 6, 7, 1, 11, 5, 8, 3, 10],
+            )
+        ]
+        # 12 categories
+        top_gene_categories = [
+            {"category": f"cat-{chr(ord('a') + i)}", "gene_count": gc}
+            for i, gc in enumerate(
+                [3, 1, 11, 5, 9, 7, 12, 2, 8, 4, 10, 6]
+            )
+        ]
+        # 12 genes — RANK BY (reaction_count + transporter_count) DESC.
+        # Build with combined-breadth values so we can verify the spec'd
+        # ranking (NOT by gene_count; that field is not even on top_genes).
+        top_genes = [
+            {
+                "locus_tag": f"PMM{i:04d}",
+                "gene_name": None if i % 3 == 0 else f"gene-{i}",
+                "reaction_count": rc,
+                "transporter_count": tc,
+                "metabolite_count": 1,
+                "metabolism_rows": rc,
+                "transport_substrate_confirmed_rows": tc,
+                "transport_family_inferred_rows": 0,
+            }
+            for i, rc, tc in [
+                (101, 2, 1),    # 3
+                (102, 5, 4),    # 9
+                (103, 1, 0),    # 1
+                (104, 7, 6),    # 13 ← top
+                (105, 0, 8),    # 8
+                (106, 3, 3),    # 6
+                (107, 4, 4),    # 8
+                (108, 2, 2),    # 4
+                (109, 6, 6),    # 12
+                (110, 5, 5),    # 10
+                (111, 1, 1),    # 2
+                (112, 7, 4),    # 11
+            ]
+        ]
+        return {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "top_reactions": top_reactions,
+            "top_tcdb_families": top_tcdb_families,
+            "top_gene_categories": top_gene_categories,
+            "top_genes": top_genes,
+        }
+
+    def test_top_reactions_sorted_and_truncated_to_10(self):
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._summary_with_top_arrays()],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        # Truncated to 10
+        assert len(out["top_reactions"]) == 10
+        # Sorted by gene_count desc, reaction_id asc tiebreaker
+        gcs = [r["gene_count"] for r in out["top_reactions"]]
+        assert gcs == sorted(gcs, reverse=True)
+        # Highest gene_count is first
+        assert out["top_reactions"][0]["gene_count"] == 12
+        # Field name is `name` (not the old `reaction_name`)
+        assert "name" in out["top_reactions"][0]
+        assert "reaction_name" not in out["top_reactions"][0]
+
+    def test_top_tcdb_families_sorted_and_truncated_to_10(self):
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._summary_with_top_arrays()],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        assert len(out["top_tcdb_families"]) == 10
+        gcs = [r["gene_count"] for r in out["top_tcdb_families"]]
+        assert gcs == sorted(gcs, reverse=True)
+        # New contract fields present
+        first = out["top_tcdb_families"][0]
+        assert "level_kind" in first
+        assert "transport_confidence" in first
+        assert "metabolite_count" in first
+
+    def test_top_gene_categories_sorted_and_truncated_to_10(self):
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._summary_with_top_arrays()],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        assert len(out["top_gene_categories"]) == 10
+        gcs = [r["gene_count"] for r in out["top_gene_categories"]]
+        assert gcs == sorted(gcs, reverse=True)
+        # Field name is `category` (not the old `gene_category`)
+        assert "category" in out["top_gene_categories"][0]
+        assert "gene_category" not in out["top_gene_categories"][0]
+
+    def test_top_genes_ranked_by_combined_breadth_not_gene_count(self):
+        """Per spec § GbmTopGene: ranked by (reaction_count + transporter_count)
+        desc, with locus_tag tiebreaker. gene_count is not even a field."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._summary_with_top_arrays()],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        assert len(out["top_genes"]) == 10
+        # Combined breadth sequence is monotonically non-increasing
+        breadths = [
+            (g["reaction_count"] + g["transporter_count"])
+            for g in out["top_genes"]
+        ]
+        assert breadths == sorted(breadths, reverse=True)
+        # PMM0104 (rc=7, tc=6) → 13, the unique top.
+        assert out["top_genes"][0]["locus_tag"] == "PMM0104"
+        # gene_name may be None (fixture sets every 3rd to None) — confirm
+        # the sort didn't TypeError on None.
+        assert any(g["gene_name"] is None for g in out["top_genes"])
+
+    def test_top_genes_locus_tag_tiebreaker(self):
+        """When combined breadth ties, sort by locus_tag asc (NOT gene_name —
+        gene_name may be None and would TypeError)."""
+        gbm = self._api()
+        # Two genes tied at combined breadth = 5; locus_tag asc breaks tie.
+        tied_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "top_genes": [
+                {
+                    "locus_tag": "PMM0999",
+                    "gene_name": None,
+                    "reaction_count": 2,
+                    "transporter_count": 3,
+                    "metabolite_count": 1,
+                    "metabolism_rows": 2,
+                    "transport_substrate_confirmed_rows": 3,
+                    "transport_family_inferred_rows": 0,
+                },
+                {
+                    "locus_tag": "PMM0001",
+                    "gene_name": None,
+                    "reaction_count": 5,
+                    "transporter_count": 0,
+                    "metabolite_count": 1,
+                    "metabolism_rows": 5,
+                    "transport_substrate_confirmed_rows": 0,
+                    "transport_family_inferred_rows": 0,
+                },
+            ],
+        }
+        conn = self._mock_conn(
+            [tied_summary],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        assert [g["locus_tag"] for g in out["top_genes"]] == [
+            "PMM0001", "PMM0999",
+        ]
+
+    def test_by_metabolite_sorted_by_metabolite_id(self):
+        """by_metabolite is bounded by input size (NOT sliced) but must be
+        sorted by metabolite_id asc for deterministic snapshots, since the
+        Cypher emits via apoc.coll.toSet() (unordered)."""
+        gbm = self._api()
+        # Two-entry by_metabolite supplied in shuffled order
+        multi_metab_summary = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "by_metabolite": [
+                {
+                    "metabolite_id": "kegg.compound:C99999",
+                    "name": "Z-compound",
+                    "formula": "Z",
+                    "rows": 1, "gene_count": 1, "reaction_count": 1,
+                    "transporter_count": 0, "metabolism_rows": 1,
+                    "transport_substrate_confirmed_rows": 0,
+                    "transport_family_inferred_rows": 0,
+                },
+                {
+                    "metabolite_id": "kegg.compound:C00086",
+                    "name": "Urea",
+                    "formula": "CH4N2O",
+                    "rows": 23, "gene_count": 18, "reaction_count": 4,
+                    "transporter_count": 14, "metabolism_rows": 4,
+                    "transport_substrate_confirmed_rows": 10,
+                    "transport_family_inferred_rows": 9,
+                },
+            ],
+        }
+        conn = self._mock_conn(
+            [multi_metab_summary],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": [
+                "kegg.compound:C00086", "kegg.compound:C99999",
+            ]}],
+        )
+        out = gbm(
+            ["kegg.compound:C00086", "kegg.compound:C99999"],
+            self._ORG, conn=conn,
+        )
+        assert [b["metabolite_id"] for b in out["by_metabolite"]] == [
+            "kegg.compound:C00086", "kegg.compound:C99999",
+        ]
+
+    def test_by_evidence_source_and_by_transport_confidence_sorted(self):
+        """Both rollups sorted by count desc, then key asc."""
+        gbm = self._api()
+        # Provide rollups in non-canonical order to exercise the sort.
+        scrambled = {
+            **self._SUMMARY_ROW_BOTH_ARMS,
+            "rows_by_evidence_source": [
+                {"evidence_source": "transport", "count": 4},
+                {"evidence_source": "metabolism", "count": 19},
+            ],
+            "rows_by_transport_confidence": [
+                {"transport_confidence": "substrate_confirmed", "count": 3},
+                {"transport_confidence": "family_inferred", "count": 9},
+            ],
+        }
+        conn = self._mock_conn(
+            [scrambled],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, conn=conn)
+        # by_evidence_source: highest count first
+        assert out["by_evidence_source"][0]["evidence_source"] == "metabolism"
+        assert out["by_evidence_source"][0]["count"] == 19
+        # by_transport_confidence: highest count first
+        assert (
+            out["by_transport_confidence"][0]["transport_confidence"]
+            == "family_inferred"
+        )
+
+    def test_truncated_uses_offset_plus_limit_formula(self):
+        """Per spec § Result-size controls (line 966): truncated iff
+        (offset + limit) < total_matching. Independent of len(results)."""
+        gbm = self._api()
+        # offset=10, limit=10 → 20; total_matching=23 → truncated=True
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],  # total_matching=23
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, limit=10, offset=10, conn=conn)
+        assert out["truncated"] is True
+
+        # offset=20, limit=10 → 30 ≥ 23 → truncated=False
+        conn2 = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_SC],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out2 = gbm(self._METS, self._ORG, limit=10, offset=20, conn=conn2)
+        assert out2["truncated"] is False

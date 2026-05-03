@@ -86,6 +86,9 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_derived_metrics_summary,
     build_list_metabolites,
     build_list_metabolites_summary,
+    build_genes_by_metabolite_metabolism,
+    build_genes_by_metabolite_transport,
+    build_genes_by_metabolite_summary,
     build_gene_clusters_by_gene,
     build_gene_clusters_by_gene_summary,
     build_gene_derived_metrics,
@@ -4820,5 +4823,380 @@ def list_metabolites(
         "offset": offset,
         "truncated": total_matching > offset + len(results),
         "not_found": not_found,
+        "results": results,
+    }
+
+
+# evidence_sources accepted by `genes_by_metabolite` — diverges intentionally
+# from `_VALID_EVIDENCE_SOURCES` (which includes `"metabolomics"` for the
+# metabolite-anchored `list_metabolites`). Gene-anchored tools have no
+# metabolomics path (DerivedMetric → Metabolite carries no Gene anchor), so
+# we reject `"metabolomics"` at the boundary instead of silently returning
+# zero rows.
+_VALID_EVIDENCE_SOURCES_GBM = ("metabolism", "transport")
+
+
+# Sparse-strip: result columns that get dropped when null. Per-arm-specific
+# fields are stripped on rows from the other arm; per-row sparse fields
+# (gene_name, product, etc.) are stripped when null on either arm.
+_GBM_SPARSE_FIELDS = (
+    "gene_name",
+    "product",
+    "transport_confidence",
+    "reaction_id",
+    "reaction_name",
+    "ec_numbers",
+    "mass_balance",
+    "tcdb_family_id",
+    "tcdb_family_name",
+    "metabolite_formula",
+    "metabolite_mass",
+    "metabolite_chebi_id",
+    # verbose fields — sparse-strip when null on the other arm or
+    # when KG simply has no value
+    "gene_category",
+    "metabolite_inchikey",
+    "metabolite_smiles",
+    "metabolite_mnxm_id",
+    "metabolite_hmdb_id",
+    "reaction_mnxr_id",
+    "reaction_rhea_ids",
+    "tcdb_level_kind",
+    "tc_class_id",
+)
+
+
+def _gbm_sort_key(row: dict) -> tuple:
+    """Global sort key for genes_by_metabolite detail rows.
+
+    Sort by: (metabolite_id, evidence_source, transport_confidence_priority,
+              secondary_id, locus_tag).
+
+    `transport_confidence_priority`:
+      - 0 for `substrate_confirmed` OR None (metabolism rows)
+      - 1 for `family_inferred`
+
+    `secondary_id`: `reaction_id` for metabolism rows, `tcdb_family_id` for
+    transport rows. Acts as deterministic tiebreaker within each
+    (metabolite, evidence_source, confidence) group.
+    """
+    tconf = row.get("transport_confidence")
+    priority = 1 if tconf == "family_inferred" else 0
+    if row.get("evidence_source") == "metabolism":
+        secondary = row.get("reaction_id") or ""
+    else:
+        secondary = row.get("tcdb_family_id") or ""
+    return (
+        row.get("metabolite_id") or "",
+        row.get("evidence_source") or "",
+        priority,
+        secondary,
+        row.get("locus_tag") or "",
+    )
+
+
+def genes_by_metabolite(
+    metabolite_ids: list[str],
+    organism: str,
+    *,
+    ec_numbers: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    mass_balance: str | None = None,
+    gene_categories: list[str] | None = None,
+    transport_confidence: str | None = None,
+    evidence_sources: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int = 10,
+    offset: int = 0,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Find genes connected to specified metabolites in one organism.
+
+    Two evidence arms (joined api-side, not via Cypher UNION):
+      - metabolism: `Gene → Reaction → Metabolite`
+      - transport:  `Gene → TcdbFamily → Metabolite` (rollup-extended)
+
+    Path-scoped filters narrow only their own arm; the other arm runs
+    unfiltered. Use `evidence_sources` to suppress an entire arm.
+
+    See `docs/tool-specs/genes_by_metabolite.md` for the full contract,
+    paging strategy, and auto-warning trigger conditions.
+
+    Raises:
+        ValueError: if `evidence_sources` contains values outside
+            ``("metabolism", "transport")``. Note this diverges from
+            `list_metabolites` — gene-anchored tools reject
+            ``"metabolomics"``.
+    """
+    # 1. Defense-in-depth validator on evidence_sources.
+    if evidence_sources is not None:
+        invalid = [
+            s for s in evidence_sources
+            if s not in _VALID_EVIDENCE_SOURCES_GBM
+        ]
+        if invalid:
+            raise ValueError(
+                f"evidence_sources contains invalid value(s) {invalid}; "
+                f"allowed: {list(_VALID_EVIDENCE_SOURCES_GBM)}."
+            )
+
+    conn = _default_conn(conn)
+
+    # 2. Arm selection driven solely by evidence_sources.
+    if evidence_sources is None:
+        active_arms = ("metabolism", "transport")
+    else:
+        # Preserve canonical order regardless of input ordering.
+        active_arms = tuple(
+            arm for arm in ("metabolism", "transport")
+            if arm in evidence_sources
+        )
+
+    # 3. Always run summary builder (envelope rollups even when
+    # summary=True).
+    sum_cypher, sum_params = build_genes_by_metabolite_summary(
+        metabolite_ids=metabolite_ids,
+        organism=organism,
+        ec_numbers=ec_numbers,
+        mass_balance=mass_balance,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        gene_categories=gene_categories,
+        transport_confidence=transport_confidence,
+        arms=active_arms,
+    )
+    summary_rows = conn.execute_query(sum_cypher, **sum_params)
+    raw_summary = summary_rows[0] if summary_rows else {}
+
+    total_matching = raw_summary.get("total_matching", 0) or 0
+    gene_count_total = raw_summary.get("gene_count_total", 0) or 0
+    by_metabolite = raw_summary.get("by_metabolite", []) or []
+
+    # 4. Detail collection — Mode 1 (single arm), Mode 2 (summary), or
+    # Mode 3 (both arms over-fetch + concat + sort + slice).
+    results: list[dict]
+    if summary:
+        results = []
+    elif offset >= total_matching:
+        # Deep-paging guardrail: short-circuit; don't touch detail arms
+        # but still run existence probes so not_found is populated.
+        results = []
+    else:
+        single_arm_mode = len(active_arms) == 1
+        if single_arm_mode:
+            # Mode 1: pass limit + offset directly into the single arm.
+            arm = active_arms[0]
+            if arm == "metabolism":
+                cypher, params = build_genes_by_metabolite_metabolism(
+                    metabolite_ids=metabolite_ids,
+                    organism=organism,
+                    ec_numbers=ec_numbers,
+                    mass_balance=mass_balance,
+                    metabolite_pathway_ids=metabolite_pathway_ids,
+                    gene_categories=gene_categories,
+                    verbose=verbose,
+                    limit=limit,
+                    offset=offset,
+                )
+            else:
+                cypher, params = build_genes_by_metabolite_transport(
+                    metabolite_ids=metabolite_ids,
+                    organism=organism,
+                    metabolite_pathway_ids=metabolite_pathway_ids,
+                    gene_categories=gene_categories,
+                    transport_confidence=transport_confidence,
+                    verbose=verbose,
+                    limit=limit,
+                    offset=offset,
+                )
+            results = list(conn.execute_query(cypher, **params))
+        else:
+            # Mode 3: both arms; over-fetch limit+offset per arm,
+            # concat, global-sort, slice.
+            per_arm_fetch = limit + offset
+            combined: list[dict] = []
+            for arm in active_arms:
+                if arm == "metabolism":
+                    cypher, params = build_genes_by_metabolite_metabolism(
+                        metabolite_ids=metabolite_ids,
+                        organism=organism,
+                        ec_numbers=ec_numbers,
+                        mass_balance=mass_balance,
+                        metabolite_pathway_ids=metabolite_pathway_ids,
+                        gene_categories=gene_categories,
+                        verbose=verbose,
+                        limit=per_arm_fetch,
+                        offset=0,
+                    )
+                else:
+                    cypher, params = build_genes_by_metabolite_transport(
+                        metabolite_ids=metabolite_ids,
+                        organism=organism,
+                        metabolite_pathway_ids=metabolite_pathway_ids,
+                        gene_categories=gene_categories,
+                        transport_confidence=transport_confidence,
+                        verbose=verbose,
+                        limit=per_arm_fetch,
+                        offset=0,
+                    )
+                combined.extend(conn.execute_query(cypher, **params))
+            combined.sort(key=_gbm_sort_key)
+            results = combined[offset:offset + limit]
+
+    # 5. Sparse-strip nullable result columns.
+    results = [
+        {k: v for k, v in row.items()
+         if not (k in _GBM_SPARSE_FIELDS and v is None)}
+        for row in results
+    ]
+
+    # 6. Compute not_found.metabolite_ids via existence probe.
+    if metabolite_ids:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) WHERE m.id IN $ids "
+            "RETURN collect(m.id) AS found",
+            ids=metabolite_ids,
+        )
+        found_metab = set(rows[0]["found"]) if rows else set()
+        not_found_metab = [x for x in metabolite_ids if x not in found_metab]
+    else:
+        not_found_metab = []
+
+    # 7. Compute not_found.metabolite_pathway_ids via existence probe.
+    if metabolite_pathway_ids:
+        rows = conn.execute_query(
+            "MATCH (p:KeggTerm) WHERE p.id IN $ids "
+            "RETURN collect(p.id) AS found",
+            ids=metabolite_pathway_ids,
+        )
+        found_paths = set(rows[0]["found"]) if rows else set()
+        not_found_paths = [
+            x for x in metabolite_pathway_ids if x not in found_paths
+        ]
+    else:
+        not_found_paths = []
+
+    # 8. not_found.organism — set when the fuzzy match resolved to zero
+    # genes (i.e. nothing showed up in the summary aggregate).
+    not_found_org = organism if gene_count_total == 0 else None
+
+    # 9. not_matched: input metabolite_ids that exist as Metabolite nodes
+    # but produced 0 rows in this organism slice. Computed as
+    # `(input - not_found.metabolite_ids) - <ids present in by_metabolite>`.
+    summary_metab_ids = {
+        entry.get("metabolite_id") for entry in by_metabolite
+    }
+    not_found_set = set(not_found_metab)
+    not_matched = [
+        mid for mid in metabolite_ids
+        if mid not in not_found_set and mid not in summary_metab_ids
+    ]
+
+    # 10. Build envelope rollups from the summary builder output.
+    # APOC's coll.toSet() yields unordered arrays — we sort api-side for
+    # deterministic snapshots, and slice top_* arrays to the spec'd top-10.
+    rows_by_es = raw_summary.get("rows_by_evidence_source", []) or []
+    rows_by_tc = raw_summary.get("rows_by_transport_confidence", []) or []
+
+    by_evidence_source = sorted(
+        [
+            {"evidence_source": e["evidence_source"], "count": e["count"]}
+            for e in rows_by_es
+        ],
+        key=lambda r: (-r["count"], r["evidence_source"]),
+    )
+    by_transport_confidence = sorted(
+        [
+            {"transport_confidence": e["transport_confidence"], "count": e["count"]}
+            for e in rows_by_tc
+        ],
+        key=lambda r: (-r["count"], r["transport_confidence"]),
+    )
+
+    # by_metabolite: bounded by input size; sort by metabolite_id asc, no slice.
+    by_metabolite = sorted(
+        by_metabolite,
+        key=lambda r: r.get("metabolite_id") or "",
+    )
+
+    # top_* envelopes: sort by gene_count desc + stable tiebreaker, then [:10].
+    top_reactions = sorted(
+        raw_summary.get("top_reactions", []) or [],
+        key=lambda r: (-(r.get("gene_count") or 0), r.get("reaction_id") or ""),
+    )[:10]
+    top_tcdb_families = sorted(
+        raw_summary.get("top_tcdb_families", []) or [],
+        key=lambda r: (
+            -(r.get("gene_count") or 0),
+            r.get("tcdb_family_id") or "",
+        ),
+    )[:10]
+    top_gene_categories = sorted(
+        raw_summary.get("top_gene_categories", []) or [],
+        key=lambda r: (-(r.get("gene_count") or 0), r.get("category") or ""),
+    )[:10]
+    # top_genes ranked by combined reaction + transporter breadth (per spec
+    # § "Return envelope" line 366 / GbmTopGene docstring), with locus_tag
+    # tiebreaker (gene_name may be None and would TypeError on sort).
+    top_genes = sorted(
+        raw_summary.get("top_genes", []) or [],
+        key=lambda r: (
+            -((r.get("reaction_count") or 0) + (r.get("transporter_count") or 0)),
+            r.get("locus_tag") or "",
+        ),
+    )[:10]
+
+    # 11. Auto-warning: family-inferred dominance (transport-only check).
+    # Strict majority threshold; metabolism rows do not factor in.
+    warnings: list[str] = []
+    transport_sc_total = sum(
+        (entry.get("transport_substrate_confirmed_rows") or 0)
+        for entry in by_metabolite
+    )
+    transport_fi_total = sum(
+        (entry.get("transport_family_inferred_rows") or 0)
+        for entry in by_metabolite
+    )
+    transport_rows_present = (transport_sc_total + transport_fi_total) > 0
+    if (
+        transport_rows_present
+        and transport_fi_total > transport_sc_total
+        and transport_confidence is None
+    ):
+        warnings.append(
+            "Majority of transport rows are family_inferred (rolled-up "
+            "from broad TCDB families). Re-run with "
+            "transport_confidence='substrate_confirmed' for "
+            "substrate-curated transporter genes only."
+        )
+
+    # 12. Assemble + return envelope.
+    not_found = {
+        "metabolite_ids": not_found_metab,
+        "organism": not_found_org,
+        "metabolite_pathway_ids": not_found_paths,
+    }
+
+    return {
+        "total_matching": total_matching,
+        "returned": len(results),
+        "offset": offset,
+        # Per spec § "Result-size controls" line 966 + Pydantic doc:
+        # truncated iff (offset + limit) < total_matching.
+        "truncated": (offset + limit) < total_matching,
+        "warnings": warnings,
+        "not_found": not_found,
+        "not_matched": not_matched,
+        "by_metabolite": by_metabolite,
+        "by_evidence_source": by_evidence_source,
+        "by_transport_confidence": by_transport_confidence,
+        "top_reactions": top_reactions,
+        "top_tcdb_families": top_tcdb_families,
+        "top_gene_categories": top_gene_categories,
+        "top_genes": top_genes,
+        "gene_count_total": gene_count_total,
+        "reaction_count_total": raw_summary.get("reaction_count_total", 0) or 0,
+        "transporter_count_total": raw_summary.get("transporter_count_total", 0) or 0,
+        "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
         "results": results,
     }
