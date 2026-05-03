@@ -1,0 +1,132 @@
+by_evidence_source:
+- count: 1
+  evidence_source: metabolism
+- count: 1
+  evidence_source: transport
+case_id: list_metabolites_id_batch_with_unknown
+mass_stats:
+  mass_max: 180.156
+  mass_median: 180.156
+  mass_min: 180.156
+not_found:
+  metabolite_ids:
+  - kegg.compound:C99999
+  organism_names: []
+  pathway_ids: []
+offset: 0
+results:
+- chebi_id: '4167'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: C6H12O6
+  gene_count: 320
+  mass: 180.156
+  metabolite_id: kegg.compound:C00031
+  name: D-Glucose
+  organism_count: 31
+  pathway_count: 35
+  pathway_ids:
+  - kegg.pathway:ko00010
+  - kegg.pathway:ko00030
+  - kegg.pathway:ko00052
+  - kegg.pathway:ko00074
+  - kegg.pathway:ko00500
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko00521
+  - kegg.pathway:ko00524
+  - kegg.pathway:ko00566
+  - kegg.pathway:ko00901
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko02060
+  - kegg.pathway:ko04066
+  - kegg.pathway:ko04068
+  - kegg.pathway:ko04113
+  - kegg.pathway:ko04148
+  - kegg.pathway:ko04152
+  - kegg.pathway:ko04742
+  - kegg.pathway:ko04910
+  - kegg.pathway:ko04911
+  - kegg.pathway:ko04917
+  - kegg.pathway:ko04922
+  - kegg.pathway:ko04930
+  - kegg.pathway:ko04931
+  - kegg.pathway:ko04932
+  - kegg.pathway:ko04933
+  - kegg.pathway:ko04973
+  - kegg.pathway:ko04976
+  - kegg.pathway:ko04978
+  - kegg.pathway:ko05111
+  - kegg.pathway:ko05230
+  - kegg.pathway:ko05415
+  transporter_count: 17
+returned: 1
+row_count: 1
+score_max: null
+score_median: null
+top_organisms:
+- count: 1
+  organism_name: Alteromonas macleodii AD45
+- count: 1
+  organism_name: Alteromonas macleodii ATCC27126
+- count: 1
+  organism_name: Alteromonas macleodii BGP6
+- count: 1
+  organism_name: Alteromonas macleodii BS11
+- count: 1
+  organism_name: Alteromonas macleodii EZ55
+- count: 1
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 1
+  organism_name: Alteromonas macleodii MIT1002
+- count: 1
+  organism_name: Marinobacter (MarRef v6)
+- count: 1
+  organism_name: Meiothermus ruber
+- count: 1
+  organism_name: Alteromonas (MarRef v6)
+top_pathways:
+- count: 1
+  pathway_id: kegg.pathway:ko00030
+  pathway_name: Pentose phosphate pathway
+- count: 1
+  pathway_id: kegg.pathway:ko00052
+  pathway_name: Galactose metabolism
+- count: 1
+  pathway_id: kegg.pathway:ko00074
+  pathway_name: Mycolic acid biosynthesis
+- count: 1
+  pathway_id: kegg.pathway:ko00500
+  pathway_name: Starch and sucrose metabolism
+- count: 1
+  pathway_id: kegg.pathway:ko00520
+  pathway_name: Amino sugar and nucleotide sugar metabolism
+- count: 1
+  pathway_id: kegg.pathway:ko00521
+  pathway_name: Streptomycin biosynthesis
+- count: 1
+  pathway_id: kegg.pathway:ko00524
+  pathway_name: Neomycin, kanamycin and gentamicin biosynthesis
+- count: 1
+  pathway_id: kegg.pathway:ko00566
+  pathway_name: Sulfoquinovose metabolism
+- count: 1
+  pathway_id: kegg.pathway:ko00901
+  pathway_name: Indole alkaloid biosynthesis
+- count: 1
+  pathway_id: kegg.pathway:ko00010
+  pathway_name: Glycolysis / Gluconeogenesis
+total_entries: 3025
+total_matching: 1
+truncated: false
+xref_coverage:
+  with_chebi: 1
+  with_hmdb: 1
+  with_mnxm: 1

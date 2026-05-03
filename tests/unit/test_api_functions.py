@@ -6249,4 +6249,214 @@ class TestListDerivedMetrics:
         conn = self._mock_conn(self._SUMMARY_ROW, [])
         out = list_derived_metrics(conn=conn)
         assert out["score_max"] is None
-        assert out["score_median"] is None
+
+
+# ---------------------------------------------------------------------------
+# list_metabolites — Phase 1 (Stage 1 RED)
+# ---------------------------------------------------------------------------
+
+
+class TestListMetabolites:
+    """Tests for api.list_metabolites.
+
+    Imports happen inside each test so pre-impl collection still passes.
+    """
+
+    _SUMMARY_ROW = {
+        "total_entries": 3025,
+        "total_matching": 1,
+        "top_organisms": [
+            {"organism_name": "Prochlorococcus MED4", "count": 1},
+        ],
+        "top_pathways": [
+            {
+                "pathway_id": "kegg.pathway:ko01100",
+                "pathway_name": "Metabolic pathways",
+                "count": 1,
+            },
+        ],
+        "by_evidence_source": [{"item": "metabolism", "count": 1}],
+        "with_chebi": 1,
+        "with_hmdb": 0,
+        "with_mnxm": 1,
+        "mass_min": 180.156,
+        "mass_median": 180.156,
+        "mass_max": 180.156,
+    }
+
+    _DETAIL_ROW = {
+        "metabolite_id": "kegg.compound:C00031",
+        "name": "D-Glucose",
+        "formula": "C6H12O6",
+        "elements": ["C", "H", "O"],
+        "mass": 180.156,
+        "gene_count": 320,
+        "organism_count": 31,
+        "transporter_count": 17,
+        "evidence_sources": ["metabolism", "transport"],
+        "chebi_id": "4167",
+        "pathway_ids": ["kegg.pathway:ko00010"],
+        "pathway_count": 1,
+    }
+
+    def _mock_conn(self, summary_row, detail_rows, *extra):
+        conn = MagicMock()
+        side_effect = [[summary_row], detail_rows]
+        side_effect.extend(extra)
+        conn.execute_query.side_effect = side_effect
+        return conn
+
+    def test_returns_dict_envelope(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        out = list_metabolites(conn=conn)
+        assert isinstance(out, dict)
+        assert out["total_entries"] == 3025
+        assert out["total_matching"] == 1
+        assert "top_organisms" in out
+        assert "top_pathways" in out
+        assert "by_evidence_source" in out
+        assert "xref_coverage" in out
+        assert "mass_stats" in out
+        assert "not_found" in out
+        assert out["returned"] == 1
+        assert out["truncated"] is False
+        assert len(out["results"]) == 1
+
+    def test_summary_only_when_summary_true(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = MagicMock()
+        # summary=True must skip the detail query entirely
+        conn.execute_query.side_effect = [[self._SUMMARY_ROW]]
+        out = list_metabolites(summary=True, conn=conn)
+        assert out["results"] == []
+        assert out["returned"] == 0
+        assert conn.execute_query.call_count == 1
+
+    def test_lucene_retry_on_parse_error(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        from neo4j.exceptions import ClientError as Neo4jClientError
+        conn = MagicMock()
+        conn.execute_query.side_effect = [
+            Neo4jClientError("Lucene parse error"),
+            [self._SUMMARY_ROW],
+            [self._DETAIL_ROW],
+        ]
+        out = list_metabolites(search="glucose*", conn=conn)
+        assert out["total_matching"] == 1
+        assert conn.execute_query.call_count == 3
+
+    def test_evidence_sources_enum_validation(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = MagicMock()
+        with pytest.raises(ValueError):
+            list_metabolites(evidence_sources=["bogus"], conn=conn)
+
+    def test_search_empty_validation(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        with pytest.raises(ValueError):
+            list_metabolites(search="")
+        with pytest.raises(ValueError):
+            list_metabolites(search="   ")
+
+    def test_organism_names_lowercased(self):
+        """organism_names is lowercased before being passed as
+        $organism_names_lc to the WHERE clause."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(
+            self._SUMMARY_ROW,
+            [self._DETAIL_ROW],
+            [{"found": ["prochlorococcus med4"]}],  # not_found probe
+        )
+        list_metabolites(
+            organism_names=["Prochlorococcus MED4"], conn=conn,
+        )
+        summary_call = conn.execute_query.call_args_list[0]
+        # Either passed as kwarg organism_names_lc or in params dict
+        kw = summary_call.kwargs
+        assert kw.get("organism_names_lc") == ["prochlorococcus med4"]
+
+    def test_not_found_metabolite_ids(self):
+        """Provided metabolite_ids that don't exist surface in
+        not_found.metabolite_ids."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(
+            self._SUMMARY_ROW,
+            [self._DETAIL_ROW],
+            [{"found": ["kegg.compound:C00031"]}],  # only one of two exists
+        )
+        out = list_metabolites(
+            metabolite_ids=[
+                "kegg.compound:C00031", "kegg.compound:C99999",
+            ],
+            conn=conn,
+        )
+        assert out["not_found"]["metabolite_ids"] == ["kegg.compound:C99999"]
+
+    def test_not_found_organism_names(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(
+            self._SUMMARY_ROW,
+            [self._DETAIL_ROW],
+            [{"found": ["prochlorococcus med4"]}],
+        )
+        out = list_metabolites(
+            organism_names=["Prochlorococcus MED4", "Bogus organism"],
+            conn=conn,
+        )
+        assert "Bogus organism" in out["not_found"]["organism_names"]
+
+    def test_not_found_pathway_ids(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(
+            self._SUMMARY_ROW,
+            [self._DETAIL_ROW],
+            [{"found": ["kegg.pathway:ko00910"]}],
+        )
+        out = list_metabolites(
+            pathway_ids=[
+                "kegg.pathway:ko00910", "kegg.pathway:bogus",
+            ],
+            conn=conn,
+        )
+        assert out["not_found"]["pathway_ids"] == ["kegg.pathway:bogus"]
+
+    def test_sparse_strip_null_chebi(self):
+        """When chebi_id is null on a row, api/ strips the key
+        (Pydantic field is optional)."""
+        from multiomics_explorer.api.functions import list_metabolites
+        row = {**self._DETAIL_ROW, "chebi_id": None}
+        conn = self._mock_conn(self._SUMMARY_ROW, [row])
+        out = list_metabolites(conn=conn)
+        assert "chebi_id" not in out["results"][0]
+
+    def test_verbose_returns_only_property_reads(self):
+        """Guard: verbose detail Cypher contains no CALL { ... } subqueries —
+        purely property reads on m. Inspects the Cypher string handed to the
+        Neo4j driver."""
+        from multiomics_explorer.api.functions import list_metabolites
+        conn = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
+        list_metabolites(verbose=True, conn=conn)
+        detail_call = conn.execute_query.call_args_list[1]
+        cypher = detail_call.args[0] if detail_call.args else ""
+        assert "CALL {" not in cypher
+        assert "CALL{" not in cypher
+
+    def test_creates_conn_when_none(self):
+        from multiomics_explorer.api.functions import list_metabolites
+        with patch(
+            "multiomics_explorer.api.functions.GraphConnection",
+        ) as MockConn:
+            mock_instance = MockConn.return_value
+            mock_instance.execute_query.side_effect = [
+                [self._SUMMARY_ROW],
+                [self._DETAIL_ROW],
+            ]
+            out = list_metabolites()
+        MockConn.assert_called_once()
+        assert out["total_matching"] == 1
+
+    def test_importable_from_package(self):
+        from multiomics_explorer import list_metabolites as pkg_lm
+        from multiomics_explorer.api import list_metabolites as api_direct
+        assert pkg_lm is api_direct

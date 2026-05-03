@@ -1,0 +1,624 @@
+by_evidence_source:
+- count: 18
+  evidence_source: metabolism
+- count: 12
+  evidence_source: transport
+case_id: list_metabolites_pathway
+mass_stats:
+  mass_max: 146.146
+  mass_median: 45.017
+  mass_min: 18.039
+not_found:
+  metabolite_ids: []
+  organism_names: []
+  pathway_ids: []
+offset: 0
+results:
+- chebi_id: '13282'
+  elements:
+  - C
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: CO2
+  gene_count: 1834
+  mass: 44.009
+  metabolite_id: kegg.compound:C00011
+  name: CO2
+  organism_count: 31
+  pathway_count: 25
+  pathway_ids:
+  - kegg.pathway:ko00220
+  - kegg.pathway:ko00230
+  - kegg.pathway:ko00260
+  - kegg.pathway:ko00361
+  - kegg.pathway:ko00625
+  - kegg.pathway:ko00630
+  - kegg.pathway:ko00680
+  - kegg.pathway:ko00710
+  - kegg.pathway:ko00720
+  - kegg.pathway:ko00785
+  - kegg.pathway:ko00791
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  - kegg.pathway:ko01230
+  - kegg.pathway:ko04964
+  - kegg.pathway:ko04966
+  - kegg.pathway:ko04970
+  - kegg.pathway:ko04971
+  - kegg.pathway:ko04972
+  - kegg.pathway:ko04973
+  - kegg.pathway:ko04974
+  - kegg.pathway:ko04976
+  transporter_count: 9
+- chebi_id: '13405'
+  elements:
+  - H
+  - N
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: H4N
+  gene_count: 1684
+  mass: 18.039
+  metabolite_id: kegg.compound:C00014
+  name: Ammonia
+  organism_count: 31
+  pathway_count: 19
+  pathway_ids:
+  - kegg.pathway:ko00220
+  - kegg.pathway:ko00230
+  - kegg.pathway:ko00250
+  - kegg.pathway:ko00260
+  - kegg.pathway:ko00460
+  - kegg.pathway:ko00630
+  - kegg.pathway:ko00785
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  - kegg.pathway:ko01230
+  - kegg.pathway:ko01310
+  - kegg.pathway:ko04964
+  - kegg.pathway:ko04966
+  - kegg.pathway:ko04974
+  - kegg.pathway:ko05110
+  - kegg.pathway:ko05120
+  transporter_count: 12
+- chebi_id: '10745'
+  elements:
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: O2
+  gene_count: 1668
+  mass: 31.998
+  metabolite_id: kegg.compound:C00007
+  name: Oxygen
+  organism_count: 31
+  pathway_count: 13
+  pathway_ids:
+  - kegg.pathway:ko00190
+  - kegg.pathway:ko00195
+  - kegg.pathway:ko00630
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko02024
+  - kegg.pathway:ko04066
+  - kegg.pathway:ko04918
+  - kegg.pathway:ko05012
+  - kegg.pathway:ko05208
+  - kegg.pathway:ko05211
+  transporter_count: 4
+- chebi_id: '13110'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: C5H10N2O3
+  gene_count: 1645
+  mass: 146.146
+  metabolite_id: kegg.compound:C00064
+  name: L-Glutamine
+  organism_count: 31
+  pathway_count: 24
+  pathway_ids:
+  - kegg.pathway:ko00220
+  - kegg.pathway:ko00230
+  - kegg.pathway:ko00240
+  - kegg.pathway:ko00250
+  - kegg.pathway:ko00470
+  - kegg.pathway:ko00630
+  - kegg.pathway:ko00750
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko00970
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01230
+  - kegg.pathway:ko01232
+  - kegg.pathway:ko01240
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko04382
+  - kegg.pathway:ko04724
+  - kegg.pathway:ko04727
+  - kegg.pathway:ko04964
+  - kegg.pathway:ko04974
+  - kegg.pathway:ko04978
+  - kegg.pathway:ko05230
+  transporter_count: 12
+- chebi_id: '13107'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: C5H8NO4
+  gene_count: 1458
+  mass: 146.122
+  metabolite_id: kegg.compound:C00025
+  name: L-Glutamate
+  organism_count: 31
+  pathway_count: 52
+  pathway_ids:
+  - kegg.pathway:ko00220
+  - kegg.pathway:ko00250
+  - kegg.pathway:ko00330
+  - kegg.pathway:ko00332
+  - kegg.pathway:ko00340
+  - kegg.pathway:ko00430
+  - kegg.pathway:ko00470
+  - kegg.pathway:ko00480
+  - kegg.pathway:ko00524
+  - kegg.pathway:ko00630
+  - kegg.pathway:ko00650
+  - kegg.pathway:ko00660
+  - kegg.pathway:ko00860
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko00970
+  - kegg.pathway:ko00975
+  - kegg.pathway:ko00998
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  - kegg.pathway:ko01210
+  - kegg.pathway:ko01230
+  - kegg.pathway:ko01240
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko04068
+  - kegg.pathway:ko04072
+  - kegg.pathway:ko04080
+  - kegg.pathway:ko04082
+  - kegg.pathway:ko04216
+  - kegg.pathway:ko04540
+  - kegg.pathway:ko04713
+  - kegg.pathway:ko04720
+  - kegg.pathway:ko04721
+  - kegg.pathway:ko04723
+  - kegg.pathway:ko04724
+  - kegg.pathway:ko04727
+  - kegg.pathway:ko04730
+  - kegg.pathway:ko04742
+  - kegg.pathway:ko04964
+  - kegg.pathway:ko04974
+  - kegg.pathway:ko05014
+  - kegg.pathway:ko05016
+  - kegg.pathway:ko05017
+  - kegg.pathway:ko05022
+  - kegg.pathway:ko05030
+  - kegg.pathway:ko05031
+  - kegg.pathway:ko05033
+  - kegg.pathway:ko05034
+  - kegg.pathway:ko05215
+  - kegg.pathway:ko05230
+  transporter_count: 7
+- chebi_id: '13351'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: CHO3
+  gene_count: 943
+  mass: 61.016
+  metabolite_id: kegg.compound:C00288
+  name: HCO3-
+  organism_count: 31
+  pathway_count: 17
+  pathway_ids:
+  - kegg.pathway:ko00220
+  - kegg.pathway:ko00230
+  - kegg.pathway:ko00720
+  - kegg.pathway:ko00791
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko04024
+  - kegg.pathway:ko04113
+  - kegg.pathway:ko04964
+  - kegg.pathway:ko04966
+  - kegg.pathway:ko04970
+  - kegg.pathway:ko04971
+  - kegg.pathway:ko04972
+  - kegg.pathway:ko04976
+  - kegg.pathway:ko04978
+  transporter_count: 10
+- chebi_id: '14658'
+  elements:
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: NO2
+  gene_count: 664
+  mass: 46.005
+  metabolite_id: kegg.compound:C00088
+  name: Nitrite
+  organism_count: 31
+  pathway_count: 8
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko00998
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  transporter_count: 20
+- chebi_id: '14037'
+  elements:
+  - C
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: CNO
+  gene_count: 567
+  mass: 42.017
+  metabolite_id: kegg.compound:C01417
+  name: Cyanate
+  organism_count: 31
+  pathway_count: 3
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko02010
+  transporter_count: 2
+- chebi_id: '14276'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: CHO2
+  gene_count: 307
+  mass: 45.017
+  metabolite_id: kegg.compound:C00058
+  name: Formate
+  organism_count: 31
+  pathway_count: 11
+  pathway_ids:
+  - kegg.pathway:ko00440
+  - kegg.pathway:ko00620
+  - kegg.pathway:ko00625
+  - kegg.pathway:ko00630
+  - kegg.pathway:ko00680
+  - kegg.pathway:ko00720
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  - kegg.pathway:ko01220
+  transporter_count: 7
+- chebi_id: '13942'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: CH2NO5P
+  gene_count: 133
+  mass: 139.003
+  metabolite_id: kegg.compound:C00169
+  name: Carbamoyl phosphate
+  organism_count: 31
+  pathway_count: 11
+  pathway_ids:
+  - kegg.pathway:ko00220
+  - kegg.pathway:ko00230
+  - kegg.pathway:ko00240
+  - kegg.pathway:ko00250
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  - kegg.pathway:ko01230
+  - kegg.pathway:ko01240
+  transporter_count: 0
+- chebi_id: '14661'
+  elements:
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: N2O
+  gene_count: 103
+  mass: 44.013
+  metabolite_id: kegg.compound:C00887
+  name: Nitrous oxide
+  organism_count: 31
+  pathway_count: 4
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  transporter_count: 2
+- chebi_id: '13941'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  formula: CH2NO2
+  gene_count: 96
+  mass: 60.032
+  metabolite_id: kegg.compound:C01563
+  name: Carbamate
+  organism_count: 31
+  pathway_count: 3
+  pathway_ids:
+  - kegg.pathway:ko00240
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  transporter_count: 0
+- chebi_id: '25545'
+  elements:
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: HNO3
+  gene_count: 103
+  mass: 63.012
+  metabolite_id: kegg.compound:C00244
+  name: Nitrate
+  organism_count: 21
+  pathway_count: 6
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  transporter_count: 5
+- elements:
+  - C
+  - N
+  evidence_sources:
+  - metabolism
+  formula: CN*
+  gene_count: 18
+  mass: null
+  metabolite_id: kegg.compound:C00726
+  name: Nitrile
+  organism_count: 17
+  pathway_count: 2
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  transporter_count: 0
+- chebi_id: '14275'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: CH3NO
+  gene_count: 23
+  mass: 45.041
+  metabolite_id: kegg.compound:C00488
+  name: Formamide
+  organism_count: 16
+  pathway_count: 4
+  pathway_ids:
+  - kegg.pathway:ko00460
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01200
+  transporter_count: 1
+- chebi_id: '14657'
+  elements:
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  formula: 'NO'
+  gene_count: 7
+  mass: 30.006
+  metabolite_id: kegg.compound:C00533
+  name: Nitric oxide
+  organism_count: 2
+  pathway_count: 38
+  pathway_ids:
+  - kegg.pathway:ko00330
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko04022
+  - kegg.pathway:ko04066
+  - kegg.pathway:ko04071
+  - kegg.pathway:ko04151
+  - kegg.pathway:ko04270
+  - kegg.pathway:ko04370
+  - kegg.pathway:ko04371
+  - kegg.pathway:ko04540
+  - kegg.pathway:ko04611
+  - kegg.pathway:ko04621
+  - kegg.pathway:ko04626
+  - kegg.pathway:ko04713
+  - kegg.pathway:ko04730
+  - kegg.pathway:ko04915
+  - kegg.pathway:ko04921
+  - kegg.pathway:ko04924
+  - kegg.pathway:ko04926
+  - kegg.pathway:ko04931
+  - kegg.pathway:ko04940
+  - kegg.pathway:ko04970
+  - kegg.pathway:ko05010
+  - kegg.pathway:ko05014
+  - kegg.pathway:ko05022
+  - kegg.pathway:ko05140
+  - kegg.pathway:ko05142
+  - kegg.pathway:ko05143
+  - kegg.pathway:ko05146
+  - kegg.pathway:ko05171
+  - kegg.pathway:ko05200
+  - kegg.pathway:ko05225
+  - kegg.pathway:ko05415
+  - kegg.pathway:ko05418
+  transporter_count: 0
+- chebi_id: '10793'
+  elements:
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  formula: H3NO
+  gene_count: 3
+  mass: 33.03
+  metabolite_id: kegg.compound:C00192
+  name: Hydroxylamine
+  organism_count: 2
+  pathway_count: 4
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  transporter_count: 0
+- chebi_id: '13388'
+  elements:
+  - N
+  evidence_sources:
+  - metabolism
+  formula: N2
+  gene_count: 1
+  mass: 28.014
+  metabolite_id: kegg.compound:C00697
+  name: Nitrogen
+  organism_count: 1
+  pathway_count: 6
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko02060
+  transporter_count: 0
+returned: 18
+row_count: 18
+score_max: null
+score_median: null
+top_organisms:
+- count: 18
+  organism_name: Ruegeria pomeroyi DSS-3
+- count: 17
+  organism_name: Shewanella sp. W3-18-1
+- count: 15
+  organism_name: Alteromonas macleodii ATCC27126
+- count: 15
+  organism_name: Alteromonas macleodii AD45
+- count: 15
+  organism_name: Alteromonas macleodii EZ55
+- count: 15
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 15
+  organism_name: Marinobacter (MarRef v6)
+- count: 15
+  organism_name: Alteromonas macleodii MIT1002
+- count: 15
+  organism_name: Alteromonas macleodii BS11
+- count: 15
+  organism_name: Alteromonas macleodii BGP6
+top_pathways:
+- count: 18
+  pathway_id: kegg.pathway:ko00910
+  pathway_name: Nitrogen metabolism
+- count: 18
+  pathway_id: kegg.pathway:ko01100
+  pathway_name: Metabolic pathways
+- count: 13
+  pathway_id: kegg.pathway:ko01120
+  pathway_name: Microbial metabolism in diverse environments
+- count: 7
+  pathway_id: kegg.pathway:ko01110
+  pathway_name: Biosynthesis of secondary metabolites
+- count: 7
+  pathway_id: kegg.pathway:ko01310
+  pathway_name: Nitrogen cycle
+- count: 7
+  pathway_id: kegg.pathway:ko02020
+  pathway_name: Two-component system
+- count: 6
+  pathway_id: kegg.pathway:ko00630
+  pathway_name: Glyoxylate and dicarboxylate metabolism
+- count: 6
+  pathway_id: kegg.pathway:ko01200
+  pathway_name: Carbon metabolism
+- count: 6
+  pathway_id: kegg.pathway:ko00220
+  pathway_name: Arginine biosynthesis
+- count: 6
+  pathway_id: kegg.pathway:ko02010
+  pathway_name: ABC transporters
+total_entries: 3025
+total_matching: 18
+truncated: false
+xref_coverage:
+  with_chebi: 17
+  with_hmdb: 16
+  with_mnxm: 18

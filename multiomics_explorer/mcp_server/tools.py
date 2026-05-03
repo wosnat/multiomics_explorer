@@ -370,6 +370,85 @@ class ClusterEnrichmentResponse(BaseModel):
     )
 
 
+# ---------------------------------------------------------------------------
+# list_metabolites response models (module-level for direct importability)
+# ---------------------------------------------------------------------------
+
+class MetaboliteResult(BaseModel):
+    # compact
+    metabolite_id: str = Field(description="Full prefixed ID (e.g. 'kegg.compound:C00031'). 85% kegg.compound, 15% chebi (TCDB-only substrates).")
+    name: str = Field(description="Metabolite name (e.g. 'D-Glucose', 'L-Glutamate')")
+    formula: str | None = Field(default=None, description="Hill-notation chemical formula (e.g. 'C6H12O6'). Null on ~9% of metabolites (mostly TCDB-curated generic substrates).")
+    elements: list[str] = Field(default_factory=list, description="Sorted unique element symbols present in formula (e.g. ['C','H','O']). Empty when formula is null. Filter on this — never on `formula` substring (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N').")
+    mass: float | None = Field(default=None, description="Monoisotopic mass in Da (e.g. 180.156). Null on ~22% of metabolites.")
+    gene_count: int = Field(default=0, description="Distinct genes reachable via Gene → Reaction → Metabolite OR Gene → TcdbFamily → Metabolite (UNION post-TCDB; e.g. 320 for glucose). When > 0, drill in via genes_by_metabolite(metabolite_ids=[id], organism=...). All metabolites have gene_count > 0 today (post-2026-05-03 transport-arm fix); the future metabolomics-DM spec will introduce metabolites measured without any gene path, which will surface here with gene_count=0 — 0 ≠ 'absent from KG'.")
+    organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path (e.g. 31 for ATP). When > 0, narrow with organism_names filter.")
+    transporter_count: int = Field(default=0, description="Distinct `tc_specificity` leaf TcdbFamily nodes annotated as transporting this metabolite (e.g. 17 for glucose, 229 for sodium). Scoped to leaves so the count reflects 'actual transporter systems' rather than counting ancestor families that inherit the substrate via the 2026-05-03 rollup. Source: TCDB-CAZy ontology.")
+    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate. 'metabolomics' is reserved for the future metabolomics-DM spec — no row carries it today. E.g. ['metabolism', 'transport'].")
+    chebi_id: str | None = Field(default=None, description="ChEBI ID (raw numeric, e.g. '4167'). Populated on 90% of metabolites overall — 100% of the 452 chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI.")
+    pathway_ids: list[str] = Field(default_factory=list, description="KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).")
+    pathway_count: int = Field(default=0, description="Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids).")
+    score: float | None = Field(default=None, description="Lucene relevance score (only with `search`).")
+
+    # verbose
+    inchikey: str | None = Field(default=None, description="InChIKey structural fingerprint (e.g. 'WQZGKKKJIJFFOK-GASJEMHNSA-N'). Verbose only.")
+    smiles: str | None = Field(default=None, description="SMILES structural string (e.g. 'OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O'). Verbose only.")
+    mnxm_id: str | None = Field(default=None, description="MetaNetX canonical ID (e.g. 'MNXM1364061'). Verbose only — populated on 100% of metabolites.")
+    hmdb_id: str | None = Field(default=None, description="HMDB ID (e.g. 'HMDB0304632'). Verbose only — populated on 47%.")
+    pathway_names: list[str] | None = Field(default=None, description="Pathway names aligned with pathway_ids (verbose only).")
+
+
+class MetTopOrganism(BaseModel):
+    organism_name: str = Field(description="Organism name (e.g. 'Ruegeria pomeroyi DSS-3')")
+    count: int = Field(description="Number of matched metabolites this organism reaches (e.g. 1271)")
+
+
+class MetTopPathway(BaseModel):
+    pathway_id: str = Field(description="KEGG pathway ID (e.g. 'kegg.pathway:ko01100')")
+    pathway_name: str = Field(description="Pathway name (e.g. 'Metabolic pathways')")
+    count: int = Field(description="Number of matched metabolites in this pathway (e.g. 870)")
+
+
+class MetEvidenceSourceBreakdown(BaseModel):
+    evidence_source: str = Field(description="Evidence path (e.g. 'metabolism', 'transport')")
+    count: int = Field(description="Number of matched metabolites with this evidence source (e.g. 1212). Sums to > total_matching when metabolites carry multiple sources.")
+
+
+class MetXrefCoverage(BaseModel):
+    with_chebi: int = Field(description="Matched metabolites with chebi_id (e.g. 1386)")
+    with_hmdb: int = Field(description="Matched metabolites with hmdb_id (e.g. 849)")
+    with_mnxm: int = Field(description="Matched metabolites with mnxm_id (e.g. 1563 — typically full coverage)")
+
+
+class MetMassStats(BaseModel):
+    mass_min: float | None = Field(default=None, description="Minimum mass across matched metabolites (e.g. 18.039). Null when no matched metabolite has a mass.")
+    mass_median: float | None = Field(default=None, description="Median mass (e.g. 328.192).")
+    mass_max: float | None = Field(default=None, description="Maximum mass (e.g. 5227.103).")
+
+
+class MetNotFound(BaseModel):
+    metabolite_ids: list[str] = Field(default_factory=list, description="Input metabolite_ids that don't exist in the KG (e.g. ['kegg.compound:C99999']).")
+    organism_names: list[str] = Field(default_factory=list, description="Input organism_names with no matching OrganismTaxon (e.g. ['Bogus organism']).")
+    pathway_ids: list[str] = Field(default_factory=list, description="Input pathway_ids with no matching KeggTerm (e.g. ['kegg.pathway:bogus']).")
+
+
+class ListMetabolitesResponse(BaseModel):
+    total_entries: int = Field(description="Total Metabolite nodes in KG (unfiltered, 3,025 today)")
+    total_matching: int = Field(description="Metabolites matching filters")
+    top_organisms: list[MetTopOrganism] = Field(default_factory=list, description="Top 10 organisms by metabolite count (within matched set), sorted desc")
+    top_pathways: list[MetTopPathway] = Field(default_factory=list, description="Top 10 pathways by metabolite count (within matched set), sorted desc")
+    by_evidence_source: list[MetEvidenceSourceBreakdown] = Field(default_factory=list, description="Frequency of evidence_sources values across matched set. Today: at most 2 entries (metabolism, transport).")
+    xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set")
+    mass_stats: MetMassStats = Field(description="Mass distribution within matched set")
+    score_max: float | None = Field(default=None, description="Max Lucene score (only with search)")
+    score_median: float | None = Field(default=None, description="Median Lucene score (only with search)")
+    returned: int = Field(description="Metabolites in this response")
+    offset: int = Field(default=0, description="Offset into full result set (e.g. 0)")
+    truncated: bool = Field(description="True if total_matching > returned")
+    not_found: MetNotFound = Field(default_factory=MetNotFound, description="Per-filter buckets for unknown input IDs")
+    results: list[MetaboliteResult] = Field(default_factory=list)
+
+
 def register_tools(mcp: FastMCP):
     """Register all KG tools with the MCP server."""
 
@@ -6095,3 +6174,178 @@ def register_tools(mcp: FastMCP):
             f"gene×DM rows"
         )
         return response
+
+    # --- list_metabolites ---
+
+    @mcp.tool(
+        tags={"metabolites", "chemistry", "discovery"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def list_metabolites(
+        ctx: Context,
+        search: Annotated[str | None, Field(
+            description="Free-text search on metabolite name (Lucene syntax). "
+            "Index covers Metabolite.name only — element/formula composition "
+            "is filtered through `elements` (presence list), not search. "
+            "E.g. 'glucose', 'phosphate AND amino'.",
+        )] = None,
+        metabolite_ids: Annotated[list[str] | None, Field(
+            description="Restrict to specific metabolites by full prefixed ID "
+            "(case-sensitive). E.g. ['kegg.compound:C00031', 'kegg.compound:C00002']. "
+            "Combines with other filters via AND. `not_found.metabolite_ids` "
+            "lists any IDs that don't exist in the KG.",
+        )] = None,
+        kegg_compound_ids: Annotated[list[str] | None, Field(
+            description="Filter by raw KEGG C-numbers (e.g. ['C00031']). "
+            "Convenience over `metabolite_ids` when working with KEGG-anchored "
+            "data; the prefixed equivalent is `kegg.compound:C*`.",
+        )] = None,
+        chebi_ids: Annotated[list[str] | None, Field(
+            description="Filter by raw ChEBI numeric IDs (e.g. ['4167', '15422']). "
+            "90% of Metabolite nodes carry a `chebi_id`.",
+        )] = None,
+        hmdb_ids: Annotated[list[str] | None, Field(
+            description="Filter by raw HMDB IDs (e.g. ['HMDB0000122']). "
+            "47% coverage.",
+        )] = None,
+        mnxm_ids: Annotated[list[str] | None, Field(
+            description="Filter by raw MetaNetX IDs (e.g. ['MNXM1364061']). "
+            "100% coverage — every Metabolite has a `mnxm_id`.",
+        )] = None,
+        elements: Annotated[list[str] | None, Field(
+            description="Element-presence filter (Hill-notation symbols). "
+            "AND of presence — ['N', 'P'] matches metabolites containing BOTH. "
+            "Replaces error-prone formula-substring matching. Empty/null "
+            "formula metabolites (~10%) never match. E.g. ['N'] for "
+            "nitrogen-containing metabolites (yields 1,563 today).",
+        )] = None,
+        mass_min: Annotated[float | None, Field(
+            description="Minimum monoisotopic mass (Da). Excludes metabolites "
+            "with null `mass` (~22%). E.g. 60.0.",
+        )] = None,
+        mass_max: Annotated[float | None, Field(
+            description="Maximum monoisotopic mass (Da). E.g. 1000.0.",
+        )] = None,
+        organism_names: Annotated[list[str] | None, Field(
+            description="Restrict to metabolites reachable by these organisms "
+            "(case-insensitive on `preferred_name`). UNION semantics — a "
+            "metabolite reached by ANY listed organism qualifies. Joined via "
+            "`Organism_has_metabolite` (catalysis OR transport post-TCDB). "
+            "E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists "
+            "any unknown names.",
+        )] = None,
+        pathway_ids: Annotated[list[str] | None, Field(
+            description="Filter by KEGG pathway membership (`KeggTerm.id`). "
+            "E.g. ['kegg.pathway:ko00910'] for nitrogen metabolism. Joined via "
+            "`Metabolite_in_pathway` (transport-extended post-TCDB; 395 distinct "
+            "pathways are metabolite-reachable). `not_found.pathway_ids` lists "
+            "any IDs that don't exist as a KeggTerm.",
+        )] = None,
+        evidence_sources: Annotated[
+            list[Literal["metabolism", "transport", "metabolomics"]] | None,
+            Field(
+                description="Filter by evidence path. Set-membership ANY semantics "
+                "— ['transport'] returns transport-only AND dual (1,097 today). "
+                "Valid values: 'metabolism' (catalysis-reachable), 'transport' "
+                "(TCDB-curated substrate). `'metabolomics'` is accepted as a "
+                "filter value for forward-compat with the future metabolomics-DM "
+                "spec; no row matches yet. Other values raise at the MCP "
+                "boundary (Pydantic Literal validation).",
+            ),
+        ] = None,
+        summary: Annotated[bool, Field(
+            description="When true, return only summary fields (results=[]).",
+        )] = False,
+        verbose: Annotated[bool, Field(
+            description="Include heavy-text and structural-fingerprint fields "
+            "(inchikey, smiles, mnxm_id, hmdb_id, pathway_names).",
+        )] = False,
+        limit: Annotated[int, Field(
+            description="Max results.", ge=1,
+        )] = 5,
+        offset: Annotated[int, Field(
+            description="Number of results to skip for pagination.", ge=0,
+        )] = 0,
+    ) -> ListMetabolitesResponse:
+        """Browse and filter metabolites in the chemistry layer.
+
+        **Direction-agnostic.** Joins through `Reaction_has_metabolite` and
+        (post-TCDB) `Tcdb_family_transports_metabolite` are direction-agnostic —
+        a metabolite that is *produced* and one that is *consumed* surface
+        identically. KEGG equation order is arbitrary. To distinguish, layer
+        transcriptional evidence (`differential_expression_by_gene`) and
+        functional annotation (`gene_overview` Pfam/KO `*-synthase` vs
+        `*-permease`).
+
+        After this tool, drill in via:
+        - genes_by_metabolite(metabolite_ids=[id], organism=...) — find the
+          catalysts / transporters per organism (replaces what would
+          otherwise be an inline per-row top-N gene list here)
+        - gene_metabolic_role(locus_tags=[...], organism=..., metabolite_elements=...) — gene-centric chemistry
+        - genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...) — pathway → genes
+        """
+        await ctx.info(
+            f"list_metabolites search={search} metabolite_ids={metabolite_ids} "
+            f"elements={elements} organism_names={organism_names} "
+            f"pathway_ids={pathway_ids} evidence_sources={evidence_sources} "
+            f"summary={summary} verbose={verbose} limit={limit} offset={offset}"
+        )
+        try:
+            conn = _conn(ctx)
+            result = api.list_metabolites(
+                search=search,
+                metabolite_ids=metabolite_ids,
+                kegg_compound_ids=kegg_compound_ids,
+                chebi_ids=chebi_ids,
+                hmdb_ids=hmdb_ids,
+                mnxm_ids=mnxm_ids,
+                elements=elements,
+                mass_min=mass_min,
+                mass_max=mass_max,
+                organism_names=organism_names,
+                pathway_ids=pathway_ids,
+                evidence_sources=evidence_sources,
+                summary=summary,
+                verbose=verbose,
+                limit=limit,
+                offset=offset,
+                conn=conn,
+            )
+            results = [MetaboliteResult(**r) for r in result["results"]]
+            top_organisms = [MetTopOrganism(**b) for b in result["top_organisms"]]
+            top_pathways = [MetTopPathway(**b) for b in result["top_pathways"]]
+            by_evidence_source = [
+                MetEvidenceSourceBreakdown(**b)
+                for b in result["by_evidence_source"]
+            ]
+            xref_coverage = MetXrefCoverage(**result["xref_coverage"])
+            mass_stats = MetMassStats(**result["mass_stats"])
+            not_found = MetNotFound(**result["not_found"])
+            response = ListMetabolitesResponse(
+                total_entries=result["total_entries"],
+                total_matching=result["total_matching"],
+                top_organisms=top_organisms,
+                top_pathways=top_pathways,
+                by_evidence_source=by_evidence_source,
+                xref_coverage=xref_coverage,
+                mass_stats=mass_stats,
+                score_max=result.get("score_max"),
+                score_median=result.get("score_median"),
+                returned=result["returned"],
+                offset=result.get("offset", 0),
+                truncated=result["truncated"],
+                not_found=not_found,
+                results=results,
+            )
+            await ctx.info(
+                f"Returning {response.returned} of {response.total_matching} "
+                f"matching metabolites ({response.total_entries} total in KG)"
+            )
+            return response
+        except ValueError as e:
+            await ctx.warning(f"list_metabolites error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"list_metabolites unexpected error: {e}")
+            raise ToolError(f"Error in list_metabolites: {e}")

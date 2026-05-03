@@ -1198,3 +1198,128 @@ class TestGenesByNumericMetricContract:
         assert len(data["excluded_derived_metrics"]) >= 1
         entry = data["excluded_derived_metrics"][0]
         assert set(entry.keys()) == self.EXPECTED_EXCLUDED_DM_KEYS
+
+
+# ---------------------------------------------------------------------------
+# list_metabolites — chemistry slice-1 Tool #1
+# ---------------------------------------------------------------------------
+@pytest.mark.kg
+class TestListMetabolitesContract:
+    """Pin the envelope + per-row schema for list_metabolites."""
+
+    EXPECTED_ENVELOPE_KEYS = {
+        "total_entries", "total_matching",
+        "top_organisms", "top_pathways", "by_evidence_source",
+        "xref_coverage", "mass_stats",
+        "score_max", "score_median",
+        "returned", "offset", "truncated", "not_found", "results",
+    }
+
+    EXPECTED_COMPACT_RESULT_KEYS = {
+        "metabolite_id", "name", "formula", "elements", "mass",
+        "gene_count", "organism_count", "transporter_count",
+        "evidence_sources", "pathway_ids", "pathway_count",
+    }
+
+    # chebi_id is sparse — present only when not None — so it's not in the
+    # required compact set above. Verbose adds the cross-DB IDs + names.
+    EXPECTED_VERBOSE_ADD_KEYS = {
+        "inchikey", "smiles", "mnxm_id", "hmdb_id", "pathway_names",
+    }
+
+    EXPECTED_NOT_FOUND_KEYS = {
+        "metabolite_ids", "organism_names", "pathway_ids",
+    }
+
+    EXPECTED_XREF_COVERAGE_KEYS = {"with_chebi", "with_hmdb", "with_mnxm"}
+    EXPECTED_MASS_STATS_KEYS = {"mass_min", "mass_median", "mass_max"}
+
+    def test_returns_dict_envelope(self, conn):
+        result = api.list_metabolites(conn=conn)
+        assert isinstance(result, dict)
+        assert self.EXPECTED_ENVELOPE_KEYS <= set(result.keys())
+        assert result["total_matching"] >= 1
+
+    def test_envelope_keys_summary_mode(self, conn):
+        """Summary mode preserves the full envelope shape (results=[])."""
+        result = api.list_metabolites(summary=True, conn=conn)
+        assert self.EXPECTED_ENVELOPE_KEYS <= set(result.keys())
+        assert result["results"] == []
+        assert result["returned"] == 0
+
+    def test_compact_result_keys(self, conn):
+        result = api.list_metabolites(limit=1, conn=conn)
+        assert len(result["results"]) >= 1
+        row_keys = set(result["results"][0].keys())
+        # compact set must be present (chebi_id is sparse)
+        assert self.EXPECTED_COMPACT_RESULT_KEYS <= row_keys
+
+    def test_verbose_result_keys(self, conn):
+        result = api.list_metabolites(limit=1, verbose=True, conn=conn)
+        row_keys = set(result["results"][0].keys())
+        expected = (
+            self.EXPECTED_COMPACT_RESULT_KEYS
+            | self.EXPECTED_VERBOSE_ADD_KEYS
+        )
+        assert expected <= row_keys
+
+    def test_not_found_typed_dict_shape(self, conn):
+        """`not_found` is a typed dict with all 3 buckets even when empty."""
+        result = api.list_metabolites(conn=conn)
+        assert isinstance(result["not_found"], dict)
+        assert set(result["not_found"].keys()) == self.EXPECTED_NOT_FOUND_KEYS
+        for v in result["not_found"].values():
+            assert isinstance(v, list)
+
+    def test_not_found_metabolite_ids_populated(self, conn):
+        """Unknown metabolite ID surfaces in not_found.metabolite_ids."""
+        result = api.list_metabolites(
+            metabolite_ids=["kegg.compound:C99999"], conn=conn,
+        )
+        assert result["not_found"]["metabolite_ids"] == [
+            "kegg.compound:C99999"
+        ]
+
+    def test_xref_coverage_shape(self, conn):
+        result = api.list_metabolites(conn=conn)
+        assert isinstance(result["xref_coverage"], dict)
+        assert set(result["xref_coverage"].keys()) == (
+            self.EXPECTED_XREF_COVERAGE_KEYS
+        )
+
+    def test_mass_stats_shape(self, conn):
+        result = api.list_metabolites(conn=conn)
+        assert isinstance(result["mass_stats"], dict)
+        assert set(result["mass_stats"].keys()) == self.EXPECTED_MASS_STATS_KEYS
+
+    def test_search_populates_score_fields(self, conn):
+        """Search mode adds `score` per row + score_max/score_median envelope."""
+        result = api.list_metabolites(search="glucose", conn=conn)
+        assert len(result["results"]) >= 1
+        assert "score" in result["results"][0]
+        assert result["score_max"] is not None
+        assert result["score_median"] is not None
+
+    def test_no_search_score_fields_none(self, conn):
+        """Without search, envelope score_* fields are None."""
+        result = api.list_metabolites(limit=1, conn=conn)
+        assert result["score_max"] is None
+        assert result["score_median"] is None
+
+    def test_evidence_sources_filter_narrows(self, conn):
+        all_m = api.list_metabolites(conn=conn)
+        filtered = api.list_metabolites(
+            evidence_sources=["transport"], conn=conn,
+        )
+        assert filtered["total_matching"] <= all_m["total_matching"]
+        assert filtered["total_matching"] >= 1
+
+    def test_invalid_evidence_source_raises(self, conn):
+        with pytest.raises(ValueError, match="evidence_sources"):
+            api.list_metabolites(
+                evidence_sources=["not_a_real_source"], conn=conn,
+            )
+
+    def test_empty_search_raises(self, conn):
+        with pytest.raises(ValueError, match="search"):
+            api.list_metabolites(search="   ", conn=conn)

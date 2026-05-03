@@ -1,0 +1,675 @@
+by_evidence_source:
+- count: 20
+  evidence_source: metabolism
+- count: 7
+  evidence_source: transport
+case_id: list_metabolites_search_glucose
+mass_stats:
+  mass_max: 587.328
+  mass_median: 422.276
+  mass_min: 164.157
+not_found:
+  metabolite_ids: []
+  organism_names: []
+  pathway_ids: []
+offset: 0
+results:
+- chebi_id: '14313'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - transport
+  formula: C6H12O6
+  gene_count: 752
+  mass: 180.156
+  metabolite_id: chebi:14313
+  name: glucose
+  organism_count: 31
+  pathway_count: 0
+  pathway_ids: []
+  score: 3.0394
+  transporter_count: 88
+- chebi_id: '13498'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: C15H22N2O17P2
+  gene_count: 655
+  mass: 564.286
+  metabolite_id: kegg.compound:C00029
+  name: UDP-glucose
+  organism_count: 31
+  pathway_count: 17
+  pathway_ids:
+  - kegg.pathway:ko00040
+  - kegg.pathway:ko00052
+  - kegg.pathway:ko00053
+  - kegg.pathway:ko00500
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko00524
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko00561
+  - kegg.pathway:ko00566
+  - kegg.pathway:ko00908
+  - kegg.pathway:ko01051
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01240
+  - kegg.pathway:ko01250
+  - kegg.pathway:ko04082
+  score: 2.5613
+  transporter_count: 1
+- chebi_id: '4167'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: C6H12O6
+  gene_count: 320
+  mass: 180.156
+  metabolite_id: kegg.compound:C00031
+  name: D-Glucose
+  organism_count: 31
+  pathway_count: 35
+  pathway_ids:
+  - kegg.pathway:ko00010
+  - kegg.pathway:ko00030
+  - kegg.pathway:ko00052
+  - kegg.pathway:ko00074
+  - kegg.pathway:ko00500
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko00521
+  - kegg.pathway:ko00524
+  - kegg.pathway:ko00566
+  - kegg.pathway:ko00901
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko02060
+  - kegg.pathway:ko04066
+  - kegg.pathway:ko04068
+  - kegg.pathway:ko04113
+  - kegg.pathway:ko04148
+  - kegg.pathway:ko04152
+  - kegg.pathway:ko04742
+  - kegg.pathway:ko04910
+  - kegg.pathway:ko04911
+  - kegg.pathway:ko04917
+  - kegg.pathway:ko04922
+  - kegg.pathway:ko04930
+  - kegg.pathway:ko04931
+  - kegg.pathway:ko04932
+  - kegg.pathway:ko04933
+  - kegg.pathway:ko04973
+  - kegg.pathway:ko04976
+  - kegg.pathway:ko04978
+  - kegg.pathway:ko05111
+  - kegg.pathway:ko05230
+  - kegg.pathway:ko05415
+  score: 2.5613
+  transporter_count: 17
+- chebi_id: '10526'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C16H24N2O16P2
+  gene_count: 136
+  mass: 562.314
+  metabolite_id: kegg.compound:C00842
+  name: dTDP-glucose
+  organism_count: 31
+  pathway_count: 9
+  pathway_ids:
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko00521
+  - kegg.pathway:ko00523
+  - kegg.pathway:ko00525
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko01055
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01250
+  score: 2.5613
+  transporter_count: 0
+- chebi_id: '13230'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C16H23N5O15P2
+  gene_count: 65
+  mass: 587.328
+  metabolite_id: kegg.compound:C00498
+  name: ADP-glucose
+  organism_count: 30
+  pathway_count: 5
+  pathway_ids:
+  - kegg.pathway:ko00500
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01250
+  score: 2.5613
+  transporter_count: 0
+- chebi_id: '13264'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C15H23N3O16P2
+  gene_count: 12
+  mass: 563.302
+  metabolite_id: kegg.compound:C00501
+  name: CDP-glucose
+  organism_count: 7
+  pathway_count: 5
+  pathway_ids:
+  - kegg.pathway:ko00500
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01250
+  score: 2.5613
+  transporter_count: 0
+- chebi_id: '10397'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - metabolism
+  formula: C6H12O6
+  gene_count: 148
+  mass: 180.156
+  metabolite_id: kegg.compound:C00221
+  name: beta-D-Glucose
+  organism_count: 31
+  pathway_count: 6
+  pathway_ids:
+  - kegg.pathway:ko00010
+  - kegg.pathway:ko00030
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  score: 2.2131
+  transporter_count: 0
+- chebi_id: '10242'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - metabolism
+  formula: C6H12O6
+  gene_count: 136
+  mass: 180.156
+  metabolite_id: kegg.compound:C00267
+  name: alpha-D-Glucose
+  organism_count: 31
+  pathway_count: 10
+  pathway_ids:
+  - kegg.pathway:ko00010
+  - kegg.pathway:ko00051
+  - kegg.pathway:ko00052
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  - kegg.pathway:ko01250
+  - kegg.pathway:ko04964
+  score: 2.2131
+  transporter_count: 0
+- chebi_id: '14314'
+  elements:
+  - C
+  - H
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: C6H11O9P
+  gene_count: 147
+  mass: 258.119
+  metabolite_id: kegg.compound:C00092
+  name: D-Glucose 6-phosphate
+  organism_count: 31
+  pathway_count: 17
+  pathway_ids:
+  - kegg.pathway:ko00500
+  - kegg.pathway:ko00521
+  - kegg.pathway:ko00524
+  - kegg.pathway:ko00562
+  - kegg.pathway:ko00998
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko02020
+  - kegg.pathway:ko02060
+  - kegg.pathway:ko04911
+  - kegg.pathway:ko04917
+  - kegg.pathway:ko04918
+  - kegg.pathway:ko04931
+  - kegg.pathway:ko04973
+  - kegg.pathway:ko05111
+  - kegg.pathway:ko05230
+  - kegg.pathway:ko05415
+  score: 1.9483
+  transporter_count: 3
+- chebi_id: '10246'
+  elements:
+  - C
+  - H
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C6H11O9P
+  gene_count: 214
+  mass: 258.119
+  metabolite_id: kegg.compound:C00103
+  name: D-Glucose 1-phosphate
+  organism_count: 31
+  pathway_count: 17
+  pathway_ids:
+  - kegg.pathway:ko00010
+  - kegg.pathway:ko00040
+  - kegg.pathway:ko00052
+  - kegg.pathway:ko00500
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko00521
+  - kegg.pathway:ko00523
+  - kegg.pathway:ko00525
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko00561
+  - kegg.pathway:ko00566
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01240
+  - kegg.pathway:ko01250
+  - kegg.pathway:ko04922
+  score: 1.9483
+  transporter_count: 0
+- chebi_id: '1078'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - transport
+  formula: C6H12O5
+  gene_count: 15
+  mass: 164.157
+  metabolite_id: kegg.compound:C00586
+  name: 2-Deoxy-D-glucose
+  organism_count: 10
+  pathway_count: 0
+  pathway_ids: []
+  score: 1.9483
+  transporter_count: 2
+- chebi_id: '10245'
+  elements:
+  - C
+  - H
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C6H11O9P
+  gene_count: 131
+  mass: 258.119
+  metabolite_id: kegg.compound:C00668
+  name: alpha-D-Glucose 6-phosphate
+  organism_count: 31
+  pathway_count: 12
+  pathway_ids:
+  - kegg.pathway:ko00010
+  - kegg.pathway:ko00030
+  - kegg.pathway:ko00052
+  - kegg.pathway:ko00520
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  - kegg.pathway:ko01240
+  - kegg.pathway:ko01250
+  - kegg.pathway:ko04152
+  - kegg.pathway:ko04922
+  score: 1.7401
+  transporter_count: 0
+- chebi_id: '10399'
+  elements:
+  - C
+  - H
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: C6H11O9P
+  gene_count: 142
+  mass: 258.119
+  metabolite_id: kegg.compound:C01172
+  name: beta-D-Glucose 6-phosphate
+  organism_count: 31
+  pathway_count: 8
+  pathway_ids:
+  - kegg.pathway:ko00010
+  - kegg.pathway:ko00030
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01200
+  - kegg.pathway:ko04152
+  - kegg.pathway:ko04922
+  score: 1.7401
+  transporter_count: 1
+- chebi_id: '10398'
+  elements:
+  - C
+  - H
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C6H11O9P
+  gene_count: 15
+  mass: 258.119
+  metabolite_id: kegg.compound:C00663
+  name: beta-D-Glucose 1-phosphate
+  organism_count: 14
+  pathway_count: 1
+  pathway_ids:
+  - kegg.pathway:ko00500
+  score: 1.7401
+  transporter_count: 0
+- chebi_id: '73918'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - transport
+  formula: C7H14O6
+  gene_count: 15
+  mass: 194.183
+  metabolite_id: chebi:73918
+  name: 3-O-methyl-D-glucose
+  organism_count: 10
+  pathway_count: 0
+  pathway_ids: []
+  score: 1.7401
+  transporter_count: 1
+- chebi_id: '70785'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C15H23N3O14P2
+  gene_count: 1
+  mass: 531.304
+  metabolite_id: kegg.compound:C03598
+  name: CDP-3,6-dideoxy-D-glucose
+  organism_count: 1
+  pathway_count: 3
+  pathway_ids:
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01250
+  score: 1.7401
+  transporter_count: 0
+- chebi_id: '10510'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C16H22N2O15P2
+  gene_count: 95
+  mass: 544.299
+  metabolite_id: kegg.compound:C11907
+  name: dTDP-4-oxo-6-deoxy-D-glucose
+  organism_count: 30
+  pathway_count: 8
+  pathway_ids:
+  - kegg.pathway:ko00521
+  - kegg.pathway:ko00523
+  - kegg.pathway:ko00525
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko01055
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01250
+  score: 1.4337
+  transporter_count: 0
+- chebi_id: '13262'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C15H21N3O15P2
+  gene_count: 25
+  mass: 545.287
+  metabolite_id: kegg.compound:C01219
+  name: CDP-4-dehydro-6-deoxy-D-glucose
+  organism_count: 18
+  pathway_count: 3
+  pathway_ids:
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01250
+  score: 1.4337
+  transporter_count: 0
+- chebi_id: '70783'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C15H21N3O14P2
+  gene_count: 20
+  mass: 529.288
+  metabolite_id: kegg.compound:C04297
+  name: CDP-4-dehydro-3,6-dideoxy-D-glucose
+  organism_count: 18
+  pathway_count: 3
+  pathway_ids:
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01250
+  score: 1.4337
+  transporter_count: 0
+- chebi_id: '10508'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C16H26N3O14P2
+  gene_count: 1
+  mass: 546.339
+  metabolite_id: kegg.compound:C04268
+  name: dTDP-4-amino-4,6-dideoxy-D-glucose
+  organism_count: 1
+  pathway_count: 6
+  pathway_ids:
+  - kegg.pathway:ko00523
+  - kegg.pathway:ko00525
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01250
+  score: 1.4337
+  transporter_count: 0
+- chebi_id: '12230'
+  elements:
+  - C
+  - H
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C12H23O14P
+  gene_count: 2
+  mass: 422.276
+  metabolite_id: kegg.compound:C04534
+  name: 6-Phospho-beta-D-glucosyl-(1,4)-D-glucose
+  organism_count: 1
+  pathway_count: 2
+  pathway_ids:
+  - kegg.pathway:ko00500
+  - kegg.pathway:ko02060
+  score: 1.3177
+  transporter_count: 0
+- chebi_id: '32332'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C16H25N3O13P2
+  gene_count: 1
+  mass: 529.332
+  metabolite_id: kegg.compound:C12318
+  name: dTDP-3-amino-2,3,6-trideoxy-4-keto-D-glucose
+  organism_count: 1
+  pathway_count: 6
+  pathway_ids:
+  - kegg.pathway:ko00404
+  - kegg.pathway:ko00523
+  - kegg.pathway:ko01055
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01250
+  score: 1.219
+  transporter_count: 0
+- chebi_id: '155215'
+  elements:
+  - C
+  - H
+  - O
+  evidence_sources:
+  - metabolism
+  formula: C18H32O16
+  gene_count: 23
+  mass: 504.438
+  metabolite_id: kegg.compound:C05404
+  name: D-Gal alpha 1->6D-Gal alpha 1->6D-Glucose
+  organism_count: 23
+  pathway_count: 2
+  pathway_ids:
+  - kegg.pathway:ko00052
+  - kegg.pathway:ko01100
+  score: 1.1341
+  transporter_count: 0
+returned: 23
+row_count: 23
+score_max: 3.039370536804199
+score_median: 1.7401065826416016
+top_organisms:
+- count: 18
+  organism_name: Shewanella sp. W3-18-1
+- count: 18
+  organism_name: Prochlorococcus MED4
+- count: 17
+  organism_name: Alteromonas macleodii ATCC27126
+- count: 17
+  organism_name: Alteromonas (MarRef v6)
+- count: 17
+  organism_name: Alteromonas macleodii EZ55
+- count: 17
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 17
+  organism_name: Alteromonas macleodii BGP6
+- count: 17
+  organism_name: Alteromonas macleodii MIT1002
+- count: 17
+  organism_name: Alteromonas macleodii AD45
+- count: 17
+  organism_name: Prochlorococcus MIT9303
+top_pathways:
+- count: 18
+  pathway_id: kegg.pathway:ko01100
+  pathway_name: Metabolic pathways
+- count: 13
+  pathway_id: kegg.pathway:ko01250
+  pathway_name: Biosynthesis of nucleotide sugars
+- count: 13
+  pathway_id: kegg.pathway:ko01110
+  pathway_name: Biosynthesis of secondary metabolites
+- count: 9
+  pathway_id: kegg.pathway:ko00541
+  pathway_name: Biosynthesis of various nucleotide sugars
+- count: 8
+  pathway_id: kegg.pathway:ko00520
+  pathway_name: Amino sugar and nucleotide sugar metabolism
+- count: 8
+  pathway_id: kegg.pathway:ko00500
+  pathway_name: Starch and sucrose metabolism
+- count: 6
+  pathway_id: kegg.pathway:ko00010
+  pathway_name: Glycolysis / Gluconeogenesis
+- count: 6
+  pathway_id: kegg.pathway:ko00052
+  pathway_name: Galactose metabolism
+- count: 6
+  pathway_id: kegg.pathway:ko01120
+  pathway_name: Microbial metabolism in diverse environments
+- count: 5
+  pathway_id: kegg.pathway:ko00521
+  pathway_name: Streptomycin biosynthesis
+total_entries: 3025
+total_matching: 23
+truncated: false
+xref_coverage:
+  with_chebi: 23
+  with_hmdb: 12
+  with_mnxm: 23

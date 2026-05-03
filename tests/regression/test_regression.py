@@ -38,6 +38,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_experiments_summary,
     build_list_compartments,
     build_list_gene_categories,
+    build_list_metabolites,
     build_list_metric_types,
     build_list_organisms,
     build_list_publications,
@@ -68,6 +69,7 @@ TOOL_BUILDERS = {
     "genes_by_ontology": None,
     "gene_ontology_terms": build_gene_ontology_terms,
     "list_publications": build_list_publications,
+    "list_metabolites": build_list_metabolites,
     "list_derived_metrics": build_list_derived_metrics,
     "list_derived_metrics_summary": build_list_derived_metrics_summary,
     "gene_derived_metrics": build_gene_derived_metrics,
@@ -227,6 +229,19 @@ def test_regression(conn, case, data_regression):
         # metric_types → ID resolution + categories ⊆ allowed_categories
         # validation.
         data = api.genes_by_categorical_metric(**params, conn=conn)
+        normalized_rows = _normalize(data.get("results", []))
+        envelope = {k: v for k, v in data.items() if k != "results"}
+        envelope["results"] = normalized_rows
+        envelope["row_count"] = len(normalized_rows)
+        data_regression.check(
+            {"case_id": case["id"], **envelope},
+            basename=case["id"],
+        )
+        return
+    elif tool == "list_metabolites":
+        # Dispatch via api (L2) — organism_names lowercasing + summary/detail
+        # split + not_found computation live above the builder.
+        data = api.list_metabolites(**params, conn=conn)
         normalized_rows = _normalize(data.get("results", []))
         envelope = {k: v for k, v in data.items() if k != "results"}
         envelope["results"] = normalized_rows

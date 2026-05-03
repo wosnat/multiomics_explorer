@@ -967,6 +967,330 @@ def build_list_publications_summary(
     return cypher, params
 
 
+def _list_metabolites_where(
+    *,
+    search: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    kegg_compound_ids: list[str] | None = None,
+    chebi_ids: list[str] | None = None,
+    hmdb_ids: list[str] | None = None,
+    mnxm_ids: list[str] | None = None,
+    elements: list[str] | None = None,
+    mass_min: float | None = None,
+    mass_max: float | None = None,
+    organism_names_lc: list[str] | None = None,
+    pathway_ids: list[str] | None = None,
+    evidence_sources: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Build WHERE clause and params for metabolite queries.
+
+    Shared between build_list_metabolites and build_list_metabolites_summary.
+    `search` is not added to WHERE — it controls which Cypher variant is
+    used (fulltext entry point vs MATCH). The $search param is added to
+    params when search is provided.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+
+    if search:
+        params["search"] = search
+
+    if metabolite_ids:
+        conditions.append("m.id IN $metabolite_ids")
+        params["metabolite_ids"] = metabolite_ids
+
+    if kegg_compound_ids:
+        conditions.append("m.kegg_compound_id IN $kegg_compound_ids")
+        params["kegg_compound_ids"] = kegg_compound_ids
+
+    if chebi_ids:
+        conditions.append("m.chebi_id IN $chebi_ids")
+        params["chebi_ids"] = chebi_ids
+
+    if hmdb_ids:
+        conditions.append("m.hmdb_id IN $hmdb_ids")
+        params["hmdb_ids"] = hmdb_ids
+
+    if mnxm_ids:
+        conditions.append("m.mnxm_id IN $mnxm_ids")
+        params["mnxm_ids"] = mnxm_ids
+
+    if elements:
+        conditions.append(
+            "ALL(e IN $elements WHERE e IN coalesce(m.elements, []))"
+        )
+        params["elements"] = elements
+
+    if mass_min is not None:
+        conditions.append("m.mass >= $mass_min")
+        params["mass_min"] = mass_min
+
+    if mass_max is not None:
+        conditions.append("m.mass <= $mass_max")
+        params["mass_max"] = mass_max
+
+    if organism_names_lc:
+        conditions.append(
+            "ANY(o IN coalesce(m.organism_names, []) "
+            "WHERE toLower(o) IN $organism_names_lc)"
+        )
+        params["organism_names_lc"] = organism_names_lc
+
+    if pathway_ids:
+        conditions.append(
+            "ANY(p IN coalesce(m.pathway_ids, []) WHERE p IN $pathway_ids)"
+        )
+        params["pathway_ids"] = pathway_ids
+
+    if evidence_sources:
+        conditions.append(
+            "ANY(s IN $evidence_sources "
+            "WHERE s IN coalesce(m.evidence_sources, []))"
+        )
+        params["evidence_sources"] = evidence_sources
+
+    where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
+    return where_block, params
+
+
+def build_list_metabolites(
+    *,
+    search: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    kegg_compound_ids: list[str] | None = None,
+    chebi_ids: list[str] | None = None,
+    hmdb_ids: list[str] | None = None,
+    mnxm_ids: list[str] | None = None,
+    elements: list[str] | None = None,
+    mass_min: float | None = None,
+    mass_max: float | None = None,
+    organism_names_lc: list[str] | None = None,
+    pathway_ids: list[str] | None = None,
+    evidence_sources: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Build Cypher for listing metabolites.
+
+    RETURN keys (compact): metabolite_id, name, formula, elements, mass,
+    gene_count, organism_count, transporter_count, evidence_sources,
+    chebi_id, pathway_ids, pathway_count.
+    When search is provided, also: score.
+    RETURN keys (verbose): adds inchikey, smiles, mnxm_id, hmdb_id,
+    pathway_names. All verbose columns are direct property reads on m;
+    no edge traversal in either compact or verbose mode.
+    """
+    where_block, params = _list_metabolites_where(
+        search=search,
+        metabolite_ids=metabolite_ids,
+        kegg_compound_ids=kegg_compound_ids,
+        chebi_ids=chebi_ids,
+        hmdb_ids=hmdb_ids,
+        mnxm_ids=mnxm_ids,
+        elements=elements,
+        mass_min=mass_min,
+        mass_max=mass_max,
+        organism_names_lc=organism_names_lc,
+        pathway_ids=pathway_ids,
+        evidence_sources=evidence_sources,
+    )
+
+    verbose_cols = (
+        ",\n       m.inchikey AS inchikey,"
+        "\n       m.smiles AS smiles,"
+        "\n       m.mnxm_id AS mnxm_id,"
+        "\n       m.hmdb_id AS hmdb_id,"
+        "\n       coalesce(m.pathway_names, []) AS pathway_names"
+        if verbose else ""
+    )
+
+    pagination_parts: list[str] = []
+    if offset:
+        pagination_parts.append("SKIP $offset")
+        params["offset"] = offset
+    if limit is not None:
+        pagination_parts.append("LIMIT $limit")
+        params["limit"] = limit
+    limit_clause = " ".join(pagination_parts)
+
+    if search:
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('metaboliteFullText', $search)\n"
+            "YIELD node AS m, score\n"
+            f"{where_block}"
+            "RETURN m.id AS metabolite_id,\n"
+            "       m.name AS name,\n"
+            "       m.formula AS formula,\n"
+            "       coalesce(m.elements, []) AS elements,\n"
+            "       m.mass AS mass,\n"
+            "       coalesce(m.gene_count, 0) AS gene_count,\n"
+            "       coalesce(m.organism_count, 0) AS organism_count,\n"
+            "       coalesce(m.transporter_count, 0) AS transporter_count,\n"
+            "       coalesce(m.evidence_sources, []) AS evidence_sources,\n"
+            "       m.chebi_id AS chebi_id,\n"
+            "       coalesce(m.pathway_ids, []) AS pathway_ids,\n"
+            "       coalesce(m.pathway_count, 0) AS pathway_count,\n"
+            f"       score{verbose_cols}\n"
+            "ORDER BY score DESC, m.organism_count DESC, m.id\n"
+            f"{limit_clause}"
+        )
+    else:
+        cypher = (
+            "MATCH (m:Metabolite)\n"
+            f"{where_block}"
+            "RETURN m.id AS metabolite_id,\n"
+            "       m.name AS name,\n"
+            "       m.formula AS formula,\n"
+            "       coalesce(m.elements, []) AS elements,\n"
+            "       m.mass AS mass,\n"
+            "       coalesce(m.gene_count, 0) AS gene_count,\n"
+            "       coalesce(m.organism_count, 0) AS organism_count,\n"
+            "       coalesce(m.transporter_count, 0) AS transporter_count,\n"
+            "       coalesce(m.evidence_sources, []) AS evidence_sources,\n"
+            "       m.chebi_id AS chebi_id,\n"
+            "       coalesce(m.pathway_ids, []) AS pathway_ids,\n"
+            f"       coalesce(m.pathway_count, 0) AS pathway_count{verbose_cols}\n"
+            "ORDER BY m.organism_count DESC, m.gene_count DESC, m.id\n"
+            f"{limit_clause}"
+        )
+
+    return cypher, params
+
+
+def build_list_metabolites_summary(
+    *,
+    search: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    kegg_compound_ids: list[str] | None = None,
+    chebi_ids: list[str] | None = None,
+    hmdb_ids: list[str] | None = None,
+    mnxm_ids: list[str] | None = None,
+    elements: list[str] | None = None,
+    mass_min: float | None = None,
+    mass_max: float | None = None,
+    organism_names_lc: list[str] | None = None,
+    pathway_ids: list[str] | None = None,
+    evidence_sources: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Build summary aggregation Cypher for list_metabolites.
+
+    RETURN keys: total_entries, total_matching, top_organisms, top_pathways,
+    by_evidence_source, with_chebi, with_hmdb, with_mnxm, mass_min,
+    mass_median, mass_max.
+    When search is provided, also: score_max, score_median.
+
+    Critical: never `collect(m) AS matched`. Instead flatten denormalized
+    list properties (KG-A5..A8) via apoc.coll.flatten over cheap collects.
+    """
+    where_block, params = _list_metabolites_where(
+        search=search,
+        metabolite_ids=metabolite_ids,
+        kegg_compound_ids=kegg_compound_ids,
+        chebi_ids=chebi_ids,
+        hmdb_ids=hmdb_ids,
+        mnxm_ids=mnxm_ids,
+        elements=elements,
+        mass_min=mass_min,
+        mass_max=mass_max,
+        organism_names_lc=organism_names_lc,
+        pathway_ids=pathway_ids,
+        evidence_sources=evidence_sources,
+    )
+
+    top_organisms_block = (
+        "CALL {\n"
+        "  WITH all_orgs\n"
+        "  UNWIND apoc.coll.frequencies(all_orgs) AS f\n"
+        "  WITH f.item AS organism_name, f.count AS count\n"
+        "  ORDER BY count DESC LIMIT 10\n"
+        "  RETURN collect({organism_name: organism_name, count: count}) "
+        "AS top_organisms\n"
+        "}\n"
+    )
+    top_pathways_block = (
+        "CALL {\n"
+        "  WITH all_pwys\n"
+        "  UNWIND apoc.coll.frequencies(all_pwys) AS f\n"
+        "  WITH f.item AS pathway_id, f.count AS count\n"
+        "  ORDER BY count DESC LIMIT 10\n"
+        "  OPTIONAL MATCH (p:KeggTerm {id: pathway_id})\n"
+        "  RETURN collect({\n"
+        "    pathway_id: pathway_id, pathway_name: p.name, count: count\n"
+        "  }) AS top_pathways\n"
+        "}\n"
+    )
+
+    if search:
+        # Search variant: fulltext entry point + score collection. Pull
+        # total_entries from a small unfiltered Metabolite count after
+        # the filtered aggregation.
+        cypher = (
+            "CALL db.index.fulltext.queryNodes('metaboliteFullText', $search)\n"
+            "YIELD node AS m, score\n"
+            f"{where_block}"
+            "WITH count(m) AS total_matching,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.evidence_sources, []))) AS es,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.organism_names, []))) AS all_orgs,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.pathway_ids, []))) AS all_pwys,\n"
+            "     count(m.chebi_id) AS with_chebi,\n"
+            "     count(m.hmdb_id) AS with_hmdb,\n"
+            "     count(m.mnxm_id) AS with_mnxm,\n"
+            "     collect(m.mass) AS masses,\n"
+            "     collect(score) AS scores\n"
+            "MATCH (m2:Metabolite)\n"
+            "WITH count(m2) AS total_entries, total_matching, es, all_orgs, "
+            "all_pwys, with_chebi, with_hmdb, with_mnxm, masses, scores\n"
+            f"{top_organisms_block}"
+            f"{top_pathways_block}"
+            "RETURN total_entries, total_matching,\n"
+            "       apoc.coll.frequencies(es) AS by_evidence_source,\n"
+            "       with_chebi, with_hmdb, with_mnxm,\n"
+            "       apoc.coll.min(masses) AS mass_min,\n"
+            "       apoc.coll.sort(masses)[size(masses)/2] AS mass_median,\n"
+            "       apoc.coll.max(masses) AS mass_max,\n"
+            "       apoc.coll.max(scores) AS score_max,\n"
+            "       apoc.coll.sort(scores)[size(scores)/2] AS score_median,\n"
+            "       top_organisms, top_pathways"
+        )
+    else:
+        # OPTIONAL MATCH preserves the total_entries row when the filtered
+        # MATCH returns zero rows — without it, an empty filter intersection
+        # collapses to 0 result rows and callers IndexError on summary[0].
+        cypher = (
+            "MATCH (m:Metabolite)\n"
+            "WITH count(m) AS total_entries\n"
+            "OPTIONAL MATCH (m:Metabolite)\n"
+            f"{where_block}"
+            "WITH total_entries,\n"
+            "     count(m) AS total_matching,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.evidence_sources, []))) AS es,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.organism_names, []))) AS all_orgs,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.pathway_ids, []))) AS all_pwys,\n"
+            "     count(m.chebi_id) AS with_chebi,\n"
+            "     count(m.hmdb_id) AS with_hmdb,\n"
+            "     count(m.mnxm_id) AS with_mnxm,\n"
+            "     collect(m.mass) AS masses\n"
+            f"{top_organisms_block}"
+            f"{top_pathways_block}"
+            "RETURN total_entries, total_matching,\n"
+            "       apoc.coll.frequencies(es) AS by_evidence_source,\n"
+            "       with_chebi, with_hmdb, with_mnxm,\n"
+            "       apoc.coll.min(masses) AS mass_min,\n"
+            "       apoc.coll.sort(masses)[size(masses)/2] AS mass_median,\n"
+            "       apoc.coll.max(masses) AS mass_max,\n"
+            "       top_organisms, top_pathways"
+        )
+
+    return cypher, params
+
+
 def build_list_gene_categories() -> tuple[str, dict]:
     cypher = (
         "MATCH (g:Gene) WHERE g.gene_category IS NOT NULL\n"

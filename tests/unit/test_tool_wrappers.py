@@ -68,6 +68,7 @@ EXPECTED_TOOLS = [
     "ontology_landscape",
     "pathway_enrichment",
     "cluster_enrichment",
+    "list_metabolites",
 ]
 
 
@@ -4778,3 +4779,216 @@ class TestGenesByCategoricalMetricWrapper:
                     ctx,
                     metric_types=["predicted_subcellular_localization"],
                     categories=["Foo"])
+
+
+# ---------------------------------------------------------------------------
+# list_metabolites — Phase 1 (Stage 1 RED)
+# ---------------------------------------------------------------------------
+
+
+_LM_SAMPLE_RESULT = {
+    "metabolite_id": "kegg.compound:C00031",
+    "name": "D-Glucose",
+    "formula": "C6H12O6",
+    "elements": ["C", "H", "O"],
+    "mass": 180.156,
+    "gene_count": 320,
+    "organism_count": 31,
+    "transporter_count": 17,
+    "evidence_sources": ["metabolism", "transport"],
+    "chebi_id": "4167",
+    "pathway_ids": ["kegg.pathway:ko00010"],
+    "pathway_count": 1,
+}
+
+_LM_SAMPLE_API_RETURN = {
+    "total_entries": 3025,
+    "total_matching": 1,
+    "top_organisms": [
+        {"organism_name": "Prochlorococcus MED4", "count": 1},
+    ],
+    "top_pathways": [
+        {
+            "pathway_id": "kegg.pathway:ko01100",
+            "pathway_name": "Metabolic pathways",
+            "count": 1,
+        },
+    ],
+    "by_evidence_source": [
+        {"evidence_source": "metabolism", "count": 1},
+    ],
+    "xref_coverage": {"with_chebi": 1, "with_hmdb": 0, "with_mnxm": 1},
+    "mass_stats": {
+        "mass_min": 180.156, "mass_median": 180.156, "mass_max": 180.156,
+    },
+    "score_max": None,
+    "score_median": None,
+    "returned": 1,
+    "offset": 0,
+    "truncated": False,
+    "not_found": {
+        "metabolite_ids": [], "organism_names": [], "pathway_ids": [],
+    },
+    "results": [_LM_SAMPLE_RESULT],
+}
+
+
+class TestListMetabolitesWrapper:
+    """MCP-wrapper tests for list_metabolites."""
+
+    _SAMPLE_RESULT = _LM_SAMPLE_RESULT
+    _SAMPLE_API_RETURN = _LM_SAMPLE_API_RETURN
+
+    @pytest.mark.asyncio
+    async def test_returns_response_type(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        assert result.total_entries == 3025
+        assert result.total_matching == 1
+        assert result.returned == 1
+        assert result.truncated is False
+        assert len(result.results) == 1
+
+    @pytest.mark.asyncio
+    async def test_compact_fields_present(self, tool_fns, mock_ctx):
+        """Compact per-row fields surface on the Pydantic model."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        r = result.results[0]
+        assert r.metabolite_id == "kegg.compound:C00031"
+        assert r.name == "D-Glucose"
+        assert r.formula == "C6H12O6"
+        assert r.elements == ["C", "H", "O"]
+        assert r.gene_count == 320
+        assert r.organism_count == 31
+        assert r.transporter_count == 17
+        assert r.evidence_sources == ["metabolism", "transport"]
+        assert r.pathway_ids == ["kegg.pathway:ko00010"]
+        assert r.pathway_count == 1
+
+    @pytest.mark.asyncio
+    async def test_verbose_fields_optional(self, tool_fns, mock_ctx):
+        """Verbose-only fields default to None / are present when populated."""
+        verbose_row = {
+            **self._SAMPLE_RESULT,
+            "inchikey": "WQZGKKKJIJFFOK-GASJEMHNSA-N",
+            "smiles": "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O",
+            "mnxm_id": "MNXM1364061",
+            "hmdb_id": "HMDB0000122",
+            "pathway_names": ["Glycolysis / Gluconeogenesis"],
+        }
+        api_return = {**self._SAMPLE_API_RETURN, "results": [verbose_row]}
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx, verbose=True)
+        r = result.results[0]
+        assert r.inchikey == "WQZGKKKJIJFFOK-GASJEMHNSA-N"
+        assert r.smiles == "OC[C@H]1OC(O)[C@H](O)[C@@H](O)[C@@H]1O"
+        assert r.mnxm_id == "MNXM1364061"
+        assert r.hmdb_id == "HMDB0000122"
+        assert r.pathway_names == ["Glycolysis / Gluconeogenesis"]
+
+    @pytest.mark.asyncio
+    async def test_not_found_structure(self, tool_fns, mock_ctx):
+        """not_found is a typed dict with all 3 buckets."""
+        api_return = {
+            **self._SAMPLE_API_RETURN,
+            "not_found": {
+                "metabolite_ids": ["kegg.compound:C99999"],
+                "organism_names": ["Bogus organism"],
+                "pathway_ids": ["kegg.pathway:bogus"],
+            },
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        assert result.not_found.metabolite_ids == ["kegg.compound:C99999"]
+        assert result.not_found.organism_names == ["Bogus organism"]
+        assert result.not_found.pathway_ids == ["kegg.pathway:bogus"]
+
+    @pytest.mark.asyncio
+    async def test_envelope_breakdowns_present(self, tool_fns, mock_ctx):
+        """top_organisms, top_pathways, by_evidence_source, xref_coverage,
+        mass_stats are surfaced on the Pydantic envelope."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._SAMPLE_API_RETURN,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        assert len(result.top_organisms) == 1
+        assert result.top_organisms[0].organism_name == "Prochlorococcus MED4"
+        assert result.top_organisms[0].count == 1
+        assert len(result.top_pathways) == 1
+        assert result.top_pathways[0].pathway_id == "kegg.pathway:ko01100"
+        assert result.top_pathways[0].pathway_name == "Metabolic pathways"
+        assert len(result.by_evidence_source) == 1
+        assert result.by_evidence_source[0].evidence_source == "metabolism"
+        assert result.xref_coverage.with_chebi == 1
+        assert result.xref_coverage.with_hmdb == 0
+        assert result.xref_coverage.with_mnxm == 1
+        assert result.mass_stats.mass_min == 180.156
+        assert result.mass_stats.mass_max == 180.156
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        """All filter params flow from MCP wrapper into api.list_metabolites."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["list_metabolites"](
+                mock_ctx,
+                search="glucose",
+                metabolite_ids=["kegg.compound:C00031"],
+                kegg_compound_ids=["C00031"],
+                chebi_ids=["4167"],
+                hmdb_ids=["HMDB0000122"],
+                mnxm_ids=["MNXM1364061"],
+                elements=["N"],
+                mass_min=60.0,
+                mass_max=1000.0,
+                organism_names=["Prochlorococcus MED4"],
+                pathway_ids=["kegg.pathway:ko00910"],
+                evidence_sources=["transport"],
+                summary=False,
+                verbose=True,
+                limit=10,
+                offset=5,
+            )
+        mock_api.assert_called_once()
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["search"] == "glucose"
+        assert kwargs["metabolite_ids"] == ["kegg.compound:C00031"]
+        assert kwargs["kegg_compound_ids"] == ["C00031"]
+        assert kwargs["chebi_ids"] == ["4167"]
+        assert kwargs["hmdb_ids"] == ["HMDB0000122"]
+        assert kwargs["mnxm_ids"] == ["MNXM1364061"]
+        assert kwargs["elements"] == ["N"]
+        assert kwargs["mass_min"] == 60.0
+        assert kwargs["mass_max"] == 1000.0
+        assert kwargs["organism_names"] == ["Prochlorococcus MED4"]
+        assert kwargs["pathway_ids"] == ["kegg.pathway:ko00910"]
+        assert kwargs["evidence_sources"] == ["transport"]
+        assert kwargs["verbose"] is True
+        assert kwargs["limit"] == 10
+        assert kwargs["offset"] == 5
+
+    @pytest.mark.asyncio
+    async def test_validation_error_raises_tool_error(self, tool_fns, mock_ctx):
+        """ValueError from api.list_metabolites becomes a ToolError."""
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            side_effect=ValueError("search must not be empty."),
+        ):
+            with pytest.raises(ToolError, match="search must not be empty"):
+                await tool_fns["list_metabolites"](mock_ctx, search="")

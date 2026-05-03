@@ -84,6 +84,8 @@ from multiomics_explorer.kg.queries_lib import (
     build_list_clustering_analyses_summary,
     build_list_derived_metrics,
     build_list_derived_metrics_summary,
+    build_list_metabolites,
+    build_list_metabolites_summary,
     build_gene_clusters_by_gene,
     build_gene_clusters_by_gene_summary,
     build_gene_derived_metrics,
@@ -4630,4 +4632,193 @@ def _cluster_enrichment_params_dict(
         "term2gene_row_count": int(len(term2gene)),
         "n_unique_terms": int(term2gene["term_id"].nunique()) if not term2gene.empty else 0,
         "multitest_method": "fdr_bh",
+    }
+
+
+_VALID_EVIDENCE_SOURCES = ("metabolism", "transport", "metabolomics")
+
+
+def list_metabolites(
+    search: str | None = None,
+    metabolite_ids: list[str] | None = None,
+    kegg_compound_ids: list[str] | None = None,
+    chebi_ids: list[str] | None = None,
+    hmdb_ids: list[str] | None = None,
+    mnxm_ids: list[str] | None = None,
+    elements: list[str] | None = None,
+    mass_min: float | None = None,
+    mass_max: float | None = None,
+    organism_names: list[str] | None = None,
+    pathway_ids: list[str] | None = None,
+    evidence_sources: list[str] | None = None,
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """List metabolites in the chemistry layer with rich filtering.
+
+    Returns dict with keys: total_entries, total_matching, returned, offset,
+    truncated, top_organisms, top_pathways, by_evidence_source, xref_coverage,
+    mass_stats, score_max, score_median, not_found, results.
+    Per result (compact): metabolite_id, name, formula, elements, mass,
+    gene_count, organism_count, transporter_count, evidence_sources,
+    chebi_id (sparse), pathway_ids, pathway_count.
+    When verbose=True, also includes: inchikey, smiles, mnxm_id, hmdb_id,
+    pathway_names. (For per-organism gene tallies, drill into
+    genes_by_metabolite — slice-1 Tool #2.)
+    When search is provided, also includes score (per row) +
+    score_max, score_median (envelope, otherwise None).
+
+    Raises:
+        ValueError: if search is empty/whitespace, or evidence_sources
+            contains values outside {"metabolism", "transport",
+            "metabolomics"}.
+    """
+    # 1. Validate search (non-empty when provided)
+    if search is not None and not search.strip():
+        raise ValueError("search must not be empty or whitespace.")
+
+    # 1. Validate evidence_sources enum (defensive — MCP wrapper also gates)
+    if evidence_sources is not None:
+        invalid = [s for s in evidence_sources if s not in _VALID_EVIDENCE_SOURCES]
+        if invalid:
+            raise ValueError(
+                f"evidence_sources contains invalid value(s) {invalid}; "
+                f"allowed: {list(_VALID_EVIDENCE_SOURCES)}."
+            )
+
+    # 3. summary=True is sugar for limit=0
+    if summary:
+        limit = 0
+
+    conn = _default_conn(conn)
+
+    # 2. Lowercase organism_names for WHERE
+    organism_names_lc = (
+        [o.lower() for o in organism_names] if organism_names else None
+    )
+
+    filter_kwargs = dict(
+        metabolite_ids=metabolite_ids,
+        kegg_compound_ids=kegg_compound_ids,
+        chebi_ids=chebi_ids,
+        hmdb_ids=hmdb_ids,
+        mnxm_ids=mnxm_ids,
+        elements=elements,
+        mass_min=mass_min,
+        mass_max=mass_max,
+        organism_names_lc=organism_names_lc,
+        pathway_ids=pathway_ids,
+        evidence_sources=evidence_sources,
+    )
+
+    def _run_summary(st=search):
+        cypher, params = build_list_metabolites_summary(
+            search=st, **filter_kwargs,
+        )
+        return conn.execute_query(cypher, **params)[0]
+
+    def _run_detail(st=search):
+        cypher, params = build_list_metabolites(
+            search=st, **filter_kwargs,
+            verbose=verbose, limit=limit, offset=offset,
+        )
+        return conn.execute_query(cypher, **params)
+
+    # 4. Always run summary builder (with Lucene retry)
+    effective_search = search
+    try:
+        raw_summary = _run_summary()
+    except Neo4jClientError:
+        if search:
+            logger.debug(
+                "list_metabolites: Lucene parse error, "
+                "retrying with escaped query"
+            )
+            effective_search = _LUCENE_SPECIAL.sub(r'\\\g<0>', search)
+            raw_summary = _run_summary(st=effective_search)
+        else:
+            raise
+
+    # 5. Run detail builder when limit != 0
+    if limit == 0:
+        results = []
+    else:
+        results = _run_detail(st=effective_search)
+
+    # 6. Sparse-strip null chebi_id
+    results = [
+        {k: v for k, v in row.items() if not (k == "chebi_id" and v is None)}
+        for row in results
+    ]
+
+    # 7. Compute typed not_found dict (one quick existence Cypher per filter)
+    not_found: dict[str, list[str]] = {
+        "metabolite_ids": [],
+        "organism_names": [],
+        "pathway_ids": [],
+    }
+    if metabolite_ids:
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) WHERE m.id IN $ids "
+            "RETURN collect(m.id) AS found",
+            ids=metabolite_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["metabolite_ids"] = [
+            x for x in metabolite_ids if x not in found
+        ]
+    if organism_names:
+        rows = conn.execute_query(
+            "MATCH (o:OrganismTaxon) "
+            "WHERE toLower(o.preferred_name) IN $names "
+            "RETURN collect(toLower(o.preferred_name)) AS found",
+            names=[o.lower() for o in organism_names],
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["organism_names"] = [
+            x for x in organism_names if x.lower() not in found
+        ]
+    if pathway_ids:
+        rows = conn.execute_query(
+            "MATCH (p:KeggTerm) WHERE p.id IN $ids "
+            "RETURN collect(p.id) AS found",
+            ids=pathway_ids,
+        )
+        found = set(rows[0]["found"]) if rows else set()
+        not_found["pathway_ids"] = [
+            x for x in pathway_ids if x not in found
+        ]
+
+    # 8. Assemble + return envelope
+    total_matching = raw_summary.get("total_matching", 0)
+    return {
+        "total_entries": raw_summary.get("total_entries", 0),
+        "total_matching": total_matching,
+        "top_organisms": raw_summary.get("top_organisms", []) or [],
+        "top_pathways": raw_summary.get("top_pathways", []) or [],
+        "by_evidence_source": _rename_freq(
+            raw_summary.get("by_evidence_source", []) or [],
+            "evidence_source",
+        ),
+        "xref_coverage": {
+            "with_chebi": raw_summary.get("with_chebi", 0),
+            "with_hmdb": raw_summary.get("with_hmdb", 0),
+            "with_mnxm": raw_summary.get("with_mnxm", 0),
+        },
+        "mass_stats": {
+            "mass_min": raw_summary.get("mass_min"),
+            "mass_median": raw_summary.get("mass_median"),
+            "mass_max": raw_summary.get("mass_max"),
+        },
+        "score_max": raw_summary.get("score_max") if search else None,
+        "score_median": raw_summary.get("score_median") if search else None,
+        "returned": len(results),
+        "offset": offset,
+        "truncated": total_matching > offset + len(results),
+        "not_found": not_found,
+        "results": results,
     }

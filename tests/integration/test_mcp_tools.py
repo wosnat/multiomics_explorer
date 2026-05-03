@@ -2345,3 +2345,103 @@ class TestSliceTwoSearchTextReach:
             f"genes_by_function returned {result['total_matching']} hits for "
             "'damping ratio' — D5 regression: geneFullText looks DM-enriched."
         )
+
+
+# ---------------------------------------------------------------------------
+# list_metabolites — chemistry slice-1 Tool #1
+# Smoke values frozen 2026-05-03 (Phase 1 spec lines 1015-1028).
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.kg
+class TestListMetabolites:
+    """Live-KG smoke tests for the list_metabolites api function."""
+
+    def test_no_filters_returns_all(self, conn):
+        """Unfiltered query reports 3,025 total Metabolite nodes."""
+        result = api.list_metabolites(conn=conn)
+        assert result["total_matching"] == 3025
+
+    def test_elements_n_filter(self, conn):
+        """N-bearing metabolites: 1,563 total."""
+        result = api.list_metabolites(elements=["N"], conn=conn)
+        assert result["total_matching"] == 1563
+
+    def test_elements_n_and_p_filter(self, conn):
+        """Multi-element AND filter (must contain both N and P): 556."""
+        result = api.list_metabolites(elements=["N", "P"], conn=conn)
+        assert result["total_matching"] == 556
+
+    def test_organism_plus_elements_filter(self, conn):
+        """MED4 + N elements (the canonical N-source primitive): 804."""
+        result = api.list_metabolites(
+            organism_names=["Prochlorococcus MED4"],
+            elements=["N"],
+            conn=conn,
+        )
+        assert result["total_matching"] == 804
+
+    def test_pathway_id_filter(self, conn):
+        """Nitrogen metabolism pathway (ko00910) has 18 metabolites."""
+        result = api.list_metabolites(
+            pathway_ids=["kegg.pathway:ko00910"], conn=conn,
+        )
+        assert result["total_matching"] == 18
+
+    def test_metabolite_ids_with_unknown_populates_not_found(self, conn):
+        """Batch ID lookup: known glucose ID resolves; unknown surfaces in
+        not_found.metabolite_ids (typed dict per spec)."""
+        result = api.list_metabolites(
+            metabolite_ids=[
+                "kegg.compound:C00031", "kegg.compound:C99999",
+            ],
+            conn=conn,
+        )
+        assert result["total_matching"] == 1
+        assert len(result["results"]) == 1
+        assert result["not_found"]["metabolite_ids"] == [
+            "kegg.compound:C99999"
+        ]
+        # Other not_found buckets stay empty (typed dict shape)
+        assert result["not_found"]["organism_names"] == []
+        assert result["not_found"]["pathway_ids"] == []
+
+    def test_search_glucose_returns_score(self, conn):
+        """Lucene search by name returns ranked rows with `score` field."""
+        result = api.list_metabolites(search="glucose", conn=conn)
+        assert len(result["results"]) >= 1
+        assert "score" in result["results"][0]
+
+    def test_evidence_sources_transport_filter(self, conn):
+        """transport-only evidence filter: 1,097 metabolites."""
+        result = api.list_metabolites(
+            evidence_sources=["transport"], conn=conn,
+        )
+        assert result["total_matching"] == 1097
+
+    def test_summary_mode_empty_results_envelope_populated(self, conn):
+        """summary=True returns no result rows but envelope is populated."""
+        result = api.list_metabolites(summary=True, conn=conn)
+        assert result["results"] == []
+        assert result["returned"] == 0
+        assert result["total_matching"] == 3025
+        # Envelope rollups present (lists, possibly empty but typed)
+        assert isinstance(result["top_organisms"], list)
+        assert isinstance(result["top_pathways"], list)
+        assert isinstance(result["by_evidence_source"], list)
+        assert isinstance(result["xref_coverage"], dict)
+        assert isinstance(result["mass_stats"], dict)
+
+    def test_organism_names_known_plus_unknown(self, conn):
+        """Known organism passes through; unknown lands in not_found.organism_names.
+
+        Guards against the OrganismTaxon-vs-Organism label regression — a wrong
+        label silently buckets every input as not_found.
+        """
+        result = api.list_metabolites(
+            organism_names=["Prochlorococcus MED4", "Bogus organism"],
+            summary=True,
+            conn=conn,
+        )
+        assert result["not_found"]["organism_names"] == ["Bogus organism"]
+        assert result["total_matching"] > 0

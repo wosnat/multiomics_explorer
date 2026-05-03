@@ -1,0 +1,52 @@
+# Human-authored content for list_metabolites about page.
+# Auto-generated sections (params, response format, expected-keys)
+# come from Pydantic models via scripts/build_about_content.py.
+
+examples:
+  - title: All N-bearing metabolites in MED4 (the N-source workflow primitive)
+    call: list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=5)
+
+  - title: Pathway-anchored — metabolites in nitrogen metabolism
+    call: list_metabolites(pathway_ids=["kegg.pathway:ko00910"], limit=10)
+
+  - title: Cross-organism survey — metabolites both partners reach
+    call: list_metabolites(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MIT1002"], summary=True)
+
+  - title: Lucene search by name
+    call: list_metabolites(search="glucose", limit=3)
+
+  - title: Transport-only metabolites (TCDB-curated substrates without local catalysis)
+    call: list_metabolites(evidence_sources=["transport"], summary=True)
+
+  - title: Multi-step — find N-metabolites then drill into catalysts
+    steps: |
+      Step 1: list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=10)
+              → extract metabolite_ids of interest
+
+      Step 2: genes_by_metabolite(metabolite_ids=[chosen_ids], organism="Prochlorococcus MED4")
+              → catalysing genes per metabolite
+
+verbose_fields:
+  - inchikey
+  - smiles
+  - mnxm_id
+  - hmdb_id
+  - pathway_names
+
+chaining:
+  - "list_organisms (per-row metabolite_count > 0) → list_metabolites(organism_names=[...])"
+  - "list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)"
+  - "list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)"
+  - "differential_expression_by_gene → gene_metabolic_role(metabolite_elements=['N']) → list_metabolites for chemistry context"
+
+mistakes:
+  - "Direction-agnostic. Joining through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) does NOT distinguish substrates from products. KEGG equation order is arbitrary. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate."
+  - "elements is presence-only, AND-of. ['N','P'] requires BOTH N and P to be present. Use the `elements` filter — never substring-match on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N')."
+  - "gene_count = 0 does not mean the metabolite is absent from the KG. As of the 2026-05-03 transport-arm fix every Metabolite has gene_count > 0; the future metabolomics-DM spec will reintroduce gene_count=0 (measured-only metabolites with no gene path)."
+  - "organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by metabolite_id (or filter per-row by organism_count and inspect `m.organism_names` for the full UNION list)."
+  - "metaboliteFullText covers Metabolite.name only — NOT formula. For element/composition queries, use `elements` (presence list)."
+  - "evidence_sources accepts 'metabolomics' as forward-compat for the future metabolomics-DM spec; no row matches it today."
+  - wrong: "list_metabolites(elements=['N'], gene_count_min=1)  # gene_count_min isn't a param"
+    right: "list_metabolites(elements=['N'])  # then filter rows in code by gene_count > 0"
+  - wrong: "list_metabolites(organism_names=['MED4'])  # short name doesn't match"
+    right: "list_metabolites(organism_names=['Prochlorococcus MED4'])  # full preferred_name"

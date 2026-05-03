@@ -6118,3 +6118,318 @@ class TestBuildGenesByCategoricalMetric:
         assert "SKIP" not in cypher
         assert "limit" not in params
         assert "offset" not in params
+
+
+# ---------------------------------------------------------------------------
+# list_metabolites — Phase 1 (Stage 1 RED)
+# ---------------------------------------------------------------------------
+
+
+class TestBuildListMetabolites:
+    """Detail-builder tests for list_metabolites.
+
+    Imports happen inside each test so pre-impl test collection still passes.
+    """
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        return build_list_metabolites(**kwargs)
+
+    def test_no_filters(self):
+        """No filters: MATCH (m:Metabolite) with no WHERE / no fulltext."""
+        cypher, params = self._build()
+        assert "MATCH (m:Metabolite)" in cypher
+        assert "WHERE" not in cypher
+        assert "fulltext" not in cypher
+        assert "score" not in cypher
+        assert params == {}
+
+    def test_metabolite_ids_filter(self):
+        cypher, params = self._build(
+            metabolite_ids=["kegg.compound:C00031", "kegg.compound:C00002"])
+        assert "m.id IN $metabolite_ids" in cypher
+        assert params["metabolite_ids"] == [
+            "kegg.compound:C00031", "kegg.compound:C00002"]
+
+    def test_kegg_compound_ids_filter(self):
+        cypher, params = self._build(kegg_compound_ids=["C00031"])
+        assert "m.kegg_compound_id IN $kegg_compound_ids" in cypher
+        assert params["kegg_compound_ids"] == ["C00031"]
+
+    def test_chebi_ids_filter(self):
+        cypher, params = self._build(chebi_ids=["4167", "15422"])
+        assert "m.chebi_id IN $chebi_ids" in cypher
+        assert params["chebi_ids"] == ["4167", "15422"]
+
+    def test_hmdb_ids_filter(self):
+        cypher, params = self._build(hmdb_ids=["HMDB0000122"])
+        assert "m.hmdb_id IN $hmdb_ids" in cypher
+        assert params["hmdb_ids"] == ["HMDB0000122"]
+
+    def test_mnxm_ids_filter(self):
+        cypher, params = self._build(mnxm_ids=["MNXM1364061"])
+        assert "m.mnxm_id IN $mnxm_ids" in cypher
+        assert params["mnxm_ids"] == ["MNXM1364061"]
+
+    def test_elements_filter_single(self):
+        """elements filter uses ALL(... IN coalesce(m.elements, []))."""
+        cypher, params = self._build(elements=["N"])
+        assert (
+            "ALL(e IN $elements WHERE e IN coalesce(m.elements, []))"
+            in cypher
+        )
+        assert params["elements"] == ["N"]
+
+    def test_elements_filter_multi(self):
+        """Two-element AND-of-presence — single ALL(...) clause covers both."""
+        cypher, params = self._build(elements=["N", "P"])
+        assert (
+            "ALL(e IN $elements WHERE e IN coalesce(m.elements, []))"
+            in cypher
+        )
+        assert params["elements"] == ["N", "P"]
+
+    def test_mass_min_filter(self):
+        cypher, params = self._build(mass_min=60.0)
+        assert "m.mass >= $mass_min" in cypher
+        assert params["mass_min"] == 60.0
+
+    def test_mass_max_filter(self):
+        cypher, params = self._build(mass_max=1000.0)
+        assert "m.mass <= $mass_max" in cypher
+        assert params["mass_max"] == 1000.0
+
+    def test_mass_range_combined(self):
+        cypher, params = self._build(mass_min=60.0, mass_max=1000.0)
+        assert "m.mass >= $mass_min" in cypher
+        assert "m.mass <= $mass_max" in cypher
+        assert params["mass_min"] == 60.0
+        assert params["mass_max"] == 1000.0
+
+    def test_organism_names_filter(self):
+        """organism_names_lc filter uses ANY(... toLower(o) IN $organism_names_lc)."""
+        cypher, params = self._build(
+            organism_names_lc=["prochlorococcus med4"])
+        assert (
+            "ANY(o IN coalesce(m.organism_names, []) "
+            "WHERE toLower(o) IN $organism_names_lc)"
+            in cypher
+        )
+        assert params["organism_names_lc"] == ["prochlorococcus med4"]
+
+    def test_pathway_ids_filter(self):
+        """pathway_ids filter uses ANY against m.pathway_ids."""
+        cypher, params = self._build(
+            pathway_ids=["kegg.pathway:ko00910"])
+        assert (
+            "ANY(p IN coalesce(m.pathway_ids, []) WHERE p IN $pathway_ids)"
+            in cypher
+        )
+        assert params["pathway_ids"] == ["kegg.pathway:ko00910"]
+
+    def test_evidence_sources_filter(self):
+        """evidence_sources filter uses ANY against m.evidence_sources."""
+        cypher, params = self._build(evidence_sources=["transport"])
+        assert (
+            "ANY(s IN $evidence_sources "
+            "WHERE s IN coalesce(m.evidence_sources, []))"
+            in cypher
+        )
+        assert params["evidence_sources"] == ["transport"]
+
+    def test_combined_filters(self):
+        """Multiple filters AND-joined in one WHERE block."""
+        cypher, params = self._build(
+            elements=["N"],
+            organism_names_lc=["prochlorococcus med4"],
+            mass_min=60.0,
+        )
+        assert "WHERE" in cypher
+        assert " AND " in cypher
+        assert params["elements"] == ["N"]
+        assert params["organism_names_lc"] == ["prochlorococcus med4"]
+        assert params["mass_min"] == 60.0
+
+    def test_search_uses_fulltext_entrypoint(self):
+        """Search variant uses the metaboliteFullText index."""
+        cypher, params = self._build(search="glucose")
+        assert "metaboliteFullText" in cypher
+        assert "YIELD node AS m, score" in cypher
+        assert params["search"] == "glucose"
+
+    def test_returns_compact_columns(self):
+        """Compact RETURN list matches spec exactly."""
+        cypher, _ = self._build()
+        for col in [
+            "m.id AS metabolite_id",
+            "m.name AS name",
+            "m.formula AS formula",
+            "coalesce(m.elements, []) AS elements",
+            "m.mass AS mass",
+            "coalesce(m.gene_count, 0) AS gene_count",
+            "coalesce(m.organism_count, 0) AS organism_count",
+            "coalesce(m.transporter_count, 0) AS transporter_count",
+            "coalesce(m.evidence_sources, []) AS evidence_sources",
+            "m.chebi_id AS chebi_id",
+            "coalesce(m.pathway_ids, []) AS pathway_ids",
+            "coalesce(m.pathway_count, 0) AS pathway_count",
+        ]:
+            assert col in cypher, f"missing compact column: {col}"
+        # verbose-only columns should NOT appear in compact mode
+        assert "inchikey" not in cypher
+        assert "smiles" not in cypher
+        assert "pathway_names" not in cypher
+
+    def test_returns_verbose_columns(self):
+        """Verbose adds inchikey, smiles, mnxm_id, hmdb_id, pathway_names —
+        all direct property reads on m."""
+        cypher, _ = self._build(verbose=True)
+        for col in [
+            "m.inchikey AS inchikey",
+            "m.smiles AS smiles",
+            "m.mnxm_id AS mnxm_id",
+            "m.hmdb_id AS hmdb_id",
+            "coalesce(m.pathway_names, []) AS pathway_names",
+        ]:
+            assert col in cypher, f"missing verbose column: {col}"
+
+    def test_verbose_has_no_call_subqueries(self):
+        """Guard: verbose mode must NOT introduce per-row CALL subqueries.
+        Verbose stays 100% property reads (no edge traversal)."""
+        cypher, _ = self._build(verbose=True)
+        # No CALL { } subqueries in detail builder
+        assert "CALL {" not in cypher
+        assert "CALL{" not in cypher
+
+    def test_order_by(self):
+        """No-search ORDER BY: organism_count DESC, gene_count DESC, m.id."""
+        cypher, _ = self._build()
+        assert (
+            "ORDER BY m.organism_count DESC, m.gene_count DESC, m.id"
+            in cypher
+        )
+
+    def test_order_by_with_search(self):
+        """Search variant ORDER BY: score DESC, organism_count DESC, m.id."""
+        cypher, _ = self._build(search="glucose")
+        assert "ORDER BY score DESC, m.organism_count DESC, m.id" in cypher
+
+    def test_limit_and_offset_clauses(self):
+        cypher, params = self._build(limit=10, offset=5)
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["limit"] == 10
+        assert params["offset"] == 5
+
+    def test_per_row_pathway_count_is_property_read(self):
+        """pathway_count comes from coalesce(m.pathway_count, 0) — not size()."""
+        cypher, _ = self._build()
+        assert "coalesce(m.pathway_count, 0) AS pathway_count" in cypher
+
+    def test_no_edge_traversal_in_filters(self):
+        """Guard against regressing to pre-KG-A5..A8 form: no per-row
+        EXISTS{ MATCH ... } against Metabolite_in_pathway or
+        Organism_has_metabolite. All filters operate on flattened
+        denormalized array properties on the Metabolite node."""
+        cypher, _ = self._build(
+            organism_names_lc=["prochlorococcus med4"],
+            pathway_ids=["kegg.pathway:ko00910"],
+        )
+        assert "Metabolite_in_pathway" not in cypher
+        assert "Organism_has_metabolite" not in cypher
+        # No EXISTS subquery patterns either
+        assert "EXISTS {" not in cypher
+        assert "EXISTS{" not in cypher
+
+
+class TestBuildListMetabolitesSummary:
+    """Envelope-builder tests for list_metabolites."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_summary,
+        )
+        return build_list_metabolites_summary(**kwargs)
+
+    def test_no_filters(self):
+        cypher, params = self._build()
+        assert "MATCH (m:Metabolite)" in cypher
+        assert "total_entries" in cypher
+        assert "total_matching" in cypher
+        assert params == {}
+
+    def test_with_filters(self):
+        """Filters propagate into params + WHERE clause."""
+        cypher, params = self._build(elements=["N"])
+        assert (
+            "ALL(e IN $elements WHERE e IN coalesce(m.elements, []))"
+            in cypher
+        )
+        assert params["elements"] == ["N"]
+
+    def test_shares_where_clause(self):
+        """Same _list_metabolites_where() helper as detail builder —
+        organism_names_lc filter renders identically."""
+        cypher, params = self._build(
+            organism_names_lc=["prochlorococcus med4"])
+        assert (
+            "ANY(o IN coalesce(m.organism_names, []) "
+            "WHERE toLower(o) IN $organism_names_lc)"
+            in cypher
+        )
+        assert params["organism_names_lc"] == ["prochlorococcus med4"]
+
+    def test_returns_envelope_columns(self):
+        """Summary RETURN includes envelope keys: total_entries,
+        total_matching, top_organisms, top_pathways, by_evidence_source,
+        with_chebi/with_hmdb/with_mnxm, mass_min/median/max."""
+        cypher, _ = self._build()
+        for key in [
+            "total_entries",
+            "total_matching",
+            "top_organisms",
+            "top_pathways",
+            "by_evidence_source",
+            "with_chebi",
+            "with_hmdb",
+            "with_mnxm",
+            "mass_min",
+            "mass_median",
+            "mass_max",
+        ]:
+            assert key in cypher, f"missing envelope column: {key}"
+
+    def test_does_not_collect_metabolite_nodes(self):
+        """Memory-friendly guard: never `collect(m) AS matched`. Should
+        flatten `m.organism_names` / `m.pathway_ids` instead."""
+        cypher, _ = self._build()
+        assert "collect(m) AS matched" not in cypher
+        assert "collect(m)AS matched" not in cypher
+
+    def test_top_organisms_uses_apoc_frequencies(self):
+        """top_organisms uses apoc.coll.frequencies + UNWIND + ORDER BY DESC + LIMIT 10."""
+        cypher, _ = self._build()
+        assert "apoc.coll.frequencies(all_orgs)" in cypher
+        # The top-10 in-Cypher trim
+        assert "UNWIND" in cypher
+        assert "ORDER BY count DESC" in cypher
+        assert "LIMIT 10" in cypher
+
+    def test_top_pathways_uses_keggterm_lookup(self):
+        """top_pathways block does an OPTIONAL MATCH (p:KeggTerm) inside
+        a CALL to look up pathway_name."""
+        cypher, _ = self._build()
+        assert "OPTIONAL MATCH (p:KeggTerm" in cypher
+        assert "pathway_name" in cypher
+        assert "CALL {" in cypher or "CALL{" in cypher
+
+    def test_search_adds_score_columns(self):
+        """Search variant adds score_max + score_median to the envelope
+        via apoc.coll.max + apoc.coll.sort + median index."""
+        cypher, params = self._build(search="glucose")
+        assert "metaboliteFullText" in cypher
+        assert "score_max" in cypher
+        assert "score_median" in cypher
+        assert "apoc.coll.max(scores)" in cypher
+        assert "apoc.coll.sort(scores)" in cypher
+        assert params["search"] == "glucose"

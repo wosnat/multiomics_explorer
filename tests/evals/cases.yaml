@@ -1546,3 +1546,49 @@
     columns: [locus_tag, derived_metric_count, derived_metric_value_kinds]
     row0:
       locus_tag: MIT1002_01809
+
+# ── List metabolites — chemistry slice-1 Tool #1 ──
+- id: list_metabolites_all
+  tool: list_metabolites
+  desc: All metabolites returned when no filters
+  params: {}
+  expect:
+    min_rows: 1
+    columns: [metabolite_id, name, formula, elements, gene_count,
+              organism_count, transporter_count, evidence_sources, pathway_ids]
+
+- id: list_metabolites_n_elements
+  tool: list_metabolites
+  desc: N-bearing metabolites filter
+  params: {elements: [N]}
+  expect:
+    min_rows: 1
+
+- id: list_metabolites_pathway
+  tool: list_metabolites
+  desc: Pathway membership filter (nitrogen metabolism)
+  params: {pathway_ids: [kegg.pathway:ko00910]}
+  expect:
+    min_rows: 1
+
+- id: list_metabolites_med4_n
+  tool: list_metabolites
+  desc: MED4 + N elements (the N-source workflow primitive)
+  params: {organism_names: [Prochlorococcus MED4], elements: [N]}
+  expect:
+    min_rows: 1
+
+- id: list_metabolites_search_glucose
+  tool: list_metabolites
+  desc: Lucene search by name
+  params: {search: glucose}
+  expect:
+    min_rows: 1
+    columns: [metabolite_id, name, score]
+
+- id: list_metabolites_id_batch_with_unknown
+  tool: list_metabolites
+  desc: Batch IDs with unknown — populates not_found.metabolite_ids
+  params: {metabolite_ids: [kegg.compound:C00031, kegg.compound:C99999]}
+  expect:
+    min_rows: 1
