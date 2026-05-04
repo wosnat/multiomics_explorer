@@ -100,7 +100,7 @@ def demo_informative_only():
     common_kwargs = dict(
         organism="MED4",
         experiment_ids=["EXP042"],
-        ontology="go",
+        ontology="kegg",
         level=2,
     )
     default_run: EnrichmentResult = pathway_enrichment(
