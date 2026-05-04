@@ -17,7 +17,7 @@ term2gene path covers cluster-membership enrichment).
 |---|---|---|---|
 | analysis_id | string | — | Clustering analysis ID. Get from list_clustering_analyses. |
 | organism | string | — | Organism (case-insensitive fuzzy match). Single-organism enforced. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite') | — | Ontology for pathway definitions. Run ontology_landscape first. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') | — | Ontology for pathway definitions. Run ontology_landscape first. |
 | tree | string \| None | None | BRITE tree name filter. Only valid when ontology='brite'. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of level or term_ids required. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. |

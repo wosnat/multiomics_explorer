@@ -5,7 +5,7 @@
 ALL_ONTOLOGIES: list[str] = [
     "go_bp", "go_mf", "go_cc", "ec", "kegg",
     "cog_category", "cyanorak_role", "tigr_role", "pfam",
-    "brite",
+    "brite", "tcdb", "cazy",
 ]
 
 # Subset of ALL_ONTOLOGIES that have GO-DAG-based level assignments.

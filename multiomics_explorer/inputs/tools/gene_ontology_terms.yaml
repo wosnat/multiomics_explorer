@@ -30,6 +30,27 @@ examples:
   - title: Rollup to BRITE category level
     call: gene_ontology_terms(locus_tags=["PMM0001", "PMM0845"], organism="MED4", ontology="brite", mode="rollup", level=1, tree="transporters")
 
+  - title: CAZy class membership rollup (which CAZy class does each gene belong to?)
+    call: gene_ontology_terms(locus_tags=["PMM0584", "PMM1322"], organism="MED4", ontology="cazy", mode="rollup", level=0)
+    response: |
+      {
+        "total_matching": 4, "total_genes": 2, "total_terms": 2,
+        "by_ontology": [{"ontology_type": "cazy", "term_count": 2, "gene_count": 2}],
+        "by_term": [
+          {"term_id": "cazy:CBM", "term_name": "Carbohydrate-Binding Module", "ontology_type": "cazy", "count": 2},
+          {"term_id": "cazy:GH",  "term_name": "Glycoside Hydrolases",        "ontology_type": "cazy", "count": 2}
+        ],
+        "results": [
+          {"locus_tag": "PMM0584", "term_id": "cazy:CBM", "term_name": "Carbohydrate-Binding Module"},
+          {"locus_tag": "PMM0584", "term_id": "cazy:GH",  "term_name": "Glycoside Hydrolases"},
+          {"locus_tag": "PMM1322", "term_id": "cazy:CBM", "term_name": "Carbohydrate-Binding Module"},
+          {"locus_tag": "PMM1322", "term_id": "cazy:GH",  "term_name": "Glycoside Hydrolases"}
+        ]
+      }
+
+  - title: TCDB family annotations for a gene
+    call: gene_ontology_terms(locus_tags=["PMM1129"], organism="MED4", ontology="tcdb")
+
   - title: From overview to ontology details
     steps: |
       Step 1: gene_overview(locus_tags=["PMM0001"])
@@ -58,3 +79,6 @@ mistakes:
   - "to check if a gene is connected to a broad term (e.g. 'DNA repair'), use genes_by_ontology(term_ids=[...], ontology=..., organism=...) which expands down the hierarchy — gene_ontology_terms only returns the leaf annotations"
   - "For brite: leaf annotations are KO-level terms (same leaf as kegg). Use ontology='brite' to filter; the returned term_ids are KO IDs shared with the kegg ontology."
   - "Use `tree` to scope BRITE rollup to a single tree (e.g. 'transporters'). Without it, rollup mixes all BRITE trees."
+  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`."
+  - "CAZy rollup at `level=0` returns the 6 top-level classes (GH, GT, PL, CE, AA, CBM). Genes commonly belong to multiple top-level classes (e.g. a CBM-domain-containing GH); duplicates per `(gene × class)` are de-duped automatically."
+  - "TCDB substrate-level questions ('which genes does this metabolite bind to?') chain via `genes_by_metabolite`, NOT this tool. Use `gene_ontology_terms(ontology='tcdb')` for *family*-level annotations (e.g. 'what TCDB family does PMM1129 belong to?')."

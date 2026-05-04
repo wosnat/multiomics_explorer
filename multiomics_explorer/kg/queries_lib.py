@@ -83,6 +83,18 @@ ONTOLOGY_CONFIG = {
             "edge": "Kegg_term_in_brite_category",
         },
     },
+    "tcdb": {
+        "label": "TcdbFamily",
+        "gene_rel": "Gene_has_tcdb_family",
+        "hierarchy_rels": ["Tcdb_family_is_a_tcdb_family"],
+        "fulltext_index": "tcdbFamilyFullText",
+    },
+    "cazy": {
+        "label": "CazyFamily",
+        "gene_rel": "Gene_has_cazy_family",
+        "hierarchy_rels": ["Cazy_family_is_a_cazy_family"],
+        "fulltext_index": "cazyFamilyFullText",
+    },
 }
 
 def _hierarchy_walk(

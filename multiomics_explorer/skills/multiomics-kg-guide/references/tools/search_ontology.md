@@ -12,7 +12,7 @@ wildcards (*), exact phrases ("..."), boolean (AND, OR).
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string | — | Search query (Lucene syntax). E.g. 'replication', 'oxido*', 'transport AND membrane'. |
-| ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite'. |
+| ontology | string | — | Ontology to search: 'go_bp', 'go_mf', 'go_cc', 'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy'. |
 | summary | bool | False | When true, return only summary fields (results=[]). |
 | limit | int | 5 | Max results. |
 | offset | int | 0 | Number of results to skip for pagination. |
@@ -105,7 +105,35 @@ search_ontology(search_text="transport", ontology="brite", tree="transporters")
 search_ontology(search_text="oxido*", ontology="kegg", level=2)
 ```
 
-### Example 5: From search to gene discovery
+### Example 5: Find TCDB families that move sucrose
+
+```example-call
+search_ontology(search_text="sucrose", ontology="tcdb")
+```
+
+```example-response
+{
+  "total_entries": 4844,
+  "total_matching": 6,
+  "score_max": 3.42,
+  "score_median": 2.10,
+  "returned": 5,
+  "truncated": true,
+  "offset": 0,
+  "results": [
+    {"id": "tcdb:2.A.1.5.3", "name": "Sucrose:H+ symporter", "score": 3.42, "level": 4},
+    ...
+  ]
+}
+```
+
+### Example 6: Browse CAZy glycoside hydrolase families
+
+```example-call
+search_ontology(search_text="GH13", ontology="cazy")
+```
+
+### Example 7: From search to gene discovery
 
 ```
 Step 1: search_ontology(search_text="replication", ontology="go_bp")
@@ -138,6 +166,10 @@ list_filter_values('brite_tree') → search_ontology(ontology='brite', tree=...)
 - Use `level` to restrict results to a specific hierarchy depth (0 = broadest). Use `tree` to scope BRITE searches to a single tree (e.g. 'transporters'). Both filters are optional.
 
 - For BRITE, pass `tree=...` (e.g. `tree='transporters'`); without it, results are dominated by the largest BRITE tree (~1,776 enzyme entries at level 3) and rarely what's wanted. Discover trees via `list_filter_values('brite_tree')`.
+
+- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`.
+
+- TCDB is family-level transporter classification (e.g. `tcdb:1.A.1` voltage-gated ion channels). For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly. Use `search_ontology(ontology='tcdb')` for *family*-level browsing.
 
 ```mistake
 search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene
