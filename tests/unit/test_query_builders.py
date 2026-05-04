@@ -181,6 +181,127 @@ class TestOntologyConfigBrite:
         assert "brite" in ALL_ONTOLOGIES
 
 
+class TestOntologyConfigTcdb:
+    """TCDB ontology added to ONTOLOGY_CONFIG (Phase 2)."""
+
+    def test_tcdb_in_ontology_config(self):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        assert "tcdb" in ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG["tcdb"]
+        assert cfg["label"] == "TcdbFamily"
+        assert cfg["gene_rel"] == "Gene_has_tcdb_family"
+        assert cfg["hierarchy_rels"] == ["Tcdb_family_is_a_tcdb_family"]
+        assert cfg["fulltext_index"] == "tcdbFamilyFullText"
+        # No bridge (single-label tree ontology, like GO/EC/KEGG/CyanoRak)
+        assert "bridge" not in cfg
+        # No parent fields (only pfam has those)
+        assert "parent_label" not in cfg
+        assert "parent_fulltext_index" not in cfg
+
+    def test_tcdb_in_all_ontologies(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert "tcdb" in ALL_ONTOLOGIES
+
+    def test_tcdb_appended_after_brite(self):
+        """Order is load-bearing for regression-fixture determinism: tcdb
+        must come after the existing 10 ontologies (after 'brite')."""
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert ALL_ONTOLOGIES.index("tcdb") > ALL_ONTOLOGIES.index("brite")
+
+
+class TestOntologyConfigCazy:
+    """CAZy ontology added to ONTOLOGY_CONFIG (Phase 2)."""
+
+    def test_cazy_in_ontology_config(self):
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        assert "cazy" in ONTOLOGY_CONFIG
+        cfg = ONTOLOGY_CONFIG["cazy"]
+        assert cfg["label"] == "CazyFamily"
+        assert cfg["gene_rel"] == "Gene_has_cazy_family"
+        assert cfg["hierarchy_rels"] == ["Cazy_family_is_a_cazy_family"]
+        assert cfg["fulltext_index"] == "cazyFamilyFullText"
+        # No bridge (single-label tree ontology)
+        assert "bridge" not in cfg
+        # No parent fields
+        assert "parent_label" not in cfg
+        assert "parent_fulltext_index" not in cfg
+
+    def test_cazy_in_all_ontologies(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert "cazy" in ALL_ONTOLOGIES
+
+    def test_cazy_appended_after_tcdb(self):
+        """Order is load-bearing: cazy follows tcdb at the end of the list."""
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert ALL_ONTOLOGIES.index("cazy") > ALL_ONTOLOGIES.index("tcdb")
+
+
+class TestHierarchyWalkTcdb:
+    """_hierarchy_walk for tcdb routes through the single-label tree branch
+    (the same branch GO/EC/KEGG/CyanoRak follow)."""
+
+    def test_tcdb_up(self):
+        frag = _hierarchy_walk("tcdb", direction="up")
+        assert frag["leaf_label"] == "TcdbFamily"
+        assert frag["gene_rel"] == "Gene_has_tcdb_family"
+        assert frag["rel_union"] == "Tcdb_family_is_a_tcdb_family"
+        # Bind: gene → leaf
+        assert (
+            "(g:Gene {organism_name: $org})-[:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
+            in frag["bind_up"]
+        )
+        # Walk up: leaf → ancestor at any level via *0..
+        assert "Tcdb_family_is_a_tcdb_family*0.." in frag["walk_up"]
+        assert "(t:TcdbFamily)" in frag["walk_up"]
+
+    def test_tcdb_down(self):
+        frag = _hierarchy_walk("tcdb", direction="down")
+        assert frag["leaf_label"] == "TcdbFamily"
+        assert frag["gene_rel"] == "Gene_has_tcdb_family"
+        # Walk down: root → leaf
+        assert (
+            "(t:TcdbFamily)<-[:Tcdb_family_is_a_tcdb_family*0..]-(leaf:TcdbFamily)"
+            in frag["walk_down"]
+        )
+
+    def test_tcdb_bind_up_starts_with_standard_prefix(self):
+        """bind_up must start with standard Gene prefix (no bridge ontology)."""
+        frag = _hierarchy_walk("tcdb", direction="up")
+        assert frag["bind_up"].startswith(
+            "MATCH (g:Gene {organism_name: $org})"
+        )
+
+
+class TestHierarchyWalkCazy:
+    """_hierarchy_walk for cazy: same single-label tree branch."""
+
+    def test_cazy_up(self):
+        frag = _hierarchy_walk("cazy", direction="up")
+        assert frag["leaf_label"] == "CazyFamily"
+        assert frag["gene_rel"] == "Gene_has_cazy_family"
+        assert frag["rel_union"] == "Cazy_family_is_a_cazy_family"
+        assert (
+            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            in frag["bind_up"]
+        )
+        assert "Cazy_family_is_a_cazy_family*0.." in frag["walk_up"]
+        assert "(t:CazyFamily)" in frag["walk_up"]
+
+    def test_cazy_down(self):
+        frag = _hierarchy_walk("cazy", direction="down")
+        assert frag["leaf_label"] == "CazyFamily"
+        assert (
+            "(t:CazyFamily)<-[:Cazy_family_is_a_cazy_family*0..]-(leaf:CazyFamily)"
+            in frag["walk_down"]
+        )
+
+    def test_cazy_bind_up_starts_with_standard_prefix(self):
+        frag = _hierarchy_walk("cazy", direction="up")
+        assert frag["bind_up"].startswith(
+            "MATCH (g:Gene {organism_name: $org})"
+        )
+
+
 class TestBuildResolveGene:
     def test_basic(self):
         cypher, params = build_resolve_gene(identifier="PMM0001")
@@ -1059,7 +1180,7 @@ class TestOntologyConfig:
         assert set(ONTOLOGY_CONFIG.keys()) == {
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam",
-            "brite",
+            "brite", "tcdb", "cazy",
         }
 
     def test_required_fields_present(self):
@@ -1112,6 +1233,8 @@ class TestBuildSearchOntology:
         ("cyanorak_role", "cyanorakRoleFullText"),
         ("tigr_role", "tigrRoleFullText"),
         ("pfam", "pfamFullText"),
+        ("tcdb", "tcdbFamilyFullText"),
+        ("cazy", "cazyFamilyFullText"),
     ])
     def test_correct_fulltext_index(self, ontology, expected_index):
         cypher, _ = build_search_ontology(ontology=ontology, search_text="test")
@@ -1141,7 +1264,8 @@ class TestBuildSearchOntology:
 
     def test_non_pfam_no_union(self):
         for ontology in ["go_bp", "go_mf", "go_cc", "ec", "kegg",
-                         "cog_category", "cyanorak_role", "tigr_role"]:
+                         "cog_category", "cyanorak_role", "tigr_role",
+                         "tcdb", "cazy"]:
             cypher, _ = build_search_ontology(ontology=ontology, search_text="test")
             assert "UNION ALL" not in cypher
 
@@ -1971,6 +2095,294 @@ class TestBuildGeneOntologyTermsSummaryLevelTree:
                 locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
                 mode="rollup",
             )
+
+
+class TestBuildSearchOntologyTcdbCazy:
+    """search_ontology emits the right fulltext-index name + label for tcdb/cazy."""
+
+    def test_search_tcdb_uses_fulltext_index(self):
+        cypher, _ = build_search_ontology(ontology="tcdb", search_text="sucrose")
+        assert "'tcdbFamilyFullText'" in cypher
+
+    def test_search_cazy_uses_fulltext_index(self):
+        cypher, _ = build_search_ontology(ontology="cazy", search_text="GH13")
+        assert "'cazyFamilyFullText'" in cypher
+
+    def test_tcdb_summary_uses_fulltext_index_and_label(self):
+        cypher, _ = build_search_ontology_summary(
+            ontology="tcdb", search_text="sucrose",
+        )
+        assert "'tcdbFamilyFullText'" in cypher
+        assert "TcdbFamily" in cypher
+
+    def test_cazy_summary_uses_fulltext_index_and_label(self):
+        cypher, _ = build_search_ontology_summary(
+            ontology="cazy", search_text="GH13",
+        )
+        assert "'cazyFamilyFullText'" in cypher
+        assert "CazyFamily" in cypher
+
+    def test_tcdb_no_union(self):
+        """tcdb is a single-label ontology — no UNION ALL like pfam."""
+        cypher, _ = build_search_ontology(ontology="tcdb", search_text="x")
+        assert "UNION ALL" not in cypher
+
+    def test_cazy_no_union(self):
+        cypher, _ = build_search_ontology(ontology="cazy", search_text="x")
+        assert "UNION ALL" not in cypher
+
+    def test_tcdb_tree_filter_raises(self):
+        """tree filter is BRITE-only; raises for tcdb."""
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_search_ontology(
+                ontology="tcdb", search_text="x", tree="transporters",
+            )
+
+    def test_cazy_tree_filter_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_search_ontology(
+                ontology="cazy", search_text="x", tree="transporters",
+            )
+
+    def test_tcdb_summary_tree_filter_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_search_ontology_summary(
+                ontology="tcdb", search_text="x", tree="transporters",
+            )
+
+    def test_cazy_summary_tree_filter_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_search_ontology_summary(
+                ontology="cazy", search_text="x", tree="transporters",
+            )
+
+
+class TestBuildGenesByOntologyTcdbCazy:
+    """genes_by_ontology builders emit the right label/edge for tcdb/cazy."""
+
+    def test_validate_tcdb_label(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
+        )
+        _, params = build_genes_by_ontology_validate(
+            term_ids=["tcdb:1.A.1"], ontology="tcdb", level=None,
+        )
+        assert params["expected_labels"] == ["TcdbFamily"]
+
+    def test_validate_cazy_label(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_validate,
+        )
+        _, params = build_genes_by_ontology_validate(
+            term_ids=["cazy:GH13"], ontology="cazy", level=None,
+        )
+        assert params["expected_labels"] == ["CazyFamily"]
+
+    def test_detail_tcdb_mode1_walks_down(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb",
+            organism="Prochlorococcus MED4",
+            term_ids=["tcdb:1.A.1"],
+            level=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Mode 1: walk DOWN from input term
+        assert "(t:TcdbFamily {id: input_tid})" in cypher
+        assert "(leaf:TcdbFamily)" in cypher
+        # Walks via tcdb hierarchy edge
+        assert "Tcdb_family_is_a_tcdb_family" in cypher
+
+    def test_detail_cazy_mode2_walks_up(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="cazy",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        # Mode 2: gene → leaf, walk leaf → ancestor
+        assert (
+            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            in cypher
+        )
+        assert "(leaf)-[:" in cypher
+        assert "]->(t:CazyFamily)" in cypher
+        assert "WHERE t.level = $level" in cypher
+
+    def test_detail_tcdb_tree_filter_raises(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_genes_by_ontology_detail(
+                ontology="tcdb", organism="Test Org",
+                level=1, min_gene_set_size=5, max_gene_set_size=500,
+                tree="transporters",
+            )
+
+    def test_detail_cazy_tree_filter_raises(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_genes_by_ontology_detail(
+                ontology="cazy", organism="Test Org",
+                level=0, min_gene_set_size=5, max_gene_set_size=500,
+                tree="transporters",
+            )
+
+    def test_per_term_tcdb(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="tcdb",
+            organism="Prochlorococcus MED4",
+            level=2,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "TcdbFamily" in cypher
+        assert ":Gene_has_tcdb_family" in cypher
+        assert "Tcdb_family_is_a_tcdb_family" in cypher
+
+    def test_per_term_cazy(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="cazy",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert "CazyFamily" in cypher
+        assert ":Gene_has_cazy_family" in cypher
+        assert "Cazy_family_is_a_cazy_family" in cypher
+
+    def test_per_gene_tcdb(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="tcdb",
+            organism="Prochlorococcus MED4",
+            level=1,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert (
+            "(g:Gene {organism_name: $org})-[:Gene_has_tcdb_family]->(leaf:TcdbFamily)"
+            in cypher
+        )
+
+    def test_per_gene_cazy(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_gene,
+        )
+        cypher, _ = build_genes_by_ontology_per_gene(
+            ontology="cazy",
+            organism="Prochlorococcus MED4",
+            level=0,
+            term_ids=None,
+            min_gene_set_size=5,
+            max_gene_set_size=500,
+        )
+        assert (
+            "(g:Gene {organism_name: $org})-[:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            in cypher
+        )
+
+
+class TestBuildGeneOntologyTermsTcdbCazy:
+    """gene_ontology_terms (reverse lookup) for tcdb/cazy."""
+
+    def test_tcdb_leaf_mode_uses_label_and_edge(self):
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="tcdb", organism_name="Test Org",
+        )
+        assert ":Gene_has_tcdb_family" in cypher
+        assert "TcdbFamily" in cypher
+
+    def test_cazy_leaf_mode_uses_label_and_edge(self):
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="cazy", organism_name="Test Org",
+        )
+        assert ":Gene_has_cazy_family" in cypher
+        assert "CazyFamily" in cypher
+
+    def test_tcdb_leaf_filter_emits_not_exists(self):
+        """tcdb is a single-label hierarchical ontology → leaf filter active."""
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="tcdb", organism_name="Test Org",
+        )
+        assert "NOT EXISTS" in cypher
+        assert "Tcdb_family_is_a_tcdb_family" in cypher
+
+    def test_cazy_leaf_filter_emits_not_exists(self):
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="cazy", organism_name="Test Org",
+        )
+        assert "NOT EXISTS" in cypher
+        assert "Cazy_family_is_a_cazy_family" in cypher
+
+    def test_tcdb_rollup_mode(self):
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="tcdb", organism_name="Test Org",
+            mode="rollup", level=0,
+        )
+        assert "Tcdb_family_is_a_tcdb_family*0.." in cypher
+        assert "t.level = $level" in cypher
+        assert params["level"] == 0
+
+    def test_cazy_rollup_mode(self):
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="cazy", organism_name="Test Org",
+            mode="rollup", level=0,
+        )
+        assert "Cazy_family_is_a_cazy_family*0.." in cypher
+        assert "t.level = $level" in cypher
+        assert params["level"] == 0
+
+    def test_tcdb_tree_filter_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_gene_ontology_terms(
+                locus_tags=["PMM0001"], ontology="tcdb", organism_name="Test Org",
+                tree="transporters",
+            )
+
+    def test_cazy_tree_filter_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_gene_ontology_terms(
+                locus_tags=["PMM0001"], ontology="cazy", organism_name="Test Org",
+                tree="Enzymes",
+            )
+
+    def test_tcdb_summary_uses_label_and_edge(self):
+        cypher, _ = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="tcdb", organism_name="Test Org",
+        )
+        assert ":Gene_has_tcdb_family" in cypher
+        assert "TcdbFamily" in cypher
+
+    def test_cazy_summary_uses_label_and_edge(self):
+        cypher, _ = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="cazy", organism_name="Test Org",
+        )
+        assert ":Gene_has_cazy_family" in cypher
+        assert "CazyFamily" in cypher
 
 
 class TestBuildGeneExistenceCheck:
@@ -4386,7 +4798,7 @@ def test_all_ontologies_matches_config_keys():
     assert ALL_ONTOLOGIES == [
         "go_bp", "go_mf", "go_cc", "ec", "kegg",
         "cog_category", "cyanorak_role", "tigr_role", "pfam",
-        "brite",
+        "brite", "tcdb", "cazy",
     ]
 
 
@@ -4515,6 +4927,36 @@ class TestBuildOntologyLandscape:
             build_ontology_landscape(
                 ontology="go_bp", organism_name="Test Org",
                 tree="transporters",
+            )
+
+    def test_tcdb_uses_label_and_edge(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="tcdb", organism_name="Prochlorococcus MED4",
+        )
+        assert ":Gene_has_tcdb_family" in cypher
+        assert ":TcdbFamily" in cypher
+        assert "Tcdb_family_is_a_tcdb_family" in cypher
+
+    def test_cazy_uses_label_and_edge(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="cazy", organism_name="Prochlorococcus MED4",
+        )
+        assert ":Gene_has_cazy_family" in cypher
+        assert ":CazyFamily" in cypher
+        assert "Cazy_family_is_a_cazy_family" in cypher
+
+    def test_tcdb_tree_filter_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_ontology_landscape(
+                ontology="tcdb", organism_name="Test Org",
+                tree="transporters",
+            )
+
+    def test_cazy_tree_filter_raises(self):
+        with pytest.raises(ValueError, match="tree filter is only valid"):
+            build_ontology_landscape(
+                ontology="cazy", organism_name="Test Org",
+                tree="Enzymes",
             )
 
 

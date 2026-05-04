@@ -2054,7 +2054,8 @@ def register_tools(mcp: FastMCP):
         )],
         ontology: Annotated[str, Field(
             description="Ontology to search: 'go_bp', 'go_mf', 'go_cc', "
-            "'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite'.",
+            "'kegg', 'ec', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', "
+            "'tcdb', 'cazy'.",
         )],
         summary: Annotated[bool, Field(
             description="When true, return only summary fields (results=[]).",
@@ -2180,6 +2181,7 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[Literal[
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+            "tcdb", "cazy",
         ], Field(
             description="Ontology for these term_ids / this level.",
         )],
@@ -2322,7 +2324,8 @@ def register_tools(mcp: FastMCP):
         )],
         ontology: Annotated[
             Literal["go_bp", "go_mf", "go_cc", "kegg", "ec",
-                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite"] | None,
+                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+                    "tcdb", "cazy"] | None,
             Field(description="Filter to one ontology. None returns all."),
         ] = None,
         mode: Annotated[Literal["leaf", "rollup"], Field(
@@ -5422,8 +5425,9 @@ def register_tools(mcp: FastMCP):
         )],
         ontology: Annotated[
             Literal["go_bp", "go_mf", "go_cc", "ec", "kegg",
-                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite"] | None,
-            Field(description="If None, surveys all 10 ontologies."),
+                    "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+                    "tcdb", "cazy"] | None,
+            Field(description="If None, surveys all 12 ontologies."),
         ] = None,
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'.",
@@ -5498,6 +5502,7 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[Literal[
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+            "tcdb", "cazy",
         ], Field(
             description="Ontology for pathway definitions. Run ontology_landscape first to rank by relevance.",
         )],
@@ -5616,6 +5621,7 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[Literal[
             "go_bp", "go_mf", "go_cc", "ec", "kegg",
             "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
+            "tcdb", "cazy",
         ], Field(description="Ontology for pathway definitions. Run ontology_landscape first.")],
         tree: Annotated[str | None, Field(description="BRITE tree name filter. Only valid when ontology='brite'.")] = None,
         level: Annotated[int | None, Field(description="Hierarchy level (0 = root). At least one of level or term_ids required.", ge=0)] = None,

@@ -17,7 +17,7 @@ search_ontology. For per-gene ontology details, use gene_ontology_terms.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite') | — | Ontology for these term_ids / this level. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy') | — | Ontology for these term_ids / this level. |
 | organism | string | — | Organism (case-insensitive substring match, e.g. 'MED4'). Required — single-valued. Use list_organisms for valid values. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. |
 | level | int \| None | None | Hierarchy level to roll UP to. 0 = broadest. At least one of `level` or `term_ids` must be provided. |
@@ -130,7 +130,27 @@ genes_by_ontology(ontology="brite", organism="MED4", level=1, tree="transporters
 genes_by_ontology(ontology="go_bp", organism="MED4", level=1, min_gene_set_size=0, max_gene_set_size=100000)
 ```
 
-### Example 7: From level-survey to pathway defs
+### Example 7: TCDB family → gene drill-down (with descendant expansion)
+
+```example-call
+genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:1.A.1"])
+```
+
+```example-response
+{"ontology": "tcdb", "organism_name": "Prochlorococcus MED4",
+ "total_matching": 1, "total_genes": 1, "total_terms": 1,
+ "by_level": [{"level": 0, "n_terms": 1, "n_genes": 1, "row_count": 1}],
+ "top_terms": [{"term_id": "tcdb:1.A.1", "term_name": "Voltage-gated Ion Channel (VIC) Superfamily", "count": 1}],
+ "results": [{"locus_tag": "PMM1129", "term_id": "tcdb:1.A.1", "term_name": "Voltage-gated Ion Channel (VIC) Superfamily", "level": 0}]}
+```
+
+### Example 8: CAZy class roll-up — genes by glycoside hydrolase / glycosyltransferase class
+
+```example-call
+genes_by_ontology(ontology="cazy", organism="MED4", level=0)
+```
+
+### Example 9: From level-survey to pathway defs
 
 ```
 Step 1: ontology_landscape(organism="MED4")
@@ -173,6 +193,14 @@ genes_by_ontology → gene_overview
 - BRITE: gene edges hit the KO leaf (`level=3`, same as KEGG). Passing `level=0/1/2` rolls up through BRITE tree hierarchy. Each BRITE tree is a separate functional classification — use `tree` to scope to a specific tree (e.g. `tree='transporters'`). Without `tree`, results mix all BRITE trees. Use `list_filter_values('brite_tree')` to discover available trees.
 
 - Flat ontologies (`cog_category`, `tigr_role`) have only `level=0`. Passing `level >= 1` in Mode 2 returns empty results; in Mode 3 the ids route to `wrong_level`.
+
+- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`.
+
+- TCDB is hierarchical (5 levels: `tc_class` → `tc_subclass` → `tc_family` → `tc_subfamily` → `tc_specificity`). `term_ids=['tcdb:1.A.1']` expands DOWN through ~31 descendant subfamilies before binding to genes via `Gene_has_tcdb_family`.
+
+- CAZy is a small ontology (~64 terms, 6 classes / 58 families). `level=0` gives ~6 class-level rows (GH, GT, PL, CE, AA, CBM); `level=1` gives families. With default `min_gene_set_size=5`, many CAZy terms are filtered out — pass `min_gene_set_size=1` to see all.
+
+- Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?').
 
 ```mistake
 genes_by_ontology(ontology='go_bp', organism='MED4')  # no level or term_ids

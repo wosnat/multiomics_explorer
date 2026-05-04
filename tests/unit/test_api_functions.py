@@ -5582,6 +5582,90 @@ class TestOntologyLandscape:
         assert result["truncated"] is False
 
 
+class TestApiAcceptsTcdbCazy:
+    """API entry points must accept ontology='tcdb' / 'cazy' once Phase 2
+    lands. Use mocked conns — no Neo4j needed.
+    """
+
+    def _search_ontology_mock_conn(self):
+        """Build a conn whose summary returns a well-formed 1-row dict and
+        whose detail returns []. Matches the contract of real Cypher: the
+        summary aggregator always returns exactly one row.
+        """
+        conn = MagicMock()
+        summary_row = [{
+            "total_entries": 0, "total_matching": 0,
+            "score_max": None, "score_median": None,
+        }]
+
+        def run(cypher, **params):
+            # Summary cypher uses `count(t) AS total_matching`; detail
+            # uses `RETURN t.id AS id`. Discriminate on that.
+            if "total_matching" in cypher:
+                return summary_row
+            return []
+
+        conn.execute_query.side_effect = run
+        return conn
+
+    def test_search_ontology_accepts_tcdb(self):
+        conn = self._search_ontology_mock_conn()
+        # Should NOT raise — proves api.search_ontology accepts ontology='tcdb'.
+        result = api.search_ontology("sucrose", "tcdb", conn=conn)
+        assert "results" in result
+
+    def test_search_ontology_accepts_cazy(self):
+        conn = self._search_ontology_mock_conn()
+        result = api.search_ontology("GH13", "cazy", conn=conn)
+        assert "results" in result
+
+    def test_ontology_landscape_sweeps_tcdb_cazy(self):
+        """Default branch (no `ontology=` argument) sweeps ALL_ONTOLOGIES
+        — once tcdb/cazy are in the list, the loop must produce rows for
+        them too (12 results, not 10)."""
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        # Ensure spec preconditions hold under test (will be RED until
+        # constants/config are extended)
+        assert "tcdb" in ALL_ONTOLOGIES
+        assert "cazy" in ALL_ONTOLOGIES
+        assert "tcdb" in ONTOLOGY_CONFIG
+        assert "cazy" in ONTOLOGY_CONFIG
+        per_ont_rows = {
+            ont: [
+                {
+                    "level": 0, "n_terms_with_genes": 1,
+                    "n_genes_at_level": 50,
+                    "min_genes_per_term": 50, "q1_genes_per_term": 50.0,
+                    "median_genes_per_term": 50.0, "q3_genes_per_term": 50.0,
+                    "max_genes_per_term": 50, "n_best_effort": 0,
+                },
+            ]
+            for ont in ALL_ONTOLOGIES
+        }
+        conn = MagicMock()
+
+        def run(cypher, **params):
+            if "RETURN collect(DISTINCT e.organism_name)" in cypher:
+                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if "count(g) AS total_genes" in cypher:
+                return [{"total_genes": 1976}]
+            for ont, rows in per_ont_rows.items():
+                cfg = ONTOLOGY_CONFIG[ont]
+                if cfg["gene_rel"] in cypher and f":{cfg['label']}" in cypher:
+                    return rows
+            raise AssertionError(f"no mock for cypher:\n{cypher[:200]}")
+
+        conn.execute_query.side_effect = run
+        result = api.ontology_landscape(organism="MED4", conn=conn)
+        ontology_types = {row["ontology_type"] for row in result["results"]}
+        assert "tcdb" in ontology_types
+        assert "cazy" in ontology_types
+        # And the count surfaces both new dimensions
+        assert result["n_ontologies"] == len(ALL_ONTOLOGIES)
+        assert result["n_ontologies"] >= 12
+
+
 class TestPathwayEnrichment:
     """Input validation + orchestration for api.pathway_enrichment."""
 

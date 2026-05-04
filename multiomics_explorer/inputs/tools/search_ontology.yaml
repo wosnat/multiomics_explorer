@@ -44,6 +44,26 @@ examples:
   - title: Filter search results by hierarchy level
     call: search_ontology(search_text="oxido*", ontology="kegg", level=2)
 
+  - title: Find TCDB families that move sucrose
+    call: search_ontology(search_text="sucrose", ontology="tcdb")
+    response: |
+      {
+        "total_entries": 4844,
+        "total_matching": 6,
+        "score_max": 3.42,
+        "score_median": 2.10,
+        "returned": 5,
+        "truncated": true,
+        "offset": 0,
+        "results": [
+          {"id": "tcdb:2.A.1.5.3", "name": "Sucrose:H+ symporter", "score": 3.42, "level": 4},
+          ...
+        ]
+      }
+
+  - title: Browse CAZy glycoside hydrolase families
+    call: search_ontology(search_text="GH13", ontology="cazy")
+
   - title: From search to gene discovery
     steps: |
       Step 1: search_ontology(search_text="replication", ontology="go_bp")
@@ -67,5 +87,7 @@ mistakes:
   - "For brite: term IDs look like 'brite:ko00001' (tree root) or 'brite:K00001' (leaf KO). BRITE trees mix functional and taxonomic hierarchies — confirm the tree context before using term IDs in genes_by_ontology."
   - "Use `level` to restrict results to a specific hierarchy depth (0 = broadest). Use `tree` to scope BRITE searches to a single tree (e.g. 'transporters'). Both filters are optional."
   - "For BRITE, pass `tree=...` (e.g. `tree='transporters'`); without it, results are dominated by the largest BRITE tree (~1,776 enzyme entries at level 3) and rarely what's wanted. Discover trees via `list_filter_values('brite_tree')`."
+  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`."
+  - "TCDB is family-level transporter classification (e.g. `tcdb:1.A.1` voltage-gated ion channels). For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly. Use `search_ontology(ontology='tcdb')` for *family*-level browsing."
   - wrong: "search_ontology(search_text='PMM0845', ontology='go_bp')  # searching for a gene"
     right: "resolve_gene(identifier='PMM0845')  # use resolve_gene for gene lookups"
